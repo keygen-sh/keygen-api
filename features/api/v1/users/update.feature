@@ -1226,6 +1226,30 @@ Feature: Update user
       }
       """
 
+  Scenario: Admin updates their permissions (wildcard)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["*"],
+        "role": "admin"
+      }
+      """
+
   Scenario: Product updates a users metadata
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
