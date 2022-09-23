@@ -58,6 +58,7 @@ module Permissible
 
       actual.size == expected.size
     end
+    alias_method :has_permissions?, :can?
 
     def cannot?(...) = !can?(...)
   end
