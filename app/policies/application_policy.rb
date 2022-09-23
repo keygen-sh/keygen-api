@@ -71,7 +71,7 @@ class ApplicationPolicy
 
   def verify_account_scoped!
     deny! "#{whatami} account does not match account context" if
-        bearer.present? && bearer.account_id != account.id
+      bearer.present? && bearer.account_id != account.id
 
     authorization_context.except(:account, :bearer, :token)
                          .each do |context, model|
@@ -96,23 +96,29 @@ class ApplicationPolicy
   end
 
   def verify_permissions!(*actions)
-    return if
-      skip_verify_permissions?
+    catch :policy_fulfilled do
+      return if
+        skip_verify_permissions?
 
-    return if
-      bearer.nil?
+      return if
+        bearer.nil?
 
-    deny! "#{whatami} lacks permission to perform action" unless
-      bearer.can?(actions)
+      deny! "#{whatami} lacks permission to perform action" unless
+        bearer.can?(actions)
 
-    return if
-      token.nil?
+      return if
+        token.nil?
 
-    deny! 'token is expired' if
-      token.expired?
+      deny! 'token is expired' if
+        token.expired?
 
-    deny! 'token lacks permission to perform action' unless
-      token.can?(actions)
+      deny! 'token lacks permission to perform action' unless
+        token.can?(actions)
+
+      return
+    end
+
+    throw :policy_fulfilled if ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
   end
 
   def verify_license_for_release!(license:, release:)
@@ -141,7 +147,7 @@ class ApplicationPolicy
       # We're catching :policy_fulfilled so that we can verify all licenses,
       # but still bubble up the deny! reason in case of a failure. In case
       # of a valid license, this will return early.
-      catch(:policy_fulfilled) do
+      catch :policy_fulfilled do
         verify_license_for_release!(license:, release:)
 
         return
