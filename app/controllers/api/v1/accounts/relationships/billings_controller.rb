@@ -41,7 +41,7 @@ module Api::V1::Accounts::Relationships
     attr_reader :billing
 
     def set_billing
-      @billing = current_account.billing
+      @billing = current_account.billing!
     end
 
     typed_parameters format: :jsonapi do

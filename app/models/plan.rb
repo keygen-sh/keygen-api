@@ -7,10 +7,12 @@ class Plan < ApplicationRecord
 
   has_many :accounts
 
-  scope :visible, -> { where private: false }
-  scope :hidden, -> { where private: true }
-  scope :paid, -> { where 'price > 0' }
-  scope :free, -> { where 'price IS NULL OR price = 0' }
+  scope :visible, -> { where(private: false) }
+  scope :hidden,  -> { where(private: true) }
+
+  scope :paid, -> { where('price > 0') }
+  scope :free, -> { where('price IS NULL OR price = 0') }
+  scope :ent,  -> { where('name LIKE ?', 'Ent%') }
 
   def private?
     private

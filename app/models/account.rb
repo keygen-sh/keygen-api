@@ -92,9 +92,18 @@ class Account < ApplicationRecord
   }
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
+  scope :ent,  -> { joins(:plan, :billing).where(plan: Plan.ent, billings: { state: 'subscribed' }) }
   scope :with_plan, -> (id) { where plan: id }
 
-  after_commit :clear_cache!, on: [:update, :destroy]
+  after_commit :clear_cache!,
+    on: %i[update destroy]
+
+  def billing!
+    raise Keygen::Error::NotFoundError.new(model: Billing.name) unless
+      billing.present?
+
+    billing
+  end
 
   def email
     admins.first.email
