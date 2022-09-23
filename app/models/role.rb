@@ -161,21 +161,22 @@ class Role < ApplicationRecord
   # autosave_associated_records_for_role_permissions bulk inserts role permissions instead
   # of saving them sequentially, which is incredibly slow with 100+ permissions.
   def autosave_associated_records_for_role_permissions
-    return unless
-      role_permissions_attributes.present?
+    return if
+      role_permissions_attributes.nil?
 
     transaction do
       role_permissions.delete_all
 
-
-      # FIXME(ezekg) Can't use role_permissions.upsert_all at this point, because for
-      #              some reason role_id ends up being nil. Instead, we'll use the
-      #              class method and then call reload.
-      RolePermission.upsert_all(
-        role_permissions_attributes.map { _1.merge(role_id: id) },
-        record_timestamps: true,
-        on_duplicate: :skip,
-      )
+      if role_permissions_attributes.any?
+        # FIXME(ezekg) Can't use role_permissions.upsert_all at this point, because for
+        #              some reason role_id ends up being nil. Instead, we'll use the
+        #              class method and then call reload.
+        RolePermission.upsert_all(
+          role_permissions_attributes.map { _1.merge(role_id: id) },
+          record_timestamps: true,
+          on_duplicate: :skip,
+        )
+      end
 
       reload
     end
