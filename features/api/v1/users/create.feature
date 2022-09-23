@@ -731,17 +731,16 @@ Feature: Create user
       """
     Then the response status should be "403"
 
-  Scenario: Admin creates an admin for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
+  Scenario: Admin creates an admin for their account (default permissions)
+    Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And all "webhook-endpoints" have the following attributes:
       """
-      {
-        "subscriptions": ["user.created"]
-      }
+      { "subscriptions": ["user.created"] }
       """
+    And the current account has 2 "admins"
+    And I am an admin of account "test1"
+    And I use an authentication token
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -760,6 +759,76 @@ Feature: Create user
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an admin for their account (has permissions)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["admin.create", "user.create"]
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "ironman@keygen.sh",
+            "password": "secret123",
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the role "admin"
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an admin for their account (no permissions)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["user.create"]
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "ironman@keygen.sh",
+            "password": "secret123",
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (admin lacks permission to perform action)"
+      }
+      """
 
   Scenario: Admin creates a developer for their account
     Given I am an admin of account "test1"

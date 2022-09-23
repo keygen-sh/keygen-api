@@ -13,6 +13,12 @@ permissions = %w[
   account.subscription.update
   account.update
 
+  admin.create
+  admin.delete
+  admin.invite
+  admin.read
+  admin.update
+
   arch.read
 
   artifact.create

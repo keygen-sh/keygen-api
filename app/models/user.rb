@@ -412,13 +412,13 @@ class User < ApplicationRecord
     case
     # When other admins: do not allow their permissions to be changed if no other admin has a full permission set.
     # When sole admin: do not allow their permissions to be changed.
-    when admin_count > MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed? && other_admins.none? { _1.can?(*Permission::ADMIN_PERMISSIONS) } ||
+    when admin_count > MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed? && other_admins.none? { _1.can?(*Permission::ADMIN_PERMISSIONS) },
          admin_count == MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed?
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
 
       throw :abort
     # When no admins, do not allow the last admin to be destroyed or their role to be changed.
-    when admin_count < MINIMUM_ADMIN_COUNT && marked_for_destruction? ||
+    when admin_count < MINIMUM_ADMIN_COUNT && marked_for_destruction?,
          admin_count < MINIMUM_ADMIN_COUNT && role_changed?
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
