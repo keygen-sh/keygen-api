@@ -1300,6 +1300,70 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product creates a user with no permissions (standard tier)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "tony@stark.industries",
+            "password": "pepperpots",
+            "permissions": []
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product creates a user with no permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "tony@stark.industries",
+            "password": "pepperpots",
+            "permissions": []
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "user"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": []
+      }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
