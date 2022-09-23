@@ -90,6 +90,9 @@ module Roleable
         autosave: true,
         as: :resource
 
+      has_many :role_permissions,
+        through: :role
+
       accepts_nested_attributes_for :role, update_only: true
       tracks_dirty_attributes_for :role
 

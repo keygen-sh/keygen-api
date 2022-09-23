@@ -4,6 +4,22 @@ module Permissible
   extend ActiveSupport::Concern
 
   included do
+    scope :with_permissions, -> *identifiers {
+      identifiers = identifiers.flatten
+                               .compact
+
+      joins(role_permissions: %i[permission])
+        .where(permissions: { action: identifiers })
+        .or(
+          joins(role_permissions: %i[permission]).where(permissions: { id: identifiers })
+        )
+        .group(:id)
+        .having(
+          'COUNT(DISTINCT permissions.id) = ?',
+          identifiers.size,
+        )
+    }
+
     def permissions=(*identifiers)
       return if
         identifiers == [nil]
