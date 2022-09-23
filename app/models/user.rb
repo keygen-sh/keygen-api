@@ -412,8 +412,8 @@ class User < ApplicationRecord
     case
     # When other admins: do not allow their permissions to be changed if no other admin has a full permission set.
     # When sole admin: do not allow their permissions to be changed.
-    when admin_count > MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed? && other_admins.none? { _1.can?(*Permission::ADMIN_PERMISSIONS) },
-         admin_count == MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed?
+    when admin_count  > MINIMUM_ADMIN_COUNT && !has_all_permissions? && !role_changed? && other_admins.none?(&:has_all_permissions?),
+         admin_count == MINIMUM_ADMIN_COUNT && !has_all_permissions? && !role_changed?
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
 
       throw :abort
@@ -424,5 +424,19 @@ class User < ApplicationRecord
 
       throw :abort
     end
+  end
+
+  def has_all_permissions?
+    return has_permissions?(*Permission::ALL_PERMISSIONS) unless
+      role_permissions_attributes_changed?
+
+    permission_ids = role_permissions_attributes.collect { _1[:permission_id] }
+    permissions    = Permission.where(id: permission_ids)
+                               .pluck(:action)
+
+    return true if
+      permissions.include?(Permission::WILDCARD_PERMISSION)
+
+    permissions.size == Permission::ALL_PERMISSIONS.size
   end
 end

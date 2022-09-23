@@ -97,7 +97,7 @@ module Roleable
       tracks_dirty_attributes_for :role
 
       delegate :permissions, :permission_ids,
-        :role_permissions_attributes_changed?,
+        :role_permissions_attributes_changed?, :role_permissions_attributes,
         allow_nil: true,
         to: :role
     end
