@@ -4,7 +4,7 @@ class UserPolicy < ApplicationPolicy
   skip_pre_check :verify_authenticated!, only: %i[create?]
 
   def index?
-    verify_permissions!('user.read')
+    verify_permissions!('user.read', *role_permissions_for(action: 'read'))
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -17,7 +17,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    verify_permissions!('user.read')
+    verify_permissions!('user.read', *role_permissions_for(action: 'read'))
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -34,7 +34,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    verify_permissions!('user.create')
+    verify_permissions!('user.create', *role_permissions_for(action: 'create'))
     verify_role!(record)
 
     case bearer
@@ -50,7 +50,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    verify_permissions!('user.update')
+    verify_permissions!('user.update', *role_permissions_for(action: 'update'))
     verify_role!(record)
 
     case bearer
@@ -66,7 +66,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
-    verify_permissions!('user.delete')
+    verify_permissions!('user.delete', *role_permissions_for(action: 'delete'))
     verify_role!(record)
 
     case bearer
@@ -78,7 +78,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def invite?
-    verify_permissions!('user.invite')
+    verify_permissions!('user.invite', *role_permissions_for(action: 'invite'))
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -127,6 +127,15 @@ class UserPolicy < ApplicationPolicy
   end
 
   private
+
+  def role_permissions_for(action:)
+    perms = []
+
+    perms << "admin.#{action}" if
+      record.respond_to?(:any?) ? record.any?(&:admin?) : record.admin?
+
+    perms
+  end
 
   def verify_role!(user)
     return if
