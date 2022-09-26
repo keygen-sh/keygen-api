@@ -13,9 +13,9 @@ module MachineProcesses
       in role: { name: 'product' } if machine_process.product == bearer
         allow!
       in role: { name: 'user' } if machine_process.user == bearer
-        allow!
+        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
       in role: { name: 'license' } if machine_process.license == bearer
-        allow!
+        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
       else
         deny!
       end
