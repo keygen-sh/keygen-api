@@ -10,9 +10,9 @@ class PolicyPolicy < ApplicationPolicy
     in role: { name: 'product' } if record.all? { _1.product_id == bearer.id }
       allow!
     in role: { name: 'license' } if record == [bearer.policy]
-      allow!
+      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
     in role: { name: 'user' } if record_ids & bearer.policy_ids == record_ids
-      allow!
+      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
     else
       deny!
     end
@@ -27,9 +27,9 @@ class PolicyPolicy < ApplicationPolicy
     in role: { name: 'product' } if record.product == bearer
       allow!
     in role: { name: 'user' } if bearer.policies.exists?(record.id)
-      allow!
+      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
     in role: { name: 'license' } if record == bearer.policy
-      allow!
+      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
     else
       deny!
     end

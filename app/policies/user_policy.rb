@@ -27,7 +27,7 @@ class UserPolicy < ApplicationPolicy
     in role: { name: 'user' } if record == bearer
       allow!
     in role: { name: 'license' } if record == bearer.user
-      allow!
+      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
     else
       deny!
     end
