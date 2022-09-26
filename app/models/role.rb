@@ -97,6 +97,12 @@ class Role < ApplicationRecord
   end
 
   ##
+  # reset_permissions! resets the role's permissions to defaults.
+  def reset_permissions!
+    update!(permissions: default_permission_ids)
+  end
+
+  ##
   # name= overloads role assignment so we can reset permissions
   # on role change.
   def name=(...)
