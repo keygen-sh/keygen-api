@@ -13,9 +13,9 @@ module Releases
       in role: { name: 'product' } if release.product == bearer
         allow!
       in role: { name: 'user' } if bearer.products.exists?(record.id)
-        allow!
+        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
       in role: { name: 'license' } if record == bearer.product
-        allow!
+        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
       else
         deny!
       end
