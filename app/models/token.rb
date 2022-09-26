@@ -173,6 +173,10 @@ class Token < ApplicationRecord
     end
   end
 
+  def reset_permissions!
+    update!(permissions: default_permission_ids)
+  end
+
   def self.cache_key(digest)
     hash = Digest::SHA256.hexdigest digest
 
