@@ -11,6 +11,16 @@ Feature: Show plan
     And the JSON response should be a "plan"
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin retrieves a plan
+    Given there exists 1 "account"
+    And there exists 3 "plans"
+    And I am an admin of the first "account"
+    And I use an authentication token
+    When I send a GET request to "/plans/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "plan"
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Anonymous retrieves a private plan
     Given there exists 3 "plans"
     And the first "plan" has the following attributes:

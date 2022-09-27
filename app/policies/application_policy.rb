@@ -70,6 +70,9 @@ class ApplicationPolicy
   end
 
   def verify_account_scoped!
+    return if
+      account.nil?
+
     deny! "#{whatami} account does not match account context" if
       bearer.present? && bearer.account_id != account.id
 
