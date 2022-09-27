@@ -23,6 +23,25 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
   raise 'failed to find bearer' if @bearer.nil?
 end
 
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license) (?:of|for) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
+  named_role_idx ||= :first
+
+  account = Account.send(named_account_idx)
+  @bearer =
+    case role
+    when "admin", "user", "read only", "developer", "sales agent", "support agent"
+      account.users.with_roles(role.parameterize.underscore).send(named_role_idx)
+    when "product"
+      account.products.send(named_role_idx)
+    when "license"
+      account.licenses.send(named_role_idx)
+    else
+      raise 'invalid role'
+    end
+
+  raise 'failed to find bearer' if @bearer.nil?
+end
+
 Given /^I have 2FA (enabled|disabled)$/ do |second_factor_status|
   @second_factor = SecondFactor.new user: @bearer, account: @bearer.account
   @second_factor.enabled = second_factor_status == 'enabled'
