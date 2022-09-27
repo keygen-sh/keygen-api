@@ -1308,7 +1308,7 @@ Feature: Update user
       """
       {
         "title": "Access denied",
-        "detail": "You do not have permission to complete the request (product is attempting to escalate privileges for the user)"
+        "detail": "You do not have permission to complete the request (product lacks privileges to perform action on user)"
       }
       """
 

@@ -35,7 +35,7 @@ class UserPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('user.create', *role_permissions_for(action: 'create'))
-    verify_role!(record)
+    verify_privileges!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -51,7 +51,7 @@ class UserPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('user.update', *role_permissions_for(action: 'update'))
-    verify_role!(record)
+    verify_privileges!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -67,7 +67,7 @@ class UserPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('user.delete', *role_permissions_for(action: 'delete'))
-    verify_role!(record)
+    verify_privileges!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -137,24 +137,24 @@ class UserPolicy < ApplicationPolicy
     perms
   end
 
-  def verify_role!(user)
+  def verify_privileges!
     return if
-      user.nil? || user.role.nil?
+      record.nil? || record.role.nil?
 
     # Assert that privilege escalation is not occurring by anonymous (sanity check)
-    deny! 'anonymous is attempting to escalate privileges for the user' if
-      bearer.nil? && user.role.changed? && !user.role.user?
+    deny! 'lacks privileges to perform action on user' if
+      bearer.nil? && record.role.changed? && !record.role.user?
 
     return if
       bearer.nil?
 
     # Assert that privilege escalation is not occurring by a bearer (sanity check)
-    deny! "#{whatami} is attempting to escalate privileges for the user" if
-      (bearer.role.changed? || user.role.changed?) &&
-      bearer.role < user.role
+    deny! "#{whatami} lacks privileges to perform action on user" if
+      (bearer.role.changed? || record.role.changed?) &&
+      bearer.role < record.role
 
     # Assert bearer can perform this action on the user
     deny! "#{whatami} lacks privileges to perform action on user" if
-      bearer.role < user.role
+      bearer.role < record.role
   end
 end
