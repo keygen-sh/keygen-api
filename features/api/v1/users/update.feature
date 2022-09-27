@@ -1250,6 +1250,102 @@ Feature: Update user
       }
       """
 
+  Scenario: Admin with limited permissions escalates their permissions
+    Given the current account is "ent1"
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["admin.read", "license.read", "user.read"]
+      """
+    Given I am the first admin of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": [
+              "admin.create",
+              "admin.read",
+              "admin.update",
+              "admin.delete"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (admin lacks permission to perform action)"
+      }
+      """
+
+  Scenario: Product removes an admin's permissions
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "admin"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": []
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (product is attempting to escalate privileges for the user)"
+      }
+      """
+
+  Scenario: Product escalates a user's permissions
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["admin.create"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/users/#users-object-attrs-permissions"
+        }
+      }
+      """
+
   Scenario: Product updates a users metadata
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
