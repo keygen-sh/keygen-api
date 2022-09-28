@@ -509,7 +509,7 @@ class License < ApplicationRecord
 
     (entls & entitlements).size == entls.size
   end
-  alias_method :has_entitlements?, :entitled?
+  alias_method :entitlements?, :entitled?
 
   def unentitled?(...) = !entitled?(...)
 
