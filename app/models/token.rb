@@ -166,7 +166,7 @@ class Token < ApplicationRecord
   end
 
   def pending_permissions
-    return [] unless
+    return Permission.none unless
       token_permissions_attributes_changed?
 
     Permission.where(
