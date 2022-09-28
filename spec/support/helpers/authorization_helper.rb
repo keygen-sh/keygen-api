@@ -425,9 +425,9 @@ module AuthorizationHelper
     def accessing_admins(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:admins) { create_list(:admin, 3, account: other_account) }
+        let(:admins) { create_list(:admin, 3, *admin_traits, account: other_account) }
       else
-        let(:admins) { create_list(:admin, 3, account:) }
+        let(:admins) { create_list(:admin, 3, *admin_traits, account:) }
       end
 
       let(:record) { admins }
@@ -436,9 +436,9 @@ module AuthorizationHelper
     def accessing_an_admin(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:admin) { create(:admin, account: other_account) }
+        let(:admin) { create(:admin, *admin_traits, account: other_account) }
       else
-        let(:admin) { create(:admin, account:) }
+        let(:admin) { create(:admin, *admin_traits, account:) }
       end
 
       let(:record) { admin }
@@ -1370,6 +1370,7 @@ module AuthorizationHelper
         let(:release_traits)     { [] }
         let(:policy_traits)      { [] }
         let(:license_traits)     { [] }
+        let(:admin_traits)       { [] }
 
         instance_exec(&)
       end
@@ -1386,6 +1387,7 @@ module AuthorizationHelper
         let(:release_traits) { [] }
         let(:policy_traits)  { [] }
         let(:license_traits) { [] }
+        let(:admin_traits)   { [] }
 
         instance_exec(&)
       end
@@ -1562,6 +1564,10 @@ module AuthorizationHelper
     end
 
     ##
+    # with_account_trait defines a trait on the account context.
+    def with_account_trait(trait, &) = with_account_traits(*trait, &)
+
+    ##
     # with_bearer_traits defines traits on the bearer context.
     def with_bearer_traits(traits, &)
       context "with bearer #{traits} traits" do
@@ -1570,6 +1576,10 @@ module AuthorizationHelper
         instance_exec(&)
       end
     end
+
+    ##
+    # with_bearer_trait defines a trait on the bearer context.
+    def with_bearer_trait(trait, &) = with_bearer_traits(*trait, &)
 
     ##
     # with_release_traits defines traits on the release context.
@@ -1582,6 +1592,10 @@ module AuthorizationHelper
     end
 
     ##
+    # with_release_trait defines a trait on the release context.
+    def with_release_trait(trait, &) = with_release_traits(*trait, &)
+
+    ##
     # with_policy_traits defines traits on the policy context.
     def with_policy_traits(traits, &)
       context "with policy #{traits} traits" do
@@ -1590,6 +1604,10 @@ module AuthorizationHelper
         instance_exec(&)
       end
     end
+
+    ##
+    # with_policy_trait defines a trait on the policy context.
+    def with_policy_trait(trait, &) = with_policy_traits(*trait, &)
 
     ##
     # with_license_traits defines traits on the license context.
@@ -1602,24 +1620,22 @@ module AuthorizationHelper
     end
 
     ##
-    # with_account_trait defines a trait on the account context.
-    def with_account_trait(trait, &) = with_account_traits(*trait, &)
-
-    ##
-    # with_bearer_trait defines a trait on the bearer context.
-    def with_bearer_trait(trait, &) = with_bearer_traits(*trait, &)
-
-    ##
-    # with_release_trait defines a trait on the release context.
-    def with_release_trait(trait, &) = with_release_traits(*trait, &)
-
-    ##
-    # with_policy_trait defines a trait on the policy context.
-    def with_policy_trait(trait, &) = with_policy_traits(*trait, &)
-
-    ##
     # with_license_trait defines a trait on the license context.
     def with_license_trait(trait, &) = with_license_traits(*trait, &)
+
+    ##
+    # with_admin_traits defines traits on the admin context.
+    def with_admin_traits(traits, &)
+      context "with admin #{traits} traits" do
+        let(:admin_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_admin_trait defines a trait on the admin context.
+    def with_admin_trait(trait, &) = with_admin_traits(*trait, &)
 
     ##
     # with_account_protection enables account protection.

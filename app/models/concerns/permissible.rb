@@ -4,6 +4,8 @@ module Permissible
   extend ActiveSupport::Concern
 
   included do
+    ##
+    # with_permissions returns a scope of models with a given permission set.
     scope :with_permissions, -> *identifiers {
       identifiers = identifiers.flatten
                                .compact
@@ -20,6 +22,8 @@ module Permissible
         )
     }
 
+    ##
+    # permissions= assigns a set of permissions to the role, either by action or permission ID.
     def permissions=(*identifiers)
       return if
         identifiers == [nil]
@@ -48,22 +52,53 @@ module Permissible
       )
     end
 
+    ##
+    # can? returns true if the user does have all provided permissions.
     def can?(*actions)
-      expected = actions.flatten
+      expected = actions.flatten.uniq
       actual   = permissions.where(action: [*expected, Permission::WILDCARD_PERMISSION])
                             .pluck(:action)
+                            .uniq
 
       return true if
         actual.include?(Permission::WILDCARD_PERMISSION)
 
       actual.size == expected.size
     end
-    alias_method :has_permissions?, :can?
+    alias_method :permissions?, :can?
 
+    ##
+    # cannot? returns true if the user does not have all provided permissions.
     def cannot?(...) = !can?(...)
+
+    ##
+    # root? returns true if the role has all permissions, or a wildcard, false otherwise.
+    def root?
+      return permissions?(*Permission::ALL_PERMISSIONS) unless
+        role_permissions_attributes_changed?
+
+      permission_ids = role_permissions_attributes.collect { _1[:permission_id] }
+      permissions    = Permission.where(id: permission_ids)
+                                 .pluck(:action)
+                                 .uniq
+
+      return true if
+        permissions.include?(Permission::WILDCARD_PERMISSION)
+
+      permissions.size == Permission::ALL_PERMISSIONS.size
+    end
+    alias_method :all_permissions?, :root?
+
+    ##
+    # default_permissions? returns true if the model is the default permission set.
+    def default_permissions?
+      (permission_ids & default_permission_ids).size == default_permission_ids.size
+    end
   end
 
   class_methods do
+    ##
+    # has_permissions defines a model's permissions and their default permission set.
     def has_permissions(permissions, default: nil)
       resolver = -> ctx, opts {
         case opts
