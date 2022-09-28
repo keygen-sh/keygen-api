@@ -71,6 +71,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_root_permissions do
+      after :create do |user|
+        user.update(permissions: Permission::ALL_PERMISSIONS)
+      end
+    end
+
     trait :with_no_permissions do
       after :create do |user|
         user.update(permissions: [])
