@@ -496,6 +496,23 @@ class License < ApplicationRecord
         )
   end
 
+  def entitled?(*identifiers)
+    identifiers = identifiers.flatten
+                             .compact
+
+    return true if
+      identifiers.empty?
+
+    entls = Entitlement.where(id: identifiers).or(
+      Entitlement.where(code: identifiers),
+    )
+
+    (entls & entitlements).size == entls.size
+  end
+  alias_method :has_entitlements?, :entitled?
+
+  def unentitled?(...) = !entitled?(...)
+
   def group!
     raise Keygen::Error::NotFoundError.new(model: Group.name) unless
       group.present?
