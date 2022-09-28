@@ -77,7 +77,8 @@ class Role < ApplicationRecord
   end
 
   ##
-  # permissions returns an array of the role's permissions.
+  # permissions returns an array of the role's permissions, including pending
+  # any changes to the role's permissions.
   def permissions
     return pending_permissions if
       role_permissions_attributes_changed?
@@ -92,7 +93,7 @@ class Role < ApplicationRecord
   # pending_permissions permissions returns the role's pending permissions,
   # via the :role_permissions nested attributes.
   def pending_permissions
-    return [] unless
+    return Permission.none unless
       role_permissions_attributes_changed?
 
     Permission.where(
