@@ -138,9 +138,8 @@ class ApplicationPolicy
       license.expires? && !license.allow_access? &&
       release.created_at > license.expiry
 
-    deny! 'license is missing entitlements' if
-      release.entitlements.any? &&
-      (release.entitlements & license.entitlements).size != release.entitlements.size
+    deny! 'license is missing entitlements' unless
+      license.entitled?(release.entitlements)
   end
 
   def verify_licenses_for_release!(licenses:, release:)
