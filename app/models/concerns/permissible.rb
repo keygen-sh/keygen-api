@@ -85,7 +85,7 @@ module Permissible
       return true if
         permissions.include?(Permission::WILDCARD_PERMISSION)
 
-      permissions.size == Permission::ALL_PERMISSIONS.size
+      (permissions & Permission::ALL_PERMISSIONS).size == Permission::ALL_PERMISSIONS.size
     end
     alias_method :all_permissions?, :root?
 
