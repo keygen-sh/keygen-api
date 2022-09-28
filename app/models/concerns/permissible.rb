@@ -72,8 +72,12 @@ module Permissible
     def cannot?(...) = !can?(...)
 
     ##
-    # root? returns true if the role has all permissions, or a wildcard, false otherwise.
+    # root? returns true if the role has all permissions, or if the role is an
+    # admin with wildcard permissions.
     def root?
+      return false unless
+        admin?
+
       return permissions?(*Permission::ALL_PERMISSIONS) unless
         role_permissions_attributes_changed?
 
