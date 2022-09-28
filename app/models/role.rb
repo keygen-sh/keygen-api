@@ -79,10 +79,25 @@ class Role < ApplicationRecord
   ##
   # permissions returns an array of the role's permissions.
   def permissions
+    return pending_permissions if
+      role_permissions_attributes_changed?
+
     Permission.joins(:role_permissions)
               .where(
                 role_permissions: { role_id: id },
               )
+  end
+
+  ##
+  # pending_permissions permissions returns the role's pending permissions,
+  # via the :role_permissions nested attributes.
+  def pending_permissions
+    return [] unless
+      role_permissions_attributes_changed?
+
+    Permission.where(
+      id: role_permissions_attributes.collect { _1[:permission_id] },
+    )
   end
 
   ##

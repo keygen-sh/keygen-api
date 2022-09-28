@@ -142,19 +142,23 @@ class UserPolicy < ApplicationPolicy
       record.nil? || record.role.nil?
 
     # Assert that privilege escalation is not occurring by anonymous (sanity check)
-    deny! 'lacks privileges to perform action on user' if
+    deny! 'anon lacks privileges to perform action on user' if
       bearer.nil? && record.role.changed? && !record.role.user?
 
     return if
       bearer.nil?
 
-    # Assert that privilege escalation is not occurring by a bearer (sanity check)
-    deny! "#{whatami} lacks privileges to perform action on user" if
-      (bearer.role.changed? || record.role.changed?) &&
-      bearer.role < record.role
-
-    # Assert bearer can perform this action on the user
-    deny! "#{whatami} lacks privileges to perform action on user" if
-      bearer.role < record.role
+    case
+    # Assert that user permission escalation is not occurring by the bearer.
+    # Bearers can only assign permissions that they themselves have, unless
+    # they're a root admin, or their role is greater.
+    when bearer.cannot?(*record.permissions.pluck(:action))
+      deny! "#{whatami} lacks privileges to perform action on user" unless
+        bearer.role > record.role ||
+        bearer.root?
+    # Assert that user role escalation is not occurring by the bearer
+    when bearer.role < record.role
+      deny! "#{whatami} lacks privileges to perform action on user"
+    end
   end
 end
