@@ -1085,10 +1085,6 @@ Feature: Update user
     Given I am an admin of account "ent1"
     And the current account is "ent1"
     And the current account has 2 "admins"
-    And the first "admin" has the following permissions:
-      """
-      ["admin.update", "user.update"]
-      """
     And I use an authentication token
     When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
       """
@@ -1116,7 +1112,7 @@ Feature: Update user
     And the current account has 2 "admins"
     And the first "admin" has the following permissions:
       """
-      ["user.update"]
+      ["user.update", "user.read", "license.read", "license.validate", "machine.read"]
       """
     And I use an authentication token
     When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
@@ -1255,7 +1251,7 @@ Feature: Update user
     And the current account has 2 "admins"
     And the first "admin" has the following permissions:
       """
-      ["admin.read", "license.read", "user.read"]
+      ["admin.read", "admin.update", "user.create", "user.update"]
       """
     Given I am the first admin of account "ent1"
     And I use an authentication token
@@ -1281,7 +1277,42 @@ Feature: Update user
       """
       {
         "title": "Access denied",
-        "detail": "You do not have permission to complete the request (admin lacks permission to perform action)"
+        "detail": "You do not have permission to complete the request (admin lacks privileges to perform action on user)"
+      }
+      """
+
+  Scenario: Admin with limited permissions escalates another admin's permissions
+    Given the current account is "ent1"
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["admin.read", "admin.update", "user.create", "user.update"]
+      """
+    Given I am the first admin of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": [
+              "admin.create",
+              "admin.read",
+              "admin.update",
+              "admin.delete"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (admin lacks privileges to perform action on user)"
       }
       """
 

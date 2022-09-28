@@ -145,8 +145,8 @@ class Token < ApplicationRecord
   end
 
   def permissions
-    return [] unless
-      role.present?
+    return pending_permissions if
+      token_permissions_attributes_changed?
 
     return role.permissions if
       token_permissions.joins(:permission)
@@ -163,6 +163,15 @@ class Token < ApplicationRecord
                 token_permissions: { token_id: id },
               )
               .reorder(nil)
+  end
+
+  def pending_permissions
+    return [] unless
+      token_permissions_attributes_changed?
+
+    Permission.where(
+      id: token_permissions_attributes.collect { _1[:permission_id] },
+    )
   end
 
   def permission_ids

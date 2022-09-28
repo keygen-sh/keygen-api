@@ -26,89 +26,91 @@ describe UserPolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_an_admin] do
-      with_token_authentication do
-        with_permissions %w[admin.read user.read] do
-          without_token_permissions { denies :show }
+      with_admin_trait :with_no_permissions do
+        with_token_authentication do
+          with_permissions %w[admin.read user.read] do
+            without_token_permissions { denies :show }
 
-          allows :show
-        end
-
-        with_permissions %w[user.read] do
-          denies :show
-        end
-
-        with_permissions %w[admin.create user.create] do
-          without_token_permissions { denies :create }
-
-          allows :create
-        end
-
-        with_permissions %w[user.create] do
-          denies :create
-        end
-
-        with_permissions %w[admin.update user.update] do
-          without_token_permissions { denies :update }
-
-          allows :update
-        end
-
-        with_permissions %w[user.update] do
-          denies :update
-        end
-
-        with_permissions %w[admin.delete user.delete] do
-          without_token_permissions { denies :destroy }
-
-          allows :destroy
-        end
-
-        with_permissions %w[user.delete] do
-          denies :destroy
-        end
-
-        with_permissions %w[admin.invite user.invite] do
-          without_token_permissions { denies :invite }
-
-          allows :invite
-        end
-
-        with_permissions %w[user.invite] do
-          denies :invite
-        end
-
-        with_permissions %w[user.ban] do
-          without_token_permissions { denies :ban }
-
-          denies :ban
-        end
-
-        with_permissions %w[user.unban] do
-          without_token_permissions { denies :unban }
-
-          denies :unban
-        end
-
-        with_wildcard_permissions do
-          without_token_permissions do
-            denies :show, :create, :update, :destroy, :invite, :ban, :unban
+            allows :show
           end
 
-          allows :show, :create, :update, :destroy, :invite
-          denies :ban, :unban
-        end
-
-        with_default_permissions do
-          without_token_permissions do
-            denies :show, :create, :update, :destroy, :invite, :ban, :unban
+          with_permissions %w[user.read] do
+            denies :show
           end
 
-          allows :show, :create, :update, :destroy, :invite
-          denies :ban, :unban
-        end
+          with_permissions %w[admin.create user.create] do
+            without_token_permissions { denies :create }
 
-        without_permissions do
-          denies :show, :create, :update, :destroy, :invite, :ban, :unban
+            allows :create
+          end
+
+          with_permissions %w[user.create] do
+            denies :create
+          end
+
+          with_permissions %w[admin.update user.update] do
+            without_token_permissions { denies :update }
+
+            allows :update
+          end
+
+          with_permissions %w[user.update] do
+            denies :update
+          end
+
+          with_permissions %w[admin.delete user.delete] do
+            without_token_permissions { denies :destroy }
+
+            allows :destroy
+          end
+
+          with_permissions %w[user.delete] do
+            denies :destroy
+          end
+
+          with_permissions %w[admin.invite user.invite] do
+            without_token_permissions { denies :invite }
+
+            allows :invite
+          end
+
+          with_permissions %w[user.invite] do
+            denies :invite
+          end
+
+          with_permissions %w[user.ban] do
+            without_token_permissions { denies :ban }
+
+            denies :ban
+          end
+
+          with_permissions %w[user.unban] do
+            without_token_permissions { denies :unban }
+
+            denies :unban
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy, :invite, :ban, :unban
+            end
+
+            allows :show, :create, :update, :destroy, :invite
+            denies :ban, :unban
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy, :invite, :ban, :unban
+            end
+
+            allows :show, :create, :update, :destroy, :invite
+            denies :ban, :unban
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy, :invite, :ban, :unban
+          end
         end
       end
     end
