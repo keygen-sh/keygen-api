@@ -380,7 +380,7 @@ Feature: Generate authentication token
     Then the response status should be "201"
     And the JSON response should be a "token" with the following attributes:
       """
-      { "permissions": ["token.generate"] }
+      { "permissions": ["*"] }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
