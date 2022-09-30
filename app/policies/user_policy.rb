@@ -152,10 +152,11 @@ class UserPolicy < ApplicationPolicy
     # Assert that user permission escalation is not occurring by the bearer.
     # Bearers can only assign permissions that they themselves have, unless
     # they're a root admin, or their role is greater.
-    when ENV.key?('KEYGEN_ENABLE_PERMISSIONS') &&
-         bearer.role <= record.role && bearer.cannot?(*record.permissions.pluck(:action))
-      deny! "#{whatami} lacks privileges to perform action on user" unless bearer.root?
-    # Assert that user role escalation is not occurring by the bearer
+    when !bearer.root? && bearer.role == record.role
+      deny! "#{whatami} lacks privileges to perform action on user" if
+        (ENV.key?('KEYGEN_ENABLE_PERMISSIONS') && bearer.cannot?(*record.permissions.pluck(:action)))
+    # Assert that user role escalation is not occurring by the bearer by
+    # creating a user with a greater role than theirs.
     when bearer.role < record.role
       deny! "#{whatami} lacks privileges to perform action on user"
     end

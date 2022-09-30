@@ -136,6 +136,16 @@ class Role < ApplicationRecord
     ROLE_RANK.fetch(name) { -1 }
   end
 
+  def ===(comparison_role)
+    comparison_role.equal?(self) ||
+      comparison_role.instance_of?(self.class) &&
+        comparison_role.id == id
+  end
+
+  def ==(comparison_role)
+    rank == comparison_role.rank
+  end
+
   def <=(comparison_role)
     rank <= comparison_role.rank
   end
