@@ -143,7 +143,8 @@ class Role < ApplicationRecord
   end
 
   def ==(comparison_role)
-    rank == comparison_role.rank
+    rank == comparison_role.rank &&
+      name == comparison_role.name
   end
 
   def <=(comparison_role)
