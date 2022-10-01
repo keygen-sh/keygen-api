@@ -20,8 +20,6 @@ roles.find_in_batches(batch_size: BATCH_SIZE) do |batch|
     role_count += 1
 
     role.reset_permissions!
-
-    sleep SLEEP_DURATION / 10
   end
 
   sleep SLEEP_DURATION
