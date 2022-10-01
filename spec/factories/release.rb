@@ -56,6 +56,24 @@ FactoryBot.define do
       end
     end
 
+    trait :licensed do
+      after :build do |release, evaluator|
+        release.product = build(:product, :licensed, account: release.account)
+      end
+    end
+
+    trait :open do
+      after :build do |release, evaluator|
+        release.product = build(:product, :open, account: release.account)
+      end
+    end
+
+    trait :closed do
+      after :build do |release, evaluator|
+        release.product = build(:product, :closed, account: release.account)
+      end
+    end
+
     trait :created_last_year do
       after :build do |release, evaluator|
         release.created_at = 1.year.ago
