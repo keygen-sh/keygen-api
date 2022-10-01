@@ -310,6 +310,16 @@ Feature: Product artifacts relationship
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "401"
 
+  Scenario: Anonymous retrieves the artifacts for an open release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 licensed "releases" for the last "product"
+    And the current account has 3 closed "releases" for the last "product"
+    And the current account has 3 open "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts"
+    Then the response status should be "401"
+
   # Show artifact
   Scenario: Admin retrieves an artifact for their account
     Given I am an admin of account "test1"
