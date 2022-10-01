@@ -7,7 +7,6 @@ class ApplicationPolicy
   include ActionPolicy::Policy::Scoping
   include ActionPolicy::Policy::Cache
   include ActionPolicy::Policy::Reasons
-  prepend ActionPolicy::Policy::Rails::Instrumentation
 
   pre_check :verify_account_scoped!
   pre_check :verify_authenticated!
