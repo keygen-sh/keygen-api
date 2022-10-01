@@ -20,8 +20,6 @@ tokens.find_in_batches(batch_size: BATCH_SIZE) do |batch|
     token_count += 1
 
     token.reset_permissions!
-
-    sleep SLEEP_DURATION / 10
   end
 
   sleep SLEEP_DURATION
