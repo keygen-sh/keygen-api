@@ -369,7 +369,7 @@ Feature: Generate authentication token
     Given the current account is "ent1"
     And the current account has 1 "user" with the following:
       """
-      { "permissions": ["token.generate"] }
+      { "permissions": ["token.generate", "license.read", "license.validate"] }
       """
     And I am a user of account "ent1"
     And I send the following headers:
@@ -380,7 +380,7 @@ Feature: Generate authentication token
     Then the response status should be "201"
     And the JSON response should be a "token" with the following attributes:
       """
-      { "permissions": ["*"] }
+      { "permissions": ["license.read", "license.validate", "token.generate"] }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job

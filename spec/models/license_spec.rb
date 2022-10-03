@@ -9,7 +9,7 @@ describe License, type: :model do
   describe '#role_attributes=' do
     it 'should set role and permissions' do
       license = create(:license, account:)
-      actions = license.permissions.pluck(:action)
+      actions = license.permissions.actions
       role    = license.role
 
       expect(actions).to match_array license.default_permissions
@@ -21,14 +21,14 @@ describe License, type: :model do
     context 'on create' do
       it 'should set default permissions' do
         license = create(:license, account:)
-        actions = license.permissions.pluck(:action)
+        actions = license.permissions.actions
 
         expect(actions).to match_array License.default_permissions
       end
 
       it 'should set custom permissions' do
         license = create(:license, account:, permissions: %w[license.read license.validate])
-        actions = license.permissions.pluck(:action)
+        actions = license.permissions.actions
 
         expect(actions).to match_array %w[license.read license.validate]
       end
@@ -39,7 +39,7 @@ describe License, type: :model do
         license = create(:license, account:)
         license.update!(permissions: %w[license.validate])
 
-        actions = license.permissions.pluck(:action)
+        actions = license.permissions.actions
 
         expect(actions).to match_array %w[license.validate]
       end
@@ -55,7 +55,7 @@ describe License, type: :model do
 
         license.reload
 
-        actions = license.permissions.pluck(:action)
+        actions = license.permissions.actions
 
         expect(actions).to match_array License.default_permissions
       end
@@ -94,7 +94,7 @@ describe License, type: :model do
       it 'should return permission intersection' do
         user    = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
         license = create(:license, account:, user:)
-        actions = license.permissions.pluck(:action)
+        actions = license.permissions.actions
 
         expect(actions).to match_array %w[license.validate license.read machine.read machine.create machine.delete]
       end

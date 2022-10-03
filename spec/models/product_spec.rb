@@ -9,7 +9,7 @@ describe Product, type: :model do
   describe '#role_attributes=' do
     it 'should set role and permissions' do
       product = create(:product, account:)
-      actions = product.permissions.pluck(:action)
+      actions = product.permissions.actions
       role    = product.role
 
       expect(actions).to match_array product.default_permissions
@@ -21,14 +21,14 @@ describe Product, type: :model do
     context 'on create' do
       it 'should set default permissions' do
         product = create(:product, account:)
-        actions = product.permissions.pluck(:action)
+        actions = product.permissions.actions
 
         expect(actions).to match_array Product.default_permissions
       end
 
       it 'should set custom permissions' do
         product = create(:product, account:, permissions: %w[product.read])
-        actions = product.permissions.pluck(:action)
+        actions = product.permissions.actions
 
         expect(actions).to match_array %w[product.read]
       end
@@ -39,7 +39,7 @@ describe Product, type: :model do
         product = create(:product, account:)
         product.update!(permissions: %w[license.validate])
 
-        actions = product.permissions.pluck(:action)
+        actions = product.permissions.actions
 
         expect(actions).to match_array %w[license.validate]
       end

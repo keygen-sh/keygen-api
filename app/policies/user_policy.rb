@@ -154,7 +154,7 @@ class UserPolicy < ApplicationPolicy
     # they're a root admin, or their role is greater.
     when !bearer.root? && bearer.role == record.role
       deny! "#{whatami} lacks privileges to perform action on user" if
-        (ENV.key?('KEYGEN_ENABLE_PERMISSIONS') && bearer.cannot?(*record.permissions.pluck(:action)))
+        (ENV.key?('KEYGEN_ENABLE_PERMISSIONS') && bearer.cannot?(*record.permissions.actions))
     # Assert that user role escalation is not occurring by the bearer by
     # creating a user with a greater role than theirs.
     when bearer.role < record.role

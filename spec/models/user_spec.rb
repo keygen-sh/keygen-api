@@ -10,7 +10,7 @@ describe User, type: :model do
     context 'on role assignment' do
       it 'should set admin role and permissions' do
         admin   = create(:admin, account:)
-        actions = admin.permissions.pluck(:action)
+        actions = admin.permissions.actions
         role    = admin.role
 
         expect(actions).to match_array Permission::ADMIN_PERMISSIONS
@@ -19,7 +19,7 @@ describe User, type: :model do
 
       it 'should set user role and permissions' do
         user    = create(:user, account:)
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
         role    = user.role
 
         expect(actions).to match_array User.default_permissions
@@ -33,7 +33,7 @@ describe User, type: :model do
         user.change_role!(:admin)
 
         admin   = user.reload
-        actions = admin.permissions.pluck(:action)
+        actions = admin.permissions.actions
         role    = admin.role
 
         expect(actions).to match_array User.default_permissions
@@ -45,7 +45,7 @@ describe User, type: :model do
         admin.change_role!(:user)
 
         user    = admin.reload
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
         role    = user.role
 
         expect(actions).to match_array User.default_permissions
@@ -58,7 +58,7 @@ describe User, type: :model do
         # Oops! Change back!
         user.change_role!(:user)
 
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
         role    = user.role
 
         expect(actions).to match_array %w[license.validate license.read]
@@ -80,14 +80,14 @@ describe User, type: :model do
     context 'on create' do
       it 'should set default permissions' do
         user    = create(:user, account:)
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
 
         expect(actions).to match_array User.default_permissions
       end
 
       it 'should set custom permissions' do
         user    = create(:user, account:, permissions: %w[license.read license.validate])
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
 
         expect(actions).to match_array %w[license.read license.validate]
       end
@@ -98,7 +98,7 @@ describe User, type: :model do
         user = create(:user, account:)
         user.update!(permissions: %w[license.validate])
 
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
 
         expect(actions).to match_array %w[license.validate]
       end
@@ -123,7 +123,7 @@ describe User, type: :model do
 
         user.reload
 
-        actions = user.permissions.pluck(:action)
+        actions = user.permissions.actions
 
         expect(actions).to match_array User.default_permissions
       end
