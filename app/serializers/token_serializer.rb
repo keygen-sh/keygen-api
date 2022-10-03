@@ -15,7 +15,6 @@ class TokenSerializer < BaseSerializer
   attribute :deactivations, if: -> { @object.activation_token? }
   attribute :permissions, if: -> { @account.ent? } do
     @object.permissions.actions
-                       .sort
   end
   attribute :created do
     @object.created_at
