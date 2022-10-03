@@ -8,7 +8,7 @@ class ProductSerializer < BaseSerializer
   attribute :url
   attribute :platforms
   attribute :permissions, if: -> { @account.ent? } do
-    @object.permissions.collect(&:action)
+    @object.permissions.actions
                        .sort
   end
   attribute :metadata do

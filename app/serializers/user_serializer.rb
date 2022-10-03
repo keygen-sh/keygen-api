@@ -12,7 +12,7 @@ class UserSerializer < BaseSerializer
     @object.role&.name&.dasherize
   end
   attribute :permissions, if: -> { @account.ent? } do
-    @object.permissions.collect(&:action)
+    @object.permissions.actions
                        .sort
   end
   attribute :metadata do
