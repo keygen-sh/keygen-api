@@ -32,6 +32,9 @@ module Dirtyable
         nested_attributes_options.key?(relation)
 
       module_eval <<~RUBY, __FILE__, __LINE__ + 1
+        after_save -> { remove_instance_variable(:@#{relation}_attributes) },
+          if: :#{relation}_attributes_changed?
+
         alias :_#{relation}_attributes= :#{relation}_attributes=
 
         def #{relation}_attributes_changed? = instance_variable_defined?(:@#{relation}_attributes)

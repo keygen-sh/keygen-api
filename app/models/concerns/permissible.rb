@@ -57,7 +57,7 @@ module Permissible
     def can?(*actions)
       expected = actions.flatten.uniq
       actual   = permissions.where(action: [*expected, Permission::WILDCARD_PERMISSION])
-                            .pluck(:action)
+                            .actions
                             .uniq
 
       return true if
@@ -83,7 +83,7 @@ module Permissible
 
       permission_ids = role_permissions_attributes.collect { _1[:permission_id] }
       permissions    = Permission.where(id: permission_ids)
-                                 .pluck(:action)
+                                 .actions
                                  .uniq
 
       return true if

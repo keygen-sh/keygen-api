@@ -10,18 +10,16 @@ describe Token, type: :model do
   describe '#permissions=' do
     context 'on create' do
       it 'should set wildcard permissions' do
-        token   = create(:token, account:, bearer:)
-        actions = token.permissions.pluck(:action)
-        perms   = token.token_permissions
+        token = create(:token, account:, bearer:)
 
-        expect(actions).to match_array bearer.default_permissions
-        expect(perms.count).to eq 1
-        expect(perms.map { _1.permission.action }).to match_array %w[*]
+        expect(token.permissions.actions).to match_array bearer.default_permissions
+        expect(token.token_permissions.count).to eq 1
+        expect(token.token_permissions.actions).to match_array %w[*]
       end
 
       it 'should set custom permissions' do
         token   = create(:token, account:, bearer:, permissions: %w[license.read license.validate])
-        actions = token.permissions.pluck(:action)
+        actions = token.permissions.actions
 
         expect(actions).to match_array %w[license.read license.validate]
       end
@@ -32,7 +30,7 @@ describe Token, type: :model do
         token = create(:token, account:, bearer:)
         token.update!(permissions: %w[license.validate])
 
-        actions = token.permissions.pluck(:action)
+        actions = token.permissions.actions
 
         expect(actions).to match_array %w[license.validate]
       end
@@ -67,7 +65,7 @@ describe Token, type: :model do
     it 'should return default permissions' do
       bearer  = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
       token   = create(:token, account:, bearer:)
-      actions = token.permissions.pluck(:action)
+      actions = token.permissions.actions
 
       expect(actions).to match_array %w[license.validate license.read machine.read machine.create machine.delete]
     end
@@ -75,7 +73,7 @@ describe Token, type: :model do
     it 'should return wildcard permissions' do
       bearer  = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
       token   = create(:token, account:, bearer:, permissions: %w[*])
-      actions = token.permissions.pluck(:action)
+      actions = token.permissions.actions
 
       expect(actions).to match_array %w[license.validate license.read machine.read machine.create machine.delete]
     end
@@ -83,7 +81,7 @@ describe Token, type: :model do
     it 'should return intersected permissions' do
       bearer  = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
       token   = create(:token, account:, bearer:, permissions: %w[license.validate license.read])
-      actions = token.permissions.pluck(:action)
+      actions = token.permissions.actions
 
       expect(actions).to match_array %w[license.validate license.read]
     end
