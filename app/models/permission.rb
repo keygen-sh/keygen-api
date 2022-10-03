@@ -463,12 +463,19 @@ class Permission < ApplicationRecord
     user.read
   ].freeze
 
+  ##
+  # actions returns the actions of the permissions.
+  def self.actions = pluck(:action)
+
+  ##
   # wildcard returns the wildcard permission record.
   def self.wildcard = where(action: WILDCARD_PERMISSION).take
 
+  ##
   # wildcard_id returns the wildcard permission ID.
   def self.wildcard_id = where(action: WILDCARD_PERMISSION).pick(:id)
 
+  ##
   # wildcard? checks if any of the given IDs are the wildcard permission.
   def self.wildcard?(*identifiers)
     return true if
