@@ -49,7 +49,6 @@ class LicenseSerializer < BaseSerializer
   end
   attribute :permissions, if: -> { @account.ent? } do
     @object.permissions.actions
-                       .sort
   end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}

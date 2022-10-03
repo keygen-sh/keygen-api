@@ -465,7 +465,7 @@ class Permission < ApplicationRecord
 
   ##
   # actions returns the actions of the permissions.
-  def self.actions = pluck(:action)
+  def self.actions = reorder(action: :asc).pluck(:action)
 
   ##
   # wildcard returns the wildcard permission record.
