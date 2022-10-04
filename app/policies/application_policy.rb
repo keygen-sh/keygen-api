@@ -54,8 +54,9 @@ class ApplicationPolicy
   def authenticated?   = bearer.present?
   def unauthenticated? = !authenticated?
 
-  # Short and easier to remember/use alias. Also makes record arg required.
-  def allow?(rule, record, *args, **kwargs) = allowed_to?(:"#{rule}?", record, *args, **kwargs)
+  # Short and easier to remember/use alias. Also makes record arg required,
+  # ensures we always use :inline_reasons.
+  def allow?(rule, record, *args, **kwargs) = allowed_to?(:"#{rule}?", record, *args, inline_reasons: true, **kwargs)
 
   # Overriding policy_for() to add custom options/keywords, such as the option to skip
   # permissions checks for nested policy checks via :skip_verify_permissions.
