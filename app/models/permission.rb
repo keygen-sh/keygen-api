@@ -193,6 +193,7 @@ class Permission < ApplicationRecord
     key.read
 
     license.read
+    license.validate
 
     machine.read
 
