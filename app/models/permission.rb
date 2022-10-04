@@ -172,6 +172,8 @@ class Permission < ApplicationRecord
     account.read
     account.subscription.read
 
+    admin.read
+
     arch.read
 
     artifact.read
