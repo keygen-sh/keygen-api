@@ -1174,7 +1174,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: License retrieves an artifact for an LICENSED release with an expired license for it
+  Scenario: License retrieves an artifact for an LICENSED release with an expired license for it (restrict access)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1184,6 +1184,10 @@ Feature: Show release artifact
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "artifact" for the last "release"
     And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
     And the current account has 1 "license" for the last "policy"
     And the last "license" has the following attributes:
       """
@@ -1193,6 +1197,68 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (license expiry falls outside of access window)"
+      }
+      """
+
+  Scenario: License retrieves an artifact for an LICENSED release with an expired license for it (revoke access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (license is expired)"
+      }
+      """
+
+  Scenario: License retrieves an artifact for an LICENSED release with an expired license for it (allow access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "ALLOW_ACCESS" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
 
   Scenario: User retrieves an artifact for a LICENSED release without a license for it
     Given the current account is "test1"
