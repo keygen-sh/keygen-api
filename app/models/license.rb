@@ -455,7 +455,7 @@ class License < ApplicationRecord
     allow_nil: true
 
   def permissions
-    return [] unless
+    return Permission.none unless
       role.present?
 
     return role.permissions unless
