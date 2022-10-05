@@ -99,29 +99,23 @@ class ApplicationPolicy
   end
 
   def verify_permissions!(*actions)
-    catch :policy_fulfilled do
-      return if
-        skip_verify_permissions?
+    return if
+      skip_verify_permissions?
 
-      return if
-        bearer.nil?
+    return if
+      bearer.nil?
 
-      deny! "#{whatami} lacks permission to perform action" unless
-        bearer.can?(actions)
+    deny! "#{whatami} lacks permission to perform action" unless
+      bearer.can?(actions)
 
-      return if
-        token.nil?
+    return if
+      token.nil?
 
-      deny! 'token is expired' if
-        token.expired?
+    deny! 'token is expired' if
+      token.expired?
 
-      deny! 'token lacks permission to perform action' unless
-        token.can?(actions)
-
-      return
-    end
-
-    throw :policy_fulfilled if ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+    deny! 'token lacks permission to perform action' unless
+      token.can?(actions)
   end
 
   def verify_license_for_release!(license:, release:)

@@ -13,7 +13,7 @@ module Users
       in role: { name: 'product'} if record.all? { _1 == bearer }
         allow!
       in role: { name: 'user' } if user == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end
@@ -28,7 +28,7 @@ module Users
       in role: { name: 'product' } if record == bearer
         allow!
       in role: { name: 'user' } if user == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end

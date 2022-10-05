@@ -13,9 +13,9 @@ module Licenses
       in role: { name: 'product' } if license.product == bearer
         allow!
       in role: { name: 'user' } if license.user == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       in role: { name: 'license' } if license == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end

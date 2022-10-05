@@ -15,7 +15,7 @@ module Machines
       in role: { name: 'user' } if machine.user == bearer
         allow!
       in role: { name: 'license' } if machine.license == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end
