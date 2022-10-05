@@ -18,7 +18,7 @@ class TokenGeneratorService < BaseService
   end
 
   def call
-    kwargs = { max_activations:, max_deactivations:, permissions: }.reject { _2.nil? }
+    kwargs = { max_activations:, max_deactivations:, permissions: }.compact
     token = account.tokens.create!(bearer:, expiry:, name:, **kwargs)
 
     token.generate!
