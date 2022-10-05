@@ -2,7 +2,8 @@
 
 class SecondFactor < ApplicationRecord
   SECOND_FACTOR_ISSUER = 'Keygen'
-  SECOND_FACTOR_IMAGE = 'https://keygen.sh/authy-icon.png'
+  SECOND_FACTOR_IMAGE  = 'https://keygen.sh/authy-icon.png'
+  SECOND_FACTOR_DRIFT  = 10
 
   include Limitable
   include Orderable
@@ -32,7 +33,7 @@ class SecondFactor < ApplicationRecord
 
   def verify(otp)
     totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
-    ts   = totp.verify(otp.to_s, drift_behind: 10, after: last_verified_at.to_i)
+    ts   = totp.verify(otp.to_s, drift_behind: SECOND_FACTOR_DRIFT, after: last_verified_at.to_i)
 
     if ts.present?
       update(last_verified_at: Time.at(ts))
