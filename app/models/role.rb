@@ -53,7 +53,8 @@ class Role < ApplicationRecord
       message: 'unsupported permissions',
     }
 
-  delegate :default_permissions, :default_permission_ids,
+  delegate :account, :account_id,
+    :default_permissions, :default_permission_ids,
     :allowed_permissions, :allowed_permission_ids,
     allow_nil: true,
     to: :resource
@@ -119,17 +120,30 @@ class Role < ApplicationRecord
   end
 
   ##
+  # reset_permissions resets the role's permission attributes to defaults.
+  def reset_permissions
+    self.permissions = default_permission_ids
+  end
+
+  ##
   # name= overloads role assignment so we can reset permissions
   # on role change.
   def name=(...)
     super(...)
 
-    # Reset permissions on role change, using the intersection
-    # of our current role's and the new role's defaults. This
-    # ensures privilege escalation is unlikely. Only run when
-    # role is persisted, i.e. on updates.
-    self.permissions = permission_ids & default_permission_ids if
+    # Reset permissions on role change, and for Ent accounts, using the
+    # intersection of our current role's permissions and the new role's
+    # defaults. This prevents accidental privilege escalation.
+    #
+    # Only run when role is persisted, i.e. on updates.
+    return unless
       persisted?
+
+    if account.ent?
+      self.permissions = permission_ids & default_permission_ids
+    else
+      self.reset_permissions
+    end
   end
 
   def rank

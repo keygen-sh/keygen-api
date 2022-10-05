@@ -13,6 +13,18 @@ FactoryBot.define do
       account.users << build(:admin, account:)
     end
 
+    trait :std do
+      before :create do |account|
+        account.plan = build(:plan, :std)
+      end
+    end
+
+    trait :ent do
+      before :create do |account|
+        account.plan = build(:plan, :ent)
+      end
+    end
+
     trait :unprotected do
       protected { false }
     end

@@ -28,41 +28,73 @@ describe User, type: :model do
     end
 
     context 'on role change' do
-      it 'should intersect permissions when upgraded to admin role' do
-        user = create(:user, account:)
-        user.change_role!(:admin)
+      context 'for standard accounts' do
+        let(:account) { create(:account, :std) }
 
-        admin   = user.reload
-        actions = admin.permissions.actions
-        role    = admin.role
+        it 'should reset permissions when upgraded to admin role' do
+          user = create(:user, account:)
+          user.change_role!(:admin)
 
-        expect(actions).to match_array User.default_permissions
-        expect(role.admin?).to be true
+          admin   = user.reload
+          actions = admin.permissions.actions
+          role    = admin.role
+
+          expect(actions).to match_array admin.default_permissions
+          expect(role.admin?).to be true
+        end
+
+        it 'should reset permissions when downgraded to user role' do
+          admin = create(:admin, account:)
+          admin.change_role!(:user)
+
+          user    = admin.reload
+          actions = user.permissions.actions
+          role    = user.role
+
+          expect(actions).to match_array user.default_permissions
+          expect(role.user?).to be true
+        end
       end
 
-      it 'should intersect permissions when downgraded to user role' do
-        admin = create(:admin, account:)
-        admin.change_role!(:user)
+      context 'for ent accounts' do
+        let(:account) { create(:account, :ent) }
 
-        user    = admin.reload
-        actions = user.permissions.actions
-        role    = user.role
+        it 'should intersect permissions when upgraded to admin role' do
+          user = create(:user, account:)
+          user.change_role!(:admin)
 
-        expect(actions).to match_array User.default_permissions
-        expect(role.user?).to be true
-      end
+          admin   = user.reload
+          actions = admin.permissions.actions
+          role    = admin.role
 
-      it 'should intersect custom permissions when changing role' do
-        user = create(:user, account:, permissions: %w[license.validate license.read])
-        user.change_role!(:admin)
-        # Oops! Change back!
-        user.change_role!(:user)
+          expect(actions).to match_array User.default_permissions
+          expect(role.admin?).to be true
+        end
 
-        actions = user.permissions.actions
-        role    = user.role
+        it 'should intersect permissions when downgraded to user role' do
+          admin = create(:admin, account:)
+          admin.change_role!(:user)
 
-        expect(actions).to match_array %w[license.validate license.read]
-        expect(role.user?).to be true
+          user    = admin.reload
+          actions = user.permissions.actions
+          role    = user.role
+
+          expect(actions).to match_array User.default_permissions
+          expect(role.user?).to be true
+        end
+
+        it 'should intersect custom permissions when changing role' do
+          user = create(:user, account:, permissions: %w[license.validate license.read])
+          user.change_role!(:admin)
+          # Oops! Change back!
+          user.change_role!(:user)
+
+          actions = user.permissions.actions
+          role    = user.role
+
+          expect(actions).to match_array %w[license.validate license.read]
+          expect(role.user?).to be true
+        end
       end
 
       it 'should revoke tokens' do
