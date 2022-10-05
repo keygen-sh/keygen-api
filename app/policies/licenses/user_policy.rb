@@ -15,7 +15,7 @@ module Licenses
       in role: { name: 'user' } if license.user == bearer
         allow!
       in role: { name: 'license' } if license == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end

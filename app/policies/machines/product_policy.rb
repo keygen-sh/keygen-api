@@ -13,9 +13,9 @@ module Machines
       in role: { name: 'product' } if machine.product == bearer
         allow!
       in role: { name: 'user' } if machine.user == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       in role: { name: 'license' } if machine.license == bearer
-        ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+        allow!
       else
         deny!
       end

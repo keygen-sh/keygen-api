@@ -8,9 +8,9 @@ class ProductPolicy < ApplicationPolicy
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
     in role: { name: 'user' } if record_ids & bearer.product_ids == record_ids
-      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+      allow!
     in role: { name: 'license' } if record == [bearer.product]
-      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+      allow!
     else
       deny!
     end
@@ -25,9 +25,9 @@ class ProductPolicy < ApplicationPolicy
     in role: { name: 'product' } if record == bearer
       allow!
     in role: { name: 'user' } if bearer.products.exists?(record.id)
-      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+      allow!
     in role: { name: 'license' } if record == bearer.product
-      ENV.key?('KEYGEN_ENABLE_PERMISSIONS')
+      allow!
     else
       deny!
     end
