@@ -24,5 +24,13 @@ FactoryBot.define do
       plan.plan_id = evaluator.stripe_plan.id if plan.plan_id.nil?
       plan.save
     end
+
+    trait :std do
+      name { "Standard Test" }
+    end
+
+    trait :ent do
+      name { "Ent Test" }
+    end
   end
 end
