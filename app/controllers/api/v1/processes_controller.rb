@@ -78,14 +78,13 @@ module Api::V1
 
     private
 
+    # FIXME(ezekg) We're using :machine_process here because Rails has
+    #              an internal :process method that conflicts.
     attr_reader :machine_process
 
     def set_machine_process
       scoped_processes = authorized_scope(current_account.machine_processes)
 
-      # FIXME(ezekg) We're using an instance variable here instead of an
-      #              attr_reader because Rails has an internal process
-      #              method that conflicts.
       @machine_process = scoped_processes.find(params[:id])
 
       Current.resource = machine_process
