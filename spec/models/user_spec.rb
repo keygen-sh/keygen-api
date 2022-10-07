@@ -95,6 +95,22 @@ describe User, type: :model do
           expect(actions).to match_array %w[license.validate license.read]
           expect(role.user?).to be true
         end
+
+        it 'should maintain wildcard permissions when changing roles' do
+          user = create(:user, account:, permissions: %w[*])
+
+          user.change_role!(:admin)
+          admin = user.reload
+
+          expect(admin.permissions.actions).to match_array %w[*]
+          expect(admin.admin?).to be true
+
+          admin.change_role!(:user)
+          user = admin.reload
+
+          expect(user.permissions.actions).to match_array %w[*]
+          expect(user.user?).to be true
+        end
       end
 
       it 'should revoke tokens' do
