@@ -73,18 +73,18 @@ class Account < ApplicationRecord
     errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_RE
   end
 
-  scope :active, -> (t = 90.days.ago) {
+  scope :active, -> (with_activity_from: 90.days.ago) {
     joins(:billing)
       .where(billings: { state: %i[subscribed trialing pending] })
-      .where(<<~SQL.squish, t)
+      .where(<<~SQL.squish, with_activity_from)
         EXISTS (
           SELECT
             1
           FROM
-            "request_logs"
+            "event_logs"
           WHERE
-            "request_logs"."account_id" = "accounts"."id" AND
-            "request_logs"."created_at" > ?
+            "event_logs"."account_id" = "accounts"."id" AND
+            "event_logs"."created_at" > ?
           LIMIT
             1
         )
