@@ -144,8 +144,9 @@ module Permissible
         define_singleton_method :default_permissions do
           perms = resolver.call(self, default)
 
-          # When no defaults are provided, default to allowed.
-          next allowed_permissions if
+          # When no defaults are provided, default to allowed minus wildcard.
+          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
+                                  .freeze if
             perms.empty?
 
           perms.freeze
@@ -154,8 +155,9 @@ module Permissible
         define_method :default_permissions do
           perms = resolver.call(self, default)
 
-          # When no defaults are provided, default to allowed.
-          next allowed_permissions if
+          # When no defaults are provided, default to allowed minus wildcard.
+          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
+                                  .freeze if
             perms.empty?
 
           perms.freeze
