@@ -358,6 +358,138 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_three(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: 'Our servers caught fire!',
+      body: <<~TXT
+        Only kidding! -- but this summer has been a hot one! Luckily, our servers weren't in Texas. (Unluckily, I am... and it's *still* in the 90s here.)
+
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Zeke here with another quick Keygen update. The last couple months has been chock full of behind-the-scenes work, but some of that work is starting to surface through new features.
+
+        To kick things off, let's cover some of the new features for our enterprise Ent tiers.
+
+        ## Permissions
+
+        Historically, Keygen has implemented a role-based strategy with fixed permissions for authorization, and it has worked quite well. But many enterprises have been asking for more fine-grained control around permissions. For example, they may want to create an admin that can only manage a subset of resources, or a read only user, or they want to create a license that can only validate and activate itself -- nothing more.
+
+        Until now, this wasn't possible. But we after months of hard work, we've finally rolled out a powerful permission system that makes all of this, and more, possible.
+
+        The new permission system is only available on our Ent tiers. Standard tiers will continue to function as they always have.
+
+        Please head on over to the blog and the docs to dig in further:
+
+        Blog: https://keygen.sh/blog/announcing-advanced-roles-and-permissions/
+
+        Docs: https://keygen.sh/docs/api/authorization/
+
+        ## Static IPs
+
+        Historically, we've been unable to support static IPs due to a limitation of one of our infrastructure providers. But we know that whitelisting a domain name can be a hard sell for some customers, or it may even be *impossible* depending on the way a customer's private network is configured, complicating an integration.
+
+        To make our offering even better and allow it to be used in even more environments, we've started rolling out static IP addresses for those on the Ent tier. Huge thanks to https://www.quotaguard.com/ for helping us out here.
+
+        If you're interested, please let us know and we'll get you set up. This feature is only available on our Ent tiers.
+
+        Docs: https://keygen.sh/docs/static-ips/
+
+        --
+
+        Next, we'll cover new features and the like that are available on all Std and Ent tiers --
+
+        ## Processes
+
+        As our product grows, we continue to encounter new and novel ways in which our customers utilize our API to their license software products. Sometimes our API supports these novel scenarios, but other times it doesnt, and we take notes and start brainstorming a solution.
+
+        One area in which our API lacked was managing application instances on a per-machine basis. Essentially, we want to be able to limit the number of machines per-license, as well as the number of instances per-machine.
+
+        Our API supported the former and has since day 1 -- limiting the number of machines per-license -- but not the number of instances per-machine.
+
+        Well, we finally have an answer to the latter problem: Processes.
+
+        Processes allow you to limit the number of PIDs per-machine, very similarly to how a machine limits the number of devices per-license.
+
+        We hope this is yet another step towards making our API the #1 choice for licensing software.
+
+        Docs: https://keygen.sh/docs/api/processes/
+
+        ## API Versioning
+
+        If you're one of those that peek our changelog from time to time, you may have noticed that we've made some breaking changes recently.
+
+        But if you don't peek our changelog, you may not have noticed these breaking changes at all.
+
+        Wait... what?
+
+        You heard that right! We've made some rather large breaking changes to our API and you probably didn't even notice (and it'd be a major bug if you did!)
+
+        That may seem like a stark contradiction, but we've spent a considerable amount of time recently on our API versioning strategy. We even wrote a blog post about it!
+
+        Please check out the post if you're interested in API versioning. And peek our changelog if you're curious about the recent changes.
+
+        Blog: https://keygen.sh/blog/breaking-things-without-breaking-things/
+
+        Docs: https://keygen.sh/docs/api/versioning/
+
+        Changelog: https://keygen.sh/changelog/
+
+        ## New SDK
+
+        Our Go SDK has a new major version available. This release coincides with the breaking changes mentioned above. Be sure to check it out if you're a Gopher.
+
+        In related news -- we're currently working on a Rust SDK. We're hoping to have a slick integration with Tauri as well.
+
+        Please let us know what languages you're hoping for next!
+
+        GitHub: https://github.com/keygen-sh/keygen-go
+
+        ## New CLI
+
+        Our CLI also has a new major version available. The CLI has been completely reworked to coincide with the changes made to our distribution API.
+
+        We think it's in a much better place now, offering an improved DX for publishing software artifacts.
+
+        Source: https://github.com/keygen-sh/keygen-cli
+
+        Action: https://github.com/unhack/keygen-action
+
+        Docs: https://keygen.sh/docs/cli/
+
+        --
+
+        That's all for now. I appreciate your continued support. Lots in store for the future, including a rather big surprise that ryhmes with "ocean horse."
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. we're hiring: https://keygen.sh/jobs/
+      TXT
+    )
+  end
+
   private
 
   def encrypt(plaintext)

@@ -112,9 +112,9 @@ class User < ApplicationRecord
     errors.add :group, :user_limit_exceeded, message: "user count has exceeded maximum allowed by current group (#{group.max_users})"
   end
 
-  scope :stdout_subscribers, -> {
+  scope :stdout_subscribers, -> (with_activity_from: 90.days.ago) {
     User.distinct_on(:email)
-        .where(account: Account.active, stdout_unsubscribed_at: nil)
+        .where(account: Account.active(with_activity_from:), stdout_unsubscribed_at: nil)
         .with_roles(:admin, :developer)
         .reorder(:email, :created_at)
   }
