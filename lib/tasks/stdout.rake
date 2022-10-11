@@ -29,7 +29,7 @@ namespace :stdout do
 
         Keygen.logger.info "Sending issue #2 to #{subscriber.email}"
 
-        StdoutMailer.issue_two(subscriber: subscriber)
+        StdoutMailer.issue_three(subscriber: subscriber)
                     .deliver_later(
                       # Fan out deliveries
                       in: rand(1.minute..3.hours),
