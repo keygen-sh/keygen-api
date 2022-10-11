@@ -2,6 +2,8 @@
 
 module Stdout
   class SubscribersController < ApplicationController
+    skip_verify_authorized
+
     def unsubscribe
       ciphertext = params.fetch(:ciphertext)
       email      = decrypt(ciphertext)
