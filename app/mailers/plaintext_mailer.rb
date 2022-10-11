@@ -108,7 +108,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
 
-        Do you have a couple minutes today to give us a quick testimonial? As a thank you, I'll give you a $20 account credit!
+        Do you have a couple minutes today to give us a quick testimonial? As a thank you, I'll send you a $20 gift card to your favorite coffee shop or lunch spot!
 
         You can leave a short testimonial here: https://keygen.sh/record-a-testimonial/ (you can do video or text, and it can be a personal testimonial or on behalf of the company.)
 
@@ -137,7 +137,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
 
-        Do you have a few minutes today to give us a quick review so more companies can find us? As a thank you, I'll give you a $20 account credit!
+        Do you have a few minutes today to give us a quick review so more companies can find us? As a thank you, I'll send you a $20 gift card to your favorite coffee shop or lunch spot!
 
         You can leave a short review here: https://keygen.sh/write-a-review/ (it can be a personal review or on behalf of the company.)
 
@@ -165,7 +165,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are well. I know you're still early in your licensing journey, but I'd love to hear more about what you're working on?
 
-        Also, please let me know if there's anything you're looking for but can’t find or if you're experiencing any technical issues.
+        Also, please let me know if there's anything you're looking for but can't find or if you're experiencing any technical issues.
 
         --
         Zeke, Founder <https://keygen.sh>
