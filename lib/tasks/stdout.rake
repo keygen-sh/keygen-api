@@ -27,7 +27,7 @@ namespace :stdout do
       subscribers.each do |subscriber|
         subscriber.touch(:stdout_last_sent_at)
 
-        Keygen.logger.info "Sending issue #2 to #{subscriber.email}"
+        Keygen.logger.info "Sending issue #3 to #{subscriber.email}"
 
         StdoutMailer.issue_three(subscriber: subscriber)
                     .deliver_later(
