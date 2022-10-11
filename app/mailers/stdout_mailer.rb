@@ -378,7 +378,7 @@ class StdoutMailer < ApplicationMailer
       to: subscriber.email,
       subject: 'Our servers caught fire!',
       body: <<~TXT
-        Only kidding! -- but this summer has been a hot one! Luckily, our servers weren't in Texas. (Unluckily, I am... and it's *still* in the 90s here.)
+        Only kidding! -- but this summer has been a hot one! Luckily, our servers weren't in Texas. (Unluckily, I am... and it's *still* hitting the 90s here.)
 
         (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
 
