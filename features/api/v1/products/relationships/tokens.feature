@@ -374,6 +374,103 @@ Feature: Generate authentication token for product
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a product token with permissions for product with wildcard permission (standard tier)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product" with the following:
+      """
+      { "permissions": ["*"] }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "policy.create",
+              "policy.update",
+              "policy.read",
+              "license.create",
+              "license.read",
+              "license.validate",
+              "license.suspend",
+              "machine.create",
+              "machine.update",
+              "machine.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin generates a product token with permissions for product with wildcard permission (ent tier)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product" with the following:
+      """
+      { "permissions": ["*"] }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/products/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "policy.create",
+              "policy.update",
+              "policy.read",
+              "license.create",
+              "license.read",
+              "license.validate",
+              "license.suspend",
+              "machine.create",
+              "machine.update",
+              "machine.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.create",
+          "license.read",
+          "license.suspend",
+          "license.validate",
+          "machine.create",
+          "machine.read",
+          "machine.update",
+          "policy.create",
+          "policy.read",
+          "policy.update"
+        ]
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to generate a token
     Given the current account is "test1"
     And the current account has 1 "product"

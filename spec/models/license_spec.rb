@@ -32,6 +32,17 @@ describe License, type: :model do
 
         expect(actions).to match_array %w[license.read license.validate]
       end
+
+      context 'with wildcard user permissions' do
+        let(:user) { create(:user, account:, permissions: %w[*]) }
+
+        it 'should set custom permissions' do
+          license = create(:license, account:, user:, permissions: %w[license.read license.validate])
+          actions = license.permissions.actions
+
+          expect(actions).to match_array %w[license.read license.validate]
+        end
+      end
     end
 
     context 'on update' do

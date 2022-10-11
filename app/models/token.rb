@@ -42,8 +42,16 @@ class Token < ApplicationRecord
 
   validates :permission_ids,
     inclusion: {
-      in: -> token { token.bearer.permission_ids << Permission.wildcard_id },
       message: 'unsupported permissions',
+      in: -> token {
+        permission_ids = token.bearer.permission_ids
+        wildcard_id    = Permission.wildcard_id
+
+        return token.bearer.allowed_permission_ids if
+          permission_ids.include?(wildcard_id)
+
+        permission_ids << wildcard_id
+      },
     }
 
   validates :max_activations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
@@ -110,7 +118,7 @@ class Token < ApplicationRecord
     where(bearer_id: bearer_id)
   }
 
-  delegate :role,
+  delegate :role, :role_permissions,
     allow_nil: true,
     to: :bearer
 
@@ -148,11 +156,19 @@ class Token < ApplicationRecord
     return pending_permissions if
       token_permissions_attributes_changed?
 
+    # When the token has a wildcard permission, defer to role.
     return role.permissions if
       token_permissions.joins(:permission)
                        .exists?(permission: {
                          action: Permission::WILDCARD_PERMISSION,
                        })
+
+    # When the role has a wildcard permission, defer to token.
+    return Permission.distinct.joins(:token_permissions).where(token_permissions: { token_id: id }).reorder(nil) if
+      role_permissions.joins(:permission)
+                      .exists?(permission: {
+                        action: Permission::WILDCARD_PERMISSION,
+                      })
 
     # A token's permission set is the intersection of its bearer's role
     # permissions and its own token permissions.
