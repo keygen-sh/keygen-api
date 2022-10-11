@@ -444,11 +444,13 @@ class StdoutMailer < ApplicationMailer
 
         You heard that right! We've made some rather large breaking changes to our API and you probably didn't even notice (and it'd be a major bug if you did!)
 
-        That may seem like a stark contradiction, but we've spent a considerable amount of time recently on our API versioning strategy. We even wrote a blog post about it!
+        That may seem like a stark contradiction, but we've spent a considerable amount of time recently on our API versioning strategy. We even wrote a blog post about it, and open sourced how we do it!
 
-        Please check out the post if you're interested in API versioning. And peek our changelog if you're curious about the recent changes.
+        Please check out the post (and gem) if you're interested in API versioning. And peek our changelog if you're curious about the recent changes.
 
         Blog: https://keygen.sh/blog/breaking-things-without-breaking-things/
+
+        Gem: https://github.com/keygen-sh/request_migrations
 
         Docs: https://keygen.sh/docs/api/versioning/
 
@@ -462,7 +464,7 @@ class StdoutMailer < ApplicationMailer
 
         Please let us know what languages you're hoping for next!
 
-        GitHub: https://github.com/keygen-sh/keygen-go
+        Source: https://github.com/keygen-sh/keygen-go
 
         ## New CLI
 
