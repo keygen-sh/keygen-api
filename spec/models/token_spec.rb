@@ -23,6 +23,17 @@ describe Token, type: :model do
 
         expect(actions).to match_array %w[license.read license.validate]
       end
+
+      context 'with wildcard bearer permissions' do
+        let(:bearer) { create(:license, account:, permissions: %w[*]) }
+
+        it 'should set custom permissions' do
+          token   = create(:token, account:, bearer:, permissions: %w[license.read license.validate])
+          actions = token.permissions.actions
+
+          expect(actions).to match_array %w[license.read license.validate]
+        end
+      end
     end
 
     context 'on update' do

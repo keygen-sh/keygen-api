@@ -461,8 +461,13 @@ class License < ApplicationRecord
     return role.permissions unless
       user.present?
 
+    # When license has wildcard permissions, defer to user.
     return user.permissions if
       role.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
+
+    # When user has wildcard permissions, defer to license.
+    return role.permissions if
+      user.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
 
     # A license's permission set is the intersection of its user's role
     # permissions and its own permissions.
