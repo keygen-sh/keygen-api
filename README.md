@@ -1,7 +1,7 @@
 # Keygen
 
 Keygen is an open source software licensing and distribution API built
-by developers for developers. Easily add license key validation, entitlements,
+for developers by developers. Easily add license key validation, entitlements,
 and device activation to your business's desktop apps, server applications,
 on-premise software, and other products using Keygen.
 
