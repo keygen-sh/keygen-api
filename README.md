@@ -80,6 +80,48 @@ Keygen is a standard Ruby/Rails application, backed by PostgreSQL and Redis.
 For anyone wishing to contribute to Keygen, we recommend taking a look at
 [our contributor guide][contributing].
 
+## Developing
+
+### Setup
+
+Running the application requires a Postgres database via `DATABASE_RUL` and
+a Redis instance via `REDIS_URL`.
+
+To initialize the database, run:
+
+```bash
+rails db:setup
+rails db:seed
+```
+
+### Running
+
+To run the application, run:
+
+```bash
+rails s
+```
+
+### Testing
+
+To run the entire test suite, specs and features, run:
+
+```bash
+rake test
+```
+
+To run features, run:
+
+```bash
+rake parallel:features
+```
+
+To run specs, run:
+
+```bash
+rake parallel:specs
+```
+
 ## License
 
 Keygen is licensed under [the Elastic License 2.0 (ELv2)][license].
