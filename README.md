@@ -87,6 +87,12 @@ For anyone wishing to contribute to Keygen, we recommend taking a look at
 Running the application requires a Postgres database via `DATABASE_RUL` and
 a Redis instance via `REDIS_URL`.
 
+To install dependencies, run:
+
+```bash
+bundle
+```
+
 To initialize the database, run:
 
 ```bash
