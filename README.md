@@ -84,8 +84,7 @@ For anyone wishing to contribute to Keygen, we recommend taking a look at
 
 ### Setup
 
-Running the application requires a Postgres database via `DATABASE_RUL` and
-a Redis instance via `REDIS_URL`.
+First, configure all required `ENV` variables.
 
 To install dependencies, run:
 
