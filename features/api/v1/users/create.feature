@@ -1215,17 +1215,15 @@ Feature: Create user
         }
       }
       """
-    Then the response status should be "201"
-    And the JSON response should be a "user" with the following attributes:
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
       """
       {
-        "permissions": ["policy.create", "product.create"]
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
       }
       """
-    And the current account should have 2 "admins"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Admin attempts to create another admin with custom permissions (standard tier, EE)
