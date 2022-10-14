@@ -66,111 +66,121 @@ class ApplicationController < ActionController::API
   def render_forbidden(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :forbidden, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Access denied",
-        detail: "You do not have permission to complete the request"
-      }.merge(kwargs)]
-    }, status: :forbidden
+        detail: "You do not have permission to complete the request",
+        **kwargs,
+      }],
+    }
   end
 
   def render_unauthorized(**kwargs)
     skip_verify_authorized!
 
     self.headers["WWW-Authenticate"] = %(Bearer realm="keygen")
-    render json: {
+
+    render status: :unauthorized, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Unauthorized",
-        detail: "You must be authenticated to complete the request"
-      }.merge(kwargs)]
-    }, status: :unauthorized
+        detail: "You must be authenticated to complete the request",
+        **kwargs,
+      }],
+    }
   end
 
   def render_unprocessable_entity(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :unprocessable_entity, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Unprocessable entity",
-        detail: "The request could not be completed"
-      }.merge(kwargs)]
-    }, status: :unprocessable_entity
+        detail: "The request could not be completed",
+        **kwargs,
+      }],
+    }
   end
 
   def render_not_found(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :not_found, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Not found",
         detail: "The requested resource was not found",
         code: "NOT_FOUND",
-      }.merge(kwargs)]
-    }, status: :not_found
+        **kwargs,
+      }],
+    }
   end
 
   def render_bad_request(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :bad_request, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Bad request",
-        detail: "The request could not be completed"
-      }.merge(kwargs)]
-    }, status: :bad_request
+        detail: "The request could not be completed",
+        **kwargs,
+      }],
+    }
   end
 
   def render_conflict(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :conflict, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Conflict",
-        detail: "The request could not be completed because of a conflict"
-      }.merge(kwargs)]
-    }, status: :conflict
+        detail: "The request could not be completed because of a conflict",
+        **kwargs,
+      }],
+    }
   end
 
   def render_payment_required(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :payment_required, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Payment required",
-        detail: "The request could not be completed"
-      }.merge(kwargs)]
-    }, status: :payment_required
+        detail: "The request could not be completed",
+        **kwargs,
+      }],
+    }
   end
 
   def render_internal_server_error(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :internal_server_error, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Internal server error",
         detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
-      }.merge(kwargs)]
-    }, status: :internal_server_error
+        **kwargs,
+      }],
+    }
   end
 
   def render_service_unavailable(**kwargs)
     skip_verify_authorized!
 
-    render json: {
+    render status: :service_unavailable, json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Service unavailable",
-        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions."
-      }.merge(kwargs)]
-    }, status: :service_unavailable
+        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions.",
+        **kwargs,
+      }],
+    }
   end
 
   def render_unprocessable_resource(resource)
@@ -226,8 +236,8 @@ class ApplicationController < ActionController::API
           title: "Unprocessable resource",
           detail: err,
           source: {
-            pointer: pointer
-          }
+            pointer: pointer,
+          },
         }
 
         # Provide more detailed error codes for resources other than account
@@ -308,14 +318,14 @@ class ApplicationController < ActionController::API
     }.flatten
 
     # Special cases where a certain limit has been met on the free tier
-    status_code =
+    status =
       if errors&.any? { |e| e[:code] == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
         :payment_required
       else
         :unprocessable_entity
       end
 
-    render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
+    render status:, json: { meta: { id: request.request_id }, errors: }
   end
 
   def rescue_from_exceptions
@@ -475,5 +485,16 @@ class ApplicationController < ActionController::API
       preferences.empty?
 
     preferences.include?(preference.to_s)
+  end
+
+  def require_ee!(entitlements: [])
+    return if
+      Keygen.ee? && Keygen.ee.entitled?(*entitlements)
+
+    if entitlements.any?
+      render_forbidden(detail: "must have an EE license with the following entitlements to access this resource: #{entitlements.join(', ')}")
+    else
+      render_forbidden(detail: "must have an EE license to access this resource")
+    end
   end
 end

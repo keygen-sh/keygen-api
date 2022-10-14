@@ -35,7 +35,7 @@ module Api::V1::Licenses::Relationships
           param :name, type: :string, allow_nil: true, optional: true
           param :max_activations, type: :integer, optional: true
           param :max_deactivations, type: :integer, optional: true
-          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
             items type: :string
           end
         end

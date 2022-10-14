@@ -16,9 +16,14 @@ module Keygen
       def product      = lic.product['id']
       def policy       = lic.policy['id']
 
+      def present? = lic.present?
       def expiry   = Time.parse(attributes['expiry'])
-      def expired? = expiry < Time.current
-      def valid?   = lic.valid? && !expired?
+      def expired? = present? && expiry < Time.current
+      def valid?   = present? && lic.valid? && !expired?
+
+      def entitled?(*codes)
+        present? && (codes & entitlements) == codes
+      end
 
       private
 

@@ -33,7 +33,7 @@ module Api::V1
           param :platforms, type: :array, allow_nil: true, optional: true do
             items type: :string
           end
-          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
+          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
             items type: :string
           end
         end
@@ -70,7 +70,7 @@ module Api::V1
           param :platforms, type: :array, allow_nil: true, optional: true do
             items type: :string
           end
-          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
+          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
             items type: :string
           end
         end

@@ -4,7 +4,7 @@ module Keygen
   module EE
     module Router
       class Constraint
-        def matches?(*) = Keygen.ee?
+        def matches?(request) = Keygen.ee?
       end
 
       def ee(&)

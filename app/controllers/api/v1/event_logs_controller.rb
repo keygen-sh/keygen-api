@@ -8,6 +8,7 @@ module Api::V1
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
     has_scope(:event) { |c, s, v| s.for_event_type(v) }
 
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :require_ent_subscription!
@@ -50,6 +51,10 @@ module Api::V1
 
     def cache_key
       [:event_logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
+    end
+
+    def require_ee!
+      super(entitlements: %w[EVENT_LOGS])
     end
   end
 end
