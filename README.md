@@ -36,30 +36,52 @@ option and the revenue goes to funding the maintenance and further
 development of Keygen. So you’ll be supporting open source software
 and getting a great service!
 
-## Self hosting with Keygen OSS
+## Self hosting with Keygen CE
 
 Keygen is a fully open source software licensing and distribution API, and
-we have a free (as in beer) [self-hosted solution][keygen-oss]. It’s exactly
-the same product as our managed cloud solution, but with a less frequent
-release schedule (think of it as an LTS release).
+we have a free (as in beer) [self-hosted solution][keygen-ce]. Keygen Community
+Edition is exactly the same product as our managed Cloud solution, but with
+a less frequent release schedule (think of it as an LTS release).
 
-Bug fixes and new features are released to the cloud version several times
-per week. Features are battle-tested in the cloud which allows us to fix
+Bug fixes and new features are released to the Cloud version several times
+per week. Features are battle-tested in the Cloud which allows us to fix
 any bugs before the general self-hosted release. Every six months, we
 combine all the changes into a new self-hosted release.
 
-Interested in self-hosting Keygen? Take a look at our [self-hosting docs][keygen-oss].
+Keygen CE does lack a few features from Keygen Cloud, which are available
+in [Keygen EE][keygen-ee].
+
+Interested in self-hosting Keygen? Take a look at our [self-hosting docs][keygen-ce].
+
+## Self hosting with Keygen EE
+
+Keygen is also enterprise-grade, battle-tested in Keygen Cloud with some of
+the best brands in the world. The following features are available in
+Keygen Enterprise Edition:
+
+- Request logs: keep a historical record of API requests, along with who
+  made the request, the request body, response body, status code, IP address,
+  and other information.
+- Event logs: keep an audit trail of every single event that happens on a
+  Keygen account.
+- Permissions: enterprise-grade roles and permissions.
+- SSO: full support for SSO/SAML/SAML2.
+
+Keygen uses Keygen EE in production to run Keygen Cloud, which is used to
+license Keygen EE. It's ~~turtles~~ Keygens all the way down.
+
+To obtain a license key, please [reach out][sales].
 
 ## Sustainability
 
-Our only sources of funding for Keygen is our premium, managed service for running
-Keygen in the cloud, and premium support contracts. But if you're looking for
-an alternative way to support the project, we've put together [some sponsorship
-packages][sponsoring].
+Our only sources of funding for Keygen is our premium, managed service for
+running Keygen in the Cloud, Keygen EE, and premium support contracts. But
+if you're looking for an alternative way to support the project, we've put
+together [some sponsorship options][sponsor].
 
-If you choose to self-host Keygen, you can become a sponsor, which is a great
-way to give back to the community and to contribute to the long-term
-sustainability of the project.
+If you choose to self-host Keygen, you can [become a sponsor][sponsor],
+which is a great way to give back to the community and to contribute
+to the long-term sustainability of the project.
 
 ## Support
 
@@ -78,7 +100,7 @@ Keygen is a standard Ruby/Rails application, backed by PostgreSQL and Redis.
 ## Contributors
 
 For anyone wishing to contribute to Keygen, we recommend taking a look at
-[our contributor guide][contributing].
+[our contributor guide][contribute].
 
 ## Developing
 
@@ -145,10 +167,11 @@ and brand from abuse.
 For a commercial license, [contact us][sales].
 
 [keygen-cloud]:
-[keygen-oss]:
-[sponsoring]:
+[keygen-ce]:
+[keygen-ee]:
+[sponsor]:
 [support]:
 [forum]:
-[contributing]:
+[contribute]:
 [license]:
 [sales]:
