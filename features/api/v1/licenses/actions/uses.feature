@@ -861,6 +861,7 @@ Feature: License usage actions
     And sidekiq should have 1 "request-log" job
 
   # Expiration basis
+  @ee
   Scenario: License increments its usage count with a usage expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policies"
@@ -887,6 +888,7 @@ Feature: License usage actions
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  @ee
   Scenario: License increments its usage count with a usage expiration basis (set)
     Given the current account is "test1"
     And the current account has 1 "policies"

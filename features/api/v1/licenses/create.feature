@@ -5286,6 +5286,7 @@ Feature: Create license
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  @ee
   Scenario: Admin creates a license with a validation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policy"

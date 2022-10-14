@@ -7657,6 +7657,7 @@ Feature: License validation actions
     And sidekiq should have 0 "request-log" jobs
 
   # Expiration basis
+  @ee
   Scenario: Anonymous validates a license key with a validation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policy"
@@ -7687,6 +7688,7 @@ Feature: License validation actions
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  @ee
   Scenario: Product validates a license key with a validation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -7721,6 +7723,7 @@ Feature: License validation actions
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  @ee
   Scenario: Anonymous validates a license key with an activation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policy"
@@ -7751,6 +7754,7 @@ Feature: License validation actions
     And sidekiq should process 1 "event-notification" job
     And the first "license" should not have an expiry
 
+  @ee
   Scenario: Anonymous validates a license key with a validation expiration basis (set)
     Given the current account is "test1"
     And the current account has 1 "policy"
