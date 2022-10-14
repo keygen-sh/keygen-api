@@ -175,7 +175,6 @@ Feature: Create policy
             "name": "Actionsack Map Pack",
             "fingerprintMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
-            "expirationBasis": "FROM_FIRST_VALIDATION",
             "transferStrategy": "RESET_EXPIRY",
             "authenticationStrategy": "LICENSE",
             "heartbeatCullStrategy": "KEEP_DEAD",
@@ -201,7 +200,6 @@ Feature: Create policy
         "name": "Actionsack Map Pack",
         "fingerprintMatchingStrategy": "MATCH_ALL",
         "expirationStrategy": "REVOKE_ACCESS",
-        "expirationBasis": "FROM_FIRST_VALIDATION",
         "transferStrategy": "RESET_EXPIRY",
         "authenticationStrategy": "LICENSE",
         "heartbeatCullStrategy": "KEEP_DEAD",
@@ -499,6 +497,7 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Admin creates a policy that has an invalid expiration basis
     Given I am an admin of account "test1"
     And the current account is "test1"

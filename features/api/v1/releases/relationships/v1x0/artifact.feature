@@ -1502,6 +1502,7 @@ Feature: Release artifact relationship
     And the first "release" should not be yanked
 
   # Expiration basis
+  @ee
   Scenario: License downloads an artifact with a download expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -1532,6 +1533,7 @@ Feature: Release artifact relationship
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  @ee
   Scenario: License downloads an artifact with a download expiration basis (set)
     Given the current account is "test1"
     And the current account has 1 "product"
