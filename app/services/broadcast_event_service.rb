@@ -17,39 +17,41 @@ class BroadcastEventService < BaseService
       end
 
       begin
-        # FIXME(ezekg) Should we pass in the entire JSONAPI :document and require the caller
-        #              to also specify :metadata for the broadcasted event? This would let
-        #              us keep any event data separate from the webhook payload.
-        metadata =
-          case event
-          when /^release\.upgraded$/
-            { prev: meta[:current], next: meta[:next] }
-          when /^artifact\.downloaded$/,
-               /^release\.downloaded$/
-            { version: resource.version }
-          when /^license\.validation\./
-            { code: meta[:code] }
-          when /\.updated$/
-            { diff: resource.to_diff } if resource.class < Diffable
-          when /\.entitlements\.(de|at)tached$/
-            { codes: account.entitlements.where(id: resource.map(&:entitlement_id)).pluck(:code) }
-          else
-            nil
-          end
+        if Keygen.ee? && Keygen.ee.entitled?('EVENT_LOGS')
+          # FIXME(ezekg) Should we pass in the entire JSONAPI :document and require the caller
+          #              to also specify :metadata for the broadcasted event? This would let
+          #              us keep any event data separate from the webhook payload.
+          metadata =
+            case event
+            when /^release\.upgraded$/
+              { prev: meta[:current], next: meta[:next] }
+            when /^artifact\.downloaded$/,
+                /^release\.downloaded$/
+              { version: resource.version }
+            when /^license\.validation\./
+              { code: meta[:code] }
+            when /\.updated$/
+              { diff: resource.to_diff } if resource.class < Diffable
+            when /\.entitlements\.(de|at)tached$/
+              { codes: account.entitlements.where(id: resource.map(&:entitlement_id)).pluck(:code) }
+            else
+              nil
+            end
 
-        # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
-        #             generated via a background job like MachineHeartbeatWorker.
-        EventLogWorker.perform_async(
-          event,
-          Current.account&.id || account.id,
-          Current.resource&.class&.name || resource.class.name,
-          Current.resource&.id || resource.id,
-          Current.bearer&.class&.name,
-          Current.bearer&.id,
-          Current.request_id,
-          SecureRandom.hex,
-          metadata.to_json,
-        )
+          # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
+          #             generated via a background job like MachineHeartbeatWorker.
+          EventLogWorker.perform_async(
+            event,
+            Current.account&.id || account.id,
+            Current.resource&.class&.name || resource.class.name,
+            Current.resource&.id || resource.id,
+            Current.bearer&.class&.name,
+            Current.bearer&.id,
+            Current.request_id,
+            SecureRandom.hex,
+            metadata.to_json,
+          )
+        end
       rescue => e
         Keygen.logger.exception(e)
       end
