@@ -61,8 +61,8 @@ module Keygen
           ed.verify(Base64.strict_decode64(sig), "license/#{enc}")
 
         nil
-      rescue
-        raise InvalidLicenseFileError, 'failed to verify license file'
+      rescue => e
+        raise InvalidLicenseFileError, "failed to verify license file: #{e}"
       end
 
       def decrypt!(data)
@@ -80,8 +80,8 @@ module Keygen
         aes.auth_data = ''
 
         aes.update(ciphertext) + aes.final
-      rescue
-        raise InvalidLicenseFileError, 'failed to decrypt license file'
+      rescue => e
+        raise InvalidLicenseFileError, "failed to decrypt license file: #{e}"
       end
 
       def load!
