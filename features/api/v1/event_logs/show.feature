@@ -1,4 +1,5 @@
 @api/v1
+@ee
 Feature: Show event logs
   Background:
     Given the following "plan" rows exist:

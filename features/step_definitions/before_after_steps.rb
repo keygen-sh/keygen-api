@@ -2,10 +2,6 @@
 
 World Rack::Test::Methods
 
-# Around do |scenario, block|
-#   DatabaseCleaner.cleaning(&block)
-# end
-
 RequestMigrations.supported_versions.each do |version|
   semver = Semverse::Version.new(version)
 
@@ -23,7 +19,13 @@ end
 Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
 After("@skip/bullet") { Bullet.instance_variable_set :@enable, true }
 
-Before do
+Before do |scenario|
+  # Skip CE tests if we're running in an EE env, and vice-versa
+  # for EE tests in a CE env.
+  return skip_this_scenario if
+    Keygen.ee? && scenario.tags.any? { _1.name == '@ce' } ||
+    Keygen.ce? && scenario.tags.any? { _1.name == '@ee' }
+
   Bullet.start_request if Bullet.enable?
 
   ActionMailer::Base.deliveries.clear

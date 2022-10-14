@@ -1,6 +1,6 @@
 @api/v1
+@ee
 Feature: List request logs
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |

@@ -1,6 +1,6 @@
 @api/v1
+@ee
 Feature: Request log counts
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
