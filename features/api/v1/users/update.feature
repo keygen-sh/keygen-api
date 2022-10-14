@@ -931,7 +931,8 @@ Feature: Update user
       """
     Then the response status should be "422"
 
-  Scenario: Admin updates a user's permissions (standard tier)
+  @ce
+  Scenario: Admin updates a user's permissions (standard tier, CE)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
@@ -960,7 +961,63 @@ Feature: Update user
       }
       """
 
-  Scenario: Admin updates a user's permissions (ent tier)
+  @ce
+  Scenario: Admin updates a user's permissions (ent tier, CE)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+
+  @ee
+  Scenario: Admin updates a user's permissions (standard tier, EE)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Admin updates a user's permissions (ent tier, EE)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
     And the current account has 1 "user"
@@ -985,6 +1042,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin zeroes a user's permissions (standard tier)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1014,6 +1072,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin zeroes a user's permissions (ent tier)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1039,6 +1098,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates an admin's permissions (ent tier)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1064,6 +1124,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates an admin's permissions (has admin.* permissions)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1089,6 +1150,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates an admin's permissions (no admin.* permissions)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1119,6 +1181,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates their permissions (no other admins)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1147,6 +1210,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates their permissions (other admins without full permissions)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1180,6 +1244,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates their permissions (other admins with full permissions)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1205,6 +1270,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin updates their permissions (wildcard)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
@@ -1229,6 +1295,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin with limited permissions escalates their permissions
     Given the current account is "ent1"
     And the current account has 2 "admins"
@@ -1264,6 +1331,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Admin with limited permissions escalates another admin's permissions
     Given the current account is "ent1"
     And the current account has 2 "admins"
@@ -1299,6 +1367,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Product removes an admin's permissions
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -1326,6 +1395,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Product escalates a user's permissions
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -1360,6 +1430,7 @@ Feature: Update user
       }
       """
 
+  @ee
   Scenario: Product updates a users metadata
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"

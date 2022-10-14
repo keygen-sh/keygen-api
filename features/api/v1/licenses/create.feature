@@ -2832,6 +2832,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User creates a license for themself (user lacks permission)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -2870,6 +2871,7 @@ Feature: Create license
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User creates a license for themself (token lacks permission)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -3656,7 +3658,8 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product creates a license with custom permissions (standard tier)
+  @ce
+  Scenario: Product creates a license with custom permissions (standard tier, CE)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -3698,7 +3701,88 @@ Feature: Create license
       }
       """
 
-  Scenario: Product creates a license with custom permissions (ent tier)
+  @ce
+  Scenario: Product creates a license with custom permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Product creates a license with custom permissions (standard tier, EE)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Product creates a license with custom permissions (ent tier, EE)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -3742,6 +3826,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a user license with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -3797,6 +3882,7 @@ Feature: Create license
       }
       """
 
+  @ee
   Scenario: Product creates a user license with custom permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
@@ -3854,6 +3940,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a license with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -3895,6 +3982,7 @@ Feature: Create license
       }
       """
 
+  @ee
   Scenario: Product creates a license with unsupported permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
@@ -3943,6 +4031,7 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a license with invalid permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -3984,6 +4073,7 @@ Feature: Create license
       }
       """
 
+  @ee
   Scenario: Product creates a license with invalid permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
@@ -4032,6 +4122,7 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User creates a license with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 unprotected "policy"
@@ -4082,6 +4173,7 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User creates a license with custom permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 unprotected "policy"
