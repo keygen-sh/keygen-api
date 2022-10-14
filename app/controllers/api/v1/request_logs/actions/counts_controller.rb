@@ -2,6 +2,7 @@
 
 module Api::V1::RequestLogs::Actions
   class CountsController < Api::V1::BaseController
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
 
@@ -49,6 +50,10 @@ module Api::V1::RequestLogs::Actions
 
     def cache_key
       [:logs, current_account.id, :count, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
+    end
+
+    def require_ee!
+      super(entitlements: %w[REQUEST_LOGS])
     end
   end
 end

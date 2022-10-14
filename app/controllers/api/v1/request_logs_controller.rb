@@ -12,6 +12,7 @@ module Api::V1
     has_scope(:status) { |c, s, v| s.search_status(v) }
     has_scope(:event) { |c, s, v| s.for_event_type(v) }
 
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -52,6 +53,10 @@ module Api::V1
 
     def cache_key
       [:request_logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
+    end
+
+    def require_ee!
+      super(entitlements: %w[REQUEST_LOGS])
     end
   end
 end
