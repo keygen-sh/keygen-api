@@ -50,6 +50,9 @@ module RequestLogger
 
     def queue_request_log_worker
       return unless
+        Keygen.ee? && Keygen.ee.entitled?('REQUEST_LOGS')
+
+      return unless
         log_request?
 
       RequestLogWorker.perform_async(
