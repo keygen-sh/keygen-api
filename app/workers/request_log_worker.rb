@@ -24,6 +24,9 @@ class RequestLogWorker
     response_body,
     response_status
   )
+    return unless
+      Keygen.ee? && Keygen.ee.entitled?('REQUEST_LOGS')
+
     account = fetch_account(account_id)
 
     # Skip request logs for non-existent accounts
