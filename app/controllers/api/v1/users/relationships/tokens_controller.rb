@@ -33,8 +33,14 @@ module Api::V1::Users::Relationships
         param :attributes, type: :hash do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
-          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
-            items type: :string
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?('PERMISSIONS')
+
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+              items type: :string
+            end
           end
         end
       end

@@ -11,5 +11,8 @@ module Keygen
 
   def self.ce? = !ENV.key?('KEYGEN_LICENSE_FILE') && !ENV.key?('KEYGEN_LICENSE_KEY')
   def self.ee? = !ce? && EE.license.valid?
-  def self.ee  = EE.license
+
+  def self.ee(&)
+    yield EE.license if ee?
+  end
 end

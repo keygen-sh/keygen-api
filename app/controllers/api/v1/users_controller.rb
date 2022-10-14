@@ -50,8 +50,14 @@ module Api::V1
             transform: -> (k, v) {
               [:role_attributes, { name: v.underscore }]
             }
-          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
-            items type: :string
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?('PERMISSIONS')
+
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+              items type: :string
+            end
           end
         end
         param :relationships, type: :hash, optional: true do
@@ -92,15 +98,21 @@ module Api::V1
           param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :email, type: :string, optional: true
           param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :product) }
-          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
-            items type: :string
-          end
           param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
               [:role_attributes, { name: v.underscore }]
             }
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?('PERMISSIONS')
+
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+              items type: :string
+            end
+          end
         end
       end
     }

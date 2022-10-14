@@ -17,7 +17,10 @@ class BroadcastEventService < BaseService
       end
 
       begin
-        if Keygen.ee? && Keygen.ee.entitled?('EVENT_LOGS')
+        Keygen.ee do |license|
+          next unless
+            license.entitled?('EVENT_LOGS')
+
           # FIXME(ezekg) Should we pass in the entire JSONAPI :document and require the caller
           #              to also specify :metadata for the broadcasted event? This would let
           #              us keep any event data separate from the webhook payload.
