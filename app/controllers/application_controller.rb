@@ -489,7 +489,7 @@ class ApplicationController < ActionController::API
 
   def require_ee!(entitlements: [])
     return if
-      Keygen.ee? && Keygen.ee.entitled?(*entitlements)
+      Keygen.ee? && Keygen.ee { _1.entitled?(*entitlements) }
 
     if entitlements.any?
       render_forbidden(detail: "must have an EE license with the following entitlements to access this resource: #{entitlements.join(', ')}")

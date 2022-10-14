@@ -18,7 +18,7 @@ class EventLogWorker
     metadata
   )
     return unless
-      Keygen.ee? && Keygen.ee.entitled?('EVENT_LOGS')
+      Keygen.ee? && Keygen.ee { _1.entitled?('EVENT_LOGS') }
 
     metadata   = JSON.parse(metadata) if metadata.present?
     event_type = fetch_event_type_by_event(event)

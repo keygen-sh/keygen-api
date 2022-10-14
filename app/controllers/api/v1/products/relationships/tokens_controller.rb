@@ -33,8 +33,14 @@ module Api::V1::Products::Relationships
         param :attributes, type: :hash do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
-          param :permissions, type: :array, optional: true, if: -> { Keygen.ee? && Keygen.ee.entitled?('PERMISSIONS') && current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
-            items type: :string
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?('PERMISSIONS')
+
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+              items type: :string
+            end
           end
         end
       end
@@ -74,5 +80,32 @@ module Api::V1::Products::Relationships
 
       Current.resource = product
     end
+<<<<<<< HEAD
+=======
+
+    typed_parameters format: :jsonapi do
+      options strict: true
+
+      on :create do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[token tokens]
+          param :attributes, type: :hash do
+            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+            param :name, type: :string, allow_nil: true, optional: true
+            Keygen.ee do |license|
+              next unless
+                license.entitled?('PERMISSIONS')
+
+              if current_account.ent? && current_bearer&.has_role?(:admin, :product)
+                param :permissions, type: :array, optional: true do
+                  items type: :string
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+>>>>>>> 77843209 (update ee to accept block)
   end
 end
