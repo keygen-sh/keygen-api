@@ -222,7 +222,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "400"
-    And the response should contain a valid signature header for "test1"
+    And the response should contain a valid signature header for "ent1"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
