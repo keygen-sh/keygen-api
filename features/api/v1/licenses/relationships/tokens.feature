@@ -248,6 +248,7 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be a "token" with a nil expiry
 
+  @ee
   Scenario: Product generates a license token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -282,6 +283,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with custom permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -314,6 +316,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with permissions that exceed the license's permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -355,6 +358,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with permissions that exceed the license's permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -388,21 +392,22 @@ Feature: Generate authentication token for license
     And the first error should have the following properties:
       """
       {
-          "title": "Unprocessable resource",
-          "detail": "unsupported permissions",
-          "code": "PERMISSIONS_NOT_ALLOWED",
-          "source": {
-            "pointer": "/data/attributes/permissions"
-          },
-          "links": {
-            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
-          }
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
+      }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product generates a license token with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -434,6 +439,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with unsupported permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -457,21 +463,22 @@ Feature: Generate authentication token for license
     And the first error should have the following properties:
       """
       {
-          "title": "Unprocessable resource",
-          "detail": "unsupported permissions",
-          "code": "PERMISSIONS_NOT_ALLOWED",
-          "source": {
-            "pointer": "/data/attributes/permissions"
-          },
-          "links": {
-            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
-          }
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
+      }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product generates a license token with invalid permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -503,6 +510,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with invalid permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "product"
@@ -526,21 +534,22 @@ Feature: Generate authentication token for license
     And the first error should have the following properties:
       """
       {
-          "title": "Unprocessable resource",
-          "detail": "unsupported permissions",
-          "code": "PERMISSIONS_NOT_ALLOWED",
-          "source": {
-            "pointer": "/data/attributes/permissions"
-          },
-          "links": {
-            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
-          }
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
+      }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product generates a license token with permissions for a license with wildcard permission (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -582,6 +591,7 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ee
   Scenario: Product generates a license token with permissions for a license with wildcard permission (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "product"

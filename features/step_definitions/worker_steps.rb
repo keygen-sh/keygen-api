@@ -19,6 +19,11 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
       "#{worker_name.singularize.underscore}_worker"
     end
 
+  # Skip request and event log assertions for CE
+  next if
+    worker_name.in?(%w[request_log_worker event_notification_worker event_log_worker]) &&
+    Keygen.ce?
+
   # Drain certain queues before count
   case worker_name
   when "webhook_worker"

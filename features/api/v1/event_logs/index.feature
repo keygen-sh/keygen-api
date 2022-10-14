@@ -1,5 +1,6 @@
 @api/v1
-Feature: List event_logs
+@ee
+Feature: List event logs
   Background:
     Given the following "plan" rows exist:
       | id                                   | name       |

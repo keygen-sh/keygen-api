@@ -145,7 +145,8 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous creates a user with permissions (standard tier)
+  @ce
+  Scenario: Anonymous creates a user with permissions (standard tier, CE)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the first "webhook-endpoint" has the following attributes:
@@ -185,7 +186,84 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous creates a user with permissions (ent tier)
+  @ce
+  Scenario: Anonymous creates a user with permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.created", "user.updated"] }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "email": "superman@keygen.sh",
+            "password": "loislane",
+            "permissions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Anonymous creates a user with permissions (standard tier, EE)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.created", "user.updated"] }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "email": "superman@keygen.sh",
+            "password": "loislane",
+            "permissions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Anonymous creates a user with permissions (ent tier, EE)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
     And the first "webhook-endpoint" has the following attributes:
@@ -1077,7 +1155,80 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to create another admin with custom permissions (standard tier)
+  @ce
+  Scenario: Admin attempts to create another admin with custom permissions (standard tier, CE)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Spiderman",
+            "lastName": "Parker",
+            "email": "spiderman@keygen.sh",
+            "password": "webmaster",
+            "role": "admin",
+            "permissions": [
+              "product.create",
+              "policy.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ce
+  Scenario: Admin attempts to create another admin with custom permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Spiderman",
+            "lastName": "Parker",
+            "email": "spiderman@keygen.sh",
+            "password": "webmaster",
+            "role": "admin",
+            "permissions": [
+              "product.create",
+              "policy.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["policy.create", "product.create"]
+      }
+      """
+    And the current account should have 2 "admins"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attempts to create another admin with custom permissions (standard tier, EE)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And I am an admin of account "test1"
@@ -1114,7 +1265,8 @@ Feature: Create user
       }
       """
 
-  Scenario: Admin attempts to create another admin with custom permissions (ent tier)
+  @ee
+  Scenario: Admin attempts to create another admin with custom permissions (ent tier, EE)
     Given the current account is "ent1"
     And the current account has 1 "webhook-endpoint"
     And I am an admin of account "ent1"
@@ -1211,7 +1363,78 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product creates a user with custom permissions (standard tier)
+  @ce
+  Scenario: Product creates a user with custom permissions (standard tier, CE)
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Ironman",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis!!",
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ce
+  Scenario: Product creates a user with custom permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Ironman",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis!!",
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Product creates a user with custom permissions (standard tier, EE)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
@@ -1248,7 +1471,8 @@ Feature: Create user
       }
       """
 
-  Scenario: Product creates a user with custom permissions (ent tier)
+  @ee
+  Scenario: Product creates a user with custom permissions (ent tier, EE)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
@@ -1287,6 +1511,7 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a user with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
@@ -1323,6 +1548,7 @@ Feature: Create user
       }
       """
 
+  @ee
   Scenario: Product creates a user with unsupported permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"
@@ -1366,6 +1592,7 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a user with invalid permissions (standard tier)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
@@ -1402,6 +1629,7 @@ Feature: Create user
       }
       """
 
+  @ee
   Scenario: Product creates a user with invalid permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"
@@ -1445,6 +1673,7 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: Product creates a user with no permissions (standard tier)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
@@ -1479,6 +1708,7 @@ Feature: Create user
       }
       """
 
+  @ee
   Scenario: Product creates a user with no permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"

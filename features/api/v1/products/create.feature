@@ -1,11 +1,15 @@
 @api/v1
 Feature: Create product
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name  |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Std 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1 |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -288,6 +292,280 @@ Feature: Create product
       }
       """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ce
+  Scenario: Admin creates a product with custom permissions (standard tier, CE)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "license.create",
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ce
+  Scenario: Admin creates a product with custom permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "license.create",
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Admin creates a product with custom permissions (standard tier, EE)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "license.create",
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Admin creates a product with custom permissions (ent tier, EE)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "license.create",
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "product"
+    And the JSON response should be a "product" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.create",
+          "license.read",
+          "license.validate"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a product with unsupported permissions (standard tier)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "product.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Admin creates a product with unsupported permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "product.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/products/#products-object-attrs-permissions"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a product with invalid permissions (standard tier)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "foo.bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  @ee
+  Scenario: Admin creates a product with invalid permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Micro-service",
+            "permissions": [
+              "foo.bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/products/#products-object-attrs-permissions"
+        }
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
