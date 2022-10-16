@@ -3340,7 +3340,6 @@ Feature: Create machine
     Then the response status should be "201"
 
   # Expiration basis
-  @ee
   Scenario: License activates a machine with an activation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policies"
@@ -3386,7 +3385,6 @@ Feature: Create machine
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
-  @ee
   Scenario: Product activates a machine with an activation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -3433,7 +3431,6 @@ Feature: Create machine
     And sidekiq should process 1 "event-notification" jobs
     And the first "license" should have a 1 month expiry
 
-  @ee
   Scenario: License activates a machine with a validation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policies"
@@ -3479,7 +3476,6 @@ Feature: Create machine
     And sidekiq should process 1 "event-notification" job
     And the first "license" should not have an expiry
 
-  @ee
   Scenario: License activates a machine with an activation expiration basis (set)
     Given the current account is "test1"
     And the current account has 1 "policies"

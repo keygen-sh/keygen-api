@@ -47,18 +47,13 @@ class Policy < ApplicationRecord
     ALLOW_ACCESS
   ].freeze
 
-  EXPIRATION_BASES =
-    if Keygen.ee?
-      %w[
-        FROM_CREATION
-        FROM_FIRST_VALIDATION
-        FROM_FIRST_ACTIVATION
-        FROM_FIRST_DOWNLOAD
-        FROM_FIRST_USE
-      ].freeze
-    else
-      %w[FROM_CREATION].freeze
-    end
+  EXPIRATION_BASES = %w[
+    FROM_CREATION
+    FROM_FIRST_VALIDATION
+    FROM_FIRST_ACTIVATION
+    FROM_FIRST_DOWNLOAD
+    FROM_FIRST_USE
+  ].freeze
 
   TRANSFER_STRATEGIES = %w[
     RESET_EXPIRY

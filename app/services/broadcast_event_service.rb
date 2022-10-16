@@ -17,6 +17,16 @@ class BroadcastEventService < BaseService
       end
 
       begin
+        # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
+        #             generated via a background job like MachineHeartbeatWorker.
+        account_id      = Current.account&.id || account.id
+        resource_type   = Current.resource&.class&.name || resource.class.name
+        resource_id     = Current.resource&.id || resource.id
+        bearer_type     = Current.bearer&.class&.name
+        bearer_id       = Current.bearer&.id
+        request_id      = Current.request_id
+        idempotency_key = SecureRandom.hex
+
         Keygen.ee do |license|
           next unless
             license.entitled?(:event_logs)
@@ -41,20 +51,28 @@ class BroadcastEventService < BaseService
               nil
             end
 
-          # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
-          #             generated via a background job like MachineHeartbeatWorker.
           EventLogWorker.perform_async(
             event,
-            Current.account&.id || account.id,
-            Current.resource&.class&.name || resource.class.name,
-            Current.resource&.id || resource.id,
-            Current.bearer&.class&.name,
-            Current.bearer&.id,
-            Current.request_id,
-            SecureRandom.hex,
+            account_id,
+            resource_type,
+            resource_id,
+            bearer_type,
+            bearer_id,
+            request_id,
+            idempotency_key,
             metadata.to_json,
           )
         end
+
+        EventNotificationWorker2.perform_async(
+          event,
+          account_id,
+          resource_type,
+          resource_id,
+          bearer_type,
+          bearer_id,
+          idempotency_key,
+        )
       rescue => e
         Keygen.logger.exception(e)
       end

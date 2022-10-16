@@ -33,8 +33,6 @@ class EventLogWorker
       request_log_id:,
       metadata:,
     )
-
-    EventNotificationWorker.perform_async(event_log.id)
   end
 
   private

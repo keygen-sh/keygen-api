@@ -20,7 +20,7 @@ module Envented
     included do
       mattr_accessor :__event_callbacks, default: {}
 
-      def notify_of_event!(event, idempotency_key: nil)
+      def notify!(event, idempotency_key: nil)
         callbacks = __event_callbacks.select do |key|
           case
           when key.starts_with?(Envented::WILDCARD_SYMBOL)
