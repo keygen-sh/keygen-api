@@ -25,7 +25,7 @@ class RequestLogWorker
     response_status
   )
     return unless
-      Keygen.ee? && Keygen.ee { _1.entitled?('REQUEST_LOGS') }
+      Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
 
     account = fetch_account(account_id)
 

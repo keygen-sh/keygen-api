@@ -50,7 +50,7 @@ module RequestLogger
 
     def queue_request_log_worker
       return unless
-        Keygen.ee? && Keygen.ee { _1.entitled?('REQUEST_LOGS') }
+        Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
 
       return unless
         log_request?
