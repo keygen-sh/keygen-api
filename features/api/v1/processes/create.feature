@@ -21,7 +21,7 @@ Feature: Spawn machine process
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin spawns a process for their account
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "machine"
@@ -50,8 +50,8 @@ Feature: Spawn machine process
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "status": "ALIVE",
         "pid": "1"
       }

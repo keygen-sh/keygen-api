@@ -47,7 +47,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with defaults (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -64,8 +64,8 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -77,8 +77,8 @@ Feature: Machine checkout actions
     And the JSON response should be a "machine-file" with the following attributes:
       """
       {
-        "issued": "2022-03-22T14:52:48.000Z",
-        "expiry": "2022-04-22T14:52:48.000Z",
+        "issued": "2022-10-16T14:52:48.000Z",
+        "expiry": "2022-11-16T14:52:48.000Z",
         "ttl": 2629746
       }
       """
@@ -101,7 +101,7 @@ Feature: Machine checkout actions
     And time is unfrozen
 
   Scenario: Admin performs a machine checkout with defaults (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -123,8 +123,8 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -139,7 +139,7 @@ Feature: Machine checkout actions
     And time is unfrozen
 
   Scenario: Admin performs an encrypted machine checkout (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -155,8 +155,8 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -171,7 +171,7 @@ Feature: Machine checkout actions
     And time is unfrozen
 
   Scenario: Admin performs an encrypted machine checkout (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -184,8 +184,8 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -314,7 +314,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with a custom TTL (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -329,8 +329,8 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-03-23T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-10-17T14:52:48.000Z",
           "ttl": 86400
         }
       }
@@ -341,7 +341,7 @@ Feature: Machine checkout actions
     And time is unfrozen
 
   Scenario: Admin performs a machine checkout with a custom TTL (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -353,7 +353,7 @@ Feature: Machine checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
           "expiry": "2022-03-22T15:52:48.000Z",
           "ttl": 3600
         }
@@ -759,7 +759,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout with encrypted includes (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
