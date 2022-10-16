@@ -3,8 +3,8 @@
 Contact: security@keygen.sh
 
 At Keygen, we consider the security of our systems a top priority. But
-no matter how much effort we put into system security, there can
-still be vulnerabilities present.
+no matter how much effort we put into system security, there can still
+be vulnerabilities present. If you find one, please let us know.
 
 ## Reporting security issues
 
