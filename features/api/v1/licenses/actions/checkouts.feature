@@ -47,7 +47,7 @@ Feature: License checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with defaults (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -64,8 +64,8 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -77,8 +77,8 @@ Feature: License checkout actions
     And the JSON response should be a "license-file" with the following attributes:
       """
       {
-        "issued": "2022-03-22T14:52:48.000Z",
-        "expiry": "2022-04-22T14:52:48.000Z",
+        "issued": "2022-10-16T14:52:48.000Z",
+        "expiry": "2022-11-16T14:52:48.000Z",
         "ttl": 2629746
       }
       """
@@ -101,7 +101,7 @@ Feature: License checkout actions
     And time is unfrozen
 
   Scenario: Admin performs a license checkout with defaults (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -123,8 +123,8 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -139,7 +139,7 @@ Feature: License checkout actions
     And time is unfrozen
 
   Scenario: Admin performs an encrypted license checkout (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -155,8 +155,8 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -171,7 +171,7 @@ Feature: License checkout actions
     And time is unfrozen
 
   Scenario: Admin performs an encrypted license checkout (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -184,8 +184,8 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-04-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
           "ttl": 2629746
         },
         "data": {
@@ -369,7 +369,7 @@ Feature: License checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a custom TTL (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -384,8 +384,8 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
-          "expiry": "2022-03-23T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-10-17T14:52:48.000Z",
           "ttl": 86400
         }
       }
@@ -396,7 +396,7 @@ Feature: License checkout actions
     And time is unfrozen
 
   Scenario: Admin performs a license checkout with a custom TTL (GET)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -408,7 +408,7 @@ Feature: License checkout actions
       """
       {
         "meta": {
-          "issued": "2022-03-22T14:52:48.000Z",
+          "issued": "2022-10-16T14:52:48.000Z",
           "expiry": "2022-03-22T15:52:48.000Z",
           "ttl": 3600
         }
@@ -758,7 +758,7 @@ Feature: License checkout actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with encrypted includes (POST)
-    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"

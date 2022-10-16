@@ -18,7 +18,7 @@ Feature: Process heartbeat actions
     Then the response status should be "403"
 
   Scenario: Admin pings a process's heartbeat
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -30,7 +30,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T15:02:48.000Z",
         "status": "ALIVE"
       }
@@ -68,7 +68,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: Admin pings a dead process's heartbeat
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -95,7 +95,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: Admin pings a dead process's heartbeat that supports resurrection (period not passed)
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -120,7 +120,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T14:57:48.000Z",
         "status": "RESURRECTED"
       }
@@ -135,7 +135,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: Admin pings a dead process's heartbeat that supports resurrection (period passed)
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -172,7 +172,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: Product pings a process's heartbeat
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -187,7 +187,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T15:02:48.000Z",
         "status": "ALIVE"
       }
@@ -214,7 +214,7 @@ Feature: Process heartbeat actions
     And sidekiq should have 1 "request-log" job
 
   Scenario: License pings a process's heartbeat
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -227,7 +227,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T15:02:48.000Z",
         "status": "ALIVE"
       }
@@ -240,7 +240,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: License pings a process's heartbeat with a custom heartbeat duration
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -258,7 +258,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-29T14:52:48.000Z",
         "status": "ALIVE"
       }
@@ -301,7 +301,7 @@ Feature: Process heartbeat actions
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "process" for the last "machine"
     # FIXME(ezekg) Freezing later to preserve user order
-    And time is frozen at "2022-04-15T14:52:48.000Z"
+    And time is frozen at "2022-10-16T14:52:48.000Z"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
@@ -309,7 +309,7 @@ Feature: Process heartbeat actions
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T15:02:48.000Z",
         "status": "ALIVE"
       }
@@ -338,7 +338,7 @@ Feature: Process heartbeat actions
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "process" for the last "machine"
     # FIXME(ezekg) Freezing later to preserve user order
-    And time is frozen at "2022-04-15T14:52:48.000Z"
+    And time is frozen at "2022-10-16T14:52:48.000Z"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
