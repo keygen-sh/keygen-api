@@ -11,7 +11,7 @@ be vulnerabilities present. If you find one, please let us know.
 If you think you have found a security vulnerability, please send a report
 to security@keygen.sh. This address can be used for all of Keygen's open
 source and commercial products (including but not limited to Keygen CE,
-Keygen EE, Keygen Cloud, and keygen.sh).
+Keygen EE, and Keygen Cloud).
 
 Please encrypt your message to us using our PGP key. The key
 fingerprint is:
