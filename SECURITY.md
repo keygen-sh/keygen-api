@@ -22,7 +22,7 @@ E2A3 C809 9721 7FB6 A578 D08A E3C6 4A7B FE47 7AAA.
 
 The key is available at the following address: https://keygen.sh/pgp-key.txt.
 
-We can accept only vulnerability reports at this address.
+We can only accept vulnerability reports at the above address.
 
 ## Security annoucements
 
