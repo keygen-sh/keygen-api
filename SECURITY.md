@@ -24,14 +24,14 @@ The key is available at the following address: https://keygen.sh/pgp-key.txt.
 
 We can accept only vulnerability reports at this address.
 
+## Security annoucements
+
+You can subscribe to email updates by having a keygen.sh account, or
+you can join the mailing list.
+
 ## Supported Versions
 
 We only add security updates to the latest `MAJOR.MINOR` version of the
 project. No security updates are backported to previous versions. If
 you want be up to date on security patches, please make sure your
 Keygen installation is running the latest release.
-
-## Security annoucements
-
-You can subscribe to email updates by having a keygen.sh account, or
-you can join the mailing list.
