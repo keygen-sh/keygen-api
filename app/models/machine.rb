@@ -38,7 +38,7 @@ class Machine < ApplicationRecord
   after_destroy :update_machines_core_count_on_destroy
 
   # Notify license of creation event (in case license isn't whodunnit)
-  on_exclusive_event 'machine.created', -> { license.notify_of_event!('machine.created') },
+  on_exclusive_event 'machine.created', -> { license.notify!('machine.created') },
     auto_release_lock: true
 
   validates :license,

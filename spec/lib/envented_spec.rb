@@ -127,45 +127,45 @@ describe Envented do
   it 'should invoke callbacks on a valid event' do
     expect(eventable).to receive(:callback).once
 
-    eventable.notify_of_event!('test.event')
+    eventable.notify!('test.event')
   end
 
   it 'should not invoke callbacks on an invalid event' do
     expect(eventable).to_not receive(:callback)
 
-    eventable.notify_of_event!('foo.bar')
+    eventable.notify!('foo.bar')
   end
 
   it 'should invoke a proc callback with an arity of 0' do
     expect(eventable).to receive(:callback)
 
-    eventable.notify_of_event!('test.callback.proc')
+    eventable.notify!('test.callback.proc')
   end
 
   it 'should raise an error when proc callback has incorrect arity' do
-    expect { eventable.notify_of_event!('test.callback.proc-args') }.to raise_error ArgumentError
+    expect { eventable.notify!('test.callback.proc-args') }.to raise_error ArgumentError
   end
 
   it 'should invoke a symbol callback with an arity of 0' do
     expect(eventable).to receive(:callback)
 
-    eventable.notify_of_event!('test.callback.symbol')
+    eventable.notify!('test.callback.symbol')
   end
 
   it 'should raise an error when symbol callback has incorrect arity' do
-    expect { eventable.notify_of_event!('test.callback.symbol-args') }.to raise_error ArgumentError
+    expect { eventable.notify!('test.callback.symbol-args') }.to raise_error ArgumentError
   end
 
   it 'should invoke callbacks on a wildcard suffix event' do
     expect(eventable).to receive(:callback).once
 
-    eventable.notify_of_event!('test.suffix.foo')
+    eventable.notify!('test.suffix.foo')
   end
 
   it 'should invoke callbacks on a wildcard prefix event' do
     expect(eventable).to receive(:callback).once
 
-    eventable.notify_of_event!('foo.test.prefix')
+    eventable.notify!('foo.test.prefix')
   end
 
   it 'should not invoke callback twice on duplicate idempotency key' do
@@ -173,15 +173,15 @@ describe Envented do
 
     key = SecureRandom.hex
 
-    eventable.notify_of_event!('test.event', idempotency_key: key)
-    eventable.notify_of_event!('test.event', idempotency_key: key)
+    eventable.notify!('test.event', idempotency_key: key)
+    eventable.notify!('test.event', idempotency_key: key)
   end
 
   it 'should invoke callbacks when idempotency keys are different' do
     expect(eventable).to receive(:callback).twice
 
-    eventable.notify_of_event!('test.event', idempotency_key: SecureRandom.hex)
-    eventable.notify_of_event!('test.event', idempotency_key: SecureRandom.hex)
+    eventable.notify!('test.event', idempotency_key: SecureRandom.hex)
+    eventable.notify!('test.event', idempotency_key: SecureRandom.hex)
   end
 
   it 'should invoke callback for all events' do
@@ -190,7 +190,7 @@ describe Envented do
     threads = []
 
     32.times do
-      threads << Thread.new { eventable.notify_of_event!('test.event') }
+      threads << Thread.new { eventable.notify!('test.event') }
     end
 
     threads.map(&:join)
@@ -200,33 +200,33 @@ describe Envented do
     it 'should invoke callbacks when :if is a proc that returns true' do
       expect(eventable).to receive(:callback)
 
-      eventable.notify_of_event!('test.if-proc.true')
+      eventable.notify!('test.if-proc.true')
     end
 
     it 'should not invoke callbacks when :if is a proc that returns false' do
       expect(eventable).to_not receive(:callback)
 
-      eventable.notify_of_event!('test.if-proc.false')
+      eventable.notify!('test.if-proc.false')
     end
 
     it 'should raise an error when :if proc has incorrect arity' do
-      expect { eventable.notify_of_event!('test.if-proc-args.true') }.to raise_error ArgumentError
+      expect { eventable.notify!('test.if-proc-args.true') }.to raise_error ArgumentError
     end
 
     it 'should invoke callbacks when :if is a method symbol that returns true' do
       expect(eventable).to receive(:callback)
 
-      eventable.notify_of_event!('test.if-symbol.true')
+      eventable.notify!('test.if-symbol.true')
     end
 
     it 'should not invoke callbacks when :if is a method symbol that returns false' do
       expect(eventable).to_not receive(:callback)
 
-      eventable.notify_of_event!('test.if-symbol.false')
+      eventable.notify!('test.if-symbol.false')
     end
 
     it 'should raise an error when :if method symbol has incorrect arity' do
-      expect { eventable.notify_of_event!('test.if-symbol-args.true') }.to raise_error ArgumentError
+      expect { eventable.notify!('test.if-symbol-args.true') }.to raise_error ArgumentError
     end
   end
 
@@ -234,45 +234,45 @@ describe Envented do
     it 'should not invoke callbacks when :unless is a proc that returns true' do
       expect(eventable).to_not receive(:callback)
 
-      eventable.notify_of_event!('test.unless-proc.true')
+      eventable.notify!('test.unless-proc.true')
     end
 
     it 'should invoke callbacks when :unless is a proc that returns false' do
       expect(eventable).to receive(:callback)
 
-      eventable.notify_of_event!('test.unless-proc.false')
+      eventable.notify!('test.unless-proc.false')
     end
 
     it 'should raise an error when :unless proc has incorrect arity' do
-      expect { eventable.notify_of_event!('test.unless-proc-args.true') }.to raise_error ArgumentError
+      expect { eventable.notify!('test.unless-proc-args.true') }.to raise_error ArgumentError
     end
 
     it 'should not invoke callbacks when :unless is a method symbol that returns true' do
       expect(eventable).to_not receive(:callback)
 
-      eventable.notify_of_event!('test.unless-symbol.true')
+      eventable.notify!('test.unless-symbol.true')
     end
 
     it 'should invoke callbacks when :unless is a method symbol that returns false' do
       expect(eventable).to receive(:callback)
 
-      eventable.notify_of_event!('test.unless-symbol.false')
+      eventable.notify!('test.unless-symbol.false')
     end
 
     it 'should raise an error when :unless method symbol has incorrect arity' do
-      expect { eventable.notify_of_event!('test.unless-symbol-args.true') }.to raise_error ArgumentError
+      expect { eventable.notify!('test.unless-symbol-args.true') }.to raise_error ArgumentError
     end
   end
 
   context 'when using :auto_release_lock' do
     it 'should automatically release the lock when true' do
-      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
-      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
+      expect { eventable.notify!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
+      expect { eventable.notify!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
     end
 
     it 'should not automatically release the lock when false' do
-      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-disabled') }.to_not raise_error
-      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-disabled') }.to raise_error Envented::LockNotAcquiredError
+      expect { eventable.notify!('test.exclusive-event.auto-release-disabled') }.to_not raise_error
+      expect { eventable.notify!('test.exclusive-event.auto-release-disabled') }.to raise_error Envented::LockNotAcquiredError
     end
   end
 
@@ -283,7 +283,7 @@ describe Envented do
       threads = []
 
       32.times do
-        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event') }
+        threads << Thread.new { eventable.notify!('test.exclusive-event') }
       end
 
       threads.map(&:join)
@@ -295,7 +295,7 @@ describe Envented do
       threads = []
 
       32.times do
-        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.wait-and-raise') }
+        threads << Thread.new { eventable.notify!('test.exclusive-event.wait-and-raise') }
       end
 
       threads.map(&:join)
@@ -303,11 +303,11 @@ describe Envented do
 
     it 'should raise when an event is locked' do
       threads = []
-      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to_not raise_error }
+      threads << Thread.new { expect { eventable.notify!('test.exclusive-event.raise') }.to_not raise_error }
       threads << Thread.new do
         sleep 0.5.seconds
 
-        expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to raise_error Envented::LockNotAcquiredError
+        expect { eventable.notify!('test.exclusive-event.raise') }.to raise_error Envented::LockNotAcquiredError
       end
 
       threads.map(&:join)
@@ -315,11 +315,11 @@ describe Envented do
 
     it 'should raise on event lock timeout' do
       threads = []
-      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.timeout') }.to_not raise_error }
+      threads << Thread.new { expect { eventable.notify!('test.exclusive-event.timeout') }.to_not raise_error }
       threads << Thread.new do
         sleep 0.5.seconds
 
-        expect { eventable.notify_of_event!('test.exclusive-event.timeout') }.to raise_error Envented::LockTimeoutError
+        expect { eventable.notify!('test.exclusive-event.timeout') }.to raise_error Envented::LockTimeoutError
       end
 
       threads.map(&:join)
@@ -335,7 +335,7 @@ describe Envented do
       #              access, and guard behavior, ensuring contested
       #              access is thrown out.
       4.times do |i|
-        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.once-with-auto-release') }
+        threads << Thread.new { eventable.notify!('test.exclusive-event.once-with-auto-release') }
       end
 
       threads.map(&:join)
@@ -347,7 +347,7 @@ describe Envented do
       threads = []
 
       64.times do |i|
-        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.once-without-auto-release') }
+        threads << Thread.new { eventable.notify!('test.exclusive-event.once-without-auto-release') }
       end
 
       threads.map(&:join)
