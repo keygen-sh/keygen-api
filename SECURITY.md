@@ -6,6 +6,9 @@ At Keygen, we consider the security of our systems a top priority. But
 no matter how much effort we put into system security, there can
 still be vulnerabilities present.
 
+**Please disclose vulnerabilities responsibly. Contact us at the
+above email instead of opening an issue.**
+
 ## Supported Versions
 
 We only add security updates to the latest `MAJOR.MINOR` version of the
