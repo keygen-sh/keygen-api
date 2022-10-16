@@ -1,4 +1,4 @@
-# Security Policy
+# Security policy
 
 Contact: security@keygen.sh
 
@@ -42,7 +42,7 @@ any release containing security fixes.
 You can also subscribe to email updates by having a keygen.sh account, or
 you can join [the mailing list][mailing-list].
 
-## Supported Versions
+## Supported versions
 
 We only add security updates to the latest `MAJOR.MINOR` version of the
 project. No security updates are backported to previous versions. If
