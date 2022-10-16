@@ -19,7 +19,7 @@ class BroadcastEventService < BaseService
       begin
         Keygen.ee do |license|
           next unless
-            license.entitled?('EVENT_LOGS')
+            license.entitled?(:event_logs)
 
           # FIXME(ezekg) Should we pass in the entire JSONAPI :document and require the caller
           #              to also specify :metadata for the broadcasted event? This would let

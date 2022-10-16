@@ -36,7 +36,7 @@ module Api::V1
 
           Keygen.ee do |license|
             next unless
-              license.entitled?('PERMISSIONS')
+              license.entitled?(:permissions)
 
             param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
               items type: :string
@@ -79,7 +79,7 @@ module Api::V1
 
           Keygen.ee do |license|
             next unless
-              license.entitled?('PERMISSIONS')
+              license.entitled?(:permissions)
 
             param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
               items type: :string
