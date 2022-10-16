@@ -54,7 +54,7 @@ module Api::V1
     end
 
     def require_ee!
-      super(entitlements: %w[EVENT_LOGS])
+      super(entitlements: %i[event_logs])
     end
   end
 end
