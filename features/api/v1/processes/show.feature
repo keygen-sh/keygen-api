@@ -18,7 +18,7 @@ Feature: Show machine process
     Then the response status should be "403"
 
   Scenario: Admin retrieves a process for their account (alive)
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "process"
@@ -30,7 +30,7 @@ Feature: Show machine process
     And the JSON response should be a "process" with the following attributes:
       """
       {
-        "lastHeartbeat": "2022-04-15T14:52:48.000Z",
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
         "nextHeartbeat": "2022-04-15T15:02:48.000Z",
         "interval": 600,
         "status": "ALIVE"
@@ -39,7 +39,7 @@ Feature: Show machine process
     And time is unfrozen
 
   Scenario: Admin retrieves a process for their account (dead)
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "process"
