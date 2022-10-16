@@ -1331,7 +1331,6 @@ Feature: Upgrade release
     Then the response status should be "404"
 
   # Expiration basis
-  @ee
   Scenario: License upgrades a release with a download expiration basis (not set)
     Given the current account is "test1"
     And the current account has the following "product" rows:
@@ -1379,7 +1378,6 @@ Feature: Upgrade release
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
-  @ee
   Scenario: License upgrades a release with a download expiration basis (set)
     Given the current account is "test1"
     And the current account has the following "product" rows:

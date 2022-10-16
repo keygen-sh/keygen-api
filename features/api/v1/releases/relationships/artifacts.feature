@@ -1355,7 +1355,6 @@ Feature: Release artifacts relationship
     Then the response status should be "303"
 
   # Expiration basis
-  @ee
   Scenario: License downloads an artifact with a download expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -1385,7 +1384,6 @@ Feature: Release artifacts relationship
     And sidekiq should process 2 "event-notification" jobs
     And the first "license" should have a 1 year expiry
 
-  @ee
   Scenario: License downloads an artifact with a download expiration basis (set)
     Given the current account is "test1"
     And the current account has 1 "product"
