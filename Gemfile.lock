@@ -432,6 +432,7 @@ GEM
     tilt (2.0.10)
     timecop (0.9.5)
     timeout (0.3.0)
+    tracer (0.1.1)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     uniform_notifier (1.16.0)
@@ -510,6 +511,7 @@ DEPENDENCIES
   stripe (~> 5.43)
   stripe-ruby-mock (~> 3.1.0.rc3)
   timecop (~> 0.9.5)
+  tracer
   webmock (~> 3.14.0)
   whacamole
 

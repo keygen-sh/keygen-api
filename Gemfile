@@ -102,6 +102,7 @@ end
 
 group :development do
   gem 'listen', '~> 3.0.5'
+  gem 'tracer'
 end
 
 group :test do
