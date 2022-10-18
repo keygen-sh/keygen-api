@@ -2,9 +2,9 @@
 
 module Keygen
   module EE
-    class LicenseFile
-      class InvalidLicenseFileError < StandardError; end
+    class InvalidLicenseFileError < StandardError; end
 
+    class LicenseFile
       HEADER_RE = /\A-----BEGIN LICENSE FILE-----\n/.freeze
       FOOTER_RE = /-----END LICENSE FILE-----\n*\z/.freeze
 
