@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class EventLog < ApplicationRecord
+  include Keygen::EE::ProtectedRecord
   include DateRangeable
   include Limitable
   include Orderable
