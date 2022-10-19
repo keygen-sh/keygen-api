@@ -40,6 +40,9 @@ module Keygen
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::Runtime
 
+    # Ignore X-Forwarded-For header
+    config.middleware.insert_before 0, Keygen::Middleware::IgnoreForwardedHost
+
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and
     #              emits errors at multiple layers in the stack, resulting
