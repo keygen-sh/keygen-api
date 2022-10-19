@@ -31,7 +31,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "status": "ALIVE"
       }
       """
@@ -112,7 +112,7 @@ Feature: Process heartbeat actions
     And the current account has 1 "process" for the last "machine"
     And the first "process" has the following attributes:
       """
-      { "lastHeartbeatAt": "2022-04-15T14:45:48.000Z" }
+      { "lastHeartbeatAt": "2022-10-16T14:45:48.000Z" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
@@ -121,7 +121,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T14:57:48.000Z",
+        "nextHeartbeat": "2022-10-16T14:57:48.000Z",
         "status": "RESURRECTED"
       }
       """
@@ -188,7 +188,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "status": "ALIVE"
       }
       """
@@ -228,7 +228,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "status": "ALIVE"
       }
       """
@@ -259,7 +259,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-29T14:52:48.000Z",
+        "nextHeartbeat": "2022-10-30T14:52:48.000Z",
         "status": "ALIVE"
       }
       """
@@ -310,7 +310,7 @@ Feature: Process heartbeat actions
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "status": "ALIVE"
       }
       """

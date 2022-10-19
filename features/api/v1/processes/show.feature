@@ -31,7 +31,7 @@ Feature: Show machine process
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
-        "nextHeartbeat": "2022-04-15T15:02:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
         "interval": 600,
         "status": "ALIVE"
       }
