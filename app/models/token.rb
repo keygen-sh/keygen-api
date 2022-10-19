@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Token < ApplicationRecord
+  include Keygen::EE::ProtectedMethods[:permissions=, :token_permissions_attributes=]
+
   TOKEN_DURATION = 2.weeks
 
   include Tokenable
