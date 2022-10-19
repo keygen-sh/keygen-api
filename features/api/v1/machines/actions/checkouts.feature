@@ -354,7 +354,7 @@ Feature: Machine checkout actions
       {
         "meta": {
           "issued": "2022-10-16T14:52:48.000Z",
-          "expiry": "2022-03-22T15:52:48.000Z",
+          "expiry": "2022-10-16T15:52:48.000Z",
           "ttl": 3600
         }
       }
