@@ -245,6 +245,8 @@ module Keygen
         # Since we don't use this header, and its only purpose is for telling
         # us the host used in the original request, before being proxied to
         # us, we can strip it out without consequence.
+        #
+        # See: https://github.com/rails/rails/issues/29893
         env.delete('HTTP_X_FORWARDED_HOST')
 
         @app.call(env)
