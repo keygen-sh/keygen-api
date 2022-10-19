@@ -238,12 +238,13 @@ module Keygen
       def call(env)
         # Whenever an API request is received that originated via a proxy, such as
         # from Vercel/Next.js, this header may be set and it may be a different
-        # value than our allowed hosts. Unfortunately, Rack prefers this header
-        # over Host, so this raises a 403 error for the bad host header.
+        # value than our allowed hosts. Unfortunately, Rails uses this header
+        # along with Host to authorize against our allowed hosts, so this
+        # raises a 403 error for the bad host header.
         #
-        # Since we don't use this header, and its only purpose for telling us
-        # the host used in the original request, before being proxied to us,
-        # we can strip it out without consequence.
+        # Since we don't use this header, and its only purpose is for telling
+        # us the host used in the original request, before being proxied to
+        # us, we can strip it out without consequence.
         env.delete('HTTP_X_FORWARDED_HOST')
 
         @app.call(env)
