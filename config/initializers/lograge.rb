@@ -83,6 +83,7 @@ Rails.application.configure do
       end
 
     {
+      host: req.host,
       request_id: req.request_id,
       api_version: api_version || 'N/A',
       query_params: query_params || 'N/A',
