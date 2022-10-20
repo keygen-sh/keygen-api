@@ -30,14 +30,16 @@ module Keygen
 
       private
 
-      def path = ENV.fetch('KEYGEN_LICENSE_FILE') { '/etc/keygen/ee.lic' }
-      def key  = ENV['KEYGEN_LICENSE_KEY']
       def data = @data ||= load!
 
-      def import!(path)
-        File.read(path)
+      def import!(path: '/etc/keygen/ee.lic', enc: nil)
+        if enc.present?
+          Base64.strict_decode64(enc)
+        else
+          File.read(path)
+        end
       rescue => e
-        raise InvalidLicenseFileError, "license file is missing: #{e}"
+        raise InvalidLicenseFileError, "license file is missing or invalid: #{e}"
       end
 
       def parse!(cert)
@@ -64,7 +66,7 @@ module Keygen
         raise InvalidLicenseFileError, "failed to verify license file: #{e}"
       end
 
-      def decrypt!(data)
+      def decrypt!(data, key:)
         raise InvalidLicenseFileError, 'license key is missing' unless
           key.present?
 
@@ -86,15 +88,26 @@ module Keygen
         raise InvalidLicenseFileError, "failed to decrypt license file: #{e}"
       end
 
+      def decode!(s)
+        JSON.parse(s)
+      rescue => e
+        raise InvalidLicenseFileError, "failed to decode license file: #{e}"
+      end
+
       def load!
-        cert = import!(path)
-        lic  = parse!(cert)
+        path = ENV['KEYGEN_LICENSE_FILE_PATH']
+        enc  = ENV['KEYGEN_LICENSE_FILE']
+        key  = ENV['KEYGEN_LICENSE_KEY']
+
+        kwargs = { path:, enc: }.compact
+        cert   = import!(**kwargs)
+        lic    = parse!(cert)
 
         verify!(lic)
 
-        dec = decrypt!(lic)
+        s = decrypt!(lic, key:)
 
-        JSON.parse(dec)
+        decode!(s)
       end
     end
   end
