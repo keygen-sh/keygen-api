@@ -5,10 +5,13 @@ module Keygen
     class InvalidLicenseFileError < StandardError; end
 
     class LicenseFile
+      DEFAULT_PATH = '/etc/keygen/ee.lic'.freeze
+
       HEADER_RE = /\A-----BEGIN LICENSE FILE-----\n/.freeze
       FOOTER_RE = /-----END LICENSE FILE-----\n*\z/.freeze
 
       def self.current = @current ||= self.new
+      def self.reset!  = @current = nil if Rails.env.test?
 
       def license      = data['data']
       def entitlements = data['included']&.filter { _1['type'] == 'entitlements' } || []
@@ -17,9 +20,10 @@ module Keygen
 
       def present?  = data.present? rescue false
       def issued    = Time.parse(data['meta']['issued'])
-      def expiry    = Time.parse(data['meta']['expiry'])
+      def expiry    = data['meta']['expiry'].present? ? Time.parse(data['meta']['expiry']) : nil
+      def expires?  = expiry.present?
       def tampered? = issued > Time.current
-      def expired?  = expiry < Time.current
+      def expired?  = expires? && expiry < Time.current
 
       def valid?
         raise InvalidLicenseFileError, 'system clock is out of sync' if
@@ -32,7 +36,7 @@ module Keygen
 
       def data = @data ||= load!
 
-      def import!(path: '/etc/keygen/ee.lic', enc: nil)
+      def import!(path: DEFAULT_PATH, enc: nil)
         if enc.present?
           Base64.strict_decode64(enc)
         else
