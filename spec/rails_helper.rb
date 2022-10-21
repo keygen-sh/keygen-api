@@ -43,6 +43,7 @@ RSpec.configure do |config|
   config.include AuthorizationHelper, type: :policy
   config.include EnvironmentHelper
   config.include FileHelper
+  config.include TimeHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
