@@ -32,6 +32,30 @@ describe Keygen::EE::LicenseFile do
               expect(lic.valid?).to be true
             end
 
+            it 'should have entitlement attributes' do
+              lic = described_class.current
+
+              expect(lic.entitlements).to match_array [Hash, Hash, Hash]
+            end
+
+            it 'should have product attributes' do
+              lic = described_class.current
+
+              expect(lic.product).to be_a Hash
+            end
+
+            it 'should have policy attributes' do
+              lic = described_class.current
+
+              expect(lic.policy).to be_a Hash
+            end
+
+            it 'should have license attributes' do
+              lic = described_class.current
+
+              expect(lic.license).to be_a Hash
+            end
+
             it 'should raise if clock is tampered' do
               lic = described_class.current
 
@@ -55,15 +79,39 @@ describe Keygen::EE::LicenseFile do
       end
     end
 
-    context 'when an expired license file exists' do
+    context 'when an invalid license file exists' do
       with_file path: described_class::DEFAULT_PATH, fixture: 'expired.lic' do
         context 'when a valid license key is used' do
           with_env KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
-            it 'should not be a valid license file' do
+            it 'should be an expired license file' do
               lic = described_class.current
 
               expect(lic.expired?).to be true
               expect(lic.valid?).to be false
+            end
+
+            it 'should not have entitlement attributes' do
+              lic = described_class.current
+
+              expect(lic.entitlements).to match_array []
+            end
+
+            it 'should not have product attributes' do
+              lic = described_class.current
+
+              expect(lic.product).to be_nil
+            end
+
+            it 'should not have policy attributes' do
+              lic = described_class.current
+
+              expect(lic.policy).to be_nil
+            end
+
+            it 'should have license attributes' do
+              lic = described_class.current
+
+              expect(lic.license).to be_a Hash
             end
           end
         end
