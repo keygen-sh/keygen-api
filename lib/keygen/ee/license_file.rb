@@ -37,11 +37,16 @@ module Keygen
       def data = @data ||= load!
 
       def import!(path: DEFAULT_PATH, enc: nil)
-        if enc.present?
-          Base64.strict_decode64(enc)
-        else
-          File.read(path)
-        end
+        return Base64.strict_decode64(enc) if
+          enc.present?
+
+        path = if (p = Pathname.new(path)) && p.relative?
+                 Rails.root.join(p)
+               else
+                 path
+               end
+
+        File.read(path)
       rescue => e
         raise InvalidLicenseFileError, "license file is missing or invalid: #{e}"
       end
