@@ -31,7 +31,7 @@ class Role < ApplicationRecord
   tracks_dirty_attributes_for :role_permissions
 
   # Set default permissions unless already set
-  before_create -> { self.permissions = default_permission_ids },
+  before_create :set_default_permissions,
     unless: :role_permissions_attributes_changed?
 
   # NOTE(ezekg) Sanity check
@@ -193,6 +193,12 @@ class Role < ApplicationRecord
   end
 
   private
+
+  def set_default_permissions
+    assign_attributes(
+      role_permissions_attributes: default_permission_ids.map {{ permission_id: _1 }},
+    )
+  end
 
   ##
   # reject_associated_records_for_role_permissions rejects duplicate role permissions.
