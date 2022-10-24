@@ -4,7 +4,7 @@ module Permissible
   extend ActiveSupport::Concern
 
   included do
-    include Keygen::EE::ProtectedMethods[:permissions=, :role_permissions_attributes=]
+    include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
 
     ##
     # with_permissions returns a scope of models with a given permission set.
