@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RequestLog < ApplicationRecord
-  include Keygen::EE::ProtectedRecord
+  include Keygen::EE::ProtectedRecord[entitlements: %i[request_logs]]
   include DateRangeable
   include Limitable
   include Orderable

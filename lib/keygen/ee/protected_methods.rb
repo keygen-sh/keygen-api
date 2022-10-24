@@ -4,14 +4,18 @@ module Keygen
 
     module ProtectedMethods
       class MethodProxy
-        def initialize(singleton_methods:, instance_methods:)
-          @proxied_singleton_methods = singleton_methods.reduce({}) { |h, v| h.merge(v => false) }
-          @proxied_instance_methods  = instance_methods.reduce({}) { |h, v| h.merge(v => false) }
+        def initialize(singleton_methods:, instance_methods:, entitlements:)
+          @singleton_methods = singleton_methods.reduce({}) { |h, v| h.merge(v => false) }
+          @instance_methods  = instance_methods.reduce({}) { |h, v| h.merge(v => false) }
+          @entitlements      = entitlements
         end
 
         def run_protected_singleton_method(method, *args, **kwargs)
           raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not available in Keygen CE. Please upgrade to Keygen EE." if
             Keygen.console? && Keygen.ce?
+
+          raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not allowed. Please upgrade Keygen EE." if
+            Keygen.console? && Keygen.ee { !_1.entitled?(*entitlements) }
 
           method.call(*args, **kwargs)
         end
@@ -20,23 +24,26 @@ module Keygen
           raise ProtectedMethodError, "Calling #{method.owner.name}##{method.name} is not available in Keygen CE. Please upgrade to Keygen EE." if
             Keygen.console? && Keygen.ce?
 
+          raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not allowed. Please upgrade Keygen EE." if
+            Keygen.console? && Keygen.ee { !_1.entitled?(*entitlements) }
+
           method.call(*args, **kwargs)
         end
 
         def protected_singleton_method?(method)
-          @proxied_singleton_methods.key?(method)
+          singleton_methods.key?(method)
         end
 
         def protected_instance_method?(method)
-          @proxied_instance_methods.key?(method)
+          instance_methods.key?(method)
         end
 
         def proxied_singleton_method?(method)
-          @proxied_singleton_methods.fetch(method) { false }
+          singleton_methods.fetch(method) { false }
         end
 
         def proxied_instance_method?(method)
-          @proxied_instance_methods.fetch(method) { false }
+          instance_methods.fetch(method) { false }
         end
 
         def proxied_singleton_method!(method)
@@ -46,7 +53,7 @@ module Keygen
           raise ArgumentError, "method #{method} is already proxied" if
             proxied_singleton_method?(method)
 
-          @proxied_singleton_methods[method] = true
+          singleton_methods[method] = true
         end
 
         def proxied_instance_method!(method)
@@ -56,15 +63,22 @@ module Keygen
           raise ArgumentError, "method #{method} is already proxied" if
             proxied_instance_method?(method)
 
-          @proxied_instance_methods[method] = true
+          instance_methods[method] = true
         end
+
+        private
+
+        attr_reader :singleton_methods,
+                    :instance_methods,
+                    :entitlements
       end
 
       module MethodBouncer
-        def instrument_protected_methods!(singleton_methods:, instance_methods:)
+        def instrument_protected_methods!(singleton_methods:, instance_methods:, entitlements:)
           @protected_method_proxy ||= MethodProxy.new(
             singleton_methods:,
             instance_methods:,
+            entitlements:,
           )
         end
 
@@ -123,7 +137,7 @@ module Keygen
         end
       end
 
-      def self.[](*methods, singleton_methods: methods, instance_methods: methods)
+      def self.[](*methods, singleton_methods: methods, instance_methods: methods, entitlements: [])
         raise ArgumentError, 'cannot use both positional and keyword arguments' if
           methods.any? && singleton_methods != methods ||
                           instance_methods != methods
@@ -135,6 +149,7 @@ module Keygen
             klass.instrument_protected_methods!(
               singleton_methods:,
               instance_methods:,
+              entitlements:,
             )
           end
         end

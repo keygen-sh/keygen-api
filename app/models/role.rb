@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Role < ApplicationRecord
-  include Keygen::EE::ProtectedMethods[:permissions=, :role_permissions_attributes=]
+  include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
   include Dirtyable
 
   USER_ROLES    = %w[user admin developer read_only sales_agent support_agent].freeze
