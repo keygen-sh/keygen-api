@@ -26,7 +26,7 @@ class Token < ApplicationRecord
   tracks_dirty_attributes_for :token_permissions
 
   # Set default permissions unless already set
-  before_validation -> { self.permissions = default_permissions },
+  before_validation :set_default_permissions,
     unless: :token_permissions_attributes_changed?,
     on: :create
 
@@ -375,6 +375,12 @@ class Token < ApplicationRecord
   end
 
   private
+
+  def set_default_permissions
+    assign_attributes(
+      token_permissions_attributes: default_permission_ids.map {{ permission_id: _1 }},
+    )
+  end
 
   ##
   # reject_associated_records_for_token_permissions rejects duplicate token permissions.
