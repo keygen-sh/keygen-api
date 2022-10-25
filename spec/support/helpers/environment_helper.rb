@@ -1,8 +1,17 @@
 # frozen_string_literal: true
 
 module EnvironmentHelper
-  module ClassMethods
-    def with_environment(prestine: true, **next_env)
+  module Methods
+    def with_prestine_env(&)
+      prev_env = ENV.to_hash
+      ENV.clear
+
+      yield
+
+      ENV.replace(prev_env)
+    end
+
+    def with_env(prestine: true, **next_env, &)
       before do
         @prev_env = ENV.to_hash
         next_env  = next_env.transform_keys(&:to_s)
@@ -21,10 +30,10 @@ module EnvironmentHelper
 
       yield
     end
-    alias :with_env :with_environment
   end
 
   def self.included(klass)
-    klass.extend ClassMethods
+    klass.include Methods
+    klass.extend Methods
   end
 end

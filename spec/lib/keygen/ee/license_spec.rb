@@ -5,7 +5,7 @@ require 'spec_helper'
 
 require_dependency Rails.root.join('lib', 'keygen')
 
-describe Keygen::EE::License do
+describe Keygen::EE::License, type: :ee do
   TEST_PUBLIC_KEY   = ['775e65407f3d86de55efbac47d1bbeab79768a21a406e39976606a704984e7d1'].pack('H*')
   TEST_LICENSE_KEY  = 'TEST-116A58-3F79F9-9F1982-9D63B1-V3'
   TEST_LICENSE_FILE = Base64.strict_encode64(
@@ -14,10 +14,6 @@ describe Keygen::EE::License do
 
   before do
     stub_const('Keygen::PUBLIC_KEY', TEST_PUBLIC_KEY)
-  end
-
-  after do
-    described_class.reset!
   end
 
   context 'when using a valid license file' do
