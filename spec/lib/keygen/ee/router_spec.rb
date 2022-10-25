@@ -5,5 +5,5 @@ require 'spec_helper'
 
 require_dependency Rails.root.join('lib', 'keygen')
 
-describe Keygen::EE::Router do
+describe Keygen::EE::Router, type: :ee do
 end

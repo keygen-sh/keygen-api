@@ -2,7 +2,7 @@
 
 module FileHelper
   module ClassMethods
-    def with_file(path:, content: nil, fixture: nil)
+    def with_file(path:, content: nil, fixture: nil, &)
       p = if (p = Pathname.new(path)) && p.relative?
             Rails.root.join(p)
           else

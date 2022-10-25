@@ -5,5 +5,5 @@ require 'spec_helper'
 
 require_dependency Rails.root.join('lib', 'keygen')
 
-describe Keygen do
+describe Keygen, type: :ee do
 end

@@ -13,6 +13,10 @@ module Keygen
       def self.current = @current ||= self.new
       def self.reset!  = @current = nil if Rails.env.test?
 
+      def initialize(data = nil)
+        @data = data&.with_indifferent_access
+      end
+
       def license      = data['data']
       def entitlements = data['included']&.filter { _1['type'] == 'entitlements' } || []
       def product      = data['included']&.find { _1['type'] == 'products' }

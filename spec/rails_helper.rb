@@ -42,8 +42,10 @@ RSpec.configure do |config|
   config.include Rails.application.routes.url_helpers
   config.include AuthorizationHelper, type: :policy
   config.include EnvironmentHelper
+  config.include ConsoleHelper
   config.include FileHelper
   config.include TimeHelper
+  config.include KeygenHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -84,5 +86,16 @@ RSpec.configure do |config|
     RequestMigrations::Testing.teardown!
     StripeHelper.stop
     DatabaseCleaner.clean
+  end
+
+  # Make sure we're working with a prestine ENV in EE tests.
+  config.around type: :ee do |example|
+    with_prestine_env(&example)
+  end
+
+  # Reset license file and license after each EE test.
+  config.after type: :ee do
+    Keygen::EE::LicenseFile.reset!
+    Keygen::EE::License.reset!
   end
 end
