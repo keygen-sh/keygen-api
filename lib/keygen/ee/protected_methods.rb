@@ -10,24 +10,24 @@ module Keygen
           @entitlements      = entitlements
         end
 
-        def run_protected_singleton_method(method, *args, **kwargs)
+        def run_protected_singleton_method(method, ...)
           raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not available in Keygen CE. Please upgrade to Keygen EE." if
-            Keygen.console? && Keygen.ce?
+            Keygen.ce?
 
-          raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not allowed. Please upgrade Keygen EE." if
-            Keygen.console? && Keygen.ee { !_1.entitled?(*entitlements) }
+          raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not allowed. Please upgrade Keygen EE." unless
+            Keygen.ee { _1.entitled?(*entitlements) }
 
-          method.call(*args, **kwargs)
+          method.call(...)
         end
 
-        def run_protected_instance_method(method, *args, **kwargs)
+        def run_protected_instance_method(method, ...)
           raise ProtectedMethodError, "Calling #{method.owner.name}##{method.name} is not available in Keygen CE. Please upgrade to Keygen EE." if
-            Keygen.console? && Keygen.ce?
+            Keygen.ce?
 
-          raise ProtectedMethodError, "Calling #{method.owner.name}.#{method.name} is not allowed. Please upgrade Keygen EE." if
-            Keygen.console? && Keygen.ee { !_1.entitled?(*entitlements) }
+          raise ProtectedMethodError, "Calling #{method.owner.name}##{method.name} is not allowed. Please upgrade Keygen EE." unless
+            Keygen.ee { _1.entitled?(*entitlements) }
 
-          method.call(*args, **kwargs)
+          method.call(...)
         end
 
         def protected_singleton_method?(method)
@@ -98,10 +98,8 @@ module Keygen
           proxy.proxied_singleton_method!(method)
 
           define_singleton_method method do |*args, **kwargs|
-            bound_method = original_method.bind(self)
-
             proxy.run_protected_singleton_method(
-              bound_method,
+              original_method,
               *args,
               **kwargs,
             )
@@ -138,11 +136,13 @@ module Keygen
       end
 
       def self.[](*methods, singleton_methods: methods, instance_methods: methods, entitlements: [])
-        raise ArgumentError, 'cannot use both positional and keyword arguments' if
-          methods.any? && singleton_methods != methods ||
-                          instance_methods != methods
+        raise ArgumentError, 'cannot use both positional and keyword arguments for methods' if
+          methods.any? && (singleton_methods != methods || instance_methods != methods)
 
         Module.new do
+          next unless
+            Keygen.console?
+
           define_singleton_method :included do |klass|
             klass.extend MethodBouncer
 
