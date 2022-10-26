@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'keygen/console'
 require_relative 'keygen/ee'
 require_relative 'keygen/error'
 require_relative 'keygen/jsonapi'
@@ -8,15 +9,25 @@ require_relative 'keygen/middleware'
 
 module Keygen
   PUBLIC_KEY = %(\xB8\xF3\xEBL\xD2`\x13_g\xA5\tn\x8D\xC1\xC9\xB9\xDC\xB8\x1E\xE9\xFEP\xD1,\xDC\xD9A\xF6`z\x901).freeze
+  VERSION    = '1.2.0'.freeze
 
   class << self
+    def logger = Logger
+
     def console? = Rails.const_defined?(:Console)
 
     def ce? = !lic? && !key?
     def ee? = !ce? && EE.license.valid?
 
-    def ee(&)
-      yield EE.license if ee?
+    def ee(&block)
+      case block.arity
+      when 2
+        yield EE.license, EE.license_file if ee?
+      when 1
+        yield EE.license if ee?
+      else
+        yield if ee?
+      end
     end
 
     private

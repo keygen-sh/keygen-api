@@ -40,8 +40,4 @@ module Keygen
       end
     end
   end
-
-  def self.logger
-    Logger
-  end
 end
