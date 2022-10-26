@@ -3,8 +3,10 @@
 module Keygen
   module EE
     class License
-      def self.current = @current ||= self.new(LicenseFile.current)
-      def self.reset!  = (@current = nil; LicenseFile.reset!) if Rails.env.test?
+      class << self
+        def current = @current ||= self.new(LicenseFile.current)
+        def reset!  = (@current = nil; LicenseFile.reset!) if Rails.env.test?
+      end
 
       def initialize(lic)
         @lic = lic
@@ -15,11 +17,14 @@ module Keygen
       def product      = lic.product['id']
       def policy       = lic.policy['id']
 
-      def present? = lic.present?
-      def expiry   = attributes['expiry'].present? ? Time.parse(attributes['expiry']) : nil
-      def expires? = expiry.present?
-      def expired? = expires? && expiry < Time.current
-      def valid?   = lic.valid? && !expired?
+      def expiry = attributes['expiry'].present? ? Time.parse(attributes['expiry']) : nil
+      def name   = attributes['name']
+
+      def present?  = lic.present?
+      def expires?  = expiry.present?
+      def expiring? = expires? && expiry < 30.days.from_now
+      def expired?  = expires? && expiry < Time.current
+      def valid?    = lic.valid? && !expired?
 
       def entitled?(*codes)
         (codes & entitlements) == codes

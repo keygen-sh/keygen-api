@@ -10,8 +10,10 @@ module Keygen
       HEADER_RE = /\A-----BEGIN LICENSE FILE-----\n/.freeze
       FOOTER_RE = /-----END LICENSE FILE-----\n*\z/.freeze
 
-      def self.current = @current ||= self.new
-      def self.reset!  = @current = nil if Rails.env.test?
+      class << self
+        def current = @current ||= self.new
+        def reset!  = @current = nil if Rails.env.test?
+      end
 
       def initialize(data = nil)
         @data = data&.with_indifferent_access
@@ -26,6 +28,7 @@ module Keygen
       def issued    = Time.parse(data['meta']['issued'])
       def expiry    = data['meta']['expiry'].present? ? Time.parse(data['meta']['expiry']) : nil
       def expires?  = expiry.present?
+      def expiring? = expires? && expiry < 30.days.from_now
       def tampered? = issued > Time.current
       def expired?  = expires? && expiry < Time.current
 

@@ -91,5 +91,9 @@ module Keygen
       #{config.root}/app/validators
       #{config.root}/app/services
     ]
+
+    config.after_initialize do
+      Keygen::Console.welcome!
+    end
   end
 end
