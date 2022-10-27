@@ -22,7 +22,7 @@ module Keygen
 
       def present?  = lic.present?
       def expires?  = expiry.present?
-      def expiring? = expires? && expiry < 30.days.from_now
+      def expiring? = expires? && expiry > Time.current && expiry < 30.days.from_now
       def expired?  = expires? && expiry < Time.current
       def valid?    = lic.valid? && !expired?
 

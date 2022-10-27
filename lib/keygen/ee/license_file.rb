@@ -28,7 +28,7 @@ module Keygen
       def issued    = Time.parse(data['meta']['issued'])
       def expiry    = data['meta']['expiry'].present? ? Time.parse(data['meta']['expiry']) : nil
       def expires?  = expiry.present?
-      def expiring? = expires? && expiry < 30.days.from_now
+      def expiring? = expires? && expiry > Time.current && expiry < 30.days.from_now
       def tampered? = issued > Time.current
       def expired?  = expires? && expiry < Time.current
 

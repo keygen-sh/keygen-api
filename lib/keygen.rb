@@ -17,7 +17,7 @@ module Keygen
     def console? = Rails.const_defined?(:Console)
 
     def ce? = !lic? && !key?
-    def ee? = !ce? && EE.license.valid?
+    def ee? = !ce?
 
     def ee(&block)
       case block.arity
