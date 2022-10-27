@@ -24,6 +24,31 @@ describe Keygen::EE::License, type: :ee do
         expect(license.expired?).to be false
         expect(license.valid?).to be true
       end
+
+      it 'should have entitlement attributes' do
+        license = described_class.current
+
+        expect(license.entitlements).to match_array [Symbol, Symbol, Symbol]
+      end
+
+      it 'should have product attributes' do
+        license = described_class.current
+
+        expect(license.product).to be_a String
+      end
+
+      it 'should have policy attributes' do
+        license = described_class.current
+
+        expect(license.policy).to be_a String
+      end
+
+      it 'should have license attributes' do
+        license = described_class.current
+
+        expect(license.expiry).to be nil
+        expect(license.name).to be_a String
+      end
     end
   end
 
@@ -35,6 +60,31 @@ describe Keygen::EE::License, type: :ee do
 
           expect(license.expired?).to be true
           expect(license.valid?).to be false
+        end
+
+        it 'should not have entitlement attributes' do
+          license = described_class.current
+
+          expect(license.entitlements).to match_array []
+        end
+
+        it 'should not have product attributes' do
+          license = described_class.current
+
+          expect(license.product).to be nil
+        end
+
+        it 'should not have policy attributes' do
+          license = described_class.current
+
+          expect(license.policy).to be nil
+        end
+
+        it 'should have license attributes' do
+          license = described_class.current
+
+          expect(license.expiry).to be_a Time
+          expect(license.name).to be_a String
         end
       end
     end

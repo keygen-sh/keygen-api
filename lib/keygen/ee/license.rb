@@ -14,8 +14,8 @@ module Keygen
 
       def id           = lic.license['id']
       def entitlements = lic.entitlements.collect { _1['attributes']['code'].downcase.to_sym }
-      def product      = lic.product['id']
-      def policy       = lic.policy['id']
+      def product      = lic.product&.[]('id')
+      def policy       = lic.policy&.[]('id')
 
       def expiry = attributes['expiry'].present? ? Time.parse(attributes['expiry']) : nil
       def name   = attributes['name']
