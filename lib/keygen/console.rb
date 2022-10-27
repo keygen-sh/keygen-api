@@ -60,19 +60,27 @@ module Keygen
       Keygen.ee do |key, lic|
         case
         when key.expiring?
-          dist = helpers.distance_of_time_in_words(key.expiry, Time.current)
-
           puts
           warn '!' * CONSOLE_WIDTH
-          warn "Your Keygen EE license key is expiring in #{dist}! Please renew soon.".center(CONSOLE_WIDTH)
+          warn "Your Keygen EE license key is expiring in #{helpers.time_ago_in_words(key.expiry)}! Please renew soon.".center(CONSOLE_WIDTH)
+          warn '!' * CONSOLE_WIDTH
+          puts
+        when key.expired?
+          puts
+          warn '!' * CONSOLE_WIDTH
+          warn "Your Keygen EE license key expired #{helpers.time_ago_in_words(key.expiry)} ago! Please renew.".center(CONSOLE_WIDTH)
           warn '!' * CONSOLE_WIDTH
           puts
         when lic.expiring?
-          dist = helpers.distance_of_time_in_words(lic.expiry, Time.current)
-
           puts
           warn '!' * CONSOLE_WIDTH
-          warn "Your Keygen EE license file is expiring in #{dist}! Please reup soon.".center(CONSOLE_WIDTH)
+          warn "Your Keygen EE license file is expiring in #{helpers.time_ago_in_words(lic.expiry)}! Please reup soon.".center(CONSOLE_WIDTH)
+          warn '!' * CONSOLE_WIDTH
+          puts
+        when lic.expired?
+          puts
+          warn '!' * CONSOLE_WIDTH
+          warn "Your Keygen EE license file expired #{helpers.time_ago_in_words(lic.expiry)} ago! Please reup.".center(CONSOLE_WIDTH)
           warn '!' * CONSOLE_WIDTH
           puts
         end
