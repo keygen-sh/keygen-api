@@ -32,15 +32,13 @@ module Keygen
                                 .°°..
     TXT
 
-    def logomark = LOGOMARK
-
     def welcome!
       return if
         Keygen.console?
 
       puts '-' * CONSOLE_WIDTH
       puts
-      puts logomark.lines.map { ' ' * LOGOMARK_PAD + _1 }.join
+      puts LOGOMARK.lines.map { ' ' * LOGOMARK_PAD + _1 }.join
       puts
       puts '-' * CONSOLE_WIDTH
       puts " Ruby: #{RUBY_DESCRIPTION}"
@@ -64,23 +62,19 @@ module Keygen
         when key.expiring?
           dist = helpers.distance_of_time_in_words(key.expiry, Time.current)
 
-          $stderr.tap { |e|
-            e.puts
-            e.puts '!' * CONSOLE_WIDTH
-            e.puts "Your Keygen EE license key is expiring in #{dist}! Please renew soon.".center(CONSOLE_WIDTH)
-            e.puts '!' * CONSOLE_WIDTH
-            e.puts
-          }
+          puts
+          warn '!' * CONSOLE_WIDTH
+          warn "Your Keygen EE license key is expiring in #{dist}! Please renew soon.".center(CONSOLE_WIDTH)
+          warn '!' * CONSOLE_WIDTH
+          puts
         when lic.expiring?
           dist = helpers.distance_of_time_in_words(lic.expiry, Time.current)
 
-          $stderr.tap { |e|
-            e.puts
-            e.puts '!' * CONSOLE_WIDTH
-            e.puts "Your Keygen EE license file is expiring in #{dist}! Please reup soon.".center(CONSOLE_WIDTH)
-            e.puts '!' * CONSOLE_WIDTH
-            e.puts
-          }
+          puts
+          warn '!' * CONSOLE_WIDTH
+          warn "Your Keygen EE license file is expiring in #{dist}! Please reup soon.".center(CONSOLE_WIDTH)
+          warn '!' * CONSOLE_WIDTH
+          puts
         end
       end
     end
