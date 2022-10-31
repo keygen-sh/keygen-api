@@ -109,6 +109,12 @@ module TypedParameters
     def call(*args, **kwargs)
       case children
       when Hash
+        required_params = children.select { _2.required? }
+        missing_keys    = required_params.keys - kwargs.keys
+
+        raise UnpermittedParameterError, "required keys are missing: #{missing_keys.join(', ')}" if
+          missing_keys.any?
+
         kwargs.reduce({}) do |res, (key, value)|
           child = children[key]
           if child.nil?
@@ -140,6 +146,11 @@ module TypedParameters
           end
         end
       when Array
+        required_params = children.select(&:required?)
+
+        raise UnpermittedParameterError, "required items are missing" if
+          required_params.size > args.size
+
         args.each_with_index.reduce([]) do |res, (value, i)|
           child = children.fetch(i) { children.one? ? children.first : nil }
           if child.nil?
@@ -177,6 +188,7 @@ module TypedParameters
 
     def strict?            = !!strict
     def optional?          = !!@optional
+    def required?          = !optional?
     def coerce?            = !!@coerce
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
