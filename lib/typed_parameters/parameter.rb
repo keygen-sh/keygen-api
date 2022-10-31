@@ -152,7 +152,7 @@ module TypedParameters
           required_params.size > args.size
 
         args.each_with_index.reduce([]) do |res, (value, i)|
-          child = children.fetch(i) { children.one? ? children.first : nil }
+          child = children.fetch(i) { finalized? ? children.first : nil }
           if child.nil?
             raise UnpermittedParameterError, "index #{i} is not allowed" if strict?
 
@@ -193,12 +193,12 @@ module TypedParameters
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
+    def finalized?         = !!@finalized
 
     private
 
     attr_reader :strict
 
-    def finalize!  = @finalized = true
-    def finalized? = !!@finalized
+    def finalize! = @finalized = true
   end
 end
