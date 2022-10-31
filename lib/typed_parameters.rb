@@ -19,24 +19,14 @@ require_relative 'typed_parameters/types/type'
 
 module TypedParameters
   class CoerceFailedError < StandardError; end
-  class UnpermittedParameterError < StandardError; end
-  class InvalidParameterError < StandardError; end
+  class InvalidParameterError < StandardError
+    attr_reader :path
 
-  # class InvalidParameterError < StandardError
-  #   attr_reader :source
+    def initialize(path:)
+      @path = path
+    end
+  end
 
-  #   def initialize(type:, param:)
-  #     @source =
-  #       case type
-  #       when :parameter
-  #         { parameter: "#{param}" }
-  #       when :pointer
-  #         { pointer: "/#{param}" }
-  #       else
-  #         nil
-  #       end
-  #   end
-  # end
   # class UnpermittedParametersError < StandardError; end
   # class InvalidRequestError < StandardError; end
   # class InvalidActionError < StandardError; end
