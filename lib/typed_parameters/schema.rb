@@ -26,7 +26,12 @@ module TypedParameters
       end
     end
 
+    ##
+    # param defines a keyed parameter for a hash schema.
     def param(key, **kwargs, &block)
+      raise NotImplementedError, "cannot define param for non-hash type (got #{@type})" unless
+        params.is_a?(Hash)
+
       param = Parameter.new(key:, **kwargs)
 
       raise ArgumentError, "#{param.type} is a not registered type (for #{param.path})" if
@@ -47,7 +52,12 @@ module TypedParameters
       end
     end
 
-    def items(type:, **kwargs, &block)
+    ##
+    # item defines an indexed parameter for an array schema.
+    def item(type:, **kwargs, &block)
+      raise NotImplementedError, "cannot define item for non-array type (got #{@type})" unless
+        params.is_a?(Array)
+
       param = Parameter.new(key: children.size, type:, **kwargs)
 
       raise ArgumentError, "#{type} is a not registered type (for #{param.path})" if
@@ -65,15 +75,21 @@ module TypedParameters
       end
     end
 
+    ##
+    # items is an alias for item.
+    def items(...) = item(...)
+
+    ##
+    # call reduces the input to an output according to the schema.
     def call(*args, **kwargs)
       case params
       when Hash
         kwargs.reduce({}) do |res, (key, value)|
           param = params[key]
-          if params.nil?
+          if param.nil?
             raise UnpermittedParameterError, "key #{key} is not allowed" if strict?
 
-            next
+            next res
           end
 
           type = param.type
@@ -110,7 +126,7 @@ module TypedParameters
           if param.nil?
             raise UnpermittedParameterError, "index #{i} is not allowed" if strict?
 
-            next
+            next res
           end
 
           type = param.type
