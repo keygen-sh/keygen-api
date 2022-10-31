@@ -84,7 +84,7 @@ module TypedParameters
         children.is_a?(Array)
 
       raise ArgumentError, "index #{key} has already been defined" if
-        children[key].present?
+        children[key].present? || finalized?
 
       case Types[type].to_sym
       when :hash
@@ -97,8 +97,12 @@ module TypedParameters
     end
 
     ##
-    # items is an alias for item.
-    def items(...) = item(...)
+    # items defines a set of like-parameters for an array schema.
+    def items(**kwargs, &)
+      item(0, **kwargs, &)
+
+      finalize!
+    end
 
     ##
     # call reduces the input to an output according to the schema.
@@ -181,5 +185,8 @@ module TypedParameters
     private
 
     attr_reader :strict
+
+    def finalize!  = @finalized = true
+    def finalized? = !!@finalized
   end
 end
