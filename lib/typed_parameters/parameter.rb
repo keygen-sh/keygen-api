@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'path'
-
 module TypedParameters
   class Parameter
+    attr_accessor :path
     attr_reader :parent,
                 :children,
                 :type
@@ -13,7 +12,7 @@ module TypedParameters
       parent: nil,
       type: nil,
       key: nil,
-      path: nil,
+      path: [],
       optional: false,
       coerce: false,
       allow_blank: true,
@@ -27,7 +26,7 @@ module TypedParameters
       @strict            = strict
       @parent            = parent
       @key               = key
-      @path              = path || Path.new([*path&.keys, key].compact)
+      @path              = path
       @optional          = optional
       @coerce            = coerce
       @allow_blank       = allow_blank
@@ -37,18 +36,17 @@ module TypedParameters
       @transform         = transform
       @validate          = validate
       @type              = Types[type]
+      @children          = case @type.to_sym
+                           when :hash
+                             {}
+                           when :array
+                             []
+                           else
+                             nil
+                           end
 
-      raise ArgumentError, "type #{type} is a not registered type (for #{path})" if
+      raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?
-
-      @children = case @type.to_sym
-                  when :hash
-                    {}
-                  when :array
-                    []
-                  else
-                    nil
-                  end
 
       if block_given?
         raise ArgumentError, "type #{@type} does not accept a block" if
@@ -112,13 +110,17 @@ module TypedParameters
         required_params = children.select { _2.required? }
         missing_keys    = required_params.keys - kwargs.keys
 
-        raise UnpermittedParameterError, "required keys are missing: #{missing_keys.join(', ')}" if
+        # FIXME(ezekg) This should raise for the first required param that is missing
+        raise InvalidParameterError.new(path:), "required keys are missing: #{missing_keys.join(', ')}" if
           missing_keys.any?
 
         kwargs.reduce({}) do |res, (key, value)|
-          child = children[key]
+          path = [*@path, key]
+
+          child = children.fetch(key) { nil }
+                          .for(path:)
           if child.nil?
-            raise UnpermittedParameterError, "key #{key} is not allowed" if strict?
+            raise InvalidParameterError.new(path:), "key #{key} is not allowed" if strict?
 
             next res
           end
@@ -126,13 +128,13 @@ module TypedParameters
           type = child.type
 
           if type.mismatch?(value)
-            raise InvalidParameterError, "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
+            raise InvalidParameterError.new(path:), "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
               child.coerce? && type.coercable?
 
             begin
               value = type.coerce!(value)
             rescue CoerceFailedError
-              raise InvalidParameterError, 'could not be coerced'
+              raise InvalidParameterError.new(path:), 'could not be coerced'
             end
           end
 
@@ -148,13 +150,17 @@ module TypedParameters
       when Array
         required_params = children.select(&:required?)
 
-        raise UnpermittedParameterError, "required items are missing" if
+        # FIXME(ezekg) This should raise for the first required item that is missing
+        raise InvalidParameterError.new(path:), "required items are missing" if
           required_params.size > args.size
 
         args.each_with_index.reduce([]) do |res, (value, i)|
+          path = [*@path, i]
+
           child = children.fetch(i) { finalized? ? children.first : nil }
+                          .for(path:)
           if child.nil?
-            raise UnpermittedParameterError, "index #{i} is not allowed" if strict?
+            raise InvalidParameterError.new(path:), "index #{i} is not allowed" if strict?
 
             next res
           end
@@ -162,13 +168,13 @@ module TypedParameters
           type = child.type
 
           if type.mismatch?(value)
-            raise InvalidParameterError, "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
+            raise InvalidParameterError.new(path:), "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
               child.coerce? && type.coercable?
 
             begin
               value = type.coerce!(value)
             rescue CoerceFailedError
-              raise InvalidParameterError, 'could not be coerced'
+              raise InvalidParameterError.new(path:), 'could not be coerced'
             end
           end
 
@@ -194,6 +200,12 @@ module TypedParameters
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
     def finalized?         = !!@finalized
+
+    def for(path:)
+      param = dup
+      param.path = path
+      param
+    end
 
     private
 
