@@ -4,11 +4,14 @@ require_relative 'path'
 
 module TypedParameters
   class Parameter
-    attr_reader :type,
-                :key
+    attr_reader :parent,
+                :children,
+                :type
 
     def initialize(
-      type:,
+      strict: true,
+      parent: nil,
+      type: nil,
       key: nil,
       path: nil,
       optional: false,
@@ -18,9 +21,11 @@ module TypedParameters
       allow_non_scalars: false,
       inclusion: [],
       transform: nil,
-      validate: nil
+      validate: nil,
+      &block
     )
-      @type              = TypedParameters.types[type]
+      @strict            = strict
+      @parent            = parent
       @key               = key
       @path              = path || Path.new([*path&.keys, key].compact)
       @optional          = optional
@@ -31,12 +36,150 @@ module TypedParameters
       @inclusion         = inclusion
       @transform         = transform
       @validate          = validate
+      @type              = Types[type]
+
+      raise ArgumentError, "type #{type} is a not registered type (for #{path})" if
+        @type.nil?
+
+      @children = case @type.to_sym
+                  when :hash
+                    {}
+                  when :array
+                    []
+                  else
+                    nil
+                  end
+
+      if block_given?
+        raise ArgumentError, "type #{@type} does not accept a block" if
+          @type.present? && !@type.accepts_block?
+
+        self.instance_exec &block
+      end
     end
 
+    ##
+    # param defines a keyed parameter for a hash schema.
+    def param(key, type:, **kwargs, &block)
+      raise NotImplementedError, "cannot define param for non-hash type (got #{@type})" unless
+        children.is_a?(Hash)
+
+      raise ArgumentError, "key #{key} has already been defined" if
+        children.key?(key)
+
+      case Types[type].to_sym
+      when :hash
+        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      when :array
+        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      else
+        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      end
+    end
+
+    ##
+    # item defines an indexed parameter for an array schema.
+    def item(key = children.size, type:, **kwargs, &block)
+      raise NotImplementedError, "cannot define item for non-array type (got #{@type})" unless
+        children.is_a?(Array)
+
+      raise ArgumentError, "index #{key} has already been defined" if
+        children[key].present?
+
+      case Types[type].to_sym
+      when :hash
+        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      when :array
+        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      else
+        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      end
+    end
+
+    ##
+    # items is an alias for item.
+    def items(...) = item(...)
+
+    ##
+    # call reduces the input to an output according to the schema.
+    def call(*args, **kwargs)
+      case children
+      when Hash
+        kwargs.reduce({}) do |res, (key, value)|
+          child = children[key]
+          if child.nil?
+            raise UnpermittedParameterError, "key #{key} is not allowed" if strict?
+
+            next res
+          end
+
+          type = child.type
+
+          if type.mismatch?(value)
+            raise InvalidParameterError, "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
+              child.coerce? && type.coercable?
+
+            begin
+              value = type.coerce!(value)
+            rescue CoerceFailedError
+              raise InvalidParameterError, 'could not be coerced'
+            end
+          end
+
+          case type.to_sym
+          when :hash
+            res.merge(key => child.call(**value))
+          when :array
+            res.merge(key => child.call(*value))
+          else
+            res.merge(key => child.call(value))
+          end
+        end
+      when Array
+        args.each_with_index.reduce([]) do |res, (value, i)|
+          child = children.fetch(i) { children.one? ? children.first : nil }
+          if child.nil?
+            raise UnpermittedParameterError, "index #{i} is not allowed" if strict?
+
+            next res
+          end
+
+          type = child.type
+
+          if type.mismatch?(value)
+            raise InvalidParameterError, "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
+              child.coerce? && type.coercable?
+
+            begin
+              value = type.coerce!(value)
+            rescue CoerceFailedError
+              raise InvalidParameterError, 'could not be coerced'
+            end
+          end
+
+          case type.to_sym
+          when :hash
+            res.push(child.call(**value))
+          when :array
+            res.push(child.call(*value))
+          else
+            res.push(child.call(value))
+          end
+        end
+      else
+        args.sole
+      end
+    end
+
+    def strict?            = !!strict
     def optional?          = !!@optional
     def coerce?            = !!@coerce
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
+
+    private
+
+    attr_reader :strict
   end
 end
