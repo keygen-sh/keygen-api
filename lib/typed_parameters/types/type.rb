@@ -19,8 +19,8 @@ module TypedParameters
       def coercable?     = @coerce.present?
       def scalar?        = !!@scalar
 
-      def match?(...)    = !!@match.call(...)
-      def mismatch?(...) = !match?(...)
+      def match?(v)    = v == self || !!@match.call(v)
+      def mismatch?(v) = !match?(v)
 
       def to_sym = type.to_sym
       def to_s   = type.to_s
