@@ -2,7 +2,6 @@
 
 module TypedParameters
   class Parameter
-    attr_accessor :path
     attr_reader :parent,
                 :children,
                 :type
@@ -12,7 +11,6 @@ module TypedParameters
       parent: nil,
       type: nil,
       key: nil,
-      path: [],
       optional: false,
       coerce: false,
       allow_blank: true,
@@ -26,7 +24,6 @@ module TypedParameters
       @strict            = strict
       @parent            = parent
       @key               = key
-      @path              = path
       @optional          = optional
       @coerce            = coerce
       @allow_blank       = allow_blank
@@ -104,91 +101,109 @@ module TypedParameters
 
     ##
     # call reduces the input to an output according to the schema.
-    def call(*args, **kwargs)
+    def call(input, type: Types.for(input), path: nil)
+      root = path
+
+      # FIXME(ezekg) Extract this validation logic out into validators?
+      if self.type != type
+        raise InvalidParameterError.new(path:), "type mismatch (received unknown expected #{self.type.name})" if
+          type.nil?
+
+        raise InvalidParameterError.new(path:), "type mismatch (received #{type.name} expected #{self.type.name})" unless
+          coerce? && self.type.coercable?
+
+        begin
+          input = self.type.coerce!(input)
+        rescue CoerceFailedError
+          raise InvalidParameterError.new(path:), 'could not be coerced'
+        end
+      end
+
       case children
       when Hash
+        raise InvalidParameterError.new(path:), "type mismatch (received #{type.name} expected object)" unless
+          type.type == :hash
+
         required_params = children.select { _2.required? }
-        missing_keys    = required_params.keys - kwargs.keys
+        missing_keys    = required_params.keys - input.keys
 
         # FIXME(ezekg) This should raise for the first required param that is missing
         raise InvalidParameterError.new(path:), "required keys are missing: #{missing_keys.join(', ')}" if
           missing_keys.any?
 
-        kwargs.reduce({}) do |res, (key, value)|
-          path = [*@path, key]
+        input.reduce({}) do |output, (key, value)|
+          type  = Types.for(value)
+          path  = [*root, key]
 
-          child = children.fetch(key) { nil }
-                          .for(path:)
-          if child.nil?
-            raise InvalidParameterError.new(path:), "key #{key} is not allowed" if strict?
+          if children.any?
+            param = children.fetch(key) { nil }
+            if param.nil?
+              raise InvalidParameterError.new(path:), "key #{key} is not allowed" if strict?
 
-            next res
-          end
-
-          type = child.type
-
-          if type.mismatch?(value)
-            raise InvalidParameterError.new(path:), "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
-              child.coerce? && type.coercable?
-
-            begin
-              value = type.coerce!(value)
-            rescue CoerceFailedError
-              raise InvalidParameterError.new(path:), 'could not be coerced'
+              next output
             end
-          end
 
-          case type.to_sym
-          when :hash
-            res.merge(key => child.call(**value))
-          when :array
-            res.merge(key => child.call(*value))
+            next output if
+              !param.allow_blank? &&
+              value.blank?
+
+            next output if
+              param.optional? &&
+              value.nil?
+
+            output.merge(key => param.call(value, type:, path:))
           else
-            res.merge(key => child.call(value))
+            raise InvalidParameterError.new(path:), "unpermitted type (expected object of scalar types)" unless
+              type.scalar?
+
+            output.merge(key => value)
           end
         end
       when Array
+        raise InvalidParameterError.new(path:), "type mismatch (received #{type.name} expected array)" unless
+          type.type == :array
+
         required_params = children.select(&:required?)
 
         # FIXME(ezekg) This should raise for the first required item that is missing
         raise InvalidParameterError.new(path:), "required items are missing" if
-          required_params.size > args.size
+          required_params.size > input.size
 
-        args.each_with_index.reduce([]) do |res, (value, i)|
-          path = [*@path, i]
+        input.each_with_index.reduce([]) do |output, (value, i)|
+          type  = Types.for(value)
+          path  = [*root, i]
+          if children.any?
+            param = children.fetch(i) { finalized? ? children.first : nil }
+            if param.nil?
+              raise InvalidParameterError.new(path:), "index #{i} is not allowed" if strict?
 
-          child = children.fetch(i) { finalized? ? children.first : nil }
-                          .for(path:)
-          if child.nil?
-            raise InvalidParameterError.new(path:), "index #{i} is not allowed" if strict?
-
-            next res
-          end
-
-          type = child.type
-
-          if type.mismatch?(value)
-            raise InvalidParameterError.new(path:), "type mismatch (received #{Types.for(value).name} expected #{type.name})" unless
-              child.coerce? && type.coercable?
-
-            begin
-              value = type.coerce!(value)
-            rescue CoerceFailedError
-              raise InvalidParameterError.new(path:), 'could not be coerced'
+              next output
             end
-          end
 
-          case type.to_sym
-          when :hash
-            res.push(child.call(**value))
-          when :array
-            res.push(child.call(*value))
+            next output if
+              !allow_blank? &&
+              value.blank?
+
+            next output if
+              optional? &&
+              value.nil?
+
+            output.push(param.call(value, type:, path:))
           else
-            res.push(child.call(value))
+            raise InvalidParameterError.new(path:), "unpermitted type (expected array of scalar types)" unless
+              type.scalar?
+
+            output.push(value)
           end
         end
       else
-        args.sole
+        value = input
+        path  = [*root]
+
+        raise InvalidParameterError.new(path:), "unpermitted type (expected scalar type)" unless
+          type.scalar?
+
+        value
       end
     end
 
@@ -200,12 +215,6 @@ module TypedParameters
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
     def finalized?         = !!@finalized
-
-    def for(path:)
-      param = dup
-      param.path = path
-      param
-    end
 
     private
 

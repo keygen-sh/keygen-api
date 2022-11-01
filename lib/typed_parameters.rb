@@ -14,6 +14,7 @@ require_relative 'typed_parameters/types/integer'
 require_relative 'typed_parameters/types/nil'
 require_relative 'typed_parameters/types/number'
 require_relative 'typed_parameters/types/string'
+require_relative 'typed_parameters/types/symbol'
 require_relative 'typed_parameters/types/time'
 require_relative 'typed_parameters/types/type'
 
