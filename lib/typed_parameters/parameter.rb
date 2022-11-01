@@ -136,6 +136,11 @@ module TypedParameters
               value.blank?
 
             next output if
+              param.allow_blank? &&
+              param.optional? &&
+              value.blank?
+
+            next output if
               param.optional? &&
               value.nil?
 
@@ -169,11 +174,16 @@ module TypedParameters
             end
 
             next output if
-              !allow_blank? &&
+              !param.allow_blank? &&
               value.blank?
 
             next output if
-              optional? &&
+              param.allow_blank? &&
+              param.optional? &&
+              value.blank?
+
+            next output if
+              param.optional? &&
               value.nil?
 
             output.push(param.call(value, path:))
