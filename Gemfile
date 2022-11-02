@@ -24,7 +24,7 @@ gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 
 # XML
-gem 'nokogiri', '~> 1.13.6'
+gem 'nokogiri', '~> 1.13.9'
 
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
