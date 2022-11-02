@@ -471,7 +471,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (~> 3.0.5)
   lograge
-  nokogiri (~> 1.13.6)
+  nokogiri (~> 1.13.9)
   oj
   openssl (~> 3.0.0)
   parallel_tests (~> 3.8)
