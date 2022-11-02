@@ -2,6 +2,7 @@
 
 require_relative 'typed_parameters/controller'
 require_relative 'typed_parameters/parameter'
+require_relative 'typed_parameters/parser'
 require_relative 'typed_parameters/types'
 require_relative 'typed_parameters/types/array'
 require_relative 'typed_parameters/types/boolean'
