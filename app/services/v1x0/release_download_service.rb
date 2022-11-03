@@ -41,8 +41,8 @@ class V1x0::ReleaseDownloadService < BaseService
 
     # Assert artifact exists before redirecting to S3
     if !artifact.etag?
-      s3  = Aws::S3::Client.new
-      obj = s3.head_object(bucket: 'keygen-dist', key: artifact.s3_object_key)
+      client = artifact.client
+      obj    = client.head_object(bucket: artifact.bucket, key: artifact.key)
 
       artifact.update!(
         content_length: obj.content_length,
@@ -51,10 +51,8 @@ class V1x0::ReleaseDownloadService < BaseService
       )
     end
 
-    # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
-    # NOTE(ezekg) Check obj.replication_status for EU
-    signer   = Aws::S3::Presigner.new
-    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: artifact.s3_object_key, expires_in: ttl&.to_i)
+    signer   = artifact.presigner
+    url      = signer.presigned_url(:get_object, bucket: artifact.bucket, key: artifact.key, expires_in: ttl&.to_i)
     link     =
       if upgrade?
         release.upgrade_links.create!(account: account, url: url, ttl: ttl)
