@@ -51,6 +51,7 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :arch
 
   before_validation -> { self.account_id ||= release&.account_id }
+  before_validation -> { self.provider ||= 'R2' }
   before_validation -> { self.status ||= 'WAITING' }
 
   validates :product,
@@ -219,12 +220,30 @@ class ReleaseArtifact < ApplicationRecord
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
 
-  def constraints?
-    constraints.any?
+  def key = "artifacts/#{account_id}/#{release_id}/#{filename}"
+
+  def presigner = Aws::S3::Presigner.new(client:)
+
+  def client
+    case provider
+    when 'S3'
+      Aws::S3::Client.new(**AWS_CLIENT_OPTIONS)
+    when 'R2'
+      Aws::S3::Client.new(**R2_CLIENT_OPTIONS)
+    end
   end
 
-  def s3_object_key
-    "artifacts/#{account_id}/#{release_id}/#{filename}"
+  def bucket
+    case provider
+    when 'S3'
+      AWS_BUCKET
+    when 'R2'
+      CF_BUCKET
+    end
+  end
+
+  def constraints?
+    constraints.any?
   end
 
   def filetype_id=(id)
@@ -255,22 +274,20 @@ class ReleaseArtifact < ApplicationRecord
     redirect_url.present?
   end
 
-  # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
-  # NOTE(ezekg) Check obj.replication_status for EU
   def download!(ttl: 1.hour)
-    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key:, expires_in: ttl&.to_i)
 
     release.download_links.create!(url: redirect_url, ttl:, account:)
   end
 
   def upgrade!(ttl: 1.hour)
-    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key:, expires_in: ttl&.to_i)
 
     release.upgrade_links.create!(url: redirect_url, ttl:, account:)
   end
 
   def upload!(ttl: 1.hour)
-    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:put_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl.to_i)
+    self.redirect_url = presigner.presigned_url(:put_object, bucket:, key:, expires_in: ttl.to_i)
 
     WaitForArtifactUploadWorker.perform_async(id)
 
