@@ -13,9 +13,9 @@ class WaitForArtifactUploadWorker
       artifact.waiting?
 
     # Wait until the artifact is uploaded
-    client = Aws::S3::Client.new
+    client = artifact.client
 
-    client.wait_until(:object_exists, bucket: 'keygen-dist', key: artifact.s3_object_key) do |w|
+    client.wait_until(:object_exists, bucket: artifact.bucket, key: artifact.key) do |w|
       w.max_attempts = nil
       w.delay        = 30
 
@@ -36,7 +36,7 @@ class WaitForArtifactUploadWorker
     )
 
     # Get artifact metadata
-    obj = client.head_object(bucket: 'keygen-dist', key: artifact.s3_object_key)
+    obj = client.head_object(bucket: artifact.bucket, key: artifact.key)
 
     artifact.update!(
       content_length: obj.content_length,

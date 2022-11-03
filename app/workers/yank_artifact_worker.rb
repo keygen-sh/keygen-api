@@ -10,9 +10,9 @@ class YankArtifactWorker
   def perform(artifact_id)
     artifact = ReleaseArtifact.find(artifact_id)
 
-    Aws::S3::Client.new.delete_object(
-      bucket: 'keygen-dist',
-      key: artifact.s3_object_key,
+    artifact.client.delete_object(
+      bucket: artifact.bucket,
+      key: artifact.key,
     )
 
     artifact.destroy
