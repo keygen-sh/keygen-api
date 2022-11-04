@@ -227,7 +227,8 @@ class ReleaseArtifact < ApplicationRecord
 
   def client
     case backend
-    when 'S3'
+    when 'S3',
+         nil # TODO(ezekg) For backwards compat (remove after seed)
       Aws::S3::Client.new(**AWS_CLIENT_OPTIONS)
     when 'R2'
       Aws::S3::Client.new(**CF_CLIENT_OPTIONS)
@@ -236,7 +237,8 @@ class ReleaseArtifact < ApplicationRecord
 
   def bucket
     case backend
-    when 'S3'
+    when 'S3',
+         nil # TODO(ezekg) For backwards compat (remove after seed)
       AWS_BUCKET
     when 'R2'
       CF_BUCKET
