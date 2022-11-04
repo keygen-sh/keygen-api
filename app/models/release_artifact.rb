@@ -51,8 +51,9 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :arch
 
   before_validation -> { self.account_id ||= release&.account_id }
-  before_validation -> { self.backend ||= 'R2' }
   before_validation -> { self.status ||= 'WAITING' }
+
+  before_create -> { self.backend ||= account.backend }
 
   validates :product,
     scope: { by: :account_id }
