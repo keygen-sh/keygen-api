@@ -53,7 +53,7 @@ class ReleaseArtifact < ApplicationRecord
   before_validation -> { self.account_id ||= release&.account_id }
   before_validation -> { self.status ||= 'WAITING' }
 
-  before_create -> { self.backend = account.backend }
+  before_create -> { self.backend ||= account.backend }
 
   validates :product,
     scope: { by: :account_id }
