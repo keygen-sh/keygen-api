@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_03_164128) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_04_140501) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -38,6 +38,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_03_164128) do
     t.string "subdomain"
     t.string "api_version"
     t.string "cname"
+    t.string "backend", default: "S3", null: false
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
@@ -412,7 +413,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_03_164128) do
     t.uuid "release_arch_id"
     t.string "status"
     t.jsonb "metadata"
-    t.string "backend", default: "S3"
+    t.string "backend", default: "S3", null: false
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["filename", "release_id", "account_id"], name: "release_artifacts_uniq_filename_idx", unique: true, where: "(filename IS NOT NULL)"
     t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"
