@@ -248,7 +248,7 @@ class ReleaseArtifact < ApplicationRecord
   end
 
   def filetype_id=(id)
-    self.release_platform_id = id
+    self.release_filetype_id = id
   end
 
   def filetype_id
@@ -256,7 +256,7 @@ class ReleaseArtifact < ApplicationRecord
   end
 
   def platform_id=(id)
-    self.release_filetype_id = id
+    self.release_platform_id = id
   end
 
   def platform_id
