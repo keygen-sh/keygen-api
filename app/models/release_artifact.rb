@@ -51,7 +51,7 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :arch
 
   before_validation -> { self.account_id ||= release&.account_id }
-  before_validation -> { self.provider ||= 'R2' }
+  before_validation -> { self.backend ||= 'R2' }
   before_validation -> { self.status ||= 'WAITING' }
 
   validates :product,
@@ -225,7 +225,7 @@ class ReleaseArtifact < ApplicationRecord
   def presigner = Aws::S3::Presigner.new(client:)
 
   def client
-    case provider
+    case backend
     when 'S3'
       Aws::S3::Client.new(**AWS_CLIENT_OPTIONS)
     when 'R2'
@@ -234,7 +234,7 @@ class ReleaseArtifact < ApplicationRecord
   end
 
   def bucket
-    case provider
+    case backend
     when 'S3'
       AWS_BUCKET
     when 'R2'
