@@ -53,7 +53,7 @@ class ReleaseArtifact < ApplicationRecord
   before_validation -> { self.account_id ||= release&.account_id }
   before_validation -> { self.status ||= 'WAITING' }
 
-  before_create -> { self.backend ||= account.backend }
+  before_create -> { self.backend = account.backend }
 
   validates :product,
     scope: { by: :account_id }
@@ -230,7 +230,7 @@ class ReleaseArtifact < ApplicationRecord
     when 'S3'
       Aws::S3::Client.new(**AWS_CLIENT_OPTIONS)
     when 'R2'
-      Aws::S3::Client.new(**R2_CLIENT_OPTIONS)
+      Aws::S3::Client.new(**CF_CLIENT_OPTIONS)
     end
   end
 
