@@ -8,23 +8,15 @@ module TypedParameters
     def typed_parameters(format: nil, &block)
       resource = controller_name.classify.underscore
       method = lambda do
-        @_typed_parameters ||= TypedParameters.build self, &block
-
-        if format == :jsonapi
-          deserialize_jsonapi_parameters(@_typed_parameters)
-        else
-          @_typed_parameters
-        end
+        # TODO(ezekg) Memoize
+        validator = Validator.new(request, schema: typed_schema)
+        validator.safe_params
       end
 
       define_method "#{resource}_parameters", &method
       define_method "#{resource}_params", &method
 
-      define_method "#{resource}_meta" do
-        @_typed_parameters ||= TypedParameters.build self, &block
-
-        @_typed_parameters.fetch(:meta, {})
-      end
+      # TODO(ezekg) Add #{resource}_meta method for JSONAPI
     end
     alias_method :typed_params, :typed_parameters
 
@@ -32,7 +24,8 @@ module TypedParameters
       resource = controller_name.classify.underscore
 
       define_method "#{resource}_query" do
-        @_typed_query ||= TypedParameters.build self, &block
+        validator = Validator.new(request, schema: typed_schema)
+        validator.safe_params
       end
     end
   end
