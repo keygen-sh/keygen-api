@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'typed_parameters/controller'
-require_relative 'typed_parameters/parameter'
-require_relative 'typed_parameters/parser'
+require_relative 'typed_parameters/schema'
 require_relative 'typed_parameters/types'
 require_relative 'typed_parameters/types/array'
 require_relative 'typed_parameters/types/boolean'
@@ -18,16 +17,11 @@ require_relative 'typed_parameters/types/string'
 require_relative 'typed_parameters/types/symbol'
 require_relative 'typed_parameters/types/time'
 require_relative 'typed_parameters/types/type'
+require_relative 'typed_parameters/validator'
 
 module TypedParameters
   class CoerceFailedError < StandardError; end
-  class InvalidParameterError < StandardError
-    attr_reader :path
-
-    def initialize(path:)
-      @path = path
-    end
-  end
+  class InvalidParameterError < StandardError; end
 
   # class UnpermittedParametersError < StandardError; end
   # class InvalidRequestError < StandardError; end

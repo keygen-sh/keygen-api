@@ -7,9 +7,21 @@ module TypedParameters
     def parse(input, params:, path: nil)
       self.path = path
 
-      input = validate!(input, params:)
-      input = coerce!(input, params:)
+      catch :skip do
+        input = validate!(input, params:)
+        puts(validate!: input)
+        input = coerce!(input, params:)
+        puts(coerce!: input)
 
+        reduce!(input, params:)
+      end
+    end
+
+    private
+
+    attr_accessor :path
+
+    def reduce!(input, params:)
       case params.children
       when Hash
         raise InvalidParameterError.new(path:), "type mismatch (received #{Types.for(input).name} expected object)" unless
@@ -34,18 +46,25 @@ module TypedParameters
               next output
             end
 
-            next output if
-              !param.allow_blank? &&
-              value.blank?
+            # param.validations.each do |validation|
+            #   validation.call(value:, param:, path:)
+            # rescue InvalidParameterError
+            #   raise if params.strict?
+            #   next output
+            # end
 
-            next output if
-              param.allow_blank? &&
-              param.optional? &&
-              value.blank?
+            # next output if
+            #   !param.allow_blank? &&
+            #   value.blank?
 
-            next output if
-              param.optional? &&
-              value.nil?
+            # next output if
+            #   param.allow_blank? &&
+            #   param.optional? &&
+            #   value.blank?
+
+            # next output if
+            #   param.optional? &&
+            #   value.nil?
 
             output.merge(key => parse(value, params: param, path:))
           else
@@ -77,18 +96,25 @@ module TypedParameters
               next output
             end
 
-            next output if
-              !param.allow_blank? &&
-              value.blank?
+            # param.validations.each do |validation|
+            #   validation.call(value:, param:, path:)
+            # rescue InvalidParameterError
+            #   raise if params.strict?
+            #   next output
+            # end
 
-            next output if
-              param.allow_blank? &&
-              param.optional? &&
-              value.blank?
+            # next output if
+            #   !param.allow_blank? &&
+            #   value.blank?
 
-            next output if
-              param.optional? &&
-              value.nil?
+            # next output if
+            #   param.allow_blank? &&
+            #   param.optional? &&
+            #   value.blank?
+
+            # next output if
+            #   param.optional? &&
+            #   value.nil?
 
             output.push(parse(value, params: param, path:))
           else
@@ -109,14 +135,23 @@ module TypedParameters
       end
     end
 
-    private
+    def validate!(value, params:)
+      type = Types.for(value)
 
-    attr_accessor :path
+      puts(value:, t1: type, t2: params.type, mismatch?: params.type.mismatch?(type))
 
-    def validate!(input, params:)
-      type = Types.for(input)
+      # Validate the value against the parent's validations
+      parent = params.parent
 
-      return input unless
+      parent&.validations&.each do |validation|
+        validation.call(value:, params:, path:)
+      rescue InvalidParameterError
+        raise if params.strict?
+
+        throw :skip
+      end
+
+      return value unless
         params.type.mismatch?(type)
 
       raise InvalidParameterError.new(path:), "type mismatch (received unknown expected #{params.type.name})" if
@@ -125,18 +160,20 @@ module TypedParameters
       raise InvalidParameterError.new(path:), "type mismatch (received #{type.name} expected #{params.type.name})" unless
         params.coerce? && params.type.coercable?
 
-      input
+      value
     end
 
-    def coerce!(input, params:)
-      type = Types.for(input)
+    def coerce!(value, params:)
+      type = Types.for(value)
 
-      return input unless
+      puts(value:,type:,params:params.type)
+
+      return value unless
         params.type.mismatch?(type) &&
         params.type.coercable? &&
         params.coerce?
 
-      params.type.coerce!(input)
+      params.type.coerce!(value)
     rescue CoerceFailedError
       raise InvalidParameterError.new(path:), 'could not be coerced'
     end
