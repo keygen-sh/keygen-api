@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
+# require_relative 'validations/allow_blank'
+# require_relative 'validations/optional'
+
 module TypedParameters
-  class Parameter
-    attr_reader :parent,
+  class Schema
+    attr_reader :validations,
+                :parent,
                 :children,
-                :type
+                :type,
+                :key
 
     def initialize(
       strict: true,
@@ -21,6 +26,7 @@ module TypedParameters
       validate: nil,
       &block
     )
+      @validations       = []
       @strict            = strict
       @parent            = parent
       @key               = key
@@ -42,6 +48,10 @@ module TypedParameters
                              nil
                            end
 
+      # @validations << Validations::AllowBlank.new if allow_blank
+      # @validations << Validations::Optional.new if optional
+      # @validations << validate if validate.present?
+
       raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?
 
@@ -56,39 +66,25 @@ module TypedParameters
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
-      raise NotImplementedError, "cannot define param for non-hash type (got #{@type})" unless
+      raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
         children.is_a?(Hash)
 
       raise ArgumentError, "key #{key} has already been defined" if
         children.key?(key)
 
-      case Types[type].to_sym
-      when :hash
-        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      when :array
-        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      else
-        children[key] = Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      end
+      children[key] = Schema.new(**kwargs, key:, type:, strict:, parent: self, &block)
     end
 
     ##
     # item defines an indexed parameter for an array schema.
     def item(key = children.size, type:, **kwargs, &block)
-      raise NotImplementedError, "cannot define item for non-array type (got #{@type})" unless
+      raise NotImplementedError, "cannot define item for non-array type (got #{self.type})" unless
         children.is_a?(Array)
 
       raise ArgumentError, "index #{key} has already been defined" if
         children[key].present? || finalized?
 
-      case Types[type].to_sym
-      when :hash
-        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      when :array
-        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      else
-        children << Parameter.new(**kwargs, key:, type:, strict:, parent: self, &block)
-      end
+      children << Schema.new(**kwargs, key:, type:, strict:, parent: self, &block)
     end
 
     ##
@@ -102,7 +98,7 @@ module TypedParameters
     def strict?            = !!strict
     def optional?          = !!@optional
     def required?          = !optional?
-    def coerce?            = !!@coerce
+    def coerce?            = !!@coerce && @type.coercable?
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
