@@ -29,10 +29,14 @@ module TypedParameters
     def convert_hash(data)
       param = Parameter.new(value: {}, schema:, parent:)
 
-      schema.children.each do |key, child|
-        value = data.fetch(key) { nil }
-        next if
-          value.nil?
+      data.each do |key, value|
+        child = schema.children.fetch(key) { nil }
+        if child.nil?
+          raise InvalidParameterError, "invalid parameter key #{key}" if
+            schema.strict?
+
+          next
+        end
 
         param.append(
           key => Parameterizer.new(schema: child, parent: param).convert(value),
@@ -47,8 +51,12 @@ module TypedParameters
 
       data.each_with_index do |value, i|
         child = schema.children.fetch(i) { schema.children.first }
-        next if
-          child.nil?
+        if child.nil?
+          raise InvalidParameterError, "invalid parameter index #{i}" if
+            schema.strict?
+
+          next
+        end
 
         param.append(
           Parameterizer.new(schema: child, parent: param).convert(value),
