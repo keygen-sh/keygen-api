@@ -3,7 +3,10 @@
 module TypedParameters
   class Validator
     def self.validate(params)
-      return if params.nil? || params.validated?
+      return if params.nil?
+
+      return params.safe if
+        params.validated?
 
       # Traverse down the param tree until we hit the end of a branch,
       # then start validating up from there, bottom to top. This is
