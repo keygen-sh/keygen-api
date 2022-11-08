@@ -34,7 +34,7 @@ module TypedParameters
         next if
           value.nil?
 
-        param.merge!(
+        param.append(
           key => Parameterizer.new(schema: child, parent: param).wrap(value),
         )
       end
@@ -50,7 +50,7 @@ module TypedParameters
         next if
           child.nil?
 
-        param.push(
+        param.append(
           Parameterizer.new(schema: child, parent: param).wrap(value),
         )
       end
