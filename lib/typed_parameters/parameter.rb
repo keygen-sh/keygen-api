@@ -18,19 +18,33 @@ module TypedParameters
 
     def validated! = @validated = true
     def validated?
-      !!@validated #&& ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
-                   #    (schema.children.is_a?(Hash) && value.all? { |k, v| v.validated? }) ||
-                   #     schema.children.nil?)
+      !!@validated && ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
+                       (schema.children.is_a?(Hash) && value.all? { |k, v| v.validated? }) ||
+                        schema.children.nil?)
+    end
+
+    def blank? = value.blank?
+
+    def inspect = "#<Parameter:#{hash} @value=#{safe}>"
+
+    def delete
+      puts delete: value
+      case parent.value
+      when Array
+        parent.value.delete(self)
+      when Hash
+        parent.value.delete(
+          parent.value.key(self),
+        )
+      end
     end
 
     def [](key) = value[key]
 
-    def merge!(...) = value.merge!(...)
-    def push(...) = value.push(...)
-    def any? = yield value
+    def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
 
     def safe
-      raise unless validated?
+      # raise unless validated?
 
       case value
       when Array

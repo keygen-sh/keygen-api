@@ -29,6 +29,11 @@ module TypedParameters
           # parent: params.parent,
         )
 
+        # Delete blanks unless schema allows blanks
+        params.delete if
+          !params.schema.allow_blank? &&
+          params.blank?
+
         # From the end of the branch, start working our way back up to
         # our root node, validating bottom to top along the way.
         validate(params.parent)
