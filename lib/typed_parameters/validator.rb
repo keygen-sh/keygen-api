@@ -2,64 +2,39 @@
 
 module TypedParameters
   class Validator
-    def initialize(schema:)
-      @schema = schema
-    end
+    def self.validate(params)
+      return if params.nil? || params.validated?
 
-    def validate(data)
-      return if
-        data.nil?
-
-      case schema.children
-      when Hash
-        validate_hash(data)
-      when Array
-        validate_array(data)
+      # Traverse down the param tree until we hit the end of a branch,
+      # then start validating up from there, bottom to top. This is
+      # kind of like a depth first search.
+      if params.schema.children&.any? &&
+         ((params.schema.children.is_a?(Hash) && params.value.any? { |k, v| !params[k].validated? }) ||
+          (params.schema.children.is_a?(Array) && params.value.any? { !_1.validated? }))
+        case params.schema.children
+        when Array
+          if params.schema.indexed?
+            params.schema.children.each_with_index { |v, i| validate(params[i]) }
+          else
+            params.value.each { |v| validate(v) }
+          end
+        when Hash
+          params.schema.children.each { |k, v| validate(params[k]) }
+        end
       else
-        validate_scalar(data)
-      end
-    end
+        params.validated!
 
-    private
-
-    attr_reader :schema
-
-    def validate_hash(data)
-      res = {}
-
-      schema.children.each do |key, child|
-        value = data.fetch(key) { nil }
-
-        next if
-          value.nil?
-
-        res.merge!(
-          key => Validator.new(schema: child).validate(value),
+        puts(
+          validated!: params.safe,
+          # parent: params.parent,
         )
+
+        # From the end of the branch, start working our way back up to
+        # our root node, validating bottom to top along the way.
+        validate(params.parent)
       end
 
-      res
-    end
-
-    def validate_array(data)
-      res = []
-
-      data.each_with_index do |value, i|
-        child = schema.children.fetch(i) { schema.children.first }
-
-        next if
-          child.nil?
-
-        res.push(
-          Validator.new(schema: child).validate(value),
-        )
-      end
-
-      res
-    end
-
-    def validate_scalar(data)
-      data
+      params.safe
     end
   end
 end
