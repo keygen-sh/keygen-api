@@ -14,8 +14,6 @@ module TypedParameters
       @validated = false
     end
 
-    def permitted? = validated
-
     def validated! = @validated = true
     def validated?
       !!@validated && ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
@@ -23,12 +21,13 @@ module TypedParameters
                         schema.children.nil?)
     end
 
+    def permitted? = validated?
+
     def blank? = value.blank?
 
-    def inspect = "#<Parameter:#{hash} @value=#{safe}>"
+    def inspect = "#<Parameter:#{hash} @value=#{to_unsafe_h}>"
 
     def delete
-      puts delete: value
       case parent.value
       when Array
         parent.value.delete(self)
@@ -43,14 +42,25 @@ module TypedParameters
 
     def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
 
-    def safe
-      # raise unless validated?
+    def to_safe_h
+      raise unless validated?
 
       case value
       when Array
-        value.map(&:safe)
+        value.map(&:to_safe_h)
       when Hash
-        value.transform_values(&:safe)
+        value.transform_values(&:to_safe_h)
+      else
+        value
+      end
+    end
+
+    def to_unsafe_h
+      case value
+      when Array
+        value.map(&:to_unsafe_h)
+      when Hash
+        value.transform_values(&:to_unsafe_h)
       else
         value
       end

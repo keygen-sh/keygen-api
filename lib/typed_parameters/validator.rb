@@ -5,7 +5,7 @@ module TypedParameters
     def self.validate(params)
       return if params.nil?
 
-      return params.safe if
+      return params.to_safe_h if
         params.validated?
 
       # Traverse down the param tree until we hit the end of a branch,
@@ -28,7 +28,7 @@ module TypedParameters
         params.validated!
 
         puts(
-          validated!: params.safe,
+          validated!: params.to_safe_h,
           # parent: params.parent,
         )
 
@@ -42,7 +42,7 @@ module TypedParameters
         validate(params.parent)
       end
 
-      params.safe
+      params.to_safe_h
     end
   end
 end
