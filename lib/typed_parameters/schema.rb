@@ -82,7 +82,7 @@ module TypedParameters
         children.is_a?(Array)
 
       raise ArgumentError, "index #{key} has already been defined" if
-        children[key].present? || finalized?
+        children[key].present? || boundless?
 
       children << Schema.new(**kwargs, key:, type:, strict:, parent: self, &block)
     end
@@ -92,7 +92,7 @@ module TypedParameters
     def items(**kwargs, &)
       item(0, **kwargs, &)
 
-      finalize!
+      boundless!
     end
 
     def strict?            = !!strict
@@ -102,12 +102,13 @@ module TypedParameters
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
-    def finalized?         = !!@finalized
+    def boundless?         = !!@boundless
+    def indexed?           = !boundless?
 
     private
 
     attr_reader :strict
 
-    def finalize! = @finalized = true
+    def boundless! = @boundless = true
   end
 end
