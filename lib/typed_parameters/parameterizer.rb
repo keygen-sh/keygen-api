@@ -7,17 +7,17 @@ module TypedParameters
       @parent = parent
     end
 
-    def wrap(data)
+    def convert(data)
       return if
         data.nil?
 
       case schema.children
       when Hash
-        wrap_hash(data)
+        convert_hash(data)
       when Array
-        wrap_array(data)
+        convert_array(data)
       else
-        wrap_scalar(data)
+        convert_scalar(data)
       end
     end
 
@@ -26,7 +26,7 @@ module TypedParameters
     attr_reader :schema,
                 :parent
 
-    def wrap_hash(data)
+    def convert_hash(data)
       param = Parameter.new(value: {}, schema:, parent:)
 
       schema.children.each do |key, child|
@@ -35,14 +35,14 @@ module TypedParameters
           value.nil?
 
         param.append(
-          key => Parameterizer.new(schema: child, parent: param).wrap(value),
+          key => Parameterizer.new(schema: child, parent: param).convert(value),
         )
       end
 
       param
     end
 
-    def wrap_array(data)
+    def convert_array(data)
       param = Parameter.new(value: [], schema:, parent:)
 
       data.each_with_index do |value, i|
@@ -51,14 +51,14 @@ module TypedParameters
           child.nil?
 
         param.append(
-          Parameterizer.new(schema: child, parent: param).wrap(value),
+          Parameterizer.new(schema: child, parent: param).convert(value),
         )
       end
 
       param
     end
 
-    def wrap_scalar(value)
+    def convert_scalar(value)
       Parameter.new(value:, schema:, parent:)
     end
   end
