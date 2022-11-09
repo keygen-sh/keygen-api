@@ -5,6 +5,7 @@ module TypedParameters
     extend ActiveSupport::Concern
     extend self
 
+    # TODO(ezekg) Add implicit and explicit param definitions
     def typed_parameters(format: nil, &block)
       resource = controller_name.classify.underscore
       method = lambda do

@@ -4,8 +4,7 @@ module TypedParameters
   class Parameter
     attr_reader :value,
                 :schema,
-                :parent,
-                :validated
+                :parent
 
     def initialize(value:, schema:, parent: nil)
       @value     = value
@@ -14,18 +13,23 @@ module TypedParameters
       @validated = false
     end
 
-    def validated! = @validated = true
+    def validate!
+      # TODO(ezekg) Add validations
+
+      @validated = true
+    end
+
     def validated?
-      !!@validated && ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
-                       (schema.children.is_a?(Hash) && value.all? { |k, v| v.validated? }) ||
-                        schema.children.nil?)
+      !!validated && ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
+                      (schema.children.is_a?(Hash) && value.all? { |k, v| v.validated? }) ||
+                       schema.children.nil?)
     end
 
     def permitted? = validated?
 
     def blank? = value.blank?
 
-    def inspect = "#<Parameter:#{hash} @value=#{to_unsafe_h}>"
+    def inspect = "#<Parameter:#{hash} @value=#{to_unsafe_h} @validated=#{validated}>"
 
     def delete
       case parent.value
@@ -65,5 +69,9 @@ module TypedParameters
         value
       end
     end
+
+    private
+
+    attr_reader :validated
   end
 end
