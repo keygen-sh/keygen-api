@@ -25,7 +25,7 @@ module TypedParameters
           params.schema.children.each { |k, v| validate!(params[k]) }
         end
       else
-        params.validated!
+        params.validate!
 
         puts(
           validated!: params.to_safe_h,
