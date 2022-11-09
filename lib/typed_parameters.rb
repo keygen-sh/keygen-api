@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'typed_parameters/controller'
+require_relative 'typed_parameters/converter'
 require_relative 'typed_parameters/parameter'
-require_relative 'typed_parameters/parameterizer'
 require_relative 'typed_parameters/schema'
 require_relative 'typed_parameters/types'
 require_relative 'typed_parameters/types/array'

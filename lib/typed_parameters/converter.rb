@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TypedParameters
-  class Parameterizer
+  class Converter
     def initialize(schema:, parent: nil)
       @schema = schema
       @parent = parent
@@ -39,7 +39,7 @@ module TypedParameters
         end
 
         param.append(
-          key => Parameterizer.new(schema: child, parent: param).convert(value),
+          key => Converter.new(schema: child, parent: param).convert(value),
         )
       end
 
@@ -59,7 +59,7 @@ module TypedParameters
         end
 
         param.append(
-          Parameterizer.new(schema: child, parent: param).convert(value),
+          Converter.new(schema: child, parent: param).convert(value),
         )
       end
 
