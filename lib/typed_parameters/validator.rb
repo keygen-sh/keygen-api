@@ -2,10 +2,10 @@
 
 module TypedParameters
   class Validator
-    def self.validate(params)
+    def self.validate!(params)
       return if params.nil?
 
-      return params.to_safe_h if
+      return if
         params.validated?
 
       # Traverse down the param tree until we hit the end of a branch,
@@ -17,12 +17,12 @@ module TypedParameters
         case params.schema.children
         when Array
           if params.schema.indexed?
-            params.schema.children.each_with_index { |v, i| validate(params[i]) }
+            params.schema.children.each_with_index { |v, i| validate!(params[i]) }
           else
-            params.value.each { |v| validate(v) }
+            params.value.each { |v| validate!(v) }
           end
         when Hash
-          params.schema.children.each { |k, v| validate(params[k]) }
+          params.schema.children.each { |k, v| validate!(params[k]) }
         end
       else
         params.validated!
@@ -39,10 +39,8 @@ module TypedParameters
 
         # From the end of the branch, start working our way back up to
         # our root node, validating bottom to top along the way.
-        validate(params.parent)
+        validate!(params.parent)
       end
-
-      params.to_safe_h
     end
   end
 end

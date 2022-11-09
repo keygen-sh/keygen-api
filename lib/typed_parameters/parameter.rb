@@ -43,7 +43,7 @@ module TypedParameters
     def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
 
     def to_safe_h
-      raise unless validated?
+      Validator.validate!(self)
 
       case value
       when Array
