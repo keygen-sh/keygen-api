@@ -67,6 +67,12 @@ module Keygen
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
+    # Default URL options (namely host)
+    Rails.application.default_url_options = {
+      host: ENV.fetch('KEYGEN_HOST') { 'api.keygen.sh' },
+      protocol: 'https',
+    }
+
     # Add support for trusted proxies
     config.action_dispatch.trusted_proxies =
       ActionDispatch::RemoteIp::TRUSTED_PROXIES + ENV.fetch('TRUSTED_PROXIES') { '' }

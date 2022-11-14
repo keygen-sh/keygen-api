@@ -37,6 +37,12 @@ class Product < ApplicationRecord
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :distribution_strategy, inclusion: { in: DISTRIBUTION_STRATEGIES, message: "unsupported distribution strategy" }, allow_nil: true
+  validates :slug,
+    uniqueness: { case_sensitive: false, scope: :account_id },
+    format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" },
+    length: { maximum: 255 },
+    exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    unless: -> { slug.nil? }
 
   scope :search_id, -> (term) {
     identifier = term.to_s

@@ -256,6 +256,12 @@ Rails.application.routes.draw do
     resources "arches", only: [:index, :show]
     resources "channels", only: [:index, :show]
 
+    namespace "packages" do
+      scope "pypi", module: "pypi" do
+        get "simple/:id", to: "simple#index", as: :pypi_packages
+      end
+    end
+
     resources "entitlements"
 
     resources "groups" do

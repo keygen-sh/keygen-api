@@ -9,13 +9,15 @@ module Pagination
   included do
     # Overload render method to append pagination links to response
     def render(args)
+      return super(args) unless args.key?(:jsonapi)
+
       resource = args[:jsonapi]
 
-      super args.merge(links: pagination_links(resource)) unless performed?
+      super(args.merge(links: pagination_links(resource))) unless performed?
     rescue => e # TODO: Let's not catch everything here
       Keygen.logger.exception e
 
-      super args unless performed? # Avoid double render
+      super(args) unless performed? # Avoid double render
     end
 
     private

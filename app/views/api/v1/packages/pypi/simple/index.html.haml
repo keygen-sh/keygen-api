@@ -1,0 +1,12 @@
+-# frozen_string_literal: true
+!!!
+%html
+  %head
+    %title Links for #{@product.slug}
+  %body
+    %h1 Links for #{@product.slug}
+
+    - @artifacts.each do |artifact|
+      - url = v1_account_artifact_url(artifact.account_id, artifact.id, anchor: artifact.checksum? ? "sha256-#{artifact.checksum}" : nil)
+
+      = link_to(artifact.filename, url, data: { 'requires-python': artifact.metadata&.fetch('requires_python', nil) })
