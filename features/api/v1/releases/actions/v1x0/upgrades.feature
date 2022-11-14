@@ -776,7 +776,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
-    Then the response status should be "204"
+    Then the response status should be "404"
 
   # Upgrade by filename
   Scenario: Admin retrieves an upgrade for a product release (upgrade available)
@@ -1113,7 +1113,7 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
-    Then the response status should be "204"
+    Then the response status should be "404"
 
   # Upgrade by query
   Scenario: Admin retrieves an upgrade for a product release (upgrade available)

@@ -7,6 +7,93 @@ describe ReleaseArtifact, type: :model do
   let(:account) { create(:account) }
   let(:product) { create(:product, account:) }
 
+  describe '.without_constraints' do
+    let(:artifacts) { described_class.where(account:) }
+
+    before do
+      r0 = create(:release, constraints: [build(:constraint, account:)], product:, account:)
+      r1 = create(:release, product:, account:)
+
+      create(:artifact, release: r0, account:)
+      create(:artifact, release: r1, account:)
+    end
+
+    it 'should filter artifacts without releases constraints' do
+      expect(artifacts.without_constraints.ids).to match_array [artifacts.second.id]
+    end
+  end
+
+  describe '.with_constraints' do
+    let(:artifacts) { described_class.where(account:) }
+
+    before do
+      r0 = create(:release, constraints: [build(:constraint, account:)], product:, account:)
+      r1 = create(:release, product:, account:)
+
+      create(:artifact, release: r0, account:)
+      create(:artifact, release: r1, account:)
+    end
+
+    it 'should filter artifacts with releases constraints' do
+      expect(artifacts.with_constraints.ids).to match_array [artifacts.first.id]
+    end
+  end
+
+  describe '.within_constraints' do
+    let(:artifacts) { described_class.where(account:) }
+
+    before do
+      e0 = create(:entitlement, code: 'A', account:)
+      e1 = create(:entitlement, code: 'B', account:)
+      e2 = create(:entitlement, code: 'C', account:)
+      e3 = create(:entitlement, code: 'D', account:)
+      e4 = create(:entitlement, code: 'E', account:)
+
+      r0 = create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e1, account:), build(:constraint, entitlement: e2, account:), build(:constraint, entitlement: e3, account:)], product:, account:)
+      r1 = create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e1, account:), build(:constraint, entitlement: e2, account:)], product:, account:)
+      r2 = create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e2, account:)], product:, account:)
+      r3 = create(:release, constraints: [build(:constraint, entitlement: e0, account:)], product:, account:)
+      r4 = create(:release, product:, account:)
+      r5 = create(:release, constraints: [build(:constraint, entitlement: e4, account:)], product:, account:)
+
+      create(:artifact, release: r0, account:)
+      create(:artifact, release: r1, account:)
+      create(:artifact, release: r2, account:)
+      create(:artifact, release: r3, account:)
+      create(:artifact, release: r4, account:)
+      create(:artifact, release: r5, account:)
+    end
+
+    context 'strict mode disabled' do
+      it 'should filter artifacts within release constraints' do
+        expect(artifacts.within_constraints('A', 'B', 'C', strict: false).ids).to match_array [
+          artifacts.first.id,
+          artifacts.second.id,
+          artifacts.third.id,
+          artifacts.fourth.id,
+          artifacts.fifth.id,
+        ]
+      end
+    end
+
+    context 'strict mode enabled' do
+      it 'should filter artifacts within release constraints' do
+        expect(artifacts.within_constraints('A', 'B', 'C', strict: true).ids).to match_array [
+          artifacts.second.id,
+          artifacts.third.id,
+          artifacts.fourth.id,
+          artifacts.fifth.id,
+        ]
+      end
+    end
+
+    it 'should filter artifacts without releases constraints' do
+      expect(artifacts.within_constraints.ids).to match_array [
+        artifacts.fifth.id,
+      ]
+    end
+  end
+
   describe '.order_by_version' do
     before do
       versions = %w[

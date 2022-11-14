@@ -47,4 +47,8 @@ class Entitlement < ApplicationRecord
   scope :search_name, -> (term) {
     where('entitlements.name ILIKE ?', "%#{term}%")
   }
+
+  ##
+  # codes returns the codes of the entitlements.
+  def self.codes = reorder(code: :asc).pluck(:code)
 end
