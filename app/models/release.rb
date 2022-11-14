@@ -377,15 +377,6 @@ class Release < ApplicationRecord
     return without_constraints if
       codes.empty?
 
-    # Explicit joins so we can be sure our table aliases aren't
-    # randomly changed by AR depending on context.
-    scp = joins(<<~SQL.squish)
-      INNER JOIN release_entitlement_constraints constraints
-        ON constraints.release_id = releases.id
-      INNER JOIN entitlements
-        ON entitlements.id = constraints.entitlement_id
-    SQL
-
     # The :strict keyword ensures that the release has less number of
     # constraints as matched codes (or none), i.e. ALL vs ANY.
     # Otherwise, we just match ANY.
@@ -401,12 +392,15 @@ class Release < ApplicationRecord
     #   count(constraints) = count(entitlements in :codes)
     #
     # This avoids permissions issues later on.
+    scp = joins(constraints: :entitlement)
     scp = if strict
-            scp.group(:id).having(<<~SQL.squish, codes:)
-              count(constraints) = count(entitlements) filter (
-                where code in (:codes)
-              )
-            SQL
+            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+               .group(:id)
+               .having(<<~SQL.squish, codes:)
+                 count(release_entitlement_constraints) = count(entitlements) filter (
+                   where code in (:codes)
+                 )
+               SQL
           else
             scp.where(entitlements: { code: codes })
           end

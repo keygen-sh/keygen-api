@@ -257,21 +257,15 @@ class ReleaseArtifact < ApplicationRecord
     return without_constraints if
       codes.empty?
 
-    scp = joins(<<~SQL.squish)
-      INNER JOIN releases
-        ON releases.id = release_artifacts.release_id
-      INNER JOIN release_entitlement_constraints constraints
-        ON constraints.release_id = releases.id
-      INNER JOIN entitlements
-        ON entitlements.id = constraints.entitlement_id
-    SQL
-
+    scp = joins(release: { constraints: :entitlement })
     scp = if strict
-            scp.group(:id).having(<<~SQL.squish, codes:)
-              count(constraints) = count(entitlements) filter (
-                where code in (:codes)
-              )
-            SQL
+            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+               .group(:id)
+               .having(<<~SQL.squish, codes:)
+                 count(release_entitlement_constraints) = count(entitlements) filter (
+                   where code in (:codes)
+                 )
+               SQL
           else
             scp.where(entitlements: { code: codes })
           end
