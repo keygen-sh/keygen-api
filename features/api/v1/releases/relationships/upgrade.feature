@@ -654,7 +654,7 @@ Feature: Upgrade release
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   # Upgrade by version
   Scenario: Admin retrieves an upgrade by version
@@ -1041,7 +1041,7 @@ Feature: Upgrade release
     And I use an authentication token
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   # Open distribution strategy
   Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy)

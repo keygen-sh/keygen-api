@@ -155,25 +155,47 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    joins(product: %i[users])
-      .where(
-        product: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
-      )
-      .union(
-        self.open
-      )
+    user = case user
+           when UUID_RE
+             User.find(user)
+           else
+             user
+           end
+
+    # Users should only be able to access artifacts with constraints
+    # intersecting their entitlements, or no constraints at all.
+    entl = within_constraints(user.entitlement_codes, strict: true)
+
+    entl.joins(product: %i[users])
+        .where(
+          product: { distribution_strategy: ['LICENSED', nil] },
+          users: { id: user },
+        )
+        .union(
+          self.open
+        )
   }
 
   scope :for_license, -> license {
-    joins(product: %i[licenses])
-      .where(
-        product: { distribution_strategy: ['LICENSED', nil] },
-        licenses: { id: license },
-      )
-      .union(
-        self.open
-      )
+    license = case license
+              when UUID_RE
+                License.find(license)
+              else
+                license
+              end
+
+    # Licenses should only be able to access artifacts with constraints
+    # intersecting their entitlements, or no constraints at all.
+    entl = within_constraints(license.entitlement_codes, strict: true)
+
+    entl.joins(product: %i[licenses])
+        .where(
+          product: { distribution_strategy: ['LICENSED', nil] },
+          licenses: { id: license },
+        )
+        .union(
+          self.open
+        )
   }
 
   scope :for_platform, -> platform {
@@ -212,6 +234,52 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
+
+  ##
+  # without_constraints returns artifacts with any release entitlement constraints.
+  scope :without_constraints, -> {
+    where_assoc_not_exists([:release, :constraints])
+  }
+
+  scope :with_constraints, -> {
+    where_assoc_exists([:release, :constraints])
+  }
+
+  ##
+  # within_constraints returns artifacts with specific release entitlement constraints.
+  #
+  # See Release.within_constraints for a detailed explanation.
+  scope :within_constraints, -> *codes, strict: false {
+    codes = codes.flatten
+                 .compact_blank
+                 .uniq
+
+    return without_constraints if
+      codes.empty?
+
+    scp = joins(<<~SQL.squish)
+      INNER JOIN releases
+        ON releases.id = release_artifacts.release_id
+      INNER JOIN release_entitlement_constraints constraints
+        ON constraints.release_id = releases.id
+      INNER JOIN entitlements
+        ON entitlements.id = constraints.entitlement_id
+    SQL
+
+    scp = if strict
+            scp.group(:id).having(<<~SQL.squish, codes:)
+              count(constraints) = count(entitlements) filter (
+                where code in (:codes)
+              )
+            SQL
+          else
+            scp.where(entitlements: { code: codes })
+          end
+
+    scp.union(
+      without_constraints,
+    )
+  }
 
   scope :waiting,  -> { with_status(:WAITING) }
   scope :uploaded, -> { with_status(:UPLOADED) }

@@ -278,9 +278,10 @@ class User < ApplicationRecord
     end
   }
 
-  def entitlement_ids = entitlements.reorder(nil).ids
-  def product_ids     = products.reorder(nil).ids
-  def policy_ids      = policies.reorder(nil).ids
+  def entitlement_codes = entitlements.reorder(nil).codes
+  def entitlement_ids   = entitlements.reorder(nil).ids
+  def product_ids       = products.reorder(nil).ids
+  def policy_ids        = policies.reorder(nil).ids
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct

@@ -7,6 +7,80 @@ describe Release, type: :model do
   let(:account) { create(:account) }
   let(:product) { create(:product, account:) }
 
+  describe '.without_constraints' do
+    let(:releases) { described_class.where(account:) }
+
+    before do
+      create(:release, constraints: [build(:constraint, account:)], product:, account:)
+      create(:release, product:, account:)
+    end
+
+    it 'should filter releases without constraints' do
+      expect(releases.without_constraints.ids).to match_array [releases.second.id]
+    end
+  end
+
+  describe '.with_constraints' do
+    let(:releases) { described_class.where(account:) }
+
+    before do
+      create(:release, constraints: [build(:constraint, account:)], product:, account:)
+      create(:release, product:, account:)
+    end
+
+    it 'should filter releases with constraints' do
+      expect(releases.with_constraints.ids).to match_array [releases.first.id]
+    end
+  end
+
+  describe '.within_constraints' do
+    let(:releases) { described_class.where(account:) }
+
+    before do
+      e0 = create(:entitlement, code: 'A', account:)
+      e1 = create(:entitlement, code: 'B', account:)
+      e2 = create(:entitlement, code: 'C', account:)
+      e3 = create(:entitlement, code: 'D', account:)
+      e4 = create(:entitlement, code: 'E', account:)
+
+      create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e1, account:), build(:constraint, entitlement: e2, account:), build(:constraint, entitlement: e3, account:)], product:, account:)
+      create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e1, account:), build(:constraint, entitlement: e2, account:)], product:, account:)
+      create(:release, constraints: [build(:constraint, entitlement: e0, account:), build(:constraint, entitlement: e2, account:)], product:, account:)
+      create(:release, constraints: [build(:constraint, entitlement: e0, account:)], product:, account:)
+      create(:release, product:, account:)
+      create(:release, constraints: [build(:constraint, entitlement: e4, account:)], product:, account:)
+    end
+
+    context 'strict mode disabled' do
+      it 'should filter releases within constraints' do
+        expect(releases.within_constraints('A', 'B', 'C', strict: false).ids).to match_array [
+          releases.first.id,
+          releases.second.id,
+          releases.third.id,
+          releases.fourth.id,
+          releases.fifth.id,
+        ]
+      end
+    end
+
+    context 'strict mode enabled' do
+      it 'should filter releases within constraints' do
+        expect(releases.within_constraints('A', 'B', 'C', strict: true).ids).to match_array [
+          releases.second.id,
+          releases.third.id,
+          releases.fourth.id,
+          releases.fifth.id,
+        ]
+      end
+    end
+
+    it 'should filter releases with constraints' do
+      expect(releases.within_constraints.ids).to match_array [
+        releases.fifth.id,
+      ]
+    end
+  end
+
   describe '#semver' do
     it 'should normalize its version' do
       release = create(:release, :published, version: '2', product:, account:)

@@ -538,7 +538,7 @@ Feature: Release artifact relationship
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves a release artifact of their product (missing all entitlements)
     Given the current account is "test1"
@@ -552,7 +552,7 @@ Feature: Release artifact relationship
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves a release artifact with a license for it
     Given the current account is "test1"
@@ -799,7 +799,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves a release artifact with a license for it (missing all entitlements)
     Given the current account is "test1"
@@ -815,7 +815,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves a release artifact without a license for it
     Given the current account is "test1"

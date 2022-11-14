@@ -234,7 +234,19 @@ class Release < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    joins(:users, :product)
+    user = case user
+           when UUID_RE
+             User.find(user)
+           else
+             user
+           end
+
+    # Users should only be able to access releases with constraints
+    # intersecting their entitlements, or no constraints at all.
+    entl = within_constraints(user.entitlement_codes, strict: true)
+
+    # Should we be applying a LIMIT to these UNION'd queries?
+    entl.joins(:users, :product)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: user },
@@ -245,15 +257,26 @@ class Release < ApplicationRecord
   }
 
   scope :for_license, -> license {
+    license = case license
+              when UUID_RE
+                License.find(license)
+              else
+                license
+              end
+
+    # Licenses should only be able to access releases with constraints
+    # intersecting their entitlements, or no constraints at all.
+    entl = within_constraints(license.entitlement_codes, strict: true)
+
     # Should we be applying a LIMIT to these UNION'd queries?
-    joins(:licenses, :product)
-      .where(
-        product: { distribution_strategy: ['LICENSED', nil] },
-        licenses: { id: license },
-      )
-      .union(
-        self.open
-      )
+    entl.joins(:licenses, :product)
+        .where(
+          product: { distribution_strategy: ['LICENSED', nil] },
+          licenses: { id: license },
+        )
+        .union(
+          self.open
+        )
   }
 
   scope :for_platform, -> platform {
@@ -335,6 +358,64 @@ class Release < ApplicationRecord
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
   scope :with_version, -> version { where(version:) }
+
+  ##
+  # without_constraints returns releases without entitlement constraints.
+  scope :without_constraints, -> { where_assoc_not_exists(:constraints) }
+
+  ##
+  # with_constraints returns releases with entitlement constraints.
+  scope :with_constraints, -> { where_assoc_exists(:constraints) }
+
+  ##
+  # within_constraints returns releases with specific entitlement constraints.
+  scope :within_constraints, -> *codes, strict: false {
+    codes = codes.flatten
+                 .compact_blank
+                 .uniq
+
+    return without_constraints if
+      codes.empty?
+
+    # Explicit joins so we can be sure our table aliases aren't
+    # randomly changed by AR depending on context.
+    scp = joins(<<~SQL.squish)
+      INNER JOIN release_entitlement_constraints constraints
+        ON constraints.release_id = releases.id
+      INNER JOIN entitlements
+        ON entitlements.id = constraints.entitlement_id
+    SQL
+
+    # The :strict keyword ensures that the release has less number of
+    # constraints as matched codes (or none), i.e. ALL vs ANY.
+    # Otherwise, we just match ANY.
+    #
+    # For example, given a license has the entitlements FOO and BAR. We
+    # want to display all releases that have constraints FOO and/or BAR,
+    # but none that have BAZ. To do this, we need to ensure that the
+    # release has either FOO and/or BAR constraints, but that it
+    # has no other constraints.
+    #
+    # After filtering, that would look like:
+    #
+    #   count(constraints) = count(entitlements in :codes)
+    #
+    # This avoids permissions issues later on.
+    scp = if strict
+            scp.group(:id).having(<<~SQL.squish, codes:)
+              count(constraints) = count(entitlements) filter (
+                where code in (:codes)
+              )
+            SQL
+          else
+            scp.where(entitlements: { code: codes })
+          end
+
+    # Union with releases without constraints as well.
+    scp.union(
+      without_constraints,
+    )
+  }
 
   scope :published, -> { with_status(:PUBLISHED) }
   scope :drafts,    -> { with_status(:DRAFT) }
