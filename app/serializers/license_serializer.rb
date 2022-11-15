@@ -47,6 +47,9 @@ class LicenseSerializer < BaseSerializer
   attribute :next_check_in do
     @object.next_check_in_at
   end
+  attribute :last_check_out do
+    @object.last_check_out_at
+  end
   attribute :permissions, if: -> { @account.ent? } do
     @object.permissions.actions
   end

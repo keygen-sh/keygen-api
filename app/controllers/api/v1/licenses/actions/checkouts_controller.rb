@@ -69,13 +69,14 @@ module Api::V1::Licenses::Actions
 
       license_file = LicenseCheckoutService.call(
         account: current_account,
-        license: license,
+        license:,
         **kwargs,
       )
       authorize! license_file,
         to: :show?
 
       license_file.validate!
+      license.touch(:last_check_out_at)
 
       BroadcastEventService.call(
         event: 'license.checked-out',
