@@ -69,13 +69,14 @@ module Api::V1::Machines::Actions
 
       machine_file = MachineCheckoutService.call(
         account: current_account,
-        machine: machine,
+        machine:,
         **kwargs,
       )
       authorize! machine_file,
         to: :show?
 
       machine_file.validate!
+      machine.touch(:last_check_out_at)
 
       BroadcastEventService.call(
         event: 'machine.checked-out',
