@@ -15,6 +15,9 @@ class MachineSerializer < BaseSerializer
   attribute :heartbeat_status
   attribute :heartbeat_duration
   attribute :max_processes
+  attribute :last_check_out do
+    @object.last_check_out_at
+  end
   attribute :last_heartbeat do
     @object.last_heartbeat_at
   end
