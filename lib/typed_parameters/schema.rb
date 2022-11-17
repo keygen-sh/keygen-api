@@ -5,6 +5,8 @@
 
 module TypedParameters
   class Schema
+    ROOT_KEY = Class.new
+
     attr_reader :validations,
                 :parent,
                 :children,
@@ -26,6 +28,11 @@ module TypedParameters
       validate: nil,
       &block
     )
+      key ||= ROOT_KEY
+
+      raise ArgumentError, 'key is required for child schema' if
+        key == ROOT_KEY && parent.present?
+
       @validations       = []
       @strict            = strict
       @parent            = parent
@@ -41,7 +48,7 @@ module TypedParameters
       @type              = Types[type]
       @children          = case @type.to_sym
                            when :hash
-                             {}.with_indifferent_access
+                             {}
                            when :array
                              []
                            else

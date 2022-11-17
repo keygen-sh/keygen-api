@@ -1,17 +1,23 @@
 # frozen_string_literal: true
 
+require_relative 'path'
+
 module TypedParameters
   class Parameter
-    attr_reader :value,
+    attr_reader :key,
+                :value,
                 :schema,
                 :parent
 
-    def initialize(value:, schema:, parent: nil)
+    def initialize(key:, value:, schema:, parent: nil)
+      @key       = key
       @value     = value
       @schema    = schema
       @parent    = parent
       @validated = false
     end
+
+    def path = @path ||= Path.new(*parent&.path&.keys, *key)
 
     def validate!
       # TODO(ezekg) Add validations

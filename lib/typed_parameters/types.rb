@@ -11,6 +11,6 @@ module TypedParameters
     end
 
     def self.for(value) = types.values.find { _1.match?(value) }
-    def self.[](type)   = types[type]
+    def self.[](type)   = types[type] || raise(ArgumentError, %(invalid type "#{type}"))
   end
 end
