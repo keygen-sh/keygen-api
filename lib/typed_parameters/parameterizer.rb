@@ -29,18 +29,31 @@ module TypedParameters
     def convert_hash(key:, value:)
       param = Parameter.new(key:, value: {}, schema:, parent:)
 
+      # Coerce the value to a hash if it's not already a hash
+      value = Types.coerce(value, to: :hash) unless
+        Types.hash?(value)
+
       value.each do |k, v|
-        child = schema.children.fetch(k) { nil }
-        if child.nil?
-          raise InvalidParameterError, "invalid parameter key #{k}" if
-            schema.strict?
+        if schema.children.any?
+          child = schema.children.fetch(k) { nil }
+          if child.nil?
+            raise InvalidParameterError, "invalid parameter key #{k}" if
+              schema.strict?
 
-          next
+            next
+          end
+
+          param.append(
+            k => Parameterizer.new(schema: child, parent: param).call(key: k, value: v),
+          )
+        else
+          raise InvalidParameterError, 'unpermitted type (expected object of scalar types)' unless
+            Types.scalar?(v)
+
+          param.append(
+            k => Parameter.new(key: k, value: v, schema:, parent: param),
+          )
         end
-
-        param.append(
-          k => Parameterizer.new(schema: child, parent: param).call(key: k, value: v),
-        )
       end
 
       param
@@ -49,18 +62,31 @@ module TypedParameters
     def convert_array(key:, value:)
       param = Parameter.new(key:, value: [], schema:, parent:)
 
+      # Coerce the value to an array if it's not already an array
+      value = Types.coerce(value, to: :array) unless
+        Types.array?(value)
+
       value.each_with_index do |v, i|
-        child = schema.children.fetch(i) { schema.children.first }
-        if child.nil?
-          raise InvalidParameterError, "invalid parameter index #{i}" if
-            schema.strict?
+        if schema.children.any?
+          child = schema.children.fetch(i) { schema.children.first }
+          if child.nil?
+            raise InvalidParameterError, "invalid parameter index #{i}" if
+              schema.strict?
 
-          next
+            next
+          end
+
+          param.append(
+            Parameterizer.new(schema: child, parent: param).call(key: i, value: v),
+          )
+        else
+          raise InvalidParameterError, 'unpermitted type (expected array of scalar types)' unless
+            Types.scalar?(v)
+
+          param.append(
+            Parameter.new(key: i, value: v, schema:, parent: param),
+          )
         end
-
-        param.append(
-          Parameterizer.new(schema: child, parent: param).call(key: i, value: v),
-        )
       end
 
       param

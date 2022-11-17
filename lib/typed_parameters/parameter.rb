@@ -4,8 +4,9 @@ require_relative 'path'
 
 module TypedParameters
   class Parameter
+    attr_accessor :value
+
     attr_reader :key,
-                :value,
                 :schema,
                 :parent
 
@@ -52,25 +53,25 @@ module TypedParameters
 
     def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
 
-    def to_safe_h
-      Validator.validate!(self)
+    def safe
+      # TODO(ezekg) Raise if parameter is invalid
 
       case value
       when Array
-        value.map(&:to_safe_h)
+        value.map(&:safe)
       when Hash
-        value.transform_values(&:to_safe_h)
+        value.transform_values(&:safe)
       else
         value
       end
     end
 
-    def to_unsafe_h
+    def unsafe
       case value
       when Array
-        value.map(&:to_unsafe_h)
+        value.map(&:unsafe)
       when Hash
-        value.transform_values(&:to_unsafe_h)
+        value.transform_values(&:unsafe)
       else
         value
       end
