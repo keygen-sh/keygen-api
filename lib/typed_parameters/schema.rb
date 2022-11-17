@@ -105,7 +105,7 @@ module TypedParameters
     def strict?            = !!strict
     def optional?          = !!@optional
     def required?          = !optional?
-    def coerce?            = !!@coerce && @type.coercable?
+    def coerce?            = !!@coerce
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars

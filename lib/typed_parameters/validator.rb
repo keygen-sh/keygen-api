@@ -8,11 +8,10 @@ module TypedParameters
       depth_first_map(params) do |param|
         type = Types.for(param.value)
 
-        raise InvalidParameterError.new(path: param.path), "type mismatch (received unknown expected #{params.schema.type.name})" if
+        raise InvalidParameterError.new(path: param.path), "type mismatch (received unknown expected #{param.schema.type.name})" if
           type.nil?
 
-        raise InvalidParameterError.new(path: param.path), "type mismatch (received #{type.name} expected #{params.schema.type.name})" if
-          # !(param.coerce? && param.schema.type.coercable?) &&
+        raise InvalidParameterError.new(path: param.path), "type mismatch (received #{type.name} expected #{param.schema.type.name})" if
           param.schema.type != type
       end
     end

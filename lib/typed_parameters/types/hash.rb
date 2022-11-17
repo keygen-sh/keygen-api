@@ -7,6 +7,7 @@ module TypedParameters
       type: :hash,
       accepts_block: true,
       scalar: false,
+      coerce: -> v { v.respond_to?(:to_h) ? v.to_h : {} },
       match: -> v { v.is_a?(Hash) || v.is_a?(HashWithIndifferentAccess) },
     )
   end
