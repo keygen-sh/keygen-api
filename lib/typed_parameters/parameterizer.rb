@@ -13,8 +13,14 @@ module TypedParameters
 
       case schema.children
       when Hash
+        value = Types.coerce(value, to: :hash) unless
+          Types.hash?(value)
+
         convert_hash(key:, value:)
       when Array
+        value = Types.coerce(value, to: :array) unless
+          Types.array?(value)
+
         convert_array(key:, value:)
       else
         convert_scalar(key:, value:)
@@ -28,10 +34,6 @@ module TypedParameters
 
     def convert_hash(key:, value:)
       param = Parameter.new(key:, value: {}, schema:, parent:)
-
-      # Coerce the value to a hash if it's not already a hash
-      value = Types.coerce(value, to: :hash) unless
-        Types.hash?(value)
 
       value.each do |k, v|
         if schema.children.any?
@@ -61,10 +63,6 @@ module TypedParameters
 
     def convert_array(key:, value:)
       param = Parameter.new(key:, value: [], schema:, parent:)
-
-      # Coerce the value to an array if it's not already an array
-      value = Types.coerce(value, to: :array) unless
-        Types.array?(value)
 
       value.each_with_index do |v, i|
         if schema.children.any?
