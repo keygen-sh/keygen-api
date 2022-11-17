@@ -5,7 +5,7 @@ require 'spec_helper'
 require 'typed_parameters'
 
 describe TypedParameters do
-  let(:schema) do
+  let :schema do
     TypedParameters::Schema.new type: :hash do
       param :foo, type: :hash do
         param :bar, type: :array do
@@ -39,7 +39,7 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Rule do
-    let(:schema) do
+    let :schema do
       TypedParameters::Schema.new type: :hash do
         param :foo, type: :hash do
           param :bar, type: :array do
@@ -102,6 +102,116 @@ describe TypedParameters do
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+  end
+
+  describe TypedParameters::Coercer do
+    let :schema do
+      TypedParameters::Schema.new type: :hash do
+        param :boolean, type: :boolean, coerce: true
+        param :string, type: :string, coerce: true
+        param :integer, type: :integer, coerce: true
+        param :float, type: :float, coerce: true
+        param :date, type: :date, coerce: true
+        param :time, type: :time, coerce: true
+        param :nil, type: :nil, coerce: true
+        param :hash, type: :hash, coerce: true
+        param :array, type: :array, coerce: true
+      end
+    end
+
+    it 'should coerce true' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { boolean: 1 })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:boolean].value).to be true
+    end
+
+    it 'should coerce false' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { boolean: 0 })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:boolean].value).to be false
+    end
+
+    it 'should coerce string' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { string: 1 })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:string].value).to eq '1'
+    end
+
+    it 'should coerce integer' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { integer: '1' })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:integer].value).to eq 1
+    end
+
+    it 'should coerce float' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { float: 1 })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:float].value).to eq 1.0
+    end
+
+    it 'should coerce date' do
+      now = Date.today
+
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { date: now.to_s })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:date].value).to eq now
+    end
+
+    it 'should coerce time' do
+      now = Time.now
+
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { time: now.strftime('%H:%M:%S.%6N') })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:time].value).to eq now
+    end
+
+    it 'should coerce nil' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { nil: 1 })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:nil].value).to be nil
+    end
+
+    it 'should coerce array' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { array: '1,2,3' })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:array].unsafe).to eq %w[1 2 3]
+    end
+
+    it 'should coerce hash' do
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { hash: [[:foo, 1]] })
+      coercer = TypedParameters::Coercer.new(schema:)
+
+      coercer.call(params)
+
+      expect(params[:hash].unsafe).to eq({ foo: 1 })
     end
   end
 
