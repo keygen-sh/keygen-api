@@ -15,7 +15,7 @@ module TypedParameters
           param.schema.type.coercable?
 
         param.value = param.schema.type.coerce(param.value)
-      rescue CoerceFailedError
+      rescue FailedCoercionError
         raise InvalidParameterError, "failed to coerce #{type} to #{param.schema.type}"
       end
     end

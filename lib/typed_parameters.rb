@@ -28,7 +28,8 @@ require_relative 'typed_parameters/types/type'
 require_relative 'typed_parameters/validator'
 
 module TypedParameters
-  class CoerceFailedError < StandardError; end
+  class UnsupportedCoercionError < StandardError; end
+  class FailedCoercionError < StandardError; end
   class InvalidParameterError < StandardError; end
 
   # class UnpermittedParametersError < StandardError; end

@@ -174,7 +174,7 @@ module TypedParameters
         params.coerce?
 
       params.type.coerce!(value)
-    rescue CoerceFailedError
+    rescue FailedCoercionError
       raise InvalidParameterError.new(path:), 'could not be coerced'
     end
   end
