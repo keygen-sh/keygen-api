@@ -1,45 +1,19 @@
 # frozen_string_literal: true
 
+require_relative 'rule'
+
 module TypedParameters
-  class Validator
-    def self.validate!(params)
-      return if params.nil?
+  class Validator < Rule
+    def call(params)
+      depth_first_map(params) do |param|
+        type = Types.for(param.value)
 
-      return if
-        params.validated?
+        raise InvalidParameterError.new(path: param.path), "type mismatch (received unknown expected #{params.schema.type.name})" if
+          type.nil?
 
-      # Traverse down the param tree until we hit the end of a branch,
-      # then start validating up from there, bottom to top. This is
-      # kind of like a depth first search.
-      if params.schema.children&.any? &&
-         ((params.schema.children.is_a?(Hash) && params.value.any? { |k, v| !params[k].validated? }) ||
-          (params.schema.children.is_a?(Array) && params.value.any? { !_1.validated? }))
-        case params.schema.children
-        when Array
-          if params.schema.indexed?
-            params.schema.children.each_with_index { |v, i| validate!(params[i]) }
-          else
-            params.value.each { |v| validate!(v) }
-          end
-        when Hash
-          params.schema.children.each { |k, v| validate!(params[k]) }
-        end
-      else
-        params.validate!
-
-        puts(
-          validated!: params.to_safe_h,
-          # parent: params.parent,
-        )
-
-        # Delete blanks unless schema allows blanks
-        params.delete if
-          !params.schema.allow_blank? &&
-          params.blank?
-
-        # From the end of the branch, start working our way back up to
-        # our root node, validating bottom to top along the way.
-        validate!(params.parent)
+        raise InvalidParameterError.new(path: param.path), "type mismatch (received #{type.name} expected #{params.schema.type.name})" if
+          # !(param.coerce? && param.schema.type.coercable?) &&
+          param.schema.type != type
       end
     end
   end
