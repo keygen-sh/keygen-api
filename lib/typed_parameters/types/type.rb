@@ -26,11 +26,12 @@ module TypedParameters
       def to_s   = type.to_s
 
       def coerce(value)
-        raise CoerceFailedError, 'type is not coercable' unless coercable?
+        raise UnsupportedCoercionError, 'type is not coercable' unless
+          coercable?
 
         @coerce.call(value)
       rescue
-        raise CoerceFailedError, "failed to coerce #{Types.for(value).name} to #{@name}"
+        raise FailedCoercionError, "failed to coerce #{Types.for(value).name} to #{@name}"
       end
 
       def call(...) = @block.call(...)
