@@ -43,9 +43,6 @@ module TypedParameters
             k => Parameterizer.new(schema: child, parent: param).call(key: k, value: v),
           )
         else
-          raise InvalidParameterError, 'unpermitted type (expected object of scalar types)' unless
-            Types.scalar?(v)
-
           param.append(
             k => Parameter.new(key: k, value: v, schema:, parent: param),
           )
@@ -72,9 +69,6 @@ module TypedParameters
             Parameterizer.new(schema: child, parent: param).call(key: i, value: v),
           )
         else
-          raise InvalidParameterError, 'unpermitted type (expected array of scalar types)' unless
-            Types.scalar?(v)
-
           param.append(
             Parameter.new(key: i, value: v, schema:, parent: param),
           )

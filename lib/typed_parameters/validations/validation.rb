@@ -3,7 +3,13 @@
 module TypedParameters
   module Validations
     class Validation
-      def validate = raise NotImplementedError
+      def initialize(schema:) = @schema = schema
+
+      def call = raise NotImplementedError
+
+      private
+
+      attr_reader :schema
     end
   end
 end
