@@ -5,9 +5,9 @@ require_relative 'validation'
 module TypedParameters
   module Validations
     class Filled < Validation
-      def validate
+      def call(param)
         raise InvalidParameterError.new, 'cannot be blank' if
-          !params.allow_blank? && value.blank? && value != false
+          !schema.allow_blank? && param.value.blank? && param.value != false
       end
     end
   end

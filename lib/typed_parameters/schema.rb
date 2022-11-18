@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# require_relative 'validations/allow_blank'
-# require_relative 'validations/optional'
-
 module TypedParameters
   class Schema
     ROOT_KEY = Class.new
@@ -47,10 +44,6 @@ module TypedParameters
       @validate          = validate
       @type              = Types[type]
       @children          = nil
-
-      # @validations << Validations::AllowBlank.new if allow_blank
-      # @validations << Validations::Optional.new if optional
-      # @validations << validate if validate.present?
 
       raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?

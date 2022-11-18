@@ -5,10 +5,14 @@ require_relative 'validation'
 module TypedParameters
   module Validations
     class Required < Validation
-      def validate
-        raise InvalidParameterError, 'is required' if
-          !params.allow_blank? && !params.optional? &&
-          value.blank? && value != false
+      def call(param)
+        param.parent.children&.each do |child|
+          next unless
+            child.key == param.key
+
+          # raise InvalidParameterError, 'is required' if
+          #   param.value
+        end
       end
     end
   end
