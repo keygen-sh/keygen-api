@@ -5,15 +5,23 @@ require_relative 'rule'
 module TypedParameters
   class Validator < Rule
     def call(params)
+      raise InvalidParameterError, "is missing" if
+        params.blank? && schema.required?
+
       depth_first_map(params) do |param|
         type   = Types.for(param.value)
         schema = param.schema
+        parent = param.parent
+
+        # Assert required params
+        raise InvalidParameterError, "is missing" if
+          (schema.required_keys - param.keys).any?
 
         # Assert type
-        raise InvalidParameterError.new(path: param.path), "type mismatch (received unknown expected #{schema.type.name})" if
+        raise InvalidParameterError, "type mismatch (received unknown expected #{schema.type.name})" if
           type.nil?
 
-        raise InvalidParameterError.new(path: param.path), "type mismatch (received #{type.name} expected #{schema.type.name})" if
+        raise InvalidParameterError, "type mismatch (received #{type.name} expected #{schema.type.name})" if
           schema.type != type
 
         # Assert scalar values for params without children
