@@ -13,17 +13,11 @@ module TypedParameters
 
       case schema.children
       when Hash
-        value = Types.coerce(value, to: :hash) unless
-          Types.hash?(value)
-
-        convert_hash(key:, value:)
+        parameterize_hash_schema(key:, value:)
       when Array
-        value = Types.coerce(value, to: :array) unless
-          Types.array?(value)
-
-        convert_array(key:, value:)
+        parameterize_array_schema(key:, value:)
       else
-        convert_scalar(key:, value:)
+        parameterize_value(key:, value:)
       end
     end
 
@@ -32,7 +26,7 @@ module TypedParameters
     attr_reader :schema,
                 :parent
 
-    def convert_hash(key:, value:)
+    def parameterize_hash_schema(key:, value:)
       param = Parameter.new(key:, value: {}, schema:, parent:)
 
       value.each do |k, v|
@@ -61,7 +55,7 @@ module TypedParameters
       param
     end
 
-    def convert_array(key:, value:)
+    def parameterize_array_schema(key:, value:)
       param = Parameter.new(key:, value: [], schema:, parent:)
 
       value.each_with_index do |v, i|
@@ -90,7 +84,7 @@ module TypedParameters
       param
     end
 
-    def convert_scalar(key:, value:)
+    def parameterize_value(key:, value:)
       Parameter.new(key:, value:, schema:, parent:)
     end
   end
