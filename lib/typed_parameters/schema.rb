@@ -46,14 +46,7 @@ module TypedParameters
       @transform         = transform
       @validate          = validate
       @type              = Types[type]
-      @children          = case @type.to_sym
-                           when :hash
-                             {}
-                           when :array
-                             []
-                           else
-                             nil
-                           end
+      @children          = nil
 
       # @validations << Validations::AllowBlank.new if allow_blank
       # @validations << Validations::Optional.new if optional
@@ -73,8 +66,10 @@ module TypedParameters
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
+      @children ||= {} if Types.hash?(self.type)
+
       raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
-        children.is_a?(Hash)
+        Types.hash?(children)
 
       raise ArgumentError, "key #{key} has already been defined" if
         children.key?(key)
@@ -85,8 +80,10 @@ module TypedParameters
     ##
     # item defines an indexed parameter for an array schema.
     def item(key = children.size, type:, **kwargs, &block)
+      @children ||= [] if Types.array?(self.type)
+
       raise NotImplementedError, "cannot define item for non-array type (got #{self.type})" unless
-        children.is_a?(Array)
+        Types.array?(children)
 
       raise ArgumentError, "index #{key} has already been defined" if
         children[key].present? || boundless?
