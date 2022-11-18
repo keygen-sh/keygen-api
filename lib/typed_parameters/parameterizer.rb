@@ -9,7 +9,7 @@ module TypedParameters
 
     def call(key: nil, value:)
       return if
-        value.nil?
+        value.nil? && !schema.allow_nil?
 
       case schema.children
       when Hash

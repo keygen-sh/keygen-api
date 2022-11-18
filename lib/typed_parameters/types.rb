@@ -11,12 +11,13 @@ module TypedParameters
         types.key?(type)
 
       types[type] = Type.new(type:, name:, match:, coerce:, scalar:, accepts_block:)
-
-      define_singleton_method(:"#{type}?") { types[type].match?(_1) }
     end
 
     def self.coerce(value, to:) = types[to].coerce(value)
 
+    def self.array?(value)  = types[:array].match?(value)
+    def self.hash?(value)   = types[:hash].match?(value)
+    def self.nil?(value)    = types[:nil].match?(value)
     def self.scalar?(value) = self.for(value).scalar?
 
     def self.for(value) = types.values.find { _1.match?(value) }
