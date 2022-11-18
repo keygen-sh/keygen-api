@@ -103,6 +103,54 @@ describe TypedParameters do
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
+
+    it 'should not raise on hash of scalar values' do
+      schema    = TypedParameters::Schema.new(type: :hash)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on hash of non-scalar values' do
+      schema    = TypedParameters::Schema.new(type: :hash)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: { d: 3 } })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on hash of non-scalar values' do
+      schema    = TypedParameters::Schema.new(type: :hash, allow_non_scalars: true)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: { d: 3 } })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should not raise on array of scalar values' do
+      schema    = TypedParameters::Schema.new(type: :array)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: [1, 2, 3])
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on array of non-scalar values' do
+      schema    = TypedParameters::Schema.new(type: :array)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: [1, 2, [3]])
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on array of non-scalar values' do
+      schema    = TypedParameters::Schema.new(type: :array, allow_non_scalars: true)
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: [1, 2, [3]])
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
   end
 
   describe TypedParameters::Coercer do
