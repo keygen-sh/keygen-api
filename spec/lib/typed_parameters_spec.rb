@@ -106,7 +106,7 @@ describe TypedParameters do
 
     it 'should not raise on missing optional root' do
       schema    = TypedParameters::Schema.new(type: :hash, optional: true)
-      params    = TypedParameters::Parameterizer.new(schema:).call(value: {})
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: nil)
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to_not raise_error
@@ -114,7 +114,7 @@ describe TypedParameters do
 
     it 'should raise on missing required root' do
       schema    = TypedParameters::Schema.new(type: :hash, optional: false)
-      params    = TypedParameters::Parameterizer.new(schema:).call(value: {})
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: nil)
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
@@ -131,6 +131,22 @@ describe TypedParameters do
     it 'should raise on missing required param' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, optional: false }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: {})
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on nil param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: true }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on nil param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError

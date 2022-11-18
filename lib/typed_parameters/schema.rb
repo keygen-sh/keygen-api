@@ -30,6 +30,9 @@ module TypedParameters
       raise ArgumentError, 'key is required for child schema' if
         key == ROOT_KEY && parent.present?
 
+      raise ArgumentError, 'root cannot be nil' if
+        key == ROOT_KEY && allow_nil
+
       @validations       = []
       @strict            = strict
       @parent            = parent
@@ -103,6 +106,7 @@ module TypedParameters
       end
     end
 
+    def root?              = key == ROOT_KEY
     def strict?            = !!strict
     def optional?          = !!@optional
     def required?          = !optional?
