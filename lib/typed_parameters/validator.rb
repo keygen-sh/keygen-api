@@ -6,16 +6,20 @@ module TypedParameters
   class Validator < Rule
     def call(params)
       raise InvalidParameterError, "is missing" if
-        params.blank? && schema.required?
+        params.nil? && schema.required? && !schema.allow_nil?
 
       depth_first_map(params) do |param|
         type   = Types.for(param.value)
         schema = param.schema
         parent = param.parent
 
-        # Assert required params
-        raise InvalidParameterError, "is missing" if
-          (schema.required_keys - param.keys).any?
+        # Handle nils
+        if Types.nil?(type)
+          raise InvalidParameterError, "cannot be nil" unless
+            schema.required? && schema.allow_nil?
+
+          next
+        end
 
         # Assert type
         raise InvalidParameterError, "type mismatch (received unknown expected #{schema.type.name})" if

@@ -2,8 +2,8 @@
 
 module TypedParameters
   class Rule
-    def initialize(schema:, visited: [])
-      @visited = visited
+    def initialize(schema:)
+      @visited = []
       @schema  = schema
     end
 
@@ -29,12 +29,12 @@ module TypedParameters
         case param.schema.children
         when Array
           if param.schema.indexed?
-            param.schema.children.each_with_index { |v, i| self.class.new(schema: v, visited:).call(param[i], &) }
+            param.schema.children.each_with_index { |v, i| self.class.new(schema: v).call(param[i], &) }
           else
-            param.value.each { |v| self.class.new(schema: param.schema.children.first, visited:).call(v, &) }
+            param.value.each { |v| self.class.new(schema: param.schema.children.first).call(v, &) }
           end
         when Hash
-          param.schema.children.each { |k, v| self.class.new(schema: v, visited:).call(param[k], &) }
+          param.schema.children.each { |k, v| self.class.new(schema: v).call(param[k], &) }
         end
       end
 

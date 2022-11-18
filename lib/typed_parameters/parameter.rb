@@ -26,9 +26,9 @@ module TypedParameters
 
       case value
       when Array
-        (0..value.filter { _1.required? }.size).to_a
+        (0..value.size).to_a
       when Hash
-        value.filter { _2.required? }.keys
+        value.keys
       else
         []
       end
@@ -52,8 +52,6 @@ module TypedParameters
 
     def optional? = schema.optional?
     def required? = !optional?
-
-    def inspect = "#<Parameter:#{hash} @value=#{to_unsafe_h} @validated=#{validated}>"
 
     def delete
       case parent.value
