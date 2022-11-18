@@ -92,6 +92,17 @@ module TypedParameters
       boundless!
     end
 
+    def required_keys
+      case children
+      when Array
+        (0...children.filter { _1.required? }.size).to_a
+      when Hash
+        children.filter { _2.required? }.keys
+      else
+        []
+      end
+    end
+
     def strict?            = !!strict
     def optional?          = !!@optional
     def required?          = !optional?
