@@ -202,7 +202,7 @@ describe TypedParameters do
 
       coercer.call(params)
 
-      expect(params[:array].unsafe).to eq %w[1 2 3]
+      expect(params[:array].value).to eq %w[1 2 3]
     end
 
     it 'should coerce hash' do
@@ -211,7 +211,7 @@ describe TypedParameters do
 
       coercer.call(params)
 
-      expect(params[:hash].unsafe).to eq({ foo: 1 })
+      expect(params[:hash].value).to eq({ foo: 1 })
     end
   end
 
