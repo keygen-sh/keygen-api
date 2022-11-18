@@ -20,6 +20,20 @@ module TypedParameters
 
     def path = @path ||= Path.new(*parent&.path&.keys, *key)
 
+    def keys
+      return [] if
+        schema.children.blank?
+
+      case value
+      when Array
+        (0..value.filter { _1.required? }.size).to_a
+      when Hash
+        value.filter { _2.required? }.keys
+      else
+        []
+      end
+    end
+
     def validate!
       # TODO(ezekg) Add validations
 
@@ -35,6 +49,9 @@ module TypedParameters
     def permitted? = validated?
 
     def blank? = value.blank?
+
+    def optional? = schema.optional?
+    def required? = !optional?
 
     def inspect = "#<Parameter:#{hash} @value=#{to_unsafe_h} @validated=#{validated}>"
 
