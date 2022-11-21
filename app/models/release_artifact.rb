@@ -236,11 +236,13 @@ class ReleaseArtifact < ApplicationRecord
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
 
   ##
-  # without_constraints returns artifacts with any release entitlement constraints.
+  # without_constraints returns artifacts without any release entitlement constraints.
   scope :without_constraints, -> {
     where_assoc_not_exists([:release, :constraints])
   }
 
+  ##
+  # with_constraints returns artifacts with release entitlement constraints.
   scope :with_constraints, -> {
     where_assoc_exists([:release, :constraints])
   }
