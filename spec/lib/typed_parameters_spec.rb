@@ -36,6 +36,38 @@ describe TypedParameters do
       expect(params[:foo][:bar][0][:baz].path.to_json_pointer).to eq '/foo/bar/0/baz'
       expect(params[:foo][:bar][1][:baz].path.to_json_pointer).to eq '/foo/bar/1/baz'
     end
+
+    context 'with array schema' do
+      let(:schema) { TypedParameters::Schema.new(type: :array) { items type: :string } }
+
+      it 'should have correct keys' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: %w[a b c])
+
+        expect(params.keys).to eq [0, 1, 2]
+      end
+
+      it 'should have no keys' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: [])
+
+        expect(params.keys).to eq []
+      end
+    end
+
+    context 'with hash schema' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash) { params :a, :b, :c, type: :string } }
+
+      it 'should have correct keys' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
+
+        expect(params.keys).to eq %i[a b c]
+      end
+
+      it 'should have no keys' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: {})
+
+        expect(params.keys).to eq []
+      end
+    end
   end
 
   describe TypedParameters::Rule do
