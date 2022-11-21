@@ -74,6 +74,10 @@ module TypedParameters
     end
 
     ##
+    # params defines multiple like-parameters for a hash schema.
+    def params(*keys, **kwargs, &) = keys.each { param(_1, **kwargs, &) }
+
+    ##
     # item defines an indexed parameter for an array schema.
     def item(key = children.size, type:, **kwargs, &block)
       @children ||= [] if Types.array?(self.type)
