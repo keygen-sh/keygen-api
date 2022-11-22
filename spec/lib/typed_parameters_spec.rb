@@ -68,6 +68,16 @@ describe TypedParameters do
         expect(params.keys).to eq []
       end
     end
+
+    context 'with other schema' do
+      let(:schema) { TypedParameters::Schema.new(type: :integer) }
+
+      it 'should have no keys' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: 1)
+
+        expect(params.keys).to eq []
+      end
+    end
   end
 
   describe TypedParameters::Rule do
