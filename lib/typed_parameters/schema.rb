@@ -7,8 +7,6 @@ module TypedParameters
     attr_reader :validations,
                 :parent,
                 :children,
-                :exclusion,
-                :inclusion,
                 :type,
                 :key
 
@@ -49,7 +47,15 @@ module TypedParameters
       @transform         = transform
       @type              = Types[type]
       @children          = nil
-      @validations       = []
+
+      # Add validations
+      @validations = []
+
+      @validations << -> v { inclusion.include?(v) } if
+        inclusion.present?
+
+      @validations << -> v { !exclusion.include?(v) } if
+        exclusion.present?
 
       @validations << validate if
         validate.present?
