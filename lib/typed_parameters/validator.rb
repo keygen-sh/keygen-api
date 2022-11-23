@@ -33,6 +33,12 @@ module TypedParameters
             schema.allow_blank?
         end
 
+        # Assert inclusions
+        if schema.inclusion.present?
+          raise InvalidParameterError, "must be one of: #{schema.inclusion.join ", "} (received #{param.value})" unless
+            schema.inclusion.include?(param.value)
+        end
+
         # Assert scalar values for params without children
         if schema.children.nil?
           case
