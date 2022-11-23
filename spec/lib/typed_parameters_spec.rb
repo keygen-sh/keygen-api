@@ -211,7 +211,7 @@ describe TypedParameters do
     end
 
     it 'should not raise on inclusion param' do
-      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, inclusion: %w[a b c] }
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, inclusion: { in: %w[a b c] } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'b' })
       validator = TypedParameters::Validator.new(schema:)
 
@@ -219,7 +219,7 @@ describe TypedParameters do
     end
 
     it 'should raise on inclusion param' do
-      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, inclusion: %w[a b c] }
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, inclusion: { in: %w[a b c] } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'd' })
       validator = TypedParameters::Validator.new(schema:)
 
@@ -227,7 +227,7 @@ describe TypedParameters do
     end
 
     it 'should not raise on exclusion param' do
-      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, exclusion: %w[a b c] }
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, exclusion: { in: %w[a b c] } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'd' })
       validator = TypedParameters::Validator.new(schema:)
 
@@ -235,8 +235,88 @@ describe TypedParameters do
     end
 
     it 'should raise on exclusion param' do
-      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, exclusion: %w[a b c] }
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, exclusion: { in: %w[a b c] } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'c' })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on param min length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { minimum: 3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param min length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { minimum: 3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on param max length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { maximum: 3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param max length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { maximum: 3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c d] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on param within length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { within: 1..3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param within length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { within: 1..3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on param in length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { in: 1..3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param in length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { in: 1..3 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b c d] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should not raise on param is length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { is: 2 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a b] })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param is length validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :array, length: { is: 2 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: %w[a] })
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
@@ -257,6 +337,7 @@ describe TypedParameters do
 
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
+
 
     it 'should not raise on hash of scalar values' do
       schema    = TypedParameters::Schema.new(type: :hash)
