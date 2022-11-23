@@ -31,14 +31,6 @@ module TypedParameters
         raise InvalidParameterError, 'cannot be blank' if
           params.blank? && !schema.allow_blank?
 
-        # Assert exclusions
-        raise InvalidParameterError, 'is not an allowed option' if
-          schema.exclusion.present? && schema.exclusion.include?(param.value)
-
-        # Assert inclusions
-        raise InvalidParameterError, 'is not a valid option' if
-          schema.inclusion.present? && !schema.inclusion.include?(param.value)
-
         # Assert validations
         raise InvalidParameterError, 'is invalid' if
           schema.validations.any? && !schema.validations.all? { _1.call(param.value) }
