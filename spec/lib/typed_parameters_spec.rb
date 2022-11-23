@@ -242,6 +242,22 @@ describe TypedParameters do
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
 
+    it 'should not raise on custom param validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, validate: -> v { v == 'ok' } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'ok' })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on custom param validation' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, validate: -> v { v == 'ok' } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'ko' })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
+
     it 'should not raise on hash of scalar values' do
       schema    = TypedParameters::Schema.new(type: :hash)
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
