@@ -39,6 +39,10 @@ module TypedParameters
         raise InvalidParameterError, 'is not a valid option' if
           schema.inclusion.present? && !schema.inclusion.include?(param.value)
 
+        # Assert validations
+        raise InvalidParameterError, 'is invalid' if
+          schema.validations.any? && !schema.validations.all? { _1.call(param.value) }
+
         # Assert scalar values for params without children
         if schema.children.nil?
           case

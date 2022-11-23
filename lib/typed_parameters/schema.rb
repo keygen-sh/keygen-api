@@ -36,7 +36,6 @@ module TypedParameters
       raise ArgumentError, 'root cannot be nil' if
         key == ROOT_KEY && allow_nil
 
-      @validations       = []
       @strict            = strict
       @parent            = parent
       @key               = key
@@ -48,9 +47,12 @@ module TypedParameters
       @inclusion         = inclusion
       @exclusion         = exclusion
       @transform         = transform
-      @validate          = validate
       @type              = Types[type]
       @children          = nil
+      @validations       = []
+
+      @validations << validate if
+        validate.present?
 
       raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?
