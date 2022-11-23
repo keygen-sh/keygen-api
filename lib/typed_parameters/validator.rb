@@ -17,7 +17,7 @@ module TypedParameters
 
         # Handle nils
         if Types.nil?(type)
-          raise InvalidParameterError, "cannot be nil" unless
+          raise InvalidParameterError, 'cannot be nil' unless
             schema.required? && schema.allow_nil?
 
           next
@@ -28,16 +28,16 @@ module TypedParameters
           schema.type != type
 
         # Assert blanks
-        if params.blank?
-          raise InvalidParameterError, "cannot be blank" unless
-            schema.allow_blank?
-        end
+        raise InvalidParameterError, 'cannot be blank' if
+          params.blank? && !schema.allow_blank?
+
+        # Assert exclusions
+        raise InvalidParameterError, 'is not an allowed option' if
+          schema.exclusion.present? && schema.exclusion.include?(param.value)
 
         # Assert inclusions
-        if schema.inclusion.present?
-          raise InvalidParameterError, "must be one of: #{schema.inclusion.join ", "} (received #{param.value})" unless
-            schema.inclusion.include?(param.value)
-        end
+        raise InvalidParameterError, 'is not a valid option' if
+          schema.inclusion.present? && !schema.inclusion.include?(param.value)
 
         # Assert scalar values for params without children
         if schema.children.nil?
