@@ -7,6 +7,7 @@ module TypedParameters
     attr_reader :validations,
                 :parent,
                 :children,
+                :inclusion,
                 :type,
                 :key
 
@@ -20,7 +21,7 @@ module TypedParameters
       allow_blank: true,
       allow_nil: false,
       allow_non_scalars: false,
-      inclusion: [],
+      inclusion: nil,
       transform: nil,
       validate: nil,
       &block
