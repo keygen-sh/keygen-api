@@ -11,7 +11,9 @@ module TypedParameters
       depth_first_map(params) do |param|
         type   = Types.for(param.value)
         schema = param.schema
-        parent = param.parent
+
+        raise InvalidParameterError, "type mismatch (received unknown expected #{schema.type.name})" if
+          type.nil?
 
         # Handle nils
         if Types.nil?(type)
@@ -22,11 +24,14 @@ module TypedParameters
         end
 
         # Assert type
-        raise InvalidParameterError, "type mismatch (received unknown expected #{schema.type.name})" if
-          type.nil?
-
         raise InvalidParameterError, "type mismatch (received #{type.name} expected #{schema.type.name})" if
           schema.type != type
+
+        # Assert blanks
+        if params.blank?
+          raise InvalidParameterError, "cannot be blank" unless
+            schema.allow_blank?
+        end
 
         # Assert scalar values for params without children
         if schema.children.nil?
