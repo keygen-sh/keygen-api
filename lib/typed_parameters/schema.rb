@@ -50,10 +50,6 @@ module TypedParameters
           format.key?(:without)
         )
 
-      # Allow blanks for the root schema by default
-      allow_blank ||= true if
-        key == ROOT_KEY
-
       raise ArgumentError, 'length must be a hash with :minimum, :maximum, :within, :in, or :is keys (but not multiple)' unless
         length.nil? || length.is_a?(Hash) && (
           length.key?(:minimum) ^
@@ -69,7 +65,7 @@ module TypedParameters
       @key               = key
       @optional          = optional
       @coerce            = coerce
-      @allow_blank       = allow_blank
+      @allow_blank       = key == ROOT_KEY || allow_blank
       @allow_nil         = allow_nil
       @allow_non_scalars = allow_non_scalars
       @nilify_blanks     = nilify_blanks
