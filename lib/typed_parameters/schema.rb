@@ -42,18 +42,18 @@ module TypedParameters
       raise ArgumentError, 'exclusion must be a hash with :in key' unless
         exclusion.nil? || exclusion.is_a?(Hash) && exclusion.key?(:in)
 
-      raise ArgumentError, 'format must be a hash with :with or :without keys' unless
+      raise ArgumentError, 'format must be a hash with :with or :without keys (but not both)' unless
         format.nil? || format.is_a?(Hash) && (
-          format.key?(:with) ||
+          format.key?(:with) ^
           format.key?(:without)
         )
 
-      raise ArgumentError, 'length must be a hash with :minimum, :maximum, :within, :in, or :is keys' unless
+      raise ArgumentError, 'length must be a hash with :minimum, :maximum, :within, :in, or :is keys (but not multiple)' unless
         length.nil? || length.is_a?(Hash) && (
-          length.key?(:minimum) ||
-          length.key?(:maximum) ||
-          length.key?(:within) ||
-          length.key?(:in) ||
+          length.key?(:minimum) ^
+          length.key?(:maximum) ^
+          length.key?(:within) ^
+          length.key?(:in) ^
           length.key?(:is)
         )
 
