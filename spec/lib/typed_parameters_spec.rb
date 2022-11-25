@@ -699,6 +699,18 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Processor do
+    it 'should coerce, validate and transform params' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :bin, type: :string, coerce: true, format: { with: /\A\d+\z/ }, transform: -> k, v { [k, v.to_i.to_s(2)] } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { bin: 42 })
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:bin].value).to eq '101010'
+    end
+  end
+
   describe TypedParameters::Pipeline do
     it 'should reduce the pipeline steps in order' do
       pipeline = TypedParameters::Pipeline.new
