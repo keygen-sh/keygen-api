@@ -238,6 +238,14 @@ describe TypedParameters do
       expect { validator.call(params) }.to_not raise_error
     end
 
+    it 'should skip :validate validation on nil param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: true, validate: -> v { v == 1 } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
     it 'should raise on nil param' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
@@ -248,6 +256,14 @@ describe TypedParameters do
 
     it 'should not raise on blank param' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, allow_blank: true }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should skip :length validation on blank param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, allow_blank: true, length: { is: 3 } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
       validator = TypedParameters::Validator.new(schema:)
 
@@ -406,7 +422,7 @@ describe TypedParameters do
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
 
-    it 'should not raise on custom param validation' do
+    it 'should not raise on param :validate validation' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, validate: -> v { v == 'ok' } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'ok' })
       validator = TypedParameters::Validator.new(schema:)
@@ -414,7 +430,7 @@ describe TypedParameters do
       expect { validator.call(params) }.to_not raise_error
     end
 
-    it 'should raise on custom param validation' do
+    it 'should raise on param :validate validation' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, validate: -> v { v == 'ok' } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'ko' })
       validator = TypedParameters::Validator.new(schema:)

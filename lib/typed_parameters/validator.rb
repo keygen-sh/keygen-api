@@ -15,7 +15,7 @@ module TypedParameters
         raise InvalidParameterError, "type mismatch (received unknown expected #{schema.type.name})" if
           type.nil?
 
-        # Handle nils
+        # Handle nils early on
         if Types.nil?(type)
           raise InvalidParameterError, 'cannot be nil' unless
             schema.required? && schema.allow_nil?
@@ -26,14 +26,6 @@ module TypedParameters
         # Assert type
         raise InvalidParameterError, "type mismatch (received #{type.name} expected #{schema.type.name})" if
           schema.type != type
-
-        # Assert blanks
-        raise InvalidParameterError, 'cannot be blank' if
-          params.blank? && !schema.allow_blank?
-
-        # Assert validations
-        raise InvalidParameterError, 'is invalid' if
-          schema.validations.any? && !schema.validations.all? { _1.call(param.value) }
 
         # Assert scalar values for params without children
         if schema.children.nil?
@@ -50,6 +42,18 @@ module TypedParameters
             end
           end
         end
+
+        # Handle blanks
+        if params.blank?
+          raise InvalidParameterError, 'cannot be blank' if
+            !schema.allow_blank?
+
+          next
+        end
+
+        # Assert validations
+        raise InvalidParameterError, 'is invalid' if
+          schema.validations.any? && !schema.validations.any? { _1.call(param.value) }
       end
     end
   end
