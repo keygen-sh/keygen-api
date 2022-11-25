@@ -2,23 +2,6 @@
 
 module TypedParameters
   class Schema
-    INCLUSION_VALIDATOR = -> v { @inclusion[:in].include?(v) }.freeze
-    EXCLUSION_VALIDATOR = -> v { !@exclusion[:in].include?(v) }.freeze
-    LENGTH_VALIDATOR    = -> v {
-      case @length
-      in minimum:
-        v.length >= minimum
-      in maximum:
-        v.length <= maximum
-      in within:
-        within.include?(v.length)
-      in in: in_value
-        in_value.include?(v.length)
-      in is:
-        v.length == is
-      end
-    }.freeze
-
     ROOT_KEY = Class.new
 
     attr_reader :validations,
@@ -39,6 +22,7 @@ module TypedParameters
       allow_non_scalars: false,
       inclusion: nil,
       exclusion: nil,
+      format: nil,
       length: nil,
       transform: nil,
       validate: nil,
@@ -57,6 +41,12 @@ module TypedParameters
 
       raise ArgumentError, 'exclusion must be a hash with :in key' unless
         exclusion.nil? || exclusion.is_a?(Hash) && exclusion.key?(:in)
+
+      raise ArgumentError, 'format must be a hash with :with or :without keys' unless
+        format.nil? || format.is_a?(Hash) && (
+          format.key?(:with) ||
+          format.key?(:without)
+        )
 
       raise ArgumentError, 'length must be a hash with :minimum, :maximum, :within, :in, or :is keys' unless
         length.nil? || length.is_a?(Hash) && (
@@ -78,17 +68,26 @@ module TypedParameters
       @allow_non_scalars = allow_non_scalars
       @inclusion         = inclusion
       @exclusion         = exclusion
+      @format            = format
       @length            = length
       @transform         = transform
       @children          = nil
+      @validations       = []
 
-      # Add validations
-      @validations = []
+      @validations << -> v { instance_exec(v, &INCLUSION_VALIDATOR) } if
+        inclusion.present?
 
-      @validations << -> v { instance_exec(v, &INCLUSION_VALIDATOR) } if inclusion.present?
-      @validations << -> v { instance_exec(v, &EXCLUSION_VALIDATOR) } if exclusion.present?
-      @validations << -> v { instance_exec(v, &LENGTH_VALIDATOR) }    if length.present?
-      @validations << validate            if validate.present?
+      @validations << -> v { instance_exec(v, &EXCLUSION_VALIDATOR) } if
+        exclusion.present?
+
+      @validations << -> v { instance_exec(v, &FORMAT_VALIDATOR) } if
+        format.present?
+
+      @validations << -> v { instance_exec(v, &LENGTH_VALIDATOR) } if
+        length.present?
+
+      @validations << validate if
+        validate.present?
 
       raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?
@@ -164,6 +163,48 @@ module TypedParameters
     def indexed?           = !boundless?
 
     private
+
+    INCLUSION_VALIDATOR = -> v {
+      case @inclusion
+      in in: in_value
+        in_value.include?(v)
+      end
+    }.freeze
+    private_constant :INCLUSION_VALIDATOR
+
+    EXCLUSION_VALIDATOR = -> v {
+      case @exclusion
+      in in: in_value
+        !in_value.include?(v)
+      end
+    }.freeze
+    private_constant :EXCLUSION_VALIDATOR
+
+    FORMAT_VALIDATOR = -> v {
+      case @format
+      in without:
+        !without.match?(v)
+      in with:
+        with.match?(v)
+      end
+    }.freeze
+    private_constant :FORMAT_VALIDATOR
+
+    LENGTH_VALIDATOR = -> v {
+      case @length
+      in minimum:
+        v.length >= minimum
+      in maximum:
+        v.length <= maximum
+      in within:
+        within.include?(v.length)
+      in in: in_value
+        in_value.include?(v.length)
+      in is:
+        v.length == is
+      end
+    }.freeze
+    private_constant :LENGTH_VALIDATOR
 
     attr_reader :strict
 
