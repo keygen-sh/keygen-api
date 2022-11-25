@@ -58,6 +58,8 @@ module TypedParameters
 
       value.each_with_index do |v, i|
         if schema.children.any?
+          # FIXME(ezekg) This should probably raise for bounded arrays instead of
+          #              defaulting to the first child.
           child = schema.children.fetch(i) { schema.children.first }
           if child.nil?
             raise InvalidParameterError, "invalid parameter index #{i}" if
