@@ -8,6 +8,7 @@ module TypedParameters
     end
 
     def call(key: nil, value:)
+      return value if value.is_a?(Parameter)
       return if
         value.nil? && !schema.allow_nil?
 

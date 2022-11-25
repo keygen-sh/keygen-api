@@ -7,8 +7,8 @@ module TypedParameters
       @schema   = schema
     end
 
-    def call(input)
-      params = Parameterizer.new(schema:).call(input)
+    def call(value)
+      params = Parameterizer.new(schema:).call(value:)
 
       pipeline << Coercer.new(schema:)
       pipeline << Validator.new(schema:)
