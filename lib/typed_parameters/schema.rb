@@ -21,6 +21,7 @@ module TypedParameters
       allow_blank: false,
       allow_nil: false,
       allow_non_scalars: false,
+      nilify_blanks: false,
       inclusion: nil,
       exclusion: nil,
       format: nil,
@@ -71,14 +72,16 @@ module TypedParameters
       @allow_blank       = allow_blank
       @allow_nil         = allow_nil
       @allow_non_scalars = allow_non_scalars
+      @nilify_blanks     = nilify_blanks
       @inclusion         = inclusion
       @exclusion         = exclusion
       @format            = format
       @length            = length
       @transform         = transform
       @children          = nil
-      @transforms        = [transform].compact
-      @validations       = []
+
+      # Validations
+      @validations = []
 
       @validations << -> v { instance_exec(v, &INCLUSION_VALIDATOR) } if
         inclusion.present?
@@ -94,6 +97,15 @@ module TypedParameters
 
       @validations << validate if
         validate.present?
+
+      # Transforms
+      @transforms = []
+
+      @transforms << NILIFY_BLANKS_TRANSFORMER if
+        nilify_blanks
+
+      @transforms << transform if
+        transform.present?
 
       raise ArgumentError, "type #{type} is a not registered type" if
         @type.nil?
@@ -165,6 +177,7 @@ module TypedParameters
     def allow_blank?       = !!@allow_blank
     def allow_nil?         = !!@allow_nil
     def allow_non_scalars? = !!@allow_non_scalars
+    def nilify_blanks?     = !!@nilify_blanks
     def boundless?         = !!@boundless
     def indexed?           = !boundless?
 
@@ -211,6 +224,9 @@ module TypedParameters
       end
     }.freeze
     private_constant :LENGTH_VALIDATOR
+
+    NILIFY_BLANKS_TRANSFORMER = -> k, v { [k, v.blank? ? nil : v] }.freeze
+    private_constant :NILIFY_BLANKS_TRANSFORMER
 
     attr_reader :strict
 
