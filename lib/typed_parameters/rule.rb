@@ -41,6 +41,8 @@ module TypedParameters
       yield param
 
       visited << param
+
+      param
     end
   end
 end
