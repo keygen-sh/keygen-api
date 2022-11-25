@@ -5,6 +5,7 @@ module TypedParameters
     ROOT_KEY = Class.new
 
     attr_reader :validations,
+                :transforms,
                 :parent,
                 :children,
                 :type,
@@ -30,10 +31,6 @@ module TypedParameters
     )
       key ||= ROOT_KEY
 
-      # Allow blanks for the root schema by default
-      allow_blank ||= true if
-        key == ROOT_KEY
-
       raise ArgumentError, 'key is required for child schema' if
         key == ROOT_KEY && parent.present?
 
@@ -51,6 +48,10 @@ module TypedParameters
           format.key?(:with) ^
           format.key?(:without)
         )
+
+      # Allow blanks for the root schema by default
+      allow_blank ||= true if
+        key == ROOT_KEY
 
       raise ArgumentError, 'length must be a hash with :minimum, :maximum, :within, :in, or :is keys (but not multiple)' unless
         length.nil? || length.is_a?(Hash) && (
@@ -76,6 +77,7 @@ module TypedParameters
       @length            = length
       @transform         = transform
       @children          = nil
+      @transforms        = [transform].compact
       @validations       = []
 
       @validations << -> v { instance_exec(v, &INCLUSION_VALIDATOR) } if

@@ -10,9 +10,9 @@ module TypedParameters
     def call(input)
       params = Parameterizer.new(schema:).call(input)
 
-      # pipeline << Transformer.new(schema:)
-      # pipeline << Coercer.new(schema:)
-      # pipeline << Validator.new(schema:)
+      pipeline << Coercer.new(schema:)
+      pipeline << Validator.new(schema:)
+      pipeline << Transformer.new(schema:)
 
       pipeline.call(params)
     end

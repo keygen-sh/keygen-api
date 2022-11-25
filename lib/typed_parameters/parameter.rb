@@ -4,10 +4,10 @@ require_relative 'path'
 
 module TypedParameters
   class Parameter
-    attr_accessor :value
+    attr_accessor :key,
+                  :value
 
-    attr_reader :key,
-                :schema,
+    attr_reader :schema,
                 :parent
 
     def initialize(key:, value:, schema:, parent: nil)

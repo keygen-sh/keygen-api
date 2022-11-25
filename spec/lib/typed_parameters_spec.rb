@@ -438,7 +438,6 @@ describe TypedParameters do
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
 
-
     it 'should not raise on hash of scalar values' do
       schema    = TypedParameters::Schema.new(type: :hash)
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
@@ -595,6 +594,51 @@ describe TypedParameters do
       coercer.call(params)
 
       expect(params[:hash].value).to eq({ foo: 1 })
+    end
+  end
+
+  describe TypedParameters::Transformer do
+    it 'should not transform the param when omitted' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo].key).to eq :foo
+      expect(params[:foo].value).to eq 1
+    end
+
+    it 'should not transform the param with noop' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [k, v] } }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo].key).to eq :foo
+      expect(params[:foo].value).to eq 1
+    end
+
+    it 'should transform the params' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [:bar, v] } }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo].key).to eq :bar
+      expect(params[:foo].value).to eq 1
+    end
+
+    it 'should delete the param' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [] } }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo]).to be nil
     end
   end
 
