@@ -17,7 +17,7 @@ module TypedParameters
       key: nil,
       optional: false,
       coerce: false,
-      allow_blank: true,
+      allow_blank: false,
       allow_nil: false,
       allow_non_scalars: false,
       inclusion: nil,
@@ -29,6 +29,10 @@ module TypedParameters
       &block
     )
       key ||= ROOT_KEY
+
+      # Allow blanks for the root schema by default
+      allow_blank ||= true if
+        key == ROOT_KEY
 
       raise ArgumentError, 'key is required for child schema' if
         key == ROOT_KEY && parent.present?
