@@ -18,8 +18,16 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Schema do
+    %i[
+      in
+    ].each do |option|
+      it "should not raise on valid :inclusion option: #{option}" do
+        expect { TypedParameters::Schema.new(type: :string, inclusion: { option => %w[foo] }) }.to_not raise_error
+      end
+    end
+
     it 'should raise on invalid :inclusion options' do
-      expect { TypedParameters::Schema.new(type: :string, inclusion: { invalid: /bar/ }) }
+      expect { TypedParameters::Schema.new(type: :string, inclusion: { invalid: %w[foo] }) }
         .to raise_error ArgumentError
     end
 
@@ -28,8 +36,16 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
+    %i[
+      in
+    ].each do |option|
+      it "should not raise on valid :exclusion option: #{option}" do
+        expect { TypedParameters::Schema.new(type: :string, exclusion: { option => %w[bar] }) }.to_not raise_error
+      end
+    end
+
     it 'should raise on invalid :exclusion options' do
-      expect { TypedParameters::Schema.new(type: :string, exclusion: { invalid: /bar/ }) }
+      expect { TypedParameters::Schema.new(type: :string, exclusion: { invalid: %w[bar] }) }
         .to raise_error ArgumentError
     end
 
@@ -38,19 +54,40 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
+    %i[
+      with
+      without
+    ].each do |option|
+      it "should not raise on valid :format option: #{option}" do
+        expect { TypedParameters::Schema.new(type: :string, format: { option => /baz/ }) }.to_not raise_error
+      end
+    end
+
     it 'should raise on multiple :format options' do
-      expect { TypedParameters::Schema.new(type: :string, format: { with: /bar/, without: /bar/ }) }
+      expect { TypedParameters::Schema.new(type: :string, format: { with: /baz/, without: /qux/ }) }
         .to raise_error ArgumentError
     end
 
     it 'should raise on invalid :format options' do
-      expect { TypedParameters::Schema.new(type: :string, format: { invalid: /bar/ }) }
+      expect { TypedParameters::Schema.new(type: :string, format: { invalid: /baz/ }) }
         .to raise_error ArgumentError
     end
 
     it 'should raise on missing :format options' do
       expect { TypedParameters::Schema.new(type: :string, format: {}) }
         .to raise_error ArgumentError
+    end
+
+    {
+      minimum: 1,
+      maximum: 1,
+      within: 1..3,
+      in: [1, 2, 3],
+      is: 1,
+    }.each do |option, length|
+      it "should not raise on valid :length option: #{option}" do
+        expect { TypedParameters::Schema.new(type: :string, length: { option => length }) }.to_not raise_error
+      end
     end
 
     it 'should raise on multiple :length options' do
