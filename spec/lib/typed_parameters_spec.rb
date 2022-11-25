@@ -700,7 +700,7 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Processor do
-    it 'should coerce, validate and transform params' do
+    it 'should coerce, validate and transform params and not raise' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :bin, type: :string, coerce: true, format: { with: /\A\d+\z/ }, transform: -> k, v { [k, v.to_i.to_s(2)] } }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { bin: 42 })
       processor = TypedParameters::Processor.new(schema:)
@@ -708,6 +708,14 @@ describe TypedParameters do
       processor.call(params)
 
       expect(params[:bin].value).to eq '101010'
+    end
+
+    it 'should coerce, validate and transform params and raise' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :bin, type: :string, coerce: true, format: { with: /\A\d+\z/ }, transform: -> k, v { [k, v.to_i.to_s(2)] } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { bin: 'foo' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
   end
 
