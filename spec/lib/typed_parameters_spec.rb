@@ -621,14 +621,14 @@ describe TypedParameters do
     end
 
     it 'should transform the params' do
-      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [:bar, v] } }
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [:bar, v + 1] } }
       params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
       transformer = TypedParameters::Transformer.new(schema:)
 
       transformer.call(params)
 
       expect(params[:foo].key).to eq :bar
-      expect(params[:foo].value).to eq 1
+      expect(params[:foo].value).to eq 2
     end
 
     it 'should delete the param' do
@@ -639,6 +639,26 @@ describe TypedParameters do
       transformer.call(params)
 
       expect(params[:foo]).to be nil
+    end
+
+    it 'should not transform blank param to nil' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, nilify_blanks: false }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo].value).to eq ''
+    end
+
+    it 'should transform blank param to nil' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, nilify_blanks: true }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo].value).to be nil
     end
   end
 
