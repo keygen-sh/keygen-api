@@ -17,6 +17,58 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Schema do
+    it 'should raise on invalid :inclusion options' do
+      expect { TypedParameters::Schema.new(type: :string, inclusion: { invalid: /bar/ }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on missing :inclusion options' do
+      expect { TypedParameters::Schema.new(type: :string, inclusion: {}) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on invalid :exclusion options' do
+      expect { TypedParameters::Schema.new(type: :string, exclusion: { invalid: /bar/ }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on missing :exclusion options' do
+      expect { TypedParameters::Schema.new(type: :string, exclusion: {}) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on multiple :format options' do
+      expect { TypedParameters::Schema.new(type: :string, format: { with: /bar/, without: /bar/ }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on invalid :format options' do
+      expect { TypedParameters::Schema.new(type: :string, format: { invalid: /bar/ }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on missing :format options' do
+      expect { TypedParameters::Schema.new(type: :string, format: {}) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on multiple :length options' do
+      expect { TypedParameters::Schema.new(type: :string, length: { in: 1..3, maximum: 42 }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on invalid :length options' do
+      expect { TypedParameters::Schema.new(type: :string, length: { invalid: /bar/ }) }
+        .to raise_error ArgumentError
+    end
+
+    it 'should raise on missing :length options' do
+      expect { TypedParameters::Schema.new(type: :string, length: {}) }
+        .to raise_error ArgumentError
+    end
+  end
+
   describe TypedParameters::Path do
     let(:path) { TypedParameters::Path.new(:foo, :bar, :baz, 42, :qux) }
 
