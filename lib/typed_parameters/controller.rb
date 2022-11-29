@@ -4,12 +4,6 @@ module TypedParameters
   module Controller
     extend ActiveSupport::Concern
 
-    IGNORED_PARAM_KEYS = %i[
-      action
-      controller
-      format
-    ].freeze
-
     included do
       cattr_accessor :typed_handlers, default: {}
       cattr_accessor :typed_schemas,  default: {}
@@ -25,7 +19,7 @@ module TypedParameters
         typed_handlers[:"params:#{on}"] = [kwargs, block]
 
         method = lambda do
-          v = params.to_unsafe_h.symbolize_keys.except(*IGNORED_PARAM_KEYS)
+          v = params.to_unsafe_h.symbolize_keys.except(:controller, :action, :format)
           s = case schema
               in Symbol => key
                 kw, b = typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
@@ -62,7 +56,7 @@ module TypedParameters
         typed_handlers[:"query:#{on}"] = [kwargs, block]
 
         define_method "#{typed_resource_name}_query" do
-          v = params.to_unsafe_h.symbolize_keys.except(*IGNORED_PARAM_KEYS)
+          v = params.to_unsafe_h.symbolize_keys.except(:controller, :action, :format)
           s = case schema
               in Symbol => key
                 kw, b = typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
