@@ -734,6 +734,36 @@ describe TypedParameters do
     end
   end
 
+  describe ApplicationController, type: :controller do
+    class UsersController < ActionController::Base; end
+
+    controller UsersController do
+      include TypedParameters::Controller
+
+      typed_schema :user do
+        param :first_name, type: :string, optional: true
+        param :last_name, type: :string, optional: true
+        param :email, type: :string, format: { with: /@/ }
+        param :password, type: :string, length: { minimum: 8 }
+        param :metadata, type: :hash, optional: true
+      end
+
+      def create = render json: user_params
+      typed_params schema: :user,
+                   on: :create
+    end
+
+    it 'should not raise for predefined schema' do
+      expect { post :create, params: { email: 'foo@example.com', password: SecureRandom.hex } }
+        .to_not raise_error
+    end
+
+    it 'should raise for predefined schema' do
+      expect { post :create, params: { email: 'foo', password: SecureRandom.hex } }
+        .to raise_error TypedParameters::InvalidParameterError
+    end
+  end
+
   # # Quick and dirty mock controller context for a request
   # def request(params = {}, action = :create)
   #   OpenStruct.new(
