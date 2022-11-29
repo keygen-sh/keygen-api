@@ -34,7 +34,7 @@ module TypedParameters
         if schema.children.any?
           child = schema.children.fetch(k) { nil }
           if child.nil?
-            raise InvalidParameterError, "invalid parameter key #{k}" if
+            raise InvalidParameterError, "invalid parameter key: #{k}" if
               schema.strict?
 
             next
@@ -62,7 +62,7 @@ module TypedParameters
           #              defaulting to the first child.
           child = schema.children.fetch(i) { schema.children.first }
           if child.nil?
-            raise InvalidParameterError, "invalid parameter index #{i}" if
+            raise InvalidParameterError, "invalid parameter index: #{i}" if
               schema.strict?
 
             next
