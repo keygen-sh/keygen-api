@@ -14,7 +14,7 @@ module TypedParameters
     def initialize(
       strict: true,
       parent: nil,
-      type: nil,
+      type: :hash,
       key: nil,
       optional: false,
       coerce: false,
