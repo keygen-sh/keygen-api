@@ -28,9 +28,9 @@ module TypedParameters
                 :parent
 
     def parameterize_hash_schema(key:, value:)
-      param = Parameter.new(key:, value: {}, schema:, parent:)
+      param = Parameter.new(key:, value: {}.with_indifferent_access, schema:, parent:)
 
-      value.symbolize_keys.each do |k, v|
+      value.each do |k, v|
         if schema.children.any?
           child = schema.children.fetch(k) { nil }
           if child.nil?
