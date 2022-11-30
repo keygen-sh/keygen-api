@@ -4,6 +4,18 @@ module TypedParameters
   module Controller
     extend ActiveSupport::Concern
 
+    class Handler
+      attr_reader :action,
+                  :schema,
+                  :format
+
+      def initialize(action:, schema:, format: nil)
+        @action = action
+        @schema = schema
+        @format = format
+      end
+    end
+
     included do
       include ClassMethods
 
@@ -39,8 +51,6 @@ module TypedParameters
     end
 
     class_methods do
-      Handler = Struct.new(:type, :schema, :format, keyword_init: true)
-
       # TODO(ezekg) Add implicit and explicit param definitions via decorator queue
       def typed_params(on:, type: :hash, schema: nil, format: nil, **kwargs, &)
         schema = case schema
@@ -50,7 +60,7 @@ module TypedParameters
                    Schema.new(type:, **kwargs, &)
                  end
 
-        typed_handlers[:"params:#{on}"] = Handler.new(type:, schema:, format:)
+        typed_handlers[:"params:#{on}"] = Handler.new(action: on, schema:, format:)
       end
 
       def typed_query(on:, schema: nil, **kwargs, &)
@@ -61,7 +71,7 @@ module TypedParameters
                    Schema.new(nilify_blanks: true, **kwargs, &)
                  end
 
-        typed_handlers[:"query:#{on}"] = Handler.new(type:, schema:, format:)
+        typed_handlers[:"query:#{on}"] = Handler.new(action: on, schema:)
       end
 
       def typed_schema(key, **kwargs, &)
