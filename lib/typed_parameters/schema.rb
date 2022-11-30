@@ -117,7 +117,7 @@ module TypedParameters
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
-      @children ||= {}.with_indifferent_access if Types.hash?(self.type)
+      @children ||= {} if Types.hash?(self.type)
 
       raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
         Types.hash?(children)
