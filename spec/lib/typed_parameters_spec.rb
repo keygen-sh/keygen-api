@@ -148,7 +148,7 @@ describe TypedParameters do
       it 'should have correct keys' do
         params = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
 
-        expect(params.keys).to eq %i[a b c]
+        expect(params.keys).to eq %w[a b c]
       end
 
       it 'should have no keys' do
