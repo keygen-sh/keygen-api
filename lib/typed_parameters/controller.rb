@@ -44,10 +44,34 @@ module TypedParameters
         params.safe
       end
 
-      class_eval <<~RUBY
-        alias_method :#{controller_name.classify.underscore}_params, :typed_params
-        alias_method :#{controller_name.classify.underscore}_query,  :typed_query
-      RUBY
+      def respond_to_missing?(method_name, *)
+        controller_name = self.controller_name.classify.underscore
+        aliases         = [
+          :"#{controller_name}_params",
+          :"#{controller_name}_query",
+        ]
+
+        aliases.include?(method_name) || super
+      end
+
+      def method_missing(method_name, *)
+        return super unless
+          /_(params|query)\z/.match?(method_name) &&
+          respond_to?(:controller_name)
+
+        controller_name = self.controller_name&.classify&.underscore
+        return super unless
+          controller_name.present?
+
+        case method_name
+        when :"#{controller_name}_params"
+          typed_params
+        when :"#{controller_name}_query"
+          typed_query
+        else
+          super
+        end
+      end
     end
 
     class_methods do
