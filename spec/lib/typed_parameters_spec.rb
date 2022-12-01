@@ -734,10 +734,83 @@ describe TypedParameters do
     end
   end
 
-  describe ApplicationController, type: :controller do
-    class UsersController < ActionController::Base; end
+  describe TypedParameters::Controller do
+    context 'without inheritance' do
+      subject {
+        Class.new ActionController::Base do
+          @controller_name = 'users'
+          include TypedParameters::Controller
+        end
+      }
 
-    controller UsersController do
+      describe '.typed_schema' do
+        it('should respond') { expect(subject).to respond_to :typed_schema }
+      end
+
+      describe '.typed_params' do
+        it('should respond') { expect(subject).to respond_to :typed_params }
+      end
+
+      describe '.typed_query' do
+        it('should respond') { expect(subject).to respond_to :typed_query }
+      end
+
+      describe '#typed_params' do
+        it('should respond') { expect(subject.new).to respond_to :typed_params }
+      end
+
+      describe '#x_params' do
+        it('should respond') { expect(subject.new).to respond_to :user_params }
+      end
+
+      describe '#typed_query' do
+        it('should respond') { expect(subject.new).to respond_to :typed_query }
+      end
+    end
+
+    context 'with inhertiance' do
+      subject {
+        parent = Class.new ActionController::Base do
+          @controller_name = 'base'
+          include TypedParameters::Controller
+        end
+
+        Class.new parent do
+          @controller_name = 'users'
+        end
+      }
+
+      describe '.typed_schema' do
+        it('should respond') { expect(subject).to respond_to :typed_schema }
+      end
+
+      describe '.typed_params' do
+        it('should respond') { expect(subject).to respond_to :typed_params }
+      end
+
+      describe '.typed_query' do
+        it('should respond') { expect(subject).to respond_to :typed_query }
+      end
+
+      describe '#typed_params' do
+        it('should respond') { expect(subject.new).to respond_to :typed_params }
+      end
+
+      describe '#x_params' do
+        it('should not respond') { expect(subject.new).to_not respond_to :base_params }
+        it('should respond') { expect(subject.new).to respond_to :user_params }
+      end
+
+      describe '#typed_query' do
+        it('should respond') { expect(subject.new).to respond_to :typed_query }
+      end
+    end
+  end
+
+  describe ApplicationController, type: :controller do
+    class self::UsersController < ActionController::Base; end
+
+    controller self::UsersController do
       include TypedParameters::Controller
 
       typed_schema :user do
