@@ -31,6 +31,7 @@ module TypedParameters
   class UnsupportedCoercionError < StandardError; end
   class FailedCoercionError < StandardError; end
   class InvalidParameterError < StandardError; end
+  class UndefinedActionError < StandardError; end
 
   # class UnpermittedParametersError < StandardError; end
   # class InvalidRequestError < StandardError; end

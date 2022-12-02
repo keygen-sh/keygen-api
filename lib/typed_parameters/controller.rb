@@ -4,8 +4,6 @@ module TypedParameters
   module Controller
     extend ActiveSupport::Concern
 
-    class ActionNotFoundError < StandardError; end
-
     class Handler
       attr_reader :action,
                   :schema,
@@ -28,7 +26,7 @@ module TypedParameters
         input   = params.to_unsafe_h.except(:controller, :action, :format)
         handler = typed_handlers[:params][action_name.to_sym]
 
-        raise ActionNotFoundError, "params have not been defined for action: #{action_name}" if
+        raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
           handler.nil?
 
         schema = handler.schema
@@ -43,7 +41,7 @@ module TypedParameters
         input   = params.to_unsafe_h.except(:controller, :action, :format)
         handler = typed_handlers[:query][action_name.to_sym]
 
-        raise ActionNotFoundError, "query has not been defined for action: #{action_name}" if
+        raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
           handler.nil?
 
         schema = handler.schema
