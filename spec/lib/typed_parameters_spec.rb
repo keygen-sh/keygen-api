@@ -849,7 +849,7 @@ describe TypedParameters do
     end
   end
 
-  describe ApplicationController, type: :controller do
+  describe 'controller', type: :controller do
     class self::UsersController < ActionController::Base; end
 
     controller self::UsersController do
@@ -866,6 +866,8 @@ describe TypedParameters do
       def create = render json: user_params
       typed_params schema: :user,
                    on: :create
+
+      def update = render json: user_params
     end
 
     it 'should not raise for predefined schema' do
@@ -876,6 +878,11 @@ describe TypedParameters do
     it 'should raise for predefined schema' do
       expect { post :create, params: { email: 'foo', password: SecureRandom.hex } }
         .to raise_error TypedParameters::InvalidParameterError
+    end
+
+    it 'should raise for undefined schema' do
+      expect { put :update, params: { id: 1, first_name: 'John', last_name: 'Smith' } }
+        .to raise_error TypedParameters::UndefinedActionError
     end
   end
 
