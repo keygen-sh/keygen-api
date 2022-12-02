@@ -735,14 +735,56 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Controller do
-    context 'without inheritance' do
-      subject {
-        Class.new ActionController::Base do
-          @controller_name = 'users'
-          include TypedParameters::Controller
-        end
-      }
+    subject {
+      Class.new ActionController::Base do
+        @controller_name = 'users'
+        include TypedParameters::Controller
+      end
+    }
 
+    it 'should define a named schema' do
+      subject.typed_schema(:foo) { param :bar, type: :string }
+
+      expect(subject.typed_schemas).to include foo: anything
+    end
+
+    it 'should define a singular params handler' do
+      subject.typed_params(on: :foo) { param :bar, type: :string }
+
+      expect(subject.typed_handlers).to include params: {
+        foo: anything,
+      }
+    end
+
+    it 'should define multiple params handlers' do
+      subject.typed_params(on: %i[foo bar baz]) { param :qux, type: :string }
+
+      expect(subject.typed_handlers).to include params: {
+        foo: anything,
+        bar: anything,
+        baz: anything,
+      }
+    end
+
+    it 'should define a singular query param handler' do
+      subject.typed_query(on: :foo) { param :bar, type: :string }
+
+      expect(subject.typed_handlers).to include query: {
+        foo: anything,
+      }
+    end
+
+    it 'should define multiple query param handlers' do
+      subject.typed_query(on: %i[foo bar baz]) { param :qux, type: :string }
+
+      expect(subject.typed_handlers).to include query: {
+        foo: anything,
+        bar: anything,
+        baz: anything,
+      }
+    end
+
+    context 'without inheritance' do
       describe '.typed_schema' do
         it('should respond') { expect(subject).to respond_to :typed_schema }
       end
