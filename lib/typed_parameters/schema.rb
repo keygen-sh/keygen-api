@@ -221,7 +221,12 @@ module TypedParameters
     }.freeze
     private_constant :LENGTH_VALIDATOR
 
-    NILIFY_BLANKS_TRANSFORMER = -> k, v { [k, v.blank? ? nil : v] }.freeze
+    NILIFY_BLANKS_TRANSFORMER = -> k, v {
+      return [k, v] if
+        v.is_a?(Array) || v.is_a?(Hash)
+
+      [k, v.blank? ? nil : v]
+    }.freeze
     private_constant :NILIFY_BLANKS_TRANSFORMER
 
     attr_reader :strict
