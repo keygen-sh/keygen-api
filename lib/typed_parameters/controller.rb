@@ -5,25 +5,34 @@ module TypedParameters
     extend ActiveSupport::Concern
 
     class Handler
-      attr_reader :action,
+      attr_reader :for,
+                  :action,
                   :schema,
                   :format
 
-      def initialize(action:, schema:, format: nil)
-        @action = action
+      def initialize(for:, schema:, action: nil, format: nil)
+        @for    = binding.local_variable_get(:for)
         @schema = schema
+        @action = action
         @format = format
+      end
+
+      def action=(action)
+        raise ArgumentError, 'cannot redefine action' if
+          @action.present?
+
+        @action = action
       end
     end
 
     included do
       include ClassMethods
 
-      cattr_accessor :typed_handlers, default: { params: {}, query: {} }
+      cattr_accessor :typed_handlers, default: { deferred: [], params: {}, query: {} }
       cattr_accessor :typed_schemas,  default: {}
 
       def typed_params
-        input   = params.to_unsafe_h.except(:controller, :action, :format)
+        input   = request.request_parameters
         handler = typed_handlers[:params][action_name.to_sym]
 
         raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
@@ -38,7 +47,7 @@ module TypedParameters
       end
 
       def typed_query
-        input   = params.to_unsafe_h.except(:controller, :action, :format)
+        input   = request.query_parameters
         handler = typed_handlers[:query][action_name.to_sym]
 
         raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
@@ -51,6 +60,62 @@ module TypedParameters
 
         params.safe
       end
+    end
+
+    class_methods do
+      # TODO(ezekg) Add implicit and explicit param definitions via decorator queue
+      def typed_params(on: nil, type: :hash, schema: nil, format: nil, **kwargs, &)
+        schema = case schema
+                 in Symbol => key
+                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
+                 in nil
+                   Schema.new(type:, **kwargs, &)
+                 end
+
+        case on
+        in Array => actions
+          actions.each do |action|
+            typed_handlers[:params][action] = Handler.new(for: :params, action:, schema:, format:)
+          end
+        in Symbol => action
+          typed_handlers[:params][action] = Handler.new(for: :params, action:, schema:, format:)
+        in nil
+          typed_handlers[:deferred] << Handler.new(for: :params, schema:, format:)
+        end
+      end
+
+      def typed_query(on: nil, schema: nil, **kwargs, &)
+        schema = case schema
+                 in Symbol => key
+                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
+                 in nil
+                   # FIXME(ezekg) Should query params :coerce by default?
+                   Schema.new(nilify_blanks: true, **kwargs, &)
+                 end
+
+        case on
+        in Array => actions
+          actions.each do |action|
+            typed_handlers[:query][action] = Handler.new(for: :query, action:, schema:)
+          end
+        in Symbol => action
+          typed_handlers[:query][action] = Handler.new(for: :query, action:, schema:)
+        in nil
+          typed_handlers[:deferred] << Handler.new(for: :query, schema:)
+        end
+      end
+
+      def typed_schema(key, **kwargs, &)
+        raise ArgumentError, "schema already exists: #{key}" if
+          typed_schemas.key?(key)
+
+        # TODO(ezekg) Implement namespaced schema config? E.g. typed_resource_name:key
+        typed_schemas[key] = Schema.new(**kwargs, &)
+      end
+
+      private
+
+      def typed_resource_name = controller_name.classify.underscore
 
       def respond_to_missing?(method_name, *)
         controller_name = self.controller_name.classify.underscore
@@ -80,47 +145,19 @@ module TypedParameters
           super
         end
       end
-    end
 
-    class_methods do
-      # TODO(ezekg) Add implicit and explicit param definitions via decorator queue
-      def typed_params(on:, type: :hash, schema: nil, format: nil, **kwargs, &)
-        schema = case schema
-                 in Symbol => key
-                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
-                 in nil
-                   Schema.new(type:, **kwargs, &)
-                 end
+      def method_added(method_name)
+        return super if
+          typed_handlers[:deferred].empty?
 
-        Array(on).each do |action|
-          typed_handlers[:params][action] = Handler.new(action:, schema:, format:)
+        while handler = typed_handlers[:deferred].shift
+          handler.action = method_name
+
+          typed_handlers[handler.for][handler.action] = handler
         end
+
+        super
       end
-
-      def typed_query(on:, schema: nil, **kwargs, &)
-        schema = case schema
-                 in Symbol => key
-                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
-                 in nil
-                   Schema.new(nilify_blanks: true, **kwargs, &)
-                 end
-
-        Array(on).each do |action|
-          typed_handlers[:query][action] = Handler.new(action:, schema:)
-        end
-      end
-
-      def typed_schema(key, **kwargs, &)
-        raise ArgumentError, "schema already exists: #{key}" if
-          typed_schemas.key?(key)
-
-        # TODO(ezekg) Implement namespaced schema config? E.g. typed_resource_name:key
-        typed_schemas[key] = Schema.new(**kwargs, &)
-      end
-
-      private
-
-      def typed_resource_name = controller_name.classify.underscore
     end
   end
 end
