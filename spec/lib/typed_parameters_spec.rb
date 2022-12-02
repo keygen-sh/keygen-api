@@ -867,7 +867,11 @@ describe TypedParameters do
       typed_params schema: :user,
                    on: :create
 
-      def update = render json: user_params
+      typed_params schema: :user
+      typed_query { param :force, type: :boolean, optional: true }
+      def update = render json: user_params.merge(user_query)
+
+      def destroy = render json: user_params
     end
 
     it 'should not raise for predefined schema' do
@@ -880,8 +884,18 @@ describe TypedParameters do
         .to raise_error TypedParameters::InvalidParameterError
     end
 
+    it 'should not raise for deferred schema' do
+      expect { put :update, params: { id: 1, email: 'bar@example.com', password: SecureRandom.hex } }
+        .to_not raise_error
+    end
+
+    it 'should raise for deferred schema' do
+      expect { put :update, params: { id: 1, password: 'secret' } }
+        .to raise_error TypedParameters::InvalidParameterError
+    end
+
     it 'should raise for undefined schema' do
-      expect { put :update, params: { id: 1, first_name: 'John', last_name: 'Smith' } }
+      expect { delete :destroy, params: { id: 1 } }
         .to raise_error TypedParameters::UndefinedActionError
     end
   end
