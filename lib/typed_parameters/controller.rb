@@ -4,6 +4,8 @@ module TypedParameters
   module Controller
     extend ActiveSupport::Concern
 
+    class ActionNotFoundError < StandardError; end
+
     class Handler
       attr_reader :action,
                   :schema,
@@ -19,14 +21,18 @@ module TypedParameters
     included do
       include ClassMethods
 
-      cattr_accessor :typed_handlers, default: {}
+      cattr_accessor :typed_handlers, default: { params: {}, query: {} }
       cattr_accessor :typed_schemas,  default: {}
 
       def typed_params
         input   = params.to_unsafe_h.except(:controller, :action, :format)
-        handler = typed_handlers[:"params:#{action_name}"]
-        schema  = handler.schema
-        params  = Parameterizer.new(schema:).call(value: input)
+        handler = typed_handlers[:params][action_name.to_sym]
+
+        raise ActionNotFoundError, "params have not been defined for action: #{action_name}" if
+          handler.nil?
+
+        schema = handler.schema
+        params = Parameterizer.new(schema:).call(value: input)
 
         Processor.new(schema:).call(params)
 
@@ -35,9 +41,13 @@ module TypedParameters
 
       def typed_query
         input   = params.to_unsafe_h.except(:controller, :action, :format)
-        handler = typed_handlers[:"query:#{action_name}"]
-        schema  = handler.schema
-        params  = Parameterizer.new(schema:).call(value: input)
+        handler = typed_handlers[:query][action_name.to_sym]
+
+        raise ActionNotFoundError, "query has not been defined for action: #{action_name}" if
+          handler.nil?
+
+        schema = handler.schema
+        params = Parameterizer.new(schema:).call(value: input)
 
         Processor.new(schema:).call(params)
 
@@ -84,7 +94,9 @@ module TypedParameters
                    Schema.new(type:, **kwargs, &)
                  end
 
-        typed_handlers[:"params:#{on}"] = Handler.new(action: on, schema:, format:)
+        Array(on).each do |action|
+          typed_handlers[:params][action] = Handler.new(action:, schema:, format:)
+        end
       end
 
       def typed_query(on:, schema: nil, **kwargs, &)
@@ -95,7 +107,9 @@ module TypedParameters
                    Schema.new(nilify_blanks: true, **kwargs, &)
                  end
 
-        typed_handlers[:"query:#{on}"] = Handler.new(action: on, schema:)
+        Array(on).each do |action|
+          typed_handlers[:query][action] = Handler.new(action:, schema:)
+        end
       end
 
       def typed_schema(key, **kwargs, &)
