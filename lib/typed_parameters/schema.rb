@@ -166,9 +166,9 @@ module TypedParameters
 
       case value
       when Array
-        (0...value.size).to_a
+        (0...schema.children.size).to_a
       when Hash
-        value.keys
+        schema.children.keys
       else
         []
       end
