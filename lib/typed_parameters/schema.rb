@@ -154,12 +154,21 @@ module TypedParameters
       boundless!
     end
 
-    def required_keys
-      case children
+    def path
+      key = @key == ROOT_KEY ? nil : @key
+
+      @path ||= Path.new(*parent&.path&.keys, *key)
+    end
+
+    def keys
+      return [] if
+        schema.children.blank?
+
+      case value
       when Array
-        (0...children.filter { _1.required? }.size).to_a
+        (0...value.size).to_a
       when Hash
-        children.filter { _2.required? }.keys
+        value.keys
       else
         []
       end
