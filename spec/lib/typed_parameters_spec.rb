@@ -863,15 +863,15 @@ describe TypedParameters do
         param :metadata, type: :hash, optional: true
       end
 
-      def create = render json: user_params
+      def create = render json: { params: user_params, query: nil }
       typed_params schema: :user,
                    on: :create
 
       typed_params schema: :user
       typed_query { param :force, type: :boolean, optional: true }
-      def update = render json: user_params.merge(user_query)
+      def update = render json: { params: user_params, query: user_query }
 
-      def destroy = render json: user_params
+      def destroy = render json: { params: user_params, query: nil }
     end
 
     it 'should not raise for predefined schema' do
@@ -897,6 +897,24 @@ describe TypedParameters do
     it 'should raise for undefined schema' do
       expect { delete :destroy, params: { id: 1 } }
         .to raise_error TypedParameters::UndefinedActionError
+    end
+
+    it 'should return params and query' do
+      params = { email: 'bar@example.com', password: SecureRandom.hex }
+      query  = { force: true }
+
+      # FIXME(ezekg) There doesn't seem to be any other way to specify
+      #              a POST body and query parameters separately in a
+      #              test request. Thus, we have this hack.
+      allow_any_instance_of(request.class).to receive(:request_parameters).and_return(params)
+      allow_any_instance_of(request.class).to receive(:query_parameters).and_return(query)
+
+      patch :update, params: { id: 1 }
+
+      body = JSON.parse(response.body, symbolize_names: true)
+
+      expect(body[:params]).to eq params
+      expect(body[:query]).to eq query
     end
   end
 
