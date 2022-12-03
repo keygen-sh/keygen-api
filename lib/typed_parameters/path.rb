@@ -8,5 +8,6 @@ module TypedParameters
 
     def to_json_pointer = '/' + keys.join('/')
     def to_dot_notation = keys.join('.')
+    def to_s            = to_dot_notation
   end
 end

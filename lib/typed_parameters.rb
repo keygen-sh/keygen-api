@@ -30,8 +30,18 @@ require_relative 'typed_parameters/validator'
 module TypedParameters
   class UnsupportedCoercionError < StandardError; end
   class FailedCoercionError < StandardError; end
-  class InvalidParameterError < StandardError; end
   class UndefinedActionError < StandardError; end
+
+  class InvalidParameterError < StandardError
+    attr_reader :path
+
+    def initialize(message, path:)
+      @path = path
+
+      # FIXME(ezekg) Don't mutate message
+      super("#{path}: #{message}")
+    end
+  end
 
   # class UnpermittedParametersError < StandardError; end
   # class InvalidRequestError < StandardError; end
