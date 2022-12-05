@@ -2,8 +2,7 @@
 
 module TypedParameters
   module Types
-    register(
-      type: :symbol,
+    register(:symbol,
       coerce: -> v { v.to_sym },
       match: -> v { v.is_a?(Symbol) },
     )

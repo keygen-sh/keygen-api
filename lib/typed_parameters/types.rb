@@ -6,12 +6,14 @@ module TypedParameters
   module Types
     cattr_reader :types, default: {}
 
-    def self.register(type:, name: type, match:, coerce: nil, scalar: true, accepts_block: false)
-      raise ArgumentError, 'type is already registered' if
+    def self.register(type, name: type, match:, coerce: nil, scalar: true, accepts_block: false)
+      raise DuplicateTypeError, 'type is already registered' if
         types.key?(type)
 
       types[type] = Type.new(type:, name:, match:, coerce:, scalar:, accepts_block:)
     end
+
+    def self.unregister(type) = types.delete(type)
 
     def self.coerce(value, to:) = types[to].coerce(value)
 
@@ -21,6 +23,6 @@ module TypedParameters
     def self.scalar?(value) = self.for(value).scalar?
 
     def self.for(value) = types.values.find { _1.match?(value) }
-    def self.[](type)   = types[type] || raise(ArgumentError, %(invalid type "#{type}"))
+    def self.[](type)   = types[type] || raise(ArgumentError, "invalid type: #{type.inspect}")
   end
 end

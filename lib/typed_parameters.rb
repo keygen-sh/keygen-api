@@ -15,7 +15,6 @@ require_relative 'typed_parameters/types'
 require_relative 'typed_parameters/types/array'
 require_relative 'typed_parameters/types/boolean'
 require_relative 'typed_parameters/types/date'
-require_relative 'typed_parameters/types/datetime'
 require_relative 'typed_parameters/types/decimal'
 require_relative 'typed_parameters/types/float'
 require_relative 'typed_parameters/types/hash'
@@ -33,6 +32,8 @@ module TypedParameters
   class FailedCoercionError < StandardError; end
   class UndefinedActionError < StandardError; end
   class InvalidMethodError < StandardError; end
+  class DuplicateFormatError < StandardError; end
+  class DuplicateTypeError < StandardError; end
 
   class InvalidParameterError < StandardError
     attr_reader :path
