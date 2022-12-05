@@ -2,8 +2,7 @@
 
 module TypedParameters
   module Types
-    register(
-      type: :float,
+    register(:float,
       coerce: -> v { v.to_f },
       match: -> v { v.is_a?(Float) },
     )

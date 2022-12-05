@@ -2,8 +2,7 @@
 
 module TypedParameters
   module Types
-    register(
-      type: :date,
+    register(:date,
       coerce: -> v { v.to_date },
       match: -> v { v.is_a?(Date) },
     )

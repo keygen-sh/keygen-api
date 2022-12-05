@@ -2,8 +2,7 @@
 
 module TypedParameters
   module Types
-    register(
-      type: :integer,
+    register(:integer,
       coerce: -> v { v.to_i },
       match: -> v { v.is_a?(Integer) },
     )

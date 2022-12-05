@@ -20,8 +20,11 @@ module TypedParameters
 
     def path = @path ||= Path.new(*parent&.path&.keys, *key)
 
-    def key?(key)        = keys.include?(key.to_s)
-    def has_keys?(*keys) = keys.all? { key?(_1) }
+    def key?(key) = keys.include?(key.to_s)
+    alias :has_key? :key?
+
+    def keys?(*keys) = keys.all? { key?(_1) }
+    alias :has_keys? :keys?
 
     def keys
       return [] if

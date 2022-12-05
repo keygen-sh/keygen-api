@@ -2,9 +2,8 @@
 
 module TypedParameters
   module Types
-    register(
+    register(:nil,
       name: :null,
-      type: :nil,
       coerce: -> v { nil },
       match: -> v { v.nil? },
     )

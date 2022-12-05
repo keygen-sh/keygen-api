@@ -12,8 +12,7 @@ module TypedParameters
       'T',
     ].freeze
 
-    register(
-      type: :boolean,
+    register(:boolean,
       coerce: -> v {
         raise unless COERCIBLE_TYPES.any? { v.is_a?(_1) }
 

@@ -2,9 +2,8 @@
 
 module TypedParameters
   module Types
-    register(
+    register(:hash,
       name: :object,
-      type: :hash,
       accepts_block: true,
       scalar: false,
       coerce: -> v { v.respond_to?(:to_h) ? v.to_h : {} },
