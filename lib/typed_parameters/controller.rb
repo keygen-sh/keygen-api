@@ -32,31 +32,29 @@ module TypedParameters
       cattr_accessor :typed_schemas,  default: {}
 
       def typed_params
-        input   = request.request_parameters
         handler = typed_handlers[:params][action_name.to_sym]
 
         raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
           handler.nil?
 
         schema = handler.schema
-        params = Parameterizer.new(schema:).call(value: input)
+        params = Parameterizer.new(schema:).call(value: request.request_parameters)
 
-        Processor.new(schema:).call(params)
+        Processor.new(controller: self, schema:).call(params)
 
         params.safe
       end
 
       def typed_query
-        input   = request.query_parameters
         handler = typed_handlers[:query][action_name.to_sym]
 
         raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
           handler.nil?
 
         schema = handler.schema
-        params = Parameterizer.new(schema:).call(value: input)
+        params = Parameterizer.new(schema:).call(value: request.query_parameters)
 
-        Processor.new(schema:).call(params)
+        Processor.new(controller: self, schema:).call(params)
 
         params.safe
       end

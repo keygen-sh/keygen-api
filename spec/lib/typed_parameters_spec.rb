@@ -734,6 +734,49 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Bouncer do
+    it 'should bounce params with :if guard' do
+      schema = TypedParameters::Schema.new type: :hash do
+        param :foo, type: :integer, if: :admin?
+        param :bar, type: :integer, unless: :admin?
+      end
+
+      controller = Class.new(ActionController::Base) { def admin? = false }.new
+      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+      bouncer.call(params)
+
+      expect(params).to_not have_keys :foo
+      expect(params).to have_keys :bar
+    end
+
+    it 'should bounce params with :unless guard' do
+      schema = TypedParameters::Schema.new type: :hash do
+        param :foo, type: :integer, if: -> { admin? }
+        param :bar, type: :integer, unless: -> { admin? }
+      end
+
+      controller = Class.new(ActionController::Base) { def admin? = true }.new
+      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+      bouncer.call(params)
+
+      expect(params).to have_keys :foo
+      expect(params).to_not have_keys :bar
+    end
+
+    it 'should raise for invalid guard' do
+      schema     = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, if: 'foo?' }
+      controller = Class.new(ActionController::Base).new
+      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+      expect { bouncer.call(params) }.to raise_error TypedParameters::InvalidMethodError
+    end
+  end
+
   describe TypedParameters::Controller do
     subject {
       Class.new ActionController::Base do
@@ -861,6 +904,7 @@ describe TypedParameters do
         param :email, type: :string, format: { with: /@/ }
         param :password, type: :string, length: { minimum: 8 }
         param :metadata, type: :hash, optional: true
+        param :role, type: :string, optional: true, if: :admin?
       end
 
       def create = render json: { params: user_params, query: nil }
@@ -872,6 +916,10 @@ describe TypedParameters do
       def update = render json: { params: user_params, query: user_query }
 
       def destroy = render json: { params: user_params, query: nil }
+
+      private
+
+      def admin? = false
     end
 
     it 'should not raise for predefined schema' do

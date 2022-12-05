@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'typed_parameters/controller'
+require_relative 'typed_parameters/bouncer'
 require_relative 'typed_parameters/coercer'
+require_relative 'typed_parameters/controller'
 require_relative 'typed_parameters/parameter'
 require_relative 'typed_parameters/parameterizer'
 require_relative 'typed_parameters/path'
@@ -31,6 +32,7 @@ module TypedParameters
   class UnsupportedCoercionError < StandardError; end
   class FailedCoercionError < StandardError; end
   class UndefinedActionError < StandardError; end
+  class InvalidMethodError < StandardError; end
 
   class InvalidParameterError < StandardError
     attr_reader :path

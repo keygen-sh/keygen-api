@@ -2,16 +2,18 @@
 
 module TypedParameters
   class Rule
-    def initialize(schema:)
-      @visited = []
-      @schema  = schema
+    def initialize(schema:, controller: nil)
+      @controller = controller
+      @schema     = schema
+      @visited    = []
     end
 
     def call(...) = raise NotImplementedError
 
     private
 
-    attr_reader :visited,
+    attr_reader :controller,
+                :visited,
                 :schema
 
     def visited?(param) = visited.include?(param)
@@ -29,12 +31,12 @@ module TypedParameters
         case param.schema.children
         when Array
           if param.schema.indexed?
-            param.schema.children.each_with_index { |v, i| self.class.new(schema: v).call(param[i], &) }
+            param.schema.children.each_with_index { |v, i| self.class.new(schema: v, controller:).call(param[i], &) }
           else
-            param.value.each { |v| self.class.new(schema: param.schema.children.first).call(v, &) }
+            param.value.each { |v| self.class.new(schema: param.schema.children.first, controller:).call(v, &) }
           end
         when Hash
-          param.schema.children.each { |k, v| self.class.new(schema: v).call(param[k], &) }
+          param.schema.children.each { |k, v| self.class.new(schema: v, controller:).call(param[k], &) }
         end
       end
 
