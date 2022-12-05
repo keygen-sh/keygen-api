@@ -2,8 +2,7 @@
 
 module TypedParameters
   module Types
-    register(
-      type: :array,
+    register(:array,
       accepts_block: true,
       scalar: false,
       coerce: -> v { v.is_a?(String) ? v.split(',') : Array(v) },
