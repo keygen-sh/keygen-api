@@ -9,7 +9,9 @@ module TypedParameters
                 :parent,
                 :children,
                 :type,
-                :key
+                :key,
+                :if,
+                :unless
 
     def initialize(
       strict: true,
@@ -28,6 +30,8 @@ module TypedParameters
       length: nil,
       transform: nil,
       validate: nil,
+      if: nil,
+      unless: nil,
       &block
     )
       key ||= ROOT_KEY
@@ -75,6 +79,8 @@ module TypedParameters
       @length            = length
       @transform         = transform
       @children          = nil
+      @if                = binding.local_variable_get(:if)
+      @unless            = binding.local_variable_get(:unless)
 
       # Validations
       @validations = []
@@ -185,6 +191,8 @@ module TypedParameters
     def nilify_blanks?     = !!@nilify_blanks
     def boundless?         = !!@boundless
     def indexed?           = !boundless?
+    def if?                = !!@if
+    def unless?            = !!@unless
 
     private
 
