@@ -797,6 +797,45 @@ describe TypedParameters do
 
       expect { bouncer.call(params) }.to raise_error TypedParameters::InvalidMethodError
     end
+
+    it 'should not bounce branches' do
+      schema = TypedParameters::Schema.new type: :hash do
+        param :user, type: :hash, if: -> { true } do
+          param :email, type: :string
+          param :roles, type: :array, if: :admin? do
+            items type: :string
+          end
+        end
+      end
+
+      controller = Class.new(ActionController::Base) { def admin? = true }.new
+      user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
+      params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
+      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+      bouncer.call(params)
+
+      expect(params.unsafe).to eq user
+    end
+
+    it 'should bounce branches' do
+      schema = TypedParameters::Schema.new type: :hash do
+        param :user, type: :hash, if: -> { true } do
+          param :email, type: :string
+          param :roles, type: :array, if: :admin? do
+            items type: :string
+          end
+        end
+      end
+
+      controller = Class.new(ActionController::Base) { def admin? = false }.new
+      params     = TypedParameters::Parameterizer.new(schema:).call(value: { user: { email: 'foo@keygen.example', roles: %w[admin] } })
+      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+      bouncer.call(params)
+
+      expect(params.unsafe).to eq 'user' => { 'email' => 'foo@keygen.example' }
+    end
   end
 
   describe TypedParameters::Controller do
