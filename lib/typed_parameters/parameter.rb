@@ -20,6 +20,9 @@ module TypedParameters
 
     def path = @path ||= Path.new(*parent&.path&.keys, *key)
 
+    def key?(key)        = keys.include?(key.to_s)
+    def has_keys?(*keys) = keys.all? { key?(_1) }
+
     def keys
       return [] if
         schema.children.blank?
@@ -52,8 +55,11 @@ module TypedParameters
 
     def optional? = schema.optional?
     def required? = !optional?
+    def parent?   = parent.present?
 
     def delete
+      raise NotImplementedError, "cannot delete param: #{key.inspect}" unless parent?
+
       case parent.value
       when Array
         parent.value.delete(self)
