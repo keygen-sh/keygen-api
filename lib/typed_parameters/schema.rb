@@ -182,6 +182,7 @@ module TypedParameters
 
     def root?              = key == ROOT_KEY
     def strict?            = !!strict
+    def lenient?           = !strict?
     def optional?          = !!@optional
     def required?          = !optional?
     def coerce?            = !!@coerce

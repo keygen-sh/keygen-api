@@ -739,6 +739,38 @@ describe TypedParameters do
 
       expect { processor.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
+
+    it 'should not raise on param :if condition' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, if: -> { true } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param :if condition' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, if: -> { false } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to raise_error TypedParameters::UnpermittedParameterError
+    end
+
+    it 'should not raise on param :unless condition' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, unless: -> { false } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to_not raise_error
+    end
+
+    it 'should raise on param :unless condition' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, unless: -> { true } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to raise_error TypedParameters::UnpermittedParameterError
+    end
   end
 
   describe TypedParameters::Pipeline do
@@ -757,84 +789,167 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Bouncer do
-    it 'should bounce params with :if guard' do
-      schema = TypedParameters::Schema.new type: :hash do
-        param :foo, type: :integer, if: :admin?
-        param :bar, type: :integer, unless: :admin?
+    context 'with lenient schema' do
+      it 'should bounce params with :if guard' do
+        schema = TypedParameters::Schema.new type: :hash, strict: false do
+          param :foo, type: :integer, if: :admin?
+          param :bar, type: :integer, unless: :admin?
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        bouncer.call(params)
+
+        expect(params).to_not have_keys :foo
+        expect(params).to have_keys :bar
       end
 
-      controller = Class.new(ActionController::Base) { def admin? = false }.new
-      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
-      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+      it 'should bounce params with :unless guard' do
+        schema = TypedParameters::Schema.new type: :hash, strict: false do
+          param :foo, type: :integer, if: -> { admin? }
+          param :bar, type: :integer, unless: -> { admin? }
+        end
 
-      bouncer.call(params)
+        controller = Class.new(ActionController::Base) { def admin? = true }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
-      expect(params).to_not have_keys :foo
-      expect(params).to have_keys :bar
-    end
+        bouncer.call(params)
 
-    it 'should bounce params with :unless guard' do
-      schema = TypedParameters::Schema.new type: :hash do
-        param :foo, type: :integer, if: -> { admin? }
-        param :bar, type: :integer, unless: -> { admin? }
+        expect(params).to have_keys :foo
+        expect(params).to_not have_keys :bar
       end
 
-      controller = Class.new(ActionController::Base) { def admin? = true }.new
-      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
-      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+      it 'should raise for invalid guard' do
+        schema     = TypedParameters::Schema.new(type: :hash, strict: false) { param :foo, type: :integer, if: 'foo?' }
+        controller = Class.new(ActionController::Base).new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
-      bouncer.call(params)
+        expect { bouncer.call(params) }.to raise_error TypedParameters::InvalidMethodError
+      end
 
-      expect(params).to have_keys :foo
-      expect(params).to_not have_keys :bar
-    end
-
-    it 'should raise for invalid guard' do
-      schema     = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, if: 'foo?' }
-      controller = Class.new(ActionController::Base).new
-      params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
-      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
-
-      expect { bouncer.call(params) }.to raise_error TypedParameters::InvalidMethodError
-    end
-
-    it 'should not bounce branches' do
-      schema = TypedParameters::Schema.new type: :hash do
-        param :user, type: :hash, if: -> { true } do
-          param :email, type: :string
-          param :roles, type: :array, if: :admin? do
-            items type: :string
+      it 'should not bounce branches' do
+        schema = TypedParameters::Schema.new type: :hash, strict: false do
+          param :user, type: :hash, if: -> { true } do
+            param :email, type: :string
+            param :roles, type: :array, if: :admin? do
+              items type: :string
+            end
           end
         end
+
+        controller = Class.new(ActionController::Base) { def admin? = true }.new
+        user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        bouncer.call(params)
+
+        expect(params.unsafe).to eq user
       end
 
-      controller = Class.new(ActionController::Base) { def admin? = true }.new
-      user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
-      params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
-      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
-
-      bouncer.call(params)
-
-      expect(params.unsafe).to eq user
-    end
-
-    it 'should bounce branches' do
-      schema = TypedParameters::Schema.new type: :hash do
-        param :user, type: :hash, if: -> { true } do
-          param :email, type: :string
-          param :roles, type: :array, if: :admin? do
-            items type: :string
+      it 'should bounce branches' do
+        schema = TypedParameters::Schema.new type: :hash, strict: false do
+          param :user, type: :hash, if: -> { true } do
+            param :email, type: :string
+            param :roles, type: :array, if: :admin? do
+              items type: :string
+            end
           end
         end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { user: { email: 'foo@keygen.example', roles: %w[admin] } })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        bouncer.call(params)
+
+        expect(params.unsafe).to eq 'user' => { 'email' => 'foo@keygen.example' }
+      end
+    end
+
+    context 'with strict schema' do
+      it 'should bounce params with :if guard' do
+        schema = TypedParameters::Schema.new type: :hash, strict: true do
+          param :foo, type: :integer, if: :admin?
+          param :bar, type: :integer, unless: :admin?
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.path.to_json_pointer).to eq '/foo'
+        }
       end
 
-      controller = Class.new(ActionController::Base) { def admin? = false }.new
-      params     = TypedParameters::Parameterizer.new(schema:).call(value: { user: { email: 'foo@keygen.example', roles: %w[admin] } })
-      bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+      it 'should bounce params with :unless guard' do
+        schema = TypedParameters::Schema.new type: :hash, strict: true do
+          param :foo, type: :integer, if: -> { admin? }
+          param :bar, type: :integer, unless: -> { admin? }
+        end
 
-      bouncer.call(params)
+        controller = Class.new(ActionController::Base) { def admin? = true }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1, bar: 2 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
-      expect(params.unsafe).to eq 'user' => { 'email' => 'foo@keygen.example' }
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.path.to_json_pointer).to eq '/bar'
+        }
+      end
+
+      it 'should raise for invalid guard' do
+        schema     = TypedParameters::Schema.new(type: :hash, strict: true) { param :foo, type: :integer, if: 'foo?' }
+        controller = Class.new(ActionController::Base).new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error TypedParameters::InvalidMethodError
+      end
+
+      it 'should not bounce branches' do
+        schema = TypedParameters::Schema.new type: :hash, strict: true do
+          param :user, type: :hash, if: -> { true } do
+            param :email, type: :string
+            param :roles, type: :array, if: :admin? do
+              items type: :string
+            end
+          end
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = true }.new
+        user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to_not raise_error TypedParameters::UnpermittedParameterError
+      end
+
+      it 'should bounce branches' do
+        schema = TypedParameters::Schema.new type: :hash, strict: true do
+          param :user, type: :hash, if: -> { true } do
+            param :email, type: :string
+            param :roles, type: :array, if: :admin? do
+              items type: :string
+            end
+          end
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: { user: { email: 'foo@keygen.example', roles: %w[admin] } })
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.path.to_json_pointer).to eq '/user/roles'
+        }
+      end
     end
   end
 
