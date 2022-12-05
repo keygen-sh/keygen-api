@@ -192,8 +192,8 @@ module TypedParameters
     def nilify_blanks?     = !!@nilify_blanks
     def boundless?         = !!@boundless
     def indexed?           = !boundless?
-    def if?                = !!@if
-    def unless?            = !!@unless
+    def if?                = !@if.nil?
+    def unless?            = !@unless.nil?
 
     private
 
