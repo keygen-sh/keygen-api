@@ -19,8 +19,15 @@ module TypedParameters
                  raise InvalidMethodError, "invalid method: #{cond.inspect}"
                end
 
-        param.delete if
-          param.schema.if? ? !res : res
+        next if
+          param.schema.unless? && !res ||
+          param.schema.if? && res
+
+        if param.schema.strict?
+          raise UnpermittedParameterError.new('unpermitted parameter', path: param.path)
+        else
+          param.delete
+        end
       end
     end
   end
