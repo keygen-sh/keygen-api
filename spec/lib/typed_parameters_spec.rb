@@ -104,6 +104,28 @@ describe TypedParameters do
       expect { TypedParameters::Schema.new(type: :string, length: {}) }
         .to raise_error ArgumentError
     end
+
+    it 'should have a correct path' do
+      grandchild = schema.children[:foo]
+                         .children[:bar]
+                         .children[0]
+                         .children[:baz]
+
+      expect(grandchild.path.to_json_pointer).to eq '/foo/bar/0/baz'
+    end
+
+    it 'should have correct array keys' do
+      grandchild = schema.children[:foo]
+                         .children[:bar]
+
+      expect(grandchild.keys).to eq [0]
+    end
+
+    it 'should have correct hash keys' do
+      grandchild = schema.children[:foo]
+
+      expect(grandchild.keys).to eq %w[bar]
+    end
   end
 
   describe TypedParameters::Path do
