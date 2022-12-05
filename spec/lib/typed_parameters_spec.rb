@@ -928,7 +928,7 @@ describe TypedParameters do
         params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
         bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
-        expect { bouncer.call(params) }.to_not raise_error TypedParameters::UnpermittedParameterError
+        expect { bouncer.call(params) }.to_not raise_error
       end
 
       it 'should bounce branches' do
