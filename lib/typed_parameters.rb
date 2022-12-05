@@ -40,10 +40,11 @@ module TypedParameters
     def initialize(message, path:)
       @path = path
 
-      # FIXME(ezekg) Don't mutate message
-      super("#{path}: #{message}")
+      super(message)
     end
   end
+
+  class UnpermittedParameterError < InvalidParameterError; end
 
   # class UnpermittedParametersError < StandardError; end
   # class InvalidRequestError < StandardError; end
