@@ -905,7 +905,7 @@ describe TypedParameters do
       end
 
       it 'should raise for invalid guard' do
-        schema     = TypedParameters::Schema.new(type: :hash, strict: true) { param :foo, type: :integer, if: 'foo?' }
+        schema     = TypedParameters::Schema.new(type: :hash, strict: true) { param :foo, type: :integer, if: false }
         controller = Class.new(ActionController::Base).new
         params     = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
         bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
