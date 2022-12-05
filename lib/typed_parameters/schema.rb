@@ -168,13 +168,13 @@ module TypedParameters
 
     def keys
       return [] if
-        schema.children.blank?
+        children.blank?
 
-      case value
+      case children
       when Array
-        (0...schema.children.size).to_a
+        (0...children.size).to_a
       when Hash
-        schema.children.keys
+        children.keys
       else
         []
       end
