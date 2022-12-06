@@ -2,21 +2,23 @@
 
 module TypedParameters
   module Types
-    COERCIBLE_TYPES = [String, Numeric].freeze
-    TRUTHY_VALUES   = [
-      1,
-      '1',
-      'true',
-      'TRUE',
-      't',
-      'T',
-    ].freeze
+    module Boolean
+      COERCIBLE_TYPES = [String, Numeric].freeze
+      TRUTHY_VALUES   = [
+        1,
+        '1',
+        'true',
+        'TRUE',
+        't',
+        'T',
+      ].freeze
+    end
 
     register(:boolean,
       coerce: -> v {
-        raise unless COERCIBLE_TYPES.any? { v.is_a?(_1) }
+        raise unless Boolean::COERCIBLE_TYPES.any? { v.is_a?(_1) }
 
-        v.in?(TRUTHY_VALUES)
+        v.in?(Boolean::TRUTHY_VALUES)
       },
       match: -> v {
         v.is_a?(TrueClass) || v.is_a?(FalseClass)

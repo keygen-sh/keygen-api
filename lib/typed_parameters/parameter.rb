@@ -74,6 +74,11 @@ module TypedParameters
     end
 
     def [](key) = value[key]
+    def []=(key, value)
+      self.value.merge!(key => value)
+    end
+
+    def each(...) = value.each(...)
 
     def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
 
@@ -82,9 +87,9 @@ module TypedParameters
 
       case value
       when Array
-        value.map(&:safe)
+        value.map { _1&.safe }
       when Hash
-        value.transform_values(&:safe)
+        value.transform_values { _1&.safe }
       else
         value
       end
@@ -93,12 +98,24 @@ module TypedParameters
     def unsafe
       case value
       when Array
-        value.map(&:unsafe)
+        value.map { _1&.unsafe }
       when Hash
-        value.transform_values(&:unsafe)
+        value.transform_values { _1&.unsafe }
       else
         value
       end
+    end
+
+    def deconstruct_keys(keys)
+      { key:, value: }
+    end
+
+    def deconstruct
+      value
+    end
+
+    def inspect
+      "#<Parameter key=#{key.inspect} value=#{unsafe.inspect}>"
     end
 
     private
