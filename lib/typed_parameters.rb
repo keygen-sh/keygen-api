@@ -3,6 +3,9 @@
 require_relative 'typed_parameters/bouncer'
 require_relative 'typed_parameters/coercer'
 require_relative 'typed_parameters/controller'
+require_relative 'typed_parameters/formats'
+require_relative 'typed_parameters/formats/format'
+require_relative 'typed_parameters/formats/jsonapi'
 require_relative 'typed_parameters/parameter'
 require_relative 'typed_parameters/parameterizer'
 require_relative 'typed_parameters/path'
@@ -47,11 +50,8 @@ module TypedParameters
 
   class UnpermittedParameterError < InvalidParameterError; end
 
-  # class UnpermittedParametersError < StandardError; end
-  # class InvalidRequestError < StandardError; end
-  # class InvalidActionError < StandardError; end
-
-  def self.types = Types
+  def self.formats = Formats
+  def self.types   = Types
 
   # def self.build(context, &block)
   #   schema = Schema.new controller: context, context: context, &block

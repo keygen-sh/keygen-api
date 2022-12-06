@@ -120,6 +120,8 @@ module TypedParameters
       end
     end
 
+    def format(format) = @transforms << Formats[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
+
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
@@ -194,6 +196,10 @@ module TypedParameters
     def indexed?           = !boundless?
     def if?                = !@if.nil?
     def unless?            = !@unless.nil?
+
+    def inspect
+      "#<Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"
+    end
 
     private
 

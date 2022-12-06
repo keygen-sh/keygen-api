@@ -129,156 +129,9 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Types do
-    after { TypedParameters::Types.unregister(:test) }
-
-    describe ':boolean' do
-      let(:type) { TypedParameters.types[:boolean] }
-
-      it 'should match' do
-        expect(type.match?(true)).to be true
-        expect(type.match?(false)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':string' do
-      let(:type) { TypedParameters.types[:string] }
-
-      it 'should match' do
-        expect(type.match?('foo')).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':symbol' do
-      let(:type) { TypedParameters.types[:symbol] }
-
-      it 'should match' do
-        expect(type.match?(:foo)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':integer' do
-      let(:type) { TypedParameters.types[:integer] }
-
-      it 'should match' do
-        expect(type.match?(1)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?(1.0)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-      end
-    end
-
-    describe ':float' do
-      let(:type) { TypedParameters.types[:float] }
-
-      it 'should match' do
-        expect(type.match?(2.0)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':number' do
-      let(:type) { TypedParameters.types[:number] }
-
-      it 'should match' do
-        expect(type.match?(2.0)).to be true
-        expect(type.match?(1)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-      end
-    end
-
-    describe ':array' do
-      let(:type) { TypedParameters.types[:array] }
-
-      it 'should match' do
-        expect(type.match?([])).to be true
-        expect(type.match?([1])).to be true
-        expect(type.match?([''])).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':hash' do
-      let(:type) { TypedParameters.types[:hash] }
-
-      it 'should match' do
-        expect(type.match?({})).to be true
-        expect(type.match?({ foo: {} })).to be true
-        expect(type.match?({ bar: 1 })).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?(nil)).to be false
-        expect(type.match?([])).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
-    describe ':nil' do
-      let(:type) { TypedParameters.types[:nil] }
-
-      it 'should match' do
-        expect(type.match?(nil)).to be true
-      end
-
-      it 'should not match' do
-        expect(type.match?(true)).to be false
-        expect(type.match?({})).to be false
-        expect(type.match?([])).to be false
-        expect(type.match?('')).to be false
-        expect(type.match?(1)).to be false
-      end
-    end
-
     describe '.register' do
+      after { TypedParameters::Types.unregister(:test) }
+
       it 'should register a type' do
         type = TypedParameters::Types.register(:test,
           match: -> v { v == :test },
@@ -320,6 +173,290 @@ describe TypedParameters do
         type = TypedParameters::Types[:string]
 
         expect(type.type).to eq :string
+      end
+    end
+
+    describe :boolean do
+      let(:type) { TypedParameters.types[:boolean] }
+
+      it 'should match' do
+        expect(type.match?(true)).to be true
+        expect(type.match?(false)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :string do
+      let(:type) { TypedParameters.types[:string] }
+
+      it 'should match' do
+        expect(type.match?('foo')).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :symbol do
+      let(:type) { TypedParameters.types[:symbol] }
+
+      it 'should match' do
+        expect(type.match?(:foo)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :integer do
+      let(:type) { TypedParameters.types[:integer] }
+
+      it 'should match' do
+        expect(type.match?(1)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?(1.0)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+      end
+    end
+
+    describe :float do
+      let(:type) { TypedParameters.types[:float] }
+
+      it 'should match' do
+        expect(type.match?(2.0)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :number do
+      let(:type) { TypedParameters.types[:number] }
+
+      it 'should match' do
+        expect(type.match?(2.0)).to be true
+        expect(type.match?(1)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+      end
+    end
+
+    describe :array do
+      let(:type) { TypedParameters.types[:array] }
+
+      it 'should match' do
+        expect(type.match?([])).to be true
+        expect(type.match?([1])).to be true
+        expect(type.match?([''])).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :hash do
+      let(:type) { TypedParameters.types[:hash] }
+
+      it 'should match' do
+        expect(type.match?({})).to be true
+        expect(type.match?({ foo: {} })).to be true
+        expect(type.match?({ bar: 1 })).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?(nil)).to be false
+        expect(type.match?([])).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe :nil do
+      let(:type) { TypedParameters.types[:nil] }
+
+      it 'should match' do
+        expect(type.match?(nil)).to be true
+      end
+
+      it 'should not match' do
+        expect(type.match?(true)).to be false
+        expect(type.match?({})).to be false
+        expect(type.match?([])).to be false
+        expect(type.match?('')).to be false
+        expect(type.match?(1)).to be false
+      end
+    end
+  end
+
+  describe TypedParameters::Formats do
+    describe '.register' do
+      after { TypedParameters::Formats.unregister(:test) }
+
+      it 'should register a format' do
+        format = TypedParameters::Formats.register(:test,
+          handler: -> params { params },
+        )
+
+        expect(TypedParameters::Formats.formats[:test]).to eq format
+      end
+
+      it 'should not register a duplicate format' do
+        format = TypedParameters::Formats.register(:test,
+          handler: -> params { params },
+        )
+
+        expect { TypedParameters::Formats.register(:test, handler: -> params { params }) }
+          .to raise_error TypedParameters::DuplicateFormatError
+      end
+    end
+
+    describe '.unregister' do
+      it 'should unregister a format' do
+        TypedParameters::Formats.register(:test, handler: -> params { params })
+        TypedParameters::Formats.unregister(:test)
+
+        expect(TypedParameters::Formats.formats[:test]).to be_nil
+      end
+    end
+
+    describe '.[]' do
+      it 'should fetch a format by key' do
+        format = TypedParameters::Formats[:jsonapi]
+
+        expect(format.format).to eq :jsonapi
+      end
+    end
+
+    describe :jsonapi do
+      let :schema do
+        TypedParameters::Schema.new(type: :hash) do
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: { in: %w[users user] }
+            param :id, type: :string
+            param :attributes, type: :hash do
+              param :first_name, type: :string, optional: true
+              param :last_name, type: :string, optional: true
+              param :email, type: :string, format: { with: /@/ }
+              param :password, type: :string
+            end
+            param :relationships, type: :hash do
+              param :note, type: :hash do
+                param :data, type: :hash do
+                  param :type, type: :string, inclusion: { in: %w[notes note] }
+                  param :id, type: :string
+                  param :attributes, type: :hash, optional: true do
+                    param :content, type: :string, length: { minimum: 80 }
+                  end
+                end
+              end
+              param :team, type: :hash do
+                param :data, type: :hash do
+                  param :type, type: :string, inclusion: { in: %w[teams team] }
+                  param :id, type: :string
+                end
+              end
+              param :posts, type: :hash do
+                param :data, type: :array do
+                  items type: :hash do
+                    param :type, type: :string, inclusion: { in: %w[posts post] }
+                    param :id, type: :string
+                    param :attributes, type: :hash, optional: true do
+                      param :title, type: :string, length: { maximum: 80 }
+                      param :content, type: :string, length: { minimum: 80 }, optional: true
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
+      it 'should transform params' do
+        data = {
+          type: 'users',
+          id: SecureRandom.base58,
+          attributes: {
+            email: 'foo@keygen.example',
+            password: SecureRandom.hex,
+          },
+          relationships: {
+            note: {
+              data: { type: 'notes', id: SecureRandom.base58, attributes: { content: 'Test' } },
+            },
+            team: {
+              data: { type: 'teams', id: SecureRandom.base58 },
+            },
+            posts: {
+              data: [
+                { type: 'posts', id: SecureRandom.base58 },
+                { type: 'posts', id: SecureRandom.base58, attributes: { title: 'Testing! 1, 2, 3!' } },
+                { type: 'posts', id: SecureRandom.base58 },
+                { type: 'posts', id: SecureRandom.base58 },
+              ],
+            },
+          },
+        }
+
+        params  = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+        jsonapi = TypedParameters.formats[:jsonapi]
+
+        jsonapi.call(params)
+
+        expect(params.unsafe).to eq(
+          'id' => data[:id],
+          'email' => data[:attributes][:email],
+          'password' => data[:attributes][:password],
+          'note_attributes' => {
+            'id' => data[:relationships][:note][:data][:id],
+            'content' => data[:relationships][:note][:data][:attributes][:content],
+          },
+          'team_attributes' => {
+            'id' => data[:relationships][:team][:data][:id],
+          },
+          'posts_attributes' => [
+            { 'id' => data[:relationships][:posts][:data][0][:id] },
+            { 'id' => data[:relationships][:posts][:data][1][:id], 'title' => data[:relationships][:posts][:data][1][:attributes][:title] },
+            { 'id' => data[:relationships][:posts][:data][2][:id] },
+            { 'id' => data[:relationships][:posts][:data][3][:id] },
+          ],
+        )
       end
     end
   end
