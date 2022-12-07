@@ -6,7 +6,7 @@ module TypedParameters
   module Formatters
     ##
     # The JSONAPI formatter transforms a JSONAPI document into Rails'
-    # standard params format.
+    # standard params format that can be passed to a model.
     #
     # For example, given the following params:
     #
