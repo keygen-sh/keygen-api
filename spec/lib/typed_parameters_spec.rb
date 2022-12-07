@@ -362,149 +362,318 @@ describe TypedParameters do
         expect(format.format).to eq :jsonapi
       end
     end
+  end
 
-    describe :jsonapi do
-      let :schema do
-        TypedParameters::Schema.new(type: :hash) do
-          param :meta, type: :hash, optional: true
-          param :data, type: :hash do
-            param :type, type: :string, inclusion: { in: %w[users user] }
-            param :id, type: :string
-            param :attributes, type: :hash do
-              param :first_name, type: :string, optional: true
-              param :last_name, type: :string, optional: true
-              param :email, type: :string, format: { with: /@/ }
-              param :password, type: :string
+  describe TypedParameters::Formatters::JSONAPI do
+    let :schema do
+      TypedParameters::Schema.new(type: :hash) do
+        param :meta, type: :hash, optional: true
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: { in: %w[users user] }
+          param :id, type: :string
+          param :attributes, type: :hash do
+            param :first_name, type: :string, optional: true
+            param :last_name, type: :string, optional: true
+            param :email, type: :string, format: { with: /@/ }
+            param :password, type: :string
+          end
+          param :relationships, type: :hash do
+            param :note, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: { in: %w[notes note] }
+                param :id, type: :string
+                param :attributes, type: :hash, optional: true do
+                  param :content, type: :string, length: { minimum: 80 }
+                end
+              end
             end
-            param :relationships, type: :hash do
-              param :note, type: :hash do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: { in: %w[notes note] }
+            param :team, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: { in: %w[teams team] }
+                param :id, type: :string
+              end
+            end
+            param :posts, type: :hash do
+              param :data, type: :array do
+                items type: :hash do
+                  param :type, type: :string, inclusion: { in: %w[posts post] }
                   param :id, type: :string
                   param :attributes, type: :hash, optional: true do
-                    param :content, type: :string, length: { minimum: 80 }
+                    param :title, type: :string, length: { maximum: 80 }
+                    param :content, type: :string, length: { minimum: 80 }, optional: true
                   end
                 end
               end
-              param :team, type: :hash do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: { in: %w[teams team] }
+            end
+            param :friends, type: :hash do
+              param :data, type: :array do
+                items type: :hash do
+                  param :type, type: :string, inclusion: { in: %w[users user] }
                   param :id, type: :string
-                end
-              end
-              param :posts, type: :hash do
-                param :data, type: :array do
-                  items type: :hash do
-                    param :type, type: :string, inclusion: { in: %w[posts post] }
-                    param :id, type: :string
-                    param :attributes, type: :hash, optional: true do
-                      param :title, type: :string, length: { maximum: 80 }
-                      param :content, type: :string, length: { minimum: 80 }, optional: true
-                    end
-                  end
-                end
-              end
-              param :friends, type: :hash do
-                param :data, type: :array do
-                  items type: :hash do
-                    param :type, type: :string, inclusion: { in: %w[users user] }
-                    param :id, type: :string
-                  end
                 end
               end
             end
           end
         end
       end
+    end
 
-      it 'should transform params' do
-        data = {
-          type: 'users',
-          id: SecureRandom.base58,
-          attributes: {
-            email: 'foo@keygen.example',
-            password: SecureRandom.hex,
+    it 'should transform params' do
+      data = {
+        type: 'users',
+        id: SecureRandom.base58,
+        attributes: {
+          email: 'foo@keygen.example',
+          password: SecureRandom.hex,
+        },
+        relationships: {
+          note: {
+            data: { type: 'notes', id: SecureRandom.base58, attributes: { content: 'Test' } },
           },
-          relationships: {
-            note: {
-              data: { type: 'notes', id: SecureRandom.base58, attributes: { content: 'Test' } },
-            },
-            team: {
-              data: { type: 'teams', id: SecureRandom.base58 },
-            },
-            posts: {
-              data: [
-                { type: 'posts', id: SecureRandom.base58 },
-                { type: 'posts', id: SecureRandom.base58, attributes: { title: 'Testing! 1, 2, 3!' } },
-                { type: 'posts', id: SecureRandom.base58 },
-                { type: 'posts', id: SecureRandom.base58 },
-              ],
-            },
-            friends: {
-              data: [
-                { type: 'users', id: SecureRandom.base58 },
-                { type: 'users', id: SecureRandom.base58 },
-              ],
-            },
+          team: {
+            data: { type: 'teams', id: SecureRandom.base58 },
           },
-        }
-
-        params    = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
-        formatter = TypedParameters.formats[:jsonapi]
-
-        params.key, params.value = formatter.call(params.key, params.value)
-
-        expect(params.unsafe).to eq(
-          id: data[:id],
-          email: data[:attributes][:email],
-          password: data[:attributes][:password],
-          note_attributes: {
-            id: data[:relationships][:note][:data][:id],
-            content: data[:relationships][:note][:data][:attributes][:content],
+          posts: {
+            data: [
+              { type: 'posts', id: SecureRandom.base58 },
+              { type: 'posts', id: SecureRandom.base58, attributes: { title: 'Testing! 1, 2, 3!' } },
+              { type: 'posts', id: SecureRandom.base58 },
+              { type: 'posts', id: SecureRandom.base58 },
+            ],
           },
-          team_id: data[:relationships][:team][:data][:id],
-          posts_attributes: [
-            { id: data[:relationships][:posts][:data][0][:id] },
-            { id: data[:relationships][:posts][:data][1][:id], title: data[:relationships][:posts][:data][1][:attributes][:title] },
-            { id: data[:relationships][:posts][:data][2][:id] },
-            { id: data[:relationships][:posts][:data][3][:id] },
-          ],
-          friend_ids: [
-            data[:relationships][:friends][:data][0][:id],
-            data[:relationships][:friends][:data][1][:id],
-          ],
-        )
+          friends: {
+            data: [
+              { type: 'users', id: SecureRandom.base58 },
+              { type: 'users', id: SecureRandom.base58 },
+            ],
+          },
+        },
+      }
+
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+      formatter = TypedParameters.formats[:jsonapi]
+
+      params.key, params.value = formatter.call(params.key, params.value)
+
+      expect(params.unsafe).to eq(
+        id: data[:id],
+        email: data[:attributes][:email],
+        password: data[:attributes][:password],
+        note_attributes: {
+          id: data[:relationships][:note][:data][:id],
+          content: data[:relationships][:note][:data][:attributes][:content],
+        },
+        team_id: data[:relationships][:team][:data][:id],
+        posts_attributes: [
+          { id: data[:relationships][:posts][:data][0][:id] },
+          { id: data[:relationships][:posts][:data][1][:id], title: data[:relationships][:posts][:data][1][:attributes][:title] },
+          { id: data[:relationships][:posts][:data][2][:id] },
+          { id: data[:relationships][:posts][:data][3][:id] },
+        ],
+        friend_ids: [
+          data[:relationships][:friends][:data][0][:id],
+          data[:relationships][:friends][:data][1][:id],
+        ],
+      )
+    end
+  end
+
+  describe TypedParameters::Formatters::Rails do
+    let :controller do
+      Class.new(ActionController::Base) { @controller_name = 'users' }
+    end
+
+    let :schema do
+      TypedParameters::Schema.new(type: :hash) do
+        param :first_name, type: :string, optional: true
+        param :last_name, type: :string, optional: true
+        param :email, type: :string, format: { with: /@/ }
+        param :password, type: :string
       end
     end
 
-    describe :rails do
-      let :controller do
-        Class.new(ActionController::Base) { @controller_name = 'users' }
+    it 'should transform params' do
+      user = {
+        first_name: 'Foo',
+        last_name: 'Bar',
+        email: 'foo@keygen.example',
+        password: SecureRandom.hex,
+      }
+
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: user)
+      formatter = TypedParameters.formats[:rails]
+
+      params.key, params.value = formatter.call(params.key, params.value, controller)
+
+      expect(params.unsafe).to eq(user:)
+    end
+  end
+
+  describe TypedParameters::Transforms::NilifyBlanks do
+    let(:transform) { TypedParameters::Transforms::NilifyBlanks.new }
+
+    [
+      string: '',
+      array: [],
+      hash: {},
+    ].each do |key, value|
+      it "should transform a blank #{key} to nil" do
+        k, v = transform.call(key, value)
+
+        expect(k).to eq key
+        expect(v).to be nil
+      end
+    end
+
+    [
+      string: 'foo',
+      array: [:foo],
+      hash: { foo: :bar },
+    ].each do |key, value|
+      it "should not transform a present #{key} to nil" do
+        k, v = transform.call(key, value)
+
+        expect(k).to eq key
+        expect(v).to be value
+      end
+    end
+  end
+
+  describe TypedParameters::Transforms::Noop do
+    let(:transform) { TypedParameters::Transforms::Noop.new }
+
+    it 'should be a noop' do
+      k, v = transform.call('foo', 'bar')
+
+      expect(k).to be nil
+      expect(v).to be nil
+    end
+  end
+
+  describe TypedParameters::Validations::Exclusion do
+    let(:validation) { TypedParameters::Validations::Exclusion.new(options) }
+    let(:options)    { nil }
+
+    context 'with in: option' do
+      let(:options) {{ in: %w[a b c] }}
+
+      it 'should succeed' do
+        expect(validation.call('d')).to be true
       end
 
-      let :schema do
-        TypedParameters::Schema.new(type: :hash) do
-          param :first_name, type: :string, optional: true
-          param :last_name, type: :string, optional: true
-          param :email, type: :string, format: { with: /@/ }
-          param :password, type: :string
-        end
+      it 'should fail' do
+        expect(validation.call('a')).to be false
+      end
+    end
+  end
+
+  describe TypedParameters::Validations::Format do
+    let(:validation) { TypedParameters::Validations::Format.new(options) }
+    let(:options)    { nil }
+
+    context 'with without: option' do
+      let(:options) {{ without: /foo/ }}
+
+      it 'should succeed' do
+        expect(validation.call('bar')).to be true
       end
 
-      it 'should transform params' do
-        user = {
-          first_name: 'Foo',
-          last_name: 'Bar',
-          email: 'foo@keygen.example',
-          password: SecureRandom.hex,
-        }
+      it 'should fail' do
+        expect(validation.call('foo')).to be false
+      end
+    end
 
-        params    = TypedParameters::Parameterizer.new(schema:).call(value: user)
-        formatter = TypedParameters.formats[:rails]
+    context 'with with: option' do
+      let(:options) {{ with: /foo/ }}
 
-        params.key, params.value = formatter.call(params.key, params.value, controller)
+      it 'should succeed' do
+        expect(validation.call('foo')).to be true
+      end
 
-        expect(params.unsafe).to eq(user:)
+      it 'should fail' do
+        expect(validation.call('bar')).to be false
+      end
+    end
+  end
+
+  describe TypedParameters::Validations::Inclusion do
+    let(:validation) { TypedParameters::Validations::Inclusion.new(options) }
+    let(:options)    { nil }
+
+    context 'with in: option' do
+      let(:options) {{ in: %w[a b c] }}
+
+      it 'should succeed' do
+        expect(validation.call('a')).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('d')).to be false
+      end
+    end
+  end
+
+  describe TypedParameters::Validations::Length do
+    let(:validation) { TypedParameters::Validations::Length.new(options) }
+    let(:options)    { nil }
+
+    context 'with minimum: option' do
+      let(:options) {{ minimum: 5 }}
+
+      it 'should succeed' do
+        expect(validation.call('foobar')).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('foo')).to be false
+      end
+    end
+
+    context 'with maximum: option' do
+      let(:options) {{ maximum: 5 }}
+
+      it 'should succeed' do
+        expect(validation.call('foo')).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('foobarbaz')).to be false
+      end
+    end
+
+    context 'with within: option' do
+      let(:options) {{ within: 1..3 }}
+
+      it 'should succeed' do
+        expect(validation.call('foo')).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('foobar')).to be false
+      end
+    end
+
+    context 'with in: option' do
+      let(:options) {{ in: 1...6 }}
+
+      it 'should succeed' do
+        expect(validation.call('foo')).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('foobar')).to be false
+      end
+    end
+
+    context 'with is: option' do
+      let(:options) {{ is: 42 }}
+
+      it 'should succeed' do
+        expect(validation.call('a'*42)).to be true
+      end
+
+      it 'should fail' do
+        expect(validation.call('a'*7)).to be false
       end
     end
   end
