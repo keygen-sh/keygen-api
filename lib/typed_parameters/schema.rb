@@ -24,6 +24,7 @@ module TypedParameters
       allow_nil: false,
       allow_non_scalars: false,
       nilify_blanks: false,
+      noop: false,
       inclusion: nil,
       exclusion: nil,
       format: nil,
@@ -73,6 +74,7 @@ module TypedParameters
       @allow_nil         = allow_nil
       @allow_non_scalars = allow_non_scalars
       @nilify_blanks     = nilify_blanks
+      @noop              = noop
       @inclusion         = inclusion
       @exclusion         = exclusion
       @format            = format
@@ -105,6 +107,9 @@ module TypedParameters
 
       @transforms << Transforms::NilifyBlanks.new if
         nilify_blanks
+
+      @transforms << Transforms::Noop.new if
+        noop
 
       @transforms << transform if
         transform.present?
