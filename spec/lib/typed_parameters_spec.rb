@@ -481,6 +481,7 @@ describe TypedParameters do
       let :controller do
         Class.new(ActionController::Base) { @controller_name = 'users' }
       end
+
       let :schema do
         TypedParameters::Schema.new(type: :hash) do
           param :first_name, type: :string, optional: true

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './types/type'
+require_relative 'types/type'
 
 module TypedParameters
   module Types
