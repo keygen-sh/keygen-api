@@ -1100,6 +1100,26 @@ describe TypedParameters do
 
       expect(params[:foo].value).to be nil
     end
+
+    it 'should not remove noop param' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, noop: false }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo]).to_not be nil
+    end
+
+    it 'should remove noop param' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, noop: true }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'bar' })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo]).to be nil
+    end
   end
 
   describe TypedParameters::Processor do
