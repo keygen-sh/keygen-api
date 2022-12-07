@@ -1,24 +1,23 @@
 # frozen_string_literal: true
 
-require_relative 'format'
+require_relative 'formatter'
 
 module TypedParameters
-  module Formats
+  module Formatters
     module JSONAPI
       IGNORED_KEYS = %i[type meta links].freeze
 
-      def self.call(params)
-        schema = params.schema
-
-        case params.value
+      def self.call(key, value)
+        case value
         in data: Parameter(value: Array) => data
-          params.value = format_array_data(data)
+          value = format_array_data(data)
         in data: Parameter(value: Hash) => data
-          params.value = format_hash_data(data)
+          value = format_hash_data(data)
         else
+          puts(:other, value:)
         end
 
-        params
+        [key, value]
       end
 
       private
@@ -49,11 +48,13 @@ module TypedParameters
           in Parameter(value: { data: Parameter(value: [Parameter(value: { type:, id:, **nil }), *]) => linkage }) if linkage.value.all? { _1 in Parameter(value: { type:, id:, **nil }) }
             linkage.value = linkage.value.map { _1[:id] }
 
-            data["#{key.singularize}_ids"] = linkage
+            data[:"#{key.to_s.singularize}_ids"] = linkage
           in Parameter(value: { data: Parameter(value: { type:, id:, **nil }) => linkage })
-            data["#{key}_id"] = linkage[:id]
+            data[:"#{key}_id"] = linkage[:id]
           else
-            data["#{key}_attributes"] = call(value)
+            value.key, value.value = call(value.key, value.value)
+
+            data[:"#{key}_attributes"] = value
           end
         end
 
@@ -62,7 +63,7 @@ module TypedParameters
     end
 
     register(:jsonapi,
-      handler: -> params { JSONAPI.call(params) },
+      transform: -> k, v { JSONAPI.call(k, v) },
       # decorator: -> controller {
       #   controller.define_method(:typed_meta) { ... }
       # },

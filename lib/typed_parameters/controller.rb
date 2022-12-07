@@ -38,7 +38,9 @@ module TypedParameters
           handler.nil?
 
         schema = handler.schema
-        params = Parameterizer.new(schema:).call(value: request.request_parameters)
+        params = Parameterizer.new(schema:).call(
+          value: request.request_parameters.deep_symbolize_keys,
+        )
 
         Processor.new(controller: self, schema:).call(params)
 
@@ -52,7 +54,9 @@ module TypedParameters
           handler.nil?
 
         schema = handler.schema
-        params = Parameterizer.new(schema:).call(value: request.query_parameters)
+        params = Parameterizer.new(schema:).call(
+          value: request.query_parameters.deep_symbolize_keys,
+        )
 
         Processor.new(controller: self, schema:).call(params)
 
