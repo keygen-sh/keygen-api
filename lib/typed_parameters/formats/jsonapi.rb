@@ -31,11 +31,31 @@ module TypedParameters
         attributes    = data[:attributes]&.delete
         relationships = data[:relationships]&.delete
 
+        # Remove ignored keys
         IGNORED_KEYS.each { data[_1]&.delete }
-        attributes&.each  { data[_1] = _2 }
 
-        # TODO(ezekg) Should this use x_id/x_ids when only IDs are provided?
-        relationships&.each { data["#{_1}_attributes"] = call(_2) }
+        # Move attributes over to top-level params
+        attributes&.each do |key, value|
+          data[key] = value
+        end
+
+        # Move relationships over. This will use x_id and x_ids when the
+        # relationship data only contains :type and :id, otherwise it
+        # will use the x_attributes key.
+        relationships&.each do |key, value|
+          case value
+          # FIXME(ezekg) We need https://bugs.ruby-lang.org/issues/18961 to
+          #              clean this up (i.e. remove the if guard).
+          in Parameter(value: { data: Parameter(value: [Parameter(value: { type:, id:, **nil }), *]) => linkage }) if linkage.value.all? { _1 in Parameter(value: { type:, id:, **nil }) }
+            linkage.value = linkage.value.map { _1[:id] }
+
+            data["#{key.singularize}_ids"] = linkage
+          in Parameter(value: { data: Parameter(value: { type:, id:, **nil }) => linkage })
+            data["#{key}_id"] = linkage[:id]
+          else
+            data["#{key}_attributes"] = call(value)
+          end
+        end
 
         data.value
       end
