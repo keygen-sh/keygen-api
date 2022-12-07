@@ -366,6 +366,7 @@ describe TypedParameters do
     describe :jsonapi do
       let :schema do
         TypedParameters::Schema.new(type: :hash) do
+          param :meta, type: :hash, optional: true
           param :data, type: :hash do
             param :type, type: :string, inclusion: { in: %w[users user] }
             param :id, type: :string
@@ -403,6 +404,14 @@ describe TypedParameters do
                   end
                 end
               end
+              param :friends, type: :hash do
+                param :data, type: :array do
+                  items type: :hash do
+                    param :type, type: :string, inclusion: { in: %w[users user] }
+                    param :id, type: :string
+                  end
+                end
+              end
             end
           end
         end
@@ -431,6 +440,12 @@ describe TypedParameters do
                 { type: 'posts', id: SecureRandom.base58 },
               ],
             },
+            friends: {
+              data: [
+                { type: 'users', id: SecureRandom.base58 },
+                { type: 'users', id: SecureRandom.base58 },
+              ],
+            },
           },
         }
 
@@ -447,14 +462,16 @@ describe TypedParameters do
             'id' => data[:relationships][:note][:data][:id],
             'content' => data[:relationships][:note][:data][:attributes][:content],
           },
-          'team_attributes' => {
-            'id' => data[:relationships][:team][:data][:id],
-          },
+          'team_id' => data[:relationships][:team][:data][:id],
           'posts_attributes' => [
             { 'id' => data[:relationships][:posts][:data][0][:id] },
             { 'id' => data[:relationships][:posts][:data][1][:id], 'title' => data[:relationships][:posts][:data][1][:attributes][:title] },
             { 'id' => data[:relationships][:posts][:data][2][:id] },
             { 'id' => data[:relationships][:posts][:data][3][:id] },
+          ],
+          'friend_ids' => [
+            data[:relationships][:friends][:data][0][:id],
+            data[:relationships][:friends][:data][1][:id],
           ],
         )
       end
