@@ -3,9 +3,10 @@
 require_relative 'typed_parameters/bouncer'
 require_relative 'typed_parameters/coercer'
 require_relative 'typed_parameters/controller'
-require_relative 'typed_parameters/formats'
-require_relative 'typed_parameters/formats/format'
-require_relative 'typed_parameters/formats/jsonapi'
+require_relative 'typed_parameters/formatters'
+require_relative 'typed_parameters/formatters/formatter'
+require_relative 'typed_parameters/formatters/jsonapi'
+require_relative 'typed_parameters/formatters/rails'
 require_relative 'typed_parameters/parameter'
 require_relative 'typed_parameters/parameterizer'
 require_relative 'typed_parameters/path'
@@ -35,7 +36,7 @@ module TypedParameters
   class FailedCoercionError < StandardError; end
   class UndefinedActionError < StandardError; end
   class InvalidMethodError < StandardError; end
-  class DuplicateFormatError < StandardError; end
+  class DuplicateFormatterError < StandardError; end
   class DuplicateTypeError < StandardError; end
 
   class InvalidParameterError < StandardError
@@ -50,7 +51,7 @@ module TypedParameters
 
   class UnpermittedParameterError < InvalidParameterError; end
 
-  def self.formats = Formats
+  def self.formats = Formatters
   def self.types   = Types
 
   # def self.build(context, &block)

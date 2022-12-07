@@ -20,7 +20,7 @@ module TypedParameters
 
     def path = @path ||= Path.new(*parent&.path&.keys, *key)
 
-    def key?(key) = keys.include?(key.to_s)
+    def key?(key) = keys.include?(key)
     alias :has_key? :key?
 
     def keys?(*keys) = keys.all? { key?(_1) }
@@ -110,7 +110,7 @@ module TypedParameters
     def deconstruct            = value
 
     def inspect
-      "#<Parameter key=#{key.inspect} value=#{unsafe.inspect}>"
+      "#<TypedParameters::Parameter key=#{key.inspect} value=#{unsafe.inspect}>"
     end
 
     private

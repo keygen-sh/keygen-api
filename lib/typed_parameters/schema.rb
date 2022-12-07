@@ -124,12 +124,12 @@ module TypedParameters
     # format defines a final transform for the schema, transforming the
     # params from an input format to an output format, e.g. a JSONAPI
     # document to Rails' standard params format.
-    def format(format) = @transforms << Formats[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
+    def format(format) = @transforms << Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
 
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
-      @children ||= {}.with_indifferent_access if Types.hash?(self.type)
+      @children ||= {} if Types.hash?(self.type)
 
       raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
         Types.hash?(children)
@@ -202,7 +202,7 @@ module TypedParameters
     def unless?            = !@unless.nil?
 
     def inspect
-      "#<Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"
+      "#<TypedParameters::Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"
     end
 
     private

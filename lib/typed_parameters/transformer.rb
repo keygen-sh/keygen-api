@@ -9,7 +9,12 @@ module TypedParameters
         schema = param.schema
 
         schema.transforms.map do |transform|
-          param.key, param.value = transform.call(param.key, param.value)
+          case transform.arity
+          when 3
+            param.key, param.value = transform.call(param.key, param.value, controller)
+          when 2
+            param.key, param.value = transform.call(param.key, param.value)
+          end
 
           param.delete if param.key.nil? && param.value.nil?
         end
