@@ -4,6 +4,33 @@ require_relative 'formatter'
 
 module TypedParameters
   module Formatters
+    ##
+    # The JSONAPI formatter transforms a JSONAPI document into Rails'
+    # standard params format.
+    #
+    # For example, given the following params:
+    #
+    #   {
+    #     data: {
+    #       type: 'users',
+    #       id: '1',
+    #       attributes: { email: 'foo@bar.example' },
+    #       relationships: {
+    #         friends: {
+    #           data: [{ type: 'users', id: '2' }]
+    #         }
+    #       }
+    #     }
+    #   }
+    #
+    # The final params would become:
+    #
+    #   {
+    #     id: '1',
+    #     email: 'foo@bar.example',
+    #     friend_ids: ['2']
+    #   }
+    #
     module JSONAPI
       IGNORED_KEYS = %i[type meta links].freeze
 
