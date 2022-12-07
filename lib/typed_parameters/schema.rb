@@ -203,44 +203,44 @@ module TypedParameters
 
     private
 
-    INCLUSION_VALIDATOR = -> v {
+    INCLUSION_VALIDATOR = -> value {
       case @inclusion
-      in in: in_value
-        in_value.include?(v)
+      in in: Array => v
+        v.include?(value)
       end
     }.freeze
     private_constant :INCLUSION_VALIDATOR
 
-    EXCLUSION_VALIDATOR = -> v {
+    EXCLUSION_VALIDATOR = -> value {
       case @exclusion
-      in in: in_value
-        !in_value.include?(v)
+      in in: Array => v
+        !v.include?(value)
       end
     }.freeze
     private_constant :EXCLUSION_VALIDATOR
 
-    FORMAT_VALIDATOR = -> v {
+    FORMAT_VALIDATOR = -> value {
       case @format
-      in without:
-        !without.match?(v)
-      in with:
-        with.match?(v)
+      in without: Regexp => v
+        !v.match?(value)
+      in with: Regexp => v
+        v.match?(value)
       end
     }.freeze
     private_constant :FORMAT_VALIDATOR
 
-    LENGTH_VALIDATOR = -> v {
+    LENGTH_VALIDATOR = -> value {
       case @length
-      in minimum:
-        v.length >= minimum
-      in maximum:
-        v.length <= maximum
-      in within:
-        within.include?(v.length)
-      in in: in_value
-        in_value.include?(v.length)
-      in is:
-        v.length == is
+      in minimum: Numeric => v
+        value.length >= v
+      in maximum: Numeric => v
+        value.length <= v
+      in within: Range => v
+        v.include?(value.length)
+      in in: Range => v
+        v.include?(value.length)
+      in is: Numeric => v
+        value.length == v
       end
     }.freeze
     private_constant :LENGTH_VALIDATOR
