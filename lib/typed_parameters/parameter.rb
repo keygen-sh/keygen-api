@@ -106,13 +106,8 @@ module TypedParameters
       end
     end
 
-    def deconstruct_keys(keys)
-      { key:, value: }
-    end
-
-    def deconstruct
-      value
-    end
+    def deconstruct_keys(keys) = { key:, value: }
+    def deconstruct            = value
 
     def inspect
       "#<Parameter key=#{key.inspect} value=#{unsafe.inspect}>"
