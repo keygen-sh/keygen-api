@@ -18,12 +18,12 @@ module TypedParameters
     #
     module Rails
       def self.call(key, value, controller:)
-        key = controller.controller_name.singularize.to_sym
+        controller_name = controller.controller_name.singularize.to_sym
 
         [
-          key,
+          controller_name,
           {
-            key => Parameter.new(key:, value:, schema: nil),
+            controller_name => Parameter.new(key:, value:, schema: nil),
           },
         ]
       end
