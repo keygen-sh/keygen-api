@@ -207,6 +207,7 @@ module TypedParameters
 
     private
 
+    # FIXME(ezekg) Move these to validation classes?
     INCLUSION_VALIDATOR = -> value {
       case @inclusion
       in in: Array => v
