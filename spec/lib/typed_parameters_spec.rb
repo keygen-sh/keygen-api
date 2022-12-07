@@ -124,7 +124,7 @@ describe TypedParameters do
     it 'should have correct hash keys' do
       grandchild = schema.children[:foo]
 
-      expect(grandchild.keys).to eq %w[bar]
+      expect(grandchild.keys).to eq %i[bar]
     end
   end
 
@@ -324,40 +324,40 @@ describe TypedParameters do
     end
   end
 
-  describe TypedParameters::Formats do
+  describe TypedParameters::Formatters do
     describe '.register' do
-      after { TypedParameters::Formats.unregister(:test) }
+      after { TypedParameters::Formatters.unregister(:test) }
 
       it 'should register a format' do
-        format = TypedParameters::Formats.register(:test,
-          handler: -> params { params },
+        format = TypedParameters::Formatters.register(:test,
+          transform: -> k, v { [k, v] },
         )
 
-        expect(TypedParameters::Formats.formats[:test]).to eq format
+        expect(TypedParameters::Formatters.formats[:test]).to eq format
       end
 
       it 'should not register a duplicate format' do
-        format = TypedParameters::Formats.register(:test,
-          handler: -> params { params },
+        format = TypedParameters::Formatters.register(:test,
+          transform: -> k, v { [k, v] },
         )
 
-        expect { TypedParameters::Formats.register(:test, handler: -> params { params }) }
-          .to raise_error TypedParameters::DuplicateFormatError
+        expect { TypedParameters::Formatters.register(:test, transform: -> k, v { [k, v] },) }
+          .to raise_error TypedParameters::DuplicateFormatterError
       end
     end
 
     describe '.unregister' do
       it 'should unregister a format' do
-        TypedParameters::Formats.register(:test, handler: -> params { params })
-        TypedParameters::Formats.unregister(:test)
+        TypedParameters::Formatters.register(:test, transform: -> k, v { [k, v] },)
+        TypedParameters::Formatters.unregister(:test)
 
-        expect(TypedParameters::Formats.formats[:test]).to be_nil
+        expect(TypedParameters::Formatters.formats[:test]).to be_nil
       end
     end
 
     describe '.[]' do
       it 'should fetch a format by key' do
-        format = TypedParameters::Formats[:jsonapi]
+        format = TypedParameters::Formatters[:jsonapi]
 
         expect(format.format).to eq :jsonapi
       end
@@ -449,31 +449,61 @@ describe TypedParameters do
           },
         }
 
-        params  = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
-        jsonapi = TypedParameters.formats[:jsonapi]
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+        formatter = TypedParameters.formats[:jsonapi]
 
-        jsonapi.call(params)
+        params.key, params.value = formatter.call(params.key, params.value)
 
         expect(params.unsafe).to eq(
-          'id' => data[:id],
-          'email' => data[:attributes][:email],
-          'password' => data[:attributes][:password],
-          'note_attributes' => {
-            'id' => data[:relationships][:note][:data][:id],
-            'content' => data[:relationships][:note][:data][:attributes][:content],
+          id: data[:id],
+          email: data[:attributes][:email],
+          password: data[:attributes][:password],
+          note_attributes: {
+            id: data[:relationships][:note][:data][:id],
+            content: data[:relationships][:note][:data][:attributes][:content],
           },
-          'team_id' => data[:relationships][:team][:data][:id],
-          'posts_attributes' => [
-            { 'id' => data[:relationships][:posts][:data][0][:id] },
-            { 'id' => data[:relationships][:posts][:data][1][:id], 'title' => data[:relationships][:posts][:data][1][:attributes][:title] },
-            { 'id' => data[:relationships][:posts][:data][2][:id] },
-            { 'id' => data[:relationships][:posts][:data][3][:id] },
+          team_id: data[:relationships][:team][:data][:id],
+          posts_attributes: [
+            { id: data[:relationships][:posts][:data][0][:id] },
+            { id: data[:relationships][:posts][:data][1][:id], title: data[:relationships][:posts][:data][1][:attributes][:title] },
+            { id: data[:relationships][:posts][:data][2][:id] },
+            { id: data[:relationships][:posts][:data][3][:id] },
           ],
-          'friend_ids' => [
+          friend_ids: [
             data[:relationships][:friends][:data][0][:id],
             data[:relationships][:friends][:data][1][:id],
           ],
         )
+      end
+    end
+
+    describe :rails do
+      let :controller do
+        Class.new(ActionController::Base) { @controller_name = 'users' }
+      end
+      let :schema do
+        TypedParameters::Schema.new(type: :hash) do
+          param :first_name, type: :string, optional: true
+          param :last_name, type: :string, optional: true
+          param :email, type: :string, format: { with: /@/ }
+          param :password, type: :string
+        end
+      end
+
+      it 'should transform params' do
+        user = {
+          first_name: 'Foo',
+          last_name: 'Bar',
+          email: 'foo@keygen.example',
+          password: SecureRandom.hex,
+        }
+
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: user)
+        formatter = TypedParameters.formats[:rails]
+
+        params.key, params.value = formatter.call(params.key, params.value, controller)
+
+        expect(params.unsafe).to eq(user:)
       end
     end
   end
@@ -520,7 +550,7 @@ describe TypedParameters do
       it 'should have correct keys' do
         params = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
 
-        expect(params.keys).to eq %w[a b c]
+        expect(params.keys).to eq %i[a b c]
       end
 
       it 'should have no keys' do
@@ -1192,7 +1222,7 @@ describe TypedParameters do
         end
 
         controller = Class.new(ActionController::Base) { def admin? = true }.new
-        user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
+        user       = { user: { email: 'foo@keygen.example', roles: %w[admin] } }
         params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
         bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
@@ -1217,7 +1247,7 @@ describe TypedParameters do
 
         bouncer.call(params)
 
-        expect(params.unsafe).to eq 'user' => { 'email' => 'foo@keygen.example' }
+        expect(params.unsafe).to eq user: { email: 'foo@keygen.example' }
       end
     end
 
@@ -1274,7 +1304,7 @@ describe TypedParameters do
         end
 
         controller = Class.new(ActionController::Base) { def admin? = true }.new
-        user       = { 'user' => { 'email' => 'foo@keygen.example', 'roles' => %w[admin] } }
+        user       = { user: { email: 'foo@keygen.example', roles: %w[admin] } }
         params     = TypedParameters::Parameterizer.new(schema:).call(value: user)
         bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
 
