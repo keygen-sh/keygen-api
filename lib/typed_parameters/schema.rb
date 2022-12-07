@@ -85,16 +85,16 @@ module TypedParameters
       # Validations
       @validations = []
 
-      @validations << -> v { instance_exec(v, &INCLUSION_VALIDATOR) } if
+      @validations << Validations::Inclusion.new(inclusion) if
         inclusion.present?
 
-      @validations << -> v { instance_exec(v, &EXCLUSION_VALIDATOR) } if
+      @validations << Validations::Exclusion.new(exclusion) if
         exclusion.present?
 
-      @validations << -> v { instance_exec(v, &FORMAT_VALIDATOR) } if
+      @validations << Validations::Format.new(format) if
         format.present?
 
-      @validations << -> v { instance_exec(v, &LENGTH_VALIDATOR) } if
+      @validations << Validations::Length.new(length) if
         length.present?
 
       @validations << validate if
@@ -103,7 +103,7 @@ module TypedParameters
       # Transforms
       @transforms = []
 
-      @transforms << NILIFY_BLANKS_TRANSFORMER if
+      @transforms << Transforms::NilifyBlanks.new if
         nilify_blanks
 
       @transforms << transform if
@@ -206,57 +206,6 @@ module TypedParameters
     end
 
     private
-
-    # FIXME(ezekg) Move these to validation classes?
-    INCLUSION_VALIDATOR = -> value {
-      case @inclusion
-      in in: Array => v
-        v.include?(value)
-      end
-    }.freeze
-    private_constant :INCLUSION_VALIDATOR
-
-    EXCLUSION_VALIDATOR = -> value {
-      case @exclusion
-      in in: Array => v
-        !v.include?(value)
-      end
-    }.freeze
-    private_constant :EXCLUSION_VALIDATOR
-
-    FORMAT_VALIDATOR = -> value {
-      case @format
-      in without: Regexp => v
-        !v.match?(value)
-      in with: Regexp => v
-        v.match?(value)
-      end
-    }.freeze
-    private_constant :FORMAT_VALIDATOR
-
-    LENGTH_VALIDATOR = -> value {
-      case @length
-      in minimum: Numeric => v
-        value.length >= v
-      in maximum: Numeric => v
-        value.length <= v
-      in within: Range => v
-        v.include?(value.length)
-      in in: Range => v
-        v.include?(value.length)
-      in is: Numeric => v
-        value.length == v
-      end
-    }.freeze
-    private_constant :LENGTH_VALIDATOR
-
-    NILIFY_BLANKS_TRANSFORMER = -> k, v {
-      return [k, v] if
-        v.is_a?(Array) || v.is_a?(Hash)
-
-      [k, v.blank? ? nil : v]
-    }.freeze
-    private_constant :NILIFY_BLANKS_TRANSFORMER
 
     attr_reader :strict
 
