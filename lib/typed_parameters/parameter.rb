@@ -40,26 +40,6 @@ module TypedParameters
       end
     end
 
-    def validate!
-      # TODO(ezekg) Add validations
-
-      @validated = true
-    end
-
-    def validated?
-      !!validated && ((schema.children.is_a?(Array) && value.all?(&:validated?)) ||
-                      (schema.children.is_a?(Hash) && value.all? { |k, v| v.validated? }) ||
-                       schema.children.nil?)
-    end
-
-    def permitted? = validated?
-
-    def blank? = value.blank?
-
-    def optional? = schema.optional?
-    def required? = !optional?
-    def parent?   = parent.present?
-
     def delete
       raise NotImplementedError, "cannot delete param: #{key.inspect}" unless
         parent?
@@ -85,6 +65,7 @@ module TypedParameters
       self.value.merge!(key => value)
     end
 
+    def each(...) = value.each(...)
     def <<(value)
       raise NotImplementedError, "cannot push to non-array: #{schema.type}" unless
         schema.array?
@@ -95,41 +76,41 @@ module TypedParameters
       self.value.push(value)
     end
 
-    def each(...) = value.each(...)
+    def format(formatter: schema.formatter, controller: nil)
+      v = case value
+          when Array
+            value.map { _1&.format }
+          when Hash
+            value.transform_values { _1&.format }
+          else
+            value
+          end
 
-    def safe
-      # TODO(ezekg) Raise if parameter is invalid
-
-      case value
-      when Array
-        value.map { _1&.safe }
-      when Hash
-        value.transform_values { _1&.safe }
-      else
-        value
+      if formatter.present?
+        v = case formatter.arity
+            when 2
+              formatter.call(v, controller:)
+            when 1
+              formatter.call(v)
+            end
       end
-    end
 
-    def unsafe
-      case value
-      when Array
-        value.map { _1&.unsafe }
-      when Hash
-        value.transform_values { _1&.unsafe }
-      else
-        value
-      end
+      v
     end
 
     def deconstruct_keys(keys) = { key:, value: }
     def deconstruct            = value
 
     def inspect
-      "#<TypedParameters::Parameter key=#{key.inspect} value=#{unsafe.inspect}>"
+      value = format(formatter: nil)
+
+      "#<TypedParameters::Parameter key=#{key.inspect} value=#{value.inspect}>"
     end
 
     private
 
     attr_reader :validated
+
+    def parent? = parent.present?
   end
 end

@@ -2,10 +2,11 @@
 
 module TypedParameters
   class Schema
-    ROOT_KEY = Class.new
+    ROOT_KEY = Object.new
 
     attr_reader :validations,
                 :transforms,
+                :formatter,
                 :parent,
                 :children,
                 :type,
@@ -83,6 +84,7 @@ module TypedParameters
       @children          = nil
       @if                = binding.local_variable_get(:if)
       @unless            = binding.local_variable_get(:unless)
+      @formatter         = nil
 
       # Validations
       @validations = []
@@ -129,7 +131,7 @@ module TypedParameters
     # format defines a final transform for the schema, transforming the
     # params from an input format to an output format, e.g. a JSONAPI
     # document to Rails' standard params format.
-    def format(format) = @transforms << Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
+    def format(format) = @formatter = Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
 
     ##
     # param defines a keyed parameter for a hash schema.
@@ -208,6 +210,7 @@ module TypedParameters
     def array?             = Types.array?(type)
     def hash?              = Types.hash?(type)
     def scalar?            = Types.scalar?(type)
+    def formatter?         = !!@formatter
 
     def inspect
       "#<TypedParameters::Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"

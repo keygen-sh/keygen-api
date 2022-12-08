@@ -31,7 +31,7 @@ module TypedParameters
       cattr_accessor :typed_handlers, default: { deferred: [], params: {}, query: {} }
       cattr_accessor :typed_schemas,  default: {}
 
-      def typed_params
+      def typed_params(format: nil)
         handler = typed_handlers[:params][action_name.to_sym]
 
         raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
@@ -44,10 +44,14 @@ module TypedParameters
 
         Processor.new(controller: self, schema:).call(params)
 
-        params.safe
+        if format.present?
+          params.format(formatter: Formatters[format], controller: self)
+        else
+          params.format(controller: self)
+        end
       end
 
-      def typed_query
+      def typed_query(format: nil)
         handler = typed_handlers[:query][action_name.to_sym]
 
         raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
@@ -60,7 +64,11 @@ module TypedParameters
 
         Processor.new(controller: self, schema:).call(params)
 
-        params.safe
+        if format.present?
+          params.format(formatter: Formatters[format], controller: self)
+        else
+          params.format(controller: self)
+        end
       end
     end
 

@@ -32,67 +32,56 @@ module TypedParameters
     #   }
     #
     module JSONAPI
-      IGNORED_KEYS = %i[type meta links].freeze
-
-      def self.call(key, value)
-        case value
-        in data: Parameter(value: Array) => data
-          value = format_array_data(data)
-        in data: Parameter(value: Hash) => data
-          value = format_hash_data(data)
+      def self.call(params)
+        case params
+        in data: Array => data
+          format_array_data(data)
+        in data: Hash => data
+          format_hash_data(data)
         else
+          params
         end
-
-        [key, value]
       end
 
       private
 
       def self.format_array_data(data)
-        data.value.each { format_hash_data(_1) }
+        data.map { format_hash_data(_1) }
       end
 
       def self.format_hash_data(data)
-        attributes    = data[:attributes]&.delete
-        relationships = data[:relationships]&.delete
-
-        # Remove ignored keys
-        IGNORED_KEYS.each { data[_1]&.delete }
+        rels  = data[:relationships]
+        attrs = data[:attributes]
+        id    = data[:id]
+        res   = { id: }
 
         # Move attributes over to top-level params
-        attributes&.each do |key, value|
-          data[key] = value
+        attrs&.each do |key, attr|
+          res[key] = attr
         end
 
         # Move relationships over. This will use x_id and x_ids when the
         # relationship data only contains :type and :id, otherwise it
         # will use the x_attributes key.
-        relationships&.each do |key, value|
-          case value
+        rels&.each do |key, rel|
+          case rel
           # FIXME(ezekg) We need https://bugs.ruby-lang.org/issues/18961 to
           #              clean this up (i.e. remove the if guard).
-          in Parameter(value: { data: Parameter(value: [Parameter(value: { type:, id:, **nil }), *]) => linkage }) if linkage.value.all? { _1 in Parameter(value: { type:, id:, **nil }) }
-            linkage.value = linkage.value.map { _1[:id] }
-
-            data[:"#{key.to_s.singularize}_ids"] = linkage
-          in Parameter(value: { data: Parameter(value: { type:, id:, **nil }) => linkage })
-            data[:"#{key}_id"] = linkage[:id]
+          in data: [{ type:, id:, **nil }, *] => linkage if linkage.all? { _1 in type:, id:, **nil }
+            res[:"#{key.to_s.singularize}_ids"] = linkage.map { _1[:id] }
+          in data: { type:, id:, **nil } => linkage
+            res[:"#{key}_id"] = linkage[:id]
           else
-            value.key, value.value = call(value.key, value.value)
-
-            data[:"#{key}_attributes"] = value
+            res[:"#{key}_attributes"] = call(rel)
           end
         end
 
-        data.value
+        res
       end
     end
 
     register(:jsonapi,
-      transform: -> k, v { JSONAPI.call(k, v) },
-      # decorator: -> controller {
-      #   controller.define_method(:typed_meta) { ... }
-      # },
+      transform: JSONAPI.method(:call),
     )
   end
 end
