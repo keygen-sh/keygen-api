@@ -65,7 +65,6 @@ module TypedParameters
     end
 
     class_methods do
-      # TODO(ezekg) Add implicit and explicit param definitions via decorator queue
       def typed_params(on: nil, type: :hash, schema: nil, format: nil, **kwargs, &)
         schema = case schema
                  in Symbol => key
