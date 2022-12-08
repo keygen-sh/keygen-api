@@ -14,8 +14,6 @@ module TypedParameters
       pipeline << Bouncer.new(controller:, schema:)
       pipeline << Coercer.new(schema:)
       pipeline << Validator.new(schema:)
-
-      # FIXME(ezekg) Should transforms be performed on params.safe?
       pipeline << Transformer.new(controller:, schema:)
 
       pipeline.call(params)
