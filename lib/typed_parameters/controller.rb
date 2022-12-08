@@ -45,9 +45,9 @@ module TypedParameters
         Processor.new(controller: self, schema:).call(params)
 
         if format.present?
-          params.format(formatter: Formatters[format], controller: self)
+          params.unwrap(formatter: Formatters[format], controller: self)
         else
-          params.format(controller: self)
+          params.unwrap(controller: self)
         end
       end
 
@@ -65,9 +65,9 @@ module TypedParameters
         Processor.new(controller: self, schema:).call(params)
 
         if format.present?
-          params.format(formatter: Formatters[format], controller: self)
+          params.unwrap(formatter: Formatters[format], controller: self)
         else
-          params.format(controller: self)
+          params.unwrap(controller: self)
         end
       end
     end
