@@ -1664,76 +1664,147 @@ describe TypedParameters do
   end
 
   describe 'controller', type: :controller do
-    class self::UsersController < ActionController::Base; end
+    context 'with explicit action' do
+      class self::UsersController < ActionController::Base; end
 
-    controller self::UsersController do
-      include TypedParameters::Controller
+      controller self::UsersController do
+        include TypedParameters::Controller
 
-      typed_schema :user do
-        param :first_name, type: :string, optional: true
-        param :last_name, type: :string, optional: true
-        param :email, type: :string, format: { with: /@/ }
-        param :password, type: :string, length: { minimum: 8 }
-        param :metadata, type: :hash, optional: true
-        param :role, type: :string, optional: true, if: :admin?
+        typed_schema :explicit do
+          param :email, type: :string, format: { with: /@/ }
+          param :password, type: :string, length: { minimum: 8 }
+        end
+
+        def create = render json: user_params
+        typed_params schema: :explicit,
+                     on: :create
       end
 
-      def create = render json: { params: user_params, query: nil }
-      typed_params schema: :user,
-                   on: :create
+      it 'should not raise' do
+        expect { post :create, params: { email: 'foo@example.com', password: SecureRandom.hex } }
+          .to_not raise_error
+      end
 
-      typed_params schema: :user
-      typed_query { param :force, type: :boolean, optional: true }
-      def update = render json: { params: user_params, query: user_query }
-
-      def destroy = render json: { params: user_params, query: nil }
-
-      private
-
-      def admin? = false
+      it 'should raise' do
+        expect { post :create, params: { email: 'foo', password: SecureRandom.hex } }
+          .to raise_error TypedParameters::InvalidParameterError
+      end
     end
 
-    it 'should not raise for predefined schema' do
-      expect { post :create, params: { email: 'foo@example.com', password: SecureRandom.hex } }
-        .to_not raise_error
+    context 'with deferred action' do
+      class self::UsersController < ActionController::Base; end
+
+      controller self::UsersController do
+        include TypedParameters::Controller
+
+        typed_schema :deferred do
+          param :email, type: :string, format: { with: /@/ }
+          param :password, type: :string, length: { minimum: 8 }
+        end
+
+        typed_params schema: :deferred
+        def create = render json: user_params
+      end
+
+      it 'should not raise' do
+        expect { post :create, params: { email: 'bar@example.com', password: SecureRandom.hex } }
+          .to_not raise_error
+      end
+
+      it 'should raise' do
+        expect { post :create, params: { password: 'secret' } }
+          .to raise_error TypedParameters::InvalidParameterError
+      end
     end
 
-    it 'should raise for predefined schema' do
-      expect { post :create, params: { email: 'foo', password: SecureRandom.hex } }
-        .to raise_error TypedParameters::InvalidParameterError
+    context 'with no schema' do
+      class self::UsersController < ActionController::Base; end
+
+      controller self::UsersController do
+        include TypedParameters::Controller
+
+        def create = render json: user_params
+      end
+
+      it 'should raise' do
+        expect { post :create }
+          .to raise_error TypedParameters::UndefinedActionError
+      end
     end
 
-    it 'should not raise for deferred schema' do
-      expect { put :update, params: { id: 1, email: 'bar@example.com', password: SecureRandom.hex } }
-        .to_not raise_error
+    context 'with multiple schemas' do
+      class self::MentionsController < ActionController::Base; end
+
+      controller self::MentionsController do
+        include TypedParameters::Controller
+
+        typed_query { param :dry_run, type: :boolean, optional: true }
+        typed_params do
+          param :username, type: :string, format: { with: /^@/ }
+        end
+        def create = render json: { params: mention_params, query: mention_query }
+      end
+
+      it 'should have correct params' do
+        params = { username: "@#{SecureRandom.hex}" }
+        query  = { dry_run: true }
+
+        # FIXME(ezekg) There doesn't seem to be any other way to specify
+        #              a POST body and query parameters separately in a
+        #              test request. Thus, we have this hack.
+        allow_any_instance_of(request.class).to receive(:request_parameters).and_return(params)
+        allow_any_instance_of(request.class).to receive(:query_parameters).and_return(query)
+
+        post :create
+
+        body = JSON.parse(response.body, symbolize_names: true)
+
+        expect(body[:params]).to eq params
+        expect(body[:query]).to eq query
+      end
     end
 
-    it 'should raise for deferred schema' do
-      expect { put :update, params: { id: 1, password: 'secret' } }
-        .to raise_error TypedParameters::InvalidParameterError
-    end
+    context 'with JSONAPI schema' do
+      class self::PostsController < ActionController::Base; end
 
-    it 'should raise for undefined schema' do
-      expect { delete :destroy, params: { id: 1 } }
-        .to raise_error TypedParameters::UndefinedActionError
-    end
+      controller self::PostsController do
+        include TypedParameters::Controller
 
-    it 'should return params and query' do
-      params = { email: 'bar@example.com', password: SecureRandom.hex }
-      query  = { force: true }
+        typed_params {
+          format :jsonapi
 
-      # FIXME(ezekg) There doesn't seem to be any other way to specify
-      #              a POST body and query parameters separately in a
-      #              test request. Thus, we have this hack.
-      allow_any_instance_of(request.class).to receive(:request_parameters).and_return(params)
-      allow_any_instance_of(request.class).to receive(:query_parameters).and_return(query)
+          param :meta, type: :array, optional: true do
+            items type: :hash do
+              param :footnote, type: :string
+            end
+          end
 
-      patch :update, params: { id: 1 }
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: { in: %w[posts] }
+            param :id, type: :string
+          end
+        }
+        def create
+          render json: {
+            data: post_params(format: nil)[:data],
+            meta: post_params(format: nil)[:meta],
+            params: post_params,
+          }
+        end
+      end
 
-      body = JSON.parse(response.body, symbolize_names: true)
+      it 'should have correct params' do
+        meta = [{ footnote: '[1] foo' }, { footnote: '[2] bar' }]
+        data = { type: 'posts', id: SecureRandom.base58 }
 
-      expect(body[:params]).to eq params
-      expect(body[:query]).to eq query
+        post :create, params: { meta:, data: }
+
+        body = JSON.parse(response.body, symbolize_names: true)
+
+        expect(body[:params]).to eq data.slice(:id)
+        expect(body[:meta]).to eq meta
+        expect(body[:data]).to eq data
+      end
     end
   end
 end

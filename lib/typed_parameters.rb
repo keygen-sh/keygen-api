@@ -40,6 +40,15 @@ require_relative 'typed_parameters/validations/validation'
 require_relative 'typed_parameters/validator'
 
 module TypedParameters
+  # Sentinel value for determining if something should be automatic.
+  # For example, automatically detecting a param's format via its
+  # schema vs using an explicitly provided format.
+  AUTO = Object.new
+
+  # Sentinel value for determining if something is the root. For
+  # example, determining if a schema is the root node.
+  ROOT = Object.new
+
   class UnsupportedCoercionError < StandardError; end
   class FailedCoercionError < StandardError; end
   class UndefinedActionError < StandardError; end
