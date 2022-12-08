@@ -205,6 +205,9 @@ module TypedParameters
     def indexed?           = !boundless?
     def if?                = !@if.nil?
     def unless?            = !@unless.nil?
+    def array?             = Types.array?(type)
+    def hash?              = Types.hash?(type)
+    def scalar?            = Types.scalar?(type)
 
     def inspect
       "#<TypedParameters::Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"

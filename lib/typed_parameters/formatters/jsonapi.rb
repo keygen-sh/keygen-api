@@ -41,7 +41,6 @@ module TypedParameters
         in data: Parameter(value: Hash) => data
           value = format_hash_data(data)
         else
-          puts(:other, value:)
         end
 
         [key, value]

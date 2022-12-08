@@ -40,13 +40,9 @@ module TypedParameters
             next
           end
 
-          param.append(
-            k => Parameterizer.new(schema: child, parent: param).call(key: k, value: v),
-          )
+          param[k] = Parameterizer.new(schema: child, parent: param).call(key: k, value: v)
         else
-          param.append(
-            k => Parameter.new(key: k, value: v, schema:, parent: param),
-          )
+          param[k] = Parameter.new(key: k, value: v, schema:, parent: param)
         end
       end
 
@@ -68,13 +64,9 @@ module TypedParameters
             next
           end
 
-          param.append(
-            Parameterizer.new(schema: child, parent: param).call(key: i, value: v),
-          )
+          param << Parameterizer.new(schema: child, parent: param).call(key: i, value: v)
         else
-          param.append(
-            Parameter.new(key: i, value: v, schema:, parent: param),
-          )
+          param << Parameter.new(key: i, value: v, schema:, parent: param)
         end
       end
 
