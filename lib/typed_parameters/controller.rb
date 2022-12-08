@@ -79,7 +79,7 @@ module TypedParameters
     end
 
     class_methods do
-      def typed_params(on: nil, type: :hash, schema: nil, format: nil, namespace: self, **kwargs, &)
+      def typed_params(on: nil, schema: nil, format: nil, namespace: self, **kwargs, &)
         schema = case schema
                  in Symbol => key
                    namespaced_key = [*namespace, key].join(':')
@@ -87,7 +87,7 @@ module TypedParameters
 
                    typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
                  in nil
-                   Schema.new(type:, **kwargs, &)
+                   Schema.new(**kwargs, &)
                  end
 
         case on
