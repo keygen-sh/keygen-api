@@ -54,9 +54,7 @@ module TypedParameters
 
       value.each_with_index do |v, i|
         if schema.children.any?
-          # FIXME(ezekg) This should probably raise for bounded arrays instead of
-          #              defaulting to the first child.
-          child = schema.children.fetch(i) { schema.children.first }
+          child = schema.children.fetch(i) { schema.boundless? ? schema.children.first : nil }
           if child.nil?
             raise UnpermittedParameterError.new('unpermitted parameter', path: param.path) if
               schema.strict?

@@ -66,7 +66,7 @@ module TypedParameters
     end
 
     def inspect
-      "#<TypedParameters::InvalidParameterError message=#{message.inspect} path=#{path.inspect}>"
+      "#<#{self.class.name} message=#{message.inspect} path=#{path.inspect}>"
     end
   end
 

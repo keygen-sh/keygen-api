@@ -104,7 +104,7 @@ module TypedParameters
     def inspect
       value = unwrap(formatter: nil)
 
-      "#<TypedParameters::Parameter key=#{key.inspect} value=#{value.inspect}>"
+      "#<#{self.class.name} key=#{key.inspect} value=#{value.inspect}>"
     end
 
     private
