@@ -124,7 +124,7 @@ module TypedParameters
         raise ArgumentError, "schema already exists: #{key}" if
           typed_schemas.key?(key)
 
-        # TODO(ezekg) Implement namespaced schema config? E.g. typed_resource_name:key
+        # TODO(ezekg) Implement namespaced schema config? E.g. <controller>:<key>.
         typed_schemas[key] = Schema.new(**kwargs, &)
       end
 
