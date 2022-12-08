@@ -151,7 +151,7 @@ module TypedParameters
 
     ##
     # item defines an indexed parameter for an array schema.
-    def item(key = children.size, type:, **kwargs, &block)
+    def item(key = children&.size || 0, type:, **kwargs, &block)
       @children ||= [] if Types.array?(self.type)
 
       raise NotImplementedError, "cannot define item for non-array type (got #{self.type})" unless
@@ -211,7 +211,7 @@ module TypedParameters
     def formatter?         = !!@formatter
 
     def inspect
-      "#<TypedParameters::Schema key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"
+      "#<#{self.class.name} key=#{key.inspect} type=#{type.inspect} children=#{children.inspect}>"
     end
 
     private
