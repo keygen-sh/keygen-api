@@ -2,8 +2,6 @@
 
 module TypedParameters
   class Schema
-    ROOT_KEY = Object.new
-
     attr_reader :validations,
                 :transforms,
                 :formatter,
@@ -36,13 +34,13 @@ module TypedParameters
       unless: nil,
       &block
     )
-      key ||= ROOT_KEY
+      key ||= ROOT
 
       raise ArgumentError, 'key is required for child schema' if
-        key == ROOT_KEY && parent.present?
+        key == ROOT && parent.present?
 
       raise ArgumentError, 'root cannot be nil' if
-        key == ROOT_KEY && allow_nil
+        key == ROOT && allow_nil
 
       raise ArgumentError, 'inclusion must be a hash with :in key' unless
         inclusion.nil? || inclusion.is_a?(Hash) && inclusion.key?(:in)
@@ -71,7 +69,7 @@ module TypedParameters
       @key               = key
       @optional          = optional
       @coerce            = coerce
-      @allow_blank       = key == ROOT_KEY || allow_blank
+      @allow_blank       = key == ROOT || allow_blank
       @allow_nil         = allow_nil
       @allow_non_scalars = allow_non_scalars
       @nilify_blanks     = nilify_blanks
@@ -174,7 +172,7 @@ module TypedParameters
     end
 
     def path
-      key = @key == ROOT_KEY ? nil : @key
+      key = @key == ROOT ? nil : @key
 
       @path ||= Path.new(*parent&.path&.keys, *key)
     end
@@ -193,7 +191,7 @@ module TypedParameters
       end
     end
 
-    def root?              = key == ROOT_KEY
+    def root?              = key == ROOT
     def strict?            = !!strict
     def lenient?           = !strict?
     def optional?          = !!@optional
