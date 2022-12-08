@@ -369,7 +369,7 @@ describe TypedParameters do
       TypedParameters::Schema.new(type: :hash) do
         format :jsonapi
 
-        param :meta, type: :hash, optional: true
+        param :meta, type: :hash, allow_non_scalars: true, optional: true
         param :data, type: :hash do
           param :type, type: :string, inclusion: { in: %w[users user] }
           param :id, type: :string
@@ -420,8 +420,8 @@ describe TypedParameters do
       end
     end
 
-    it 'should transform params' do
-      data = {
+    let :data do
+      {
         type: 'users',
         id: SecureRandom.base58,
         attributes: {
@@ -451,10 +451,20 @@ describe TypedParameters do
           },
         },
       }
+    end
 
-      params = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+    let :meta do
+      {
+        key: {
+          key: 'value',
+        },
+      }
+    end
 
-      expect(params.format).to eq(
+    it 'should format params' do
+      params = TypedParameters::Parameterizer.new(schema:).call(value: { meta:, data: })
+
+      expect(params.unwrap).to eq(
         id: data[:id],
         email: data[:attributes][:email],
         password: data[:attributes][:password],
@@ -475,6 +485,15 @@ describe TypedParameters do
         ],
       )
     end
+
+    it 'should not format params' do
+      params = TypedParameters::Parameterizer.new(schema:).call(value: { meta:, data: })
+
+      expect(params.unwrap(formatter: nil)).to eq(
+        meta:,
+        data:,
+      )
+    end
   end
 
   describe TypedParameters::Formatters::Rails do
@@ -493,17 +512,25 @@ describe TypedParameters do
       end
     end
 
-    it 'should transform params' do
-      user = {
+    let :user do
+      {
         first_name: 'Foo',
         last_name: 'Bar',
         email: 'foo@keygen.example',
         password: SecureRandom.hex,
       }
+    end
 
+    it 'should format params' do
       params = TypedParameters::Parameterizer.new(schema:).call(value: user)
 
-      expect(params.format(controller:)).to eq(user:)
+      expect(params.unwrap(controller:)).to eq(user:)
+    end
+
+    it 'should format params' do
+      params = TypedParameters::Parameterizer.new(schema:).call(value: user)
+
+      expect(params.unwrap(formatter: nil)).to eq(user)
     end
   end
 
@@ -1416,7 +1443,7 @@ describe TypedParameters do
 
         bouncer.call(params)
 
-        expect(params.format).to eq user
+        expect(params.unwrap).to eq user
       end
 
       it 'should bounce branches' do
@@ -1435,7 +1462,7 @@ describe TypedParameters do
 
         bouncer.call(params)
 
-        expect(params.format).to eq user: { email: 'foo@keygen.example' }
+        expect(params.unwrap).to eq user: { email: 'foo@keygen.example' }
       end
     end
 
