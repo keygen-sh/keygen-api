@@ -61,7 +61,8 @@ module TypedParameters
     def parent?   = parent.present?
 
     def delete
-      raise NotImplementedError, "cannot delete param: #{key.inspect}" unless parent?
+      raise NotImplementedError, "cannot delete param: #{key.inspect}" unless
+        parent?
 
       case parent.value
       when Array
@@ -75,12 +76,26 @@ module TypedParameters
 
     def [](key) = value[key]
     def []=(key, value)
+      raise NotImplementedError, "cannot set key-value for non-hash: #{schema.type}" unless
+        schema.hash?
+
+      raise ArgumentError, 'value must be a parameter' unless
+        value.nil? || value.is_a?(Parameter)
+
       self.value.merge!(key => value)
     end
 
-    def each(...) = value.each(...)
+    def <<(value)
+      raise NotImplementedError, "cannot push to non-array: #{schema.type}" unless
+        schema.array?
 
-    def append(*args, **kwargs) = kwargs.present? ? value.merge!(**kwargs) : value.push(*args)
+      raise ArgumentError, 'value must be a parameter' unless
+        value.nil? || value.is_a?(Parameter)
+
+      self.value.push(value)
+    end
+
+    def each(...) = value.each(...)
 
     def safe
       # TODO(ezekg) Raise if parameter is invalid
