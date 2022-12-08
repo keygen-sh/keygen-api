@@ -76,14 +76,14 @@ module TypedParameters
       self.value.push(value)
     end
 
-    def format(formatter: schema.formatter, controller: nil)
+    def unwrap(formatter: schema.formatter, controller: nil)
       v = case value
-          when Array
-            value.map { _1&.format }
           when Hash
-            value.transform_values { _1&.format }
+            value.transform_values { _1.respond_to?(:unwrap) ? _1.unwrap : _1 }
+          when Array
+            value.map { _1.respond_to?(:unwrap) ? _1.unwrap : _1 }
           else
-            value
+            value.respond_to?(:unwrap) ? value.unwrap : value
           end
 
       if formatter.present?
@@ -102,7 +102,7 @@ module TypedParameters
     def deconstruct            = value
 
     def inspect
-      value = format(formatter: nil)
+      value = unwrap(formatter: nil)
 
       "#<TypedParameters::Parameter key=#{key.inspect} value=#{value.inspect}>"
     end
