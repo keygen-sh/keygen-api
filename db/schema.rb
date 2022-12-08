@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_15_145108) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_08_021513) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -151,6 +151,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_145108) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "keys_tsv_key_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at"
+    t.index ["account_id", "key"], name: "index_keys_on_account_id_and_key", unique: true
     t.index ["created_at"], name: "index_keys_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true
     t.index ["policy_id", "created_at"], name: "index_keys_on_policy_id_and_created_at"
