@@ -1678,10 +1678,22 @@ describe TypedParameters do
       end
     }
 
-    it 'should define a named schema' do
+    it 'should define a local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to include foo: anything
+      expect(subject.typed_schemas).to have_key :"#{subject}:foo"
+    end
+
+    it 'should define a global schema' do
+      subject.typed_schema(:foo, namespace: nil) { param :bar, type: :string }
+
+      expect(subject.typed_schemas).to have_key :foo
+    end
+
+    it 'should define a namespaced schema' do
+      subject.typed_schema(:foo, namespace: :bar) { param :baz, type: :string }
+
+      expect(subject.typed_schemas).to have_key :"bar:foo"
     end
 
     it 'should define a singular params handler' do
