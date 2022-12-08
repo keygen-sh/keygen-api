@@ -17,20 +17,15 @@ module TypedParameters
     #   { user: { email: 'foo@bar.example' } }
     #
     module Rails
-      def self.call(key, value, controller:)
-        controller_name = controller.controller_name.singularize.to_sym
+      def self.call(params, controller:)
+        key = controller.controller_name.singularize.to_sym
 
-        [
-          controller_name,
-          {
-            controller_name => Parameter.new(key:, value:, schema: nil),
-          },
-        ]
+        { key => params }
       end
     end
 
     register(:rails,
-      transform: -> k, v, c { Rails.call(k, v, controller: c) },
+      transform: Rails.method(:call),
     )
   end
 end

@@ -367,6 +367,8 @@ describe TypedParameters do
   describe TypedParameters::Formatters::JSONAPI do
     let :schema do
       TypedParameters::Schema.new(type: :hash) do
+        format :jsonapi
+
         param :meta, type: :hash, optional: true
         param :data, type: :hash do
           param :type, type: :string, inclusion: { in: %w[users user] }
@@ -450,12 +452,9 @@ describe TypedParameters do
         },
       }
 
-      params    = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
-      formatter = TypedParameters.formats[:jsonapi]
+      params = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
 
-      params.key, params.value = formatter.call(params.key, params.value)
-
-      expect(params.unsafe).to eq(
+      expect(params.format).to eq(
         id: data[:id],
         email: data[:attributes][:email],
         password: data[:attributes][:password],
@@ -485,6 +484,8 @@ describe TypedParameters do
 
     let :schema do
       TypedParameters::Schema.new(type: :hash) do
+        format :rails
+
         param :first_name, type: :string, optional: true
         param :last_name, type: :string, optional: true
         param :email, type: :string, format: { with: /@/ }
@@ -500,12 +501,9 @@ describe TypedParameters do
         password: SecureRandom.hex,
       }
 
-      params    = TypedParameters::Parameterizer.new(schema:).call(value: user)
-      formatter = TypedParameters.formats[:rails]
+      params = TypedParameters::Parameterizer.new(schema:).call(value: user)
 
-      params.key, params.value = formatter.call(params.key, params.value, controller)
-
-      expect(params.unsafe).to eq(user:)
+      expect(params.format(controller:)).to eq(user:)
     end
   end
 
@@ -1418,7 +1416,7 @@ describe TypedParameters do
 
         bouncer.call(params)
 
-        expect(params.unsafe).to eq user
+        expect(params.format).to eq user
       end
 
       it 'should bounce branches' do
@@ -1437,7 +1435,7 @@ describe TypedParameters do
 
         bouncer.call(params)
 
-        expect(params.unsafe).to eq user: { email: 'foo@keygen.example' }
+        expect(params.format).to eq user: { email: 'foo@keygen.example' }
       end
     end
 

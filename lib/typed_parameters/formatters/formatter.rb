@@ -11,6 +11,9 @@ module TypedParameters
       end
 
       def call(...) = @transform.call(...)
+
+      # FIXME(ezekg) Is there a cleaner way of delegating arity?
+      def arity = @transform.arity
     end
   end
 end

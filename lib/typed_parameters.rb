@@ -55,6 +55,10 @@ module TypedParameters
 
       super(message)
     end
+
+    def inspect
+      "#<TypedParameters::InvalidParameterError message=#{message.inspect} path=#{path.inspect}>"
+    end
   end
 
   class UnpermittedParameterError < InvalidParameterError; end

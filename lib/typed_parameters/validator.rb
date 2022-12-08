@@ -44,7 +44,7 @@ module TypedParameters
         end
 
         # Handle blanks
-        if param.blank?
+        if param.value.blank?
           raise InvalidParameterError.new('cannot be blank', path: param.path) if
             !schema.allow_blank?
 
@@ -52,8 +52,8 @@ module TypedParameters
         end
 
         # Assert validations
-        raise InvalidParameterError.new('is invalid', path: param.path) if
-          schema.validations.any? && !schema.validations.any? { _1.call(param.value) }
+        raise InvalidParameterError.new('is invalid', path: param.path) unless
+          schema.validations.all? { _1.call(param.value) }
       end
     end
   end
