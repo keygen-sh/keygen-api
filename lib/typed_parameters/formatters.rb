@@ -7,7 +7,7 @@ module TypedParameters
     cattr_reader :formats, default: {}
 
     def self.register(format, transform:)
-      raise DuplicateFormatterError, 'format is already registered' if
+      raise DuplicateFormatterError, "format is already registered: #{format.inspect}" if
         formats.key?(format)
 
       formats[format] = Formatter.new(format, transform:)

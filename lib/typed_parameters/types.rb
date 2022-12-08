@@ -7,7 +7,7 @@ module TypedParameters
     cattr_reader :types, default: {}
 
     def self.register(type, name: type, match:, coerce: nil, scalar: true, accepts_block: false)
-      raise DuplicateTypeError, 'type is already registered' if
+      raise DuplicateTypeError, "type is already registered: #{type.inspect}" if
         types.key?(type)
 
       types[type] = Type.new(type:, name:, match:, coerce:, scalar:, accepts_block:)

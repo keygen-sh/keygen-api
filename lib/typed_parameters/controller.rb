@@ -31,7 +31,7 @@ module TypedParameters
       cattr_accessor :typed_handlers, default: { deferred: [], params: {}, query: {} }
       cattr_accessor :typed_schemas,  default: {}
 
-      def typed_params(format: nil)
+      def typed_params(format: AUTO)
         handler = typed_handlers[:params][action_name.to_sym]
 
         raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
@@ -44,14 +44,17 @@ module TypedParameters
 
         Processor.new(controller: self, schema:).call(params)
 
-        if format.present?
-          params.unwrap(formatter: Formatters[format], controller: self)
+        case format
+        when AUTO
+          params.unwrap(formatter: schema.formatter, controller: self)
+        when nil
+          params.unwrap(formatter: nil, controller: self)
         else
-          params.unwrap(controller: self)
+          params.unwrap(formatter: Formatters[format], controller: self)
         end
       end
 
-      def typed_query(format: nil)
+      def typed_query(format: AUTO)
         handler = typed_handlers[:query][action_name.to_sym]
 
         raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
@@ -64,10 +67,13 @@ module TypedParameters
 
         Processor.new(controller: self, schema:).call(params)
 
-        if format.present?
-          params.unwrap(formatter: Formatters[format], controller: self)
+        case format
+        when AUTO
+          params.unwrap(formatter: schema.formatter, controller: self)
+        when nil
+          params.unwrap(formatter: nil, controller: self)
         else
-          params.unwrap(controller: self)
+          params.unwrap(formatter: Formatters[format], controller: self)
         end
       end
     end
@@ -136,7 +142,7 @@ module TypedParameters
         aliases.include?(method_name) || super
       end
 
-      def method_missing(method_name, *)
+      def method_missing(method_name, ...)
         return super unless
           /_(params|query)\z/.match?(method_name) &&
           respond_to?(:controller_name)
@@ -147,9 +153,9 @@ module TypedParameters
 
         case method_name
         when :"#{controller_name}_params"
-          typed_params
+          typed_params(...)
         when :"#{controller_name}_query"
-          typed_query
+          typed_query(...)
         else
           super
         end
