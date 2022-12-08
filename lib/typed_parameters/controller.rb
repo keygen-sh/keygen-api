@@ -79,10 +79,13 @@ module TypedParameters
     end
 
     class_methods do
-      def typed_params(on: nil, type: :hash, schema: nil, format: nil, **kwargs, &)
+      def typed_params(on: nil, type: :hash, schema: nil, format: nil, namespace: self, **kwargs, &)
         schema = case schema
                  in Symbol => key
-                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
+                   namespaced_key = [*namespace, key].join(':')
+                                                     .to_sym
+
+                   typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
                  in nil
                    Schema.new(type:, **kwargs, &)
                  end
@@ -99,10 +102,13 @@ module TypedParameters
         end
       end
 
-      def typed_query(on: nil, schema: nil, **kwargs, &)
+      def typed_query(on: nil, schema: nil, namespace: self, **kwargs, &)
         schema = case schema
                  in Symbol => key
-                   typed_schemas[key] || raise(ArgumentError, "schema does not exist: #{key}")
+                   namespaced_key = [*namespace, key].join(':')
+                                                     .to_sym
+
+                   typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
                  in nil
                    # FIXME(ezekg) Should query params :coerce by default?
                    Schema.new(nilify_blanks: true, **kwargs, &)
@@ -120,17 +126,17 @@ module TypedParameters
         end
       end
 
-      def typed_schema(key, **kwargs, &)
-        raise ArgumentError, "schema already exists: #{key}" if
-          typed_schemas.key?(key)
+      def typed_schema(key, namespace: self, **kwargs, &)
+        namespaced_key = [*namespace, key].join(':')
+                                          .to_sym
 
-        # TODO(ezekg) Implement namespaced schema config? E.g. <controller>:<key>.
-        typed_schemas[key] = Schema.new(**kwargs, &)
+        raise ArgumentError, "schema already exists: #{namespaced_key.inspect}" if
+          typed_schemas.key?(namespaced_key)
+
+        typed_schemas[namespaced_key] = Schema.new(**kwargs, &)
       end
 
       private
-
-      def typed_resource_name = controller_name.classify.underscore
 
       def respond_to_missing?(method_name, *)
         controller_name = self.controller_name.classify.underscore
