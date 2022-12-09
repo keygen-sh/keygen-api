@@ -53,28 +53,6 @@ module TypedParameters
       end
     end
 
-    def [](key) = value[key]
-    def []=(key, value)
-      raise NotImplementedError, "cannot set key-value for non-hash: #{schema.type}" unless
-        schema.hash?
-
-      raise ArgumentError, 'value must be a parameter' unless
-        value.nil? || value.is_a?(Parameter)
-
-      self.value.merge!(key => value)
-    end
-
-    def each(...) = value.each(...)
-    def <<(value)
-      raise NotImplementedError, "cannot push to non-array: #{schema.type}" unless
-        schema.array?
-
-      raise ArgumentError, 'value must be a parameter' unless
-        value.nil? || value.is_a?(Parameter)
-
-      self.value.push(value)
-    end
-
     def unwrap(formatter: schema.formatter, controller: nil)
       v = case value
           when Hash
@@ -96,6 +74,10 @@ module TypedParameters
 
       v
     end
+
+    # Delegate everything else to the value
+    def respond_to_missing?(method_name, ...) = value.respond_to?(method_name, ...)
+    def method_missing(method_name, ...)      = value.send(method_name, ...)
 
     def deconstruct_keys(keys) = { key:, value: }
     def deconstruct            = value

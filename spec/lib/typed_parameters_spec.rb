@@ -838,6 +838,22 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Parameter do
+    it 'should delegate missing methods to value' do
+      params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+      orig   = params.dup
+
+      expect { params.stringify_keys! }.to_not raise_error
+      expect { params.fetch(:foo) }.to raise_error KeyError
+      expect { params.fetch('foo') }.to_not raise_error
+      expect { params.merge!(qux: 2) }.to_not raise_error
+      expect { params.fetch(:qux) }.to_not raise_error
+      expect { params.reject! { _1 == :qux } }.to_not raise_error
+      expect { params.fetch(:qux) }.to raise_error KeyError
+      expect { params.symbolize_keys! }.to_not raise_error
+
+      expect(params.value).to eq orig.value
+    end
+
     it 'should have a correct path' do
       params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
 
@@ -1354,6 +1370,26 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Transformer do
+    it 'should traverse params depth-first' do
+      schema = TypedParameters::Schema.new(type: :hash) do
+        param :parent, type: :hash, transform: -> k, v { [:a, v[:b].to_i] } do
+          param :child, type: :hash, transform: -> k, v { [:b, v[:c].to_i] } do
+            param :grandchild, type: :hash, transform: -> k, v { [:c, v[:d].to_i] } do
+              param :value, type: :integer, transform: -> k, v { [:d, v.to_i]}
+            end
+          end
+        end
+      end
+
+      data        = { parent: { child: { grandchild: { value: 42 } } } }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: data)
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:a].value).to eq 42
+    end
+
     it 'should not transform the param when omitted' do
       schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer }
       params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
@@ -1383,8 +1419,8 @@ describe TypedParameters do
 
       transformer.call(params)
 
-      expect(params[:foo].key).to eq :bar
-      expect(params[:foo].value).to eq 2
+      expect(params[:bar].key).to eq :bar
+      expect(params[:bar].value).to eq 2
     end
 
     it 'should delete the param' do
