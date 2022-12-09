@@ -83,6 +83,7 @@ module TypedParameters
       @if                = binding.local_variable_get(:if)
       @unless            = binding.local_variable_get(:unless)
       @formatter         = nil
+      @options           = {}
 
       # Validations
       @validations = []
@@ -134,6 +135,19 @@ module TypedParameters
     def format(format) = @formatter = Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
 
     ##
+    # with defines a set of options to use for all direct children of the
+    # schema. For example, with(if: -> { ... }) { ... } would define a
+    # common guard for all children params.
+    def with(**kwargs, &)
+      orig     = @options
+      @options = kwargs
+
+      yield
+
+      @options = orig
+    end
+
+    ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
       @children ||= {} if Types.hash?(self.type)
@@ -144,7 +158,7 @@ module TypedParameters
       raise ArgumentError, "key #{key} has already been defined" if
         children.key?(key)
 
-      children[key] = Schema.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      children[key] = Schema.new(**options, **kwargs, key:, type:, strict:, parent: self, &block)
     end
 
     ##
@@ -162,7 +176,7 @@ module TypedParameters
       raise ArgumentError, "index #{key} has already been defined" if
         children[key].present? || boundless?
 
-      children << Schema.new(**kwargs, key:, type:, strict:, parent: self, &block)
+      children << Schema.new(**options, **kwargs, key:, type:, strict:, parent: self, &block)
     end
 
     ##
@@ -218,7 +232,8 @@ module TypedParameters
 
     private
 
-    attr_reader :strict
+    attr_reader :options,
+                :strict
 
     def boundless! = @boundless = true
   end
