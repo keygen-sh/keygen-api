@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TypedParameters
-  class Rule
+  class Mapper
     def initialize(schema:, controller: nil)
       @controller = controller
       @schema     = schema
