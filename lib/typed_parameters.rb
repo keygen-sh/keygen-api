@@ -2,6 +2,7 @@
 
 require_relative 'typed_parameters/bouncer'
 require_relative 'typed_parameters/coercer'
+require_relative 'typed_parameters/configuration'
 require_relative 'typed_parameters/controller'
 require_relative 'typed_parameters/formatters'
 require_relative 'typed_parameters/formatters/formatter'
@@ -14,6 +15,7 @@ require_relative 'typed_parameters/path'
 require_relative 'typed_parameters/pipeline'
 require_relative 'typed_parameters/processor'
 require_relative 'typed_parameters/schema'
+require_relative 'typed_parameters/transforms/key_casing'
 require_relative 'typed_parameters/transforms/nilify_blanks'
 require_relative 'typed_parameters/transforms/noop'
 require_relative 'typed_parameters/transforms/transform'
@@ -74,4 +76,9 @@ module TypedParameters
 
   def self.formats = Formatters
   def self.types   = Types
+
+  def self.config = @config ||= Configuration.new
+  def self.configure
+    yield config
+  end
 end
