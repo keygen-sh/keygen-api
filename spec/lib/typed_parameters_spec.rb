@@ -656,6 +656,172 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Transforms::KeyCasing do
+    let(:transform) { TypedParameters::Transforms::KeyCasing.new }
+    let(:casing)    { nil }
+
+    before { TypedParameters.config.key_transform = casing }
+    after  { TypedParameters.config.key_transform = nil }
+
+    context 'with no key transform' do
+      %w[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should not transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => 'baz' })
+
+          expect(k).to eq key
+          expect(v).to eq key => 'baz'
+        end
+      end
+
+      %i[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should mot transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => :baz })
+
+          expect(k).to eq key
+          expect(v).to eq key => :baz
+        end
+      end
+    end
+
+    context 'with :underscore key transform' do
+      let(:casing) { :underscore }
+
+      %w[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => 'baz' })
+
+          expect(k).to eq 'foo_bar'
+          expect(v).to eq k => 'baz'
+        end
+      end
+
+      %i[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => :baz })
+
+          expect(k).to eq :foo_bar
+          expect(v).to eq k => :baz
+        end
+      end
+    end
+
+    context 'with :camel key transform' do
+      let(:casing) { :camel }
+
+      %w[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => 'baz' })
+
+          expect(k).to eq 'FooBar'
+          expect(v).to eq k => 'baz'
+        end
+      end
+
+      %i[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => :baz })
+
+          expect(k).to eq :FooBar
+          expect(v).to eq k => :baz
+        end
+      end
+    end
+
+    context 'with :lower_camel key transform' do
+      let(:casing) { :lower_camel }
+
+      %w[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => 'baz' })
+
+          expect(k).to eq 'fooBar'
+          expect(v).to eq k => 'baz'
+        end
+      end
+
+      %i[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => :baz })
+
+          expect(k).to eq :fooBar
+          expect(v).to eq k => :baz
+        end
+      end
+    end
+
+    context 'with :dash key transform' do
+      let(:casing) { :dash }
+
+      %w[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => 'baz' })
+
+          expect(k).to eq 'foo-bar'
+          expect(v).to eq k => 'baz'
+        end
+      end
+
+      %i[
+        foo_bar
+        foo-bar
+        FooBar
+        fooBar
+      ].each do |key|
+        it "should transform key: #{key.inspect}" do
+          k, v = transform.call(key, { key => :baz })
+
+          expect(k).to eq :'foo-bar'
+          expect(v).to eq k => :baz
+        end
+      end
+    end
+  end
+
   describe TypedParameters::Transforms::NilifyBlanks do
     let(:transform) { TypedParameters::Transforms::NilifyBlanks.new }
 
@@ -826,14 +992,56 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Path do
-    let(:path) { TypedParameters::Path.new(:foo, :bar, :baz, 42, :qux) }
+    let(:path)   { TypedParameters::Path.new(:foo, :bar_baz, 42, :qux) }
+    let(:casing) { nil }
+
+    before { TypedParameters.config.path_transform = casing }
+    after  { TypedParameters.config.path_transform = nil }
 
     it 'should support JSON pointer paths' do
-      expect(path.to_json_pointer).to eq '/foo/bar/baz/42/qux'
+      expect(path.to_json_pointer).to eq '/foo/bar_baz/42/qux'
     end
 
     it 'should support dot notation paths' do
-      expect(path.to_dot_notation).to eq 'foo.bar.baz.42.qux'
+      expect(path.to_dot_notation).to eq 'foo.bar_baz.42.qux'
+    end
+
+    context 'with no path transform' do
+      it 'should not transform path' do
+        expect(path.to_s).to eq 'foo.bar_baz[42].qux'
+      end
+    end
+
+    context 'with :underscore path transform' do
+      let(:casing) { :underscore }
+
+      it 'should transform path' do
+        expect(path.to_s).to eq 'foo.bar_baz[42].qux'
+      end
+    end
+
+    context 'with :camel path transform' do
+      let(:casing) { :camel }
+
+      it 'should transform path' do
+        expect(path.to_s).to eq 'Foo.BarBaz[42].Qux'
+      end
+    end
+
+    context 'with :lower_camel path transform' do
+      let(:casing) { :lower_camel }
+
+      it 'should transform path' do
+        expect(path.to_s).to eq 'foo.barBaz[42].qux'
+      end
+    end
+
+    context 'with :dash path transform' do
+      let(:casing) { :dash }
+
+      it 'should transform path' do
+        expect(path.to_s).to eq 'foo.bar-baz[42].qux'
+      end
     end
   end
 
@@ -1436,7 +1644,19 @@ describe TypedParameters do
       expect(params[:foo].value).to eq 1
     end
 
-    it 'should transform the params' do
+    it 'should transform array params' do
+      schema      = TypedParameters::Schema.new(type: :array) { item type: :integer, transform: -> k, v { [1, v + 1] } }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: [1] )
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[0]).to be nil
+      expect(params[1].key).to eq 1
+      expect(params[1].value).to eq 2
+    end
+
+    it 'should transform hash params' do
       schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, transform: -> k, v { [:bar, v + 1] } }
       params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
       transformer = TypedParameters::Transformer.new(schema:)
