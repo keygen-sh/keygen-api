@@ -11,7 +11,7 @@ module TypedParameters
 
         type = Types.for(param.value)
 
-        raise InvalidParameterError.new("cannot coerce #{type} (#{param.schema.type} is not coerceable)", path: param.path) unless
+        raise InvalidParameterError.new("cannot coerce #{type} to #{param.schema.type}", path: param.path) unless
           param.schema.type.coercable?
 
         param.value = param.schema.type.coerce(param.value)
