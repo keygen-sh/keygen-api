@@ -103,7 +103,9 @@ module TypedParameters
         validate.present?
 
       # Transforms
-      @transforms = []
+      @transforms = [
+        Transforms::KeyCasing.new,
+      ]
 
       @transforms << Transforms::NilifyBlanks.new if
         nilify_blanks
