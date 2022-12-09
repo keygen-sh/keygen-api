@@ -5,7 +5,6 @@ module TypedParameters
     def initialize(schema:, controller: nil)
       @controller = controller
       @schema     = schema
-      @visited    = []
     end
 
     def call(...) = raise NotImplementedError
@@ -13,16 +12,10 @@ module TypedParameters
     private
 
     attr_reader :controller,
-                :visited,
                 :schema
-
-    def visited?(param) = visited.include?(param)
 
     def depth_first_map(param, &)
       return if param.nil?
-
-      return if
-        visited?(param)
 
       # Traverse down the param tree until we hit the end of a "branch",
       # then start validating in from there, moving from the outside in.
@@ -41,8 +34,6 @@ module TypedParameters
       end
 
       yield param
-
-      visited << param
 
       param
     end
