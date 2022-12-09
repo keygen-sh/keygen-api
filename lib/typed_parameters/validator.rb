@@ -53,12 +53,14 @@ module TypedParameters
           end
         end
 
-        # Handle blanks
+        # Handle blanks (and false-positive "blank" values)
         if param.value.blank?
-          raise InvalidParameterError.new('cannot be blank', path: param.path) if
-            !schema.allow_blank?
+          unless param.value == false
+            raise InvalidParameterError.new('cannot be blank', path: param.path) if
+              !schema.allow_blank?
 
-          next
+            next
+          end
         end
 
         # Assert validations

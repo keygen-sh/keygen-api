@@ -1026,6 +1026,30 @@ describe TypedParameters do
       expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
 
+    it 'should not raise on false param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :boolean, allow_blank: false }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: false })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should not raise on 0 param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_blank: false }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 0 })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
+    it 'should not raise on 0.0 param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :float, allow_blank: false }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 0.0 })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
     it 'should not raise on blank param' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, allow_blank: true }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
