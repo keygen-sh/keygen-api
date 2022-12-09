@@ -17,7 +17,11 @@ module TypedParameters
       @parent = parent
     end
 
-    def path = @path ||= Path.new(*parent&.path&.keys, *key)
+    def path
+      key = @key == ROOT ? nil : @key
+
+      @path ||= Path.new(*parent&.path&.keys, *key)
+    end
 
     def key?(key) = keys.include?(key)
     alias :has_key? :key?
