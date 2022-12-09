@@ -68,7 +68,7 @@ module TypedParameters
       @parent            = parent
       @key               = key
       @optional          = optional
-      @coerce            = coerce
+      @coerce            = coerce && @type.coercable?
       @allow_blank       = key == ROOT || allow_blank
       @allow_nil         = allow_nil
       @allow_non_scalars = allow_non_scalars
