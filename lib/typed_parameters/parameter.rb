@@ -11,11 +11,10 @@ module TypedParameters
                 :parent
 
     def initialize(key:, value:, schema:, parent: nil)
-      @key       = key
-      @value     = value
-      @schema    = schema
-      @parent    = parent
-      @validated = false
+      @key    = key
+      @value  = value
+      @schema = schema
+      @parent = parent
     end
 
     def path = @path ||= Path.new(*parent&.path&.keys, *key)
@@ -108,8 +107,6 @@ module TypedParameters
     end
 
     private
-
-    attr_reader :validated
 
     def parent? = parent.present?
   end
