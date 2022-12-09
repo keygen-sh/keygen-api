@@ -630,7 +630,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/relationships/group"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -875,7 +878,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license with invalid metadata
+  Scenario: Admin creates a license with complex nested metadata
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -909,17 +912,7 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "unpermitted type (expected nested object of scalar types)",
-        "source": {
-          "pointer": "/data/attributes/metadata/object/key"
-        }
-      }
-      """
+    Then the response status should be "201"
 
   Scenario: Admin creates a license with metadata for their account and the keys should be transformed to camelcase
     Given I am an admin of account "test1"
@@ -1740,17 +1733,17 @@ Feature: Create license
         }
       }
       """
+    Then the response status should be "400"
     And the current account should have 0 "licenses"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "is too short (minimum is 1 character)",
+        "title": "Bad request",
+        "detail": "cannot be blank",
         "source": {
           "pointer": "/data/attributes/key"
-        },
-        "code": "KEY_TOO_SHORT"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -2877,7 +2870,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/protected"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/protected"
+        }
       }
       """
     And the current account should have 0 "licenses"
@@ -2923,7 +2919,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/protected"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/protected"
+        }
       }
       """
     And the current account should have 0 "licenses"
@@ -2967,7 +2966,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/id"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/id"
+        }
       }
       """
     And the current account should have 0 "licenses"
@@ -3013,7 +3015,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/suspended"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/suspended"
+        }
       }
       """
     And the current account should have 0 "licenses"
@@ -3059,7 +3064,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/expiry"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/expiry"
+        }
       }
       """
     And the current account should have 0 "licenses"
@@ -3602,7 +3610,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -3698,7 +3709,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -3793,7 +3807,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -3879,7 +3896,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -3971,7 +3991,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -4018,7 +4041,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -4970,7 +4996,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/maxMachines"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/maxMachines"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5021,7 +5050,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/maxProcesses"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/maxProcesses"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
