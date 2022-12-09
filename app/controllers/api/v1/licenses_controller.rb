@@ -35,6 +35,49 @@ module Api::V1
       render jsonapi: license
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[license licenses] }
+        param :id, type: :string, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+        param :attributes, type: :hash, optional: true do
+          param :name, type: :string, optional: true
+          param :key, type: :string, optional: true
+          param :protected, type: :boolean, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :expiry, type: :time, optional: true, coerce: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :suspended, type: :boolean, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :max_machines, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :max_cores, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :max_uses, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :max_processes, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            items type: :string
+          end
+          param :metadata, type: :hash, allow_non_scalars: true, optional: true
+        end
+        param :relationships, type: :hash do
+          param :policy, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[policy policies] }
+              param :id, type: :string
+            end
+          end
+          param :user, type: :hash, optional: true do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[user users] }
+              param :id, type: :string
+            end
+          end
+          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[group groups] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
       license = current_account.licenses.new(license_params)
       authorize! license
@@ -52,6 +95,28 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[license licenses] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true, allow_nil: true
+          param :expiry, type: :time, optional: true, coerce: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :protected, type: :boolean, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :suspended, type: :boolean, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :metadata, type: :hash, allow_non_scalars: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :max_machines, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :max_cores, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :max_uses, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :max_processes, type: :integer, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            items type: :string
+          end
+        end
+      end
+    }
     def update
       authorize! license
 
@@ -90,85 +155,6 @@ module Api::V1
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
       Current.resource = license
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[license licenses]
-          if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
-            param :id, type: :string, optional: true
-          end
-          param :attributes, type: :hash, optional: true do
-            param :name, type: :string, optional: true
-            param :key, type: :string, optional: true
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
-              param :protected, type: :boolean, optional: true
-              param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
-              param :suspended, type: :boolean, optional: true
-              param :max_machines, type: :integer, optional: true, allow_nil: true
-              param :max_cores, type: :integer, optional: true, allow_nil: true
-              param :max_uses, type: :integer, optional: true, allow_nil: true
-              param :max_processes, type: :integer, optional: true, allow_nil: true
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-          param :relationships, type: :hash do
-            param :policy, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[policy policies]
-                param :id, type: :string
-              end
-            end
-            param :user, type: :hash, optional: true do
-              param :data, type: :hash, allow_nil: true do
-                param :type, type: :string, inclusion: %w[user users]
-                param :id, type: :string
-              end
-            end
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-              param :group, type: :hash, optional: true do
-                param :data, type: :hash, allow_nil: true do
-                  param :type, type: :string, inclusion: %w[group groups]
-                  param :id, type: :string
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[license licenses]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true, allow_nil: true
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-              param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
-              param :protected, type: :boolean, optional: true
-              param :suspended, type: :boolean, optional: true
-              param :metadata, type: :hash, allow_non_scalars: true, optional: true
-              param :max_machines, type: :integer, optional: true, allow_nil: true
-              param :max_cores, type: :integer, optional: true, allow_nil: true
-              param :max_uses, type: :integer, optional: true, allow_nil: true
-              param :max_processes, type: :integer, optional: true, allow_nil: true
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-          end
-        end
-      end
     end
   end
 end

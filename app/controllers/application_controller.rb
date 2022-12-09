@@ -4,6 +4,7 @@ class ApplicationController < ActionController::API
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
+  include TypedParameters::Controller
   include ActionPolicy::Controller
 
   # NOTE(ezekg) Including these at the end so that they're run last
@@ -319,14 +320,16 @@ class ApplicationController < ActionController::API
 
   def rescue_from_exceptions
     yield
-  rescue TypedParameters::UnpermittedParametersError,
-         TypedParameters::InvalidRequestError,
-         Keygen::Error::BadRequestError,
+  rescue TypedParameters::UnpermittedParameterError,
+         TypedParameters::InvalidParameterError => e
+    # FIXME(ezekg) This should set :pointer and :parameter
+    #              depending on the err's source
+    render_bad_request detail: e.message, source: { pointer: e.path.to_json_pointer }
+  rescue Keygen::Error::BadRequestError,
          ActionController::UnpermittedParameters,
          ActionController::ParameterMissing => e
     render_bad_request detail: e.message
-  rescue TypedParameters::InvalidParameterError,
-         Keygen::Error::InvalidScopeError => e
+  rescue Keygen::Error::InvalidScopeError => e
     render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnauthorizedError => e
     kwargs = { code: e.code }
