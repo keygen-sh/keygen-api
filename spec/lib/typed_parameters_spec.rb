@@ -126,6 +126,32 @@ describe TypedParameters do
 
       expect(grandchild.keys).to eq %i[bar]
     end
+
+    describe '#with' do
+      let :schema do
+        TypedParameters::Schema.new type: :hash do
+          with if: -> { true } do
+            param :foo, type: :string
+            param :bar, type: :string
+            param :baz, type: :hash do
+              param :qux, type: :string
+            end
+          end
+        end
+      end
+
+      it 'should pass options to children' do
+        children = schema.children.values
+
+        expect(children.all?(&:if?)).to be true
+      end
+
+      it 'should not pass options to grandchildren' do
+        grandchildren = schema.children[:baz].children.values
+
+        expect(grandchildren.all?(&:if?)).to be false
+      end
+    end
   end
 
   describe TypedParameters::Types do

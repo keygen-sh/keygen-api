@@ -136,8 +136,21 @@ module TypedParameters
 
     ##
     # with defines a set of options to use for all direct children of the
-    # schema. For example, with(if: -> { ... }) { ... } would define a
-    # common guard for all children params.
+    # schema defined within the block.
+    #
+    # For example, it can be used to define a common guard:
+    #
+    #   with if: -> { ... } do
+    #     param :foo, type: :string
+    #     param :bar, type: :string
+    #     param :baz, type: :hash do
+    #       param :qux, type: :string
+    #     end
+    #   end
+    #
+    # In this example, :foo, :bar, and :baz will inherit the if: guard,
+    # but :qux will not, since it is not a direct child.
+    #
     def with(**kwargs, &)
       orig     = @options
       @options = kwargs
