@@ -32,6 +32,7 @@ module TypedParameters
       validate: nil,
       if: nil,
       unless: nil,
+      as: nil,
       &block
     )
       key ||= ROOT
@@ -107,6 +108,9 @@ module TypedParameters
       @transforms = [
         Transforms::KeyCasing.new,
       ]
+
+      @transforms << Transforms::KeyAlias.new(as) if
+        as.present?
 
       @transforms << Transforms::NilifyBlanks.new if
         nilify_blanks
