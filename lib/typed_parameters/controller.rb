@@ -139,10 +139,16 @@ module TypedParameters
       private
 
       def respond_to_missing?(method_name, *)
-        controller_name = self.controller_name.classify.underscore
-        aliases         = [
-          :"#{controller_name}_params",
-          :"#{controller_name}_query",
+        return super unless
+          respond_to?(:controller_name)
+
+        name = controller_name&.classify&.underscore
+        return super unless
+          name.present?
+
+        aliases = [
+          :"#{name}_params",
+          :"#{name}_query",
         ]
 
         aliases.include?(method_name) || super
@@ -153,14 +159,14 @@ module TypedParameters
           /_(params|query)\z/.match?(method_name) &&
           respond_to?(:controller_name)
 
-        controller_name = self.controller_name&.classify&.underscore
+        name = controller_name&.classify&.underscore
         return super unless
-          controller_name.present?
+          name.present?
 
         case method_name
-        when :"#{controller_name}_params"
+        when :"#{name}_params"
           typed_params(...)
-        when :"#{controller_name}_query"
+        when :"#{name}_query"
           typed_query(...)
         else
           super
