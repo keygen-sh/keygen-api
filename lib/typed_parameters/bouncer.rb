@@ -11,10 +11,10 @@ module TypedParameters
 
         cond = param.schema.if? ? param.schema.if : param.schema.unless
         res  = case cond
-               in Proc
-                 controller.instance_exec(&cond)
-               in Symbol
-                 controller.send(cond)
+               in Proc => method
+                 controller.instance_exec(&method)
+               in Symbol => method
+                 controller.send(method)
                else
                  raise InvalidMethodError, "invalid method: #{cond.inspect}"
                end
