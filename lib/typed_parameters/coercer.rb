@@ -6,17 +6,15 @@ module TypedParameters
   class Coercer < Mapper
     def call(params)
       depth_first_map(params) do |param|
+        schema = param.schema
         next unless
-          param.schema.coerce?
+          schema.coerce?
 
+        param.value = schema.type.coerce(param.value)
+      rescue FailedCoercionError
         type = Types.for(param.value)
 
-        raise InvalidParameterError.new("cannot coerce #{type} to #{param.schema.type}", path: param.path) unless
-          param.schema.type.coercable?
-
-        param.value = param.schema.type.coerce(param.value)
-      rescue FailedCoercionError
-        raise InvalidParameterError.new("failed to coerce #{type} to #{param.schema.type}", path: param.path)
+        raise InvalidParameterError.new("failed to coerce #{type} to #{schema.type}", path: param.path)
       end
     end
   end
