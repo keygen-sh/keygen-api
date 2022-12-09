@@ -848,6 +848,17 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Transforms::KeyAlias do
+    let(:transform) { TypedParameters::Transforms::KeyAlias.new(:alias) }
+
+    it 'should rename key to the alias' do
+      k, v = transform.call(:foo, :bar)
+
+      expect(k).to eq :alias
+      expect(v).to be :bar
+    end
+  end
+
   describe TypedParameters::Transforms::NilifyBlanks do
     let(:transform) { TypedParameters::Transforms::NilifyBlanks.new }
 
@@ -1741,6 +1752,17 @@ describe TypedParameters do
       transformer.call(params)
 
       expect(params[:foo]).to be nil
+    end
+
+    it 'should rename aliased param' do
+      schema      = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, as: :bar }
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 'baz' })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      transformer.call(params)
+
+      expect(params[:foo]).to be nil
+      expect(params[:bar].value).to be 'baz'
     end
   end
 
