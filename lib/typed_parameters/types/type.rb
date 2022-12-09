@@ -19,7 +19,10 @@ module TypedParameters
       def coercable?     = @coerce.present?
       def scalar?        = !!@scalar
 
-      def match?(v)    = v == self || !!@match.call(v)
+      # NOTE(ezekg) Using self#== because value may be a Type, and we're
+      #             overriding Type#coerce, which is a Ruby core method
+      #             expected to return an [x, y] tuple.
+      def match?(v)    = self == v || !!@match.call(v)
       def mismatch?(v) = !match?(v)
 
       def to_sym = type.to_sym
