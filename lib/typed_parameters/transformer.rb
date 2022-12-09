@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'rule'
+require_relative 'mapper'
 
 module TypedParameters
-  class Transformer < Rule
+  class Transformer < Mapper
     def call(params)
       depth_first_map(params) do |param|
         schema = param.schema
