@@ -1866,6 +1866,44 @@ describe TypedParameters do
 
         expect(params.unwrap).to eq user: { email: 'foo@keygen.example' }
       end
+
+      it 'should bounce group' do
+        schema = TypedParameters::Schema.new type: :hash, strict: false do
+          param :user, type: :hash, unless: -> { false } do
+            param :first_name, type: :string
+            param :last_name, type: :string
+            with if: :admin? do
+              param :password, type: :string
+              param :roles, type: :array do
+                items type: :string
+              end
+            end
+            param :email, type: :string
+          end
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+        params     = TypedParameters::Parameterizer.new(schema:).call(
+          value: {
+            user: {
+              first_name: 'John',
+              last_name: 'Doe',
+              email: 'foo@keygen.example',
+              password: 'secret',
+              roles: %w[admin],
+            },
+          },
+        )
+
+        bouncer.call(params)
+
+        expect(params.unwrap).to eq user: {
+          first_name: 'John',
+          last_name: 'Doe',
+          email: 'foo@keygen.example',
+        }
+      end
     end
 
     context 'with strict schema' do
@@ -1945,6 +1983,41 @@ describe TypedParameters do
         expect { bouncer.call(params) }.to raise_error { |err|
           expect(err).to be_a TypedParameters::UnpermittedParameterError
           expect(err.path.to_json_pointer).to eq '/user/roles'
+        }
+      end
+
+      it 'should bounce group' do
+        schema = TypedParameters::Schema.new type: :hash, strict: true do
+          param :user, type: :hash, unless: -> { false } do
+            param :first_name, type: :string
+            param :last_name, type: :string
+            with if: :admin? do
+              param :password, type: :string
+              param :roles, type: :array do
+                items type: :string
+              end
+            end
+            param :email, type: :string
+          end
+        end
+
+        controller = Class.new(ActionController::Base) { def admin? = false }.new
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+        params     = TypedParameters::Parameterizer.new(schema:).call(
+          value: {
+            user: {
+              first_name: 'John',
+              last_name: 'Doe',
+              email: 'foo@keygen.example',
+              password: 'secret',
+              roles: %w[admin],
+            },
+          },
+        )
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.path.to_json_pointer).to eq '/user/password'
         }
       end
     end
