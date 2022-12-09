@@ -46,6 +46,7 @@ module TypedParameters
     def depth_first_map(param, &)
       return if param.nil?
 
+      # Postorder DFS, so we'll visit the children first.
       if param.schema.children&.any?
         case param.schema.children
         when Array
@@ -59,6 +60,7 @@ module TypedParameters
         end
       end
 
+      # Then we visit the parent.
       yield param
 
       param
