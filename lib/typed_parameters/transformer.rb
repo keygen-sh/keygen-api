@@ -11,7 +11,7 @@ module TypedParameters
 
         schema.transforms.map do |transform|
           key, value = transform.call(param.key, param.value)
-          if key.nil? && value.nil?
+          if key.nil?
             param.delete
 
             break
@@ -20,8 +20,7 @@ module TypedParameters
           # If param's key has changed, we want to rename the key
           # for its parent too.
           if param.parent.present? && param.key != key
-            parent[param.key].delete
-            parent[key] = param
+            parent[key] = param.delete
           end
 
           param.key, param.value = key, value

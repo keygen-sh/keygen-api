@@ -7,7 +7,7 @@ module TypedParameters
       @parent = parent
     end
 
-    def call(key: nil, value:)
+    def call(key: ROOT, value:)
       return value if value.is_a?(Parameter)
       return if
         value.nil?
