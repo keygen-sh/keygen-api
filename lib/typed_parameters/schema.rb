@@ -126,8 +126,8 @@ module TypedParameters
     end
 
     ##
-    # format defines a final transform for the schema, transforming the
-    # params from an input format to an output format, e.g. a JSONAPI
+    # format defines the final output format for the schema, transforming
+    # the params from an input format to an output format, e.g. a JSONAPI
     # document to Rails' standard params format.
     def format(format) = @formatter = Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
 
