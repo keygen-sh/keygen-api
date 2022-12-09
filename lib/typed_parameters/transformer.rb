@@ -7,11 +7,24 @@ module TypedParameters
     def call(params)
       depth_first_map(params) do |param|
         schema = param.schema
+        parent = param.parent
 
         schema.transforms.map do |transform|
-          param.key, param.value = transform.call(param.key, param.value)
+          key, value = transform.call(param.key, param.value)
+          if key.nil? && value.nil?
+            param.delete
 
-          param.delete if param.key.nil? && param.value.nil?
+            break
+          end
+
+          # If param's key has changed, we want to rename the key
+          # for its parent too.
+          if param.key != key
+            parent[param.key].delete
+            parent[key] = param
+          end
+
+          param.key, param.value = key, value
         end
       end
     end
