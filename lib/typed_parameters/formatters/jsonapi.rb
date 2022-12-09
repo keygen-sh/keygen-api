@@ -69,8 +69,12 @@ module TypedParameters
           #              clean this up (i.e. remove the if guard).
           in data: [{ type:, id:, **nil }, *] => linkage if linkage.all? { _1 in type:, id:, **nil }
             res[:"#{key.to_s.singularize}_ids"] = linkage.map { _1[:id] }
+          in data: []
+            res[:"#{key.to_s.singularize}_ids"] = []
           in data: { type:, id:, **nil } => linkage
             res[:"#{key}_id"] = linkage[:id]
+          in data: nil
+            res[:"#{key}_id"] = nil
           else
             res[:"#{key}_attributes"] = call(rel)
           end
