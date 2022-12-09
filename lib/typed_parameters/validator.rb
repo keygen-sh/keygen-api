@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'rule'
+require_relative 'mapper'
 
 module TypedParameters
-  class Validator < Rule
+  class Validator < Mapper
     def call(params)
       raise InvalidParameterError.new('is missing', path: schema.path) if
         params.nil? && schema.required? && !schema.allow_nil?
