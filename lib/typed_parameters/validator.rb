@@ -32,13 +32,23 @@ module TypedParameters
           case
           when Types.hash?(schema.type)
             param.value.each do |key, value|
-              raise InvalidParameterError.new('unpermitted type (expected hash of scalar types)', path: param.path) unless
-                Types.scalar?(value) || schema.allow_non_scalars?
+              next if
+                Types.scalar?(value)
+
+              path = Path.new(*param.path.keys, key)
+
+              raise InvalidParameterError.new('unpermitted type (expected object of scalar types)', path:) unless
+                schema.allow_non_scalars?
             end
           when Types.array?(schema.type)
             param.value.each_with_index do |value, index|
-              raise InvalidParameterError.new('unpermitted type (expected array of scalar types)', path: param.path) unless
-                Types.scalar?(value) || schema.allow_non_scalars?
+              next if
+                Types.scalar?(value)
+
+              path = Path.new(*param.path.keys, index)
+
+              raise InvalidParameterError.new('unpermitted type (expected array of scalar types)', path:) unless
+                schema.allow_non_scalars?
             end
           end
         end
