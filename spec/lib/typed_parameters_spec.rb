@@ -2460,6 +2460,21 @@ describe TypedParameters do
       end
     }
 
+    it 'should not raise when included in Metal controller' do
+      expect { Class.new(ActionController::Metal) { include TypedParameters::Controller } }
+        .to_not raise_error
+    end
+
+    it 'should not raise when included in Base controller' do
+      expect { Class.new(ActionController::Base) { include TypedParameters::Controller } }
+        .to_not raise_error
+    end
+
+    it 'should not raise when included in API controller' do
+      expect { Class.new(ActionController::API) { include TypedParameters::Controller } }
+        .to_not raise_error
+    end
+
     it 'should raise when included outside controller' do
       expect { Class.new { include TypedParameters::Controller } }
         .to raise_error ArgumentError
