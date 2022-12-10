@@ -5,13 +5,15 @@ require_relative 'transform'
 module TypedParameters
   module Transforms
     class KeyCasing < Transform
+      def initialize(casing = nil) = @casing = casing || TypedParameters.config.key_transform
+
       def call(key, value)
-        transformed_key   = transform(key)
+        transformed_key   = transform_key(key)
         transformed_value = case value
                             when Hash
-                              value.transform_keys! { transform(_1) }
+                              value.deep_transform_keys! { transform_key(_1) }
                             when Array
-                              value.map { transform(_1) }
+                              value.map { transform_value(_1) }
                             else
                               value
                             end
@@ -21,29 +23,42 @@ module TypedParameters
 
       private
 
-      def transform(key)
+      attr_reader :casing
+
+      def transform_string(str)
+        case casing
+        when :underscore
+          str.underscore
+        when :camel
+          str.underscore.camelize
+        when :lower_camel
+          str.underscore.camelize(:lower)
+        when :dash
+          str.underscore.dasherize
+        else
+          str
+        end
+      end
+
+      def transform_key(key)
         case key
         when String
-          case TypedParameters.config.key_transform
-          when :underscore
-            key.underscore
-          when :camel
-            key.underscore.camelize
-          when :lower_camel
-            key.underscore.camelize(:lower)
-          when :dash
-            key.underscore.dasherize
-          else
-            key
-          end
+          transform_string(key)
         when Symbol
-          transform(key.to_s).to_sym
-        when Hash
-          key.deep_transform_keys! { transform(_1) }
-        when Array
-          key.map { transform(_1) }
+          transform_string(key.to_s).to_sym
         else
           key
+        end
+      end
+
+      def transform_value(value)
+        case value
+        when Hash
+          value.deep_transform_keys! { transform_key(_1) }
+        when Array
+          value.map { transform_value(_1) }
+        else
+          value
         end
       end
     end
