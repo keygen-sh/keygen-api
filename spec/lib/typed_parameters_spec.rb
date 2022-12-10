@@ -2465,10 +2465,17 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
+    it 'should raise when a duplicate schema is defined' do
+      subject.typed_schema(:foo) { param :bar, type: :string }
+
+      expect { subject.typed_schema(:foo) { param :baz, type: :string } }
+        .to raise_error ArgumentError
+    end
+
     it 'should define a local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to have_key :"#{subject}:foo"
+      expect(subject.typed_schemas).to have_key :"#{subject}/foo"
     end
 
     it 'should define a global schema' do
@@ -2480,7 +2487,7 @@ describe TypedParameters do
     it 'should define a namespaced schema' do
       subject.typed_schema(:foo, namespace: :bar) { param :baz, type: :string }
 
-      expect(subject.typed_schemas).to have_key :"bar:foo"
+      expect(subject.typed_schemas).to have_key :"bar/foo"
     end
 
     it 'should define a singular params handler' do
