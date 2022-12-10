@@ -140,7 +140,7 @@ module TypedParameters
 
       def respond_to_missing?(method_name, *)
         return super unless
-          respond_to?(:controller_name)
+          /_(params|query)\z/.match?(method_name)
 
         name = controller_name&.classify&.underscore
         return super unless
@@ -156,8 +156,7 @@ module TypedParameters
 
       def method_missing(method_name, ...)
         return super unless
-          /_(params|query)\z/.match?(method_name) &&
-          respond_to?(:controller_name)
+          /_(params|query)\z/.match?(method_name)
 
         name = controller_name&.classify&.underscore
         return super unless
@@ -185,6 +184,11 @@ module TypedParameters
 
         super
       end
+    end
+
+    def self.included(klass)
+      raise ArgumentError, "cannot be used outside of controller (got #{klass.ancestors})" unless
+        klass < ::ActionController::Metal
     end
   end
 end
