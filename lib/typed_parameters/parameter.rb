@@ -17,6 +17,8 @@ module TypedParameters
       @parent = parent
     end
 
+    def parent? = parent.present?
+
     def path
       key = @key == ROOT ? nil : @key
 
@@ -91,9 +93,5 @@ module TypedParameters
 
       "#<#{self.class.name} key=#{key.inspect} value=#{value.inspect}>"
     end
-
-    private
-
-    def parent? = parent.present?
   end
 end
