@@ -147,6 +147,18 @@ describe TypedParameters do
       expect(grandchild.keys).to eq %i[bar]
     end
 
+    describe '#format' do
+      it 'should not raise for root node' do
+        expect { TypedParameters::Schema.new { format :jsonapi } }
+          .to_not raise_error
+      end
+
+      it 'should raise for child node' do
+        expect { TypedParameters::Schema.new { param(:key, type: :hash) { format :jsonapi } } }
+          .to raise_error NotImplementedError
+      end
+    end
+
     describe '#with' do
       let :schema do
         TypedParameters::Schema.new type: :hash do
