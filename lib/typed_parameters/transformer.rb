@@ -19,7 +19,7 @@ module TypedParameters
 
           # If param's key has changed, we want to rename the key
           # for its parent too.
-          if param.parent.present? && param.key != key
+          if param.parent? && param.key != key
             parent[key] = param.delete
           end
 
