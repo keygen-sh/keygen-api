@@ -82,7 +82,7 @@ module TypedParameters
       def typed_params(on: nil, schema: nil, format: nil, namespace: self, **kwargs, &)
         schema = case schema
                  in Symbol => key
-                   namespaced_key = [*namespace, key].join(':')
+                   namespaced_key = [*namespace, key].join('/')
                                                      .to_sym
 
                    typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
@@ -105,7 +105,7 @@ module TypedParameters
       def typed_query(on: nil, schema: nil, namespace: self, **kwargs, &)
         schema = case schema
                  in Symbol => key
-                   namespaced_key = [*namespace, key].join(':')
+                   namespaced_key = [*namespace, key].join('/')
                                                      .to_sym
 
                    typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
@@ -127,7 +127,7 @@ module TypedParameters
       end
 
       def typed_schema(key, namespace: self, **kwargs, &)
-        namespaced_key = [*namespace, key].join(':')
+        namespaced_key = [*namespace, key].join('/')
                                           .to_sym
 
         raise ArgumentError, "schema already exists: #{namespaced_key.inspect}" if
