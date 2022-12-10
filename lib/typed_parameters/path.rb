@@ -4,7 +4,10 @@ module TypedParameters
   class Path
     attr_reader :keys
 
-    def initialize(*keys) = @keys = keys
+    def initialize(*keys, casing: nil)
+      @casing = casing || TypedParameters.config.key_transform
+      @keys   = keys
+    end
 
     def to_json_pointer = '/' + keys.map { transform(_1) }.join('/')
     def to_dot_notation = keys.map { transform(_1) }.join('.')
@@ -28,10 +31,12 @@ module TypedParameters
 
     private
 
+    attr_reader :casing
+
     def transform(key)
       return key if key.is_a?(Numeric)
 
-      case TypedParameters.config.path_transform
+      case casing
       when :underscore
         key.to_s.underscore
       when :camel
