@@ -2448,6 +2448,11 @@ describe TypedParameters do
       end
     }
 
+    it 'should raise when included outside controller' do
+      expect { Class.new { include TypedParameters::Controller } }
+        .to raise_error ArgumentError
+    end
+
     it 'should define a local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
