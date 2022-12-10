@@ -17,6 +17,26 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Configuration do
+    subject { TypedParameters::Configuration.new }
+
+    describe '#path_transform=' do
+      it('should respond') { expect(subject).to respond_to :path_transform= }
+    end
+
+    describe '#path_transform' do
+      it('should respond') { expect(subject).to respond_to :path_transform }
+    end
+
+    describe '#key_transform=' do
+      it('should respond') { expect(subject).to respond_to :key_transform= }
+    end
+
+    describe '#key_transform' do
+      it('should respond') { expect(subject).to respond_to :key_transform }
+    end
+  end
+
   describe TypedParameters::Schema do
     %i[
       in
