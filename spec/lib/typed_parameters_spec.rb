@@ -683,11 +683,8 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Transforms::KeyCasing do
-    let(:transform) { TypedParameters::Transforms::KeyCasing.new }
+    let(:transform) { TypedParameters::Transforms::KeyCasing.new(casing) }
     let(:casing)    { nil }
-
-    before { TypedParameters.config.key_transform = casing }
-    after  { TypedParameters.config.key_transform = nil }
 
     context 'with no key transform' do
       %w[
@@ -749,6 +746,86 @@ describe TypedParameters do
           expect(v).to eq k => :baz
         end
       end
+
+      it 'should transform a shallow array' do
+        k, v = transform.call('rootKey', %w[a_value another_value])
+
+        expect(k).to eq 'root_key'
+        expect(v).to eq %w[a_value another_value]
+      end
+
+      it 'should transform a deep array' do
+        k, v = transform.call(
+          'rootKey',
+          [
+            'child_value',
+            {
+              'childKey' => [
+                { 'grandchildKey' => { 'greatGrandchildKey' => %i[a_value another_value] } },
+                { 'grandchildKey' => { 'greatGrandchildKey' => %s[a_value another_value] } },
+              ],
+            },
+            :child_value,
+            {
+              'childKey' => [
+                { 'grandchildKey' => { 'greatGrandchildKey' => [1, 2, 3] } },
+              ],
+            },
+            1,
+          ],
+        )
+
+        expect(k).to eq 'root_key'
+        expect(v).to eq [
+          'child_value',
+          {
+            'child_key' => [
+              { 'grandchild_key' => { 'great_grandchild_key' => %i[a_value another_value] } },
+              { 'grandchild_key' => { 'great_grandchild_key' => %s[a_value another_value] } },
+            ],
+          },
+          :child_value,
+          {
+            'child_key' => [
+              { 'grandchild_key' => { 'great_grandchild_key' => [1, 2, 3] } },
+            ],
+          },
+          1,
+        ]
+      end
+
+      it 'should transform a shallow hash' do
+        k, v = transform.call(:rootKey, { aKey: :a_value, anotherKey: :another_value })
+
+        expect(k).to eq :root_key
+        expect(v).to eq a_key: :a_value, another_key: :another_value
+      end
+
+      it 'should transform a deep hash' do
+        k, v = transform.call(
+          :rootKey,
+          {
+            childKey: [
+              { grandchildKey: { greatGrandchildKey: %i[a_value another_value] } },
+              'grandchild_value',
+              { grandchildKey: { greatGrandchildKey: %s[a_value another_value] } },
+              :grandchild_value,
+              { grandchildKey: { greatGrandchildKey: [1, 2, 3] } },
+              1,
+            ]
+          },
+        )
+
+        expect(k).to eq :root_key
+        expect(v).to eq child_key: [
+          { grandchild_key: { great_grandchild_key: %i[a_value another_value] } },
+          'grandchild_value',
+          { grandchild_key: { great_grandchild_key: %s[a_value another_value] } },
+          :grandchild_value,
+          { grandchild_key: { great_grandchild_key: [1, 2, 3] } },
+          1,
+        ]
+      end
     end
 
     context 'with :camel key transform' do
@@ -780,6 +857,86 @@ describe TypedParameters do
           expect(k).to eq :FooBar
           expect(v).to eq k => :baz
         end
+      end
+
+      it 'should transform a shallow array' do
+        k, v = transform.call('root_key', %w[a_value another_value])
+
+        expect(k).to eq 'RootKey'
+        expect(v).to eq %w[a_value another_value]
+      end
+
+      it 'should transform a deep array' do
+        k, v = transform.call(
+          'root_key',
+          [
+            'child_value',
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => %i[a_value another_value] } },
+                { 'grandchild_key' => { 'great_grandchild_key' => %s[a_value another_value] } },
+              ],
+            },
+            :child_value,
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => [1, 2, 3] } },
+              ],
+            },
+            1,
+          ],
+        )
+
+        expect(k).to eq 'RootKey'
+        expect(v).to eq [
+          'child_value',
+          {
+            'ChildKey' => [
+              { 'GrandchildKey' => { 'GreatGrandchildKey' => %i[a_value another_value] } },
+              { 'GrandchildKey' => { 'GreatGrandchildKey' => %s[a_value another_value] } },
+            ],
+          },
+          :child_value,
+          {
+            'ChildKey' => [
+              { 'GrandchildKey' => { 'GreatGrandchildKey' => [1, 2, 3] } },
+            ],
+          },
+          1,
+        ]
+      end
+
+      it 'should transform a shallow hash' do
+        k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
+
+        expect(k).to eq :RootKey
+        expect(v).to eq AKey: :a_value, AnotherKey: :another_value
+      end
+
+      it 'should transform a deep hash' do
+        k, v = transform.call(
+          :root_key,
+          {
+            child_key: [
+              { grandchild_key: { great_grandchild_key: %i[a_value another_value] } },
+              'grandchild_value',
+              { grandchild_key: { great_grandchild_key: %s[a_value another_value] } },
+              :grandchild_value,
+              { grandchild_key: { great_grandchild_key: [1, 2, 3] } },
+              1,
+            ],
+          },
+        )
+
+        expect(k).to eq :RootKey
+        expect(v).to eq ChildKey: [
+          { GrandchildKey: { GreatGrandchildKey: %i[a_value another_value] } },
+          'grandchild_value',
+          { GrandchildKey: { GreatGrandchildKey: %s[a_value another_value] } },
+          :grandchild_value,
+          { GrandchildKey: { GreatGrandchildKey: [1, 2, 3] } },
+          1,
+        ]
       end
     end
 
@@ -813,6 +970,86 @@ describe TypedParameters do
           expect(v).to eq k => :baz
         end
       end
+
+      it 'should transform a shallow array' do
+        k, v = transform.call('root_key', %w[a_value another_value])
+
+        expect(k).to eq 'rootKey'
+        expect(v).to eq %w[a_value another_value]
+      end
+
+      it 'should transform a deep array' do
+        k, v = transform.call(
+          'root_key',
+          [
+            'child_value',
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => %i[a_value another_value] } },
+                { 'grandchild_key' => { 'great_grandchild_key' => %s[a_value another_value] } },
+              ],
+            },
+            :child_value,
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => [1, 2, 3] } },
+              ],
+            },
+            1,
+          ],
+        )
+
+        expect(k).to eq 'rootKey'
+        expect(v).to eq [
+          'child_value',
+          {
+            'childKey' => [
+              { 'grandchildKey' => { 'greatGrandchildKey' => %i[a_value another_value] } },
+              { 'grandchildKey' => { 'greatGrandchildKey' => %s[a_value another_value] } },
+            ],
+          },
+          :child_value,
+          {
+            'childKey' => [
+              { 'grandchildKey' => { 'greatGrandchildKey' => [1, 2, 3] } },
+            ],
+          },
+          1,
+        ]
+      end
+
+      it 'should transform a shallow hash' do
+        k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
+
+        expect(k).to eq :rootKey
+        expect(v).to eq aKey: :a_value, anotherKey: :another_value
+      end
+
+      it 'should transform a deep hash' do
+        k, v = transform.call(
+          :root_key,
+          {
+            child_key: [
+              { grandchild_key: { great_grandchild_key: %i[a_value another_value] } },
+              'grandchild_value',
+              { grandchild_key: { great_grandchild_key: %s[a_value another_value] } },
+              :grandchild_value,
+              { grandchild_key: { great_grandchild_key: [1, 2, 3] } },
+              1,
+            ],
+          },
+        )
+
+        expect(k).to eq :rootKey
+        expect(v).to eq childKey: [
+          { grandchildKey: { greatGrandchildKey: %i[a_value another_value] } },
+          'grandchild_value',
+          { grandchildKey: { greatGrandchildKey: %s[a_value another_value] } },
+          :grandchild_value,
+          { grandchildKey: { greatGrandchildKey: [1, 2, 3] } },
+          1,
+        ]
+      end
     end
 
     context 'with :dash key transform' do
@@ -844,6 +1081,86 @@ describe TypedParameters do
           expect(k).to eq :'foo-bar'
           expect(v).to eq k => :baz
         end
+      end
+
+      it 'should transform a shallow array' do
+        k, v = transform.call('root_key', %w[a_value another_value])
+
+        expect(k).to eq 'root-key'
+        expect(v).to eq %w[a_value another_value]
+      end
+
+      it 'should transform a deep array' do
+        k, v = transform.call(
+          'root_key',
+          [
+            'child_value',
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => %i[a_value another_value] } },
+                { 'grandchild_key' => { 'great_grandchild_key' => %s[a_value another_value] } },
+              ],
+            },
+            :child_value,
+            {
+              'child_key' => [
+                { 'grandchild_key' => { 'great_grandchild_key' => [1, 2, 3] } },
+              ],
+            },
+            1,
+          ],
+        )
+
+        expect(k).to eq 'root-key'
+        expect(v).to eq [
+          'child_value',
+          {
+            'child-key' => [
+              { 'grandchild-key' => { 'great-grandchild-key' => %i[a_value another_value] } },
+              { 'grandchild-key' => { 'great-grandchild-key' => %s[a_value another_value] } },
+            ],
+          },
+          :child_value,
+          {
+            'child-key' => [
+              { 'grandchild-key' => { 'great-grandchild-key' => [1, 2, 3] } },
+            ],
+          },
+          1,
+        ]
+      end
+
+      it 'should transform a shallow hash' do
+        k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
+
+        expect(k).to eq :'root-key'
+        expect(v).to eq 'a-key': :a_value, 'another-key': :another_value
+      end
+
+      it 'should transform a deep hash' do
+        k, v = transform.call(
+          :root_key,
+          {
+            child_key: [
+              { grandchild_key: { great_grandchild_key: %i[a_value another_value] } },
+              'grandchild_value',
+              { grandchild_key: { great_grandchild_key: %s[a_value another_value] } },
+              :grandchild_value,
+              { grandchild_key: { great_grandchild_key: [1, 2, 3] } },
+              1,
+            ],
+          },
+        )
+
+        expect(k).to eq :'root-key'
+        expect(v).to eq 'child-key': [
+          { 'grandchild-key': { 'great-grandchild-key': %i[a_value another_value] } },
+          'grandchild_value',
+          { 'grandchild-key': { 'great-grandchild-key': %s[a_value another_value] } },
+          :grandchild_value,
+          { 'grandchild-key': { 'great-grandchild-key': [1, 2, 3] } },
+          1,
+        ]
       end
     end
   end
@@ -1029,11 +1346,8 @@ describe TypedParameters do
   end
 
   describe TypedParameters::Path do
-    let(:path)   { TypedParameters::Path.new(:foo, :bar_baz, 42, :qux) }
+    let(:path)   { TypedParameters::Path.new(:foo, :bar_baz, 42, :qux, casing:) }
     let(:casing) { nil }
-
-    before { TypedParameters.config.path_transform = casing }
-    after  { TypedParameters.config.path_transform = nil }
 
     it 'should support JSON pointer paths' do
       expect(path.to_json_pointer).to eq '/foo/bar_baz/42/qux'
