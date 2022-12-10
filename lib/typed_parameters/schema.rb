@@ -136,7 +136,17 @@ module TypedParameters
     # format defines the final output format for the schema, transforming
     # the params from an input format to an output format, e.g. a JSONAPI
     # document to Rails' standard params format.
-    def format(format) = @formatter = Formatters[format] || raise(ArgumentError, "invalid format: #{format.inspect}")
+    def format(format)
+      raise NotImplementedError, 'cannot define format for child schema' if
+        child?
+
+      formatter = Formatters[format]
+
+      raise ArgumentError, "invalid format: #{format.inspect}" if
+        formatter.nil?
+
+      @formatter = formatter
+    end
 
     ##
     # with defines a set of options to use for all direct children of the
@@ -225,6 +235,8 @@ module TypedParameters
     end
 
     def root?              = key == ROOT
+    def child?             = !root?
+    def children?          = !children.blank?
     def strict?            = !!strict
     def lenient?           = !strict?
     def optional?          = !!@optional
