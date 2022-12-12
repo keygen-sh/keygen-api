@@ -52,6 +52,32 @@ describe TypedParameters do
 
   describe TypedParameters::Schema do
     %i[
+      array
+      hash
+    ].each do |type|
+      it "should allow a block for type: #{type}" do
+        expect { TypedParameters::Schema.new(type:) {} }.to_not raise_error
+      end
+    end
+
+    %i[
+      boolean
+      string
+      integer
+      float
+      decimal
+      number
+      symbol
+      date
+      time
+      nil
+    ].each do |type|
+      it "should not allow a block for type: #{type}" do
+        expect { TypedParameters::Schema.new(type:) {} }.to raise_error ArgumentError
+      end
+    end
+
+    %i[
       in
     ].each do |option|
       it "should not raise on valid :inclusion option: #{option}" do
