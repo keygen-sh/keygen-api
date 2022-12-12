@@ -9,14 +9,7 @@ module TypedParameters
 
       def call(key, value)
         transformed_key   = transform_key(key)
-        transformed_value = case value
-                            when Hash
-                              value.deep_transform_keys { transform_key(_1) }
-                            when Array
-                              value.map { transform_value(_1) }
-                            else
-                              value
-                            end
+        transformed_value = transform_value(value)
 
         [transformed_key, transformed_value]
       end
