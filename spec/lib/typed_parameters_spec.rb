@@ -687,6 +687,33 @@ describe TypedParameters do
         data:,
       )
     end
+
+    context 'when formatting linkage' do
+      let :schema do
+        TypedParameters::Schema.new(type: :hash) do
+          format :jsonapi
+
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: { in: %w[users user] }
+            param :id, type: :string, optional: true
+          end
+        end
+      end
+
+      it 'should format full linkage' do
+        data   = { type: 'user', id: SecureRandom.base58 }
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+
+        expect(params.unwrap).to eq(data.slice(:id))
+      end
+
+      it 'should format partial linkage' do
+        data   = { type: 'user' }
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { data: })
+
+        expect(params.unwrap).to be_empty
+      end
+    end
   end
 
   describe TypedParameters::Formatters::Rails do
@@ -2083,7 +2110,31 @@ describe TypedParameters do
       expect(params[:bar].value).to eq 2
     end
 
-    it 'should delete param with no key or value' do
+    it 'should not delete root param with no key or value' do
+      schema      = TypedParameters::Schema.new(type: :hash, transform: -> k, v { [] })
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      expect { transformer.call(params) }.to raise_error NotImplementedError
+    end
+
+    it 'should not delete root param with no key' do
+      schema      = TypedParameters::Schema.new(type: :hash, transform: -> k, v { [nil, v] })
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      expect { transformer.call(params) }.to raise_error NotImplementedError
+    end
+
+    it 'should not delete root param with no value' do
+      schema      = TypedParameters::Schema.new(type: :hash, transform: -> k, v { [k, nil] })
+      params      = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      transformer = TypedParameters::Transformer.new(schema:)
+
+      expect { transformer.call(params) }.to_not raise_error
+    end
+
+    it 'should delete child param with no key or value' do
       schema = TypedParameters::Schema.new type: :hash do
         param :foo, type: :hash do
           param :bar, type: :integer, transform: -> k, v { [] }
@@ -2095,10 +2146,11 @@ describe TypedParameters do
 
       transformer.call(params)
 
-      expect(params[:foo].value).to be_empty
+      expect(params[:foo].value).to eq({})
+      expect(params[:foo][:bar]).to be nil
     end
 
-    it 'should delete param with no key' do
+    it 'should delete child param with no key' do
       schema = TypedParameters::Schema.new type: :hash do
         param :foo, type: :hash do
           param :bar, type: :integer, transform: -> k, v { [nil, v] }
@@ -2110,10 +2162,11 @@ describe TypedParameters do
 
       transformer.call(params)
 
-      expect(params[:foo].value).to be_empty
+      expect(params[:foo].value).to eq({})
+      expect(params[:foo][:bar]).to be nil
     end
 
-    it 'should not delete param with no value' do
+    it 'should not delete child param with no value' do
       schema = TypedParameters::Schema.new type: :hash do
         param :foo, type: :hash do
           param :bar, type: :integer, transform: -> k, v { [k, nil] }
@@ -2126,6 +2179,7 @@ describe TypedParameters do
       transformer.call(params)
 
       expect(params[:foo].value).to_not be_empty
+      expect(params[:foo][:bar].value).to be nil
     end
 
     it 'should not transform blank param to nil' do
