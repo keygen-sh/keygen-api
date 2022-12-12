@@ -5,8 +5,8 @@ require_relative 'transform'
 module TypedParameters
   module Transforms
     class KeyAlias < Transform
-      def initialize(as)   = @as = as
-      def call(key, value) = [as, value]
+      def initialize(as) = @as = as
+      def call(_, value) = [as, value]
 
       private
 
