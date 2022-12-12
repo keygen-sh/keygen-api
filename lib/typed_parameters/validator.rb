@@ -30,7 +30,7 @@ module TypedParameters
         # Assert scalar values for params without children
         if schema.children.nil?
           case
-          when Types.hash?(schema.type)
+          when schema.hash?
             param.value.each do |key, value|
               next if
                 Types.scalar?(value)
@@ -40,7 +40,7 @@ module TypedParameters
               raise InvalidParameterError.new('unpermitted type (expected object of scalar types)', path:) unless
                 schema.allow_non_scalars?
             end
-          when Types.array?(schema.type)
+          when schema.array?
             param.value.each_with_index do |value, index|
               next if
                 Types.scalar?(value)
