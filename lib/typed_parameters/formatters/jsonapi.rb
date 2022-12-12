@@ -52,8 +52,7 @@ module TypedParameters
       def self.format_hash_data(data)
         rels  = data[:relationships]
         attrs = data[:attributes]
-        id    = data[:id]
-        res   = { id: }
+        res   = data.slice(:id)
 
         # Move attributes over to top-level params
         attrs&.each do |key, attr|
