@@ -229,7 +229,7 @@ describe TypedParameters do
     describe '#with' do
       let :schema do
         TypedParameters::Schema.new type: :hash do
-          with if: -> { true } do
+          with optional: true, if: -> { true } do
             param :foo, type: :string
             param :bar, type: :string
             param :baz, type: :hash do
@@ -242,12 +242,14 @@ describe TypedParameters do
       it 'should pass options to children' do
         children = schema.children.values
 
+        expect(children.all?(&:optional?)).to be true
         expect(children.all?(&:if?)).to be true
       end
 
       it 'should not pass options to grandchildren' do
         grandchildren = schema.children[:baz].children.values
 
+        expect(grandchildren.all?(&:optional?)).to be false
         expect(grandchildren.all?(&:if?)).to be false
       end
     end
