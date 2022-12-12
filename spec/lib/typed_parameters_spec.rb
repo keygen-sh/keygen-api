@@ -293,6 +293,22 @@ describe TypedParameters do
 
         expect(type.type).to eq :integer
       end
+
+      context 'with a custom type' do
+        it 'should prioritize the newest type' do
+          TypedParameters::Types.register(:shallow_hash,
+            match: -> v { v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) } },
+          )
+
+          t1 = TypedParameters::Types.for({ foo: 1, bar: 2 })
+          t2 = TypedParameters::Types.for({ baz: [:qux] })
+
+          expect(t1.type).to eq :shallow_hash
+          expect(t2.type).to eq :hash
+
+          TypedParameters::Types.unregister(:shallow_hash)
+        end
+      end
     end
 
     describe '.[]' do
