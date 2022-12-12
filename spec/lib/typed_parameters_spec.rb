@@ -77,6 +77,34 @@ describe TypedParameters do
       end
     end
 
+    context 'with :array type' do
+      it 'should raise when defining a param' do
+        expect { TypedParameters::Schema.new(type: :array) { param :foo, type: :string } }.to raise_error NotImplementedError
+      end
+
+      it 'should not raise when defining items' do
+        expect { TypedParameters::Schema.new(type: :array) { items type: :string } }.to_not raise_error
+      end
+
+      it 'should not raise when defining an item' do
+        expect { TypedParameters::Schema.new(type: :array) { item type: :string } }.to_not raise_error
+      end
+    end
+
+    context 'with :hash type' do
+      it 'should not raise when defining a param' do
+        expect { TypedParameters::Schema.new(type: :hash) { param :foo, type: :string } }.to_not raise_error
+      end
+
+      it 'should not raise when defining items' do
+        expect { TypedParameters::Schema.new(type: :hash) { items type: :string } }.to raise_error NotImplementedError
+      end
+
+      it 'should not raise when defining an item' do
+        expect { TypedParameters::Schema.new(type: :hash) { item type: :string } }.to raise_error NotImplementedError
+      end
+    end
+
     %i[
       in
     ].each do |option|

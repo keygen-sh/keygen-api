@@ -177,7 +177,7 @@ module TypedParameters
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
-      @children ||= {} if Types.hash?(self.type)
+      @children ||= {} if hash?
 
       raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
         Types.hash?(children)
@@ -195,7 +195,7 @@ module TypedParameters
     ##
     # item defines an indexed parameter for an array schema.
     def item(key = children&.size || 0, type:, **kwargs, &block)
-      @children ||= [] if Types.array?(self.type)
+      @children ||= [] if array?
 
       raise NotImplementedError, "cannot define item for non-array type (got #{self.type})" unless
         Types.array?(children)
