@@ -5,7 +5,7 @@ module TypedParameters
     attr_reader :keys
 
     def initialize(*keys, casing: nil)
-      @casing = casing || TypedParameters.config.key_transform
+      @casing = casing || TypedParameters.config.path_transform
       @keys   = keys
     end
 
