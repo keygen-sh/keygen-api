@@ -9,15 +9,15 @@ module TypedParameters
       @keys   = keys
     end
 
-    def to_json_pointer = '/' + keys.map { transform(_1) }.join('/')
-    def to_dot_notation = keys.map { transform(_1) }.join('.')
+    def to_json_pointer = '/' + keys.map { transform_key(_1) }.join('/')
+    def to_dot_notation = keys.map { transform_key(_1) }.join('.')
 
     def to_s
-      keys.map { transform(_1) }.reduce(+'') do |s, key|
+      keys.map { transform_key(_1) }.reduce(+'') do |s, key|
         next s << key if s.blank?
 
         case key
-        when Numeric
+        when Integer
           s << "[#{key}]"
         else
           s << ".#{key}"
@@ -33,21 +33,25 @@ module TypedParameters
 
     attr_reader :casing
 
-    def transform(key)
-      return key if key.is_a?(Numeric)
-
+    def transform_string(str)
       case casing
       when :underscore
-        key.to_s.underscore
+        str.underscore
       when :camel
-        key.to_s.underscore.camelize
+        str.underscore.camelize
       when :lower_camel
-        key.to_s.underscore.camelize(:lower)
+        str.underscore.camelize(:lower)
       when :dash
-        key.to_s.underscore.dasherize
+        str.underscore.dasherize
       else
-        key.to_s
+        str
       end
+    end
+
+    def transform_key(key)
+      return key if key.is_a?(Integer)
+
+      transform_string(key.to_s)
     end
   end
 end
