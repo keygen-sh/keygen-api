@@ -5,7 +5,7 @@ require_relative 'transform'
 module TypedParameters
   module Transforms
     class Noop < Transform
-      def call(key, value) = []
+      def call(*) = []
     end
   end
 end
