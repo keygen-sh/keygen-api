@@ -1195,6 +1195,26 @@ describe TypedParameters do
         ]
       end
     end
+
+    context 'with config key transform' do
+      before do
+        @key_transform_was = TypedParameters.config.key_transform
+
+        TypedParameters.config.key_transform = :dash
+      end
+
+      after do
+        TypedParameters.config.key_transform = @key_transform_was
+      end
+
+      it "should transform key" do
+        k, v = transform.call(:foo_bar, { :baz_qux => 1 })
+
+        expect(k).to eq :'foo-bar'
+        expect(v).to eq :'baz-qux' => 1
+      end
+
+    end
   end
 
   describe TypedParameters::Transforms::KeyAlias do
@@ -1424,6 +1444,22 @@ describe TypedParameters do
 
       it 'should transform path' do
         expect(path.to_s).to eq 'foo.bar-baz[42].qux'
+      end
+    end
+
+    context 'with config path transform' do
+      before do
+        @path_transform_was = TypedParameters.config.path_transform
+
+        TypedParameters.config.path_transform = :lower_camel
+      end
+
+      after do
+        TypedParameters.config.path_transform = @path_transform_was
+      end
+
+      it 'should transform path' do
+        expect(path.to_s).to eq 'foo.barBaz[42].qux'
       end
     end
   end
