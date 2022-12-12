@@ -22,7 +22,9 @@ module TypedParameters
     def self.nil?(value)    = types[:nil].match?(value)
     def self.scalar?(value) = self.for(value).scalar?
 
-    def self.for(value) = types.values.find { _1.match?(value) }
+    # NOTE(ezekg) Reversing so that we access newer types first, to allow for
+    #             more fine-grained custom types.
+    def self.for(value) = types.values.reverse.find { _1.match?(value) }
     def self.[](type)   = types[type] || raise(ArgumentError, "invalid type: #{type.inspect}")
   end
 end
