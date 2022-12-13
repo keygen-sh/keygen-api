@@ -3,6 +3,8 @@
 module TypedParameters
   module Formatters
     class Formatter
+      extend Forwardable
+
       attr_reader :format
 
       def initialize(format, transform:)
@@ -12,8 +14,7 @@ module TypedParameters
 
       def call(...) = @transform.call(...)
 
-      # FIXME(ezekg) Is there a cleaner way of delegating arity?
-      def arity = @transform.arity
+      delegate arity: :@transform
     end
   end
 end
