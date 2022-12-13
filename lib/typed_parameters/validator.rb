@@ -12,7 +12,7 @@ module TypedParameters
         type   = Types.for(param.value)
         schema = param.schema
 
-        raise InvalidParameterError.new("type mismatch (received unknown expected #{schema.type.name})", path: param.path) if
+        raise InvalidParameterError.new("type mismatch (received unknown expected #{schema.type.humanize})", path: param.path) if
           type.nil?
 
         # Handle nils early on
@@ -24,8 +24,8 @@ module TypedParameters
         end
 
         # Assert type
-        raise InvalidParameterError.new("type mismatch (received #{type.name} expected #{schema.type.name})", path: param.path) if
-          schema.type != type
+        raise InvalidParameterError.new("type mismatch (received #{type.humanize} expected #{schema.type.humanize})", path: param.path) unless
+          type == schema.type || type.variation? && type.archetype == schema.type
 
         # Assert scalar values for params without children
         if schema.children.nil?

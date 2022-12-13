@@ -22,12 +22,6 @@ require_relative 'typed_parameters/transforms/noop'
 require_relative 'typed_parameters/transforms/transform'
 require_relative 'typed_parameters/transformer'
 require_relative 'typed_parameters/types'
-# FIXME(ezekg) Number type is order-dependent, since it covers both integer
-#              and float. Because types are matched in reverse order, we
-#              want to load number first, since it's less specific.
-#
-# Should we add a way to specify order when registering types?
-require_relative 'typed_parameters/types/number'
 require_relative 'typed_parameters/types/array'
 require_relative 'typed_parameters/types/boolean'
 require_relative 'typed_parameters/types/date'
@@ -36,6 +30,7 @@ require_relative 'typed_parameters/types/float'
 require_relative 'typed_parameters/types/hash'
 require_relative 'typed_parameters/types/integer'
 require_relative 'typed_parameters/types/nil'
+require_relative 'typed_parameters/types/number'
 require_relative 'typed_parameters/types/string'
 require_relative 'typed_parameters/types/symbol'
 require_relative 'typed_parameters/types/time'
@@ -57,12 +52,9 @@ module TypedParameters
   # example, determining if a schema is the root node.
   ROOT = Object.new
 
-  class UnsupportedCoercionError < StandardError; end
-  class FailedCoercionError < StandardError; end
   class UndefinedActionError < StandardError; end
   class InvalidMethodError < StandardError; end
-  class DuplicateFormatterError < StandardError; end
-  class DuplicateTypeError < StandardError; end
+  class CoercionError < StandardError; end
 
   class InvalidParameterError < StandardError
     attr_reader :path
