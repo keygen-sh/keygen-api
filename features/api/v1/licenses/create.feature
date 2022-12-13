@@ -912,7 +912,22 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "201"
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received object expected metadata object)",
+        "source": {
+          "pointer": "/data/attributes/metadata"
+        }
+      }
+      """
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with metadata for their account and the keys should be transformed to camelcase
     Given I am an admin of account "test1"
