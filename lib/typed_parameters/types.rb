@@ -56,8 +56,8 @@ module TypedParameters
       type
     end
 
-    def self.for(value)
-      _, type = subtypes.find { |_, t| t.match?(value) } ||
+    def self.for(value, try: nil)
+      _, type = subtypes.slice(*try).find { |_, t| t.match?(value) } ||
                 types.find { |_, t| t.match?(value) }
 
       raise ArgumentError, "cannot find type for value: #{value.inspect}" if

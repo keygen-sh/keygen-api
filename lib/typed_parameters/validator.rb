@@ -9,8 +9,10 @@ module TypedParameters
         params.nil? && schema.required? && !schema.allow_nil?
 
       depth_first_map(params) do |param|
-        type   = Types.for(param.value)
         schema = param.schema
+        type   = Types.for(param.value,
+          try: schema.type.subtype? ? schema.type.to_sym : nil,
+        )
 
         raise InvalidParameterError.new("type mismatch (received unknown expected #{schema.type.humanize})", path: param.path) if
           type.nil?
