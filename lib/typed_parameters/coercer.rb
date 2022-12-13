@@ -11,7 +11,7 @@ module TypedParameters
           schema.coerce?
 
         param.value = schema.type.coerce(param.value)
-      rescue FailedCoercionError
+      rescue CoercionError
         type = Types.for(param.value)
 
         raise InvalidParameterError.new("failed to coerce #{type} to #{schema.type}", path: param.path)
