@@ -27,6 +27,9 @@ module TypedParameters
     end
 
     def self.unregister(type)
+      return unless
+        registry.include?(type)
+
       t = abstracts.delete(type) || subtypes.delete(type) || types.delete(type)
 
       registry.delete(type) if
