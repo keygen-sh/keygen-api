@@ -30,7 +30,8 @@ module TypedParameters
       end
 
       def archetype
-        return unless variation?
+        return unless @archetype.present?
+
         return @archetype if
           @archetype.is_a?(Type)
 
@@ -41,7 +42,7 @@ module TypedParameters
       def coercable?     = !!@coerce
       def scalar?        = !!@scalar
       def abstract?      = !!@abstract
-      def variation?     = !!@archetype
+      def subtype?       = !!@archetype
 
       # NOTE(ezekg) Using yoda-style self#== because value may be a Type, and
       #             we're overriding Type#coerce, which is a Ruby core method
@@ -50,7 +51,7 @@ module TypedParameters
       def mismatch?(v) = !match?(v)
 
       def humanize
-        if variation?
+        if subtype?
           "#{@name} #{archetype.humanize}"
         else
           @name.to_s

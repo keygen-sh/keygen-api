@@ -25,7 +25,7 @@ module TypedParameters
 
         # Assert type
         raise InvalidParameterError.new("type mismatch (received #{type.humanize} expected #{schema.type.humanize})", path: param.path) unless
-          type == schema.type || type.variation? && type.archetype == schema.type
+          type == schema.type || type.subtype? && type.archetype == schema.type
 
         # Assert scalar values for params without children
         if schema.children.nil?
