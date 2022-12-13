@@ -3094,6 +3094,7 @@ describe TypedParameters do
 
         body = JSON.parse(response.body, symbolize_names: true)
 
+        # FIXME(ezekg) Use rails-controller-testing gem for assigns[]?
         expect(body[:params]).to eq params
         expect(body[:query]).to eq query
       end
@@ -3136,6 +3137,7 @@ describe TypedParameters do
 
         body = JSON.parse(response.body, symbolize_names: true)
 
+        # FIXME(ezekg) Use rails-controller-testing gem for assigns[]?
         expect(body[:params]).to eq data.slice(:id)
         expect(body[:meta]).to eq meta
         expect(body[:data]).to eq data
