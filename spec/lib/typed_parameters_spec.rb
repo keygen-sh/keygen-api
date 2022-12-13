@@ -55,7 +55,7 @@ describe TypedParameters do
       array
       hash
     ].each do |type|
-      it "should allow a block for type: #{type}" do
+      it "should allow block for type: #{type}" do
         expect { TypedParameters::Schema.new(type:) {} }.to_not raise_error
       end
     end
@@ -72,13 +72,13 @@ describe TypedParameters do
       time
       nil
     ].each do |type|
-      it "should not allow a block for type: #{type}" do
+      it "should not allow block for type: #{type}" do
         expect { TypedParameters::Schema.new(type:) {} }.to raise_error ArgumentError
       end
     end
 
     context 'with :array type' do
-      it 'should raise when defining a param' do
+      it 'should raise when defining param' do
         expect { TypedParameters::Schema.new(type: :array) { param :foo, type: :string } }.to raise_error NotImplementedError
       end
 
@@ -92,7 +92,7 @@ describe TypedParameters do
     end
 
     context 'with :hash type' do
-      it 'should not raise when defining a param' do
+      it 'should not raise when defining param' do
         expect { TypedParameters::Schema.new(type: :hash) { param :foo, type: :string } }.to_not raise_error
       end
 
@@ -192,7 +192,7 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
-    it 'should have a correct path' do
+    it 'should have correct path' do
       grandchild = schema.children[:foo]
                          .children[:bar]
                          .children[0]
@@ -255,64 +255,190 @@ describe TypedParameters do
     end
   end
 
+  describe TypedParameters::Types::Type do
+    let :type do
+      TypedParameters::Types::Type.new(
+        type: :hash,
+        name: :object,
+        accepts_block: true,
+        scalar: false,
+        coerce: -> v { v.respond_to?(:to_h) ? v.to_h : {} },
+        match: -> v { v.is_a?(Hash) },
+        abstract: false,
+        archetype: nil,
+      )
+    end
+
+    describe '#match?' do
+      it 'should match self' do
+        expect(type.match?(type)).to be true
+      end
+
+      it 'should match value' do
+        expect(type.match?({})).to be true
+      end
+
+      it 'should not match value' do
+        expect(type.match?(1)).to be false
+      end
+    end
+
+    describe '#mismatch?' do
+      it 'should not match self' do
+        expect(type.mismatch?(type)).to be false
+      end
+
+      it 'should not match value' do
+        expect(type.mismatch?({})).to be false
+      end
+
+      it 'should match value' do
+        expect(type.mismatch?(1)).to be true
+      end
+    end
+
+    describe '#humanize' do
+      it 'should return humanized name' do
+        expect(type.humanize).to eq 'object'
+      end
+
+      context 'with variation' do
+        let :variation do
+          TypedParameters::Types::Type.new(
+            type: :shallow_hash,
+            name: :shallow,
+            accepts_block: true,
+            scalar: false,
+            coerce: -> v { v.respond_to?(:to_h) ? v.to_h : {} },
+            match: -> v { v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) } },
+            abstract: false,
+            archetype: type,
+          )
+        end
+
+        it 'should return humanized name' do
+          expect(variation.humanize).to eq 'shallow object'
+        end
+      end
+    end
+  end
+
   describe TypedParameters::Types do
     describe '.register' do
       after { TypedParameters::Types.unregister(:test) }
 
-      it 'should register a type' do
+      it 'should register nominal type' do
         type = TypedParameters::Types.register(:test,
-          match: -> v { v == :test },
-          coerce: -> v { :test },
+          match: -> v {},
         )
 
         expect(TypedParameters::Types.types[:test]).to eq type
       end
 
-      it 'should not register a duplicate type' do
+      it 'should register subtype' do
         type = TypedParameters::Types.register(:test,
-          match: -> v { v == :test },
+          archetype: :symbol,
+          match: -> v {},
         )
 
-        expect { TypedParameters::Types.register(:test, match: -> v { v == :test }) }
-          .to raise_error TypedParameters::DuplicateTypeError
+        expect(TypedParameters::Types.subtypes[:test]).to eq type
+      end
+
+      it 'should register abstract type' do
+        type = TypedParameters::Types.register(:test,
+          abstract: true,
+          match: -> v {},
+        )
+
+        expect(TypedParameters::Types.abstracts[:test]).to eq type
+      end
+
+      it 'should not register a duplicate type' do
+        type = TypedParameters::Types.register(:test,
+          match: -> v {},
+          abstract: true,
+        )
+
+        expect { TypedParameters::Types.register(:test, match: -> v {}) }
+          .to raise_error ArgumentError
       end
     end
 
     describe '.unregister' do
-      it 'should unregister a type' do
-        TypedParameters::Types.register(:test, match: -> v { v == :test })
+      it 'should unregister nominal type' do
+        TypedParameters::Types.register(:test, match: -> v {})
         TypedParameters::Types.unregister(:test)
 
         expect(TypedParameters::Types.types[:test]).to be_nil
       end
+
+      it 'should unregister subtype' do
+        TypedParameters::Types.register(:test, archetype: :hash, match: -> v {})
+        TypedParameters::Types.unregister(:test)
+
+        expect(TypedParameters::Types.subtypes[:test]).to be_nil
+      end
+
+      it 'should unregister abstract type' do
+        TypedParameters::Types.register(:test, abstract: true, match: -> v {})
+        TypedParameters::Types.unregister(:test)
+
+        expect(TypedParameters::Types.abstracts[:test]).to be_nil
+      end
     end
 
     describe '.for' do
-      it 'should fetch a type by value' do
+      it 'should fetch type' do
         type = TypedParameters::Types.for(1)
 
         expect(type.type).to eq :integer
       end
 
-      context 'with a custom type' do
-        it 'should prioritize the newest type' do
-          TypedParameters::Types.register(:shallow_hash,
-            match: -> v { v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) } },
-          )
+      it 'should not fetch type' do
+        expect { TypedParameters::Types.for(Class.new) }.to raise_error ArgumentError
+      end
 
+      context 'with custom type' do
+        subject { Class.new }
+
+        before { TypedParameters::Types.register(:class, match: -> v { v.is_a?(subject) }) }
+        after  { TypedParameters::Types.unregister(:class) }
+
+        it 'should fetch type' do
+          type = TypedParameters::Types.for(subject.new)
+
+          expect(type.type).to eq :class
+        end
+      end
+
+      context 'with variation type' do
+        before do
+          TypedParameters::Types.register(:shallow_hash,
+            archetype: :hash,
+            match: -> v {
+              v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) }
+            },
+          )
+        end
+
+        after do
+          TypedParameters::Types.unregister(:shallow_hash)
+        end
+
+        it 'should differentiate variation' do
           t1 = TypedParameters::Types.for({ foo: 1, bar: 2 })
-          t2 = TypedParameters::Types.for({ baz: [:qux] })
+          t2 = TypedParameters::Types.for({ baz: [1], qux: { a: 2 } })
 
           expect(t1.type).to eq :shallow_hash
+          expect(t1.archetype.type).to_not be_nil
           expect(t2.type).to eq :hash
-
-          TypedParameters::Types.unregister(:shallow_hash)
+          expect(t2.archetype).to be_nil
         end
       end
     end
 
     describe '.[]' do
-      it 'should fetch a type by key' do
+      it 'should fetch type by key' do
         type = TypedParameters::Types[:string]
 
         expect(type.type).to eq :string
@@ -333,6 +459,14 @@ describe TypedParameters do
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
       end
+
+      it 'should find' do
+        t = TypedParameters.types.for(true)
+        f = TypedParameters.types.for(false)
+
+        expect(t.type).to eq :boolean
+        expect(f.type).to eq :boolean
+      end
     end
 
     describe :string do
@@ -347,6 +481,12 @@ describe TypedParameters do
         expect(type.match?(nil)).to be false
         expect(type.match?({})).to be false
         expect(type.match?(1)).to be false
+      end
+
+      it 'should find' do
+        t = TypedParameters.types.for('foo')
+
+        expect(t.type).to eq :string
       end
     end
 
@@ -364,6 +504,12 @@ describe TypedParameters do
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
       end
+
+      it 'should find' do
+        t = TypedParameters.types.for(:foo)
+
+        expect(t.type).to eq :symbol
+      end
     end
 
     describe :integer do
@@ -379,6 +525,12 @@ describe TypedParameters do
         expect(type.match?(1.0)).to be false
         expect(type.match?({})).to be false
         expect(type.match?('')).to be false
+      end
+
+      it 'should find' do
+        t = TypedParameters.types.for(1)
+
+        expect(t.type).to eq :integer
       end
     end
 
@@ -396,6 +548,12 @@ describe TypedParameters do
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
       end
+
+      it 'should find' do
+        t = TypedParameters.types.for(1.0)
+
+        expect(t.type).to eq :float
+      end
     end
 
     describe :number do
@@ -411,6 +569,14 @@ describe TypedParameters do
         expect(type.match?(nil)).to be false
         expect(type.match?({})).to be false
         expect(type.match?('')).to be false
+      end
+
+      it 'should not find' do
+        integer = TypedParameters.types.for(1)
+        float   = TypedParameters.types.for(1.0)
+
+        expect(integer.type).to_not eq :number
+        expect(float.type).to_not eq :number
       end
     end
 
@@ -430,6 +596,12 @@ describe TypedParameters do
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
       end
+
+      it 'should find' do
+        t = TypedParameters.types.for([])
+
+        expect(t.type).to eq :array
+      end
     end
 
     describe :hash do
@@ -448,6 +620,12 @@ describe TypedParameters do
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
       end
+
+      it 'should find' do
+        t = TypedParameters.types.for({})
+
+        expect(t.type).to eq :hash
+      end
     end
 
     describe :nil do
@@ -463,6 +641,12 @@ describe TypedParameters do
         expect(type.match?([])).to be false
         expect(type.match?('')).to be false
         expect(type.match?(1)).to be false
+      end
+
+      it 'should find' do
+        t = TypedParameters.types.for(nil)
+
+        expect(t.type).to eq :nil
       end
     end
   end
@@ -593,7 +777,7 @@ describe TypedParameters do
     describe '.register' do
       after { TypedParameters::Formatters.unregister(:test) }
 
-      it 'should register a format' do
+      it 'should register format' do
         format = TypedParameters::Formatters.register(:test,
           transform: -> k, v { [k, v] },
         )
@@ -606,13 +790,13 @@ describe TypedParameters do
           transform: -> k, v { [k, v] },
         )
 
-        expect { TypedParameters::Formatters.register(:test, transform: -> k, v { [k, v] },) }
-          .to raise_error TypedParameters::DuplicateFormatterError
+        expect { TypedParameters::Formatters.register(:test, transform: -> k, v { [k, v] }) }
+          .to raise_error ArgumentError
       end
     end
 
     describe '.unregister' do
-      it 'should unregister a format' do
+      it 'should unregister format' do
         TypedParameters::Formatters.register(:test, transform: -> k, v { [k, v] },)
         TypedParameters::Formatters.unregister(:test)
 
@@ -621,7 +805,7 @@ describe TypedParameters do
     end
 
     describe '.[]' do
-      it 'should fetch a format by key' do
+      it 'should fetch format by key' do
         format = TypedParameters::Formatters[:jsonapi]
 
         expect(format.format).to eq :jsonapi
@@ -891,14 +1075,14 @@ describe TypedParameters do
         end
       end
 
-      it 'should transform a shallow array' do
+      it 'should transform shallow array' do
         k, v = transform.call('rootKey', %w[a_value another_value])
 
         expect(k).to eq 'root_key'
         expect(v).to eq %w[a_value another_value]
       end
 
-      it 'should transform a deep array' do
+      it 'should transform deep array' do
         k, v = transform.call(
           'rootKey',
           [
@@ -938,14 +1122,14 @@ describe TypedParameters do
         ]
       end
 
-      it 'should transform a shallow hash' do
+      it 'should transform shallow hash' do
         k, v = transform.call(:rootKey, { aKey: :a_value, anotherKey: :another_value })
 
         expect(k).to eq :root_key
         expect(v).to eq a_key: :a_value, another_key: :another_value
       end
 
-      it 'should transform a deep hash' do
+      it 'should transform deep hash' do
         k, v = transform.call(
           :rootKey,
           {
@@ -1003,14 +1187,14 @@ describe TypedParameters do
         end
       end
 
-      it 'should transform a shallow array' do
+      it 'should transform shallow array' do
         k, v = transform.call('root_key', %w[a_value another_value])
 
         expect(k).to eq 'RootKey'
         expect(v).to eq %w[a_value another_value]
       end
 
-      it 'should transform a deep array' do
+      it 'should transform deep array' do
         k, v = transform.call(
           'root_key',
           [
@@ -1050,14 +1234,14 @@ describe TypedParameters do
         ]
       end
 
-      it 'should transform a shallow hash' do
+      it 'should transform shallow hash' do
         k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
 
         expect(k).to eq :RootKey
         expect(v).to eq AKey: :a_value, AnotherKey: :another_value
       end
 
-      it 'should transform a deep hash' do
+      it 'should transform deep hash' do
         k, v = transform.call(
           :root_key,
           {
@@ -1115,14 +1299,14 @@ describe TypedParameters do
         end
       end
 
-      it 'should transform a shallow array' do
+      it 'should transform shallow array' do
         k, v = transform.call('root_key', %w[a_value another_value])
 
         expect(k).to eq 'rootKey'
         expect(v).to eq %w[a_value another_value]
       end
 
-      it 'should transform a deep array' do
+      it 'should transform deep array' do
         k, v = transform.call(
           'root_key',
           [
@@ -1162,14 +1346,14 @@ describe TypedParameters do
         ]
       end
 
-      it 'should transform a shallow hash' do
+      it 'should transform shallow hash' do
         k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
 
         expect(k).to eq :rootKey
         expect(v).to eq aKey: :a_value, anotherKey: :another_value
       end
 
-      it 'should transform a deep hash' do
+      it 'should transform deep hash' do
         k, v = transform.call(
           :root_key,
           {
@@ -1227,14 +1411,14 @@ describe TypedParameters do
         end
       end
 
-      it 'should transform a shallow array' do
+      it 'should transform shallow array' do
         k, v = transform.call('root_key', %w[a_value another_value])
 
         expect(k).to eq 'root-key'
         expect(v).to eq %w[a_value another_value]
       end
 
-      it 'should transform a deep array' do
+      it 'should transform deep array' do
         k, v = transform.call(
           'root_key',
           [
@@ -1274,14 +1458,14 @@ describe TypedParameters do
         ]
       end
 
-      it 'should transform a shallow hash' do
+      it 'should transform shallow hash' do
         k, v = transform.call(:root_key, { a_key: :a_value, another_key: :another_value })
 
         expect(k).to eq :'root-key'
         expect(v).to eq 'a-key': :a_value, 'another-key': :another_value
       end
 
-      it 'should transform a deep hash' do
+      it 'should transform deep hash' do
         k, v = transform.call(
           :root_key,
           {
@@ -1340,7 +1524,7 @@ describe TypedParameters do
       array: [],
       hash: {},
     ].each do |key, value|
-      it "should transform a blank #{key} to nil" do
+      it "should transform blank #{key} to nil" do
         k, v = transform.call(key, value)
 
         expect(k).to eq key
@@ -1353,7 +1537,7 @@ describe TypedParameters do
       array: [:foo],
       hash: { foo: :bar },
     ].each do |key, value|
-      it "should not transform a present #{key} to nil" do
+      it "should not transform present #{key} to nil" do
         k, v = transform.call(key, value)
 
         expect(k).to eq key
@@ -1365,7 +1549,7 @@ describe TypedParameters do
   describe TypedParameters::Transforms::Noop do
     let(:transform) { TypedParameters::Transforms::Noop.new }
 
-    it 'should be a noop' do
+    it 'should be noop' do
       k, v = transform.call('foo', 'bar')
 
       expect(k).to be nil
@@ -1577,7 +1761,7 @@ describe TypedParameters do
       expect(params.value).to eq orig.value
     end
 
-    it 'should have a correct path' do
+    it 'should have correct path' do
       params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
 
       expect(params[:foo][:bar][0][:baz].path.to_json_pointer).to eq '/foo/bar/0/baz'
@@ -1645,7 +1829,7 @@ describe TypedParameters do
       end
     end
 
-    it 'should use a depth-first algorithm' do
+    it 'should use depth-first algorithm' do
       params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }, { baz: 2 }], qux: [{ quux: 0 }, { quux: 1 }, { quux: 2 }] } })
       order  = []
 
@@ -2003,6 +2187,37 @@ describe TypedParameters do
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to_not raise_error
+    end
+
+    context 'with type variation' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash) { param :metadata, type: :metadata } }
+
+      before do
+        TypedParameters::Types.register(:metadata,
+          archetype: :hash,
+          match: -> v {
+            v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) }
+          },
+        )
+      end
+
+      after do
+        TypedParameters::Types.unregister(:metadata)
+      end
+
+      it 'should not raise' do
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { metadata: { foo: 'bar', baz: 'qux' }})
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to_not raise_error
+      end
+
+      it 'should raise' do
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { metadata: { foo: { bar: 'baz' } } })
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+      end
     end
   end
 
@@ -2639,32 +2854,32 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
-    it 'should raise when a duplicate schema is defined' do
+    it 'should raise when duplicate schema is defined' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
       expect { subject.typed_schema(:foo) { param :baz, type: :string } }
         .to raise_error ArgumentError
     end
 
-    it 'should define a local schema' do
+    it 'should define local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
       expect(subject.typed_schemas).to have_key :"#{subject}/foo"
     end
 
-    it 'should define a global schema' do
+    it 'should define global schema' do
       subject.typed_schema(:foo, namespace: nil) { param :bar, type: :string }
 
       expect(subject.typed_schemas).to have_key :foo
     end
 
-    it 'should define a namespaced schema' do
+    it 'should define namespaced schema' do
       subject.typed_schema(:foo, namespace: :bar) { param :baz, type: :string }
 
       expect(subject.typed_schemas).to have_key :"bar/foo"
     end
 
-    it 'should define a singular params handler' do
+    it 'should define singular params handler' do
       subject.typed_params(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include params: {
@@ -2682,7 +2897,7 @@ describe TypedParameters do
       }
     end
 
-    it 'should define a singular query param handler' do
+    it 'should define singular query param handler' do
       subject.typed_query(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include query: {
@@ -2852,7 +3067,7 @@ describe TypedParameters do
         query  = { dry_run: true }
 
         # FIXME(ezekg) There doesn't seem to be any other way to specify
-        #              a POST body and query parameters separately in a
+        #              POST body and query parameters separately in a
         #              test request. Thus, we have this hack.
         allow_any_instance_of(request.class).to receive(:request_parameters).and_return(params)
         allow_any_instance_of(request.class).to receive(:query_parameters).and_return(query)
