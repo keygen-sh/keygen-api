@@ -302,8 +302,8 @@ describe TypedParameters do
         expect(type.humanize).to eq 'object'
       end
 
-      context 'with variation' do
-        let :variation do
+      context 'with subtype' do
+        let :subtype do
           TypedParameters::Types::Type.new(
             type: :shallow_hash,
             name: :shallow,
@@ -317,7 +317,7 @@ describe TypedParameters do
         end
 
         it 'should return humanized name' do
-          expect(variation.humanize).to eq 'shallow object'
+          expect(subtype.humanize).to eq 'shallow object'
         end
       end
     end
@@ -411,7 +411,7 @@ describe TypedParameters do
         end
       end
 
-      context 'with variation type' do
+      context 'with subtype' do
         before do
           TypedParameters::Types.register(:shallow_hash,
             archetype: :hash,
@@ -425,14 +425,32 @@ describe TypedParameters do
           TypedParameters::Types.unregister(:shallow_hash)
         end
 
-        it 'should differentiate variation' do
-          t1 = TypedParameters::Types.for({ foo: 1, bar: 2 })
-          t2 = TypedParameters::Types.for({ baz: [1], qux: { a: 2 } })
+        it 'should fetch subtype' do
+          types = []
 
-          expect(t1.type).to eq :shallow_hash
-          expect(t1.archetype.type).to_not be_nil
-          expect(t2.type).to eq :hash
-          expect(t2.archetype).to be_nil
+          types << TypedParameters::Types.for({ foo: 1, bar: 2 }, try: %i[shallow_hash])
+          types << TypedParameters::Types.for({ foo: 1, bar: 2 }, try: :shallow_hash)
+
+          types.each do |type|
+            expect(type.type).to eq :shallow_hash
+            expect(type.subtype?).to be true
+            expect(type.archetype.type).to eq :hash
+          end
+        end
+
+        it 'should not fetch subtype' do
+          types = []
+
+          types << TypedParameters::Types.for({ foo: 1, bar: 2 }, try: [])
+          types << TypedParameters::Types.for({ foo: 1, bar: 2 })
+          types << TypedParameters::Types.for({ baz: [1], qux: { a: 2 } }, try: %i[shallow_hash])
+          types << TypedParameters::Types.for({ baz: [1], qux: { a: 2 } }, try: :shallow_hash)
+          types << TypedParameters::Types.for({ baz: [1], qux: { a: 2 } }, try: nil)
+
+          types.each do |type|
+            expect(type.type).to eq :hash
+            expect(type.subtype?).to be false
+          end
         end
       end
     end
@@ -2189,11 +2207,11 @@ describe TypedParameters do
       expect { validator.call(params) }.to_not raise_error
     end
 
-    context 'with type variation' do
-      let(:schema) { TypedParameters::Schema.new(type: :hash) { param :metadata, type: :metadata } }
+    context 'with subtype' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash) { param :metadata, type: :shallow_hash } }
 
       before do
-        TypedParameters::Types.register(:metadata,
+        TypedParameters::Types.register(:shallow_hash,
           archetype: :hash,
           match: -> v {
             v.is_a?(Hash) && v.values.none? { _1.is_a?(Array) || _1.is_a?(Hash) }
@@ -2202,7 +2220,7 @@ describe TypedParameters do
       end
 
       after do
-        TypedParameters::Types.unregister(:metadata)
+        TypedParameters::Types.unregister(:shallow_hash)
       end
 
       it 'should not raise' do
