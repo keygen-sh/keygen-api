@@ -19,6 +19,7 @@ module TypedParameters
 
         # Handle nils early on
         if Types.nil?(type)
+          # FIXME(ezekg) Should we add config to skip raising when optional param is nil?
           raise InvalidParameterError.new('cannot be null', path: param.path) unless
             schema.allow_nil?
 
