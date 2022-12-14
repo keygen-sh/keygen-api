@@ -25,10 +25,22 @@ module Api::V1::Groups::Relationships
       render jsonapi: owner
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[user users] }, noop: true
+          param :id, type: :string, transform: -> (k, v) {
+            [:user_id, v]
+          }
+        end
+      end
+    }
     def attach
       authorize! with: Groups::GroupOwnerPolicy
 
-      owners_data = owner_params.fetch(:data).map do |owner|
+      owners_data = owner_params.map do |owner|
         owner.merge(account_id: current_account.id)
       end
 
@@ -43,10 +55,22 @@ module Api::V1::Groups::Relationships
       render jsonapi: attached
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[user users] }, noop: true
+          param :id, type: :string, transform: -> (k, v) {
+            [:user_id, v]
+          }
+        end
+      end
+    }
     def detach
       authorize! with: Groups::GroupOwnerPolicy
 
-      user_ids = owner_params.fetch(:data).map { |e| e[:user_id] }.compact
+      user_ids = owner_params.collect { |e| e[:user_id] }.compact
       owners   = group.owners.where(user_id: user_ids)
 
       # Ensure all owners exist. Deleting non-existing owners would be a noop, but
@@ -84,32 +108,6 @@ module Api::V1::Groups::Relationships
       @group = scoped_groups.find(params[:group_id])
 
       Current.resource = group
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :attach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[user users], transform: -> (k, v) { [] }
-            param :id, type: :string, transform: -> (k, v) {
-              [:user_id, v]
-            }
-          end
-        end
-      end
-
-      on :detach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[user users], transform: -> (k, v) { [] }
-            param :id, type: :string, transform: -> (k, v) {
-              [:user_id, v]
-            }
-          end
-        end
-      end
     end
   end
 end
