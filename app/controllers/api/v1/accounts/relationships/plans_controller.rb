@@ -13,6 +13,14 @@ module Api::V1::Accounts::Relationships
       render jsonapi: plan
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[plan plans] }
+        param :id, type: :string
+      end
+    }
     def update
       plan = Plan.find(plan_params[:id])
       authorize! plan,
@@ -49,17 +57,6 @@ module Api::V1::Accounts::Relationships
           render_unprocessable_entity detail: "failed to update #{current_account.billing.state} plan because of a billing issue (check payment method)"
         else
           render_unprocessable_entity detail: "failed to update plan because a payment method is missing"
-        end
-      end
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[plan plans]
-          param :id, type: :string
         end
       end
     end
