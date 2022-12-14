@@ -26,6 +26,9 @@ module Api::V1
       render jsonapi: artifacts
     end
 
+    typed_query {
+      param :ttl, type: :integer, coerce: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+    }
     def show
       authorize! artifact
 
@@ -50,6 +53,37 @@ module Api::V1
       render jsonapi: artifact, status: :see_other, location: download.url
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[artifact artifacts] }
+        param :attributes, type: :hash do
+          param :filename, type: :string
+          param :filesize, type: :integer, optional: true
+          param :filetype, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+            [:filetype_attributes, { key: }]
+          }
+          param :platform, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+            [:platform_attributes, { key: }]
+          }
+          param :arch, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+            [:arch_attributes, { key: }]
+          }
+          param :signature, type: :string, allow_blank: true, optional: true
+          param :checksum, type: :string, allow_blank: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+        param :relationships, type: :hash do
+          param :release, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[release releases] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
       artifact = current_account.release_artifacts.new(artifact_params)
       authorize! artifact
@@ -71,6 +105,20 @@ module Api::V1
       render jsonapi: artifact, status: :temporary_redirect, location: upload.url
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[artifact artifacts] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :filesize, type: :integer, optional: true, allow_nil: true
+          param :signature, type: :string, optional: true, allow_blank: true, allow_nil: true
+          param :checksum, type: :string, optional: true, allow_blank: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+      end
+    }
     def update
       authorize! artifact
 
@@ -114,61 +162,6 @@ module Api::V1
       )
 
       Current.resource = artifact
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[artifact artifacts]
-          param :attributes, type: :hash do
-            param :filename, type: :string
-            param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, optional: true, transform: -> (_, key) {
-              [:filetype_attributes, { key: }]
-            }
-            param :platform, type: :string, optional: true, transform: -> (_, key) {
-              [:platform_attributes, { key: }]
-            }
-            param :arch, type: :string, optional: true, transform: -> (_, key) {
-              [:arch_attributes, { key: }]
-            }
-            param :signature, type: :string, optional: true
-            param :checksum, type: :string, optional: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-          param :relationships, type: :hash do
-            param :release, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[release releases]
-                param :id, type: :string
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[artifact artifacts]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :filesize, type: :integer, optional: true, allow_nil: true
-            param :signature, type: :string, optional: true, allow_nil: true
-            param :checksum, type: :string, optional: true, allow_nil: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-        end
-      end
-    end
-
-    typed_query do
-      on :show do
-        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          query :ttl, type: :integer, coerce: true, optional: true
-        end
-      end
     end
   end
 end
