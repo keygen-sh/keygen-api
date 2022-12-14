@@ -12,6 +12,52 @@ module Api::V1
       render jsonapi: account
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[account accounts] }
+        param :attributes, type: :hash, optional: true do
+          param :name, type: :string, optional: true
+          param :slug, type: :string, optional: true
+          param :protected, type: :boolean, optional: true
+        end
+        param :relationships, type: :hash do
+          param :plan, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[plan plans] }
+              param :id, type: :string
+            end
+          end
+          param :admins, type: :hash, transform: -> _, v { [:users, v] } do
+            param :data, type: :array do
+              items type: :hash do
+                param :type, type: :string, inclusion: { in: %w[user users] }
+                param :attributes, type: :hash do
+                  param :email, type: :string
+                  param :password, type: :string
+                  param :first_name, type: :string, optional: true
+                  param :last_name, type: :string, optional: true
+                  param :metadata, type: :metadata, allow_blank: true, optional: true
+                  param :role, type: :string, optional: true, noop: true
+                end
+                param :relationships, type: :hash, optional: true, noop: true do
+                  param :group, type: :hash, optional: true do
+                    param :data, type: :hash, allow_nil: true do
+                      param :type, type: :string, inclusion: { in: %w[group groups] }
+                      param :id, type: :string
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+      param :meta, type: :hash, optional: true do
+        param :referral, type: :string, optional: true
+      end
+    }
     def create
       account = Account.new account_params.merge(referral_id: account_meta[:referral])
       authorize! account
@@ -23,6 +69,20 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[account accounts] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true
+          param :slug, type: :string, optional: true
+          param :api_version, type: :string, inclusion: { in: RequestMigrations.supported_versions }, optional: true
+          param :protected, type: :boolean, optional: true
+        end
+      end
+    }
     def update
       authorize! account
 
@@ -53,68 +113,6 @@ module Api::V1
       @account = current_account
 
       Current.resource = account
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[account accounts]
-          param :attributes, type: :hash, optional: true do
-            param :name, type: :string, optional: true
-            param :slug, type: :string, optional: true
-            param :protected, type: :boolean, optional: true
-          end
-          param :relationships, type: :hash do
-            param :plan, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[plan plans]
-                param :id, type: :string
-              end
-            end
-            param :admins, type: :hash do
-              param :data, type: :array do
-                items type: :hash do
-                  param :type, type: :string, inclusion: %w[user users]
-                  param :attributes, type: :hash do
-                    param :email, type: :string
-                    param :password, type: :string
-                    param :first_name, type: :string, optional: true
-                    param :last_name, type: :string, optional: true
-                    param :metadata, type: :hash, allow_non_scalars: true, optional: true
-                    param :role, type: :string, optional: true, transform: -> (k, v) { [] }
-                  end
-                  param :relationships, type: :hash, optional: true, transform: -> (k, v) { [] } do
-                    param :group, type: :hash, optional: true do
-                      param :data, type: :hash, allow_nil: true do
-                        param :type, type: :string, inclusion: %w[group groups]
-                        param :id, type: :string
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-        param :meta, type: :hash, optional: true do
-          param :referral, type: :string, optional: true
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[account accounts]
-          param :id, type: :string, optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :slug, type: :string, optional: true
-            param :api_version, type: :string, inclusion: RequestMigrations.supported_versions, optional: true
-            param :protected, type: :boolean, optional: true
-          end
-        end
-      end
     end
   end
 end
