@@ -67,6 +67,9 @@ module Keygen
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
+    # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
+    config.action_dispatch.perform_deep_munge = false
+
     # Add support for trusted proxies
     config.action_dispatch.trusted_proxies =
       ActionDispatch::RemoteIp::TRUSTED_PROXIES + ENV.fetch('TRUSTED_PROXIES') { '' }

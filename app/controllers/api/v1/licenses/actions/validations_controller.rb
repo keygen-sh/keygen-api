@@ -30,11 +30,31 @@ module Api::V1::Licenses::Actions
       render jsonapi: license, meta: meta
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true do
+        param :nonce, type: :integer, optional: true
+        param :scope, type: :hash, optional: true do
+          param :product, type: :string, optional: true
+          param :policy, type: :string, optional: true
+          param :machine, type: :string, optional: true
+          param :fingerprint, type: :string, optional: true
+          param :fingerprints, type: :array, optional: true do
+            items type: :string
+          end
+          param :entitlements, type: :array, optional: true do
+            items type: :string
+          end
+          param :user, type: :string, optional: true
+        end
+      end
+    }
     def validate_by_id
       authorize! license,
         to: :validate?
 
-      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
+      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_meta[:scope])
       meta = {
         ts: Time.current,
         valid:,
@@ -42,11 +62,11 @@ module Api::V1::Licenses::Actions
         code:,
       }
 
-      if nonce = validation_params.dig(:meta, :nonce)
+      if nonce = validation_meta[:nonce]
         meta[:nonce] = nonce
       end
 
-      if scope = validation_params.dig(:meta, :scope)
+      if scope = validation_meta[:scope]
         meta[:scope] = scope
       end
 
@@ -66,21 +86,44 @@ module Api::V1::Licenses::Actions
       render jsonapi: license, meta: meta
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash do
+        param :key, type: :string, allow_blank: false
+        param :legacy_encrypted, type: :boolean, optional: true
+        param :encrypted, type: :boolean, optional: true
+        param :nonce, type: :integer, optional: true
+        param :scope, type: :hash, optional: true do
+          param :product, type: :string, optional: true
+          param :policy, type: :string, optional: true
+          param :machine, type: :string, optional: true
+          param :fingerprint, type: :string, optional: true
+          param :fingerprints, type: :array, optional: true do
+            items type: :string
+          end
+          param :entitlements, type: :array, optional: true do
+            items type: :string
+          end
+          param :user, type: :string, optional: true
+        end
+      end
+    }
     def validate_by_key
       @license = LicenseKeyLookupService.call(
         account: current_account,
-        key: validation_params[:meta][:key],
+        key: validation_meta[:key],
         # Since we've added new encryption schemes, we only want to alter
         # the lookup for legacy encrypted licenses.
-        legacy_encrypted: validation_params[:meta][:legacy_encrypted] == true ||
-                          validation_params[:meta][:encrypted] == true
+        legacy_encrypted: validation_meta[:legacy_encrypted] == true ||
+                          validation_meta[:encrypted] == true
       )
 
       authorize! license,
         with: LicensePolicy,
         to: :validate_key?
 
-      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])
+      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_meta[:scope])
       meta = {
         ts: Time.current,
         valid:,
@@ -88,11 +131,11 @@ module Api::V1::Licenses::Actions
         code:,
       }
 
-      if nonce = validation_params[:meta][:nonce]
+      if nonce = validation_meta[:nonce]
         meta[:nonce] = nonce
       end
 
-      if scope = validation_params[:meta][:scope]
+      if scope = validation_meta[:scope]
         meta[:scope] = scope
       end
 
@@ -122,51 +165,6 @@ module Api::V1::Licenses::Actions
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
       Current.resource = license
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :validate_by_id do
-        param :meta, type: :hash, optional: true do
-          param :nonce, type: :integer, optional: true
-          param :scope, type: :hash, optional: true do
-            param :product, type: :string, optional: true
-            param :policy, type: :string, optional: true
-            param :machine, type: :string, optional: true
-            param :fingerprint, type: :string, optional: true
-            param :fingerprints, type: :array, optional: true do
-              items type: :string
-            end
-            param :entitlements, type: :array, optional: true do
-              items type: :string
-            end
-            param :user, type: :string, optional: true
-          end
-        end
-      end
-
-      on :validate_by_key do
-        param :meta, type: :hash do
-          param :key, type: :string, allow_blank: false
-          param :legacy_encrypted, type: :boolean, optional: true
-          param :encrypted, type: :boolean, optional: true
-          param :nonce, type: :integer, optional: true
-          param :scope, type: :hash, optional: true do
-            param :product, type: :string, optional: true
-            param :policy, type: :string, optional: true
-            param :machine, type: :string, optional: true
-            param :fingerprint, type: :string, optional: true
-            param :fingerprints, type: :array, optional: true do
-              items type: :string
-            end
-            param :entitlements, type: :array, optional: true do
-              items type: :string
-            end
-            param :user, type: :string, optional: true
-          end
-        end
-      end
     end
   end
 end
