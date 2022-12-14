@@ -9,11 +9,15 @@ module Api::V1::Releases::Relationships
     before_action :authenticate_with_token
     before_action :set_release
 
+    typed_query {
+      param :constraint, type: :string, optional: true
+      param :channel, type: :string, optional: true
+    }
     def show
       authorize! release,
         to: :upgrade?
 
-      kwargs  = upgrade_query.symbolize_keys.slice(:constraint, :channel)
+      kwargs  = upgrade_query.slice(:constraint, :channel)
       upgrade = release.upgrade!(**kwargs)
       authorize! upgrade
 
@@ -52,13 +56,6 @@ module Api::V1::Releases::Relationships
       )
 
       Current.resource = release
-    end
-
-    typed_query do
-      on :show do
-        query :constraint, type: :string, optional: true
-        query :channel, type: :string, optional: true
-      end
     end
   end
 end
