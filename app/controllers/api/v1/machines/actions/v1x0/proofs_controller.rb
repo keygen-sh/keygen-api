@@ -9,6 +9,13 @@ module Api::V1::Machines::Actions::V1x0
 
     authorize :machine
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+        param :dataset, type: :hash
+      end
+    }
     def create
       authorize! with: Machines::V1x0::ProofPolicy
 
@@ -36,18 +43,6 @@ module Api::V1::Machines::Actions::V1x0
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
       Current.resource = machine
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :create do
-        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          param :meta, type: :hash, optional: true do
-            param :dataset, type: :hash
-          end
-        end
-      end
     end
   end
 end
