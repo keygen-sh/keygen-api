@@ -452,7 +452,10 @@ Feature: Release constraints relationship
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/1/relationships/entitlement/data/bad"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/1/relationships/entitlement/data/bad"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
