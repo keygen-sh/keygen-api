@@ -25,6 +25,23 @@ module Api::V1::Releases::Relationships
       render jsonapi: constraint
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[constraint constraints] }, noop: true
+          param :relationships, type: :hash do
+            param :entitlement, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
+      end
+    }
     def attach
       authorize! with: Releases::ReleaseEntitlementConstraintPolicy
 
@@ -45,6 +62,16 @@ module Api::V1::Releases::Relationships
       render jsonapi: attached
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[constraint constraints] }, noop: true
+          param :id, type: :string
+        end
+      end
+    }
     def detach
       authorize! with: Releases::ReleaseEntitlementConstraintPolicy
 
@@ -86,35 +113,6 @@ module Api::V1::Releases::Relationships
       @release = FindByAliasService.call(scope: scoped_releases, identifier: params[:release_id], aliases: %i[version tag])
 
       Current.resource = release
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :attach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
-            param :relationships, type: :hash do
-              param :entitlement, type: :hash do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: %w[entitlement entitlements]
-                  param :id, type: :string
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :detach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
-            param :id, type: :string
-          end
-        end
-      end
     end
   end
 end
