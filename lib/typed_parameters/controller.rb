@@ -26,8 +26,6 @@ module TypedParameters
     end
 
     included do
-      include ClassMethods
-
       cattr_accessor :typed_handlers, default: { deferred: [], params: {}, query: {} }
       cattr_accessor :typed_schemas,  default: {}
 
@@ -74,6 +72,42 @@ module TypedParameters
           params.unwrap(formatter: nil, controller: self)
         else
           params.unwrap(formatter: Formatters[format], controller: self)
+        end
+      end
+
+      private
+
+      def respond_to_missing?(method_name, *)
+        return super unless
+          /_(params|query)\z/.match?(method_name)
+
+        name = controller_name&.classify&.underscore
+        return super unless
+          name.present?
+
+        aliases = [
+          :"#{name}_params",
+          :"#{name}_query",
+        ]
+
+        aliases.include?(method_name) || super
+      end
+
+      def method_missing(method_name, ...)
+        return super unless
+          /_(params|query)\z/.match?(method_name)
+
+        name = controller_name&.classify&.underscore
+        return super unless
+          name.present?
+
+        case method_name
+        when :"#{name}_params"
+          typed_params(...)
+        when :"#{name}_query"
+          typed_query(...)
+        else
+          super
         end
       end
     end
@@ -138,40 +172,6 @@ module TypedParameters
 
       private
 
-      def respond_to_missing?(method_name, *)
-        return super unless
-          /_(params|query)\z/.match?(method_name)
-
-        name = controller_name&.classify&.underscore
-        return super unless
-          name.present?
-
-        aliases = [
-          :"#{name}_params",
-          :"#{name}_query",
-        ]
-
-        aliases.include?(method_name) || super
-      end
-
-      def method_missing(method_name, ...)
-        return super unless
-          /_(params|query)\z/.match?(method_name)
-
-        name = controller_name&.classify&.underscore
-        return super unless
-          name.present?
-
-        case method_name
-        when :"#{name}_params"
-          typed_params(...)
-        when :"#{name}_query"
-          typed_query(...)
-        else
-          super
-        end
-      end
-
       def method_added(method_name)
         return super if
           typed_handlers[:deferred].empty?
@@ -189,6 +189,8 @@ module TypedParameters
     def self.included(klass)
       raise ArgumentError, "cannot be used outside of controller (got #{klass.ancestors})" unless
         klass < ::ActionController::Metal
+
+      super(klass)
     end
   end
 end
