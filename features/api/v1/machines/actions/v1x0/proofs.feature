@@ -1,6 +1,5 @@
-@api/v1
+@api/v1.0 @deprecated
 Feature: Machine proof actions
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -112,7 +111,10 @@ Feature: Machine proof actions
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /meta"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/meta"
+        }
       }
       """
 
