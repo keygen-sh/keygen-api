@@ -13,6 +13,7 @@ module TypedParameters
                 :unless
 
     def initialize(
+      controller: nil,
       strict: true,
       parent: nil,
       type: :hash,
@@ -64,6 +65,7 @@ module TypedParameters
           length.key?(:is)
         )
 
+      @controller        = controller
       @type              = Types[type]
       @strict            = strict
       @parent            = parent
@@ -144,6 +146,9 @@ module TypedParameters
 
       raise ArgumentError, "invalid format: #{format.inspect}" if
         formatter.nil?
+
+      controller.instance_exec(&formatter.decorator) if
+        controller.present? && formatter.decorator?
 
       @formatter = formatter
     end
@@ -261,7 +266,8 @@ module TypedParameters
 
     private
 
-    attr_reader :options,
+    attr_reader :controller,
+                :options,
                 :strict
 
     def boundless! = @boundless = true

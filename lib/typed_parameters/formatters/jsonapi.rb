@@ -91,6 +91,47 @@ module TypedParameters
 
     register(:jsonapi,
       transform: JSONAPI.method(:call),
+      decorate: -> {
+        next if
+          respond_to?(:typed_meta)
+
+        mod = Module.new
+
+        mod.define_method :respond_to_missing? do |method_name, *args|
+          next super(method_name, *args) unless
+            /_meta\z/.match?(method_name)
+
+          name = controller_name&.classify&.underscore
+          next super(method_name, *args) unless
+            name.present?
+
+          aliases = %I[
+            #{name}_meta
+            typed_meta
+          ]
+
+          aliases.include?(method_name) || super(method_name, *args)
+        end
+
+        mod.define_method :method_missing do |method_name, *args|
+          next super(method_name, *args) unless
+            /_meta\z/.match?(method_name)
+
+          name = controller_name&.classify&.underscore
+          next super(method_name, *args) unless
+            name.present?
+
+          case method_name
+          when :"#{name}_meta",
+               :typed_meta
+            typed_params(format: nil).fetch(:meta) { {} }
+          else
+            super(method_name, *args)
+          end
+        end
+
+        include mod
+      },
     )
   end
 end

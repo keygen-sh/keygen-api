@@ -3123,7 +3123,7 @@ describe TypedParameters do
         def create
           render json: {
             data: post_params(format: nil)[:data],
-            meta: post_params(format: nil)[:meta],
+            meta: post_meta,
             params: post_params,
           }
         end
@@ -3141,6 +3141,11 @@ describe TypedParameters do
         expect(body[:params]).to eq data.slice(:id)
         expect(body[:meta]).to eq meta
         expect(body[:data]).to eq data
+      end
+
+      it 'should decorate controller' do
+        expect(controller).to respond_to :typed_meta
+        expect(controller).to respond_to :post_meta
       end
     end
   end
