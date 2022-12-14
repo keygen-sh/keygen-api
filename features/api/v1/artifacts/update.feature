@@ -343,7 +343,7 @@ Feature: Update artifact
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an "artifact" with the following attributes:
       """
-      { "metadata": { "foo": "bar" } }
+      { "metadata": {} }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -405,7 +405,10 @@ Feature: Update artifact
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/filename"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/filename"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -436,7 +439,10 @@ Feature: Update artifact
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/status"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/status"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
