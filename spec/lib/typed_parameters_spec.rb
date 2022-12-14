@@ -2589,6 +2589,36 @@ describe TypedParameters do
 
       expect { processor.call(params) }.to raise_error TypedParameters::UnpermittedParameterError
     end
+
+    it 'should include optional coercible nillable param when blank' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, coerce: true, allow_nil: true, optional: true }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:foo]).to_not be nil
+      expect(params[:foo].key).to eq :foo
+      expect(params[:foo].value).to be nil
+    end
+
+    it 'should not include optional coercible nillable param when omitted' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, coerce: true, allow_nil: true, optional: true }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: {})
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:foo]).to be nil
+    end
+
+    it 'should raise on optional coercible param when blank' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, coerce: true, optional: true }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: '' })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to raise_error TypedParameters::InvalidParameterError
+    end
   end
 
   describe TypedParameters::Pipeline do

@@ -19,8 +19,8 @@ module TypedParameters
 
         # Handle nils early on
         if Types.nil?(type)
-          raise InvalidParameterError.new('cannot be nil', path: param.path) unless
-            schema.required? && schema.allow_nil?
+          raise InvalidParameterError.new('cannot be null', path: param.path) unless
+            schema.allow_nil?
 
           next
         end
