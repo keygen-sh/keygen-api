@@ -8,8 +8,8 @@ module TypedParameters
     end
 
     def call(key: ROOT, value:)
-      return value if value.is_a?(Parameter)
-      return if
+      return value if
+        value.is_a?(Parameter) ||
         value.nil?
 
       case schema.children

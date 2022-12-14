@@ -30,8 +30,9 @@ module TypedParameters
         raise InvalidParameterError.new("type mismatch (received #{type.humanize} expected #{schema.type.humanize})", path: param.path) unless
           type == schema.type || type.subtype? && type.archetype == schema.type
 
-        # Assert scalar values for params without children
+        # Assertions for params without children
         if schema.children.nil?
+          # Assert non-scalars only contain scalars (unless allowed)
           case
           when schema.hash?
             param.value.each do |key, value|
@@ -54,17 +55,18 @@ module TypedParameters
                 schema.allow_non_scalars?
             end
           end
-        end
 
-        # Handle blanks (and false-positive "blank" values)
-        if param.value.blank?
-          unless param.value == false
-            raise InvalidParameterError.new('cannot be blank', path: param.path) if
-              !schema.allow_blank?
+          # Handle blanks (and false-positive "blank" values)
+          if param.value.blank?
+            unless param.value == false
+              raise InvalidParameterError.new('cannot be blank', path: param.path) unless
+                schema.allow_blank?
 
-            next
+              next
+            end
           end
         end
+
 
         # Assert validations
         raise InvalidParameterError.new('is invalid', path: param.path) unless
