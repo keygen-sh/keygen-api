@@ -9,12 +9,19 @@ module Api::V1::Licenses::Actions
 
     authorize :license
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true do
+        param :increment, type: :integer, optional: true
+      end
+    }
     def increment
       authorize! license,
         with: Licenses::UsagePolicy
 
       license.with_lock 'FOR UPDATE NOWAIT' do
-        license.increment :uses, increment_param
+        license.increment :uses, use_meta.fetch(:increment, 1)
         license.save!
       end
 
@@ -37,12 +44,19 @@ module Api::V1::Licenses::Actions
                          source: { pointer: '/meta/increment' }
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true do
+        param :decrement, type: :integer, optional: true
+      end
+    }
     def decrement
       authorize! license,
         with: Licenses::UsagePolicy
 
       license.with_lock 'FOR UPDATE NOWAIT' do
-        license.decrement :uses, decrement_param
+        license.decrement :uses, use_meta.fetch(:decrement, 1)
         license.save!
       end
 
@@ -92,30 +106,6 @@ module Api::V1::Licenses::Actions
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
       Current.resource = license
-    end
-
-    def increment_param
-      use_params.dig(:meta, :increment) || 1
-    end
-
-    def decrement_param
-      use_params.dig(:meta, :decrement) || 1
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :increment do
-        param :meta, type: :hash, optional: true do
-          param :increment, type: :integer, optional: true
-        end
-      end
-
-      on :decrement do
-        param :meta, type: :hash, optional: true do
-          param :decrement, type: :integer, optional: true
-        end
-      end
     end
   end
 end
