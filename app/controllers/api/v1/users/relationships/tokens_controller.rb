@@ -25,6 +25,20 @@ module Api::V1::Users::Relationships
       render jsonapi: token
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash, optional: true do
+        param :type, type: :string, inclusion: { in: %w[token tokens] }
+        param :attributes, type: :hash do
+          param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
+          param :name, type: :string, allow_nil: true, optional: true
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            items type: :string
+          end
+        end
+      end
+    }
     def create
       authorize! with: Users::TokenPolicy
 
@@ -64,25 +78,6 @@ module Api::V1::Users::Relationships
       @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
 
       Current.resource = user
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash, optional: true do
-          param :type, type: :string, inclusion: %w[token tokens]
-          param :attributes, type: :hash do
-            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
-            param :name, type: :string, allow_nil: true, optional: true
-            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-          end
-        end
-      end
     end
   end
 end
