@@ -275,7 +275,10 @@ Feature: Generate authentication token for license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -345,7 +348,10 @@ Feature: Generate authentication token for license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -421,7 +427,10 @@ Feature: Generate authentication token for license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -487,7 +496,10 @@ Feature: Generate authentication token for license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -563,7 +575,10 @@ Feature: Generate authentication token for license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
