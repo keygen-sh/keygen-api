@@ -12,8 +12,16 @@ module Api::V1::Releases::Actions::V1x0
       check_for_upgrade_by_id
     ]
 
+    typed_query {
+      param :product, type: :string
+      param :platform, type: :string
+      param :filetype, type: :string
+      param :version, type: :string
+      param :constraint, type: :string, optional: true
+      param :channel, type: :string, optional: true
+    }
     def check_for_upgrade_by_query
-      kwargs = upgrade_query.to_h.symbolize_keys.slice(
+      kwargs = upgrade_query.slice(
         :product,
         :platform,
         :filetype,
@@ -41,15 +49,18 @@ module Api::V1::Releases::Actions::V1x0
       render status: :no_content
     end
 
+    typed_query {
+      param :constraint, type: :string, optional: true
+      param :channel, type: :string, optional: true
+    }
     def check_for_upgrade_by_id
-      kwargs = upgrade_query.to_h.symbolize_keys
-        .slice(:constraint, :channel)
-        .merge(
-          filetype: release.artifact.filetype_id,
-          platform: release.artifact.platform_id,
-          product: release.product_id,
-          version: release.version,
-        )
+      kwargs = upgrade_query.slice(:constraint, :channel)
+                            .merge(
+                              filetype: release.artifact.filetype_id,
+                              platform: release.artifact.platform_id,
+                              product: release.product_id,
+                              version: release.version,
+                            )
 
       check_for_upgrade(**kwargs)
     rescue ::V1x0::ReleaseUpgradeService::InvalidConstraintError => e
@@ -133,22 +144,6 @@ module Api::V1::Releases::Actions::V1x0
       # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
       #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
       render status: :no_content
-    end
-
-    typed_query do
-      on :check_for_upgrade_by_query do
-        query :product, type: :string
-        query :platform, type: :string
-        query :filetype, type: :string
-        query :version, type: :string
-        query :constraint, type: :string, optional: true
-        query :channel, type: :string, optional: true
-      end
-
-      on :check_for_upgrade_by_id do
-        query :constraint, type: :string, optional: true
-        query :channel, type: :string, optional: true
-      end
     end
   end
 end
