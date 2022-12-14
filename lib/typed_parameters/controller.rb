@@ -113,12 +113,14 @@ module TypedParameters
     end
 
     class_methods do
-      def typed_params(on: nil, schema: nil, format: nil, namespace: self, **kwargs, &)
+      def typed_params(on: nil, schema: nil, format: nil, **kwargs, &)
         typed_handlers[:params][self] ||= {}
 
         schema = case schema
+                in Array(Symbol, Symbol) => namespace, key
+                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
                  in Symbol => key
-                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
+                   typed_schemas.dig(self, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
                    Schema.new(**kwargs, controller: self, &)
                  end
@@ -135,12 +137,14 @@ module TypedParameters
         end
       end
 
-      def typed_query(on: nil, schema: nil, namespace: self, **kwargs, &)
+      def typed_query(on: nil, schema: nil, **kwargs, &)
         typed_handlers[:query][self] ||= {}
 
         schema = case schema
+                 in Array(Symbol, Symbol) => namespace, key
+                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
                  in Symbol => key
-                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
+                   typed_schemas.dig(self, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
                    # FIXME(ezekg) Should query params :coerce by default?
                    Schema.new(nilify_blanks: true, strict: false, **kwargs, controller: self, &)
