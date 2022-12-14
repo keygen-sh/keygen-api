@@ -17,6 +17,14 @@ module Api::V1::Licenses::Relationships
       render jsonapi: policy
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[policy policies] }
+        param :id, type: :string
+      end
+    }
     def update
       policy = current_account.policies.find_by(id: policy_params[:id])
       authorize! policy,
@@ -44,17 +52,6 @@ module Api::V1::Licenses::Relationships
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
       Current.resource = license
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[policy policies]
-          param :id, type: :string
-        end
-      end
     end
   end
 end
