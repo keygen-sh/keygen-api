@@ -20,6 +20,18 @@ module Api::V1
       render jsonapi: entitlement
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
+        param :attributes, type: :hash do
+          param :name, type: :string
+          param :code, type: :string
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+      end
+    }
     def create
       entitlement = current_account.entitlements.new(entitlement_params)
       authorize! entitlement
@@ -37,6 +49,19 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true
+          param :code, type: :string, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+      end
+    }
     def update
       authorize! entitlement
 
@@ -75,33 +100,6 @@ module Api::V1
       @entitlement = FindByAliasService.call(scope: scoped_entitlements, identifier: params[:id], aliases: :code)
 
       Current.resource = entitlement
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[entitlement entitlements]
-          param :attributes, type: :hash do
-            param :name, type: :string
-            param :code, type: :string
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[entitlement entitlements]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :code, type: :string, optional: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-        end
-      end
     end
   end
 end
