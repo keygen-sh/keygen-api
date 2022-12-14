@@ -9,13 +9,17 @@ module Api::V1::Machines::Actions
 
     authorize :machine
 
+    typed_query {
+      param :include, type: :array, coerce: true, optional: true
+      param :encrypt, type: :boolean, coerce: true, optional: true
+      param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+    }
     def show
-      kwargs = checkout_query.symbolize_keys
-                             .slice(
-                               :include,
-                               :encrypt,
-                               :ttl,
-                              )
+      kwargs = checkout_query.slice(
+        :include,
+        :encrypt,
+        :ttl,
+      )
 
       machine_file = checkout_machine_file(**kwargs)
 
@@ -31,9 +35,22 @@ module Api::V1::Machines::Actions
       render_unprocessable_entity detail: e.message
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true do
+        param :include, type: :array, optional: true
+        param :encrypt, type: :boolean, optional: true
+        param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+      end
+    }
+    typed_query {
+      param :include, type: :array, coerce: true, optional: true
+      param :encrypt, type: :boolean, coerce: true, optional: true
+      param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+    }
     def create
       kwargs = checkout_query.merge(checkout_meta)
-                             .symbolize_keys
                              .slice(
                                :include,
                                :encrypt,
@@ -85,32 +102,6 @@ module Api::V1::Machines::Actions
       )
 
       machine_file
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :create do
-        param :meta, type: :hash, optional: true do
-          param :include, type: :array, optional: true
-          param :encrypt, type: :boolean, optional: true
-          param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
-        end
-      end
-    end
-
-    typed_query do
-      on :show do
-        param :include, type: :array, coerce: true, optional: true
-        param :encrypt, type: :boolean, coerce: true, optional: true
-        param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
-      end
-
-      on :create do
-        param :include, type: :array, coerce: true, optional: true
-        param :encrypt, type: :boolean, coerce: true, optional: true
-        param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
-      end
     end
   end
 end
