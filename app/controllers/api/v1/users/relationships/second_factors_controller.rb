@@ -25,6 +25,17 @@ module Api::V1::Users::Relationships
       render jsonapi: second_factor
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash, optional: true do
+        param :type, type: :string, inclusion: { in: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors] }
+      end
+      param :meta, type: :hash do
+        param :password, type: :string, optional: true
+        param :otp, type: :string, optional: true
+      end
+    }
     def create
       second_factor = user.second_factors.new(account: current_account)
       authorize! second_factor,
@@ -53,6 +64,20 @@ module Api::V1::Users::Relationships
       end
     end
 
+     typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :enabled, type: :boolean
+        end
+      end
+      param :meta, type: :hash do
+        param :otp, type: :string
+      end
+    }
     def update
       second_factor = user.second_factors.find(params[:id])
       authorize! second_factor,
@@ -76,6 +101,13 @@ module Api::V1::Users::Relationships
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash, optional: true do
+        param :otp, type: :string
+      end
+    }
     def destroy
       second_factor = user.second_factors.find(params[:id])
       authorize! second_factor,
@@ -105,39 +137,6 @@ module Api::V1::Users::Relationships
       @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
 
       Current.resource = user
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash, optional: true do
-          param :type, type: :string, inclusion: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors]
-        end
-        param :meta, type: :hash do
-          param :password, type: :string, optional: true
-          param :otp, type: :string, optional: true
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :enabled, type: :boolean
-          end
-        end
-        param :meta, type: :hash do
-          param :otp, type: :string
-        end
-      end
-
-      on :destroy do
-        param :meta, type: :hash, optional: true do
-          param :otp, type: :string
-        end
-      end
     end
   end
 end
