@@ -8,6 +8,14 @@ module Api::V1::Users::Actions
 
     authorize :user
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash do
+        param :old_password, type: :string
+        param :new_password, type: :string
+      end
+    }
     def update
       authorize! user,
         with: Users::PasswordPolicy
@@ -26,6 +34,14 @@ module Api::V1::Users::Actions
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash do
+        param :password_reset_token, type: :string
+        param :new_password, type: :string
+      end
+    }
     def reset
       authorize! user,
         with: Users::PasswordPolicy
@@ -65,24 +81,6 @@ module Api::V1::Users::Actions
       @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id], aliases: :email)
 
       Current.resource = user
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :update do
-        param :meta, type: :hash do
-          param :old_password, type: :string
-          param :new_password, type: :string
-        end
-      end
-
-      on :reset do
-        param :meta, type: :hash do
-          param :password_reset_token, type: :string
-          param :new_password, type: :string
-        end
-      end
     end
   end
 end
