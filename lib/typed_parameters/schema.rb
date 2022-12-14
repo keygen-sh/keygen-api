@@ -41,7 +41,7 @@ module TypedParameters
       raise ArgumentError, 'key is required for child schema' if
         key == ROOT && parent.present?
 
-      raise ArgumentError, 'root cannot be nil' if
+      raise ArgumentError, 'root cannot be null' if
         key == ROOT && allow_nil
 
       raise ArgumentError, 'inclusion must be a hash with :in key' unless
