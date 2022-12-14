@@ -13,6 +13,17 @@ module Api::V1::Accounts::Relationships
       render jsonapi: billing
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[billing billings] }
+        param :attributes, type: :hash do
+          param :token, type: :string, optional: true
+          param :coupon, type: :string, optional: true
+        end
+      end
+    }
     def update
       authorize! billing,
         with: Accounts::BillingPolicy
@@ -42,20 +53,6 @@ module Api::V1::Accounts::Relationships
 
     def set_billing
       @billing = current_account.billing!
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[billing billings]
-          param :attributes, type: :hash do
-            param :token, type: :string, optional: true
-            param :coupon, type: :string, optional: true
-          end
-        end
-      end
     end
   end
 end
