@@ -23,6 +23,24 @@ module Api::V1
       render jsonapi: key
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[key keys] }
+        param :attributes, type: :hash do
+          param :key, type: :string
+        end
+        param :relationships, type: :hash do
+          param :policy, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[policy policies] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
       key = current_account.keys.new(key_params)
       authorize! key
@@ -40,6 +58,17 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[key keys] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :key, type: :string, optional: true
+        end
+      end
+    }
     def update
       authorize! key
 
@@ -78,37 +107,6 @@ module Api::V1
       @key = scoped_keys.find(params[:id])
 
       Current.resource = key
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[key keys]
-          param :attributes, type: :hash do
-            param :key, type: :string
-          end
-          param :relationships, type: :hash do
-            param :policy, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[policy policies]
-                param :id, type: :string
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[key keys]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :key, type: :string, optional: true
-          end
-        end
-      end
     end
   end
 end
