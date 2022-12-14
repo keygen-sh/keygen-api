@@ -9,8 +9,8 @@ module TypedParameters
 
     def call(key: ROOT, value:)
       return value if
-        value.is_a?(Parameter) ||
-        value.nil?
+        key == ROOT && value.nil? ||
+        value.is_a?(Parameter)
 
       case schema.children
       when Hash
