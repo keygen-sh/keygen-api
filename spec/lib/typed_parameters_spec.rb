@@ -1919,6 +1919,21 @@ describe TypedParameters do
       expect { validator.call(params) }.to_not raise_error
     end
 
+    it 'should not raise on missing nested optional params' do
+      schema = TypedParameters::Schema.new(type: :hash) do
+        param :foo, type: :hash do
+          param :bar, type: :hash, optional: true do
+            param :baz, type: :string, optional: true
+          end
+        end
+      end
+
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: {} })
+      validator = TypedParameters::Validator.new(schema:)
+
+      expect { validator.call(params) }.to_not raise_error
+    end
+
     it 'should raise on missing required param' do
       schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :string, optional: false }
       params    = TypedParameters::Parameterizer.new(schema:).call(value: {})
