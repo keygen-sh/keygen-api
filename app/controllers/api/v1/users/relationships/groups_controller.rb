@@ -17,6 +17,14 @@ module Api::V1::Users::Relationships
       render jsonapi: group
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash, allow_nil: true do
+        param :type, type: :string, inclusion: { in: %w[group groups] }
+        param :id, type: :string
+      end
+    }
     def update
       authorize! user,
         with: Users::GroupPolicy
@@ -42,17 +50,6 @@ module Api::V1::Users::Relationships
       @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
 
       Current.resource = user
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :update do
-        param :data, type: :hash, allow_nil: true do
-          param :type, type: :string, inclusion: %w[group groups]
-          param :id, type: :string
-        end
-      end
     end
   end
 end
