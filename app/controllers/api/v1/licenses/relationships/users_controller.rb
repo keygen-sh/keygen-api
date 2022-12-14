@@ -17,6 +17,14 @@ module Api::V1::Licenses::Relationships
       render jsonapi: user
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash, allow_nil: true do
+        param :type, type: :string, inclusion: { in: %w[user users] }
+        param :id, type: :string
+      end
+    }
     def update
       user = license.user
       authorize! user,
@@ -44,17 +52,6 @@ module Api::V1::Licenses::Relationships
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
       Current.resource = license
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :update do
-        param :data, type: :hash, allow_nil: true do
-          param :type, type: :string, inclusion: %w[user users]
-          param :id, type: :string
-        end
-      end
     end
   end
 end
