@@ -52,7 +52,13 @@ module TypedParameters
       def self.format_hash_data(data)
         rels  = data[:relationships]
         attrs = data[:attributes]
-        res   = data.slice(:id)
+        res   = data.except(
+          :attributes,
+          :links,
+          :meta,
+          :relationships,
+          :type,
+        )
 
         # Move attributes over to top-level params
         attrs&.each do |key, attr|
