@@ -25,10 +25,23 @@ module Api::V1::Licenses::Relationships
       render jsonapi: entitlement
     end
 
+
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, transform: -> (k, v) { [] }
+          param :id, type: :string, transform: -> (k, v) {
+            [:entitlement_id, v]
+          }
+        end
+      end
+    }
     def attach
       authorize! with: Licenses::EntitlementPolicy
 
-      entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
+      entitlements_data = entitlement_params.map do |entitlement|
         entitlement.merge(account_id: current_account.id)
       end
 
@@ -43,10 +56,22 @@ module Api::V1::Licenses::Relationships
       render jsonapi: attached
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :array do
+        items type: :hash do
+          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, transform: -> (k, v) { [] }
+          param :id, type: :string, transform: -> (k, v) {
+            [:entitlement_id, v]
+          }
+        end
+      end
+    }
     def detach
       authorize! with: Licenses::EntitlementPolicy
 
-      entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
+      entitlement_ids = entitlement_params.map { |e| e[:entitlement_id] }.compact
 
       # Block policy entitlements from being detached. These entitlements need to be detached
       # via the policy. This request wouldn't detach the entitlements, but since non-existing
@@ -103,32 +128,6 @@ module Api::V1::Licenses::Relationships
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
       Current.resource = license
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :attach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[entitlement entitlements], transform: -> (k, v) { [] }
-            param :id, type: :string, transform: -> (k, v) {
-              [:entitlement_id, v]
-            }
-          end
-        end
-      end
-
-      on :detach do
-        param :data, type: :array do
-          items type: :hash do
-            param :type, type: :string, inclusion: %w[entitlement entitlements], transform: -> (k, v) { [] }
-            param :id, type: :string, transform: -> (k, v) {
-              [:entitlement_id, v]
-            }
-          end
-        end
-      end
     end
   end
 end
