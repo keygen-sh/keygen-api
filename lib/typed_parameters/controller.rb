@@ -121,7 +121,7 @@ module TypedParameters
 
                    typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
                  in nil
-                   Schema.new(**kwargs, &)
+                   Schema.new(**kwargs, controller: self, &)
                  end
 
         case on
@@ -145,7 +145,7 @@ module TypedParameters
                    typed_schemas[namespaced_key] || raise(ArgumentError, "schema does not exist: #{namespaced_key.inspect}")
                  in nil
                    # FIXME(ezekg) Should query params :coerce by default?
-                   Schema.new(nilify_blanks: true, **kwargs, &)
+                   Schema.new(nilify_blanks: true, **kwargs, controller: self, &)
                  end
 
         case on
@@ -167,7 +167,7 @@ module TypedParameters
         raise ArgumentError, "schema already exists: #{namespaced_key.inspect}" if
           typed_schemas.key?(namespaced_key)
 
-        typed_schemas[namespaced_key] = Schema.new(**kwargs, &)
+        typed_schemas[namespaced_key] = Schema.new(**kwargs, controller: self, &)
       end
 
       private

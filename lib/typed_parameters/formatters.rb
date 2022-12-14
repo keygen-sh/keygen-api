@@ -6,11 +6,11 @@ module TypedParameters
   module Formatters
     cattr_reader :formats, default: {}
 
-    def self.register(format, transform:)
+    def self.register(format, transform:, decorate: nil)
       raise ArgumentError, "format is already registered: #{format.inspect}" if
         formats.key?(format)
 
-      formats[format] = Formatter.new(format, transform:)
+      formats[format] = Formatter.new(format, transform:, decorate:)
     end
 
     def self.unregister(type) = formats.delete(type)
