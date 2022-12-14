@@ -2927,26 +2927,32 @@ describe TypedParameters do
     it 'should define local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to have_key :"#{subject}/foo"
+      expect(subject.typed_schemas).to include(
+        subject => have_key(:foo),
+      )
     end
 
     it 'should define global schema' do
       subject.typed_schema(:foo, namespace: nil) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to have_key :foo
+      expect(subject.typed_schemas).to include(
+        nil => have_key(:foo),
+      )
     end
 
     it 'should define namespaced schema' do
       subject.typed_schema(:foo, namespace: :bar) { param :baz, type: :string }
 
-      expect(subject.typed_schemas).to have_key :"bar/foo"
+      expect(subject.typed_schemas).to include(
+        bar: have_key(:foo),
+      )
     end
 
     it 'should define singular params handler' do
       subject.typed_params(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include params: {
-        foo: anything,
+        subject => { foo: anything },
       }
     end
 
@@ -2954,9 +2960,11 @@ describe TypedParameters do
       subject.typed_params(on: %i[foo bar baz]) { param :qux, type: :string }
 
       expect(subject.typed_handlers).to include params: {
-        foo: anything,
-        bar: anything,
-        baz: anything,
+        subject => {
+          foo: anything,
+          bar: anything,
+          baz: anything,
+        },
       }
     end
 
@@ -2964,7 +2972,7 @@ describe TypedParameters do
       subject.typed_query(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include query: {
-        foo: anything,
+        subject => { foo: anything },
       }
     end
 
@@ -2972,9 +2980,11 @@ describe TypedParameters do
       subject.typed_query(on: %i[foo bar baz]) { param :qux, type: :string }
 
       expect(subject.typed_handlers).to include query: {
-        foo: anything,
-        bar: anything,
-        baz: anything,
+        subject => {
+          foo: anything,
+          bar: anything,
+          baz: anything,
+        },
       }
     end
 
