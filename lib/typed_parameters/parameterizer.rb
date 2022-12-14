@@ -30,6 +30,9 @@ module TypedParameters
     def parameterize_hash_schema(key:, value:)
       param = Parameter.new(key:, value: {}, schema:, parent:)
 
+      raise UnpermittedParameterError.new('unpermitted parameter', path: param.path) unless
+        value.is_a?(Hash)
+
       value.each do |k, v|
         if schema.children.any?
           child = schema.children.fetch(k) { nil }
@@ -51,6 +54,9 @@ module TypedParameters
 
     def parameterize_array_schema(key:, value:)
       param = Parameter.new(key:, value: [], schema:, parent:)
+
+      raise UnpermittedParameterError.new('unpermitted parameter', path: param.path) unless
+        value.is_a?(Array)
 
       value.each_with_index do |v, i|
         if schema.children.any?
