@@ -32,8 +32,39 @@ module Api::V1
       render jsonapi: machine
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[machine machines] }
+        param :id, type: :string, optional: true
+        param :attributes, type: :hash do
+          param :fingerprint, type: :string
+          param :name, type: :string, optional: true, allow_nil: true
+          param :ip, type: :string, optional: true, allow_nil: true
+          param :hostname, type: :string, optional: true, allow_nil: true
+          param :platform, type: :string, optional: true, allow_nil: true
+          param :cores, type: :integer, optional: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+        param :relationships, type: :hash do
+          param :license, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[license licenses] }
+              param :id, type: :string
+            end
+          end
+          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[group groups] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
-      machine = current_account.machines.new machine_params
+      machine = current_account.machines.new(machine_params)
       authorize! machine
 
       if machine.valid? && current_token&.activation_token?
@@ -75,6 +106,24 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[machine machines] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true, allow_nil: true
+          param :ip, type: :string, optional: true, allow_nil: true
+          param :hostname, type: :string, optional: true, allow_nil: true
+          param :platform, type: :string, optional: true, allow_nil: true
+          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) } do
+            param :cores, type: :integer, optional: true, allow_nil: true
+            param :metadata, type: :metadata, allow_blank: true, optional: true
+          end
+        end
+      end
+    }
     def update
       authorize! machine
 
@@ -139,59 +188,6 @@ module Api::V1
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
       Current.resource = machine
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[machine machines]
-          param :id, type: :string, optional: true
-          param :attributes, type: :hash do
-            param :fingerprint, type: :string
-            param :name, type: :string, optional: true, allow_nil: true
-            param :ip, type: :string, optional: true, allow_nil: true
-            param :hostname, type: :string, optional: true, allow_nil: true
-            param :platform, type: :string, optional: true, allow_nil: true
-            param :cores, type: :integer, optional: true, allow_nil: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-          param :relationships, type: :hash do
-            param :license, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[license licenses]
-                param :id, type: :string
-              end
-            end
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-              param :group, type: :hash, optional: true do
-                param :data, type: :hash, allow_nil: true do
-                  param :type, type: :string, inclusion: %w[group groups]
-                  param :id, type: :string
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[machine machines]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true, allow_nil: true
-            param :ip, type: :string, optional: true, allow_nil: true
-            param :hostname, type: :string, optional: true, allow_nil: true
-            param :platform, type: :string, optional: true, allow_nil: true
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
-              param :cores, type: :integer, optional: true, allow_nil: true
-              param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            end
-          end
-        end
-      end
     end
   end
 end
