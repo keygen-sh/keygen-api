@@ -575,7 +575,10 @@ Feature: Create machine
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/relationships/group"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -615,7 +618,10 @@ Feature: Create machine
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/relationships/group"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -1159,13 +1165,12 @@ Feature: Create machine
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "can't be blank",
-        "code": "FINGERPRINT_MISSING",
+        "title": "Bad request",
+        "detail": "cannot be blank",
         "source": {
           "pointer": "/data/attributes/fingerprint"
         }
