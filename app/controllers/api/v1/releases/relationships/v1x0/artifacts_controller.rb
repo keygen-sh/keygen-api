@@ -8,6 +8,9 @@ module Api::V1::Releases::Relationships::V1x0
     before_action :authenticate_with_token, only: %i[show]
     before_action :set_release
 
+    typed_query {
+      param :ttl, type: :integer, coerce: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+    }
     def show
       authorize! release,
         with: Releases::V1x0::DownloadPolicy,
@@ -85,14 +88,6 @@ module Api::V1::Releases::Relationships::V1x0
       @release = scoped_releases.find(params[:release_id])
 
       Current.resource = release
-    end
-
-    typed_query do
-      on :show do
-        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          query :ttl, type: :integer, coerce: true, optional: true
-        end
-      end
     end
   end
 end
