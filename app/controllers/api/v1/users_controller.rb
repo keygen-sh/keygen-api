@@ -34,6 +34,36 @@ module Api::V1
       render jsonapi: user
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[user users] }
+        param :attributes, type: :hash do
+          param :first_name, type: :string, optional: true
+          param :last_name, type: :string, optional: true
+          param :email, type: :string
+          param :password, type: :string, optional: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
+            if: -> { current_bearer&.has_role?(:admin) },
+            transform: -> (k, v) {
+              [:role_attributes, { name: v.underscore }]
+            }
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            items type: :string
+          end
+        end
+        param :relationships, type: :hash, optional: true do
+          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[group groups] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
       user = current_account.users.new user_params
       authorize! user
@@ -51,6 +81,29 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[user users] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash, optional: true do
+          param :first_name, type: :string, optional: true
+          param :last_name, type: :string, optional: true
+          param :email, type: :string, optional: true
+          param :password, type: :string, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :product) }
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            items type: :string
+          end
+          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
+            if: -> { current_bearer&.has_role?(:admin) },
+            transform: -> (k, v) {
+              [:role_attributes, { name: v.underscore }]
+            }
+        end
+      end
+    }
     def update
       # NOTE(ezekg) Wrapping in a transaction to cover any possible database side-effects
       #             of the attrs assignment, e.g. setting the IDs of an association.
@@ -101,71 +154,6 @@ module Api::V1
       @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id].downcase, aliases: :email)
 
       Current.resource = user
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[user users]
-          param :attributes, type: :hash do
-            param :first_name, type: :string, optional: true
-            param :last_name, type: :string, optional: true
-            param :email, type: :string
-            param :password, type: :string, optional: true, allow_nil: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            if current_bearer&.has_role?(:admin)
-              param :role, type: :string, inclusion: %w[user admin developer sales-agent support-agent], optional: true, transform: -> (k, v) {
-                [:role_attributes, { name: v.underscore }]
-              }
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-          end
-          param :relationships, type: :hash, optional: true do
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-              param :group, type: :hash, optional: true do
-                param :data, type: :hash, allow_nil: true do
-                  param :type, type: :string, inclusion: %w[group groups]
-                  param :id, type: :string
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[user users]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash, optional: true do
-            param :first_name, type: :string, optional: true
-            param :last_name, type: :string, optional: true
-            param :email, type: :string, optional: true
-            if current_bearer&.has_role?(:admin, :product)
-              param :password, type: :string, optional: true, allow_nil: true
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
-              param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            end
-            if current_bearer&.has_role?(:admin)
-              param :role, type: :string, inclusion: %w[user admin developer sales-agent support-agent], optional: true, transform: -> (k, v) {
-                [:role_attributes, { name: v.underscore }]
-              }
-            end
-          end
-        end
-      end
     end
   end
 end
