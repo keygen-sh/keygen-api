@@ -20,6 +20,25 @@ module Api::V1
       render jsonapi: product
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[product products] }
+        param :attributes, type: :hash do
+          param :name, type: :string
+          param :distribution_strategy, type: :string, optional: true
+          param :url, type: :string, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :platforms, type: :array, optional: true, allow_nil: true do
+            items type: :string
+          end
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
+            items type: :string
+          end
+        end
+      end
+    }
     def create
       product = current_account.products.new(product_params)
       authorize! product
@@ -37,6 +56,26 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[product products] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true
+          param :distribution_strategy, type: :string, optional: true, allow_nil: true
+          param :url, type: :string, optional: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :platforms, type: :array, optional: true, allow_nil: true do
+            items type: :string
+          end
+          param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer) } do
+            items type: :string
+          end
+        end
+      end
+    }
     def update
       authorize! product
 
@@ -75,51 +114,6 @@ module Api::V1
       @product = scoped_products.find(params[:id])
 
       Current.resource = product
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[product products]
-          param :attributes, type: :hash do
-            param :name, type: :string
-            param :distribution_strategy, type: :string, optional: true
-            param :url, type: :string, optional: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            param :platforms, type: :array, optional: true, allow_nil: true do
-              items type: :string
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :developer)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[product products]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :distribution_strategy, type: :string, optional: true, allow_nil: true
-            param :url, type: :string, optional: true, allow_nil: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            param :platforms, type: :array, optional: true, allow_nil: true do
-              items type: :string
-            end
-            if current_account.ent? && current_bearer&.has_role?(:admin, :developer)
-              param :permissions, type: :array, optional: true do
-                items type: :string
-              end
-            end
-          end
-        end
-      end
     end
   end
 end
