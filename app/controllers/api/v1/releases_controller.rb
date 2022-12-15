@@ -56,10 +56,10 @@ module Api::V1
           with if: -> { current_api_version == '1.0' } do
             param :filename, type: :string, optional: true
             param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, optional: true
-            param :platform, type: :string, optional: true
-            param :signature, type: :string, optional: true
-            param :checksum, type: :string, optional: true
+            param :filetype, type: :string, allow_nil: true, optional: true
+            param :platform, type: :string, allow_nil: true, optional: true
+            param :signature, type: :string, allow_nil: true, optional: true
+            param :checksum, type: :string, allow_nil: true, optional: true
           end
         end
         param :relationships, type: :hash do
