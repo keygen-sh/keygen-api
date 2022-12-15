@@ -243,7 +243,7 @@ Feature: Create artifact
       """
       {
         "title": "Bad request",
-        "detail": "is missing",
+        "detail": "cannot be null",
         "source": {
           "pointer": "/data/attributes/filename"
         }
