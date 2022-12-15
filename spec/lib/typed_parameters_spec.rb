@@ -2927,57 +2927,51 @@ describe TypedParameters do
     it 'should define local schema' do
       subject.typed_schema(:foo) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to include(
-        subject => have_key(:foo),
-      )
+      expect(subject.typed_schemas[subject, :foo]).to be_a TypedParameters::Schema
     end
 
     it 'should define global schema' do
       subject.typed_schema(:foo, namespace: nil) { param :bar, type: :string }
 
-      expect(subject.typed_schemas).to include(
-        nil => have_key(:foo),
-      )
+      expect(subject.typed_schemas[nil, :foo]).to be_a TypedParameters::Schema
     end
 
     it 'should define namespaced schema' do
       subject.typed_schema(:foo, namespace: :bar) { param :baz, type: :string }
 
-      expect(subject.typed_schemas).to include(
-        bar: have_key(:foo),
-      )
+      expect(subject.typed_schemas[:bar, :foo]).to be_a TypedParameters::Schema
     end
 
     it 'should define singular params handler' do
       subject.typed_params(on: :foo) { param :bar, type: :string }
 
-      expect(subject.typed_handlers).to include params: {
-        subject => have_key(:foo),
-      }
+      expect(subject.typed_handlers.params[subject, :foo]).to be_a TypedParameters::Handler
     end
 
     it 'should define multiple params handlers' do
       subject.typed_params(on: %i[foo bar baz]) { param :qux, type: :string }
 
-      expect(subject.typed_handlers).to include params: {
-        subject => have_keys(%i[foo bar baz]),
-      }
+      params = subject.typed_handlers.params
+
+      expect(params[subject, :foo]).to be_a TypedParameters::Handler
+      expect(params[subject, :bar]).to be_a TypedParameters::Handler
+      expect(params[subject, :baz]).to be_a TypedParameters::Handler
     end
 
     it 'should define singular query param handler' do
       subject.typed_query(on: :foo) { param :bar, type: :string }
 
-      expect(subject.typed_handlers).to include query: {
-        subject => have_key(:foo),
-      }
+      expect(subject.typed_handlers.query[subject, :foo]).to be_a TypedParameters::Handler
     end
 
     it 'should define multiple query param handlers' do
       subject.typed_query(on: %i[foo bar baz]) { param :qux, type: :string }
 
-      expect(subject.typed_handlers).to include query: {
-        subject => have_keys(%i[foo bar baz]),
-      }
+      query = subject.typed_handlers.query
+
+      expect(query[subject, :foo]).to be_a TypedParameters::Handler
+      expect(query[subject, :bar]).to be_a TypedParameters::Handler
+      expect(query[subject, :baz]).to be_a TypedParameters::Handler
     end
 
     context 'without inheritance' do
