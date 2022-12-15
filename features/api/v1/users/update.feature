@@ -141,29 +141,6 @@ Feature: Update user
       """
     Then the response status should be "403"
 
-  Scenario: Admin updates a user for their account including the wrong id
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 2 "webhook-endpoints"
-    And I use an authentication token
-    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
-      """
-      {
-        "data": {
-          "type": "users",
-          "id": "foo",
-          "attributes": {
-            "firstName": "Foobar"
-          }
-        }
-      }
-      """
-    Then the response status should be "400"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
   Scenario: Admin attempts to update a user for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
@@ -290,7 +267,7 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "must be one of: user, admin, developer, sales-agent, support-agent (received read-only)",
+        "detail": "is invalid",
         "source": {
           "pointer": "/data/attributes/role"
         }
@@ -742,9 +719,9 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "unpermitted type (expected nested object of scalar types)",
+        "detail": "type mismatch (received object expected metadata object)",
         "source": {
-          "pointer": "/data/attributes/metadata/object/object"
+          "pointer": "/data/attributes/metadata"
         }
       }
       """
@@ -778,9 +755,9 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "unpermitted type (expected nested array of scalar types)",
+        "detail": "type mismatch (received object expected metadata object)",
         "source": {
-          "pointer": "/data/attributes/metadata/array/2"
+          "pointer": "/data/attributes/metadata"
         }
       }
       """
@@ -976,7 +953,10 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1027,7 +1007,10 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
