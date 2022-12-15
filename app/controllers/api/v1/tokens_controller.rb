@@ -25,6 +25,20 @@ module Api::V1
       render jsonapi: token
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash, optional: true do
+        param :type, type: :string, inclusion: { in: %w[token tokens] }
+        param :attributes, type: :hash do
+          param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
+          param :name, type: :string, allow_nil: true, optional: true
+        end
+      end
+      param :meta, type: :hash, optional: true do
+        param :otp, type: :string
+      end
+    }
     def generate
       authenticate_with_http_basic do |email, password|
         user = current_account.users.find_by email: "#{email}".downcase
@@ -131,23 +145,6 @@ module Api::V1
       @token = scoped_tokens.find(params[:id])
 
       Current.resource = token
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :generate do
-        param :data, type: :hash, optional: true do
-          param :type, type: :string, inclusion: %w[token tokens]
-          param :attributes, type: :hash do
-            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
-            param :name, type: :string, allow_nil: true, optional: true
-          end
-        end
-        param :meta, type: :hash, optional: true do
-          param :otp, type: :string
-        end
-      end
     end
   end
 end
