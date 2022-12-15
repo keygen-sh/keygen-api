@@ -17,6 +17,9 @@ module TypedParameters
       @parent = parent
     end
 
+    def array?  = Types.array?(value)
+    def hash?   = Types.hash?(value)
+    def scalar? = Types.scalar?(value)
     def parent? = parent.present?
 
     def path
