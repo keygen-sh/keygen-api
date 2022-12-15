@@ -81,7 +81,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -118,7 +121,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -155,7 +161,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -194,7 +203,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/relationships/group"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -956,7 +968,7 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "must be one of: user, admin, developer, sales-agent, support-agent (received read-only)",
+        "detail": "is invalid",
         "source": {
           "pointer": "/data/attributes/role"
         }
@@ -1043,7 +1055,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1174,7 +1189,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1246,7 +1264,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1322,7 +1343,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1396,7 +1420,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1512,7 +1539,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1543,7 +1573,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1574,7 +1607,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1605,7 +1641,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1636,7 +1675,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1667,7 +1709,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1698,7 +1743,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1729,7 +1777,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/roLe"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/roLe"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1760,7 +1811,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1852,7 +1906,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role, /data/attributes/rolex0d"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/rolex0d"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1881,7 +1938,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -2025,7 +2085,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/role"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
