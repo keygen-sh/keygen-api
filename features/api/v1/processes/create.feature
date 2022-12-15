@@ -1384,13 +1384,12 @@ Feature: Spawn machine process
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "can't be blank",
-        "code": "PID_MISSING",
+        "title": "Bad request",
+        "detail": "cannot be blank",
         "source": {
           "pointer": "/data/attributes/pid"
         }

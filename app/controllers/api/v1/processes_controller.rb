@@ -26,6 +26,26 @@ module Api::V1
       render jsonapi: machine_process
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[process processes] }
+        param :id, type: :string, optional: true
+        param :attributes, type: :hash do
+          param :pid, type: :string
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+        end
+        param :relationships, type: :hash do
+          param :machine, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[machine machines] }
+              param :id, type: :string
+            end
+          end
+        end
+      end
+    }
     def create
       machine_process = current_account.machine_processes.new(process_params)
       authorize! machine_process
@@ -48,6 +68,17 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[process processes] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+        end
+      end
+    }
     def update
       authorize! machine_process
 
@@ -88,41 +119,6 @@ module Api::V1
       @machine_process = scoped_processes.find(params[:id])
 
       Current.resource = machine_process
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[process processes]
-          param :id, type: :string, optional: true
-          param :attributes, type: :hash do
-            param :pid, type: :string
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-          param :relationships, type: :hash do
-            param :machine, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[machine machines]
-                param :id, type: :string
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[process processes]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-              param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            end
-          end
-        end
-      end
     end
   end
 end
