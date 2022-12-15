@@ -60,18 +60,18 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[artifact artifacts] }
         param :attributes, type: :hash do
           param :filename, type: :string
-          param :filesize, type: :integer, optional: true
-          param :filetype, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+          param :filesize, type: :integer, allow_nil: true, optional: true
+          param :filetype, type: :string, allow_blank: true, allow_nil: true, optional: true, transform: -> _, key {
             [:filetype_attributes, { key: }]
           }
-          param :platform, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+          param :platform, type: :string, allow_blank: true, allow_nil: true, optional: true, transform: -> _, key {
             [:platform_attributes, { key: }]
           }
-          param :arch, type: :string, optional: true, allow_blank: true, transform: -> _, key {
+          param :arch, type: :string, allow_blank: true, allow_nil: true, optional: true, transform: -> _, key {
             [:arch_attributes, { key: }]
           }
-          param :signature, type: :string, allow_blank: true, optional: true
-          param :checksum, type: :string, allow_blank: true, optional: true
+          param :signature, type: :string, allow_blank: true, allow_nil: true, optional: true
+          param :checksum, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
         end
         param :relationships, type: :hash do
@@ -112,9 +112,9 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[artifact artifacts] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
-          param :filesize, type: :integer, optional: true, allow_nil: true
-          param :signature, type: :string, optional: true, allow_blank: true, allow_nil: true
-          param :checksum, type: :string, optional: true, allow_blank: true, allow_nil: true
+          param :filesize, type: :integer, allow_nil: true, optional: true
+          param :signature, type: :string, allow_blank: true, allow_nil: true, optional: true
+          param :checksum, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
         end
       end
