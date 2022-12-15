@@ -1059,7 +1059,7 @@ Feature: Create release
       """
       {
         "title": "Bad request",
-        "detail": "must be one of: stable, rc, beta, alpha, dev (received latest)",
+        "detail": "is invalid",
         "source": {
           "pointer": "/data/attributes/channel"
         }
