@@ -30,7 +30,7 @@ module Api::V1
           param :max_users, type: :integer, optional: true
           param :max_licenses, type: :integer, optional: true
           param :max_machines, type: :integer, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
         end
       end
     }
@@ -62,7 +62,7 @@ module Api::V1
           param :max_users, type: :integer, optional: true, allow_nil: true
           param :max_licenses, type: :integer, optional: true, allow_nil: true
           param :max_machines, type: :integer, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
         end
       end
     }
