@@ -2952,7 +2952,7 @@ describe TypedParameters do
       subject.typed_params(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include params: {
-        subject => { foo: anything },
+        subject => have_key(:foo),
       }
     end
 
@@ -2960,11 +2960,7 @@ describe TypedParameters do
       subject.typed_params(on: %i[foo bar baz]) { param :qux, type: :string }
 
       expect(subject.typed_handlers).to include params: {
-        subject => {
-          foo: anything,
-          bar: anything,
-          baz: anything,
-        },
+        subject => have_keys(%i[foo bar baz]),
       }
     end
 
@@ -2972,7 +2968,7 @@ describe TypedParameters do
       subject.typed_query(on: :foo) { param :bar, type: :string }
 
       expect(subject.typed_handlers).to include query: {
-        subject => { foo: anything },
+        subject => have_key(:foo),
       }
     end
 
@@ -2980,11 +2976,7 @@ describe TypedParameters do
       subject.typed_query(on: %i[foo bar baz]) { param :qux, type: :string }
 
       expect(subject.typed_handlers).to include query: {
-        subject => {
-          foo: anything,
-          bar: anything,
-          baz: anything,
-        },
+        subject => have_keys(%i[foo bar baz]),
       }
     end
 
