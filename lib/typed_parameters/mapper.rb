@@ -47,16 +47,17 @@ module TypedParameters
       return if param.nil?
 
       # Postorder DFS, so we'll visit the children first.
-      if param.schema.children&.any? && param.respond_to?(:[])
+      if param.schema.children&.any?
         case param.schema.children
-        when Array
+        in Array if param.array?
           if param.schema.indexed?
             param.schema.children.each_with_index { |v, i| self.class.new(schema: v, controller:).call(param[i], &) }
           else
             param.value.each { |v| self.class.new(schema: param.schema.children.first, controller:).call(v, &) }
           end
-        when Hash
+        in Hash if param.hash?
           param.schema.children.each { |k, v| self.class.new(schema: v, controller:).call(param[k], &) }
+        else
         end
       end
 
