@@ -24,6 +24,9 @@ module Api::V1::Products::Relationships
       render jsonapi: artifacts
     end
 
+    typed_query {
+      param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+    }
     def show
       authorize! artifact,
         with: Products::ReleaseArtifactPolicy
@@ -70,14 +73,6 @@ module Api::V1::Products::Relationships
         aliases: :filename,
         reorder: false,
       )
-    end
-
-    typed_query do
-      on :show do
-        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          query :ttl, type: :integer, coerce: true, optional: true
-        end
-      end
     end
   end
 end
