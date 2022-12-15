@@ -18,16 +18,20 @@ describe TypedParameters do
   end
 
   before do
-    @path_transform_was = TypedParameters.config.path_transform
-    @key_transform_was  = TypedParameters.config.key_transform
+    @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
+    @path_transform_was   = TypedParameters.config.path_transform
+    @key_transform_was    = TypedParameters.config.key_transform
 
-    TypedParameters.config.path_transform = nil
-    TypedParameters.config.key_transform  = nil
+    # FIXME(ezekg) Add a config.reset! method in test envs?
+    TypedParameters.config.ignore_nil_optionals = false
+    TypedParameters.config.path_transform       = nil
+    TypedParameters.config.key_transform        = nil
   end
 
   after do
-    TypedParameters.config.path_transform = @path_transform_was
-    TypedParameters.config.key_transform  = @key_transform_was
+    TypedParameters.config.ignore_nil_optionals = @ignore_nil_optionals_was
+    TypedParameters.config.path_transform       = @path_transform_was
+    TypedParameters.config.key_transform        = @key_transform_was
   end
 
   describe TypedParameters::Configuration do
@@ -2220,6 +2224,62 @@ describe TypedParameters do
       validator = TypedParameters::Validator.new(schema:)
 
       expect { validator.call(params) }.to_not raise_error
+    end
+
+    context 'with config to not ignore optional nils' do
+      before do
+        @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
+
+        TypedParameters.config.ignore_nil_optionals = false
+      end
+
+      after do
+        TypedParameters.config.ignore_nil_optionals = @ignore_nil_optionals_was
+      end
+
+      it 'should raise on required nil param' do
+        schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false, optional: false }
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+      end
+
+      it 'should raise on optional nil param' do
+        schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false, optional: true }
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+      end
+    end
+
+    context 'with config to ignore optional nils' do
+      before do
+        @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
+
+        TypedParameters.config.ignore_nil_optionals = true
+      end
+
+      after do
+        TypedParameters.config.ignore_nil_optionals = @ignore_nil_optionals_was
+      end
+
+      it 'should raise on required nil param' do
+        schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false, optional: false }
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error TypedParameters::InvalidParameterError
+      end
+
+      it 'should not raise on optional nil param' do
+        schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, allow_nil: false, optional: true }
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: nil })
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to_not raise_error
+      end
     end
 
     context 'with subtype' do
