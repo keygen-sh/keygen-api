@@ -303,7 +303,9 @@ Feature: Search
       {
         "meta": {
           "type": "unknowns",
-          "query": {}
+          "query": {
+            "foo": "bar"
+          }
         }
       }
       """
@@ -684,7 +686,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "type mismatch (received array expected object)",
+        "detail": "search query for 'metadata' must be a hash of key-value search terms",
         "source": {
           "pointer": "/meta/query/metadata"
         }
@@ -1866,7 +1868,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "search query is required",
+        "detail": "cannot be blank",
         "source": {
           "pointer": "/meta/query"
         }
