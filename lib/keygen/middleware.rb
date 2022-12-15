@@ -73,15 +73,14 @@ module Keygen
             Keygen.logger.exception(e)
 
             [
-              400,
+              500,
               {
                 "Content-Type" => "application/vnd.api+json",
               },
               [{
                 errors: [{
-                  title: "Bad request",
-                  detail: "The request could not be completed because it was invalid",
-                  code: "REQUEST_INVALID"
+                  title: "Internal server error",
+                  detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
                 }]
               }.to_json]
             ]
