@@ -38,6 +38,55 @@ module Api::V1
       render jsonapi: release
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[release releases] }
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true, allow_nil: true
+          param :description, type: :string, optional: true, allow_nil: true
+          param :channel, type: :string, inclusion: { in: %w[stable rc beta alpha dev] }, transform: -> (_, key) {
+            [:channel_attributes, { key: }]
+          }
+          param :status, type: :string, inclusion: { in: %w[DRAFT PUBLISHED] }, optional: true
+          param :version, type: :string
+          param :tag, type: :string, optional: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+          with if: -> { current_api_version == '1.0' } do
+            param :filename, type: :string, optional: true
+            param :filesize, type: :integer, optional: true
+            param :filetype, type: :string, optional: true
+            param :platform, type: :string, optional: true
+            param :signature, type: :string, optional: true
+            param :checksum, type: :string, optional: true
+          end
+        end
+        param :relationships, type: :hash do
+          param :product, type: :hash do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[product products] }
+              param :id, type: :string
+            end
+          end
+          param :constraints, type: :hash, optional: true do
+            param :data, type: :array do
+              items type: :hash do
+                param :type, type: :string, inclusion: { in: %w[constraint constraints] }
+                param :relationships, type: :hash do
+                  param :entitlement, type: :hash do
+                    param :data, type: :hash do
+                      param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
+                      param :id, type: :string
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    }
     def create
       release = current_account.releases.new(api_version: current_api_version, **release_params)
       authorize! release
@@ -55,6 +104,25 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[release releases] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :name, type: :string, optional: true, allow_nil: true
+          param :description, type: :string, optional: true, allow_nil: true
+          param :tag, type: :string, optional: true, allow_nil: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
+          with if: -> { current_api_version == '1.0' } do
+            param :filesize, type: :integer, optional: true, allow_nil: true
+            param :signature, type: :string, optional: true, allow_nil: true
+            param :checksum, type: :string, optional: true, allow_nil: true
+          end
+        end
+      end
+    }
     def update
       authorize! release
 
@@ -97,76 +165,6 @@ module Api::V1
       )
 
       Current.resource = release
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[release releases]
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :description, type: :string, optional: true, allow_nil: true
-            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
-              [:channel_attributes, { key: }]
-            }
-            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true
-            param :version, type: :string
-            param :tag, type: :string, optional: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            if current_api_version == '1.0'
-              param :filename, type: :string, optional: true
-              param :filesize, type: :integer, optional: true
-              param :filetype, type: :string, optional: true
-              param :platform, type: :string, optional: true
-              param :signature, type: :string, optional: true
-              param :checksum, type: :string, optional: true
-            end
-          end
-          param :relationships, type: :hash do
-            param :product, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[product products]
-                param :id, type: :string
-              end
-            end
-            param :constraints, type: :hash, optional: true do
-              param :data, type: :array do
-                items type: :hash do
-                  param :type, type: :string, inclusion: %w[constraint constraints]
-                  param :relationships, type: :hash do
-                    param :entitlement, type: :hash do
-                      param :data, type: :hash do
-                        param :type, type: :string, inclusion: %w[entitlement entitlements]
-                        param :id, type: :string
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[release releases]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true, allow_nil: true
-            param :description, type: :string, optional: true, allow_nil: true
-            param :tag, type: :string, optional: true, allow_nil: true
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            if current_api_version == '1.0'
-              param :filesize, type: :integer, optional: true, allow_nil: true
-              param :signature, type: :string, optional: true, allow_nil: true
-              param :checksum, type: :string, optional: true, allow_nil: true
-            end
-          end
-        end
-      end
     end
   end
 end

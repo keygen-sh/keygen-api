@@ -304,7 +304,10 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/version"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/version"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
