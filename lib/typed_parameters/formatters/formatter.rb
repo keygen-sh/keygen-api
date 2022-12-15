@@ -3,8 +3,6 @@
 module TypedParameters
   module Formatters
     class Formatter
-      extend Forwardable
-
       attr_reader :decorator,
                   :format
 
@@ -14,10 +12,9 @@ module TypedParameters
         @decorator = decorate
       end
 
-      def call(...)  = @transform.call(...)
       def decorator? = @decorator.present?
 
-      delegate arity: :@transform
+      delegate :arity, :call, to: :@transform
     end
   end
 end
