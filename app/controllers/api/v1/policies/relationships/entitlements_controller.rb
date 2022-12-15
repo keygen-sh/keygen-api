@@ -30,7 +30,7 @@ module Api::V1::Policies::Relationships
 
       param :data, type: :array do
         items type: :hash do
-          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, transform: -> (k, v) { [] }
+          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, noop: true
           param :id, type: :string, transform: -> (k, v) {
             [:entitlement_id, v]
           }
@@ -60,7 +60,7 @@ module Api::V1::Policies::Relationships
 
       param :data, type: :array do
         items type: :hash do
-          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, transform: -> (k, v) { [] }
+          param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }, noop: true
           param :id, type: :string, transform: -> (k, v) {
             [:entitlement_id, v]
           }
