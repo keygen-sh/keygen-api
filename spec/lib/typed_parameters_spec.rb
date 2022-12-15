@@ -2930,6 +2930,13 @@ describe TypedParameters do
       expect(subject.typed_schemas[subject, :foo]).to be_a TypedParameters::Schema
     end
 
+    it 'should support inherited schema' do
+      subject.typed_schema(:foo) { param :bar, type: :string }
+      child = Class.new(subject)
+
+      expect(child.typed_schemas[child, :foo]).to eq subject.typed_schemas[subject, :foo]
+    end
+
     it 'should define global schema' do
       subject.typed_schema(:foo, namespace: nil) { param :bar, type: :string }
 
@@ -2958,6 +2965,13 @@ describe TypedParameters do
       expect(params[subject, :baz]).to be_a TypedParameters::Handler
     end
 
+    it 'should support inherited params' do
+      subject.typed_params(on: :foo) { param :bar, type: :string }
+      child = Class.new(subject)
+
+      expect(child.typed_handlers.params[subject, :foo]).to eq subject.typed_handlers.params[subject, :foo]
+    end
+
     it 'should define singular query param handler' do
       subject.typed_query(on: :foo) { param :bar, type: :string }
 
@@ -2972,6 +2986,13 @@ describe TypedParameters do
       expect(query[subject, :foo]).to be_a TypedParameters::Handler
       expect(query[subject, :bar]).to be_a TypedParameters::Handler
       expect(query[subject, :baz]).to be_a TypedParameters::Handler
+    end
+
+    it 'should support inherited query' do
+      subject.typed_query(on: :foo) { param :bar, type: :string }
+      child = Class.new(subject)
+
+      expect(child.typed_handlers.query[subject, :foo]).to eq subject.typed_handlers.query[subject, :foo]
     end
 
     context 'without inheritance' do
