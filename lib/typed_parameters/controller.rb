@@ -1,36 +1,19 @@
 # frozen_string_literal: true
 
+require_relative 'handler'
+require_relative 'handler_set'
+require_relative 'schema_set'
+
 module TypedParameters
   module Controller
     extend ActiveSupport::Concern
 
-    class Handler
-      attr_reader :for,
-                  :action,
-                  :schema,
-                  :format
-
-      def initialize(for:, schema:, action: nil, format: nil)
-        @for    = binding.local_variable_get(:for)
-        @schema = schema
-        @action = action
-        @format = format
-      end
-
-      def action=(action)
-        raise ArgumentError, 'cannot redefine action' if
-          @action.present?
-
-        @action = action
-      end
-    end
-
     included do
-      cattr_accessor :typed_handlers, default: { deferred: [], params: {}, query: {} }
-      cattr_accessor :typed_schemas,  default: {}
+      cattr_accessor :typed_handlers, default: HandlerSet.new
+      cattr_accessor :typed_schemas,  default: SchemaSet.new
 
       def typed_params(format: AUTO)
-        handler = typed_handlers.dig(:params, self.class, action_name.to_sym)
+        handler = typed_handlers.params[self.class, action_name.to_sym]
 
         raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
           handler.nil?
@@ -53,7 +36,7 @@ module TypedParameters
       end
 
       def typed_query(format: AUTO)
-        handler = typed_handlers.dig(:query, self.class, action_name.to_sym)
+        handler = typed_handlers.query[self.class, action_name.to_sym]
 
         raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
           handler.nil?
@@ -114,13 +97,11 @@ module TypedParameters
 
     class_methods do
       def typed_params(on: nil, schema: nil, format: nil, **kwargs, &)
-        typed_handlers[:params][self] ||= {}
-
         schema = case schema
                 in Array(Symbol, Symbol) => namespace, key
-                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
+                   typed_schemas[namespace, key] || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
                  in Symbol => key
-                   typed_schemas.dig(self, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
+                   typed_schemas[self, key] || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
                    Schema.new(**kwargs, controller: self, &)
                  end
@@ -128,23 +109,21 @@ module TypedParameters
         case on
         in Array => actions
           actions.each do |action|
-            typed_handlers[:params][self][action] = Handler.new(for: :params, action:, schema:, format:)
+            typed_handlers.params[self, action] = Handler.new(for: :params, action:, schema:, format:)
           end
         in Symbol => action
-          typed_handlers[:params][self][action] = Handler.new(for: :params, action:, schema:, format:)
+          typed_handlers.params[self, action] = Handler.new(for: :params, action:, schema:, format:)
         in nil
-          typed_handlers[:deferred] << Handler.new(for: :params, schema:, format:)
+          typed_handlers.deferred << Handler.new(for: :params, schema:, format:)
         end
       end
 
       def typed_query(on: nil, schema: nil, **kwargs, &)
-        typed_handlers[:query][self] ||= {}
-
         schema = case schema
                  in Array(Symbol, Symbol) => namespace, key
-                   typed_schemas.dig(namespace, key) || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
+                   typed_schemas[namespace, key] || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
                  in Symbol => key
-                   typed_schemas.dig(self, key) || raise(ArgumentError, "schema does not exist: #{key.inspect}")
+                   typed_schemas[self, key] || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
                    # FIXME(ezekg) Should query params :coerce by default?
                    Schema.new(nilify_blanks: true, strict: false, **kwargs, controller: self, &)
@@ -153,35 +132,37 @@ module TypedParameters
         case on
         in Array => actions
           actions.each do |action|
-            typed_handlers[:query][self][action] = Handler.new(for: :query, action:, schema:)
+            typed_handlers.query[self, action] = Handler.new(for: :query, action:, schema:)
           end
         in Symbol => action
-          typed_handlers[:query][self][action] = Handler.new(for: :query, action:, schema:)
+          typed_handlers.query[self, action] = Handler.new(for: :query, action:, schema:)
         in nil
-          typed_handlers[:deferred] << Handler.new(for: :query, schema:)
+          typed_handlers.deferred << Handler.new(for: :query, schema:)
         end
       end
 
       def typed_schema(key, namespace: self, **kwargs, &)
-        typed_schemas[namespace] ||= {}
-
         raise ArgumentError, "schema already exists: #{key.inspect}" if
-          typed_schemas[namespace].key?(key)
+          typed_schemas.include?(namespace, key)
 
-        typed_schemas[namespace][key] = Schema.new(**kwargs, controller: self, &)
+        typed_schemas[namespace, key] = Schema.new(**kwargs, controller: self, &)
       end
 
       private
 
       def method_added(method_name)
-        return super if
-          typed_handlers[:deferred].empty?
+        return super unless
+          typed_handlers.deferred?
 
-        while handler = typed_handlers[:deferred].shift
+        while handler = typed_handlers.deferred.shift
           handler.action = method_name
 
-          typed_handlers[handler.for][self] ||= {}
-          typed_handlers[handler.for][self][handler.action] = handler
+          case handler.for
+          when :params
+            typed_handlers.params[self, handler.action] = handler
+          when :query
+            typed_handlers.query[self, handler.action] = handler
+          end
         end
 
         super
