@@ -22,9 +22,18 @@ module Api::V1
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash do
+        param :type, type: :string
+        param :op, type: :string, optional: true
+        param :query, type: :hash, allow_non_scalars: true
+      end
+    }
     def search
-      query, type = search_meta.fetch_values('query', 'type')
-      op          = search_meta.fetch('op') { :AND }.to_sym
+      query, type = search_meta.fetch_values(:query, :type)
+      op          = search_meta.fetch(:op) { :AND }.to_sym
       model       = type.underscore.classify.safe_constantize
 
       raise UnsupportedSearchTypeError if
@@ -77,12 +86,11 @@ module Api::V1
           end
 
           if value.any? { |k, v| v.is_a?(String) && v.size < SEARCH_MIN_QUERY_SIZE }
-            keypair = value.find { |k, v| v.is_a?(String) && v.size < SEARCH_MIN_QUERY_SIZE }
-            key     = keypair.first
+            key, _ = value.find { |k, v| v.is_a?(String) && v.size < SEARCH_MIN_QUERY_SIZE }
 
             return render_bad_request(
-              detail: "search query for '#{key.camelize(:lower)}' is too small (minimum #{SEARCH_MIN_QUERY_SIZE} characters)",
-              source: { pointer: "/meta/query/metadata/#{key.camelize(:lower)}" }
+              detail: "search query for '#{key.to_s.camelize(:lower)}' is too small (minimum #{SEARCH_MIN_QUERY_SIZE} characters)",
+              source: { pointer: "/meta/query/metadata/#{key.to_s.camelize(:lower)}" }
             )
           end
 
@@ -122,37 +130,6 @@ module Api::V1
       render_bad_request(detail: "search type '#{type.camelize(:lower)}' is not supported", source: { pointer: "/meta/type" })
     rescue EmptyQueryError
       render_bad_request(detail: "search query is required", source: { pointer: "/meta/query" })
-    end
-
-    private
-
-    typed_parameters do
-      options strict: true
-
-      on :search do
-        param :meta, type: :hash do
-          param :type, type: :string
-          param :op, type: :string, optional: true
-          param :query, type: :hash, allow_non_scalars: true do
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-
-            # FIXME(ezekg) Wildcard to be able to support the nested metadata
-            #              query above (when searching arrays and objects)
-            controller.params.fetch('query', {}).except('metadata').each do |(key, value)|
-              case value
-              when TrueClass, FalseClass
-                param key.to_sym, type: :boolean, optional: true
-              when Integer
-                param key.to_sym, type: :integer, optional: true
-              when Float
-                param key.to_sym, type: :float, optional: true
-              else
-                param key.to_sym, type: :string, optional: true
-              end
-            end
-          end
-        end
-      end
     end
   end
 end
