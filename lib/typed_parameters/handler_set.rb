@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'hash_with_deep_access'
+require_relative 'namespaced_set'
 
 module TypedParameters
   class HandlerSet
@@ -10,7 +10,7 @@ module TypedParameters
 
     def deferred? = @deferred.any?
 
-    def params = @params ||= HashWithDeepAccess.new
-    def query  = @query  ||= HashWithDeepAccess.new
+    def params = @params ||= NamespacedSet.new
+    def query  = @query  ||= NamespacedSet.new
   end
 end

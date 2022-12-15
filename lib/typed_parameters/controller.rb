@@ -15,7 +15,7 @@ module TypedParameters
       def typed_params(format: AUTO)
         handler = typed_handlers.params[self.class, action_name.to_sym]
 
-        raise UndefinedActionError, "params have not been defined for action: #{action_name}" if
+        raise UndefinedActionError, "params have not been defined for action: #{action_name.inspect}" if
           handler.nil?
 
         schema = handler.schema
@@ -38,7 +38,7 @@ module TypedParameters
       def typed_query(format: AUTO)
         handler = typed_handlers.query[self.class, action_name.to_sym]
 
-        raise UndefinedActionError, "query has not been defined for action: #{action_name}" if
+        raise UndefinedActionError, "query has not been defined for action: #{action_name.inspect}" if
           handler.nil?
 
         schema = handler.schema
@@ -59,6 +59,8 @@ module TypedParameters
       end
 
       private
+
+      def typed_namespace = self.class
 
       def respond_to_missing?(method_name, *)
         return super unless
@@ -143,7 +145,7 @@ module TypedParameters
 
       def typed_schema(key, namespace: self, **kwargs, &)
         raise ArgumentError, "schema already exists: #{key.inspect}" if
-          typed_schemas.include?(namespace, key)
+          typed_schemas.exists?(namespace, key)
 
         typed_schemas[namespace, key] = Schema.new(**kwargs, controller: self, &)
       end
