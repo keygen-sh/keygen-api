@@ -53,7 +53,7 @@ module TypedParameters
           if param.schema.indexed?
             param.schema.children.each_with_index { |v, i| self.class.new(schema: v, controller:).call(param[i], &) }
           else
-            param.value.each { |v| self.class.new(schema: param.schema.children.first, controller:).call(v, &) }
+            Array(param.value).each { |v| self.class.new(schema: param.schema.children.first, controller:).call(v, &) }
           end
         when Hash
           param.schema.children.each { |k, v| self.class.new(schema: v, controller:).call(param[k], &) }
