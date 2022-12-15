@@ -156,7 +156,7 @@ Feature: Update webhook endpoint
       """
       {
         "title": "Bad request",
-        "detail": "must be one of: 1.2, 1.1, 1.0 (received 0.0)",
+        "detail": "is invalid",
         "source": {
           "pointer": "/data/attributes/apiVersion"
         }
