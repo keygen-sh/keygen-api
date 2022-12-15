@@ -52,7 +52,7 @@ module Api::V1
           param :status, type: :string, inclusion: { in: %w[DRAFT PUBLISHED] }, optional: true
           param :version, type: :string
           param :tag, type: :string, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
           with if: -> { current_api_version == '1.0' } do
             param :filename, type: :string, optional: true
             param :filesize, type: :integer, optional: true
@@ -114,7 +114,7 @@ module Api::V1
           param :name, type: :string, optional: true, allow_nil: true
           param :description, type: :string, optional: true, allow_nil: true
           param :tag, type: :string, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
           with if: -> { current_api_version == '1.0' } do
             param :filesize, type: :integer, optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
