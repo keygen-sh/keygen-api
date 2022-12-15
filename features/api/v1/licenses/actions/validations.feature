@@ -6539,7 +6539,7 @@ Feature: License validation actions
       """
       {
         "title": "Bad request",
-        "detail": "is missing",
+        "detail": "cannot be null",
         "source": {
           "pointer": "/meta/scope/fingerprints/0"
         }
