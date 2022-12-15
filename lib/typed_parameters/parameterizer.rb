@@ -13,10 +13,10 @@ module TypedParameters
         value.is_a?(Parameter)
 
       case schema.children
-      when Hash
-        parameterize_hash_schema(key:, value:)
       when Array
         parameterize_array_schema(key:, value:)
+      when Hash
+        parameterize_hash_schema(key:, value:)
       else
         parameterize_value(key:, value:)
       end
@@ -26,31 +26,6 @@ module TypedParameters
 
     attr_reader :schema,
                 :parent
-
-    def parameterize_hash_schema(key:, value:)
-      param = Parameter.new(key:, value: {}, schema:, parent:)
-
-      raise UnpermittedParameterError.new('unpermitted parameter type (expected object)', path: param.path) unless
-        value.is_a?(Hash)
-
-      value.each do |k, v|
-        if schema.children.any?
-          child = schema.children.fetch(k) { nil }
-          if child.nil?
-            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, k)) if
-              schema.strict?
-
-            next
-          end
-
-          param[k] = Parameterizer.new(schema: child, parent: param).call(key: k, value: v)
-        else
-          param[k] = Parameter.new(key: k, value: v, schema:, parent: param)
-        end
-      end
-
-      param
-    end
 
     def parameterize_array_schema(key:, value:)
       param = Parameter.new(key:, value: [], schema:, parent:)
@@ -71,6 +46,31 @@ module TypedParameters
           param << Parameterizer.new(schema: child, parent: param).call(key: i, value: v)
         else
           param << Parameter.new(key: i, value: v, schema:, parent: param)
+        end
+      end
+
+      param
+    end
+
+    def parameterize_hash_schema(key:, value:)
+      param = Parameter.new(key:, value: {}, schema:, parent:)
+
+      raise UnpermittedParameterError.new('unpermitted parameter type (expected object)', path: param.path) unless
+        value.is_a?(Hash)
+
+      value.each do |k, v|
+        if schema.children.any?
+          child = schema.children.fetch(k) { nil }
+          if child.nil?
+            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, k)) if
+              schema.strict?
+
+            next
+          end
+
+          param[k] = Parameterizer.new(schema: child, parent: param).call(key: k, value: v)
+        else
+          param[k] = Parameter.new(key: k, value: v, schema:, parent: param)
         end
       end
 
