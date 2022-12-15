@@ -20,7 +20,20 @@ module Api::V1
       render jsonapi: endpoint
     end
 
-    # POST /webhook-endpoints
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints] }
+        param :attributes, type: :hash do
+          param :url, type: :string
+          param :subscriptions, type: :array, optional: true do
+            items type: :string
+          end
+          param :signature_algorithm, type: :string, optional: true
+        end
+      end
+    }
     def create
       endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, **webhook_endpoint_params)
       authorize! endpoint
@@ -32,6 +45,22 @@ module Api::V1
       end
     end
 
+    typed_params {
+      format :jsonapi
+
+      param :data, type: :hash do
+        param :type, type: :string, inclusion: { in: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints] }
+        param :id, type: :string, optional: true, noop: true
+        param :attributes, type: :hash do
+          param :url, type: :string, optional: true
+          param :subscriptions, type: :array, optional: true do
+            items type: :string
+          end
+          param :api_version, type: :string, inclusion: { in: RequestMigrations.supported_versions }, optional: true
+          param :signature_algorithm, type: :string, optional: true
+        end
+      end
+    }
     def update
       authorize! endpoint
 
@@ -58,38 +87,6 @@ module Api::V1
       @endpoint = scoped_endpoints.find(params[:id])
 
       Current.resource = endpoint
-    end
-
-    typed_parameters format: :jsonapi do
-      options strict: true
-
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints]
-          param :attributes, type: :hash do
-            param :url, type: :string
-            param :subscriptions, type: :array, optional: true do
-              items type: :string
-            end
-            param :signature_algorithm, type: :string, optional: true
-          end
-        end
-      end
-
-      on :update do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints]
-          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
-          param :attributes, type: :hash do
-            param :url, type: :string, optional: true
-            param :subscriptions, type: :array, optional: true do
-              items type: :string
-            end
-            param :api_version, type: :string, inclusion: RequestMigrations.supported_versions, optional: true
-            param :signature_algorithm, type: :string, optional: true
-          end
-        end
-      end
     end
   end
 end
