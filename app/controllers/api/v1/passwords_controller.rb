@@ -7,6 +7,14 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :set_user, only: [:reset]
 
+    typed_params {
+      format :jsonapi
+
+      param :meta, type: :hash do
+        param :deliver, type: :boolean, optional: true
+        param :email, type: :string
+      end
+    }
     def reset
       return unless
         user.present?
@@ -18,11 +26,11 @@ module Api::V1
         account: current_account,
         resource: user,
         meta: {
-          password_reset_token: token
-        }
+          password_reset_token: token,
+        },
       )
 
-      if password_meta[:deliver] != false # nil or true = send email
+      unless password_meta[:deliver] == false # nil or true = send email
         user.send_password_reset_email(token: token)
       end
     end
@@ -35,17 +43,6 @@ module Api::V1
       email = password_meta[:email].downcase
 
       @user = current_account.users.find_by(email: email)
-    end
-
-    typed_parameters do
-      options strict: true
-
-      on :reset do
-        param :meta, type: :hash do
-          param :deliver, type: :boolean, optional: true
-          param :email, type: :string
-        end
-      end
     end
   end
 end
