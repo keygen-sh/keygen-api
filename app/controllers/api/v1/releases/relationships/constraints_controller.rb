@@ -30,7 +30,7 @@ module Api::V1::Releases::Relationships
 
       param :data, type: :array do
         items type: :hash do
-          param :type, type: :string, inclusion: { in: %w[constraint constraints] }, noop: true
+          param :type, type: :string, inclusion: { in: %w[constraint constraints] }
           param :relationships, type: :hash do
             param :entitlement, type: :hash do
               param :data, type: :hash do
@@ -67,7 +67,7 @@ module Api::V1::Releases::Relationships
 
       param :data, type: :array do
         items type: :hash do
-          param :type, type: :string, inclusion: { in: %w[constraint constraints] }, noop: true
+          param :type, type: :string, inclusion: { in: %w[constraint constraints] }
           param :id, type: :string
         end
       end
