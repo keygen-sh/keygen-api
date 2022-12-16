@@ -20,7 +20,8 @@ module TypedParameters
 
     register(:boolean,
       coerce: -> v {
-        raise unless Boolean::COERCIBLE_TYPES.any? { v.is_a?(_1) }
+        return nil unless
+          Boolean::COERCIBLE_TYPES.any? { v.is_a?(_1) }
 
         v.in?(Boolean::TRUTHY_VALUES)
       },
