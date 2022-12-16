@@ -17,6 +17,15 @@ module TypedParameters
             break
           end
 
+          # Ignore nil optionals when config is enabled
+          unless schema.allow_nil?
+            if value.nil? && schema.optional? && TypedParameters.config.ignore_nil_optionals
+              param.delete
+
+              break
+            end
+          end
+
           # If param's key has changed, we want to rename the key
           # for its parent too.
           if param.parent? && param.key != key
