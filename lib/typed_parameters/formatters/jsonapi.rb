@@ -81,6 +81,8 @@ module TypedParameters
           in data: nil
             res[:"#{key}_id"] = nil
           else
+            # NOTE(ezekg) Embedded relationships are non-standard as per the
+            #             JSONAPI spec, but I don't really care. :)
             res[:"#{key}_attributes"] = call(rel)
           end
         end
