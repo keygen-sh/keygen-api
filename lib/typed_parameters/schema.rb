@@ -143,7 +143,8 @@ module TypedParameters
     ##
     # format defines the final output format for the schema, transforming
     # the params from an input format to an output format, e.g. a JSONAPI
-    # document to Rails' standard params format.
+    # document to Rails' standard params format. This also applies the
+    # formatter's decorators onto the controller.
     def format(format)
       raise NotImplementedError, 'cannot define format for child schema' if
         child?
@@ -153,6 +154,7 @@ module TypedParameters
       raise ArgumentError, "invalid format: #{format.inspect}" if
         formatter.nil?
 
+      # Apply the formatter's decorators onto the controller.
       controller.instance_exec(&formatter.decorator) if
         controller.present? && formatter.decorator?
 
