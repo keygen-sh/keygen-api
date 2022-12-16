@@ -323,10 +323,9 @@ class ApplicationController < ActionController::API
   rescue TypedParameters::UnpermittedParameterError,
          TypedParameters::InvalidParameterError => e
     source = e.source == :query ? :parameter : :pointer
+    path   = e.source == :query ? e.path.to_s : e.path.to_json_pointer
 
-    # FIXME(ezekg) This should set :pointer and :parameter
-    #              depending on the err's source
-    render_bad_request detail: e.message, source: { source => e.path.to_json_pointer }
+    render_bad_request detail: e.message, source: { source => path }
   rescue Keygen::Error::BadRequestError,
          ActionController::UnpermittedParameters,
          ActionController::ParameterMissing => e
