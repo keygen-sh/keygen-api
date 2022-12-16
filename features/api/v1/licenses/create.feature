@@ -83,20 +83,12 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "cannot be null",
-        "source": {
-          "pointer": "/data/attributes/key"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And the JSON response should be a "license" with a key that is not nil
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a license for a user of their account

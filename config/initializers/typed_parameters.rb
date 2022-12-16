@@ -3,7 +3,8 @@
 require_dependency Rails.root / 'lib' / 'typed_parameters'
 
 TypedParameters.configure do |config|
-  config.path_transform = :lower_camel
+  config.path_transform       = :lower_camel
+  config.ignore_nil_optionals = true
 end
 
 TypedParameters.types.register(:metadata,
