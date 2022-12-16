@@ -7,6 +7,7 @@ module TypedParameters
                 :formatter,
                 :parent,
                 :children,
+                :source,
                 :type,
                 :key,
                 :if,
@@ -14,6 +15,7 @@ module TypedParameters
 
     def initialize(
       controller: nil,
+      source: nil,
       strict: true,
       parent: nil,
       type: :hash,
@@ -44,6 +46,9 @@ module TypedParameters
       raise ArgumentError, 'root cannot be null' if
         key == ROOT && allow_nil
 
+      raise ArgumentError, 'source must be one of: :params or :query' unless
+        source.nil? || source == :params || source == :query
+
       raise ArgumentError, 'inclusion must be a hash with :in key' unless
         inclusion.nil? || inclusion.is_a?(Hash) && inclusion.key?(:in)
 
@@ -66,6 +71,7 @@ module TypedParameters
         )
 
       @controller        = controller
+      @source            = source
       @type              = Types[type]
       @strict            = strict
       @parent            = parent

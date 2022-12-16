@@ -59,7 +59,7 @@ describe TypedParameters do
       array
       hash
     ].each do |type|
-      it "should allow block for type: #{type}" do
+      it "should allow block for type: #{type.inspect}" do
         expect { TypedParameters::Schema.new(type:) {} }.to_not raise_error
       end
     end
@@ -76,7 +76,7 @@ describe TypedParameters do
       time
       nil
     ].each do |type|
-      it "should not allow block for type: #{type}" do
+      it "should not allow block for type: #{type.inspect}" do
         expect { TypedParameters::Schema.new(type:) {} }.to raise_error ArgumentError
       end
     end
@@ -112,7 +112,7 @@ describe TypedParameters do
     %i[
       in
     ].each do |option|
-      it "should not raise on valid :inclusion option: #{option}" do
+      it "should not raise on valid :inclusion option: #{option.inspect}" do
         expect { TypedParameters::Schema.new(type: :string, inclusion: { option => %w[foo] }) }.to_not raise_error
       end
     end
@@ -130,7 +130,7 @@ describe TypedParameters do
     %i[
       in
     ].each do |option|
-      it "should not raise on valid :exclusion option: #{option}" do
+      it "should not raise on valid :exclusion option: #{option.inspect}" do
         expect { TypedParameters::Schema.new(type: :string, exclusion: { option => %w[bar] }) }.to_not raise_error
       end
     end
@@ -149,7 +149,7 @@ describe TypedParameters do
       with
       without
     ].each do |option|
-      it "should not raise on valid :format option: #{option}" do
+      it "should not raise on valid :format option: #{option.inspect}" do
         expect { TypedParameters::Schema.new(type: :string, format: { option => /baz/ }) }.to_not raise_error
       end
     end
@@ -176,7 +176,7 @@ describe TypedParameters do
       in: [1, 2, 3],
       is: 1,
     }.each do |option, length|
-      it "should not raise on valid :length option: #{option}" do
+      it "should not raise on valid :length option: #{option.inspect}" do
         expect { TypedParameters::Schema.new(type: :string, length: { option => length }) }.to_not raise_error
       end
     end
@@ -196,26 +196,47 @@ describe TypedParameters do
         .to raise_error ArgumentError
     end
 
-    it 'should have correct path' do
-      grandchild = schema.children[:foo]
-                         .children[:bar]
-                         .children[0]
-                         .children[:baz]
+    describe '#source' do
+      [
+        :params,
+        :query,
+        nil,
+      ].each do |source|
+        it "should not raise on valid :source: #{source.inspect}" do
+          expect { TypedParameters::Schema.new(type: :string, source:) }.to_not raise_error
+        end
+      end
 
-      expect(grandchild.path.to_json_pointer).to eq '/foo/bar/0/baz'
+      it 'should raise on invalid :source' do
+        expect { TypedParameters::Schema.new(type: :string, source: :foo) }
+          .to raise_error ArgumentError
+      end
     end
 
-    it 'should have correct array keys' do
-      grandchild = schema.children[:foo]
-                         .children[:bar]
+    describe '#path' do
+      it 'should have correct path' do
+        grandchild = schema.children[:foo]
+                          .children[:bar]
+                          .children[0]
+                          .children[:baz]
 
-      expect(grandchild.keys).to eq [0]
+        expect(grandchild.path.to_json_pointer).to eq '/foo/bar/0/baz'
+      end
     end
 
-    it 'should have correct hash keys' do
-      grandchild = schema.children[:foo]
+    describe '#keys' do
+      it 'should have correct array keys' do
+        grandchild = schema.children[:foo]
+                          .children[:bar]
 
-      expect(grandchild.keys).to eq %i[bar]
+        expect(grandchild.keys).to eq [0]
+      end
+
+      it 'should have correct hash keys' do
+        grandchild = schema.children[:foo]
+
+        expect(grandchild.keys).to eq %i[bar]
+      end
     end
 
     describe '#format' do
@@ -1783,52 +1804,56 @@ describe TypedParameters do
       expect(params.value).to eq orig.value
     end
 
-    it 'should have correct path' do
-      params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+    describe '#path' do
+      it 'should have correct path' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
 
-      expect(params[:foo][:bar][0][:baz].path.to_json_pointer).to eq '/foo/bar/0/baz'
-      expect(params[:foo][:bar][1][:baz].path.to_json_pointer).to eq '/foo/bar/1/baz'
-    end
-
-    context 'with array schema' do
-      let(:schema) { TypedParameters::Schema.new(type: :array) { items type: :string } }
-
-      it 'should have correct keys' do
-        params = TypedParameters::Parameterizer.new(schema:).call(value: %w[a b c])
-
-        expect(params.keys).to eq [0, 1, 2]
-      end
-
-      it 'should have no keys' do
-        params = TypedParameters::Parameterizer.new(schema:).call(value: [])
-
-        expect(params.keys).to eq []
+        expect(params[:foo][:bar][0][:baz].path.to_json_pointer).to eq '/foo/bar/0/baz'
+        expect(params[:foo][:bar][1][:baz].path.to_json_pointer).to eq '/foo/bar/1/baz'
       end
     end
 
-    context 'with hash schema' do
-      let(:schema) { TypedParameters::Schema.new(type: :hash) { params :a, :b, :c, type: :string } }
+    describe '#keys' do
+      context 'with array schema' do
+        let(:schema) { TypedParameters::Schema.new(type: :array) { items type: :string } }
 
-      it 'should have correct keys' do
-        params = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
+        it 'should have correct keys' do
+          params = TypedParameters::Parameterizer.new(schema:).call(value: %w[a b c])
 
-        expect(params.keys).to eq %i[a b c]
+          expect(params.keys).to eq [0, 1, 2]
+        end
+
+        it 'should have no keys' do
+          params = TypedParameters::Parameterizer.new(schema:).call(value: [])
+
+          expect(params.keys).to eq []
+        end
       end
 
-      it 'should have no keys' do
-        params = TypedParameters::Parameterizer.new(schema:).call(value: {})
+      context 'with hash schema' do
+        let(:schema) { TypedParameters::Schema.new(type: :hash) { params :a, :b, :c, type: :string } }
 
-        expect(params.keys).to eq []
+        it 'should have correct keys' do
+          params = TypedParameters::Parameterizer.new(schema:).call(value: { a: 1, b: 2, c: 3 })
+
+          expect(params.keys).to eq %i[a b c]
+        end
+
+        it 'should have no keys' do
+          params = TypedParameters::Parameterizer.new(schema:).call(value: {})
+
+          expect(params.keys).to eq []
+        end
       end
-    end
 
-    context 'with other schema' do
-      let(:schema) { TypedParameters::Schema.new(type: :integer) }
+      context 'with other schema' do
+        let(:schema) { TypedParameters::Schema.new(type: :integer) }
 
-      it 'should have no keys' do
-        params = TypedParameters::Parameterizer.new(schema:).call(value: 1)
+        it 'should have no keys' do
+          params = TypedParameters::Parameterizer.new(schema:).call(value: 1)
 
-        expect(params.keys).to eq []
+          expect(params.keys).to eq []
+        end
       end
     end
   end
@@ -2279,6 +2304,48 @@ describe TypedParameters do
         validator = TypedParameters::Validator.new(schema:)
 
         expect { validator.call(params) }.to_not raise_error
+      end
+    end
+
+    context 'with :params source' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash, source: :params) }
+
+      it 'should have a correct source' do
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to eq :params
+        }
+      end
+    end
+
+    context 'with :query source' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash, source: :query) }
+
+      it 'should have a correct source' do
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to eq :query
+        }
+      end
+    end
+
+    context 'with nil source' do
+      let(:schema) { TypedParameters::Schema.new(type: :hash) }
+
+      it 'should have a correct source' do
+        params    = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        validator = TypedParameters::Validator.new(schema:)
+
+        expect { validator.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to be nil
+        }
       end
     end
 
@@ -3028,6 +3095,51 @@ describe TypedParameters do
         expect { bouncer.call(params) }.to raise_error { |err|
           expect(err).to be_a TypedParameters::UnpermittedParameterError
           expect(err.path.to_json_pointer).to eq '/user/password'
+        }
+      end
+    end
+
+    context 'with :params source' do
+      let(:schema)     { TypedParameters::Schema.new(type: :array, source: :params, if: :allowed?) }
+      let(:controller) { Class.new(ActionController::Base) { def allowed? = false }.new }
+
+      it 'should have a correct source' do
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.source).to eq :params
+        }
+      end
+    end
+
+    context 'with :query source' do
+      let(:schema)     { TypedParameters::Schema.new(type: :array, source: :query, if: :allowed?) }
+      let(:controller) { Class.new(ActionController::Base) { def allowed? = false }.new }
+
+      it 'should have a correct source' do
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.source).to eq :query
+        }
+      end
+    end
+
+    context 'with nil source' do
+      let(:schema)     { TypedParameters::Schema.new(type: :array, if: :allowed?) }
+      let(:controller) { Class.new(ActionController::Base) { def allowed? = false }.new }
+
+      it 'should have a correct source' do
+        params     = TypedParameters::Parameterizer.new(schema:).call(value: [])
+        bouncer    = TypedParameters::Bouncer.new(controller:, schema:)
+
+        expect { bouncer.call(params) }.to raise_error { |err|
+          expect(err).to be_a TypedParameters::UnpermittedParameterError
+          expect(err.source).to be nil
         }
       end
     end

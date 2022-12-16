@@ -40,7 +40,7 @@ module TypedParameters
         if schema.children.any?
           child = schema.children.fetch(i) { schema.boundless? ? schema.children.first : nil }
           if child.nil?
-            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, i)) if
+            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, i), source: schema.source) if
               schema.strict?
 
             next
@@ -65,7 +65,7 @@ module TypedParameters
         if schema.children.any?
           child = schema.children.fetch(k) { nil }
           if child.nil?
-            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, k)) if
+            raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, k), source: schema.source) if
               schema.strict?
 
             next
