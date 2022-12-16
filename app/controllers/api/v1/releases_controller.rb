@@ -44,22 +44,22 @@ module Api::V1
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[release releases] }
         param :attributes, type: :hash do
-          param :name, type: :string, optional: true, allow_nil: true
-          param :description, type: :string, optional: true, allow_nil: true
+          param :name, type: :string, optional: true
+          param :description, type: :string, allow_nil: true, optional: true
           param :channel, type: :string, inclusion: { in: %w[stable rc beta alpha dev] }, transform: -> (_, key) {
             [:channel_attributes, { key: }]
           }
           param :status, type: :string, inclusion: { in: %w[DRAFT PUBLISHED] }, optional: true
           param :version, type: :string
-          param :tag, type: :string, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
+          param :tag, type: :string, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
           with if: -> { current_api_version == '1.0' } do
             param :filename, type: :string, optional: true
             param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, allow_nil: true, optional: true
-            param :platform, type: :string, allow_nil: true, optional: true
-            param :signature, type: :string, allow_nil: true, optional: true
-            param :checksum, type: :string, allow_nil: true, optional: true
+            param :filetype, type: :string, optional: true
+            param :platform, type: :string, optional: true
+            param :signature, type: :string, optional: true
+            param :checksum, type: :string, optional: true
           end
         end
         param :relationships, type: :hash do
@@ -111,14 +111,14 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[release releases] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
-          param :name, type: :string, optional: true, allow_nil: true
-          param :description, type: :string, optional: true, allow_nil: true
-          param :tag, type: :string, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
+          param :name, type: :string, allow_nil: true, optional: true
+          param :description, type: :string, allow_nil: true, optional: true
+          param :tag, type: :string, allow_nil: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
           with if: -> { current_api_version == '1.0' } do
-            param :filesize, type: :integer, optional: true, allow_nil: true
-            param :signature, type: :string, optional: true, allow_nil: true
-            param :checksum, type: :string, optional: true, allow_nil: true
+            param :filesize, type: :integer, allow_nil: true, optional: true
+            param :signature, type: :string, allow_nil: true, optional: true
+            param :checksum, type: :string, allow_nil: true, optional: true
           end
         end
       end

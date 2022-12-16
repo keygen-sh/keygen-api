@@ -343,7 +343,7 @@ Feature: Update artifact
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an "artifact" with the following attributes:
       """
-      { "metadata": {} }
+      { "metadata": { "foo": "bar" } }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job

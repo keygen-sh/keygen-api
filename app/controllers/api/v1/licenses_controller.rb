@@ -48,10 +48,10 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :suspended, type: :boolean, optional: true
-            param :max_machines, type: :integer, optional: true, allow_nil: true
-            param :max_cores, type: :integer, optional: true, allow_nil: true
-            param :max_uses, type: :integer, optional: true, allow_nil: true
-            param :max_processes, type: :integer, optional: true, allow_nil: true
+            param :max_machines, type: :integer, allow_nil: true, optional: true
+            param :max_cores, type: :integer, allow_nil: true, optional: true
+            param :max_uses, type: :integer, allow_nil: true, optional: true
+            param :max_processes, type: :integer, allow_nil: true, optional: true
           end
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
             items type: :string
@@ -104,15 +104,15 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[license licenses] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
-          param :name, type: :string, optional: true, allow_nil: true
+          param :name, type: :string, allow_nil: true, optional: true
           with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :protected, type: :boolean, optional: true
             param :suspended, type: :boolean, optional: true
-            param :max_machines, type: :integer, optional: true, allow_nil: true
-            param :max_cores, type: :integer, optional: true, allow_nil: true
-            param :max_uses, type: :integer, optional: true, allow_nil: true
-            param :max_processes, type: :integer, optional: true, allow_nil: true
+            param :max_machines, type: :integer, allow_nil: true, optional: true
+            param :max_cores, type: :integer, allow_nil: true, optional: true
+            param :max_uses, type: :integer, allow_nil: true, optional: true
+            param :max_processes, type: :integer, allow_nil: true, optional: true
             param :metadata, type: :metadata, optional: true
           end
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
