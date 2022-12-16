@@ -277,6 +277,31 @@ describe TypedParameters do
         expect(grandchildren.all?(&:optional?)).to be false
         expect(grandchildren.all?(&:if?)).to be false
       end
+
+      context 'with overrides' do
+        let :schema do
+          TypedParameters::Schema.new type: :hash do
+            with optional: true, if: -> { true } do
+              param :foo, type: :string, optional: false
+              param :bar, type: :string
+              param :baz, type: :string
+            end
+          end
+        end
+
+        it 'should support per-param overrides' do
+          children = schema.children.values
+
+          expect(children[0].optional?).to be false
+          expect(children[0].if?).to be true
+
+          expect(children[1].optional?).to be true
+          expect(children[1].if?).to be true
+
+          expect(children[2].optional?).to be true
+          expect(children[2].if?).to be true
+        end
+      end
     end
   end
 
