@@ -3263,7 +3263,7 @@ describe TypedParameters do
       subject.typed_params(on: :foo) { param :bar, type: :string }
       child = Class.new(subject)
 
-      expect(child.typed_handlers.params[subject, :foo]).to eq subject.typed_handlers.params[subject, :foo]
+      expect(child.typed_handlers.params[child, :foo]).to eq subject.typed_handlers.params[subject, :foo]
     end
 
     it 'should define singular query param handler' do
@@ -3286,7 +3286,7 @@ describe TypedParameters do
       subject.typed_query(on: :foo) { param :bar, type: :string }
       child = Class.new(subject)
 
-      expect(child.typed_handlers.query[subject, :foo]).to eq subject.typed_handlers.query[subject, :foo]
+      expect(child.typed_handlers.query[child, :foo]).to eq subject.typed_handlers.query[subject, :foo]
     end
 
     context 'without inheritance' do
