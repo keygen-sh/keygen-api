@@ -196,7 +196,7 @@ module TypedParameters
       raise ArgumentError, "key #{key} has already been defined" if
         children.key?(key)
 
-      children[key] = Schema.new(**options, **kwargs, key:, type:, strict:, parent: self, &block)
+      children[key] = Schema.new(**options, **kwargs, key:, type:, strict:, source:, parent: self, &block)
     end
 
     ##
@@ -214,7 +214,7 @@ module TypedParameters
       raise ArgumentError, "index #{key} has already been defined" if
         children[key].present? || boundless?
 
-      children << Schema.new(**options, **kwargs, key:, type:, strict:, parent: self, &block)
+      children << Schema.new(**options, **kwargs, key:, type:, strict:, source:, parent: self, &block)
     end
 
     ##
