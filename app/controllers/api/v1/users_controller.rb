@@ -43,8 +43,8 @@ module Api::V1
           param :first_name, type: :string, optional: true
           param :last_name, type: :string, optional: true
           param :email, type: :string
-          param :password, type: :string, optional: true, allow_nil: true
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
+          param :password, type: :string, allow_nil: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
@@ -91,11 +91,11 @@ module Api::V1
           param :first_name, type: :string, optional: true
           param :last_name, type: :string, optional: true
           param :email, type: :string, optional: true
-          param :password, type: :string, optional: true, allow_nil: true, if: -> { current_bearer&.has_role?(:admin, :product) }
+          param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :product) }
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
             items type: :string
           end
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
