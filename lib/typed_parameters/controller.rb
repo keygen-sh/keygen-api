@@ -103,7 +103,7 @@ module TypedParameters
     class_methods do
       def typed_params(on: nil, schema: nil, format: nil, **kwargs, &)
         schema = case schema
-                in Array(Symbol, Symbol) => namespace, key
+                 in Array(Symbol, Symbol) => namespace, key
                    typed_schemas[namespace, key] || raise(ArgumentError, "schema does not exist: #{namespace.inspect}/#{key.inspect}")
                  in Symbol => key
                    typed_schemas[self, key] || raise(ArgumentError, "schema does not exist: #{key.inspect}")
