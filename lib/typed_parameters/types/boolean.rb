@@ -11,6 +11,10 @@ module TypedParameters
         'TRUE',
         't',
         'T',
+        'yes',
+        'YES',
+        'y',
+        'Y',
       ].freeze
     end
 
