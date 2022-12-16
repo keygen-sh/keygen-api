@@ -6,8 +6,9 @@ module TypedParameters
 
     ##
     # ignore_nil_optionals defines how nil optionals are handled.
-    # When enabled, optional params that are nil will be ignored if
-    # the schema does not allow_nil.
+    # When enabled, optional params that are nil will be dropped
+    # given the schema does not allow_nil. Essentially, they
+    # will be treated as if they weren't provided.
     config_accessor(:ignore_nil_optionals) { false }
 
     ##
