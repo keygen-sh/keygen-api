@@ -20,6 +20,9 @@ module TypedParameters
 
         schema = handler.schema
         params = Parameterizer.new(schema:).call(
+          # TODO(ezekg) Add a config here that accepts a block, similar to a Rack app
+          #             so that users can define their own parameter source. E.g.
+          #             using and parsing request.body can allow array roots.
           value: request.request_parameters.deep_symbolize_keys,
         )
 
