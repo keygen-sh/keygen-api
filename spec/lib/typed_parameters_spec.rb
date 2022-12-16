@@ -1804,6 +1804,36 @@ describe TypedParameters do
       expect(params.value).to eq orig.value
     end
 
+    describe '#delete' do
+      it 'should not delete root param' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+
+        expect { params.delete }.to raise_error NotImplementedError
+      end
+
+      it 'should delete child param' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+
+        expect { params[:foo].delete }.to_not raise_error
+        expect(params[:foo]).to be nil
+      end
+
+      it 'should delete grandchild param' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+
+        expect { params[:foo][:bar].delete }.to_not raise_error
+        expect(params[:foo][:bar]).to be nil
+      end
+
+      it 'should delete great grandchild param' do
+        params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
+
+        expect { params[:foo][:bar][1].delete }.to_not raise_error
+        expect(params[:foo][:bar][0]).to_not be nil
+        expect(params[:foo][:bar][1]).to be nil
+      end
+    end
+
     describe '#path' do
       it 'should have correct path' do
         params = TypedParameters::Parameterizer.new(schema:).call(value: { foo: { bar: [{ baz: 0 }, { baz: 1 }] } })
