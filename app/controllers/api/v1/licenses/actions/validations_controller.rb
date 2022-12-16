@@ -38,7 +38,7 @@ module Api::V1::Licenses::Actions
         param :scope, type: :hash, optional: true do
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
-          param :user, type: :string, optional: true, allow_nil: true
+          param :user, type: :string, allow_nil: true, optional: true
           param :machine, type: :string, optional: true
           param :fingerprint, type: :string, optional: true
           param :fingerprints, type: :array, optional: true do
@@ -97,7 +97,7 @@ module Api::V1::Licenses::Actions
         param :scope, type: :hash, optional: true do
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
-          param :user, type: :string, optional: true, allow_nil: true
+          param :user, type: :string, allow_nil: true, optional: true
           param :machine, type: :string, optional: true
           param :fingerprint, type: :string, optional: true
           param :fingerprints, type: :array, optional: true do

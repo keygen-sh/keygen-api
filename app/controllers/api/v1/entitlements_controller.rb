@@ -28,7 +28,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string
           param :code, type: :string
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
         end
       end
     }
@@ -58,7 +58,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :code, type: :string, optional: true
-          param :metadata, type: :metadata, allow_blank: true, allow_nil: true, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
         end
       end
     }
