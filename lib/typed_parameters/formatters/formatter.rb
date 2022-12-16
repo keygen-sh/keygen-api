@@ -12,7 +12,7 @@ module TypedParameters
         @decorator = decorate
       end
 
-      def decorator? = @decorator.present?
+      def decorator? = decorator.present?
 
       delegate :arity, :call, to: :@transform
     end
