@@ -29,7 +29,7 @@ module Api::V1
               param :id, type: :string
             end
           end
-          param :admins, type: :hash, transform: -> _, v { [:users, v] } do
+          param :admins, type: :hash, as: :users do
             param :data, type: :array do
               items type: :hash do
                 param :type, type: :string, inclusion: { in: %w[user users] }
