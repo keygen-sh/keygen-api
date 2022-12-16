@@ -61,16 +61,18 @@ module TypedParameters
   class CoercionError < StandardError; end
 
   class InvalidParameterError < StandardError
-    attr_reader :path
+    attr_reader :source,
+                :path
 
-    def initialize(message, path:)
-      @path = path
+    def initialize(message, source:, path:)
+      @source = source
+      @path   = path
 
       super(message)
     end
 
     def inspect
-      "#<#{self.class.name} message=#{message.inspect} path=#{path.inspect}>"
+      "#<#{self.class.name} message=#{message.inspect} source=#{source.inspect} path=#{path.inspect}>"
     end
   end
 

@@ -5,7 +5,7 @@ require_relative 'mapper'
 module TypedParameters
   class Validator < Mapper
     def call(params)
-      raise InvalidParameterError.new('is missing', path: schema.path) if
+      raise InvalidParameterError.new('is missing', path: schema.path, source: schema.source) if
         params.nil? && schema.required? && !schema.allow_nil?
 
       depth_first_map(params) do |param|
@@ -14,12 +14,12 @@ module TypedParameters
           try: schema.type.subtype? ? schema.type.to_sym : nil,
         )
 
-        raise InvalidParameterError.new("type mismatch (received unknown expected #{schema.type.humanize})", path: param.path) if
+        raise InvalidParameterError.new("type mismatch (received unknown expected #{schema.type.humanize})", path: param.path, source: schema.source) if
           type.nil?
 
         # Handle nils early on
         if Types.nil?(type)
-          raise InvalidParameterError.new('cannot be null', path: param.path) unless
+          raise InvalidParameterError.new('cannot be null', path: param.path, source: schema.source) unless
             schema.optional? && TypedParameters.config.ignore_nil_optionals ||
             schema.allow_nil?
 
@@ -27,7 +27,7 @@ module TypedParameters
         end
 
         # Assert type
-        raise InvalidParameterError.new("type mismatch (received #{type.humanize} expected #{schema.type.humanize})", path: param.path) unless
+        raise InvalidParameterError.new("type mismatch (received #{type.humanize} expected #{schema.type.humanize})", path: param.path, source: schema.source) unless
           type == schema.type || type.subtype? && type.archetype == schema.type
 
         # Assertions for params without children
@@ -39,9 +39,7 @@ module TypedParameters
               next if
                 Types.scalar?(value)
 
-              path = Path.new(*param.path.keys, key)
-
-              raise InvalidParameterError.new('unpermitted type (expected object of scalar types)', path:) unless
+              raise InvalidParameterError.new('unpermitted type (expected object of scalar types)', path: Path.new(*param.path.keys, key), source: schema.source) unless
                 schema.allow_non_scalars?
             end
           when schema.array?
@@ -49,9 +47,7 @@ module TypedParameters
               next if
                 Types.scalar?(value)
 
-              path = Path.new(*param.path.keys, index)
-
-              raise InvalidParameterError.new('unpermitted type (expected array of scalar types)', path:) unless
+              raise InvalidParameterError.new('unpermitted type (expected array of scalar types)', path: Path.new(*param.path.keys, index), source: schema.source) unless
                 schema.allow_non_scalars?
             end
           end
@@ -59,7 +55,7 @@ module TypedParameters
           # Handle blanks (and false-positive "blank" values)
           if param.value.blank?
             unless param.value == false
-              raise InvalidParameterError.new('cannot be blank', path: param.path) unless
+              raise InvalidParameterError.new('cannot be blank', path: param.path, source: schema.source) unless
                 schema.allow_blank?
 
               next
@@ -68,7 +64,7 @@ module TypedParameters
         end
 
         # Assert validations
-        raise InvalidParameterError.new('is invalid', path: param.path) unless
+        raise InvalidParameterError.new('is invalid', path: param.path, source: schema.source) unless
           schema.validations.all? { _1.call(param.value) }
       end
     end
