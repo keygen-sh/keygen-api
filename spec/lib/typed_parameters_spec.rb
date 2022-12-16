@@ -751,6 +751,14 @@ describe TypedParameters do
       }
     end
 
+    it 'should not parameterize nil' do
+      schema = TypedParameters::Schema.new(type: :hash)
+      paramz = TypedParameters::Parameterizer.new(schema:)
+      params = nil
+
+      expect(paramz.call(value: params)).to be nil
+    end
+
     it 'should not raise on unbounded array' do
       schema = TypedParameters::Schema.new(type: :array) { items type: :string }
       paramz = TypedParameters::Parameterizer.new(schema:)
