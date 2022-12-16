@@ -2256,7 +2256,7 @@ describe TypedParameters do
 
     context 'with config to ignore optional nils' do
       before do
-        @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
+        @ignore_nil_optionals_was = TypedParameters.config.ignore_nil_optionals
 
         TypedParameters.config.ignore_nil_optionals = true
       end
