@@ -126,7 +126,10 @@ Feature: Typed parameters
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/unpermittedParam"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/unpermittedParam"
+        }
       }
       """
 
