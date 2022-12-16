@@ -7,7 +7,11 @@ module TypedParameters
       @schema     = schema
     end
 
-    def call(...) = raise NotImplementedError
+    def call(*, &) = raise NotImplementedError
+
+    def self.call(*args, **kwargs, &block)
+      new(**kwargs).call(*args, &block)
+    end
 
     private
 
@@ -51,12 +55,12 @@ module TypedParameters
         case param.schema.children
         in Array if param.array?
           if param.schema.indexed?
-            param.schema.children.each_with_index { |v, i| self.class.new(schema: v, controller:).call(param[i], &) }
+            param.schema.children.each_with_index { |v, i| self.class.call(param[i], schema: v, controller:, &) }
           else
-            param.value.each { |v| self.class.new(schema: param.schema.children.first, controller:).call(v, &) }
+            param.value.each { |v| self.class.call(v, schema: param.schema.children.first, controller:, &) }
           end
         in Hash if param.hash?
-          param.schema.children.each { |k, v| self.class.new(schema: v, controller:).call(param[k], &) }
+          param.schema.children.each { |k, v| self.class.call(param[k], schema: v, controller:, &) }
         else
         end
       end

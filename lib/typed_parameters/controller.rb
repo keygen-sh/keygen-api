@@ -105,7 +105,7 @@ module TypedParameters
                  in Symbol => key
                    typed_schemas[self, key] || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
-                   Schema.new(**kwargs, controller: self, &)
+                   Schema.new(**kwargs, controller: self, source: :params, &)
                  end
 
         case on
@@ -128,7 +128,7 @@ module TypedParameters
                    typed_schemas[self, key] || raise(ArgumentError, "schema does not exist: #{key.inspect}")
                  in nil
                    # FIXME(ezekg) Should query params :coerce by default?
-                   Schema.new(nilify_blanks: true, strict: false, **kwargs, controller: self, &)
+                   Schema.new(nilify_blanks: true, strict: false, **kwargs, controller: self, source: :query, &)
                  end
 
         case on

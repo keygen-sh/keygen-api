@@ -24,7 +24,7 @@ module TypedParameters
           param.schema.if? && res
 
         if param.schema.strict?
-          raise UnpermittedParameterError.new('unpermitted parameter', path: param.path)
+          raise UnpermittedParameterError.new('unpermitted parameter', path: param.path, source: schema.source)
         else
           param.delete
         end
