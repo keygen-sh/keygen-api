@@ -18,9 +18,9 @@ describe TypedParameters do
   end
 
   before do
-    @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
-    @path_transform_was   = TypedParameters.config.path_transform
-    @key_transform_was    = TypedParameters.config.key_transform
+    @ignore_nil_optionals_was = TypedParameters.config.ignore_nil_optionals
+    @path_transform_was       = TypedParameters.config.path_transform
+    @key_transform_was        = TypedParameters.config.key_transform
 
     # FIXME(ezekg) Add a config.reset! method in test envs?
     TypedParameters.config.ignore_nil_optionals = false
@@ -2316,7 +2316,7 @@ describe TypedParameters do
 
     context 'with config to not ignore optional nils' do
       before do
-        @ignore_nil_optionals = TypedParameters.config.ignore_nil_optionals
+        @ignore_nil_optionals_was = TypedParameters.config.ignore_nil_optionals
 
         TypedParameters.config.ignore_nil_optionals = false
       end
