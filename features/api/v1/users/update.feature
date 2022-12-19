@@ -984,10 +984,12 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
-
 
   @ee
   Scenario: Admin updates a user's permissions (standard tier, EE)
@@ -1012,7 +1014,10 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
