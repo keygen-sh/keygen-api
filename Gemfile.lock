@@ -327,6 +327,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
+    rails-pattern_matching (0.2.0)
+      activemodel
+      activerecord
     rails_autoscale_agent (0.11.0)
     railties (7.0.4)
       actionpack (= 7.0.4)
@@ -486,6 +489,7 @@ DEPENDENCIES
   rack-cors
   rack-timeout
   rails (~> 7.0.4)
+  rails-pattern_matching
   rails_autoscale_agent
   redis (~> 4.7.1)
   request_migrations (~> 1.1)

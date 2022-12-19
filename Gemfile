@@ -49,6 +49,9 @@ gem 'active_record_union'
 gem 'active_record_distinct_on'
 gem 'activerecord_where_assoc'
 
+# Pattern matching
+gem 'rails-pattern_matching'
+
 # Background jobs
 gem 'sidekiq', '~> 6.4'
 gem 'sidekiq-unique-jobs', '~> 7.1.23'
