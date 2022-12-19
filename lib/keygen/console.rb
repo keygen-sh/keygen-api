@@ -34,7 +34,7 @@ module Keygen
 
     def welcome!
       return if
-        Keygen.console?
+        Keygen.console? || Keygen.test?
 
       puts '-' * CONSOLE_WIDTH
       puts
