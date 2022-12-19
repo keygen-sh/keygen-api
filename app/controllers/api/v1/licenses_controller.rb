@@ -56,7 +56,7 @@ module Api::V1
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
             items type: :string
           end
-          param :metadata, type: :metadata, optional: true
+          param :metadata, type: :metadata, allow_blank: true, optional: true
         end
         param :relationships, type: :hash do
           param :policy, type: :hash do
@@ -113,7 +113,7 @@ module Api::V1
             param :max_cores, type: :integer, allow_nil: true, optional: true
             param :max_uses, type: :integer, allow_nil: true, optional: true
             param :max_processes, type: :integer, allow_nil: true, optional: true
-            param :metadata, type: :metadata, optional: true
+            param :metadata, type: :metadata, allow_blank: true, optional: true
           end
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
             items type: :string
