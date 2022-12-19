@@ -93,6 +93,58 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous creates a user with blank names
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "",
+            "lastName": "",
+            "email": "test@keygen.example",
+            "password": "foobarbazqux"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the firstName ""
+    And the JSON response should be a "user" with the lastName ""
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous creates a user with null names
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": null,
+            "lastName": null,
+            "email": "test@keygen.example",
+            "password": "foobarbazqux"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with a nil firstName
+    And the JSON response should be a "user" with a nil lastName
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous creates a user with permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
