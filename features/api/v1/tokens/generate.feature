@@ -133,7 +133,10 @@ Feature: Generate authentication token
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -166,7 +169,10 @@ Feature: Generate authentication token
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
