@@ -93,7 +93,7 @@ Feature: License checkout actions
       """
     And the last "license" should have the following attributes:
       """
-      { "lastCheckOutAt": "2022-03-22T14:52:48.000Z" }
+      { "lastCheckOutAt": "2022-10-16T14:52:48.000Z" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
