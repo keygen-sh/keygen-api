@@ -215,7 +215,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -253,7 +256,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -1186,7 +1192,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1221,7 +1230,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1392,7 +1404,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -1427,7 +1442,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 

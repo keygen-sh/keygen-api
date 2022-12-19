@@ -3737,7 +3737,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
@@ -3777,7 +3780,10 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/permissions"
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
       }
       """
 
