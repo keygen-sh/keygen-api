@@ -6,21 +6,21 @@ require 'spec_helper'
 require_dependency Rails.root.join('lib', 'keygen')
 
 describe Keygen::EE::LicenseFile, type: :ee do
-  TEST_PUBLIC_KEY   = ['775e65407f3d86de55efbac47d1bbeab79768a21a406e39976606a704984e7d1'].pack('H*')
-  TEST_LICENSE_KEY  = 'TEST-116A58-3F79F9-9F1982-9D63B1-V3'
-  TEST_LICENSE_FILE = Base64.strict_encode64(
+  public_key   = ['775e65407f3d86de55efbac47d1bbeab79768a21a406e39976606a704984e7d1'].pack('H*')
+  license_key  = 'TEST-116A58-3F79F9-9F1982-9D63B1-V3'
+  license_file = Base64.strict_encode64(
     file_fixture('valid.lic').read,
   )
 
   before do
-    stub_const('Keygen::PUBLIC_KEY', TEST_PUBLIC_KEY)
+    stub_const('Keygen::PUBLIC_KEY', public_key)
   end
 
   context 'when using the default license file source' do
     context 'when a valid license file exists' do
       with_file path: described_class::DEFAULT_PATH, fixture: 'valid.lic' do
         context 'when a valid license key is used' do
-          with_env KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+          with_env KEYGEN_LICENSE_KEY: license_key do
             it 'should be a valid license file' do
               lic = described_class.current
 
@@ -78,7 +78,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
     context 'when an invalid license file exists' do
       with_file path: described_class::DEFAULT_PATH, fixture: 'expired.lic' do
         context 'when a valid license key is used' do
-          with_env KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+          with_env KEYGEN_LICENSE_KEY: license_key do
             it 'should be an expired license file' do
               lic = described_class.current
 
@@ -117,7 +117,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
     context 'when a tampered license file exists' do
       with_file path: described_class::DEFAULT_PATH, fixture: 'tampered.lic' do
         context 'when a valid license key is used' do
-          with_env KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+          with_env KEYGEN_LICENSE_KEY: license_key do
             it 'should fail to load license file' do
               lic = described_class.current
 
@@ -139,7 +139,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
 
   context 'when using a custom license file path' do
     context 'when using a real relative path' do
-      with_env KEYGEN_LICENSE_FILE_PATH: file_fixture('valid.lic').relative_path_from(Rails.root), KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+      with_env KEYGEN_LICENSE_FILE_PATH: file_fixture('valid.lic').relative_path_from(Rails.root), KEYGEN_LICENSE_KEY: license_key do
         it 'should be a valid license file' do
           lic = described_class.current
 
@@ -150,7 +150,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
 
     context 'when using a relative path' do
       with_file path: '.ee.lic', fixture: 'valid.lic' do
-        with_env KEYGEN_LICENSE_FILE_PATH: '.ee.lic', KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+        with_env KEYGEN_LICENSE_FILE_PATH: '.ee.lic', KEYGEN_LICENSE_KEY: license_key do
           it 'should be a valid license file' do
             lic = described_class.current
 
@@ -162,7 +162,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
 
     context 'when using an absolute path' do
       with_file path: '/etc/licenses/ee.lic', fixture: 'valid.lic' do
-        with_env KEYGEN_LICENSE_FILE_PATH: '/etc/licenses/ee.lic', KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+        with_env KEYGEN_LICENSE_FILE_PATH: '/etc/licenses/ee.lic', KEYGEN_LICENSE_KEY: license_key do
           it 'should be a valid license file' do
             lic = described_class.current
 
@@ -173,7 +173,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
     end
 
     context 'when using an invalid path' do
-      with_env KEYGEN_LICENSE_FILE_PATH: '/dev/null', KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+      with_env KEYGEN_LICENSE_FILE_PATH: '/dev/null', KEYGEN_LICENSE_KEY: license_key do
         it 'should fail to load license file' do
           lic = described_class.current
 
@@ -184,7 +184,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
   end
 
   context 'when using an encoded license file' do
-    with_env KEYGEN_LICENSE_FILE: TEST_LICENSE_FILE, KEYGEN_LICENSE_KEY: TEST_LICENSE_KEY do
+    with_env KEYGEN_LICENSE_FILE: license_file, KEYGEN_LICENSE_KEY: license_key do
       it 'should be a valid license file' do
         lic = described_class.current
 
