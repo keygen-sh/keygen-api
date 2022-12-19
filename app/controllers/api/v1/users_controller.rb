@@ -40,8 +40,8 @@ module Api::V1
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[user users] }
         param :attributes, type: :hash do
-          param :first_name, type: :string, optional: true
-          param :last_name, type: :string, optional: true
+          param :first_name, type: :string, allow_blank: true, optional: true
+          param :last_name, type: :string, allow_blank: true, optional: true
           param :email, type: :string
           param :password, type: :string, allow_nil: true, optional: true
           param :metadata, type: :metadata, allow_blank: true, optional: true
@@ -88,8 +88,8 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[user users] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash, optional: true do
-          param :first_name, type: :string, optional: true
-          param :last_name, type: :string, optional: true
+          param :first_name, type: :string, allow_blank: true, allow_nil: true, optional: true
+          param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :email, type: :string, optional: true
           param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :product) }
           param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
