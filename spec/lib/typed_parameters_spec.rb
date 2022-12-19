@@ -2908,6 +2908,50 @@ describe TypedParameters do
 
       expect { processor.call(params) }.to raise_error TypedParameters::InvalidParameterError
     end
+
+    it 'should raise on renamed param with guard' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, if: -> { false }, as: :bar }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      processor = TypedParameters::Processor.new(schema:)
+
+      expect { processor.call(params) }.to raise_error { |err|
+        expect(err).to be_a TypedParameters::UnpermittedParameterError
+        expect(err.path.to_json_pointer).to eq '/foo'
+      }
+    end
+
+    it 'should rename param' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, as: :bar }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:foo]).to be nil
+      expect(params[:bar]).to_not be nil
+    end
+
+    it 'should rename param with transform' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, as: :bar, transform: -> k, v { [k, v] } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:foo]).to be nil
+      expect(params[:bar]).to_not be nil
+    end
+
+    it 'should not rename param with reverse transform' do
+      schema    = TypedParameters::Schema.new(type: :hash) { param :foo, type: :integer, as: :bar, transform: -> k, v { [:foo, v] } }
+      params    = TypedParameters::Parameterizer.new(schema:).call(value: { foo: 1 })
+      processor = TypedParameters::Processor.new(schema:)
+
+      processor.call(params)
+
+      expect(params[:foo]).to_not be nil
+      expect(params[:bar]).to be nil
+    end
   end
 
   describe TypedParameters::Pipeline do
