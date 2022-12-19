@@ -42,7 +42,7 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[license licenses] }
         param :id, type: :string, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
         param :attributes, type: :hash, optional: true do
-          param :name, type: :string, optional: true
+          param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :key, type: :string, optional: true
           with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) } do
             param :protected, type: :boolean, optional: true
@@ -104,7 +104,7 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[license licenses] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
-          param :name, type: :string, allow_nil: true, optional: true
+          param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
           with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :protected, type: :boolean, optional: true
