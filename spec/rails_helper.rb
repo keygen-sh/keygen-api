@@ -93,6 +93,12 @@ RSpec.configure do |config|
     with_prestine_env(&example)
   end
 
+  # Reset license file and license before each EE test.
+  config.before type: :ee do
+    Keygen::EE::LicenseFile.reset!
+    Keygen::EE::License.reset!
+  end
+
   # Reset license file and license after each EE test.
   config.after type: :ee do
     Keygen::EE::LicenseFile.reset!

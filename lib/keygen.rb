@@ -15,7 +15,6 @@ module Keygen
     def logger = Logger
 
     def console? = Rails.const_defined?(:Console)
-    def test?    = Rails.env.test?
 
     def ce? = !lic? && !key?
     def ee? = !ce?
