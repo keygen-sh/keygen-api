@@ -43,7 +43,7 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
   end
 
   within_console do
-    it 'should include the module outside of a console environment' do
+    it 'should include the module within a console environment' do
       expect(subject.ancestors).to include Keygen::EE::ProtectedMethods::MethodBouncer
     end
 
