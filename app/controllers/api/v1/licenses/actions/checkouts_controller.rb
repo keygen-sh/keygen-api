@@ -39,7 +39,7 @@ module Api::V1::Licenses::Actions
       format :jsonapi
 
       param :meta, type: :hash, optional: true do
-        param :include, type: :array, optional: true
+        param :include, type: :array, allow_blank: true, optional: true
         param :encrypt, type: :boolean, optional: true
         param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
       end

@@ -885,24 +885,15 @@ Feature: License checkout actions
       """
       { "meta": { "include": [] } }
       """
-    Then the response status should be "400"
-    And the response should contain the following raw headers:
+    Then the response status should be "200"
+    And the JSON response should be a "license-file" with the following encoded certificate data:
       """
-      Content-Type: application/vnd.api+json
+      { "included": [] }
       """
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "cannot be blank",
-        "source": {
-          "pointer": "/meta/include"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+    And time is unfrozen
 
   Scenario: Admin performs a license checkout with empty includes (GET)
     Given the current account is "test1"
