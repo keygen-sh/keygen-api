@@ -13,8 +13,68 @@ describe Keygen, type: :ee do
       end
     end
 
+    within_worker do
+      it 'should return false in a worker env' do
+        expect(Keygen.console?).to be false
+      end
+    end
+
+    within_server do
+      it 'should return false in a server env' do
+        expect(Keygen.console?).to be false
+      end
+    end
+
     it 'should return false in another env' do
       expect(Keygen.console?).to be false
+    end
+  end
+
+  describe '.server?' do
+    within_console do
+      it 'should return false in a console env' do
+        expect(Keygen.server?).to be false
+      end
+    end
+
+    within_worker do
+      it 'should return false in a worker env' do
+        expect(Keygen.server?).to be false
+      end
+    end
+
+    within_server do
+      it 'should return true in a server env' do
+        expect(Keygen.server?).to be true
+      end
+    end
+
+    it 'should return false in another env' do
+      expect(Keygen.server?).to be false
+    end
+  end
+
+  describe '.worker?' do
+    within_console do
+      it 'should return false in a console env' do
+        expect(Keygen.worker?).to be false
+      end
+    end
+
+    within_worker do
+      it 'should return true in a worker env' do
+        expect(Keygen.worker?).to be true
+      end
+    end
+
+    within_server do
+      it 'should return false in a server env' do
+        expect(Keygen.worker?).to be false
+      end
+    end
+
+    it 'should return false in another env' do
+      expect(Keygen.worker?).to be false
     end
   end
 
