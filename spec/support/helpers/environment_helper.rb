@@ -11,21 +11,17 @@ module EnvironmentHelper
       ENV.replace(prev_env)
     end
 
-    def with_env(prestine: true, **next_env, &)
-      before do
-        @prev_env = ENV.to_hash
-        next_env  = next_env.transform_keys(&:to_s)
-                            .transform_values(&:to_s)
+    def with_env(**next_env, &)
+      prev_env = ENV.to_hash
 
-        if prestine
-          ENV.replace(next_env)
-        else
-          ENV.update(next_env)
-        end
+      before do
+        ENV.update(
+          next_env.transform_keys(&:to_s).transform_values(&:to_s),
+        )
       end
 
       after do
-        ENV.replace(@prev_env)
+        ENV.replace(prev_env)
       end
 
       yield
