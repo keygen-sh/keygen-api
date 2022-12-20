@@ -10,7 +10,7 @@ module Api::V1::Machines::Actions
     authorize :machine
 
     typed_query {
-      param :include, type: :array, coerce: true, optional: true
+      param :include, type: :array, coerce: true, allow_blank: true, optional: true
       param :encrypt, type: :boolean, coerce: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
     }
@@ -45,7 +45,7 @@ module Api::V1::Machines::Actions
       end
     }
     typed_query {
-      param :include, type: :array, coerce: true, optional: true
+      param :include, type: :array, coerce: true, allow_blank: true, optional: true
       param :encrypt, type: :boolean, coerce: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
     }

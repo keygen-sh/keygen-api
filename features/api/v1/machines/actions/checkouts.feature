@@ -199,6 +199,67 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
+  Scenario: Admin performs an encrypted machine checkout with blank value (POST)
+    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "encrypt": null } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "machine-file" with a certificate signed using "ed25519"
+    And the JSON response should be a "machine-file" with the following encoded certificate data:
+      """
+      {
+        "meta": {
+          "issued": "2022-03-22T14:52:48.000Z",
+          "expiry": "2022-04-22T14:52:48.000Z",
+          "ttl": 2629746
+        },
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin performs an encrypted machine checkout with blank value (GET)
+    Given time is frozen at "2022-03-22T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?encrypt="
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate signed using "ed25519"
+    And the response should be a "MACHINE" certificate with the following encoded data:
+      """
+      {
+        "meta": {
+          "issued": "2022-03-22T14:52:48.000Z",
+          "expiry": "2022-04-22T14:52:48.000Z",
+          "ttl": 2629746
+        },
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: Admin performs a machine checkout using Ed25519 (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -878,6 +939,51 @@ Feature: Machine checkout actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with empty includes (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "include": [] } }
+      """
+    Then the response status should be "400"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/vnd.api+json
+      """
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "cannot be blank",
+        "source": {
+          "pointer": "/meta/include"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with empty includes (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include="
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate with the following encoded data:
+      """
+      { "included": [] }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a machine checkout by fingerprint (POST)
