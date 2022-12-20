@@ -42,7 +42,7 @@ RSpec.configure do |config|
   config.include Rails.application.routes.url_helpers
   config.include AuthorizationHelper, type: :policy
   config.include EnvironmentHelper
-  config.include ConsoleHelper
+  config.include ApplicationHelper
   config.include FileHelper
   config.include TimeHelper
   config.include KeygenHelper

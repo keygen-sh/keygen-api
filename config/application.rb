@@ -92,8 +92,7 @@ module Keygen
       #{config.root}/app/services
     ]
 
-    config.after_initialize do
-      Keygen::Console.welcome!
-    end
+    # Print env info when server boots
+    config.after_initialize { Keygen::Console.welcome! }
   end
 end
