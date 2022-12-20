@@ -15,6 +15,8 @@ module Keygen
     def logger = Logger
 
     def console? = Rails.const_defined?(:Console)
+    def server?  = Rails.const_defined?(:Server) || puma?
+    def worker?  = sidekiq?
 
     def ce? = !lic? && !key?
     def ee? = !ce?
@@ -34,5 +36,8 @@ module Keygen
 
     def lic? = ENV.key?('KEYGEN_LICENSE_FILE_PATH') || ENV.key?('KEYGEN_LICENSE_FILE')
     def key? = ENV.key?('KEYGEN_LICENSE_KEY')
+
+    def puma?    = Puma.const_defined?(:Server) && $0.include?('puma')
+    def sidekiq? = Sidekiq.const_defined?(:CLI)
   end
 end

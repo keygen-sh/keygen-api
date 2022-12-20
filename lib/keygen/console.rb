@@ -33,8 +33,8 @@ module Keygen
     TXT
 
     def welcome!
-      return if
-        Keygen.console?
+      return unless
+        Keygen.server? || Keygen.worker?
 
       puts '-' * CONSOLE_WIDTH
       puts
