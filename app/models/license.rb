@@ -19,6 +19,9 @@ class License < ApplicationRecord
       user.read
     ]
 
+  encrypts :key,
+    deterministic: true
+
   belongs_to :account
   belongs_to :user,
     optional: true
