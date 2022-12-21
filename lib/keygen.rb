@@ -22,13 +22,18 @@ module Keygen
     def ee? = !ce?
 
     def ee(&block)
+      return unless
+        ee?
+
       case block.arity
       when 2
-        yield EE.license, EE.license_file if ee?
+        yield EE.license, EE.license_file
       when 1
-        yield EE.license if ee?
+        yield EE.license
+      when 0
+        yield
       else
-        yield if ee?
+        raise ArgumentError, 'expected block with 0..2 arguments'
       end
     end
 

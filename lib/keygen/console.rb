@@ -54,6 +54,7 @@ module Keygen
       puts '-' * CONSOLE_WIDTH
 
       warn!
+      err!
     end
 
     def warn!
@@ -85,6 +86,10 @@ module Keygen
           puts
         end
       end
+
+      # This will raise if either the license or license file are expired
+      # and past the expiry grace period, or otherwise tampered with.
+      def err! = Keygen.ee { |key, lic| key.valid? && lic.valid? }
     end
 
     private
