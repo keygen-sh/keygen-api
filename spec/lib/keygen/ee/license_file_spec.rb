@@ -83,7 +83,31 @@ describe Keygen::EE::LicenseFile, type: :ee do
               lic = described_class.current
 
               expect(lic.expired?).to be true
-              expect(lic.valid?).to be false
+            end
+
+            it 'should be invalid within grace period' do
+              lic = described_class.current
+
+              with_time lic.expiry + 3.days do
+                expect { lic.valid? }.to_not raise_error
+                expect(lic.valid?).to be false
+              end
+            end
+
+            it 'should raise outside grace period' do
+              lic = described_class.current
+
+              with_time lic.expiry + 2.months do
+                expect { lic.valid? }.to raise_error Keygen::EE::ExpiredLicenseFileError
+              end
+            end
+
+            it 'should raise with tampered clock' do
+              lic = described_class.current
+
+              with_time lic.expiry - 3.days do
+                expect { lic.valid? }.to raise_error Keygen::EE::InvalidLicenseFileError
+              end
             end
 
             it 'should not have entitlement attributes' do

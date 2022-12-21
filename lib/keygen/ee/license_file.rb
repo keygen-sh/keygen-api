@@ -3,6 +3,7 @@
 module Keygen
   module EE
     class InvalidLicenseFileError < StandardError; end
+    class ExpiredLicenseFileError < StandardError; end
 
     class LicenseFile
       DEFAULT_PATH = '/etc/keygen/ee.lic'.freeze
@@ -35,6 +36,9 @@ module Keygen
       def valid?
         raise InvalidLicenseFileError, 'system clock is out of sync' if
           tampered?
+
+        raise ExpiredLicenseFileError, 'license file is expired' if
+          expired? && expiry < 30.days.ago
 
         !expired?
       end
