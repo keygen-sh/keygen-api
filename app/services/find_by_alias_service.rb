@@ -42,10 +42,9 @@ class FindByAliasService < BaseService
     #     "accounts"."slug" = :identifier
     #   LIMIT
     #     1
-    s = scope.where(
-      columns.map { |c| "#{Arel.sql("\"#{table_name}\".\"#{c}\"")} = :identifier" }.join(" OR "),
-      identifier: identifier
-    )
+    s = columns[1..].reduce(scope.where(columns[0] => identifier)) do |s, column|
+      s.or(scope.where(column => identifier))
+    end
 
     # In case of duplicates, find the oldest one first.
     s = s.reorder(created_at: :asc) if
