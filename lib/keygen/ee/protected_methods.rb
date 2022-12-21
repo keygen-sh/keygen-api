@@ -15,7 +15,9 @@ module Keygen
             Keygen.ce?
 
           raise ProtectedMethodError, "Calling #{method.receiver.name}.#{method.name} is not allowed. Please upgrade Keygen EE." unless
-            Keygen.ee { _1.entitled?(*entitlements) }
+            Keygen.ee { |key, lic|
+              lic.valid? && key.valid? && key.entitled?(*entitlements)
+            }
 
           method.call(...)
         end
@@ -25,7 +27,9 @@ module Keygen
             Keygen.ce?
 
           raise ProtectedMethodError, "Calling #{method.receiver.class.name}##{method.name} is not allowed. Please upgrade Keygen EE." unless
-            Keygen.ee { _1.entitled?(*entitlements) }
+            Keygen.ee { |key, lic|
+              lic.valid? && key.valid? && key.entitled?(*entitlements)
+            }
 
           method.call(...)
         end

@@ -55,11 +55,27 @@ describe Keygen::EE::License, type: :ee do
   context 'when using an expired license file' do
     with_file path: Keygen::EE::LicenseFile::DEFAULT_PATH, fixture: 'expired.lic' do
       with_env KEYGEN_LICENSE_KEY: license_key do
-        it 'should be an invalid license' do
+        it 'should be an expired license' do
           license = described_class.current
 
           expect(license.expired?).to be true
-          expect(license.valid?).to be false
+        end
+
+        it 'should be invalid within grace period' do
+          license = described_class.current
+
+          with_time license.expiry + 5.days do
+            expect { license.valid? }.to_not raise_error
+            expect(license.valid?).to be false
+          end
+        end
+
+        it 'should raise outside grace period' do
+          license = described_class.current
+
+          with_time license.expiry + 31.days do
+            expect { license.valid? }.to raise_error Keygen::EE::ExpiredLicenseError
+          end
         end
 
         it 'should not have entitlement attributes' do

@@ -2,6 +2,8 @@
 
 module Keygen
   module EE
+    class ExpiredLicenseError < StandardError; end
+
     class License
       class << self
         def current = @current ||= self.new(LicenseFile.current)
@@ -24,7 +26,13 @@ module Keygen
       def expires?  = expiry.present?
       def expiring? = expires? && expiry > Time.current && expiry < 30.days.from_now
       def expired?  = expires? && expiry < Time.current
-      def valid?    = lic.valid? && !expired?
+
+      def valid?
+        raise ExpiredLicenseError, 'license is expired' if
+          expired? && expiry < 30.days.ago
+
+         !expired?
+      end
 
       def entitled?(*codes)
         (codes & entitlements) == codes
