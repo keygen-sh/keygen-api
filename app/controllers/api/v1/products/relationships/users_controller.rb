@@ -20,7 +20,7 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      user = FindByAliasService.call(scope: product.users, identifier: params[:id], aliases: :email)
+      user = FindByAliasService.call(product.users, id: params[:id], aliases: :email)
       authorize! user,
         with: Products::UserPolicy
 

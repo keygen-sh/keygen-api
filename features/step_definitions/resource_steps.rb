@@ -23,7 +23,7 @@ end
 Given /^the account "([^\"]*)" has the following attributes:$/ do |id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
   account.update!(attributes)
@@ -53,7 +53,7 @@ Then /^the current token has the following attributes:$/ do |body|
 end
 
 Given /^the current account is "([^\"]*)"$/ do |id|
-  @account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  @account = FindByAliasService.call(Account, id:, aliases: :slug)
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
@@ -61,25 +61,25 @@ Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |id|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   account.daily_request_count = 1_000_000_000
 end
 
 Given /^the account "([^\"]*)" is on a free tier$/ do |id|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   account.plan.update! price: 0
 end
 
 Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |id, resource, limit|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   account.plan.update! "max_#{resource.pluralize.underscore}" => limit.to_i
 end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -87,7 +87,7 @@ Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
 end
 
 Given /^the account "([^\"]*)" has its billing uninitialized$/ do |id|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   account.billing&.delete
 end
@@ -614,7 +614,7 @@ end
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -639,7 +639,7 @@ end
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -701,7 +701,7 @@ Then /^the current (?:bearer|user|license|product) should have (\d+) "([^\"]*)"$
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, resource|
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   case resource
   when /^administrators?$/
@@ -724,14 +724,14 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, reso
 end
 
 Then /^the account "([^\"]*)" should have a referral of "([^\"]*)"$/ do |account_id, referral_id|
-  account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
   billing = account.billing
 
   expect(billing.referral_id).to eq referral_id
 end
 
 Then /^the account "([^\"]*)" should not have a referral$/ do |account_id|
-  account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
   billing = account.billing
 
   expect(billing.referral_id).to be_nil
@@ -740,7 +740,7 @@ end
 Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
   expect(account.attributes.as_json).to include attributes
@@ -824,7 +824,7 @@ end
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
   model   = account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
 

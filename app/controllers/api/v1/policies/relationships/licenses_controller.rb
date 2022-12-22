@@ -22,7 +22,7 @@ module Api::V1::Policies::Relationships
     end
 
     def show
-      license = FindByAliasService.call(scope: policy.licenses, identifier: params[:id], aliases: :key)
+      license = FindByAliasService.call(policy.licenses, id: params[:id], aliases: :key)
       authorize! license,
         with: Policies::LicensePolicy
 

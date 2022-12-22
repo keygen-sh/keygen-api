@@ -61,7 +61,7 @@ class RequestLogWorker
     cache_key = Account.cache_key(account_id)
 
     Rails.cache.fetch(cache_key, skip_nil: true, expires_in: 15.minutes) do
-      FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+      FindByAliasService.call(Account, id: account_id, aliases: :slug)
     end
   rescue Keygen::Error::NotFoundError
     nil

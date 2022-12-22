@@ -68,8 +68,8 @@ module Api::V1::Products::Relationships
       scoped_artifacts = authorized_scope(apply_scopes(product.release_artifacts))
 
       @artifact = FindByAliasService.call(
-        scope: scoped_artifacts.order_by_version,
-        identifier: params[:id],
+        scoped_artifacts.order_by_version,
+        id: params[:id],
         aliases: :filename,
         reorder: false,
       )

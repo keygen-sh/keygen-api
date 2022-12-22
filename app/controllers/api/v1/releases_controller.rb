@@ -159,8 +159,8 @@ module Api::V1
       scoped_releases = authorized_scope(apply_scopes(current_account.releases))
 
       @release = FindByAliasService.call(
-        scope: scoped_releases,
-        identifier: params[:id],
+        scoped_releases,
+        id: params[:id],
         aliases: %i[version tag],
       )
 

@@ -60,8 +60,8 @@ module Api::V1::Releases::Relationships
       scoped_releases = authorized_scope(current_account.releases)
 
       @release = FindByAliasService.call(
-        scope: scoped_releases,
-        identifier: params[:release_id],
+        scoped_releases,
+        id: params[:release_id],
         aliases: %i[version tag],
       )
 
@@ -72,8 +72,8 @@ module Api::V1::Releases::Relationships
       scoped_artifacts = authorized_scope(apply_scopes(release.artifacts))
 
       @artifact = FindByAliasService.call(
-        scope: scoped_artifacts.order_by_version,
-        identifier: params[:id],
+        scoped_artifacts.order_by_version,
+        id: params[:id],
         aliases: :filename,
         reorder: false,
       )

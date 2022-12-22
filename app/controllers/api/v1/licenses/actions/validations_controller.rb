@@ -162,7 +162,7 @@ module Api::V1::Licenses::Actions
     def set_license
       scoped_licenses = authorized_scope(current_account.licenses)
 
-      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
+      @license = FindByAliasService.call(scoped_licenses, id: params[:id], aliases: :key)
 
       Current.resource = license
     end

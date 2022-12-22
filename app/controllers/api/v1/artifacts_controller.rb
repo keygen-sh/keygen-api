@@ -155,8 +155,8 @@ module Api::V1
       # NOTE(ezekg) Fetch the latest version of the artifact since we have no
       #             other qualifiers outside of a :filename alias.
       @artifact = FindByAliasService.call(
-        scope: scoped_artifacts.order_by_version,
-        identifier: params[:id],
+        scoped_artifacts.order_by_version,
+        id: params[:id],
         aliases: :filename,
         reorder: false,
       )

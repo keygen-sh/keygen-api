@@ -18,7 +18,7 @@ module Api::V1::Groups::Relationships
     end
 
     def show
-      license = FindByAliasService.call(scope: group.licenses, identifier: params[:id], aliases: :key)
+      license = FindByAliasService.call(group.licenses, id: params[:id], aliases: :key)
       authorize! license,
         with: Groups::LicensePolicy
 
