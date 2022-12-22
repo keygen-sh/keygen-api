@@ -22,7 +22,7 @@ module Api::V1::Licenses::Relationships
     end
 
     def show
-      machine = FindByAliasService.call(scope: license.machines, identifier: params[:id], aliases: :fingerprint)
+      machine = FindByAliasService.call(license.machines, id: params[:id], aliases: :fingerprint)
       authorize! machine,
         with: Licenses::MachinePolicy
 
@@ -36,7 +36,7 @@ module Api::V1::Licenses::Relationships
     def set_license
       scoped_licenses = authorized_scope(current_account.licenses)
 
-      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
+      @license = FindByAliasService.call(scoped_licenses, id: params[:license_id], aliases: :key)
 
       Current.resource = license
     end

@@ -134,7 +134,7 @@ module Api::V1::Users::Relationships
     def set_user
       scoped_users = authorized_scope(current_account.users)
 
-      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
+      @user = FindByAliasService.call(scoped_users, id: params[:user_id], aliases: :email)
 
       Current.resource = user
     end

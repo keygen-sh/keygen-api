@@ -97,7 +97,7 @@ module Api::V1
     def set_entitlement
       scoped_entitlements = authorized_scope(current_account.entitlements)
 
-      @entitlement = FindByAliasService.call(scope: scoped_entitlements, identifier: params[:id], aliases: :code)
+      @entitlement = FindByAliasService.call(scoped_entitlements, id: params[:id], aliases: :code)
 
       Current.resource = entitlement
     end

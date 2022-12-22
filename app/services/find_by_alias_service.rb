@@ -1,37 +1,39 @@
 class FindByAliasService < BaseService
-  def initialize(scope:, identifier:, aliases:, reorder: true)
-    @table_name  = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
-    @model_name  = scope.model_name.name
-    @model_scope = scope
-    @identifier  = identifier&.squish
-    @aliases     = aliases
-    @reorder     = reorder
+  PRIMARY_KEY = :id
+
+  def initialize(scope, id:, aliases:, reorder: true)
+    @table   = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
+    @model   = scope.model_name.name
+    @scope   = scope
+    @id      = id&.squish
+    @aliases = aliases
+    @reorder = reorder
   end
 
   def call = find_by_alias!
 
   private
 
-  attr_reader :table_name,
-              :model_name,
-              :model_scope,
-              :identifier,
+  attr_reader :table,
+              :model,
+              :scope,
+              :id,
               :aliases,
               :reorder
 
   def reorder? = !!reorder
 
   def find_by_alias!
-    raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier) if
-      identifier.nil?
+    raise Keygen::Error::NotFoundError.new(model:, id:) if
+      id.nil?
 
-    # Strip out ID attribute if the identifier doesn't resemble a UUID (pg will throw)
-    columns = [:id, *aliases].uniq
+    # Strip out ID attribute if the ID doesn't resemble a UUID (pg will throw)
+    columns = [PRIMARY_KEY, *aliases].uniq
 
-    columns.reject! { _1 == :id } unless
-      UUID_RE.match?(identifier)
+    columns.reject! { _1 == PRIMARY_KEY } unless
+      UUID_RE.match?(id)
 
-    raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier) if
+    raise Keygen::Error::NotFoundError.new(model:, id:) if
       columns.empty?
 
     # Generates a query resembling the following, while handling encrypted columns:
@@ -41,27 +43,27 @@ class FindByAliasService < BaseService
     #   FROM
     #     "accounts"
     #   WHERE
-    #     "accounts"."id"   = :identifier OR
-    #     "accounts"."slug" = :identifier
+    #     "accounts"."id"   = :id OR
+    #     "accounts"."slug" = :id
     #   LIMIT
     #     1
     primary_column, *alias_columns = columns
 
-    scope = model_scope.where(primary_column => identifier)
-    scope = alias_columns&.reduce(scope) do |s, column|
+    scp = scope.where(primary_column => id)
+    scp = alias_columns&.reduce(scp) do |s, column|
       s.or(
-        model_scope.where(column => identifier),
+        scope.where(column => id),
       )
     end
 
     # In case of duplicates, find the oldest one first.
-    scope = scope.reorder(created_at: :asc) if
+    scp = scp.reorder(created_at: :asc) if
       reorder?
 
-    record = scope.limit(1)
-                  .take
+    record = scp.limit(1)
+                .take
 
-    raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier) if
+    raise Keygen::Error::NotFoundError.new(model:, id:) if
       record.nil?
 
     record

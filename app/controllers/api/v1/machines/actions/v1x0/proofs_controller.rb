@@ -40,7 +40,7 @@ module Api::V1::Machines::Actions::V1x0
     def set_machine
       scoped_machines = authorized_scope(current_account.machines)
 
-      @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
+      @machine = FindByAliasService.call(scoped_machines, id: params[:id], aliases: :fingerprint)
 
       Current.resource = machine
     end

@@ -22,7 +22,7 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      machine = FindByAliasService.call(scope: product.machines, identifier: params[:id], aliases: :fingerprint)
+      machine = FindByAliasService.call(product.machines, id: params[:id], aliases: :fingerprint)
       authorize! machine,
         with: Products::MachinePolicy
 

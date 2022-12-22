@@ -78,7 +78,7 @@ module Api::V1::Users::Actions
                        current_account.users
                      end
 
-      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id], aliases: :email)
+      @user = FindByAliasService.call(scoped_users, id: params[:id], aliases: :email)
 
       Current.resource = user
     end

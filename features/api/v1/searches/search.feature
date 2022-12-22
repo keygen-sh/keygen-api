@@ -968,7 +968,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the JSON response should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1024,7 +1024,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the JSON response should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
