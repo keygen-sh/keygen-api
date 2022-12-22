@@ -7,8 +7,8 @@ module TypedParameters
     class Inclusion < Validation
       def call(value)
         case options
-        in in: Array => a
-          a.include?(value)
+        in in: Range | Array => e
+          e.include?(value)
         end
       end
     end
