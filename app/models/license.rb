@@ -221,11 +221,8 @@ class License < ApplicationRecord
     where('licenses.id::text ILIKE ?', "%#{identifier}%")
   }
 
-  scope :search_key, -> (term) {
-    where('licenses.key ILIKE ?', "%#{term}%")
-  }
-
-  scope :search_name, -> (term) {
+  scope :search_key,  -> key  { where(key:) }
+  scope :search_name, -> term {
     where('licenses.name ILIKE ?', "%#{term}%")
   }
 
