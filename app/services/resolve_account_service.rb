@@ -42,7 +42,7 @@ class ResolveAccountService < BaseService
 
     Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
       # FIXME(ezekg) Remove domain column after all customers are migrated to cname
-      FindByAliasService.call(scope: Account, identifier: domain, aliases: %i[cname domain])
+      FindByAliasService.call(Account, id: domain, aliases: %i[cname domain])
     end
   end
 
@@ -60,7 +60,7 @@ class ResolveAccountService < BaseService
     cache_key = Account.cache_key(id)
 
     Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
-      FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+      FindByAliasService.call(Account, id:, aliases: :slug)
     end
   end
 

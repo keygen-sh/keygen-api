@@ -24,7 +24,7 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      release = FindByAliasService.call(scope: product.releases, identifier: params[:id], aliases: %i[version tag])
+      release = FindByAliasService.call(product.releases, id: params[:id], aliases: %i[version tag])
       authorize! release,
         with: Products::ReleasePolicy
 

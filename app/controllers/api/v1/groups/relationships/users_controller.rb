@@ -18,7 +18,7 @@ module Api::V1::Groups::Relationships
     end
 
     def show
-      user = FindByAliasService.call(scope: group.users, identifier: params[:id], aliases: :email)
+      user = FindByAliasService.call(group.users, id: params[:id], aliases: :email)
       authorize! user,
         with: Groups::UserPolicy
 
