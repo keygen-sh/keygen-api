@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # heroku run:detached -e SLEEP_DURATION=0.5 --tail \
-#   rails runner db/scripts/encrypt_license_keys.rb
+#   rails runner db/scripts/encrypt_license_keys_script.rb
 
 SLEEP_DURATION = ENV.fetch('SLEEP_DURATION') { 1 }.to_f
 
