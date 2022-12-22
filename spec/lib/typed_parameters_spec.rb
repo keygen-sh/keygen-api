@@ -1684,14 +1684,28 @@ describe TypedParameters do
     let(:options)    { nil }
 
     context 'with in: option' do
-      let(:options) {{ in: %w[a b c] }}
+      context 'with range' do
+        let(:options) {{ in: 0..9 }}
 
-      it 'should succeed' do
-        expect(validation.call('a')).to be true
+        it 'should succeed' do
+          expect(validation.call(0)).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call(10)).to be false
+        end
       end
 
-      it 'should fail' do
-        expect(validation.call('d')).to be false
+      context 'with array' do
+        let(:options) {{ in: %w[a b c] }}
+
+        it 'should succeed' do
+          expect(validation.call('a')).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call('d')).to be false
+        end
       end
     end
   end
@@ -1725,26 +1739,54 @@ describe TypedParameters do
     end
 
     context 'with within: option' do
-      let(:options) {{ within: 1..3 }}
+      context 'with range' do
+        let(:options) {{ within: 1..3 }}
 
-      it 'should succeed' do
-        expect(validation.call('foo')).to be true
+        it 'should succeed' do
+          expect(validation.call('foo')).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call('foobar')).to be false
+        end
       end
 
-      it 'should fail' do
-        expect(validation.call('foobar')).to be false
+      context 'with array' do
+        let(:options) {{ within: [0, 2, 4, 6] }}
+
+        it 'should succeed' do
+          expect(validation.call('foobar')).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call('foo')).to be false
+        end
       end
     end
 
     context 'with in: option' do
-      let(:options) {{ in: 1...6 }}
+      context 'with range' do
+        let(:options) {{ in: 1...6 }}
 
-      it 'should succeed' do
-        expect(validation.call('foo')).to be true
+        it 'should succeed' do
+          expect(validation.call('foo')).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call('foobar')).to be false
+        end
       end
 
-      it 'should fail' do
-        expect(validation.call('foobar')).to be false
+      context 'with array' do
+        let(:options) {{ in: [0, 2, 4, 6] }}
+
+        it 'should succeed' do
+          expect(validation.call('foobar')).to be true
+        end
+
+        it 'should fail' do
+          expect(validation.call('foo')).to be false
+        end
       end
     end
 
