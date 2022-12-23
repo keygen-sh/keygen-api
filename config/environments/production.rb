@@ -2,13 +2,11 @@
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  config.hosts << 'api.keygen.sh'
-  config.hosts << 'get.keygen.sh'
-  config.hosts << 'bin.keygen.sh'
-  config.hosts << 'stdout.keygen.sh'
-  config.hosts << 'backstage-licensing.spotify.com'
-  config.hosts << 'backstage-licensing.withspotify.com'
-  config.hosts << 'licensing.superlicenses.com'
+  config.hosts.concat(
+    [ENV['KEYGEN_HOST'], *ENV['KEYGEN_HOSTS']&.split(',')].then { |host|
+      host.uniq.compact_blank.map { _1.downcase.strip }
+    },
+  )
 
   # Disables security vulnerability
   config.assets.compile = false
