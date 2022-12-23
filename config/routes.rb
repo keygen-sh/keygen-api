@@ -6,7 +6,16 @@ require 'sidekiq_unique_jobs/web'
 Rails.application.routes.draw do
   domain_constraints =
     if !Rails.env.development?
-      { domain: %w[keygen.sh] }
+      {
+        domain: ENV.fetch('KEYGEN_DOMAIN') {
+          # Get host without subdomains if domain is not explicitly set
+          host = ENV.fetch('KEYGEN_HOST')
+          next unless
+            domains = host.downcase.strip.split('.')[-2, 2]
+
+          domains.join('.')
+        },
+      }
     else
       {}
     end
