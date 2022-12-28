@@ -18,6 +18,7 @@ module Keygen
              Rack::QueryParser::InvalidParameterError,
              Rack::QueryParser::ParameterTypeError,
              ActionController::BadRequest,
+             Encoding::CompatibilityError,
              JSON::ParserError,
              ArgumentError => e
         message = e.message.scrub

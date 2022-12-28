@@ -391,9 +391,9 @@ class ApplicationController < ActionController::API
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case e.cause
     when PG::InvalidTextRepresentation
-      render_bad_request detail: 'The request could not be completed because it contains badly formatted data (check encoding)', code: 'ENCODING_INVALID'
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when PG::CharacterNotInRepertoire
-      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when PG::UniqueViolation
       render_conflict
     else
@@ -404,7 +404,7 @@ class ApplicationController < ActionController::API
   rescue PG::Error => e
     case e.message
     when /incomplete multibyte character/
-      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding))', code: 'ENCODING_INVALID'
     else
       Keygen.logger.exception(e)
 
@@ -417,7 +417,8 @@ class ApplicationController < ActionController::API
     render_conflict # Race condition on unique index
   rescue ActiveModel::ValidationError => e
     render_unprocessable_resource e.model
-  rescue ArgumentError => e
+  rescue Encoding::CompatibilityError,
+         ArgumentError => e
     case e.message
     when /invalid byte sequence in UTF-8/,
          /incomplete multibyte character/
