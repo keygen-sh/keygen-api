@@ -262,7 +262,7 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.19.0)
+    loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -335,8 +335,8 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.4.3)
-      loofah (~> 2.3)
+    rails-html-sanitizer (1.4.4)
+      loofah (~> 2.19, >= 2.19.1)
     rails-pattern_matching (0.2.0)
       activemodel
       activerecord
@@ -484,6 +484,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (~> 3.0.5)
   lograge
+  loofah (~> 2.19.1)
   nokogiri (~> 1.13.10)
   oj
   openssl (~> 3.0.0)
@@ -496,6 +497,7 @@ DEPENDENCIES
   rack-cors
   rack-timeout
   rails (~> 7.0.4)
+  rails-html-sanitizer (~> 1.4.4)
   rails-pattern_matching
   rails_autoscale_agent
   redis (~> 4.7.1)
