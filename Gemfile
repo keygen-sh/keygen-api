@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '3.1.3'
+ruby '3.2.0'
 
 gem 'rails', '~> 7.0.4'
 gem 'pg', '~> 1.3.4'
@@ -106,10 +106,10 @@ group :development do
 end
 
 group :test do
-  gem 'stripe-ruby-mock', '~> 3.1.0.rc3', require: 'stripe_mock'
+  gem 'stripe-ruby-mock', github: 'stripe-ruby-mock/stripe-ruby-mock', ref: '6ceea9679bb573cb8bc6830f1bdf670b220a9859', require: 'stripe_mock'
   gem 'cucumber-rails', '~> 2.5', require: false
-  gem 'rspec-rails', '~> 5.1.1'
-  gem 'rspec-expectations', '~> 3.11'
+  gem 'rspec-rails', '~> 6.0.1'
+  gem 'rspec-expectations', '~> 3.12.1'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'
   gem 'faker', '~> 2.20.0'
