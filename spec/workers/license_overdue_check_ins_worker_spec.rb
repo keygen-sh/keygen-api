@@ -19,8 +19,7 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-overdue' }
 
     it 'should send a license.check-in-overdue webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       create :license, :day_check_in, last_check_in_at: 25.hours.ago, account: account
 
@@ -29,10 +28,7 @@ describe LicenseOverdueCheckInsWorker do
     end
 
     it 'should send multiple license.check-in-overdue webhook events' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(3).times
 
       create :license, :day_check_in, last_check_in_at: 42.hours.ago, account: account
       create :license, :day_check_in, last_check_in_at: 30.hours.ago, account: account
@@ -42,8 +38,6 @@ describe LicenseOverdueCheckInsWorker do
 
       worker.perform_async
       worker.drain
-
-      expect(events).to eq 3
     end
 
     it 'should mark the license with the overdue event time' do
@@ -62,8 +56,7 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-overdue' }
 
     it 'should not send a license.check-in-overdue webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
       create :license, :week_check_in, last_check_in_at: 3.days.from_now, account: account
 
@@ -87,8 +80,7 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-required-soon' }
 
     it 'should send a license.check-in-required-soon webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       create :license, :day_check_in, last_check_in_at: 1.day.from_now, account: account
 
@@ -97,10 +89,7 @@ describe LicenseOverdueCheckInsWorker do
     end
 
     it 'should send multiple license.check-in-required-soon webhook event' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(3).times
 
       create :license, :day_check_in, last_check_in_at: 4.days.from_now, account: account
       create :license, :day_check_in, last_check_in_at: 2.days.from_now, account: account
@@ -110,8 +99,6 @@ describe LicenseOverdueCheckInsWorker do
 
       worker.perform_async
       worker.drain
-
-      expect(events).to eq 3
     end
 
     it 'should mark the license with the check-in soon event time' do
@@ -129,8 +116,7 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-required-soon' }
 
     it 'should not send a license.expiring-soon webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
       create :license, :month_check_in, last_check_in_at: 1.month.from_now, account: account
 

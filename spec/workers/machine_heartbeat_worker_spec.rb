@@ -44,8 +44,7 @@ describe MachineHeartbeatWorker do
     let(:heartbeat_at) { nil }
 
     it 'should not send a webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
       worker.perform_async machine.id
       worker.drain
@@ -66,15 +65,10 @@ describe MachineHeartbeatWorker do
       let(:heartbeat_at) { Time.current }
 
       it 'should send a machine.heartbeat.pong webhook event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async machine.id
         worker.drain
-
-        expect(events).to eq 1
       end
 
       it 'should not deactivate the machine' do
@@ -91,15 +85,10 @@ describe MachineHeartbeatWorker do
       let(:heartbeat_at) { 1.hour.ago }
 
       it 'should send a machine.heartbeat.dead webhook event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async machine.id
         worker.drain
-
-        expect(events).to eq 1
       end
 
       it 'should deactivate the machine' do
@@ -115,15 +104,10 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          events = 0
-
-          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           worker.drain
-
-          expect(events).to eq 1
         end
 
         it 'should deactivate the machine' do
@@ -140,15 +124,10 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          events = 0
-
-          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           worker.drain
-
-          expect(events).to eq 1
         end
 
         it 'should not deactivate the machine' do
@@ -165,15 +144,10 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          events = 0
-
-          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           expect { worker.drain }.to_not raise_error
-
-          expect(events).to eq 1
         end
 
         it 'should not deactivate the machine' do
@@ -194,15 +168,10 @@ describe MachineHeartbeatWorker do
           let(:heartbeat_at) { 11.minutes.ago }
 
           it 'should send a machine.heartbeat.dead webhook event' do
-            events = 0
-
-            allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-            expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+            expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
             worker.perform_async machine.id
             expect { worker.drain }.to raise_error error
-
-            expect(events).to eq 1
           end
 
           it 'should not deactivate the machine' do
@@ -218,15 +187,10 @@ describe MachineHeartbeatWorker do
           let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
           it 'should send a machine.heartbeat.dead webhook event' do
-            events = 0
-
-            allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-            expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+            expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
             worker.perform_async machine.id
             expect { worker.drain }.to_not raise_error
-
-            expect(events).to eq 1
           end
 
           it 'should deactivate the machine' do

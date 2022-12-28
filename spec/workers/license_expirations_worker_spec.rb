@@ -19,8 +19,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expired' }
 
     it 'should send a license.expired webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       create :license, expiry: Time.current, account: account
 
@@ -29,10 +28,7 @@ describe LicenseExpirationsWorker do
     end
 
     it 'should send multiple license.expired webhook events' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(3).times
 
       create :license, expiry: Time.current, account: account
       create :license, expiry: Time.current, account: account
@@ -42,8 +38,6 @@ describe LicenseExpirationsWorker do
 
       worker.perform_async
       worker.drain
-
-      expect(events).to eq 3
     end
 
     it 'should mark the license with the expiration event time' do
@@ -62,8 +56,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expired' }
 
     it 'should not send a license.expired webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
       create :license, expiry: 7.days.from_now, account: account
 
@@ -87,8 +80,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expiring-soon' }
 
     it 'should send a license.expiring-soon webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       create :license, expiry: 2.days.from_now, account: account
 
@@ -97,10 +89,7 @@ describe LicenseExpirationsWorker do
     end
 
     it 'should send multiple license.expiring-soon webhook event' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(4).times
 
       create :license, expiry: 2.days.from_now, account: account
       create :license, expiry: 1.day.from_now, account: account
@@ -110,8 +99,6 @@ describe LicenseExpirationsWorker do
 
       worker.perform_async
       worker.drain
-
-      expect(events).to eq 4
     end
 
     it 'should mark the license with the expiring soon event time' do
@@ -129,8 +116,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expiring-soon' }
 
     it 'should not send a license.expiring-soon webhook event' do
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
       create :license, expiry: 9.days.from_now, account: account
 
