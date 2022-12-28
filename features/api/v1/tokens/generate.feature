@@ -742,7 +742,7 @@ Feature: Generate authentication token
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains badly encoded data (check encoding)",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
         "code": "ENCODING_INVALID"
       }
       """
