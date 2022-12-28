@@ -25,15 +25,10 @@ describe WaitForArtifactUploadWorker do
 
     context 'when an upload succeeds' do
       it 'should emit an artifact.uploaded event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event:)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async(artifact.id)
         worker.drain
-
-        expect(events).to eq 1
       end
 
       it 'should have an uploaded status' do
@@ -61,8 +56,7 @@ describe WaitForArtifactUploadWorker do
       end
 
       it 'should not emit an artifact.uploaded event' do
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event:)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to_not receive(:call)
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
 
         worker.perform_async(artifact.id)
         worker.drain

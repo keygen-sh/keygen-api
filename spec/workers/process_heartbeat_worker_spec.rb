@@ -44,15 +44,10 @@ describe ProcessHeartbeatWorker do
     let(:last_heartbeat_at) { Time.current }
 
     it 'should send a process.heartbeat.pong webhook event' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       worker.perform_async process.id
       worker.drain
-
-      expect(events).to eq 1
     end
 
     it 'should not deactivate the process' do
@@ -69,15 +64,10 @@ describe ProcessHeartbeatWorker do
     let(:last_heartbeat_at) { 1.hour.ago }
 
     it 'should send a process.heartbeat.dead webhook event' do
-      events = 0
-
-      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
       worker.perform_async process.id
       worker.drain
-
-      expect(events).to eq 1
     end
 
     it 'should deactivate the process' do
@@ -94,15 +84,10 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         worker.drain
-
-        expect(events).to eq 1
       end
 
       it 'should deactivate the process' do
@@ -120,15 +105,10 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         worker.drain
-
-        expect(events).to eq 1
       end
 
       it 'should not deactivate the process' do
@@ -146,15 +126,10 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        events = 0
-
-        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         expect { worker.drain }.to_not raise_error
-
-        expect(events).to eq 1
       end
 
       it 'should not deactivate the process' do
@@ -176,15 +151,10 @@ describe ProcessHeartbeatWorker do
         let(:last_heartbeat_at) { 11.minutes.ago }
 
         it 'should send a process.heartbeat.dead webhook event' do
-          events = 0
-
-          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
           worker.perform_async process.id
           expect { worker.drain }.to raise_error error
-
-          expect(events).to eq 1
         end
 
         it 'should not deactivate the process' do
@@ -200,15 +170,10 @@ describe ProcessHeartbeatWorker do
         let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
         it 'should send a process.heartbeat.dead webhook event' do
-          events = 0
-
-          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
 
           worker.perform_async process.id
           expect { worker.drain }.to_not raise_error
-
-          expect(events).to eq 1
         end
 
         it 'should deactivate the process' do
