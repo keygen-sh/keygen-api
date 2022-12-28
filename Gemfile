@@ -25,6 +25,8 @@ gem 'oj'
 
 # XML/HTML
 gem 'nokogiri', '~> 1.13.10'
+gem 'rails-html-sanitizer', '~> 1.4.4'
+gem 'loofah', '~> 2.19.1'
 
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
