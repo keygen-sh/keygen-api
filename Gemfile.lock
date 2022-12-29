@@ -293,7 +293,7 @@ GEM
       racc (~> 1.4)
     numerizer (0.1.1)
     oj (3.13.23)
-    openssl (3.0.0)
+    openssl (3.1.0)
     parallel (1.22.1)
     parallel_tests (3.8.1)
       parallel
@@ -487,7 +487,7 @@ DEPENDENCIES
   loofah (~> 2.19.1)
   nokogiri (~> 1.13.10)
   oj
-  openssl (~> 3.0.0)
+  openssl (~> 3.1.0)
   parallel_tests (~> 3.8)
   pg (~> 1.3.4)
   premailer-rails

@@ -35,7 +35,7 @@ gem 'stripe', '~> 5.43'
 gem 'action_policy', '~> 0.6.3'
 
 # Cryptography
-gem 'openssl', '~> 3.0.0'
+gem 'openssl', '~> 3.1.0'
 gem 'ed25519'
 gem 'jwt'
 
