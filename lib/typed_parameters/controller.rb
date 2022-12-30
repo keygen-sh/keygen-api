@@ -18,24 +18,28 @@ module TypedParameters
         raise UndefinedActionError, "params have not been defined for action: #{action_name.inspect}" if
           handler.nil?
 
-        schema = handler.schema
-        params = Parameterizer.new(schema:).call(
-          # TODO(ezekg) Add a config here that accepts a block, similar to a Rack app
-          #             so that users can define their own parameter source. E.g.
-          #             using and parsing request.body can allow array roots.
-          value: request.request_parameters.deep_symbolize_keys,
+        schema    = handler.schema
+        processor = Processor.new(controller: self, schema:)
+        paramz    = Parameterizer.new(schema:)
+        # TODO(ezekg) Add a config here that accepts a block, similar to a Rack app
+        #             so that users can define their own parameter source. E.g.
+        #             using and parsing request.body can allow array roots.
+        params    = paramz.call(value: request.request_parameters.deep_symbolize_keys)
+        formatter = case format
+                    when Symbol, String
+                      Formatters[format]
+                    when AUTO
+                      schema.formatter
+                    else
+                      nil
+                    end
+
+        processor.call(params)
+
+        params.unwrap(
+          controller: self,
+          formatter:,
         )
-
-        Processor.new(controller: self, schema:).call(params)
-
-        case format
-        when AUTO
-          params.unwrap(formatter: schema.formatter, controller: self)
-        when nil
-          params.unwrap(formatter: nil, controller: self)
-        else
-          params.unwrap(formatter: Formatters[format], controller: self)
-        end
       end
 
       def typed_query(format: AUTO)
@@ -44,21 +48,25 @@ module TypedParameters
         raise UndefinedActionError, "query has not been defined for action: #{action_name.inspect}" if
           handler.nil?
 
-        schema = handler.schema
-        params = Parameterizer.new(schema:).call(
-          value: request.query_parameters.deep_symbolize_keys,
+        schema    = handler.schema
+        processor = Processor.new(controller: self, schema:)
+        paramz    = Parameterizer.new(schema:)
+        params    = paramz.call(value: request.query_parameters.deep_symbolize_keys)
+        formatter = case format
+                    when Symbol, String
+                      Formatters[format]
+                    when AUTO
+                      schema.formatter
+                    else
+                      nil
+                    end
+
+        processor.call(params)
+
+        params.unwrap(
+          controller: self,
+          formatter:,
         )
-
-        Processor.new(controller: self, schema:).call(params)
-
-        case format
-        when AUTO
-          params.unwrap(formatter: schema.formatter, controller: self)
-        when nil
-          params.unwrap(formatter: nil, controller: self)
-        else
-          params.unwrap(formatter: Formatters[format], controller: self)
-        end
       end
 
       private
