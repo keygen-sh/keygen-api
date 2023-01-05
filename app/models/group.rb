@@ -1,4 +1,5 @@
 class Group < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResolveAccountService < BaseService
   ACCOUNT_SCOPE_INVALID_DOMAIN_RE = /keygen\.sh\z/
   ACCOUNT_SCOPE_CACHE_TTL         = 15.minutes

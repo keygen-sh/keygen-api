@@ -4,6 +4,7 @@ class Policy < ApplicationRecord
   class UnsupportedPoolError < StandardError; end
   class EmptyPoolError < StandardError; end
 
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

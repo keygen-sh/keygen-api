@@ -78,8 +78,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "code"], name: "index_entitlements_on_account_id_and_code", unique: true
     t.index ["code"], name: "index_entitlements_on_code"
+    t.index ["environment_id"], name: "index_entitlements_on_environment_id"
+  end
+
+  create_table "environments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "code", null: false
+    t.index ["account_id", "code"], name: "index_environments_on_account_id_and_code", unique: true
+    t.index ["account_id", "created_at"], name: "index_environments_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["code"], name: "index_environments_on_code"
   end
 
   create_table "event_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -139,7 +152,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id"], name: "index_groups_on_account_id"
+    t.index ["environment_id"], name: "index_groups_on_environment_id"
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -195,12 +210,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "group_id"
     t.integer "max_processes_override"
     t.datetime "last_check_out_at", precision: nil
+    t.uuid "environment_id"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_licenses_on_environment_id"
     t.index ["group_id"], name: "index_licenses_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
@@ -218,8 +235,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index "machine_id, md5((pid)::text)", name: "index_machine_processes_on_machine_id_md5_pid", unique: true
     t.index ["account_id"], name: "index_machine_processes_on_account_id"
+    t.index ["environment_id"], name: "index_machine_processes_on_environment_id"
     t.index ["last_heartbeat_at"], name: "index_machine_processes_on_last_heartbeat_at"
     t.index ["machine_id"], name: "index_machine_processes_on_machine_id"
   end
@@ -241,12 +260,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "group_id"
     t.integer "max_processes_override"
     t.datetime "last_check_out_at", precision: nil
+    t.uuid "environment_id"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_machines_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_machines_on_environment_id"
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["group_id"], name: "index_machines_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
@@ -339,11 +360,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.integer "max_processes"
     t.string "overage_strategy"
     t.string "heartbeat_basis"
+    t.uuid "environment_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_policies_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_policies_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at"
   end
@@ -368,12 +391,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "account_id"
     t.string "url"
     t.string "distribution_strategy"
+    t.string "slug"
+    t.uuid "environment_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
+    t.index ["account_id", "slug"], name: "index_products_on_account_id_and_slug", unique: true
     t.index ["created_at"], name: "index_products_on_created_at", order: :desc
     t.index ["distribution_strategy"], name: "index_products_on_distribution_strategy"
+    t.index ["environment_id"], name: "index_products_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true
   end
 
@@ -396,8 +423,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_arches_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_arches_on_account_id_and_key", unique: true
+    t.index ["environment_id"], name: "index_release_arches_on_environment_id"
   end
 
   create_table "release_artifacts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -418,7 +447,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "status"
     t.jsonb "metadata"
     t.string "backend"
+    t.uuid "environment_id"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_release_artifacts_on_environment_id"
     t.index ["filename", "release_id", "account_id"], name: "release_artifacts_uniq_filename_idx", unique: true, where: "(filename IS NOT NULL)"
     t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"
     t.index ["release_filetype_id"], name: "index_release_artifacts_on_release_filetype_id"
@@ -432,8 +463,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_channels_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_channels_on_account_id_and_key", unique: true
+    t.index ["environment_id"], name: "index_release_channels_on_environment_id"
   end
 
   create_table "release_download_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -465,8 +498,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
+    t.index ["environment_id"], name: "index_release_filetypes_on_environment_id"
   end
 
   create_table "release_platforms", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -476,8 +511,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_platforms_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
+    t.index ["environment_id"], name: "index_release_platforms_on_environment_id"
   end
 
   create_table "release_upgrade_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -531,8 +568,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "semver_build_word"
     t.bigint "semver_build_num"
     t.string "tag"
+    t.uuid "environment_id"
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
+    t.index ["environment_id"], name: "index_releases_on_environment_id"
     t.index ["product_id"], name: "index_releases_on_product_id"
     t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
     t.index ["release_filetype_id"], name: "index_releases_on_release_filetype_id"
@@ -624,10 +663,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.integer "activations", default: 0
     t.integer "deactivations", default: 0
     t.string "name"
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
     t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc
     t.index ["digest"], name: "index_tokens_on_digest", unique: true
+    t.index ["environment_id"], name: "index_tokens_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_tokens_on_id_and_created_at_and_account_id", unique: true
   end
 
@@ -646,6 +687,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.datetime "stdout_last_sent_at", precision: nil
     t.datetime "banned_at", precision: nil
     t.uuid "group_id"
+    t.uuid "environment_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
@@ -654,6 +696,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.index ["banned_at"], name: "index_users_on_banned_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true
+    t.index ["environment_id"], name: "index_users_on_environment_id"
     t.index ["group_id"], name: "index_users_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_users_on_id_and_created_at_and_account_id", unique: true
   end

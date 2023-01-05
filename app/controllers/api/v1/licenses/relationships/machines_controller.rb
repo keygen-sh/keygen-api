@@ -7,6 +7,7 @@ module Api::V1::Licenses::Relationships
     has_scope(:user) { |c, s, v| s.for_user(v) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_license

@@ -4,11 +4,13 @@ class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
   include Dirtyable
 
-  USER_ROLES    = %w[user admin developer read_only sales_agent support_agent].freeze
-  PRODUCT_ROLES = %w[product].freeze
-  LICENSE_ROLES = %w[license].freeze
-  ROLE_RANK     = {
-    admin:         6,
+  USER_ROLES        = %w[user admin developer read_only sales_agent support_agent].freeze
+  ENVIRONMENT_ROLES = %w[environment].freeze
+  PRODUCT_ROLES     = %w[product].freeze
+  LICENSE_ROLES     = %w[license].freeze
+  ROLE_RANK         = {
+    admin:         7,
+    environment:   6,
     developer:     5,
     product:       4,
     sales_agent:   3,
@@ -34,19 +36,33 @@ class Role < ApplicationRecord
   before_create :set_default_permissions,
     unless: :role_permissions_attributes_changed?
 
-  # NOTE(ezekg) Sanity check
+  # NOTE(ezekg) Sanity checks
   validates :resource_type,
-    inclusion: { in: [User.name, Product.name, License.name] }
+    inclusion: { in: [User.name, Environment.name, Product.name, License.name] }
 
   validates :name,
     inclusion: { in: USER_ROLES, message: 'must be a valid user role' },
-    if: -> { resource.is_a?(User) }
+    if: -> {
+      resource.is_a?(User)
+    }
+
+  validates :name,
+    inclusion: { in: ENVIRONMENT_ROLES, message: 'must be a valid environment role' },
+    if: -> {
+      resource.is_a?(Environment)
+    }
+
   validates :name,
     inclusion: { in: PRODUCT_ROLES, message: 'must be a valid product role' },
-    if: -> { resource.is_a?(Product) }
+    if: -> {
+      resource.is_a?(Product)
+    }
+
   validates :name,
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
-    if: -> { resource.is_a?(License) }
+    if: -> {
+      resource.is_a?(License)
+    }
 
   validates :permission_ids,
     inclusion: {
