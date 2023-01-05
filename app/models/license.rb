@@ -2,6 +2,7 @@
 
 class License < ApplicationRecord
   include Envented::Callbacks
+  include Environmental
   include Limitable
   include Orderable
   include Tokenable

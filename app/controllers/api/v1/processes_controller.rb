@@ -9,6 +9,7 @@ module Api::V1
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_machine_process, only: %i[show update destroy]

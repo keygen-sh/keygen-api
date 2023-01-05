@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_event, only: [:show, :destroy]

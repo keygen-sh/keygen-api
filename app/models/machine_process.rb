@@ -4,6 +4,7 @@ class MachineProcess < ApplicationRecord
   class ResurrectionUnsupportedError < StandardError; end
   class ResurrectionExpiredError < StandardError; end
 
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

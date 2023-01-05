@@ -5,6 +5,7 @@ class Machine < ApplicationRecord
   class ResurrectionExpiredError < StandardError; end
 
   include Envented::Callbacks
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

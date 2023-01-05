@@ -6,6 +6,7 @@ module Api::V1
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_key, only: %i[show update destroy]

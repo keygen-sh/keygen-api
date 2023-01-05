@@ -8,6 +8,7 @@ module Api::V1::Releases::Relationships
     has_scope(:arch) { |c, s, v| s.for_arch(v) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[index show]
     before_action :authenticate_with_token, only: %i[index show]
