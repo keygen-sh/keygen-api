@@ -152,7 +152,6 @@ module Authentication
     @current_token       = nil
 
     current_license = LicenseKeyLookupService.call(
-      environment: current_environment,
       account: current_account,
       key: license_key,
     )

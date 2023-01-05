@@ -35,6 +35,18 @@ class ReleaseArtifactSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
+  relationship :environment do
+    linkage always: true do
+      if @object.environment_id?
+        { type: :environments, id: @object.environment_id }
+      else
+        nil
+      end
+    end
+    link :related do
+      @url_helpers.v1_account_artifact_environment_path @object.account_id, @object
+    end
+  end
   relationship :release do
     linkage always: true do
       { type: :releases, id: @object.release_id }

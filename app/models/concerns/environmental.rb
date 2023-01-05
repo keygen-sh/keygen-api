@@ -11,8 +11,8 @@ module Environmental
       next self unless
         Keygen.server?
 
-      # NOTE(ezekg) We'll show all resources without an environment set as well
-      #             as resources for our current environment.
+      # NOTE(ezekg) We'll show all resources without an environment as well
+      #             as resources for the current environment.
       where(environment: [nil, Current.environment])
     }
   end
