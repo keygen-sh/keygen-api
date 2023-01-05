@@ -55,18 +55,29 @@ Rails.application.routes.draw do
   end
 
   concern :v1 do
-    get "ping", to: "health#general_ping"
-
-    post   "tokens",     to: "tokens#generate"
-    put    "tokens",     to: "tokens#regenerate_current"
-    put    "tokens/:id", to: "tokens#regenerate"
-    get    "tokens",     to: "tokens#index"
-    get    "tokens/:id", to: "tokens#show", as: :token
-    delete "tokens/:id", to: "tokens#revoke"
-
+    get  "ping",      to: "health#general_ping"
     post "passwords", to: "passwords#reset"
-    get  "profile", to: "profiles#show"
-    get  "me", to: "profiles#me"
+    get  "profile",   to: "profiles#show"
+    get  "me",        to: "profiles#me"
+
+    resources "tokens", only: %i[index show] do
+      collection do
+        post "/", to: "tokens#generate"
+
+        # FIXME(ezekg) Deprecate this route
+        put  "/", to: "tokens#regenerate_current"
+      end
+
+      member do
+        put    "/", to: "tokens#regenerate"
+        delete "/", to: "tokens#revoke"
+      end
+
+      scope module: "tokens/relationships" do
+        resource "environment", only: %i[show]
+        resource "bearer", only: %i[show]
+      end
+    end
 
     resources "keys" do
       scope module: "keys/relationships" do
@@ -81,6 +92,7 @@ Rails.application.routes.draw do
     resources "machines", constraints: { id: /[^\/]*/ } do
       scope module: "machines/relationships" do
         resources "processes", only: %i[index show]
+        resource "environment", only: %i[show]
         resource "product", only: [:show]
         resource "group", only: [:show, :update]
         resource "license", only: [:show]
@@ -104,6 +116,7 @@ Rails.application.routes.draw do
 
     resources "processes" do
       scope module: "processes/relationships" do
+        resource "environment", only: %i[show]
         resource "product", only: %i[show]
         resource "license", only: %i[show]
         resource "machine", only: %i[show]
@@ -123,6 +136,7 @@ Rails.application.routes.draw do
         resources "licenses", only: [:index, :show]
         resources "machines", only: [:index, :show]
         resources "tokens", only: [:index, :show, :create]
+        resource "environment", only: %i[show]
         resource "group", only: [:show, :update]
       end
       member do
@@ -141,6 +155,7 @@ Rails.application.routes.draw do
       scope module: "licenses/relationships" do
         resources "machines", only: [:index, :show]
         resources "tokens", only: %i[index show create]
+        resource "environment", only: %i[show]
         resource "product", only: [:show]
         resource "policy", only: [:show, :update]
         resource "group", only: [:show, :update]
@@ -183,6 +198,7 @@ Rails.application.routes.draw do
           end
         end
         resources "licenses", only: [:index, :show]
+        resource "environment", only: %i[show]
         resource "product", only: [:show]
         resources "entitlements", only: [:index, :show] do
           collection do
@@ -205,6 +221,7 @@ Rails.application.routes.draw do
         resources "arches", only: [:index, :show]
         resources "channels", only: [:index, :show]
         resources "releases", constraints: { id: /[^\/]*/ }, only: [:index, :show]
+        resource "environment", only: %i[show]
       end
     end
 
@@ -240,6 +257,7 @@ Rails.application.routes.draw do
           end
         end
         resources "artifacts", only: [:index, :show]
+        resource "environment", only: %i[show]
         resource "upgrade", only: %i[show]
         resource "product", only: [:show]
 
@@ -260,15 +278,35 @@ Rails.application.routes.draw do
       end
     end
 
-    resources "artifacts", constraints: { id: /.*/ }
-    resources "platforms", only: [:index, :show]
-    resources "arches", only: [:index, :show]
-    resources "channels", only: [:index, :show]
+    resources "artifacts", constraints: { id: /.*/ } do
+      scope module: "artifacts/relationships" do
+        resource "environment", only: %i[show]
+      end
+    end
+
+    resources "platforms", only: [:index, :show] do
+      scope module: "platforms/relationships" do
+        resource "environment", only: %i[show]
+      end
+    end
+
+    resources "arches", only: [:index, :show] do
+      scope module: "arches/relationships" do
+        resource "environment", only: %i[show]
+      end
+    end
+
+    resources "channels", only: [:index, :show] do
+      scope module: "channels/relationships" do
+        resource "environment", only: %i[show]
+      end
+    end
 
     resources "entitlements"
 
     resources "groups" do
       scope module: "groups/relationships" do
+        resource "environment", only: %i[show]
         resources "users", only: %i[index show]
         resources "licenses", only: %i[index show]
         resources "machines", only: %i[index show]
@@ -298,10 +336,9 @@ Rails.application.routes.draw do
           end
         end
       end
-    end
 
-    ee do
       resources "event_logs", path: "event-logs", only: [:index, :show]
+      resources "environments"
     end
 
     resources "metrics", only: [:index, :show] do
