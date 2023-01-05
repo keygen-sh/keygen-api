@@ -160,6 +160,9 @@ class Permission < ApplicationRecord
     webhook-event.retry
   ].freeze
 
+  # Available env permissions.
+  ENVIRONMENT_PERMISSIONS = [WILDCARD_PERMISSION].freeze
+
   # Available admin permissions.
   ADMIN_PERMISSIONS = ALL_PERMISSIONS.dup
                                      .freeze

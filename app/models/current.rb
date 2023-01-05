@@ -1,5 +1,6 @@
 class Current < ActiveSupport::CurrentAttributes
   attribute :account,
+            :environment,
             :bearer,
             :token,
             :resource
@@ -12,8 +13,9 @@ class Current < ActiveSupport::CurrentAttributes
     super
 
     # Ensure these are always reset when account is changed
-    self.bearer   = nil
-    self.token    = nil
-    self.resource = nil
+    self.environment = nil
+    self.bearer      = nil
+    self.token       = nil
+    self.resource    = nil
   end
 end

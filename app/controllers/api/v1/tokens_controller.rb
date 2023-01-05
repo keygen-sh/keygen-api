@@ -8,6 +8,7 @@ module Api::V1
     has_scope(:bearer, type: :hash, using: %i[type id]) { |c, s, (t, id)| s.for_bearer(t, id) }
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :require_active_subscription!, only: %i[index regenerate regenerate_current]
     before_action :authenticate_with_token!, except: %i[generate]
     before_action :set_token, only: %i[show regenerate revoke]

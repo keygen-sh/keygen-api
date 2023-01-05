@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseChannel < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

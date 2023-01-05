@@ -23,13 +23,15 @@ class ApplicationController < ActionController::API
   attr_accessor :current_http_scheme
   attr_accessor :current_http_token
   attr_accessor :current_account
+  attr_accessor :current_environment
   attr_accessor :current_bearer
   attr_accessor :current_token
 
   # Action policy authz contexts
-  authorize :account, through: :current_account
-  authorize :bearer,  through: :current_bearer
-  authorize :token,   through: :current_token
+  authorize :account,     through: :current_account
+  authorize :environment, through: :current_environment
+  authorize :bearer,      through: :current_bearer
+  authorize :token,       through: :current_token
 
   verify_authorized
 
@@ -385,6 +387,8 @@ class ApplicationController < ActionController::API
   rescue Keygen::Error::InvalidAccountDomainError,
          Keygen::Error::InvalidAccountIdError
     render_not_found
+  rescue Keygen::Error::InvalidEnvironmentError => e
+    render_bad_request detail: e.message, code: 'ENVIRONMENT_INVALID', source: { header: 'Keygen-Environment' }
   rescue ActiveModel::RangeError
     render_bad_request detail: "integer is too large"
   rescue ActiveRecord::StatementInvalid => e

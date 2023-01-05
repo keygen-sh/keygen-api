@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePlatform < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable

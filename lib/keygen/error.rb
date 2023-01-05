@@ -38,6 +38,7 @@ module Keygen
 
     class InvalidAccountDomainError < StandardError; end
     class InvalidAccountIdError < StandardError; end
+    class InvalidEnvironmentError < StandardError; end
     class BadRequestError < StandardError; end
   end
 end

@@ -5,6 +5,7 @@ class Token < ApplicationRecord
 
   TOKEN_DURATION = 2.weeks
 
+  include Environmental
   include Tokenable
   include Limitable
   include Orderable

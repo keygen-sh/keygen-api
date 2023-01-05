@@ -5,6 +5,7 @@ module Api::V1
     skip_verify_authorized
 
     before_action :scope_to_current_account!
+    before_action :scope_to_current_environment!
     before_action :set_user, only: [:reset]
 
     typed_params {

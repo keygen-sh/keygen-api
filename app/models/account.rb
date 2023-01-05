@@ -10,6 +10,7 @@ class Account < ApplicationRecord
 
   belongs_to :plan
   has_one :billing
+  has_many :environments
   has_many :webhook_endpoints
   has_many :webhook_events
   has_many :request_logs
