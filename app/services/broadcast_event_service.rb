@@ -19,7 +19,7 @@ class BroadcastEventService < BaseService
       # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
       #             generated via a background job like MachineHeartbeatWorker.
       account_id      = Current.account&.id || account.id
-      environment_id  = Current.environment&.id || resource.environment&.id
+      environment_id  = Current.environment&.id || (resource.environment&.id if resource.respond_to?(:environment))
       resource_type   = Current.resource&.class&.name || resource.class.name
       resource_id     = Current.resource&.id || resource.id
       bearer_type     = Current.bearer&.class&.name
