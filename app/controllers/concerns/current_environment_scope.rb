@@ -15,10 +15,10 @@ module CurrentEnvironmentScope
     # callbacks before and after the current environment has been set.
     define_callbacks :current_environment_scope
 
-    around_action :assert_supports_environment!
+    before_action :assert_environment_support!
 
-    def supports_environment? = environmental_controllers.include?(self.class)
-    def provided_environment? = request.headers.key?(ENVIRONMENT_HEADER_KEY)
+    def environment_supported? = environmental_controllers.include?(self.class)
+    def environment_provided?  = request.headers.key?(ENVIRONMENT_HEADER_KEY)
 
     def set_current_environment
       return if
@@ -26,7 +26,7 @@ module CurrentEnvironmentScope
 
       run_callbacks :current_environment_scope do
         next unless
-          provided_environment?
+          environment_provided?
 
         environment = (
           Current.environment ||= ResolveEnvironmentService.call(
@@ -39,11 +39,13 @@ module CurrentEnvironmentScope
       end
     end
 
-    def assert_supports_environment!
-      raise Keygen::Error::UnsupportedHeaderError.new('environment is not supported for this resource', header: ENVIRONMENT_HEADER_KEY) if
-        provided_environment? && !supports_environment?
+    def assert_environment_support!
+      return unless
+        environment_provided?
 
-      yield
+      unless environment_supported?
+        raise Keygen::Error::UnsupportedHeaderError.new('environment is not supported for this resource', header: ENVIRONMENT_HEADER_KEY)
+      end
     end
   end
 
