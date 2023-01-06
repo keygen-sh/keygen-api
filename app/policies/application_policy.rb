@@ -12,7 +12,7 @@ class ApplicationPolicy
   pre_check :verify_authenticated!
 
   authorize :account
-  authorize :environment, allow_nil: true
+  authorize :environment, allow_nil: true, optional: true
   authorize :bearer,      allow_nil: true
   authorize :token,       allow_nil: true
 
