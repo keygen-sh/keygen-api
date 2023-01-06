@@ -12,12 +12,8 @@ class ResolveEnvironmentService < BaseService
     return unless
       Keygen.ee?
 
-    cache(environment) do
-      FindByAliasService.call(
-        account.environments,
-        aliases: %i[code],
-        id: environment,
-      )
+    cache do
+      FindByAliasService.call(account.environments, id: environment, aliases: %i[code])
     end
   end
 
@@ -26,7 +22,7 @@ class ResolveEnvironmentService < BaseService
   attr_reader :environment,
               :account
 
-  def cache(environment)
+  def cache
     key = Environment.cache_key(environment, account:)
 
     Rails.cache.fetch(key, skip_nil: true, expires_in: ENVIRONMENT_SCOPE_CACHE_TTL) do
