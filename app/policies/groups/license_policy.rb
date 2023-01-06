@@ -5,6 +5,9 @@ module Groups
     authorize :group
 
     scope_for :active_record_relation do |relation|
+      relation = relation.for_environment(Current.environment) if
+        relation.respond_to?(:for_environment)
+
       case bearer
       in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
         relation.all
