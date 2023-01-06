@@ -167,11 +167,11 @@ module Permissible
       end
 
       module_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def self.allowed_permission_ids = Permission.where(action: allowed_permissions).pluck(:id)
-        def self.default_permission_ids = Permission.where(action: default_permissions).pluck(:id)
+        def self.allowed_permission_ids = Permission.where(action: allowed_permissions).ids
+        def self.default_permission_ids = Permission.where(action: default_permissions).ids
 
-        def allowed_permission_ids = Permission.where(action: allowed_permissions).pluck(:id)
-        def default_permission_ids = Permission.where(action: default_permissions).pluck(:id)
+        def allowed_permission_ids = Permission.where(action: allowed_permissions).ids
+        def default_permission_ids = Permission.where(action: default_permissions).ids
       RUBY
     end
   end
