@@ -13,7 +13,8 @@ class EventLogWorker < BaseWorker
     whodunnit_id,
     request_log_id,
     idempotency_key,
-    metadata
+    metadata,
+    environment_id = nil
   )
     return unless
       Keygen.ee? && Keygen.ee { _1.entitled?(:event_logs) }
@@ -24,6 +25,7 @@ class EventLogWorker < BaseWorker
       event_type_id: event_type.id,
       idempotency_key:,
       account_id:,
+      environment_id:,
       resource_type:,
       resource_id:,
       whodunnit_type:,
