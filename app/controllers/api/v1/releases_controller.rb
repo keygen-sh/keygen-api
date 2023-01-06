@@ -2,6 +2,8 @@
 
 module Api::V1
   class ReleasesController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:entitlements) { |c, s, v| s.within_constraints(v) }
     has_scope(:constraints) { |c, s, v| s.within_constraints(v) }
@@ -17,7 +19,6 @@ module Api::V1
     has_scope(:version,  if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.with_version(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[index show]
     before_action :authenticate_with_token, only: %i[index show]

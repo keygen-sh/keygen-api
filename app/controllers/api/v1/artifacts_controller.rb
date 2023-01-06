@@ -2,6 +2,8 @@
 
 module Api::V1
   class ArtifactsController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:release) { |c, s, v| s.for_release(v) }
@@ -11,7 +13,6 @@ module Api::V1
     has_scope(:arch) { |c, s, v| s.for_arch(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[index show]
     before_action :authenticate_with_token, only: %i[index show]

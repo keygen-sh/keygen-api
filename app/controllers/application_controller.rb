@@ -342,6 +342,9 @@ class ApplicationController < ActionController::API
          ActionController::UnpermittedParameters,
          ActionController::ParameterMissing => e
     render_bad_request detail: e.message
+  rescue Keygen::Error::UnsupportedHeaderError,
+         Keygen::Error::InvalidHeaderError => e
+    render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::InvalidScopeError => e
     render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnauthorizedError => e
