@@ -42,6 +42,11 @@ class Permission < ApplicationRecord
     entitlement.read
     entitlement.update
 
+    environment.read
+    environment.create
+    environment.update
+    environment.delete
+
     event-log.read
 
     group.create
@@ -186,6 +191,8 @@ class Permission < ApplicationRecord
     constraint.read
 
     entitlement.read
+
+    environment.read
 
     event-log.read
 
