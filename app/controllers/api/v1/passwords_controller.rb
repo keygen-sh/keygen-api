@@ -3,9 +3,9 @@
 module Api::V1
   class PasswordsController < Api::V1::BaseController
     skip_verify_authorized
+    supports_environment
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :set_user, only: [:reset]
 
     typed_params {

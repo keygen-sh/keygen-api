@@ -2,12 +2,13 @@
 
 module Api::V1
   class MetricsController < Api::V1::BaseController
+    supports_environment
+
     has_scope :date, type: :hash, using: [:start, :end], only: :index
     has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
     has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_metric, only: %i[show]

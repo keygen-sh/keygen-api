@@ -2,10 +2,11 @@
 
 module Api::V1::Products::Relationships
   class UsersController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:roles, type: :array, default: [:user]) { |c, s, v| s.with_roles(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product

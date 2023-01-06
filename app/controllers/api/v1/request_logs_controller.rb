@@ -2,6 +2,8 @@
 
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:date, type: :hash, using: [:start, :end], only: :index)
     has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
@@ -14,7 +16,6 @@ module Api::V1
 
     before_action :require_ee!
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_request_log, only: [:show]

@@ -2,6 +2,8 @@
 
 module Api::V1
   class MachinesController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:fingerprint) { |c, s, v| s.with_fingerprint(v) }
     has_scope(:ip) { |c, s, v| s.with_ip(v) }
@@ -15,7 +17,6 @@ module Api::V1
     has_scope(:group) { |c, s, v| s.for_group(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_machine, only: [:show, :update, :destroy]

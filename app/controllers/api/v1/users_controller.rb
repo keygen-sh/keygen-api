@@ -2,6 +2,8 @@
 
 module Api::V1
   class UsersController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:roles, type: :array, default: [:user]) { |c, s, v| s.with_roles(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
@@ -13,7 +15,6 @@ module Api::V1
     has_scope(:active, :boolean) { |c, s, v| s.assigned(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!, only: %i[index create destroy]
     before_action :authenticate_with_token!, only: %i[index show update destroy]
     before_action :authenticate_with_token, only: %i[create]

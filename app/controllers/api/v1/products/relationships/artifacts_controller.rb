@@ -2,6 +2,8 @@
 
 module Api::V1::Products::Relationships
   class ArtifactsController < Api::V1::BaseController
+    supports_environment
+
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
@@ -9,7 +11,6 @@ module Api::V1::Products::Relationships
     has_scope(:arch) { |c, s, v| s.for_arch(v) }
 
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product, only: %i[index show]
