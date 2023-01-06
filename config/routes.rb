@@ -302,7 +302,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources "entitlements"
+    resources "entitlements" do
+      scope module: "entitlements/relationships" do
+        resource "environment", only: %i[show]
+      end
+    end
 
     resources "groups" do
       scope module: "groups/relationships" do
