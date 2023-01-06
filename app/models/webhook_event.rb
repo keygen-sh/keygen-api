@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class WebhookEvent < ApplicationRecord
+  include Environmental
   include Idempotentable
   include Limitable
   include Orderable
