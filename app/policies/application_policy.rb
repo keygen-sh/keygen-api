@@ -12,12 +12,13 @@ class ApplicationPolicy
   pre_check :verify_authenticated!
 
   authorize :account
-  authorize :bearer, allow_nil: true
-  authorize :token,  allow_nil: true
+  authorize :environment, allow_nil: true
+  authorize :bearer,      allow_nil: true
+  authorize :token,       allow_nil: true
 
   scope_matcher :active_record_relation, ActiveRecord::Relation
   scope_for :active_record_relation do |relation|
-    relation = relation.for_environment(Current.environment) if
+    relation = relation.for_environment(environment) if
       relation.respond_to?(:for_environment)
 
     case bearer
