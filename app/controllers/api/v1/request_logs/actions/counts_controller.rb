@@ -2,9 +2,10 @@
 
 module Api::V1::RequestLogs::Actions
   class CountsController < Api::V1::BaseController
+    supports_environment
+
     before_action :require_ee!
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :authenticate_with_token!
 
     def count

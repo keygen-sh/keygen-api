@@ -26,9 +26,21 @@ module Keygen
       attr_reader :source
 
       def initialize(parameter:)
-        @source = { parameter: parameter }
+        @source = { parameter: }
       end
     end
+
+    class InvalidHeaderError < StandardError
+      attr_reader :source
+
+      def initialize(message, header:)
+        @source = { header: }
+
+        super(message)
+      end
+    end
+
+    class UnsupportedHeaderError < InvalidHeaderError; end
 
     class NotFoundError < ActiveRecord::RecordNotFound
       def initialize(message: nil, model: nil, primary_key: nil, id: nil)

@@ -2,8 +2,9 @@
 
 module Api::V1::Products::Relationships
   class PoliciesController < Api::V1::BaseController
+    supports_environment
+
     before_action :scope_to_current_account!
-    before_action :scope_to_current_environment!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product

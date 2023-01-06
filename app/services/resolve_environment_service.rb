@@ -1,35 +1,33 @@
 # frozen_string_literal: true
 
 class ResolveEnvironmentService < BaseService
-  ENVIRONMENT_SCOPE_HEADER_KEY = 'Keygen-Environment'.freeze
-  ENVIRONMENT_SCOPE_CACHE_TTL  = 15.minutes
+  ENVIRONMENT_SCOPE_CACHE_TTL = 15.minutes
 
-  def initialize(account:, request:)
-    @account = account
-    @request = request
+  def initialize(environment:, account:)
+    @environment = environment
+    @account     = account
   end
 
   def call
-    id = request.headers[ENVIRONMENT_SCOPE_HEADER_KEY]
     return unless
-      id.present?
+      Keygen.ee?
 
-    cache(id) do
+    cache(environment) do
       FindByAliasService.call(
         account.environments,
         aliases: %i[code],
-        id:,
+        id: environment,
       )
     end
   end
 
   private
 
-  attr_reader :account,
-              :request
+  attr_reader :environment,
+              :account
 
-  def cache(env_id)
-    key = Environment.cache_key(env_id, account:)
+  def cache(environment)
+    key = Environment.cache_key(environment, account:)
 
     Rails.cache.fetch(key, skip_nil: true, expires_in: ENVIRONMENT_SCOPE_CACHE_TTL) do
       yield
