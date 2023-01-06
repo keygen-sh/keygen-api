@@ -391,7 +391,7 @@ class ApplicationController < ActionController::API
          Keygen::Error::InvalidAccountIdError
     render_not_found
   rescue Keygen::Error::InvalidEnvironmentError => e
-    render_bad_request detail: e.message, code: 'ENVIRONMENT_INVALID', source: { header: 'Keygen-Environment' }
+    render_bad_request detail: e.message, source: { header: 'Keygen-Environment' }
   rescue ActiveModel::RangeError
     render_bad_request detail: "integer is too large"
   rescue ActiveRecord::StatementInvalid => e
