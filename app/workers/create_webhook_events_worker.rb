@@ -4,12 +4,12 @@ class CreateWebhookEventsWorker < BaseWorker
   sidekiq_options queue: :webhooks,
                   lock: :until_executed
 
-  def perform(event, account_id, data)
+  def perform(event, account_id, data, environment_id = nil)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
       Account.find account_id
     end
 
-    account.webhook_endpoints.find_each do |endpoint|
+    account.webhook_endpoints.for_environment(environment_id).find_each do |endpoint|
       next unless endpoint.subscribed? event
 
       event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
@@ -22,6 +22,7 @@ class CreateWebhookEventsWorker < BaseWorker
         endpoint: endpoint.url,
         event_type: event_type,
         status: 'DELIVERING',
+        environment_id:,
       )
 
       # Serialize the event and decode so we can use in webhook job

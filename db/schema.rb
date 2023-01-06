@@ -107,7 +107,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_event_logs_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_event_logs_on_environment_id"
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
     t.index ["request_log_id"], name: "index_event_logs_on_request_log_id"
@@ -599,8 +601,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "resource_type"
     t.uuid "resource_id"
     t.date "created_date", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["account_id", "created_date"], name: "index_request_logs_on_account_id_and_created_date", order: { created_date: :desc }
+    t.index ["environment_id"], name: "index_request_logs_on_environment_id"
     t.index ["method"], name: "request_logs_method_idx"
     t.index ["status"], name: "request_logs_status_idx"
   end
@@ -709,8 +713,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.jsonb "subscriptions", default: ["*"]
     t.string "signature_algorithm", default: "ed25519"
     t.string "api_version"
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_webhook_endpoints_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_endpoints_on_id_and_created_at_and_account_id", unique: true
   end
 
@@ -727,7 +733,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "event_type_id", null: false
     t.string "status"
     t.string "api_version"
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_webhook_events_on_environment_id"
     t.index ["event_type_id"], name: "index_webhook_events_on_event_type_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
