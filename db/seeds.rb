@@ -35,6 +35,11 @@ permissions = %w[
   entitlement.read
   entitlement.update
 
+  environment.read
+  environment.create
+  environment.update
+  environment.delete
+
   event-log.read
 
   group.create
@@ -173,6 +178,10 @@ events = %w[
   entitlement.created
   entitlement.deleted
   entitlement.updated
+
+  environment.created
+  environment.updated
+  environment.deleted
 
   group.created
   group.deleted
