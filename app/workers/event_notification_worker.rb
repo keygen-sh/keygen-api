@@ -33,3 +33,6 @@ class EventNotificationWorker < BaseWorker
     end
   end
 end
+
+# FIXME(ezekg) Remove EventNotificationWorker once old jobs are processed
+EventNotificationWorker2 = EventNotificationWorker
