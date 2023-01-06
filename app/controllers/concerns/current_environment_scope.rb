@@ -21,16 +21,21 @@ module CurrentEnvironmentScope
     def provided_environment? = request.headers.key?(ENVIRONMENT_HEADER_KEY)
 
     def set_current_environment
+      return if
+        current_account.nil?
+
       run_callbacks :current_environment_scope do
         next unless
           provided_environment?
 
-        Current.environment ||= ResolveEnvironmentService.call(
-          environment: request.headers[ENVIRONMENT_HEADER_KEY],
-          account: Current.account,
+        environment = (
+          Current.environment ||= ResolveEnvironmentService.call(
+            environment: request.headers[ENVIRONMENT_HEADER_KEY],
+            account: current_account,
+          )
         )
 
-        @current_environment = Current.environment
+        @current_environment = environment
       end
     end
 
@@ -44,7 +49,7 @@ module CurrentEnvironmentScope
 
   class_methods do
     def supports_environment
-      before_action :set_current_environment
+      after_current_account :set_current_environment
 
       environmental_controllers << self
     end
