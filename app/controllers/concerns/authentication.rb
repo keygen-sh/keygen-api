@@ -105,9 +105,9 @@ module Authentication
     @current_http_scheme = :token
     @current_http_token  = http_token
     @current_token       = TokenLookupService.call(
+      environment: current_environment,
       account: current_account,
       token: http_token,
-      environment:,
     )
 
     # If a token was provided but was not found, fail early.
@@ -153,9 +153,9 @@ module Authentication
     @current_token       = nil
 
     current_license = LicenseKeyLookupService.call(
+      environment: current_environment,
       account: current_account,
       key: license_key,
-      environment:,
     )
 
     # Fail early if license key was provided but not found
@@ -230,9 +230,4 @@ module Authentication
 
     auth_scheme.downcase
   end
-
-  # NOTE(ezekg) Bearers with a nil environment can authenticate in all
-  #             environments, but bearers with a specific environments
-  #             can only authenticate in their own environment.
-  def environment = [nil, Current.environment]
 end

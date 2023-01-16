@@ -14,6 +14,8 @@ class Environment < ApplicationRecord
     dependent: :destroy,
     as: :bearer
 
+  before_create -> { self.isolation_strategy ||= 'ISOLATED' }
+
   after_commit :clear_cache!,
     on: %i[
       destroy
@@ -37,4 +39,11 @@ class Environment < ApplicationRecord
 
   def cache_key    = Environment.cache_key(id, account:)
   def clear_cache! = Environment.clear_cache!(id, code, account:)
+
+  def isolated? = isolation_strategy == 'ISOLATED'
+  def shared?   = isolation_strategy == 'SHARED'
+
+  ##
+  # codes returns the codes of the environments.
+  def self.codes = reorder(code: :asc).pluck(:code)
 end

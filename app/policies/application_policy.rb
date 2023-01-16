@@ -77,7 +77,7 @@ class ApplicationPolicy
     return if
       account.nil?
 
-    deny! "#{whatami} account does not match account context" if
+    deny! "#{whatami} account does not match current account" if
       bearer.present? && bearer.account_id != account.id
 
     authorization_context.except(:account, :bearer, :token)
@@ -91,15 +91,30 @@ class ApplicationPolicy
 
     case record
     in [{ account_id: _ }, *] => r if r.any? { _1.account_id != account.id }
-      deny! "a record's account does not match account context"
+      deny! "a record's account does not match current account"
     in { account_id: } if account_id != account.id
-      deny! 'record account does not match account context'
+      deny! 'record account does not match current account'
     else
     end
   end
 
   def verify_authenticated!
     deny! 'authentication is required' if unauthenticated?
+  end
+
+  def verify_environment!
+    return if
+      environment.nil?
+
+    case record
+    in [{ environment_id: _ }, *] => r unless r.all? { _1.environment_id.nil? && environment.shared? ||
+                                                       _1.environment_id == environment.id }
+      deny! "a record's environment does not match current environment"
+    in { environment_id: } unless environment_id.nil? && environment.shared? ||
+                                  environment_id == environment.id
+      deny! 'record environment does not match current environment'
+    else
+    end
   end
 
   def verify_permissions!(*actions)

@@ -61,6 +61,7 @@ module DefaultHeaders
     add_cache_control_headers
     add_signature_headers
     add_whoami_headers
+    add_environment_header
     add_version_header
     add_powered_by_header
   end
@@ -100,14 +101,15 @@ module DefaultHeaders
   end
 
   def add_whoami_headers
-    response.headers['Keygen-Account-Id'] = current_account&.id if
-      current_account&.id.present?
-    response.headers['Keygen-Bearer-Id'] = current_bearer&.id if
-      current_bearer&.id.present?
-    response.headers['Keygen-Token-Id'] = current_token&.id if
-      current_token&.id.present?
+    response.headers['Keygen-Account-Id'] = current_account&.id
+    response.headers['Keygen-Bearer-Id'] = current_bearer&.id
+    response.headers['Keygen-Token-Id'] = current_token&.id
   rescue => e
     Keygen.logger.exception e
+  end
+
+  def add_environment_header
+    response.headers['Keygen-Environment'] = current_environment&.code
   end
 
   def add_version_header
