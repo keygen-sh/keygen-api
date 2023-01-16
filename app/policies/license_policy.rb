@@ -5,6 +5,7 @@ class LicensePolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('license.read')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -20,6 +21,7 @@ class LicensePolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('license.read')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -37,6 +39,7 @@ class LicensePolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('license.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -52,6 +55,7 @@ class LicensePolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('license.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -65,6 +69,7 @@ class LicensePolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('license.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -80,6 +85,7 @@ class LicensePolicy < ApplicationPolicy
 
   def check_out?
     verify_permissions!('license.check-out')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -97,6 +103,7 @@ class LicensePolicy < ApplicationPolicy
 
   def check_in?
     verify_permissions!('license.check-in')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -114,6 +121,7 @@ class LicensePolicy < ApplicationPolicy
 
   def validate?
     verify_permissions!('license.validate')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -141,6 +149,7 @@ class LicensePolicy < ApplicationPolicy
 
   def revoke?
     verify_permissions!('license.revoke')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -156,6 +165,7 @@ class LicensePolicy < ApplicationPolicy
 
   def renew?
     verify_permissions!('license.renew')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -171,6 +181,7 @@ class LicensePolicy < ApplicationPolicy
 
   def suspend?
     verify_permissions!('license.suspend')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -184,6 +195,7 @@ class LicensePolicy < ApplicationPolicy
 
   def reinstate?
     verify_permissions!('license.reinstate')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -197,6 +209,7 @@ class LicensePolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('license.read')
+    verify_environment!
 
     case bearer
     in role: { name: 'license' } if record == bearer
