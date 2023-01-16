@@ -5,7 +5,9 @@ class LicensePolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('license.read')
-    verify_environment!
+    verify_environment!(
+      allow_nil_environment: true,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -21,7 +23,9 @@ class LicensePolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('license.read')
-    verify_environment!
+    verify_environment!(
+      allow_nil_environment: true,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -69,7 +73,6 @@ class LicensePolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('license.delete')
-    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -121,7 +124,9 @@ class LicensePolicy < ApplicationPolicy
 
   def validate?
     verify_permissions!('license.validate')
-    verify_environment!
+    verify_environment!(
+      allow_nil_environment: true,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

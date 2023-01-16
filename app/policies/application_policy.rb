@@ -102,15 +102,15 @@ class ApplicationPolicy
     deny! 'authentication is required' if unauthenticated?
   end
 
-  def verify_environment!
+  def verify_environment!(allow_nil_environment: false)
     return if
       environment.nil?
 
     case record
-    in [{ environment_id: _ }, *] => r unless r.all? { _1.environment_id.nil? && environment.shared? ||
+    in [{ environment_id: _ }, *] => r unless r.all? { allow_nil_environment && environment.shared? && _1.environment_id.nil? ||
                                                        _1.environment_id == environment.id }
       deny! "a record's environment does not match current environment"
-    in { environment_id: } unless environment_id.nil? && environment.shared? ||
+    in { environment_id: } unless allow_nil_environment && environment.shared? && environment_id.nil? ||
                                   environment_id == environment.id
       deny! 'record environment does not match current environment'
     else
