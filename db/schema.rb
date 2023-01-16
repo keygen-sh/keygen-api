@@ -90,6 +90,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "code", null: false
+    t.string "isolation_strategy", null: false
     t.index ["account_id", "code"], name: "index_environments_on_account_id_and_code", unique: true
     t.index ["account_id", "created_at"], name: "index_environments_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["code"], name: "index_environments_on_code"

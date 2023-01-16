@@ -12,7 +12,7 @@ class LicenseKeyLookupService < BaseService
 
   def call
     licenses = if environment.present?
-                 account.licenses.for_environments(*environment)
+                 account.licenses.for_environment(environment)
                else
                  account.licenses
                end
