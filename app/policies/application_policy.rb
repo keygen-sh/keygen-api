@@ -110,28 +110,29 @@ class ApplicationPolicy
   ##
   # verify_environment verifies the current environment matches for all records.
   #
-  # When :isolate is false, the current environment is shared with the global (nil)
+  # When :strict is false, the current environment is shared with the global (nil)
   # environment, and records from the nil environment are allowed to bleed into
-  # the current environment-scoped records, given the current environment is
-  # a shared environment. Generally, this is only used for reads.
-  def verify_environment!(isolate: true)
+  # the current environment-scoped records, given the current environment is a
+  # shared environment. Generally, this is only used for reads (plus e.g.
+  # validations and downloads).
+  def verify_environment!(strict: true)
     deny! "#{whatami} environment does not match current environment" if
-      bearer.present? && bearer.environment_id? &&
-      bearer.environment_id != environment&.id
+      bearer.present? && bearer.environment_id? && bearer.environment_id != environment&.id
 
     deny! "token environment does not match current environment" if
-      token.present? && token.environment_id? &&
-      token.environment_id != environment&.id
+      token.present? && token.environment_id? && token.environment_id != environment&.id
 
-    # If we're in the nil environment, we can access everything.
+    # When we're in the nil environment, we can access everything.
     return if
       environment.nil?
 
+    # Otherwise, we'll want to check either 1) that we're in a shared environment
+    # and :strict is not enabled, or 2) that the environments match.
     case record
-    in [{ environment_id: _ }, *] => r unless r.all? { !isolate && environment.shared? && _1.environment_id.nil? ||
-                                                       _1.environment_id == environment.id }
+    in [{ environment_id: _ }, *] => r unless r.all? { !strict && environment.shared? && _1.environment_id.nil? ||
+                                                        _1.environment_id == environment.id }
       deny! "a record's environment does not match current environment"
-    in { environment_id: } unless !isolate && environment.shared? && environment_id.nil? ||
+    in { environment_id: } unless !strict && environment.shared? && environment_id.nil? ||
                                   environment_id == environment.id
       deny! 'record environment does not match current environment'
     else
