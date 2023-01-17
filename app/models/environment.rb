@@ -6,6 +6,11 @@ class Environment < ApplicationRecord
   include Roleable
   include Diffable
 
+  ISOLATION_STRATEGIES = %w[
+    ISOLATED
+    SHARED
+  ]
+
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
@@ -32,6 +37,10 @@ class Environment < ApplicationRecord
   validates :name,
     length: { minimum: 1, maximum: 255 },
     allow_blank: false,
+    presence: true
+
+  validates :isolation_strategy,
+    inclusion: { in: ISOLATION_STRATEGIES, message: 'unsupported isolation strategy' },
     presence: true
 
   def self.cache_key(key, account:)      = [:envs, account.id, key, CACHE_KEY_VERSION].join(':')
