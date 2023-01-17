@@ -11,12 +11,6 @@ class LicenseKeyLookupService < BaseService
   end
 
   def call
-    licenses = if environment.present?
-                 account.licenses.for_environment(environment)
-               else
-                 account.licenses
-               end
-
     # FIXME(ezekg) So wrong... but it's my own damn vault! Hashing != encryption.
     if legacy_encrypted
       matches = ENCRYPTED_KEY_RE.match(key)
@@ -43,4 +37,6 @@ class LicenseKeyLookupService < BaseService
 
   # FIXME(ezekg) Remove this after usage drops off (LUL)
   attr_reader :legacy_encrypted
+
+  def licenses = account.licenses.for_environment(environment)
 end
