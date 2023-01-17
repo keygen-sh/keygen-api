@@ -13,8 +13,10 @@ module Environmental
         where(environment:)
       in isolation_strategy: 'SHARED'
         where(environment: [nil, environment])
+      in nil
+        where(environment: nil)
       else
-        self
+        none
       end
     }
   end

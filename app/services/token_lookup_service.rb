@@ -15,13 +15,6 @@ class TokenLookupService < BaseService
     return nil unless
       account.present? && token.present?
 
-    version = token[-2..-1]&.downcase
-    tokens  = if environment.present?
-                account.tokens.for_environment(environment)
-              else
-                account.tokens
-              end
-
     case version
     when 'v1'
       matches = TOKEN_LEGACY_RE.match(token)
@@ -54,4 +47,7 @@ class TokenLookupService < BaseService
   attr_reader :environment,
               :account,
               :token
+
+  def tokens  = account.tokens.for_environment(environment)
+  def version = token[-2..-1]&.downcase
 end
