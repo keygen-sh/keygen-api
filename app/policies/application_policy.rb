@@ -8,7 +8,7 @@ class ApplicationPolicy
   include ActionPolicy::Policy::Cache
   include ActionPolicy::Policy::Reasons
 
-  pre_check :verify_account_scoped!
+  pre_check :verify_account!
   pre_check :verify_authenticated!
 
   authorize :account
@@ -73,19 +73,24 @@ class ApplicationPolicy
     policy
   end
 
-  def verify_account_scoped!
+  ##
+  # verify_account verifies the current account matches for all records.
+  def verify_account!
     return if
       account.nil?
 
     deny! "#{whatami} account does not match current account" if
       bearer.present? && bearer.account_id != account.id
 
+    deny! "token account does not match current account" if
+      token.present? && token.account_id != account.id
+
     authorization_context.except(:account, :bearer, :token)
                          .each do |context, model|
       next unless
         model.respond_to?(:account_id)
 
-      deny! "#{whatami} account does not match #{context.to_s.humanize.downcase} context" if
+      deny! "#{whatami} account does not match current #{context.to_s.humanize.downcase} account" if
         bearer.present? && bearer.account_id != model.account_id
     end
 
@@ -102,15 +107,31 @@ class ApplicationPolicy
     deny! 'authentication is required' if unauthenticated?
   end
 
-  def verify_environment!(allow_nil_environment: false)
+  ##
+  # verify_environment verifies the current environment matches for all records.
+  #
+  # When :isolate is false, the current environment is shared with the global (nil)
+  # environment, and records from the nil environment are allowed to bleed into
+  # the current environment-scoped records, given the current environment is
+  # a shared environment. Generally, this is only used for reads.
+  def verify_environment!(isolate: true)
+    deny! "#{whatami} environment does not match current environment" if
+      bearer.present? && bearer.environment_id? &&
+      bearer.environment_id != environment&.id
+
+    deny! "token environment does not match current environment" if
+      token.present? && token.environment_id? &&
+      token.environment_id != environment&.id
+
+    # If we're in the nil environment, we can access everything.
     return if
       environment.nil?
 
     case record
-    in [{ environment_id: _ }, *] => r unless r.all? { allow_nil_environment && environment.shared? && _1.environment_id.nil? ||
+    in [{ environment_id: _ }, *] => r unless r.all? { !isolate && environment.shared? && _1.environment_id.nil? ||
                                                        _1.environment_id == environment.id }
       deny! "a record's environment does not match current environment"
-    in { environment_id: } unless allow_nil_environment && environment.shared? && environment_id.nil? ||
+    in { environment_id: } unless !isolate && environment.shared? && environment_id.nil? ||
                                   environment_id == environment.id
       deny! 'record environment does not match current environment'
     else

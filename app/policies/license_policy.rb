@@ -6,7 +6,7 @@ class LicensePolicy < ApplicationPolicy
   def index?
     verify_permissions!('license.read')
     verify_environment!(
-      allow_nil_environment: true,
+      isolate: false,
     )
 
     case bearer
@@ -24,7 +24,7 @@ class LicensePolicy < ApplicationPolicy
   def show?
     verify_permissions!('license.read')
     verify_environment!(
-      allow_nil_environment: true,
+      isolate: false,
     )
 
     case bearer
@@ -126,7 +126,7 @@ class LicensePolicy < ApplicationPolicy
   def validate?
     verify_permissions!('license.validate')
     verify_environment!(
-      allow_nil_environment: true,
+      isolate: false,
     )
 
     case bearer
