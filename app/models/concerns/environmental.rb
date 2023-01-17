@@ -8,13 +8,13 @@ module Environmental
       optional: true
 
     scope :for_environment, -> environment {
-      case environment
-      in isolation_strategy: 'ISOLATED'
-        where(environment:)
-      in isolation_strategy: 'SHARED'
-        where(environment: [nil, environment])
-      in nil
+      case
+      when environment.nil?
         where(environment: nil)
+      when environment.isolated?
+        where(environment:)
+      when environment.shared?
+        where(environment: [nil, environment])
       else
         none
       end
