@@ -73,6 +73,7 @@ class LicensePolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('license.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
