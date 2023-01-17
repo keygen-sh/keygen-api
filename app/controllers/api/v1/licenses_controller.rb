@@ -67,8 +67,8 @@ module Api::V1
           end
         end
         param :relationships, type: :hash do
-          param :environment, type: :hash do
-            param :data, type: :hash do
+          param :environment, type: :hash, optional: true do
+            param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[environment environments] }
               param :id, type: :string
             end
