@@ -52,7 +52,7 @@ module Api::V1::Licenses::Relationships
     def create
       authorize! with: Licenses::TokenPolicy
 
-      kwargs = token_params.to_h.symbolize_keys.slice(
+      kwargs = token_params.slice(
         :max_activations,
         :max_deactivations,
         :permissions,

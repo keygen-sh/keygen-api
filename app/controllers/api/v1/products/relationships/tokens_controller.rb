@@ -50,7 +50,7 @@ module Api::V1::Products::Relationships
     def create
       authorize! with: Products::TokenPolicy
 
-      kwargs = token_params.to_h.symbolize_keys.slice(
+      kwargs = token_params.slice(
         :permissions,
         :expiry,
         :name,
