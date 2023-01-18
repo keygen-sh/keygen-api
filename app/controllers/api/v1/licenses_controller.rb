@@ -5,7 +5,7 @@ module Api::V1
     supports_environment
 
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
-    has_scope(:environment) { |c, s, v| s.for_environment(v, strict: true) }
+    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.precence, strict: true) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
