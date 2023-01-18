@@ -7,6 +7,10 @@ module Environmental
     belongs_to :environment,
       optional: true
 
+    before_create -> {
+      self.environment ||= Current.environment
+    }
+
     ##
     # for_environment scopes the current resource to an environment.
     #
