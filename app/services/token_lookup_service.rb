@@ -48,6 +48,6 @@ class TokenLookupService < BaseService
               :account,
               :token
 
-  def tokens  = account.tokens.for_environment(environment)
+  def tokens  = account.tokens.for_environment(environment, strict: true)
   def version = token[-2..-1]&.downcase
 end
