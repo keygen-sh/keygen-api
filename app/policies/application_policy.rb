@@ -145,17 +145,30 @@ class ApplicationPolicy
         end
       )
 
-    # When we're in the global environment, we can access everything.
-    return if
-      environment.nil?
-
-    # Otherwise, for each record, we'll want to assert that we're in shared environment
-    # and :strict is not enabled when the environment is nil, otherwise, we'll assert
-    # that the record's environment matches the current environment.
+    # ^^^ ditto for records, except when we're within the global environment,
+    # we're allowd to read records from any environment.
+    #
+    # FIXME(ezekg) Formatting
     case record
-    in [{ environment_id: _ }, *] => r unless r.all? { _1.environment_id == environment.id || !strict && environment.shared? && _1.environment_id == nil }
+    in [{ environment_id: _ }, *] => records unless records.all? { |record|
+      case
+      when environment.nil?
+        true
+      when environment.isolated?
+        record.environment_id == environment.id
+      when environment.shared?
+        record.environment_id == environment.id || record.environment_id == nil
+      end
+    }
       deny! "a record's environment does not match current environment"
-    in { environment_id: } unless environment_id == environment.id || !strict && environment.shared? && _1.environment_id == nil
+    in { environment_id: } unless case
+                                  when environment.nil?
+                                    true
+                                  when environment.isolated?
+                                    environment_id == environment.id
+                                  when environment.shared?
+                                    environment_id == environment.id || environment_id == nil
+                                  end
       deny! 'record environment does not match current environment'
     else
     end
