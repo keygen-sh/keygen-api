@@ -38,5 +38,8 @@ class LicenseKeyLookupService < BaseService
   # FIXME(ezekg) Remove this after usage drops off (LUL)
   attr_reader :legacy_encrypted
 
-  def licenses = account.licenses.for_environment(environment, strict: true)
+  # NOTE(ezekg) When we're in the global (nil) environment, we want to enable strict mode
+  #             so that we can't authenticate with a license from another environment,
+  #             even if we have access to that environment's licenses.
+  def licenses = account.licenses.for_environment(environment, strict: environment.nil?)
 end
