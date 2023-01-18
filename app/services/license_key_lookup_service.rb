@@ -38,5 +38,5 @@ class LicenseKeyLookupService < BaseService
   # FIXME(ezekg) Remove this after usage drops off (LUL)
   attr_reader :legacy_encrypted
 
-  def licenses = account.licenses.for_environment(environment)
+  def licenses = account.licenses.for_environment(environment, strict: true)
 end
