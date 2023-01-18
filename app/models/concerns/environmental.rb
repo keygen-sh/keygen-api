@@ -22,19 +22,11 @@ module Environmental
     scope :for_environment, -> environment, strict: false {
       case
       when environment.nil?
-        if strict
-          where(environment: nil)
-        else
-          self
-        end
+        strict ? where(environment: nil) : self
       when environment.isolated?
         where(environment:)
       when environment.shared?
-        if strict
-          where(environment:)
-        else
-          where(environment: [nil, environment])
-        end
+        strict ? where(environment:) : where(environment: [nil, environment])
       else
         none
       end
