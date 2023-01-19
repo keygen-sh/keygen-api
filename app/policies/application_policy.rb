@@ -82,7 +82,7 @@ class ApplicationPolicy
     deny! "#{whatami} account does not match current account" if
       bearer.present? && bearer.account_id != account.id
 
-    deny! "token account does not match current account" if
+    deny! 'token account does not match current account' if
       token.present? && token.account_id != account.id
 
     authorization_context.except(:account, :bearer, :token)
