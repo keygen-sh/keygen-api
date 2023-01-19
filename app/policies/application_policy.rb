@@ -157,7 +157,7 @@ class ApplicationPolicy
       when environment.isolated?
         record.environment_id == environment.id
       when environment.shared?
-        record.environment_id == environment.id || record.environment_id == nil
+        record.environment_id == environment.id || !strict && record.environment_id == nil
       end
     }
       deny! "a record's environment does not match current environment"
@@ -167,7 +167,7 @@ class ApplicationPolicy
                                   when environment.isolated?
                                     environment_id == environment.id
                                   when environment.shared?
-                                    environment_id == environment.id || environment_id == nil
+                                    environment_id == environment.id || !strict && environment_id == nil
                                   end
       deny! 'record environment does not match current environment'
     else
