@@ -7,7 +7,7 @@ module Environmental
     belongs_to :environment,
       optional: true
 
-    before_create -> {
+    after_initialize -> {
       self.environment ||= Current.environment
     }
 
