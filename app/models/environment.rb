@@ -15,9 +15,25 @@ class Environment < ApplicationRecord
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
   belongs_to :account
-  has_many :tokens,
-    dependent: :destroy,
-    as: :bearer
+
+  # TODO(ezekg) Should deleting queue up a cancelable background job?
+  has_many :tokens,             dependent: :destroy_async, as: :bearer
+  has_many :webhooks_endpoints, dependent: :destroy_async
+  has_many :webhooks_event,     dependent: :destroy_async
+  has_many :entitlements,       dependent: :destroy_async
+  has_many :groups,             dependent: :destroy_async
+  has_many :products,           dependent: :destroy_async
+  has_many :policies,           dependent: :destroy_async
+  has_many :licenses,           dependent: :destroy_async
+  has_many :machines,           dependent: :destroy_async
+  has_many :machine_processes,  dependent: :destroy_async
+  has_many :users,              dependent: :destroy_async
+  has_many :releases,           dependent: :destroy_async
+  has_many :release_artifacts,  dependent: :destroy_async
+  has_many :release_filetypes,  dependent: :destroy_async
+  has_many :release_channels,   dependent: :destroy_async
+  has_many :release_platforms,  dependent: :destroy_async
+  has_many :release_arches,     dependent: :destroy_async
 
   before_create -> { self.isolation_strategy ||= 'ISOLATED' }
 
