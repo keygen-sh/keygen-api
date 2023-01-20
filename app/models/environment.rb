@@ -15,9 +15,20 @@ class Environment < ApplicationRecord
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
   belongs_to :account
+  has_many :tokens,
+    dependent: :destroy,
+    class_name: Token.name,
+    inverse_of: :bearer,
+    as: :bearer
+
+  ##
+  # _tokens association is only for cascading deletes.
+  has_many :_tokens,
+    dependent: :destroy_async,
+    inverse_of: :environment,
+    class_name: Token.name
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :tokens,             dependent: :destroy_async, as: :bearer
   has_many :webhooks_endpoints, dependent: :destroy_async
   has_many :webhooks_event,     dependent: :destroy_async
   has_many :entitlements,       dependent: :destroy_async
