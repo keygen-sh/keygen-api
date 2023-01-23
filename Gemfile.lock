@@ -224,8 +224,8 @@ GEM
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    httparty (0.20.0)
-      mime-types (~> 3.0)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
@@ -482,7 +482,7 @@ DEPENDENCIES
   faker (~> 2.20.0)
   haml-rails
   has_scope
-  httparty
+  httparty (~> 0.21.0)
   json (~> 2.3.0)
   jsonapi-rails (= 0.4.0)
   jwt
