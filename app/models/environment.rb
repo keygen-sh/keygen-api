@@ -16,35 +16,35 @@ class Environment < ApplicationRecord
 
   belongs_to :account
   has_many :tokens,
-    dependent: :destroy,
     class_name: Token.name,
     inverse_of: :bearer,
+    dependent: :destroy,
     as: :bearer
 
   ##
   # _tokens association is only for cascading deletes.
   has_many :_tokens,
-    dependent: :destroy_async,
+    class_name: Token.name,
     inverse_of: :environment,
-    class_name: Token.name
+    dependent: :nullify
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :webhooks_endpoints, dependent: :destroy_async
-  has_many :webhooks_event,     dependent: :destroy_async
-  has_many :entitlements,       dependent: :destroy_async
-  has_many :groups,             dependent: :destroy_async
-  has_many :products,           dependent: :destroy_async
-  has_many :policies,           dependent: :destroy_async
-  has_many :licenses,           dependent: :destroy_async
-  has_many :machines,           dependent: :destroy_async
-  has_many :machine_processes,  dependent: :destroy_async
-  has_many :users,              dependent: :destroy_async
-  has_many :releases,           dependent: :destroy_async
-  has_many :release_artifacts,  dependent: :destroy_async
-  has_many :release_filetypes,  dependent: :destroy_async
-  has_many :release_channels,   dependent: :destroy_async
-  has_many :release_platforms,  dependent: :destroy_async
-  has_many :release_arches,     dependent: :destroy_async
+  has_many :webhooks_endpoints, dependent: :nullify
+  has_many :webhooks_event,     dependent: :nullify
+  has_many :entitlements,       dependent: :nullify
+  has_many :groups,             dependent: :nullify
+  has_many :products,           dependent: :nullify
+  has_many :policies,           dependent: :nullify
+  has_many :licenses,           dependent: :nullify
+  has_many :machines,           dependent: :nullify
+  has_many :machine_processes,  dependent: :nullify
+  has_many :users,              dependent: :nullify
+  has_many :releases,           dependent: :nullify
+  has_many :release_artifacts,  dependent: :nullify
+  has_many :release_filetypes,  dependent: :nullify
+  has_many :release_channels,   dependent: :nullify
+  has_many :release_platforms,  dependent: :nullify
+  has_many :release_arches,     dependent: :nullify
 
   before_create -> { self.isolation_strategy ||= 'ISOLATED' }
 
