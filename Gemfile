@@ -63,7 +63,7 @@ gem 'sidekiq-throttled'
 gem 'sidekiq-cronitor', '~> 2.0'
 
 # HTTP requests
-gem 'httparty'
+gem 'httparty', '~> 0.21.0'
 
 # State machine
 gem 'aasm', '~> 5.0.3'
