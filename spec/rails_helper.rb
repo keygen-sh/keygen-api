@@ -41,10 +41,10 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
   config.include AuthorizationHelper, type: :policy
-  config.include EnvironmentHelper
   config.include ApplicationHelper
   config.include FileHelper
   config.include TimeHelper
+  config.include EnvHelper
   config.include KeygenHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
