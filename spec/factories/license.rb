@@ -151,5 +151,23 @@ FactoryBot.define do
         license.update(group: build(:group, account: license.account))
       end
     end
+
+    trait :in_isolated_environment do
+      after :create do |license|
+        license.update(environment: build(:environment, :isolated, account: license.account))
+      end
+    end
+
+    trait :in_shared_environment do
+      after :create do |license|
+        license.update(environment: build(:environment, :shared, account: license.account))
+      end
+    end
+
+    trait :in_nil_environment do
+      after :create do |license|
+        license.update(environment: nil)
+      end
+    end
   end
 end
