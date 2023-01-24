@@ -7,9 +7,8 @@ module Environmental
     belongs_to :environment,
       optional: true
 
-    after_initialize -> {
-      self.environment ||= Current.environment
-    }
+    after_initialize -> { self.environment ||= Current.environment },
+      if: -> { has_attribute?(:environment_id) }
 
     ##
     # for_environment scopes the current resource to an environment.
