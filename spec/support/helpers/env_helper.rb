@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EnvironmentHelper
+module EnvHelper
   module Methods
     def with_prestine_env(&)
       prev_env = ENV.to_hash
