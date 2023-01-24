@@ -34,5 +34,23 @@ FactoryBot.define do
         product.distribution_strategy = 'CLOSED'
       end
     end
+
+    trait :in_isolated_environment do
+      after :create do |product|
+        product.update(environment: build(:environment, :isolated, account: product.account))
+      end
+    end
+
+    trait :in_shared_environment do
+      after :create do |product|
+        product.update(environment: build(:environment, :shared, account: product.account))
+      end
+    end
+
+    trait :in_nil_environment do
+      after :create do |product|
+        product.update(environment: nil)
+      end
+    end
   end
 end
