@@ -26,16 +26,18 @@ class GroupSerializer < BaseSerializer
     end
   end
 
-  relationship :environment do
-    linkage always: true do
-      if @object.environment_id?
-        { type: :environments, id: @object.environment_id }
-      else
-        nil
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
       end
-    end
-    link :related do
-      @url_helpers.v1_account_group_environment_path @object.account_id, @object
+      link :related do
+        @url_helpers.v1_account_group_environment_path @object.account_id, @object
+      end
     end
   end
 

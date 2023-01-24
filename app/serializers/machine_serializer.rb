@@ -42,18 +42,22 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
-  relationship :environment do
-    linkage always: true do
-      if @object.environment_id?
-        { type: :environments, id: @object.environment_id }
-      else
-        nil
+
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
+      end
+      link :related do
+        @url_helpers.v1_account_machine_environment_path @object.account_id, @object
       end
     end
-    link :related do
-      @url_helpers.v1_account_machine_environment_path @object.account_id, @object
-    end
   end
+
   relationship :product do
     linkage always: true do
       { type: :products, id: @object.product&.id }
@@ -62,6 +66,7 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_product_path @object.account_id, @object
     end
   end
+
   relationship :group do
     linkage always: true do
       if @object.group_id?
@@ -74,6 +79,7 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_group_path @object.account_id, @object
     end
   end
+
   relationship :license do
     linkage always: true do
       { type: :licenses, id: @object.license_id }
@@ -82,6 +88,7 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_license_path @object.account_id, @object
     end
   end
+
   relationship :user do
     linkage always: true do
       if @object.license&.user_id.present?
@@ -94,6 +101,7 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_user_path @object.account_id, @object
     end
   end
+
   relationship :processes do
     link :related do
       @url_helpers.v1_account_machine_processes_path @object.account_id, @object

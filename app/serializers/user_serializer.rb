@@ -32,18 +32,22 @@ class UserSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
-  relationship :environment do
-    linkage always: true do
-      if @object.environment_id?
-        { type: :environments, id: @object.environment_id }
-      else
-        nil
+
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
+      end
+      link :related do
+        @url_helpers.v1_account_user_environment_path @object.account_id, @object
       end
     end
-    link :related do
-      @url_helpers.v1_account_user_environment_path @object.account_id, @object
-    end
   end
+
   relationship :group do
     linkage always: true do
       if @object.group_id?
@@ -56,26 +60,31 @@ class UserSerializer < BaseSerializer
       @url_helpers.v1_account_user_group_path @object.account_id, @object
     end
   end
+
   relationship :products do
     link :related do
       @url_helpers.v1_account_user_products_path @object.account_id, @object
     end
   end
+
   relationship :licenses do
     link :related do
       @url_helpers.v1_account_user_licenses_path @object.account_id, @object
     end
   end
+
   relationship :machines do
     link :related do
       @url_helpers.v1_account_user_machines_path @object.account_id, @object
     end
   end
+
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_user_tokens_path @object.account_id, @object
     end
   end
+
   relationship :second_factors do
     link :related do
       @url_helpers.v1_account_user_second_factors_path @object.account_id, @object

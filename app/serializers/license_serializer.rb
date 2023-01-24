@@ -71,18 +71,22 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
-  relationship :environment do
-    linkage always: true do
-      if @object.environment_id?
-        { type: :environments, id: @object.environment_id }
-      else
-        nil
+
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
+      end
+      link :related do
+        @url_helpers.v1_account_license_environment_path @object.account_id, @object
       end
     end
-    link :related do
-      @url_helpers.v1_account_license_environment_path @object.account_id, @object
-    end
   end
+
   relationship :product do
     linkage always: true do
       { type: :products, id: @object.policy&.product_id }
@@ -91,6 +95,7 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_license_product_path @object.account_id, @object
     end
   end
+
   relationship :policy do
     linkage always: true do
       { type: :policies, id: @object.policy_id }
@@ -99,6 +104,7 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_license_policy_path @object.account_id, @object
     end
   end
+
   relationship :group do
     linkage always: true do
       if @object.group_id?
@@ -111,6 +117,7 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_license_group_path @object.account_id, @object
     end
   end
+
   relationship :user do
     linkage always: true do
       if @object.user_id.present?
@@ -123,6 +130,7 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_license_user_path @object.account_id, @object
     end
   end
+
   relationship :machines do
     link :related do
       @url_helpers.v1_account_license_machines_path @object.account_id, @object
@@ -134,6 +142,7 @@ class LicenseSerializer < BaseSerializer
       }
     end
   end
+
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_license_tokens_path @object.account_id, @object
