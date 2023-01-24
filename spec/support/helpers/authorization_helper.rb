@@ -14,16 +14,18 @@ module AuthorizationHelper
     def as_admin(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account, *account_traits) }
-        let(:bearer)  { create(:admin, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
+        let(:bearer)      { create(:admin, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
     def as_product(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account, *account_traits) }
-        let(:bearer)  { create(:product, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
+        let(:bearer)      { create(:product, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -31,6 +33,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account)      { create(:account, *account_traits) }
+        let(:environment)  { nil }
         let(:policy)       { create(:policy, *policy_traits, account:) }
         let(:license_user) { nil }
         let(:expiry)       { nil }
@@ -41,8 +44,9 @@ module AuthorizationHelper
     def as_user(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account, *account_traits) }
-        let(:bearer)  { create(:user, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
+        let(:bearer)      { create(:user, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -54,8 +58,9 @@ module AuthorizationHelper
     end
 
     def as_anonymous(scenarios)
-      let(:account) { create(:account, *account_traits) }
-      let(:bearer)  { nil }
+      let(:account)     { create(:account, *account_traits) }
+      let(:environment) { nil }
+      let(:bearer)      { nil }
     end
 
     ##
@@ -1367,6 +1372,7 @@ module AuthorizationHelper
         let(:token_permissions)  { nil }
         let(:account_traits)     { [] }
         let(:bearer_traits)      { [] }
+        let(:token_traits)       { [] }
         let(:release_traits)     { [] }
         let(:policy_traits)      { [] }
         let(:license_traits)     { [] }
@@ -1384,6 +1390,7 @@ module AuthorizationHelper
 
         let(:account_traits) { [] }
         let(:bearer_traits)  { [] }
+        let(:token_traits)   { [] }
         let(:release_traits) { [] }
         let(:policy_traits)  { [] }
         let(:license_traits) { [] }
@@ -1453,7 +1460,7 @@ module AuthorizationHelper
     # with_token_authentication defines a context using token authentication.
     def with_token_authentication(&)
       context 'with token authentication' do
-        let(:token) { create(:token, account:, bearer:, permissions: token_permissions) }
+        let(:token) { create(:token, *token_traits, account:, bearer:, permissions: token_permissions) }
 
         instance_exec(&)
       end
@@ -1580,6 +1587,35 @@ module AuthorizationHelper
     ##
     # with_bearer_trait defines a trait on the bearer context.
     def with_bearer_trait(trait, &) = with_bearer_traits(*trait, &)
+
+    ##
+    # with_token_traits defines traits on the token context.
+    def with_token_traits(traits, &)
+      context "with token #{traits} traits" do
+        let(:token_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_token_trait defines a trait on the token context.
+    def with_token_trait(trait, &) = with_token_traits(*trait, &)
+
+    ##
+    # with_bearer_and_token_traits defines traits on the bearer and token contexts.
+    def with_bearer_and_token_traits(traits, &)
+      context "with token and bearer #{traits} traits" do
+        let(:bearer_traits) { traits }
+        let(:token_traits)  { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_bearer_and_token_trait defines a trait on the bearer and token contexts.
+    def with_bearer_and_token_trait(trait, &) = with_bearer_and_token_traits(*trait, &)
 
     ##
     # with_release_traits defines traits on the release context.
