@@ -28,58 +28,70 @@ class ProductSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
-  relationship :environment do
-    linkage always: true do
-      if @object.environment_id?
-        { type: :environments, id: @object.environment_id }
-      else
-        nil
+
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
+      end
+      link :related do
+        @url_helpers.v1_account_product_environment_path @object.account_id, @object
       end
     end
-    link :related do
-      @url_helpers.v1_account_product_environment_path @object.account_id, @object
-    end
   end
+
   relationship :policies do
     link :related do
       @url_helpers.v1_account_product_policies_path @object.account_id, @object
     end
   end
+
   relationship :licenses do
     link :related do
       @url_helpers.v1_account_product_licenses_path @object.account_id, @object
     end
   end
+
   relationship :machines do
     link :related do
       @url_helpers.v1_account_product_machines_path @object.account_id, @object
     end
   end
+
   relationship :users do
     link :related do
       @url_helpers.v1_account_product_users_path @object.account_id, @object
     end
   end
+
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_product_tokens_path @object.account_id, @object
     end
   end
+
   relationship :platforms do
     link :related do
       @url_helpers.v1_account_product_platforms_path @object.account_id, @object
     end
   end
+
   relationship :channels do
     link :related do
       @url_helpers.v1_account_product_channels_path @object.account_id, @object
     end
   end
+
   relationship :releases do
     link :related do
       @url_helpers.v1_account_product_releases_path @object.account_id, @object
     end
   end
+
   relationship :artifacts do
     link :related do
       @url_helpers.v1_account_product_artifacts_path @object.account_id, @object
