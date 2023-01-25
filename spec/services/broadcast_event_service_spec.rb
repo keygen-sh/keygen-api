@@ -55,9 +55,6 @@ describe BroadcastEventService do
     allow_any_instance_of(License).to receive(:created_at).and_return Time.current
     allow_any_instance_of(License).to receive(:updated_at).and_return Time.current
 
-    # FIXME(ezekg) Workaround for sidekiq-status for not having good test support
-    allow_any_instance_of(WebhookEvent).to receive(:status).and_return 'working'
-
     # FIXME(ezekg) Mock HTTPParty so we don't actually make any real requests
     allow(WebhookWorker::Request).to receive(:post) {
       OpenStruct.new(code: 204, body: nil)
@@ -141,17 +138,18 @@ describe BroadcastEventService do
   it 'should attempt to deliver the event' do
     allow_any_instance_of(WebhookEvent).to receive(:last_response_code).and_return 200
     allow_any_instance_of(WebhookEvent).to receive(:last_response_body).and_return 'OK'
+    allow_any_instance_of(WebhookEvent).to receive(:status).and_return 'DELIVERED'
     allow(WebhookWorker::Request).to receive(:post) {
       OpenStruct.new(code: 200, body: 'OK')
     }
 
     event = create_webhook_event!(account, resource)
-    body = jsonapi_render(event, account:)
-    url = endpoint.url
+    body  = jsonapi_render(event, account:)
+    url   = endpoint.url
 
     expect(WebhookWorker::Request).to have_received(:post).with(
       url,
-      hash_including(body: body)
+      hash_including(body:),
     )
   end
 
