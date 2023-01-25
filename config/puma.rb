@@ -25,12 +25,6 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }.to_i
 # Specifies connection keep-alive/idle timeout
 persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }.to_i
 
-# https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#lower-latency-better-throughput
-wait_for_less_busy_worker ENV.fetch("RAILS_WAIT_FOR_LESS_BUSY_WORKERS") { 0.005 }.to_f
-
-# https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#better-memory-usage
-nakayoshi_fork
-
 # Ensure our backlog is drained
 drain_on_shutdown
 
