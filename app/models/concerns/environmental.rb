@@ -8,7 +8,8 @@ module Environmental
       optional: true
 
     after_initialize -> { self.environment ||= Current.environment },
-      if: -> { has_attribute?(:environment_id) }
+      if: -> { has_attribute?(:environment_id) },
+      unless: :persisted?
 
     ##
     # for_environment scopes the current resource to an environment.
