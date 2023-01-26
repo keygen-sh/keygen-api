@@ -6,6 +6,49 @@ require 'spec_helper'
 describe License, type: :model do
   let(:account) { create(:account) }
 
+  describe '#environment=' do
+    context 'when the environment is present' do
+      it 'should not raise for new record' do
+        environment = create(:environment, account:)
+
+        expect { create(:license, account:, environment:) }.to_not raise_error
+      end
+
+      it 'should raise for existing record' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
+        expect { license.update!(environment: nil) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should set environment' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect(license.environment).to eq environment
+      end
+    end
+
+    context 'when the environment is nil' do
+      it 'should not raise for new record' do
+        expect { create(:license, account:, environment: nil) }.to_not raise_error
+      end
+
+      it 'should raise for existing record' do
+        license = create(:license, account:, environment: nil)
+
+        expect { license.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should set environment' do
+        license = create(:license, account:, environment: nil)
+
+        expect(license.environment).to be_nil
+      end
+    end
+  end
+
   describe '#role_attributes=' do
     it 'should set role and permissions' do
       license = create(:license, account:)

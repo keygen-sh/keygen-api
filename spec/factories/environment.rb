@@ -6,8 +6,9 @@ FactoryBot.define do
     # to insert duplicate codes would fail, and this prevents that.
     initialize_with { Environment.find_or_initialize_by(code:) }
 
+    isolation_strategy { 'ISOLATED' }
+    code { SecureRandom.hex }
     name { code.humanize }
-    code { 'undefined' }
 
     trait :isolated do
       isolation_strategy { 'ISOLATED' }
