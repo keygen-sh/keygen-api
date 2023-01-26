@@ -13,10 +13,12 @@ module Environmental
       }
 
     # TODO(ezekg) Extract this into a concern or an attr_immutable lib?
-    before_update -> { errors.add(:environment, :not_allowed, message: 'is immutable') and throw :abort },
-      if: -> {
+    validate on: %i[update] do
+      next unless
         environment_id_changed? && environment_id != environment_id_was
-      }
+
+      errors.add(:environment, :not_allowed, message: 'is immutable')
+    end
 
     ##
     # for_environment scopes the current resource to an environment.
