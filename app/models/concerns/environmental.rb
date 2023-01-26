@@ -8,8 +8,14 @@ module Environmental
       optional: true
 
     after_initialize -> { self.environment ||= Current.environment },
-      if: -> { has_attribute?(:environment_id) },
-      unless: :persisted?
+      if: -> {
+        has_attribute?(:environment_id) && new_record?
+      }
+
+    before_update -> { errors.add(:environment, :not_allowed, message: 'is immutable') and throw :abort },
+      if: -> {
+        environment_id_changed? && environment_id != environment_id_was
+      }
 
     ##
     # for_environment scopes the current resource to an environment.
