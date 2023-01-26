@@ -12,6 +12,7 @@ module Environmental
         has_attribute?(:environment_id) && new_record?
       }
 
+    # TODO(ezekg) Extract this into a concern or an attr_immutable lib?
     before_update -> { errors.add(:environment, :not_allowed, message: 'is immutable') and throw :abort },
       if: -> {
         environment_id_changed? && environment_id != environment_id_was
