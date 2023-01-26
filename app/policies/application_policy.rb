@@ -115,61 +115,66 @@ class ApplicationPolicy
   # the current environment-scoped records, given the current environment is a
   # shared environment. Generally, this is only used for reads (plus e.g.
   # validations and downloads).
-  def verify_environment!(strict: true)
+  def verify_environment!(strict: true, &block)
     # For isolated environments, the bearer can only be from the current isolated
     # environment. For shared environments, the bearer can be from the current
     # environment or from the global environment. For the global environment,
     # the bearer must be from the global environment.
-    deny! "#{whatami} environment does not match current environment" unless
+    deny! "#{whatami} environment is not compatible with the current environment" unless
       bearer.nil? || (
         case
         when environment.nil?
-          bearer.environment_id == nil
+          bearer.environment_id.nil?
         when environment.isolated?
           bearer.environment_id == environment.id
         when environment.shared?
-          bearer.environment_id == environment.id || bearer.environment_id == nil
+          bearer.environment_id == environment.id || bearer.environment_id.nil?
         end
       )
 
     # ^^^ ditto for the token.
-    deny! 'token environment does not match current environment' unless
+    deny! 'token environment is not compatible with the current environment' unless
       token.nil? || (
         case
         when environment.nil?
-          token.environment_id == nil
+          token.environment_id.nil?
         when environment.isolated?
           token.environment_id == environment.id
         when environment.shared?
-          token.environment_id == environment.id || token.environment_id == nil
+          token.environment_id == environment.id || token.environment_id.nil?
         end
       )
 
-    # ^^^ ditto for records, except when we're within the global environment,
-    # we're allowd to read records from any environment.
+    # Allow custom assertions, e.g. that the environment of a license's policy is
+    # accessible from the license's environment.
+    yield environment if
+      block_given?
+
+    # Same as bearer/token, except when we're within the global environment,
+    # we're allowed to read records from any environment (i.e. non-strict).
     #
-    # FIXME(ezekg) Formatting
+    # FIXME(ezekg) Formatting?
     case record
     in [{ environment_id: _ }, *] => records unless records.all? { |record|
       case
       when environment.nil?
-        true
+        !strict || record.environment_id.nil?
       when environment.isolated?
         record.environment_id == environment.id
       when environment.shared?
-        record.environment_id == environment.id || !strict && record.environment_id == nil
+        record.environment_id == environment.id || !strict && record.environment_id.nil?
       end
     }
-      deny! "a record's environment does not match current environment"
+      deny! "a record's environment is not compatible with the current environment"
     in { environment_id: } unless case
                                   when environment.nil?
-                                    true
+                                    !strict || record.environment_id.nil?
                                   when environment.isolated?
                                     environment_id == environment.id
                                   when environment.shared?
-                                    environment_id == environment.id || !strict && environment_id == nil
+                                    environment_id == environment.id || !strict && environment_id.nil?
                                   end
-      deny! 'record environment does not match current environment'
+      deny! 'record environment is not compatible with the current environment'
     else
     end
   end

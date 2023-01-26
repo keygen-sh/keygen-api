@@ -43,7 +43,20 @@ class LicensePolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('license.create')
-    verify_environment!
+    verify_environment! do |environment|
+      next if
+        record.policy.nil?
+
+      deny! 'policy environment is not compatible with the license environment' unless
+        case
+        when environment.nil?
+          record.policy.environment.nil?
+        when environment.isolated?
+          record.policy.environment_id == environment.id
+        when environment.shared?
+          record.policy.environment_id == environment.id || record.policy.environment_id.nil?
+        end
+    end
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
