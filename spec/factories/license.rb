@@ -153,19 +153,19 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      after :create do |license|
+      before :create do |license|
         license.update(environment: build(:environment, :isolated, account: license.account))
       end
     end
 
     trait :in_shared_environment do
-      after :create do |license|
+      before :create do |license|
         license.update(environment: build(:environment, :shared, account: license.account))
       end
     end
 
     trait :in_nil_environment do
-      after :create do |license|
+      before :create do |license|
         license.update(environment: nil)
       end
     end

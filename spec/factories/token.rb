@@ -22,19 +22,19 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      after :create do |token|
+      before :create do |token|
         token.update(environment: build(:environment, :isolated, account: token.account))
       end
     end
 
     trait :in_shared_environment do
-      after :create do |token|
+      before :create do |token|
         token.update(environment: build(:environment, :shared, account: token.account))
       end
     end
 
     trait :in_nil_environment do
-      after :create do |token|
+      before :create do |token|
         token.update(environment: nil)
       end
     end
