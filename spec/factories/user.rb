@@ -84,19 +84,19 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      after :create do |user|
+      before :create do |user|
         user.update(environment: build(:environment, :isolated, account: user.account))
       end
     end
 
     trait :in_shared_environment do
-      after :create do |user|
+      before :create do |user|
         user.update(environment: build(:environment, :shared, account: user.account))
       end
     end
 
     trait :in_nil_environment do
-      after :create do |user|
+      before :create do |user|
         user.update(environment: nil)
       end
     end
