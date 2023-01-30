@@ -7,9 +7,17 @@ module Environmental
     belongs_to :environment,
       optional: true
 
-    after_initialize -> { self.environment ||= Current.environment },
+    after_initialize -> { self.environment_id ||= Current.environment&.id },
       if: -> {
         has_attribute?(:environment_id) && new_record?
+      }
+
+    # Validate the association only if we've been given an environment (because it's optional)
+    validates :environment,
+      presence: { message: 'must exist' },
+      scope: { by: :account_id },
+      unless: -> {
+        environment_id_before_type_cast.nil?
       }
 
     # TODO(ezekg) Extract this into a concern or an attr_immutable lib?

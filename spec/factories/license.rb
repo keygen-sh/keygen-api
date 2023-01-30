@@ -7,20 +7,20 @@ FactoryBot.define do
     user { nil }
 
     after :build do |license, evaluator|
-      account = evaluator.account.presence
-      policy  = evaluator.policy.presence || build(:policy, account: account)
-      user    =
-        case
-        when evaluator.user.present?
-          evaluator.user
-        else
-          nil
-        end
+      account     = evaluator.account.presence
+      environment = evaluator.environment.presence
+      policy      = evaluator.policy.presence || build(:policy, account:, environment:)
+      user        = case
+                    when evaluator.user.present?
+                      evaluator.user
+                    else
+                      nil
+                    end
 
       license.assign_attributes(
-        account: account,
-        policy: policy,
-        user: user,
+        account:,
+        policy:,
+        user:,
       )
     end
 

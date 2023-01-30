@@ -87,7 +87,7 @@ class License < ApplicationRecord
 
   # Validate this association only if we've been given a user (because it's optional)
   validates :user,
-    presence: { message: "must exist" },
+    presence: { message: 'must exist' },
     scope: { by: :account_id },
     unless: -> {
       # Using before type cast because non-UUIDs are silently ignored and we
@@ -102,6 +102,23 @@ class License < ApplicationRecord
     unless: -> {
       group_id_before_type_cast.nil?
     }
+
+  # ^^^ ditto for environment association (handled in environmental). And we also want
+  # to assert that the license's environment matches its policy's environment.
+  validate on: %i[create] do
+    next if
+      policy.nil?
+
+    errors.add :environment, :not_allowed, message: "must be compatible with policy's environment" unless
+      case
+      when environment.nil?
+        policy.environment.nil?
+      when environment.isolated?
+        policy.environment_id == environment_id
+      when environment.shared?
+        policy.environment_id == environment_id || policy.environment_id.nil?
+      end
+  end
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if

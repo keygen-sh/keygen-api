@@ -7,14 +7,14 @@ describe License, type: :model do
   let(:account) { create(:account) }
 
   describe '#environment=' do
-    context 'when the environment is present' do
-      it 'should not raise for new record' do
+    context 'when the environment is valid' do
+      it 'should not raise on create' do
         environment = create(:environment, account:)
 
         expect { create(:license, account:, environment:) }.to_not raise_error
       end
 
-      it 'should raise for existing record' do
+      it 'should raise on update' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
@@ -30,12 +30,25 @@ describe License, type: :model do
       end
     end
 
+    context 'when the environment is invalid' do
+      it 'should raise on create' do
+        expect { create(:license, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should raise on update' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
     context 'when the environment is nil' do
-      it 'should not raise for new record' do
+      it 'should not raise on create' do
         expect { create(:license, account:, environment: nil) }.to_not raise_error
       end
 
-      it 'should raise for existing record' do
+      it 'should raise on update' do
         license = create(:license, account:, environment: nil)
 
         expect { license.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
