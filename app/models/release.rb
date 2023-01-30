@@ -370,6 +370,22 @@ class Release < ApplicationRecord
 
   ##
   # within_constraints returns releases with specific entitlement constraints.
+  #
+  # The :strict keyword ensures that the release has equal or less than
+  # number of constraints as matched codes (or none), i.e. ALL vs ANY.
+  # Otherwise, we just match ANY.
+  #
+  # For example, given a license has the entitlements FOO and BAR. We
+  # want to display all releases that have constraints FOO and/or BAR,
+  # but none that have BAZ. To do this, we need to ensure that the
+  # release has either FOO and/or BAR constraints, but that it
+  # has no other constraints.
+  #
+  # After filtering, that would look like:
+  #
+  #   count(constraints) = count(entitlements in :codes)
+  #
+  # This avoids permissions issues later on.
   scope :within_constraints, -> *codes, strict: false {
     codes = codes.flatten
                  .compact_blank
@@ -378,21 +394,6 @@ class Release < ApplicationRecord
     return without_constraints if
       codes.empty?
 
-    # The :strict keyword ensures that the release has less number of
-    # constraints as matched codes (or none), i.e. ALL vs ANY.
-    # Otherwise, we just match ANY.
-    #
-    # For example, given a license has the entitlements FOO and BAR. We
-    # want to display all releases that have constraints FOO and/or BAR,
-    # but none that have BAZ. To do this, we need to ensure that the
-    # release has either FOO and/or BAR constraints, but that it
-    # has no other constraints.
-    #
-    # After filtering, that would look like:
-    #
-    #   count(constraints) = count(entitlements in :codes)
-    #
-    # This avoids permissions issues later on.
     scp = joins(constraints: :entitlement)
     scp = if strict
             scp.reorder(created_at: DEFAULT_SORT_ORDER)
