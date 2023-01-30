@@ -23,7 +23,7 @@ module Environmental
     ##
     # for_environment scopes the current resource to an environment.
     #
-    # When :strict is false, some environments may bleed into others. For example,
+    # When :strict is false, some environments MAY bleed into others. For example,
     # a shared environment may include resources from the global environment, and
     # the global environment will include resources from all environments. To
     # scope to a specific environment without others bleeding into the
