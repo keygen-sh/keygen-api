@@ -4,51 +4,6 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
-    cattr_accessor :inherits_environment_from,
-      default: nil
-
-    belongs_to :environment,
-      optional: true
-
-    after_initialize -> { self.environment_id ||= default_environment_id },
-      if: -> {
-        has_attribute?(:environment_id) && new_record?
-      }
-
-    # Validate the association only if we've been given an environment (because it's optional)
-    validates :environment,
-      presence: { message: 'must exist' },
-      scope: { by: :account_id },
-      unless: -> {
-        environment_id_before_type_cast.nil?
-      }
-
-    # TODO(ezekg) Extract this into a concern or an attr_immutable lib?
-    validate on: %i[update] do
-      next unless
-        environment_id_changed? && environment_id != environment_id_was
-
-      errors.add(:environment, :not_allowed, message: 'is immutable')
-    end
-
-    # We also want to assert that the model's environment matches the environment
-    # of the association it inherits an environment from (if any).
-    validate on: %i[create] do
-      assoc = association_for_inherited_environment
-      next if
-        assoc.nil?
-
-      errors.add :environment, :not_allowed, message: "must be compatible with #{assoc.name.underscore.humanize(capitalize: false)}'s environment" unless
-        case
-        when environment.nil?
-          assoc.environment.nil?
-        when environment.isolated?
-          assoc.environment_id == environment_id
-        when environment.shared?
-          assoc.environment_id == environment_id || assoc.environment_id.nil?
-        end
-    end
-
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -69,25 +24,67 @@ module Environmental
         none
       end
     }
-
-    def association_for_inherited_environment
-      return if
-        inherits_environment_from.nil?
-
-      reflection = self.class.reflect_on_association(inherits_environment_from)
-      return if
-        reflection.nil?
-
-      public_send(reflection.name)
-    end
-
-    def default_environment    = Current.environment || association_for_inherited_environment&.environment
-    def default_environment_id = default_environment&.id
   end
 
   class_methods do
+    ##
+    # has_environment configures the model to be scoped to an optional environment.
+    #
+    # Use :inherits_from to automatically configure the default environment of
+    # the model. Accepts an association name. Also adds validations that assert
+    # the model's environment is compatible with the association's.
     def has_environment(inherits_from: nil)
-      self.inherits_environment_from = inherits_from
+      belongs_to :environment,
+        optional: true
+
+      after_initialize -> { self.environment ||= Current.environment },
+        if: -> {
+          has_attribute?(:environment) && new_record?
+        }
+
+      # Validate the association only if we've been given an environment (because it's optional)
+      validates :environment,
+        presence: { message: 'must exist' },
+        scope: { by: :account_id },
+        unless: -> {
+          environment_id_before_type_cast.nil?
+        }
+
+      # TODO(ezekg) Extract this into a concern or an attr_immutable lib?
+      validate on: %i[update] do
+        next unless
+          environment_id_changed? && environment_id != environment_id_was
+
+        errors.add(:environment, :not_allowed, message: 'is immutable')
+      end
+
+      # Define generic logic for environment inheritance
+      unless inherits_from.nil?
+        # NOTE(ezekg) This after initialize hook is in addition to the default one above.
+        #             Using environment_id here to prevent superfluous queries.
+        module_eval <<~RUBY, __FILE__, __LINE__ + 1
+          after_initialize -> { self.environment_id ||= #{inherits_from}&.environment_id },
+            if: -> {
+              has_attribute?(:environment_id) && new_record?
+            }
+        RUBY
+
+        # We also want to assert that the model's environment matches the environment
+        # of the association it inherits an environment from (if any).
+        module_eval <<~RUBY, __FILE__, __LINE__ + 1
+          validate on: %i[create] do
+            errors.add :environment, :not_allowed, message: "must be compatible with #{inherits_from}'s environment" unless
+              case
+              when environment.nil?
+                #{inherits_from}.environment.nil?
+              when environment.isolated?
+                #{inherits_from}.environment_id == environment_id
+              when environment.shared?
+                #{inherits_from}.environment_id == environment_id || #{inherits_from}.environment_id.nil?
+              end
+          end
+        RUBY
+      end
     end
   end
 end
