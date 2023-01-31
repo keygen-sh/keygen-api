@@ -4,10 +4,13 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
+    cattr_accessor :inherits_environment_from,
+      default: nil
+
     belongs_to :environment,
       optional: true
 
-    after_initialize -> { self.environment_id ||= Current.environment&.id },
+    after_initialize -> { self.environment_id ||= default_environment_id },
       if: -> {
         has_attribute?(:environment_id) && new_record?
       }
@@ -26,6 +29,24 @@ module Environmental
         environment_id_changed? && environment_id != environment_id_was
 
       errors.add(:environment, :not_allowed, message: 'is immutable')
+    end
+
+    # We also want to assert that the model's environment matches the environment
+    # of the association it inherits an environment from (if any).
+    validate on: %i[create] do
+      assoc = association_for_inherited_environment
+      next if
+        assoc.nil?
+
+      errors.add :environment, :not_allowed, message: "must be compatible with #{assoc.name.humanize(capitalize: false)}'s environment" unless
+        case
+        when environment.nil?
+          assoc.environment.nil?
+        when environment.isolated?
+          assoc.environment_id == environment_id
+        when environment.shared?
+          assoc.environment_id == environment_id || assoc.environment_id.nil?
+        end
     end
 
     ##
@@ -48,5 +69,25 @@ module Environmental
         none
       end
     }
+
+    def association_for_inherited_environment
+      return if
+        inherits_environment_from.nil?
+
+      reflection = self.class.reflect_on_association(inherits_environment_from)
+      return if
+        reflection.nil?
+
+      public_send(reflection.name)
+    end
+
+    def default_environment    = Current.environment || association_for_inherited_environment&.environment
+    def default_environment_id = default_environment&.id
+  end
+
+  class_methods do
+    def has_environment(inherits_from: nil)
+      self.inherits_environment_from = inherits_from
+    end
   end
 end
