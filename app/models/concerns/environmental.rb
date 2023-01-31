@@ -38,7 +38,7 @@ module Environmental
       next if
         assoc.nil?
 
-      errors.add :environment, :not_allowed, message: "must be compatible with #{assoc.name.humanize(capitalize: false)}'s environment" unless
+      errors.add :environment, :not_allowed, message: "must be compatible with #{assoc.name.underscore.humanize(capitalize: false)}'s environment" unless
         case
         when environment.nil?
           assoc.environment.nil?
