@@ -7,14 +7,51 @@ describe License, type: :model do
   let(:account) { create(:account) }
 
   describe '#environment=' do
-    context 'when the environment is valid' do
-      it 'should not raise on create' do
+    context 'on create' do
+      it 'should not raise when environment exists' do
         environment = create(:environment, account:)
 
         expect { create(:license, account:, environment:) }.to_not raise_error
       end
 
-      it 'should raise on update' do
+      it 'should raise when environment does not exist' do
+        expect { create(:license, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should not raise when environment is nil' do
+        expect { create(:license, account:, environment: nil) }.to_not raise_error
+      end
+
+      it 'should not raise when environment matches policy' do
+        environment = create(:environment, account:)
+        policy      = create(:policy, account:, environment:)
+
+        expect { create(:license, account:, environment:, policy:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match policy' do
+        environment = create(:environment, account:)
+        policy      = create(:policy, account:, environment: nil)
+
+        expect { create(:license, account:, environment:, policy:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should set when environment exists' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect(license.environment).to eq environment
+      end
+
+      it 'should set when environment is nil' do
+        license = create(:license, account:, environment: nil)
+
+        expect(license.environment).to be_nil
+      end
+    end
+
+    context 'on update' do
+      it 'should raise when environment exists' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
@@ -22,42 +59,17 @@ describe License, type: :model do
         expect { license.update!(environment: nil) }.to raise_error ActiveRecord::RecordInvalid
       end
 
-      it 'should set environment' do
-        environment = create(:environment, account:)
-        license     = create(:license, account:, environment:)
-
-        expect(license.environment).to eq environment
-      end
-    end
-
-    context 'when the environment is invalid' do
-      it 'should raise on create' do
-        expect { create(:license, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should raise on update' do
+      it 'should raise when environment does not exist' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
         expect { license.update!(environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
       end
-    end
 
-    context 'when the environment is nil' do
-      it 'should not raise on create' do
-        expect { create(:license, account:, environment: nil) }.to_not raise_error
-      end
-
-      it 'should raise on update' do
+      it 'should raise when environment is nil' do
         license = create(:license, account:, environment: nil)
 
         expect { license.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should set environment' do
-        license = create(:license, account:, environment: nil)
-
-        expect(license.environment).to be_nil
       end
     end
   end
