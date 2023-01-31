@@ -14,6 +14,7 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
+  has_environment
   has_role :product
   has_permissions Permission::PRODUCT_PERMISSIONS
 
