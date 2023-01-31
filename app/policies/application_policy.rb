@@ -42,7 +42,7 @@ class ApplicationPolicy
 
   private
 
-  def whatami = bearer.role.name.humanize(capitalize: false)
+  def whatami = bearer.role.name.underscore.humanize(capitalize: false)
 
   def record_ids
     case
@@ -90,7 +90,7 @@ class ApplicationPolicy
       next unless
         model.respond_to?(:account_id)
 
-      deny! "#{whatami} account does not match current #{context.to_s.humanize.downcase} account" if
+      deny! "#{whatami} account does not match current #{context.to_s.underscore.humanize(capitalize: false)} account" if
         bearer.present? && bearer.account_id != model.account_id
     end
 

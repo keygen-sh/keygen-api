@@ -375,7 +375,7 @@ class ApplicationController < ActionController::API
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
     if e.model.present?
-      resource = e.model.underscore.humanize.downcase
+      resource = e.model.underscore.humanize(capitalize: false)
 
       if e.id.present?
         id = Array.wrap(e.id).first
