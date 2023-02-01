@@ -31,10 +31,11 @@ module Environmental
     # has_environment configures the model to be scoped to an optional environment.
     #
     # Use :default to automatically configure a default environment for the model.
-    # Accepts a proc that resolves into an environment or environment ID. Also
-    # adds validations that assert the model's environment is compatible with
-    # the resolved default environment.
-    def has_environment(default: nil)
+    # Accepts a proc that resolves into an environment or environment ID.
+    #
+    # Use :constraint to add validations to the model's environment, e.g. to assert
+    # a model's environment is compatible with an association's environment.
+    def has_environment(default: nil, constraint: nil)
       belongs_to :environment,
         optional: true
 
@@ -59,48 +60,32 @@ module Environmental
         errors.add(:environment, :not_allowed, message: 'is immutable')
       end
 
-      # Define generic logic for environment inheritance
       unless default.nil?
         # NOTE(ezekg) This after initialize hook is in addition to the default one above.
-        #             Using environment_id here to prevent superfluous queries.
         module_eval <<~RUBY, __FILE__, __LINE__ + 1
           after_initialize -> {
-              case default.call(self)
-              in Environment => env
-                self.environment ||= env
-              in String => id
-                self.environment_id ||= id
-              in nil
-                # already nil
-              end
+              self.environment_id ||= case default.call(self)
+                                      in Environment => env
+                                        env.id
+                                      in String => id
+                                        id
+                                      in nil
+                                        nil
+                                      end
             },
             if: -> {
               has_attribute?(:environment_id) && new_record?
             }
         RUBY
+      end
 
+      unless constraint.nil?
         # We also want to assert that the model's current environment is compatible
-        # with its default environment (if a default is set).
+        # with its environment constraint (if a constraint is set).
         module_eval <<~RUBY, __FILE__, __LINE__ + 1
           validate on: %i[create] do
-            default_environment_id = case default.call(self)
-                                     in Environment => env
-                                       env.id
-                                     in String => id
-                                       id
-                                     in nil
-                                       nil
-                                     end
-
-            errors.add :environment, :not_allowed, message: "must be compatible with default environment" unless
-              case
-              when environment.nil?
-                default_environment_id.nil?
-              when environment.isolated?
-                default_environment_id == environment_id
-              when environment.shared?
-                default_environment_id == environment_id || default_environment_id.nil?
-              end
+            errors.add :environment, :not_allowed, message: 'must be compatible with environment constraint' unless
+              constraint.call(self)
           end
         RUBY
       end

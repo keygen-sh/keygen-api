@@ -10,7 +10,13 @@ FactoryBot.define do
     account { nil }
 
     after :build do |user, evaluator|
-      user.account ||= evaluator.account.presence
+      account     = evaluator.account.presence
+      environment = evaluator.environment.presence
+
+      user.assign_attributes(
+        account:,
+        environment:,
+      )
     end
 
     factory :admin do

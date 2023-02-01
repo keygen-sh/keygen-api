@@ -101,12 +101,20 @@ class Policy < ApplicationRecord
     NO_OVERAGE
   ].freeze
 
-  has_environment default: -> policy {
-    return if
-      policy.product.nil?
+  has_environment default: -> policy { policy.product&.environment_id },
+    constraint: -> policy {
+      return if
+        policy.product.nil?
 
-    policy.product.environment_id
-  }
+      case
+      when policy.environment.nil?
+        policy.product.environment_id.nil?
+      when policy.environment.isolated?
+        policy.product.environment_id == policy.environment_id
+      when policy.environment.shared?
+        policy.product.environment_id == policy.environment_id || policy.product.environment_id.nil?
+      end
+    }
 
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
