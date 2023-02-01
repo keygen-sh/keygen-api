@@ -101,7 +101,12 @@ class Policy < ApplicationRecord
     NO_OVERAGE
   ].freeze
 
-  has_environment inherits_from: :product
+  has_environment default: -> policy {
+    return if
+      policy.product.nil?
+
+    policy.product.environment_id
+  }
 
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
