@@ -63,7 +63,16 @@ module Environmental
       unless default.nil?
         # NOTE(ezekg) This after initialize hook is in addition to the default one above.
         after_initialize -> {
-            self.environment_id ||= case default.call(self)
+            value = case default.arity
+                    when 1
+                      instance_exec(self, &default)
+                    when 0
+                      instance_exec(&default)
+                    else
+                      raise ArgumentError, 'expected proc with 0..1 arguments'
+                    end
+
+            self.environment_id ||= case value
                                     in Environment => env
                                       env.id
                                     in String => id
@@ -82,7 +91,14 @@ module Environmental
         # with its environment constraint (if a constraint is set).
         validate on: %i[create] do
           errors.add :environment, :not_allowed, message: 'must be compatible with environment constraint' unless
-            constraint.call(self)
+            case constraint.arity
+            when 1
+              instance_exec(self, &constraint)
+            when 0
+              instance_exec(&constraint)
+            else
+              raise ArgumentError, 'expected proc with 0..1 arguments'
+            end
         end
       end
     end
