@@ -30,10 +30,11 @@ module Environmental
     ##
     # has_environment configures the model to be scoped to an optional environment.
     #
-    # Use :inherits_from to automatically configure the default environment of
-    # the model. Accepts an association name. Also adds validations that assert
-    # the model's environment is compatible with the association's.
-    def has_environment(inherits_from: nil)
+    # Use :default to automatically configure a default environment for the model.
+    # Accepts a proc that resolves into an environment or environment ID. Also
+    # adds validations that assert the model's environment is compatible with
+    # the resolved default environment.
+    def has_environment(default: nil)
       belongs_to :environment,
         optional: true
 
@@ -59,28 +60,46 @@ module Environmental
       end
 
       # Define generic logic for environment inheritance
-      unless inherits_from.nil?
+      unless default.nil?
         # NOTE(ezekg) This after initialize hook is in addition to the default one above.
         #             Using environment_id here to prevent superfluous queries.
         module_eval <<~RUBY, __FILE__, __LINE__ + 1
-          after_initialize -> { self.environment_id ||= #{inherits_from}&.environment_id },
+          after_initialize -> {
+              case default.call(self)
+              in Environment => env
+                self.environment ||= env
+              in String => id
+                self.environment_id ||= id
+              in nil
+                # already nil
+              end
+            },
             if: -> {
               has_attribute?(:environment_id) && new_record?
             }
         RUBY
 
-        # We also want to assert that the model's environment matches the environment
-        # of the association it inherits an environment from (if any).
+        # We also want to assert that the model's current environment is compatible
+        # with its default environment (if a default is set).
         module_eval <<~RUBY, __FILE__, __LINE__ + 1
           validate on: %i[create] do
-            errors.add :environment, :not_allowed, message: "must be compatible with #{inherits_from}'s environment" unless
+            default_environment_id = case default.call(self)
+                                     in Environment => env
+                                       env.id
+                                     in String => id
+                                       id
+                                     in nil
+                                       nil
+                                     end
+
+            errors.add :environment, :not_allowed, message: "must be compatible with default environment" unless
               case
               when environment.nil?
-                #{inherits_from}.environment.nil?
+                default_environment_id.nil?
               when environment.isolated?
-                #{inherits_from}.environment_id == environment_id
+                default_environment_id == environment_id
               when environment.shared?
-                #{inherits_from}.environment_id == environment_id || #{inherits_from}.environment_id.nil?
+                default_environment_id == environment_id || default_environment_id.nil?
               end
           end
         RUBY
