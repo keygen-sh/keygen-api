@@ -36,6 +36,20 @@ describe License, type: :model do
         expect { create(:license, account:, environment:, policy:) }.to raise_error ActiveRecord::RecordInvalid
       end
 
+      it 'should not raise when environment matches user' do
+        environment = create(:environment, account:)
+        user        = create(:user, account:, environment:)
+
+        expect { create(:license, account:, environment:, user:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match user' do
+        environment = create(:environment, account:)
+        user        = create(:user, account:, environment: nil)
+
+        expect { create(:license, account:, environment:, user:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
       it 'should set when environment exists' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)

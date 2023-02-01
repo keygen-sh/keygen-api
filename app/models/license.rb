@@ -17,11 +17,17 @@ class License < ApplicationRecord
 
       case
       when license.environment.nil?
-        license.policy.environment_id.nil?
+        license.policy.environment_id.nil? && (
+          license.user.nil? || license.user.environment_id.nil?
+        )
       when license.environment.isolated?
-        license.policy.environment_id == license.environment_id
+        license.policy.environment_id == license.environment_id && (
+          license.user.nil? || license.user.environment_id == license.environment_id
+        )
       when license.environment.shared?
-        license.policy.environment_id == license.environment_id || license.policy.environment_id.nil?
+        license.policy.environment_id == license.environment_id || license.policy.environment_id.nil? && (
+          license.user.nil? || license.user.environment_id == license.environment_id || license.user.environment_id.nil?
+        )
       end
     }
 
