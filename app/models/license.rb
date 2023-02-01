@@ -10,23 +10,23 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_environment default: -> license { license.policy&.environment_id },
-    constraint: -> license {
+  has_environment default: -> { policy&.environment_id },
+    constraint: -> {
       return if
-        license.policy.nil?
+        policy.nil?
 
       case
-      when license.environment.nil?
-        license.policy.environment_id.nil? && (
-          license.user.nil? || license.user.environment_id.nil?
+      when environment.nil?
+        policy.environment_id.nil? && (
+          user.nil? || user.environment_id.nil?
         )
-      when license.environment.isolated?
-        license.policy.environment_id == license.environment_id && (
-          license.user.nil? || license.user.environment_id == license.environment_id
+      when environment.isolated?
+        policy.environment_id == environment_id && (
+          user.nil? || user.environment_id == environment_id
         )
-      when license.environment.shared?
-        license.policy.environment_id == license.environment_id || license.policy.environment_id.nil? && (
-          license.user.nil? || license.user.environment_id == license.environment_id || license.user.environment_id.nil?
+      when environment.shared?
+        policy.environment_id == environment_id || policy.environment_id.nil? && (
+          user.nil? || user.environment_id == environment_id || user.environment_id.nil?
         )
       end
     }

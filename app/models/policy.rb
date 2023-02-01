@@ -101,18 +101,18 @@ class Policy < ApplicationRecord
     NO_OVERAGE
   ].freeze
 
-  has_environment default: -> policy { policy.product&.environment_id },
-    constraint: -> policy {
+  has_environment default: -> { product&.environment_id },
+    constraint: -> {
       return if
-        policy.product.nil?
+        product.nil?
 
       case
-      when policy.environment.nil?
-        policy.product.environment_id.nil?
-      when policy.environment.isolated?
-        policy.product.environment_id == policy.environment_id
-      when policy.environment.shared?
-        policy.product.environment_id == policy.environment_id || policy.product.environment_id.nil?
+      when environment.nil?
+        product.environment_id.nil?
+      when environment.isolated?
+        product.environment_id == environment_id
+      when environment.shared?
+        product.environment_id == environment_id || product.environment_id.nil?
       end
     }
 
