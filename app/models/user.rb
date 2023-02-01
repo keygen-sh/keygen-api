@@ -11,6 +11,7 @@ class User < ApplicationRecord
   include Roleable
   include Diffable
 
+  has_environment
   has_secure_password :password, validations: false
   has_default_role :user
   has_permissions -> user {
