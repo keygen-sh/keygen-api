@@ -10,7 +10,13 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_environment inherits_from: :policy
+  has_environment default: -> license {
+    return if
+      license.policy.nil?
+
+    license.policy.environment_id
+  }
+
   has_role :license
   has_permissions Permission::LICENSE_PERMISSIONS,
     # NOTE(ezekg) Removing these from defaults for backwards compatibility
