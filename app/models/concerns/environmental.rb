@@ -62,32 +62,28 @@ module Environmental
 
       unless default.nil?
         # NOTE(ezekg) This after initialize hook is in addition to the default one above.
-        module_eval <<~RUBY, __FILE__, __LINE__ + 1
-          after_initialize -> {
-              self.environment_id ||= case default.call(self)
-                                      in Environment => env
-                                        env.id
-                                      in String => id
-                                        id
-                                      in nil
-                                        nil
-                                      end
-            },
-            if: -> {
-              has_attribute?(:environment_id) && new_record?
-            }
-        RUBY
+        after_initialize -> {
+            self.environment_id ||= case default.call(self)
+                                    in Environment => env
+                                      env.id
+                                    in String => id
+                                      id
+                                    in nil
+                                      nil
+                                    end
+          },
+          if: -> {
+            has_attribute?(:environment_id) && new_record?
+          }
       end
 
       unless constraint.nil?
         # We also want to assert that the model's current environment is compatible
         # with its environment constraint (if a constraint is set).
-        module_eval <<~RUBY, __FILE__, __LINE__ + 1
-          validate on: %i[create] do
-            errors.add :environment, :not_allowed, message: 'must be compatible with environment constraint' unless
-              constraint.call(self)
-          end
-        RUBY
+        validate on: %i[create] do
+          errors.add :environment, :not_allowed, message: 'must be compatible with environment constraint' unless
+            constraint.call(self)
+        end
       end
     end
   end
