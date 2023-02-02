@@ -85,6 +85,34 @@ describe License, type: :model do
 
         expect { license.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
       end
+
+      it 'should not raise when environment matches policy' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(policy: create(:policy, account:, environment:)) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match policy' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(policy: create(:policy, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should not raise when environment matches user' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(user: create(:user, account:, environment:)) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match user' do
+        environment = create(:environment, account:)
+        license     = create(:license, account:, environment:)
+
+        expect { license.update!(user: create(:user, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
     end
   end
 
