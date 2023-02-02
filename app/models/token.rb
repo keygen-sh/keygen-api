@@ -13,6 +13,22 @@ class Token < ApplicationRecord
   include Permissible
   include Dirtyable
 
+  has_environment default: -> { bearer&.environment_id },
+    constraint: -> {
+      return if
+        bearer.nil?
+
+      throw :fail unless
+        case
+        when environment.nil?
+          bearer.environment_id.nil?
+        when environment.isolated?
+          bearer.environment_id == environment_id
+        when environment.shared?
+          bearer.environment_id == environment_id || bearer.environment_id.nil?
+        end
+    }
+
   # Default to wildcard permission but allow all
   has_permissions Permission::ALL_PERMISSIONS,
     default: %w[*]

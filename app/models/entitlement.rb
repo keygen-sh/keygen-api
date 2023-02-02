@@ -7,6 +7,8 @@ class Entitlement < ApplicationRecord
   include Pageable
   include Diffable
 
+  has_environment
+
   belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, dependent: :delete_all

@@ -4,6 +4,8 @@ class Group < ApplicationRecord
   include Orderable
   include Pageable
 
+  has_environment
+
   belongs_to :account
   has_many :group_permissions
   has_many :permissions,

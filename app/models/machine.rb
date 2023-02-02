@@ -14,6 +14,28 @@ class Machine < ApplicationRecord
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes
 
+  has_environment default: -> { license&.environment_id },
+    constraint: -> {
+      return if
+        license.nil?
+
+      throw :fail unless
+        case
+        when environment.nil?
+          license.environment_id.nil? && (
+            group.nil? || group.environment_id.nil?
+          )
+        when environment.isolated?
+          license.environment_id == environment_id && (
+            group.nil? || group.environment_id == environment_id
+          )
+        when environment.shared?
+          license.environment_id == environment_id || license.environment_id.nil? && (
+            group.nil? || group.environment_id == environment_id || group.environment_id.nil?
+          )
+        end
+    }
+
   belongs_to :account
   belongs_to :license, counter_cache: true
   belongs_to :group,
