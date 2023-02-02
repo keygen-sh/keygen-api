@@ -89,17 +89,31 @@ module Environmental
       unless constraint.nil?
         # We also want to assert that the model's current environment is compatible
         # with its environment constraint (if a constraint is set).
-        validate on: %i[create] do
-          errors.add :environment, :not_allowed, message: 'must be compatible with environment constraint' unless
-            case constraint.arity
-            when 1
-              instance_exec(self, &constraint)
-            when 0
-              instance_exec(&constraint)
-            else
-              raise ArgumentError, 'expected proc with 0..1 arguments'
+        #
+        # NOTE(ezekg) We're using a lambda here so that we can return early out
+        #             of the nested catch blocks (next won't work).
+        validator = -> {
+          catch :fail do
+            catch :pass do
+              case constraint.arity
+              when 1
+                instance_exec(self, &constraint)
+              when 0
+                instance_exec(&constraint)
+              else
+                raise ArgumentError, 'expected proc with 0..1 arguments'
+              end
             end
-        end
+
+            # Unless our constraint throws :fail, we're all good.
+            return
+          end
+
+          # If we reach this, our constraint threw :fail.
+          errors.add :environment, :not_allowed, message: 'is invalid (constraint failed)'
+        }
+
+        validate on: %i[create], &validator
       end
     end
   end
