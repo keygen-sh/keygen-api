@@ -15,20 +15,21 @@ class License < ApplicationRecord
       return if
         policy.nil?
 
-      case
-      when environment.nil?
-        policy.environment_id.nil? && (
-          user.nil? || user.environment_id.nil?
-        )
-      when environment.isolated?
-        policy.environment_id == environment_id && (
-          user.nil? || user.environment_id == environment_id
-        )
-      when environment.shared?
-        policy.environment_id == environment_id || policy.environment_id.nil? && (
-          user.nil? || user.environment_id == environment_id || user.environment_id.nil?
-        )
-      end
+      throw :fail unless
+        case
+        when environment.nil?
+          policy.environment_id.nil? && (
+            user.nil? || user.environment_id.nil?
+          )
+        when environment.isolated?
+          policy.environment_id == environment_id && (
+            user.nil? || user.environment_id == environment_id
+          )
+        when environment.shared?
+          policy.environment_id == environment_id || policy.environment_id.nil? && (
+            user.nil? || user.environment_id == environment_id || user.environment_id.nil?
+          )
+        end
     }
 
   has_role :license
