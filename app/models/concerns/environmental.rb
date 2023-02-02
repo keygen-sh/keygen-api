@@ -113,7 +113,7 @@ module Environmental
           errors.add :environment, :not_allowed, message: 'is invalid (constraint failed)'
         }
 
-        validate on: %i[create], &validator
+        validate on: %i[create update], &validator
       end
     end
   end
