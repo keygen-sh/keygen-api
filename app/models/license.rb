@@ -19,14 +19,20 @@ class License < ApplicationRecord
         case
         when environment.nil?
           policy.environment_id.nil? && (
+            group.nil? || group.environment_id.nil?
+          ) && (
             user.nil? || user.environment_id.nil?
           )
         when environment.isolated?
           policy.environment_id == environment_id && (
+            group.nil? || group.environment_id == environment_id
+          ) && (
             user.nil? || user.environment_id == environment_id
           )
         when environment.shared?
           policy.environment_id == environment_id || policy.environment_id.nil? && (
+            group.nil? || group.environment_id == environment_id || group.environment_id.nil?
+          ) && (
             user.nil? || user.environment_id == environment_id || user.environment_id.nil?
           )
         end
