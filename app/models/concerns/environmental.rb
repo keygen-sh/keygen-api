@@ -4,6 +4,8 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
+    include Dirtyable
+
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -40,9 +42,8 @@ module Environmental
         optional: true
 
       after_initialize -> { self.environment ||= Current.environment },
-        if: -> {
-          has_attribute?(:environment_id) && new_record?
-        }
+        unless: -> { environment_id_assigned? || environment_assigned? },
+        if: -> { new_record? }
 
       # Validate the association only if we've been given an environment (because it's optional)
       validates :environment,
@@ -81,9 +82,8 @@ module Environmental
                                       nil
                                     end
           },
-          if: -> {
-            has_attribute?(:environment_id) && new_record?
-          }
+          unless: -> { environment_id_assigned? || environment_assigned? },
+          if: -> { new_record? }
       end
 
       unless constraint.nil?
