@@ -11,7 +11,21 @@ class User < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_environment
+  has_environment constraint: -> {
+    return if
+      group.nil?
+
+    throw :fail unless
+      case
+      when environment.nil?
+        group.environment_id.nil?
+      when environment.isolated?
+        group.environment_id == environment_id
+      when environment.shared?
+        group.environment_id == environment_id || group.environment_id.nil?
+      end
+  }
+
   has_secure_password :password, validations: false
   has_default_role :user
   has_permissions -> user {

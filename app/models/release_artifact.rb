@@ -13,6 +13,22 @@ class ReleaseArtifact < ApplicationRecord
     YANKED
   ]
 
+  has_environment default: -> { release&.environment_id },
+    constraint: -> {
+      return if
+        release.nil?
+
+      throw :fail unless
+        case
+        when environment.nil?
+          release.environment_id.nil?
+        when environment.isolated?
+          release.environment_id == environment_id
+        when environment.shared?
+          release.environment_id == environment_id || release.environment_id.nil?
+        end
+    }
+
   attr_accessor :redirect_url
 
   belongs_to :account
