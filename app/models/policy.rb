@@ -106,14 +106,15 @@ class Policy < ApplicationRecord
       return if
         product.nil?
 
-      case
-      when environment.nil?
-        product.environment_id.nil?
-      when environment.isolated?
-        product.environment_id == environment_id
-      when environment.shared?
-        product.environment_id == environment_id || product.environment_id.nil?
-      end
+      throw :fail unless
+        case
+        when environment.nil?
+          product.environment_id.nil?
+        when environment.isolated?
+          product.environment_id == environment_id
+        when environment.shared?
+          product.environment_id == environment_id || product.environment_id.nil?
+        end
     }
 
   # Virtual attribute that we'll use to change defaults
