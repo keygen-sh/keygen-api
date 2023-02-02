@@ -50,17 +50,41 @@ describe License, type: :model do
         expect { create(:license, account:, environment:, user:) }.to raise_error ActiveRecord::RecordInvalid
       end
 
-      it 'should set when environment exists' do
+      it 'should set provided environment' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
         expect(license.environment).to eq environment
       end
 
-      it 'should set when environment is nil' do
+      it 'should set nil environment' do
         license = create(:license, account:, environment: nil)
 
         expect(license.environment).to be_nil
+      end
+
+      context 'with current environment' do
+        before { Current.environment = create(:environment, account:) }
+        after  { Current.environment = nil }
+
+        it 'should set provided environment' do
+          environment = create(:environment, account:)
+          license     = create(:license, account:, environment:)
+
+          expect(license.environment).to eq environment
+        end
+
+        it 'should set current environment' do
+          license = create(:license, account:)
+
+          expect(license.environment).to eq Current.environment
+        end
+
+        it 'should set nil environment' do
+          license = create(:license, account:, environment: nil)
+
+          expect(license.environment).to be_nil
+        end
       end
     end
 
