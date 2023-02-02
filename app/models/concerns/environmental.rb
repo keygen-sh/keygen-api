@@ -41,7 +41,7 @@ module Environmental
 
       after_initialize -> { self.environment ||= Current.environment },
         if: -> {
-          has_attribute?(:environment) && new_record?
+          has_attribute?(:environment_id) && new_record?
         }
 
       # Validate the association only if we've been given an environment (because it's optional)
