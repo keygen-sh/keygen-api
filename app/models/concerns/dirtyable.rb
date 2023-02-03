@@ -16,15 +16,15 @@ module Dirtyable
     #
     #   license = License.new
     #   license.environment # => #<Environment id=1>
-    #   license.environment_assigned? # => false
+    #   license.environment_attribute_assigned? # => false
     #
     #   license = License.new environment: nil
     #   license.environment # => nil
-    #   license.environment_assigned? # => true
+    #   license.environment_attribute_assigned? # => true
     #
     #   license = License.new environment: #<Environment id=2>
     #   license.environment # => #<Environment id=2>
-    #   license.environment_assigned? # => true
+    #   license.environment_attribute_assigned? # => true
     #
     # As you can see, our environment is nil for the second license. Without
     # this override, we wouldn't be able to determine whether or not :environment
@@ -102,14 +102,14 @@ module Dirtyable
     #
     # Adds the following method,
     #
-    #   user.role_attributes_changed?
+    #   user.role_attributes_assigned?
     #
     # Which behaves like,
     #
     #   user = User.new
-    #   user.role_attributes_changed? # => false
+    #   user.role_attributes_assigned? # => false
     #   user.assign_attributes(role_attributes: { name: :admin })
-    #   user.role_attributes_changed? # => true
+    #   user.role_attributes_assigned? # => true
     #
     def tracks_dirty_attributes_for(relation)
       raise NotImplementedError, 'tracking nested attributes is only supported for active records' unless
@@ -120,10 +120,10 @@ module Dirtyable
 
       module_eval <<~RUBY, __FILE__, __LINE__ + 1
         after_save -> { remove_instance_variable(:@#{relation}_attributes) },
-          if: :#{relation}_attributes_changed?
+          if: :#{relation}_attributes_assigned?
 
-        def #{relation}_attributes_changed? = instance_variable_defined?(:@#{relation}_attributes)
-        def #{relation}_attributes          = @#{relation}_attributes
+        def #{relation}_attributes_assigned? = instance_variable_defined?(:@#{relation}_attributes)
+        def #{relation}_attributes           = @#{relation}_attributes
         def #{relation}_attributes=(attributes)
           @#{relation}_attributes = attributes
 

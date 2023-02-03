@@ -34,7 +34,7 @@ class Role < ApplicationRecord
 
   # Set default permissions unless already set
   before_create :set_default_permissions,
-    unless: :role_permissions_attributes_changed?
+    unless: :role_permissions_attributes_assigned?
 
   # NOTE(ezekg) Sanity checks
   validates :resource_type,
@@ -99,7 +99,7 @@ class Role < ApplicationRecord
   # any changes to the role's permissions.
   def permissions
     return pending_permissions if
-      role_permissions_attributes_changed?
+      role_permissions_attributes_assigned?
 
     Permission.joins(:role_permissions)
               .where(
@@ -112,7 +112,7 @@ class Role < ApplicationRecord
   # via the :role_permissions nested attributes.
   def pending_permissions
     return Permission.none unless
-      role_permissions_attributes_changed?
+      role_permissions_attributes_assigned?
 
     Permission.where(
       id: role_permissions_attributes.collect { _1[:permission_id] },
@@ -123,7 +123,7 @@ class Role < ApplicationRecord
   # permission_ids returns an array of the role's permission IDs,
   # including pending changes.
   def permission_ids
-    if role_permissions_attributes_changed?
+    if role_permissions_attributes_assigned?
       role_permissions_attributes.collect { _1[:permission_id] }
     else
       role_permissions.collect(&:permission_id)
@@ -201,11 +201,11 @@ class Role < ApplicationRecord
   def license? = name.to_sym == :license
 
   def changed_for_autosave?
-    super || role_permissions_attributes_changed?
+    super || role_permissions_attributes_assigned?
   end
 
   def changed?
-    super || role_permissions_attributes_changed?
+    super || role_permissions_attributes_assigned?
   end
 
   private
