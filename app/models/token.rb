@@ -44,7 +44,7 @@ class Token < ApplicationRecord
 
   # Set default permissions unless already set
   before_validation :set_default_permissions,
-    unless: :token_permissions_attributes_changed?,
+    unless: :token_permissions_attributes_assigned?,
     on: :create
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
@@ -178,7 +178,7 @@ class Token < ApplicationRecord
 
   def permissions
     return pending_permissions if
-      token_permissions_attributes_changed?
+      token_permissions_attributes_assigned?
 
     # When the token has a wildcard permission, defer to role.
     return role.permissions if
@@ -207,7 +207,7 @@ class Token < ApplicationRecord
 
   def pending_permissions
     return Permission.none unless
-      token_permissions_attributes_changed?
+      token_permissions_attributes_assigned?
 
     Permission.where(
       id: token_permissions_attributes.collect { _1[:permission_id] },
@@ -215,7 +215,7 @@ class Token < ApplicationRecord
   end
 
   def permission_ids
-    if token_permissions_attributes_changed?
+    if token_permissions_attributes_assigned?
       token_permissions_attributes.collect { _1[:permission_id] }
     else
       token_permissions.collect(&:permission_id)
@@ -389,11 +389,11 @@ class Token < ApplicationRecord
   end
 
   def changed_for_autosave?
-    super || token_permissions_attributes_changed?
+    super || token_permissions_attributes_assigned?
   end
 
   def changed?
-    super || token_permissions_attributes_changed?
+    super || token_permissions_attributes_assigned?
   end
 
   private

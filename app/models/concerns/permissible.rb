@@ -81,7 +81,7 @@ module Permissible
         admin?
 
       return permissions?(*Permission::ALL_PERMISSIONS) unless
-        role_permissions_attributes_changed?
+        role_permissions_attributes_assigned?
 
       permission_ids = role_permissions_attributes.collect { _1[:permission_id] }
       permissions    = Permission.where(id: permission_ids)
