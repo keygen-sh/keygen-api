@@ -57,7 +57,7 @@ module Roleable
     def license? = role? && role.license?
 
     def changed_for_autosave?
-      super || role_attributes_changed?
+      super || role_attributes_assigned?
     end
   end
 
@@ -97,7 +97,7 @@ module Roleable
       tracks_dirty_attributes_for :role
 
       delegate :permissions, :permission_ids, :role_permissions,
-        :role_permissions_attributes_changed?, :role_permissions_attributes,
+        :role_permissions_attributes_assigned?, :role_permissions_attributes,
         allow_nil: true,
         to: :role
     end
