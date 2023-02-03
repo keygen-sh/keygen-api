@@ -8,6 +8,8 @@ class RequestLog < ApplicationRecord
   include Orderable
   include Pageable
 
+  has_environment
+
   belongs_to :account
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true

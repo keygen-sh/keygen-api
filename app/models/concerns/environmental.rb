@@ -15,13 +15,20 @@ module Environmental
     # scope to a specific environment without others bleeding into the
     # results, enable :strict mode.
     scope :for_environment, -> environment, strict: false {
+      environment = case environment
+                    when UUID_RE
+                      Environment.find(environment)
+                    else
+                      environment
+                    end
+
       case
       when environment.nil?
         strict ? where(environment: nil) : self
       when environment.isolated?
         where(environment:)
       when environment.shared?
-        strict ? where(environment:) : where(environment: [nil, environment])
+        strict ? where(environment:) : where(environment: [nil, *environment])
       else
         none
       end

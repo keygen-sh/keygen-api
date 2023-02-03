@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ReleaseArch < ApplicationRecord
-  include Environmental
   include Limitable
   include Orderable
   include Pageable
