@@ -56,6 +56,10 @@ Given /^the current account is "([^\"]*)"$/ do |id|
   @account = FindByAliasService.call(Account, id:, aliases: :slug)
 end
 
+Given /^the current environment is "([^\"]*)"$/ do |id|
+  Current.environment = FindByAliasService.call(@account.environments, id:, aliases: :code)
+end
+
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
 end
