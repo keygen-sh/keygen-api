@@ -33,9 +33,6 @@ module Dirtyable
     # whether or not an environment was explicitly passed.
     #
     def tracks_dirty_attributes(*attribute_names)
-      raise NotImplementedError, "nested attributes not accepted for #{relation}" if
-        attribute_names.any? && attribute_names.in?(attributes.keys)
-
       module_exec do
         if self <= ActiveRecord::Base
           after_save -> { remove_instance_variable(:@assigned_attributes) },
@@ -51,25 +48,33 @@ module Dirtyable
           __assign_attributes(attributes)
         end
 
-        def respond_to_missing?(method_name, ...)
-          case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
-          in key:
-            attributes.key?(key) || (
-              self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
-            )
-          else
-            super
+        if attribute_names.empty?
+          def respond_to_missing?(method_name, ...)
+            case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
+            in key:
+              self.class.attribute_names.include?(key) || (
+                self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+              )
+            else
+              super
+            end
           end
-        end
 
-        def method_missing(method_name, ...)
-          case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
-          in { key: } if attributes.key?(key) || (
-                           self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
-                         )
-            @assigned_attributes&.key?(key.to_sym)
-          else
-            super
+          def method_missing(method_name, ...)
+            case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
+            in { key: } if self.class.attribute_names.include?(key) || (
+                            self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+                          )
+              @assigned_attributes&.key?(key.to_sym)
+            else
+              super
+            end
+          end
+        else
+          attribute_names.each do |attribute_name|
+            define_method :"#{attribute_name}_attribute_assigned?" do
+              @assigned_attributes&.key?(attribute_name.to_sym)
+            end
           end
         end
       end
