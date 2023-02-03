@@ -53,7 +53,7 @@ module Dirtyable
 
         def assigned_attributes? = instance_variable_defined?(:@assigned_attributes)
         def assign_attributes(attributes)
-          @assigned_attributes = (@assigned_attributes || {}).merge(attributes)
+          @assigned_attributes = (@assigned_attributes || {}).merge(attributes.stringify_keys)
 
           __assign_attributes(attributes)
         end
@@ -75,7 +75,7 @@ module Dirtyable
             in { key: } if self.class.attribute_names.include?(key) || (
                             self.class < ::ActiveRecord::Base && self.class.reflections.key?(key)
                           )
-              @assigned_attributes&.key?(key.to_sym)
+              @assigned_attributes&.key?(key)
             else
               super
             end
@@ -83,7 +83,7 @@ module Dirtyable
         else
           attribute_names.each do |attribute_name|
             define_method :"#{attribute_name}_attribute_assigned?" do
-              @assigned_attributes&.key?(attribute_name.to_sym)
+              @assigned_attributes&.key?(attribute_name.to_s)
             end
           end
         end
