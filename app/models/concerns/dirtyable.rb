@@ -33,6 +33,16 @@ module Dirtyable
     # whether or not an environment was explicitly passed.
     #
     def tracks_dirty_attributes(*attribute_names)
+      raise NotImplementedError, "attributes not accepted for #{self}: #{attribute_names.inspect}" unless
+        attribute_names.empty? ||
+          attribute_names.all? {
+            _1.to_s.in?(self.attribute_names) || (
+              self < ::ActiveRecord::Base && (
+                _1.to_s.in?(self.column_names) || _1.to_s.in?(reflections.keys)
+              )
+            )
+          }
+
       module_exec do
         if self <= ActiveRecord::Base
           after_save -> { remove_instance_variable(:@assigned_attributes) },
@@ -53,7 +63,7 @@ module Dirtyable
             case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
             in key:
               self.class.attribute_names.include?(key) || (
-                self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+                self.class < ::ActiveRecord::Base && self.class.reflections.key?(key)
               )
             else
               super
@@ -63,7 +73,7 @@ module Dirtyable
           def method_missing(method_name, ...)
             case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
             in { key: } if self.class.attribute_names.include?(key) || (
-                            self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+                            self.class < ::ActiveRecord::Base && self.class.reflections.key?(key)
                           )
               @assigned_attributes&.key?(key.to_sym)
             else
@@ -106,7 +116,7 @@ module Dirtyable
     #
     def tracks_dirty_attributes_for(relation)
       raise NotImplementedError, 'tracking nested attributes is only supported for active records' unless
-        self <= ActiveRecord::Base
+        self < ::ActiveRecord::Base
 
       raise NotImplementedError, "nested attributes not accepted for #{relation}" unless
         nested_attributes_options.key?(relation)
@@ -126,5 +136,13 @@ module Dirtyable
         end
       RUBY
     end
+  end
+
+  def self.included(klass)
+    raise ArgumentError, "cannot be used outside of model (got #{klass.ancestors})" unless
+      (klass < ::ActiveModel::Model && klass < ::ActiveModel::Attributes) ||
+      klass < ::ActiveRecord::Base
+
+    super(klass)
   end
 end
