@@ -7,6 +7,8 @@ class WebhookEvent < ApplicationRecord
   include Orderable
   include Pageable
 
+  has_environment
+
   belongs_to :account
   belongs_to :event_type
 

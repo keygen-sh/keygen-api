@@ -24,6 +24,7 @@ PLACEHOLDERS = %w[
   webhook_endpoint
   webhook_event
   entitlement
+  environment
   policy_entitlement
   license_entitlement
   release
@@ -47,12 +48,12 @@ PLACEHOLDERS = %w[
   date
   time
   null_byte
-  event_types
-  event_logs
+  event_type
+  event_log
   otp
-  groups
-  group_owners
-  owners
+  group
+  group_owner
+  owner
 ]
 
 # Matches:

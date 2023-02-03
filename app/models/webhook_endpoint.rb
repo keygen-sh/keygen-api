@@ -6,6 +6,8 @@ class WebhookEndpoint < ApplicationRecord
   include Orderable
   include Pageable
 
+  has_environment
+
   belongs_to :account
 
   before_create -> { self.api_version ||= account.api_version }
