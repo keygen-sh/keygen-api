@@ -6,7 +6,8 @@ module Environmental
   included do
     include Dirtyable
 
-    tracks_dirty_attributes
+    tracks_dirty_attributes :environment_id,
+                            :environment
 
     ##
     # for_environment scopes the current resource to an environment.
