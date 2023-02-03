@@ -6,6 +6,8 @@ module Environmental
   included do
     include Dirtyable
 
+    tracks_dirty_attributes
+
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -42,7 +44,7 @@ module Environmental
         optional: true
 
       after_initialize -> { self.environment ||= Current.environment },
-        unless: -> { environment_id_assigned? || environment_assigned? },
+        unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? }
 
       # Validate the association only if we've been given an environment (because it's optional)
@@ -82,7 +84,7 @@ module Environmental
                                       nil
                                     end
           },
-          unless: -> { environment_id_assigned? || environment_assigned? },
+          unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
           if: -> { new_record? }
       end
 

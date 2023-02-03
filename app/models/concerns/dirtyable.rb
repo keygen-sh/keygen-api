@@ -3,7 +3,7 @@
 module Dirtyable
   extend ActiveSupport::Concern
 
-  included do
+  class_methods do
     ##
     # Override for AR's default assign_attributes method, used when we need
     # to check is an attribute was provided during class instantiation.
@@ -32,29 +32,49 @@ module Dirtyable
     # to conditionally apply a default via the current environment based on
     # whether or not an environment was explicitly passed.
     #
-    after_save -> { remove_instance_variable(:@assigned_attributes) },
-      if: :assigned_attributes?
+    def tracks_dirty_attributes(*attribute_names)
+      raise NotImplementedError, "nested attributes not accepted for #{relation}" if
+        attribute_names.any? && attribute_names.in?(attributes.keys)
 
-    alias :__assign_attributes :assign_attributes
+      module_exec do
+        if self <= ActiveRecord::Base
+          after_save -> { remove_instance_variable(:@assigned_attributes) },
+            if: :assigned_attributes?
+        end
 
-    def assigned_attributes? = instance_variable_defined?(:@assigned_attributes)
-    def assign_attributes(attributes)
-      @assigned_attributes = (@assigned_attributes || {}).merge(attributes)
+        alias :__assign_attributes :assign_attributes
 
-      __assign_attributes(attributes)
-    end
+        def assigned_attributes? = instance_variable_defined?(:@assigned_attributes)
+        def assign_attributes(attributes)
+          @assigned_attributes = (@assigned_attributes || {}).merge(attributes)
 
-    def method_missing(method_name, ...)
-      case /(?<key>.*?)_assigned\?/.match(method_name)
-      in { key: } if has_attribute?(key) || self.class.reflections.key?(key)
-        @assigned_attributes&.key?(key.to_sym)
-      else
-        super
+          __assign_attributes(attributes)
+        end
+
+        def respond_to_missing?(method_name, ...)
+          case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
+          in key:
+            attributes.key?(key) || (
+              self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+            )
+          else
+            super
+          end
+        end
+
+        def method_missing(method_name, ...)
+          case /(?<key>.*?)_attribute_assigned\?/.match(method_name)
+          in { key: } if attributes.key?(key) || (
+                           self.class <= ActiveRecord::Base && self.class.reflections.key?(key)
+                         )
+            @assigned_attributes&.key?(key.to_sym)
+          else
+            super
+          end
+        end
       end
     end
-  end
 
-  class_methods do
     ##
     # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
     #              have been provided. This adds a flag we can check.
@@ -80,6 +100,9 @@ module Dirtyable
     #   user.role_attributes_changed? # => true
     #
     def tracks_dirty_attributes_for(relation)
+      raise NotImplementedError, 'tracking nested attributes is only supported for active records' unless
+        self <= ActiveRecord::Base
+
       raise NotImplementedError, "nested attributes not accepted for #{relation}" unless
         nested_attributes_options.key?(relation)
 
