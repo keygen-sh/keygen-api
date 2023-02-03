@@ -6,9 +6,6 @@ module Environmental
   included do
     include Dirtyable
 
-    tracks_dirty_attributes :environment_id,
-                            :environment
-
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -43,6 +40,9 @@ module Environmental
     def has_environment(default: nil, constraint: nil)
       belongs_to :environment,
         optional: true
+
+      tracks_dirty_attributes :environment_id,
+                              :environment
 
       after_initialize -> { self.environment ||= Current.environment },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },

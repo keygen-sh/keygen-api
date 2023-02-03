@@ -15,11 +15,10 @@ describe Dirtyable, type: :concern do
             include ActiveModel::Attributes
             include Dirtyable
 
-            tracks_dirty_attributes :foo
-
             attribute :foo, :integer
             attribute :bar, :integer
             attribute :baz, :integer
+            tracks_dirty_attributes :foo
           }
         }
 
@@ -40,11 +39,11 @@ describe Dirtyable, type: :concern do
             include ActiveModel::Attributes
             include Dirtyable
 
-            tracks_dirty_attributes
-
             attribute :foo, :integer
             attribute :bar, :integer
             attribute :baz, :integer
+
+            tracks_dirty_attributes
           }
         }
 
@@ -58,12 +57,29 @@ describe Dirtyable, type: :concern do
           expect { model.qux_attribute_assigned? }.to raise_error NoMethodError
         end
       end
+
+      context "when tracking attributes that don't exist" do
+        let(:dirtyable) {
+          Class.new {
+            include ActiveModel::Model
+            include ActiveModel::Attributes
+            include Dirtyable
+
+            tracks_dirty_attributes :foo
+          }
+        }
+
+        it 'should raise' do
+          expect { dirtyable }.to raise_error NotImplementedError
+        end
+      end
     end
 
     describe '.tracks_dirty_attributes_for' do
       let(:dirtyable) {
         Class.new {
           include ActiveModel::Model
+          include ActiveModel::Attributes
           include Dirtyable
 
           tracks_dirty_attributes_for :foo
