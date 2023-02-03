@@ -48,13 +48,11 @@ module Dirtyable
             if: :assigned_attributes?
         end
 
-        alias :__assign_attributes :assign_attributes
-
         def assigned_attributes? = instance_variable_defined?(:@assigned_attributes)
         def assign_attributes(attributes)
           @assigned_attributes = (@assigned_attributes || {}).merge(attributes.stringify_keys)
 
-          __assign_attributes(attributes)
+          super
         end
 
         if attribute_names.empty?
@@ -124,14 +122,12 @@ module Dirtyable
         after_save -> { remove_instance_variable(:@#{relation}_attributes) },
           if: :#{relation}_attributes_changed?
 
-        alias :__#{relation}_attributes= :#{relation}_attributes=
-
         def #{relation}_attributes_changed? = instance_variable_defined?(:@#{relation}_attributes)
         def #{relation}_attributes          = @#{relation}_attributes
         def #{relation}_attributes=(attributes)
           @#{relation}_attributes = attributes
 
-          self.__#{relation}_attributes = attributes
+          super
         end
       RUBY
     end
