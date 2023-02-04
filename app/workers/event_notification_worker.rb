@@ -6,22 +6,35 @@ class EventNotificationWorker
   sidekiq_options lock: :until_executed,
                   queue: :logs
 
-  def perform(event_log_id)
-    event_log  = EventLog.find(event_log_id)
-    event_type = event_log.event_type
-    whodunnit  = event_log.whodunnit
-    resource   = event_log.resource
+  def perform(
+    event,
+    account_id,
+    resource_type,
+    resource_id,
+    whodunnit_type,
+    whodunnit_id,
+    idempotency_key
+  )
+    if (klass = resource_type&.classify&.constantize) && klass.attribute_method?(:account_id)
+      resource = klass.find_by(id: resource_id, account_id:)
 
-    if whodunnit.present?
-      whodunnit.notify!(event_type.event, idempotency_key: "#{whodunnit.id}:#{event_log.idempotency_key}") if
-        whodunnit.respond_to?(:notify!)
-
-      # No use in attempting to resend the same idempotent event
-      return if
-        whodunnit == resource
+      resource.notify!(event, idempotency_key: "#{resource_id}:#{idempotency_key}") if
+        resource.respond_to?(:notify!)
     end
 
-    resource.notify!(event_type.event, idempotency_key: "#{resource.id}:#{event_log.idempotency_key}") if
-      resource.respond_to?(:notify!)
+    # No use in attempting to resend the same idempotent event
+    return if
+      resource_type == whodunnit_type &&
+      resource_id == whodunnit_id
+
+    if (klass = whodunnit_type&.classify&.constantize) && klass.attribute_method?(:account_id)
+      whodunnit = klass.find_by(id: whodunnit_id, account_id:)
+
+      whodunnit.notify!(event, idempotency_key: "#{whodunnit_id}:#{idempotency_key}") if
+        whodunnit.respond_to?(:notify!)
+    end
   end
 end
+
+# FIXME(ezekg) Remove after backlog for EventNotificationWorker2 is clear
+EventNotificationWorker2 = EventNotificationWorker
