@@ -2,7 +2,6 @@
 
 class LicenseOverdueCheckInsWorker
   include Sidekiq::Worker
-  include Sidekiq::Cronitor
 
   sidekiq_options queue: :critical, lock: :until_executed, cronitor_key: '5N6CbP'
 

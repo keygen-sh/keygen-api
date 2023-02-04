@@ -2,7 +2,6 @@
 
 class LicenseExpirationsWorker
   include Sidekiq::Worker
-  include Sidekiq::Cronitor
 
   sidekiq_options queue: :critical, lock: :until_executed, cronitor_key: 'nBWCsr'
 
