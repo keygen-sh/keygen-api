@@ -2,7 +2,6 @@
 
 class RequestLimitsReportWorker
   include Sidekiq::Worker
-  include Sidekiq::Cronitor
 
   sidekiq_options queue: :cron, lock: :until_executed
 
