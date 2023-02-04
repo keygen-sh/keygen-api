@@ -32,6 +32,11 @@ class Machine < ApplicationRecord
     if: -> { license.present? && group_id.nil? },
     on: %i[create]
 
+  # Set initial heartbeat if heartbeat is required
+  before_validation -> { self.last_heartbeat_at ||= Time.current },
+    if: :requires_heartbeat?,
+    on: :create
+
   # Update license's total core count on machine create, update and destroy
   after_create :update_machines_core_count_on_create
   after_update :update_machines_core_count_on_update

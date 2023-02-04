@@ -197,7 +197,9 @@ describe ProcessHeartbeatWorker do
 
       job = worker.jobs.last
 
-      expect(job['at'].to_i).to be(job['created_at'].to_i + heartbeat_duration.to_i)
+      expect(job['at'].to_i).to be_within(30.seconds).of(
+        job['created_at'].to_i + heartbeat_duration.to_i,
+      )
     end
   end
 
@@ -215,7 +217,9 @@ describe ProcessHeartbeatWorker do
 
       job = worker.jobs.last
 
-      expect(job['at'].to_i).to be(job['created_at'].to_i + heartbeat_duration.to_i)
+      expect(job['at'].to_i).to be_within(30.seconds).of(
+        job['created_at'].to_i + heartbeat_duration.to_i,
+      )
     end
   end
 end

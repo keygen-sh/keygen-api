@@ -4075,3 +4075,91 @@ Feature: Create machine
         "code": "LICENSE_NOT_ALLOWED"
       }
       """
+
+  Scenario: Admin creates a machine that does not require a heartbeat
+    Given time is frozen at "2023-02-04T03:28:50.000Z"
+    And I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireHeartbeat": false }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "57:1f:d2:13:38:54:08:c2:4f:0e:d5:a4:5d:4b:00:61"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following attributes:
+      """
+      {
+        "heartbeatStatus": "NOT_STARTED",
+        "lastHeartbeat": null
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin creates a machine that does require a heartbeat
+    Given time is frozen at "2023-02-04T03:28:50.000Z"
+    And I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireHeartbeat": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "57:1f:d2:13:38:54:08:c2:4f:0e:d5:a4:5d:4b:00:61"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following attributes:
+      """
+      {
+        "heartbeatStatus": "ALIVE",
+        "lastHeartbeat": "2023-02-04T03:28:50.000Z"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
