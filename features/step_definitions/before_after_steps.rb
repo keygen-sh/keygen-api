@@ -31,7 +31,7 @@ Before do |scenario|
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
   StripeHelper.start
-  Rails.cache.clear(namespace: "test_#{ENV['TEST_ENV_NUMBER']}")
+  Rails.cache.clear
 
   stub_account_keygens
   stub_cache
@@ -68,7 +68,7 @@ After do |scenario|
     )
   end
 
-  Rails.cache.clear(namespace: "test_#{ENV['TEST_ENV_NUMBER']}")
+  Rails.cache.clear
 
   @account = nil
   @token = nil
