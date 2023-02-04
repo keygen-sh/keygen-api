@@ -7,3 +7,4 @@ std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} --strict --tags 'no
 default: <%= std_opts %> features
 wip: --tags @wip:3 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags 'not @wip'
+# parallel: --group-by scenarios
