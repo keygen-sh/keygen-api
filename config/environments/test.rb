@@ -33,8 +33,8 @@ Rails.application.configure do
   if ENV['REDIS_URL'].present?
     config.action_controller.perform_caching = true
     config.cache_store = :redis_cache_store, {
-      namespace: "test_#{ENV['TEST_ENV_NUMBER']}",
       url: ENV['REDIS_URL'],
+      db: ENV['TEST_ENV_NUMBER'].to_i,
       pool_size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
       pool_timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
       connect_timeout: ENV.fetch('REDIS_CONNECT_TIMEOUT') { 5 }.to_i,
