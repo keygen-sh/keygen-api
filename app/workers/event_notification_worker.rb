@@ -35,6 +35,3 @@ class EventNotificationWorker
     end
   end
 end
-
-# FIXME(ezekg) Remove after backlog for EventNotificationWorker2 is clear
-EventNotificationWorker2 = EventNotificationWorker
