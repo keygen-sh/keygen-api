@@ -355,7 +355,6 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.7.1)
-    redis-prescription (1.0.0)
     regexp_parser (2.2.1)
     request_migrations (1.1.1)
       rails (>= 6.0)
@@ -412,10 +411,6 @@ GEM
     sidekiq-cronitor (2.0.0)
       cronitor (~> 4.0)
       sidekiq (~> 6.0)
-    sidekiq-throttled (0.17.0)
-      concurrent-ruby
-      redis-prescription
-      sidekiq (>= 6.4)
     sidekiq-unique-jobs (7.1.29)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
@@ -512,7 +507,6 @@ DEPENDENCIES
   sidekiq (~> 6.5.7)
   sidekiq-cron (~> 1.9.1)
   sidekiq-cronitor (~> 2.0.0)
-  sidekiq-throttled (~> 0.17.0)
   sidekiq-unique-jobs (~> 7.1.29)
   sprockets (~> 3.0)
   stripe (~> 5.43)

@@ -2,9 +2,7 @@
 
 class WaitForArtifactUploadWorker
   include Sidekiq::Worker
-  include Sidekiq::Throttled::Worker
 
-  sidekiq_throttle concurrency: { limit: 25 }
   sidekiq_options queue: :critical
 
   def perform(artifact_id, enqueued_at = Time.current.iso8601)

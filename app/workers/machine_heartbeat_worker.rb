@@ -2,9 +2,7 @@
 
 class MachineHeartbeatWorker
   include Sidekiq::Worker
-  include Sidekiq::Throttled::Worker
 
-  sidekiq_throttle concurrency: { limit: 25 }
   sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
     lock: :until_executing,

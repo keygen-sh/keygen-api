@@ -58,7 +58,6 @@ gem 'rails-pattern_matching'
 gem 'sidekiq', '~> 6.5.7'
 gem 'sidekiq-unique-jobs', '~> 7.1.29'
 gem 'sidekiq-cron', '~> 1.9.1'
-gem 'sidekiq-throttled', '~> 0.17.0'
 gem 'sidekiq-cronitor', '~> 2.0.0'
 
 # HTTP requests

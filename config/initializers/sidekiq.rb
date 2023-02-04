@@ -3,7 +3,6 @@
 require 'sidekiq'
 require 'sidekiq-unique-jobs'
 require 'sidekiq-cron'
-require 'sidekiq/throttled'
 require 'sidekiq/web'
 
 SIDEKIQ_MAX_QUEUE_LATENCY =
@@ -70,9 +69,6 @@ end
 SidekiqUniqueJobs.configure do |config|
   config.enabled = !Rails.env.test?
 end
-
-# Configure Sidekiq throttled
-Sidekiq::Throttled.setup!
 
 # Enable strict args for development/test
 Sidekiq.strict_args! unless
