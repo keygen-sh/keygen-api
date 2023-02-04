@@ -25,7 +25,8 @@ Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session
 
 # Configure Sidekiq client
 Sidekiq.configure_client do |config|
-  config.redis = {
+  config.logger = Rails.logger if Rails.env.test?
+  config.redis  = {
     ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
     size: 5,
     pool_timeout: 5,
@@ -48,7 +49,7 @@ Sidekiq.configure_server do |config|
     network_timeout: 5,
   }
 
-  schedule_file = Rails.root.join 'config', 'schedule.yml'
+  schedule_file = Rails.root / 'config' / 'schedule.yml'
 
   if File.exist?(schedule_file)
     Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
@@ -68,9 +69,6 @@ end
 # Configure Sidekiq unique jobs
 SidekiqUniqueJobs.configure do |config|
   config.enabled = !Rails.env.test?
-
-  # FIXME(ezekg) Wordaround for https://github.com/mhenrixon/sidekiq-unique-jobs/issues/630
-  config.lock_timeout = ENV.fetch('REDIS_LOCK_TIMEOUT') { 1 }.to_i
 end
 
 # Configure Sidekiq throttled
