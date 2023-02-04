@@ -64,7 +64,7 @@ class BroadcastEventService < BaseService
           )
         end
 
-        EventNotificationWorker2.perform_async(
+        EventNotificationWorker.perform_async(
           event,
           account_id,
           resource_type,
