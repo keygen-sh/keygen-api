@@ -2,9 +2,7 @@
 
 class RequestLogWorker
   include Sidekiq::Worker
-  include Sidekiq::Throttled::Worker
 
-  sidekiq_throttle concurrency: { limit: 10 }
   sidekiq_options queue: :logs
 
   def perform(
