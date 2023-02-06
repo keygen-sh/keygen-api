@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 # heroku run:detached -e SLEEP_DURATION=0.5 --tail \
-#   rails runner db/scripts/encrypt_license_keys_script.rb
+#   rails runner db/scripts/encrypt_second_factor_secrets_script.rb
 
 SLEEP_DURATION = ENV.fetch('SLEEP_DURATION') { 0.1 }.to_f
 
-License.find_each do |license|
+SecondFactor.find_each do |second_factor|
   next if
-    license.encrypted_attribute?(:key)
+    second_factor.encrypted_attribute?(:secret)
 
-  license.encrypt
+  second_factor.encrypt
 
   sleep SLEEP_DURATION
 end
