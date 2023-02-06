@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class RequestLimitsReportWorker
-  include Sidekiq::Worker
-
-  sidekiq_options queue: :cron, lock: :until_executed
+class RequestLimitsReportWorker < BaseWorker
+  sidekiq_options queue: :cron,
+                  lock: :until_executed,
+                  cronitor_disabled: false
 
   def perform
     date = Date.yesterday

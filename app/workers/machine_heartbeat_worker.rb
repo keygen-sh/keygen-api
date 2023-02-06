@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class MachineHeartbeatWorker
-  include Sidekiq::Worker
-
+class MachineHeartbeatWorker < BaseWorker
   sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
     lock: :until_executing,

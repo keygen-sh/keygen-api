@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class RequestLogWorker
-  include Sidekiq::Worker
-
+class RequestLogWorker < BaseWorker
   sidekiq_options queue: :logs
 
   def perform(

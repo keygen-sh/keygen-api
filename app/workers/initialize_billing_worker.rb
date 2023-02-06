@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class InitializeBillingWorker
-  include Sidekiq::Worker
-
+class InitializeBillingWorker < BaseWorker
   sidekiq_options queue: :billing
 
   def perform(account_id, referral_id)

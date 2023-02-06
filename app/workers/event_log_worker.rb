@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class EventLogWorker
-  include Sidekiq::Worker
-
+class EventLogWorker < BaseWorker
   sidekiq_options lock: :until_executed,
                   queue: :logs
 

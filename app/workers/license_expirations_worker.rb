@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class LicenseExpirationsWorker
-  include Sidekiq::Worker
-
-  sidekiq_options queue: :critical, lock: :until_executed, cronitor_key: 'nBWCsr'
+class LicenseExpirationsWorker < BaseWorker
+  sidekiq_options queue: :critical,
+                  lock: :until_executed,
+                  cronitor_disabled: false
 
   def perform
     License.includes(:account, :policy).reorder(nil).where.not(expiry: nil).where(expiry: [3.days.ago..3.days.from_now]).find_each do |license|

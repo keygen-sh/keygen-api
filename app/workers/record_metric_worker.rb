@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class RecordMetricWorker
-  include Sidekiq::Worker
-
+class RecordMetricWorker < BaseWorker
   sidekiq_options queue: :metrics
 
   def perform(event, account_id, resource_type, resource_id)

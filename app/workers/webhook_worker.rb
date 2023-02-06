@@ -2,14 +2,18 @@
 
 require "httparty"
 
-class WebhookWorker
+class WebhookWorker < BaseWorker
+  include SignatureHeaders
+
   MAX_RESPONSE_BODY_BYTE_SIZE = 2048
   ACCEPTABLE_CODES = (200..299).freeze
 
-  include Sidekiq::Worker
-  include SignatureHeaders
+  sidekiq_options queue: :webhooks,
+                  retry: 15,
+                  lock: :until_executed,
+                  dead: false,
+                  cronitor_disabled: false
 
-  sidekiq_options queue: :webhooks, retry: 15, lock: :until_executed, dead: false
   sidekiq_retry_in do |count|
     jitter = 10.minutes.to_i * rand(1..10)
 

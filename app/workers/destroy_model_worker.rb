@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class DestroyModelWorker
-  include Sidekiq::Worker
-
+class DestroyModelWorker < BaseWorker
   sidekiq_options queue: :critical
 
   def perform(type, id)

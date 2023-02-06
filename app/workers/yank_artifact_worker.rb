@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class YankArtifactWorker
-  include Sidekiq::Worker
-
+class YankArtifactWorker < BaseWorker
   sidekiq_options queue: :critical
 
   def perform(artifact_id)
