@@ -94,7 +94,7 @@ module Api::V1
       end
 
       if machine.save
-        if machine.not_started? && machine.requires_heartbeat?
+        if machine.alive? && machine.requires_heartbeat?
           MachineHeartbeatWorker.perform_in(
             machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
             machine.id,
@@ -102,7 +102,7 @@ module Api::V1
         end
 
         BroadcastEventService.call(
-          event: "machine.created",
+          event: 'machine.created',
           account: current_account,
           resource: machine
         )
