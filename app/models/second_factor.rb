@@ -9,6 +9,8 @@ class SecondFactor < ApplicationRecord
   include Orderable
   include Pageable
 
+  encrypts :secret
+
   belongs_to :account
   belongs_to :user
 
