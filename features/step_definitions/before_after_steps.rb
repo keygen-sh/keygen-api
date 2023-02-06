@@ -72,6 +72,4 @@ After do |scenario|
 
   @account = nil
   @token = nil
-
-  travel_back
 end
