@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class WaitForArtifactUploadWorker
-  include Sidekiq::Worker
-
+class WaitForArtifactUploadWorker < BaseWorker
   sidekiq_options queue: :critical
 
   def perform(artifact_id, enqueued_at = Time.current.iso8601)

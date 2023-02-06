@@ -1,6 +1,4 @@
-class PruneEventLogsWorker
-  include Sidekiq::Worker
-
+class PruneEventLogsWorker < BaseWorker
   BATCH_SIZE         = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
   SLEEP_DURATION     = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
   HIGH_VOLUME_EVENTS = %w[
@@ -12,7 +10,9 @@ class PruneEventLogsWorker
     process.heartbeat.pong
   ]
 
-  sidekiq_options queue: :cron, lock: :until_executed
+  sidekiq_options queue: :cron,
+                  lock: :until_executed,
+                  cronitor_disabled: false
 
   def perform
     accounts = Account.joins(:event_logs)

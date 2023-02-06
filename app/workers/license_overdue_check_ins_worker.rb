@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class LicenseOverdueCheckInsWorker
-  include Sidekiq::Worker
-
-  sidekiq_options queue: :critical, lock: :until_executed, cronitor_key: '5N6CbP'
+class LicenseOverdueCheckInsWorker < BaseWorker
+  sidekiq_options queue: :critical,
+                  lock: :until_executed,
+                  cronitor_disabled: false
 
   def perform
     query = %[

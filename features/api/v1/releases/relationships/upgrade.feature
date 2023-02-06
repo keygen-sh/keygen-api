@@ -1361,7 +1361,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """

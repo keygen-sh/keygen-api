@@ -1,10 +1,10 @@
-class PruneMetricsWorker
-  include Sidekiq::Worker
-
+class PruneMetricsWorker < BaseWorker
   BATCH_SIZE     = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
   SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
 
-  sidekiq_options queue: :cron, lock: :until_executed
+  sidekiq_options queue: :cron,
+                  lock: :until_executed,
+                  cronitor_disabled: false
 
   def perform
     accounts = Account.joins(:metrics)
