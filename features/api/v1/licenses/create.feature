@@ -485,7 +485,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin creates an isolated license for a policy in a global environment
+  Scenario: Admin creates an isolated license for a policy in the global environment
     Given the current account is "ent1"
     And the current account has 1 isolated "environment"
     And the current environment is "isolated"
@@ -535,7 +535,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin creates a shared license for a policy in a global environment
+  Scenario: Admin creates a shared license for a policy in the global environment
     Given the current account is "ent1"
     And the current account has 1 shared "environment"
     And the current environment is "shared"
@@ -670,7 +670,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin creates an isolated license for a user in a global environment
+  Scenario: Admin creates an isolated license for a user in the global environment
     Given the current account is "ent1"
     And the current account has 1 isolated "environment"
     And the current environment is "isolated"
@@ -724,7 +724,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin creates a shared license for a user in a global environment
+  Scenario: Admin creates a shared license for a user in the global environment
     Given the current account is "ent1"
     And the current account has 1 shared "environment"
     And the current environment is "shared"
