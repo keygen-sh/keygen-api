@@ -12,8 +12,10 @@ class ResolveEnvironmentService < BaseService
     return unless
       Keygen.ee?
 
-    cache do
+    with_cache do
       FindByAliasService.call(account.environments, id: environment, aliases: %i[code])
+    rescue Keygen::Error::NotFoundError
+      raise Keygen::Error::InvalidEnvironmentError, 'environment is invalid'
     end
   end
 
@@ -22,13 +24,13 @@ class ResolveEnvironmentService < BaseService
   attr_reader :environment,
               :account
 
-  def cache
+  def cache = Rails.cache
+
+  def with_cache
     key = Environment.cache_key(environment, account:)
 
-    Rails.cache.fetch(key, skip_nil: true, expires_in: ENVIRONMENT_SCOPE_CACHE_TTL) do
+    cache.fetch(key, skip_nil: true, expires_in: ENVIRONMENT_SCOPE_CACHE_TTL) do
       yield
-    rescue Keygen::Error::NotFoundError
-      raise Keygen::Error::InvalidEnvironmentError, 'environment is invalid'
     end
   end
 end
