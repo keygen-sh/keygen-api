@@ -56,6 +56,19 @@ class LicensePolicy < ApplicationPolicy
         when environment.shared?
           record.policy.environment_id == environment.id || record.policy.environment_id.nil?
         end
+
+      next if
+        record.user.nil?
+
+      deny! 'user environment is not compatible with the license environment' unless
+        case
+        when environment.nil?
+          record.user.environment.nil?
+        when environment.isolated?
+          record.user.environment_id == environment.id
+        when environment.shared?
+          record.user.environment_id == environment.id || record.user.environment_id.nil?
+        end
     end
 
     case bearer
