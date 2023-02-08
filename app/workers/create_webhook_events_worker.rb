@@ -6,11 +6,17 @@ class CreateWebhookEventsWorker < BaseWorker
 
   def perform(event, account_id, data, environment_id = nil)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-      Account.find account_id
+      Account.find(account_id)
     end
 
-    account.webhook_endpoints.for_environment(environment_id).find_each do |endpoint|
-      next unless endpoint.subscribed? event
+    webhook_endpoints = account.webhook_endpoints.for_environment(
+      environment_id,
+      strict: true,
+    )
+
+    webhook_endpoints.find_each do |webhook_endpoint|
+      next unless
+        webhook_endpoint.subscribed?(event)
 
       event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
         EventType.find_or_create_by! event: event
@@ -19,7 +25,7 @@ class CreateWebhookEventsWorker < BaseWorker
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create!(
         api_version: CURRENT_API_VERSION,
-        endpoint: endpoint.url,
+        endpoint: webhook_endpoint.url,
         event_type: event_type,
         status: 'DELIVERING',
         environment_id:,
@@ -35,14 +41,14 @@ class CreateWebhookEventsWorker < BaseWorker
       jid = WebhookWorker.perform_async(
         account.id,
         webhook_event.id,
-        endpoint.id,
-        payload.to_json
+        webhook_endpoint.id,
+        payload.to_json,
       )
 
       # Update the event to contain the payload and job identifier
       webhook_event.update!(
-        payload: payload.dig(:data, :attributes, :payload),
-        jid: jid
+        payload: data,
+        jid:,
       )
     end
   end
