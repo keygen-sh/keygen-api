@@ -23,6 +23,20 @@ module Licenses
 
     def update?
       verify_permissions!('license.user.update')
+      verify_environment! do |environment|
+        next if
+          record.nil?
+
+        deny! 'user environment is not compatible with the license environment' unless
+          case
+          when environment.nil?
+            record.environment.nil?
+          when environment.isolated?
+            record.environment_id == environment.id
+          when environment.shared?
+            record.environment_id == environment.id || record.environment_id.nil?
+          end
+      end
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
