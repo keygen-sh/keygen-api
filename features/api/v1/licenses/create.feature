@@ -517,12 +517,16 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "422"
     And the first error should have the following properties:
       """
       {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (policy environment is not compatible with the license environment)"
+        "title": "Unprocessable resource",
+        "detail": "environment must be compatible with policy environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -616,7 +620,7 @@ Feature: Create license
       """
       {
         "title": "Access denied",
-        "detail": "You do not have permission to complete the request (policy environment is not compatible with the license environment)"
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -654,7 +658,7 @@ Feature: Create license
       """
       {
         "title": "Access denied",
-        "detail": "You do not have permission to complete the request (policy environment is not compatible with the license environment)"
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -702,12 +706,16 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "422"
     And the first error should have the following properties:
       """
       {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (user environment is not compatible with the license environment)"
+        "title": "Unprocessable resource",
+        "detail": "environment must be compatible with user environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -804,12 +812,16 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "422"
     And the first error should have the following properties:
       """
       {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (user environment is not compatible with the license environment)"
+        "title": "Unprocessable resource",
+        "detail": "environment must be compatible with user environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
@@ -846,12 +858,16 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "422"
     And the first error should have the following properties:
       """
       {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (user environment is not compatible with the license environment)"
+        "title": "Unprocessable resource",
+        "detail": "environment must be compatible with user environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
       }
       """
     And the response should contain a valid signature header for "ent1"
