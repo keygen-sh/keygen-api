@@ -101,22 +101,6 @@ class Policy < ApplicationRecord
     NO_OVERAGE
   ].freeze
 
-  has_environment default: -> { product&.environment_id },
-    constraint: -> {
-      return if
-        product.nil?
-
-      throw :fail unless
-        case
-        when environment.nil?
-          product.environment_id.nil?
-        when environment.isolated?
-          product.environment_id == environment_id
-        when environment.shared?
-          product.environment_id == environment_id || product.environment_id.nil?
-        end
-    }
-
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
 
@@ -130,6 +114,8 @@ class Policy < ApplicationRecord
   has_many :entitlements, through: :policy_entitlements
   has_many :event_logs,
     as: :resource
+
+  has_environment default: -> { product&.environment_id }
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }

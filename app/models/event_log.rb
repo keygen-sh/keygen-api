@@ -8,8 +8,6 @@ class EventLog < ApplicationRecord
   include Orderable
   include Pageable
 
-  has_environment
-
   belongs_to :account
   belongs_to :event_type
   belongs_to :resource,
@@ -20,6 +18,8 @@ class EventLog < ApplicationRecord
     optional: true
   belongs_to :request_log,
     optional: true
+
+  has_environment
 
   scope :for_event_type, -> event {
     where(event_type_id: EventType.where(event:))

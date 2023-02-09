@@ -11,22 +11,27 @@ class User < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_environment constraint: -> {
-    return if
-      group.nil?
-
-    throw :fail unless
-      case
-      when environment.nil?
-        group.environment_id.nil?
-      when environment.isolated?
-        group.environment_id == environment_id
-      when environment.shared?
-        group.environment_id == environment_id || group.environment_id.nil?
-      end
-  }
+  belongs_to :account, inverse_of: :users
+  belongs_to :group,
+    optional: true
+  has_many :second_factors, dependent: :destroy
+  has_many :licenses, dependent: :destroy
+  has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :license_entitlements, through: :licenses
+  has_many :policy_entitlements, through: :licenses
+  has_many :machines, through: :licenses
+  has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
+    through: :products
+  has_many :event_logs,
+    as: :resource
+  has_many :group_owners
+  has_many :groups,
+    through: :group_owners
 
   has_secure_password :password, validations: false
+  has_environment
   has_default_role :user
   has_permissions -> user {
       role = if user.respond_to?(:role)
@@ -67,25 +72,6 @@ class User < ApplicationRecord
         ]
       end
     }
-
-  belongs_to :account, inverse_of: :users
-  belongs_to :group,
-    optional: true
-  has_many :second_factors, dependent: :destroy
-  has_many :licenses, dependent: :destroy
-  has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :license_entitlements, through: :licenses
-  has_many :policy_entitlements, through: :licenses
-  has_many :machines, through: :licenses
-  has_many :tokens, as: :bearer, dependent: :destroy_async
-  has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
-    through: :products
-  has_many :event_logs,
-    as: :resource
-  has_many :group_owners
-  has_many :groups,
-    through: :group_owners
 
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
