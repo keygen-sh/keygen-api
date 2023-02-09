@@ -13,22 +13,6 @@ class Token < ApplicationRecord
   include Permissible
   include Dirtyable
 
-  has_environment default: -> { bearer&.environment_id },
-    constraint: -> {
-      return if
-        bearer.nil?
-
-      throw :fail unless
-        case
-        when environment.nil?
-          bearer.environment_id.nil?
-        when environment.isolated?
-          bearer.environment_id == environment_id
-        when environment.shared?
-          bearer.environment_id == environment_id || bearer.environment_id.nil?
-        end
-    }
-
   # Default to wildcard permission but allow all
   has_permissions Permission::ALL_PERMISSIONS,
     default: %w[*]
@@ -38,6 +22,8 @@ class Token < ApplicationRecord
   has_many :token_permissions,
     dependent: :delete_all,
     autosave: true
+
+  has_environment default: -> { bearer&.environment_id }
 
   accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
   tracks_dirty_attributes_for :token_permissions

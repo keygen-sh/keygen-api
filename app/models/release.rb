@@ -33,22 +33,6 @@ class Release < ApplicationRecord
     YANKED
   ]
 
-  has_environment default: -> { product&.environment_id },
-    constraint: -> {
-      return if
-        product.nil?
-
-      throw :fail unless
-        case
-        when environment.nil?
-          product.environment_id.nil?
-        when environment.isolated?
-          product.environment_id == environment_id
-        when environment.shared?
-          product.environment_id == environment_id || product.environment_id.nil?
-        end
-    }
-
   belongs_to :account,
     inverse_of: :releases
   belongs_to :product,
@@ -101,6 +85,8 @@ class Release < ApplicationRecord
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
     dependent: :delete
+
+  has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
   accepts_nested_attributes_for :artifact, update_only: true

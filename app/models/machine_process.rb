@@ -12,22 +12,6 @@ class MachineProcess < ApplicationRecord
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL   = 10.minutes
 
-  has_environment default: -> { machine&.environment_id },
-    constraint: -> {
-      return if
-        machine.nil?
-
-      throw :fail unless
-        case
-        when environment.nil?
-          machine.environment_id.nil?
-        when environment.isolated?
-          machine.environment_id == environment_id
-        when environment.shared?
-          machine.environment_id == environment_id || machine.environment_id.nil?
-        end
-    }
-
   belongs_to :account
   belongs_to :machine
   has_one :group,      through: :machine
@@ -35,6 +19,8 @@ class MachineProcess < ApplicationRecord
   has_one :user,       through: :machine
   has_one :policy,     through: :machine
   has_one :product,    through: :machine
+
+  has_environment default: -> { machine&.environment_id }
 
   before_validation -> { self.last_heartbeat_at ||= Time.current },
     on: :create

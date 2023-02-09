@@ -40,11 +40,8 @@ module Environmental
     # has_environment configures the model to be scoped to an optional environment.
     #
     # Use :default to automatically configure a default environment for the model.
-    # Accepts a proc that resolves into an environment or environment ID.
-    #
-    # Use :constraint to add validations to the model's environment, e.g. to assert
-    # a model's environment is compatible with an association's environment.
-    def has_environment(default: nil, constraint: nil)
+    # Accepts a proc that resolves into an Environment or environment ID.
+    def has_environment(default: nil)
       belongs_to :environment,
         optional: true
 
@@ -55,7 +52,7 @@ module Environmental
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? }
 
-      # Validate the association only if we've been given an environment (because it's optional)
+      # Validate the association only if we've been given an environment (because it's optional).
       validates :environment,
         presence: { message: 'must exist' },
         scope: { by: :account_id },
@@ -96,34 +93,44 @@ module Environmental
           if: -> { new_record? }
       end
 
-      unless constraint.nil?
-        # We also want to assert that the model's current environment is compatible
-        # with its environment constraint (if a constraint is set).
-        #
-        # NOTE(ezekg) We're using a lambda here so that we can return early out
-        #             of the nested catch blocks (next won't work).
-        validator = -> {
-          catch :fail do
-            catch :pass do
-              case constraint.arity
-              when 1
-                instance_exec(self, &constraint)
-              when 0
-                instance_exec(&constraint)
-              else
-                raise ArgumentError, 'expected proc with 0..1 arguments'
+      # We also want to assert that the model's current environment is compatible
+      # with all of its :belongs_to associations that are environmental.
+      unless (reflections = reflect_on_all_associations(:belongs_to)).empty?
+        reflections.reject { _1.name == :environment }
+                   .each do |reflection|
+          # Assert that we're either we're dealing with a polymorphic association (and in that
+          # case, we'll perform the environment assert later during validation), or we want
+          # to assert the :belongs_to has an :environment association to assert against.
+          next unless
+            (reflection.options in polymorphic: true) || reflection.klass < Environmental
+
+          # Perform asserts on create and update.
+          validate on: %i[create update] do
+            next unless
+              environment_id_changed? || public_send("#{reflection.foreign_key}_changed?")
+
+            association = public_send(reflection.name)
+            next if
+              association.nil?
+
+            # Again, assert that the association has an :environment association to assert
+            # against (this is mainly here for polymorphic associations).
+            next unless
+              association.class < Environmental
+
+            # Add a validation error if the current model's environment is incompatible with
+            # its association's environment.
+            errors.add :environment, :not_allowed, message: "environment must be compatible with #{reflection.name} environment" unless
+              case
+              when environment.nil?
+                association.environment_id.nil?
+              when environment.isolated?
+                association.environment_id == environment_id
+              when environment.shared?
+                association.environment_id == environment_id || association.environment_id.nil?
               end
-            end
-
-            # Unless our constraint throws :fail, we're all good.
-            return
           end
-
-          # If we reach this, our constraint threw :fail.
-          errors.add :environment, :not_allowed, message: 'is invalid (constraint failed)'
-        }
-
-        validate on: %i[create update], &validator
+        end
       end
     end
   end

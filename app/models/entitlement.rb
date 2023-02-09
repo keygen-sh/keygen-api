@@ -7,8 +7,6 @@ class Entitlement < ApplicationRecord
   include Pageable
   include Diffable
 
-  has_environment
-
   belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, dependent: :delete_all
@@ -17,6 +15,8 @@ class Entitlement < ApplicationRecord
     dependent: :delete_all
   has_many :event_logs,
     as: :resource
+
+  has_environment
 
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
