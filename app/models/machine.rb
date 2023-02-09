@@ -412,7 +412,7 @@ class Machine < ApplicationRecord
 
     update!(last_heartbeat_at: Time.current, last_death_event_sent_at: nil)
 
-    self.heartbeat_status_override = :RESURRECTED
+    self.heartbeat_status_override = 'RESURRECTED'
   end
 
   def heartbeat_duration
@@ -420,17 +420,17 @@ class Machine < ApplicationRecord
   end
 
   def heartbeat_not_started?
-    heartbeat_status == :NOT_STARTED
+    heartbeat_status == 'NOT_STARTED'
   end
   alias_method :not_started?, :heartbeat_not_started?
 
   def heartbeat_alive?
-    heartbeat_status == :ALIVE || heartbeat_status == :RESURRECTED
+    heartbeat_status == 'ALIVE' || heartbeat_status == 'RESURRECTED'
   end
   alias_method :alive?, :heartbeat_alive?
 
   def heartbeat_dead?
-    heartbeat_status == :DEAD
+    heartbeat_status == 'DEAD'
   end
   alias_method :dead?, :heartbeat_dead?
 
@@ -453,14 +453,14 @@ class Machine < ApplicationRecord
     return heartbeat_status_override if
       heartbeat_status_override.present?
 
-    return :NOT_STARTED unless
+    return 'NOT_STARTED' unless
       requires_heartbeat? &&
       last_heartbeat_at?
 
     if next_heartbeat_at >= Time.current
-      :ALIVE
+      'ALIVE'
     else
-      :DEAD
+      'DEAD'
     end
   end
 
