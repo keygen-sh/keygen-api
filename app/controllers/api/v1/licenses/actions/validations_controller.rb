@@ -113,6 +113,7 @@ module Api::V1::Licenses::Actions
     }
     def validate_by_key
       @license = LicenseKeyLookupService.call(
+        environment: current_environment,
         account: current_account,
         key: validation_meta[:key],
         # Since we've added new encryption schemes, we only want to alter

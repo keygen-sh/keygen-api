@@ -2,10 +2,16 @@
 Feature: License validation actions
 
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
+    And I send and accept JSON
     And I send and accept JSON
 
   # Quick validation
@@ -1263,6 +1269,98 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin quick validates an isolated license in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin quick validates a global license in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "404"
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin quick validates a shared license in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin quick validates a global license in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -4759,6 +4857,101 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates an isolated license in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a global license in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "404"
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a shared license in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a global license in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -8350,3 +8543,195 @@ Feature: License validation actions
       }
       """
     Then the response status should be "403"
+
+  @ee
+  Scenario: Admin validates an isolated license key in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a shared license key in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "license"
+    And the current account has 1 isolated "admin"
+    And the current environment is "isolated"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a global license key in an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a shared license key in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates an isolated license key in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 isolated "license"
+    And the current environment is "shared"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a global license key in a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
