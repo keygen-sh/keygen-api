@@ -7,6 +7,7 @@ class ChangeAliveStatusToNotStartedForMachineMigration < BaseMigration
     case body
     in data: { type: /\Amachines\z/, attributes: { heartbeatStatus: 'ALIVE' } }
       body[:data][:attributes][:heartbeatStatus] = 'NOT_STARTED'
+      body[:data][:attributes][:lastHeartbeat]   = nil
     else
     end
   end
