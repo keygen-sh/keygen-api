@@ -16,7 +16,6 @@ RequestMigrations.configure do |config|
   config.versions        = {
     '1.2' => %i[
       change_alive_status_to_not_started_for_machine_migration
-      change_last_heartbeat_to_nil_for_machine_migration
     ],
     '1.1' => %i[
       adjust_validity_for_validation_codes_migration

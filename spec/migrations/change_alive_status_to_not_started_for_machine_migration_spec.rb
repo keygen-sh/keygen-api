@@ -26,6 +26,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'NOT_STARTED',
+            lastHeartbeat: nil,
           ),
         ),
       )
@@ -36,6 +37,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'NOT_STARTED',
+            lastHeartbeat: nil,
           ),
         ),
       )
@@ -53,6 +55,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'ALIVE',
+            lastHeartbeat: Time,
           ),
         ),
       )
@@ -63,6 +66,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'NOT_STARTED',
+            lastHeartbeat: nil,
           ),
         ),
       )
@@ -80,6 +84,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'DEAD',
+            lastHeartbeat: Time,
           ),
         ),
       )
@@ -90,6 +95,7 @@ describe ChangeAliveStatusToNotStartedForMachineMigration do
         data: include(
           attributes: include(
             heartbeatStatus: 'DEAD',
+            lastHeartbeat: Time,
           ),
         ),
       )
