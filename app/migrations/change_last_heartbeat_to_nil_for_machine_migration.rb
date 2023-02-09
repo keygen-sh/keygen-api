@@ -5,7 +5,7 @@ class ChangeLastHeartbeatToNilForMachineMigration < BaseMigration
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
-    in data: { type: /\Amachines\z/, attributes: { lastHeartbeat: String } }
+    in data: { type: /\Amachines\z/, attributes: { lastHeartbeat: String | Time } }
       body[:data][:attributes][:lastHeartbeat] = nil
     else
     end

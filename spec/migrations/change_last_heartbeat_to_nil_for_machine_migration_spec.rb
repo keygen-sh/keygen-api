@@ -52,7 +52,7 @@ describe ChangeLastHeartbeatToNilForMachineMigration do
       expect(data).to include(
         data: include(
           attributes: include(
-            lastHeartbeat: subject.last_heartbeat_at.iso8601(3),
+            lastHeartbeat: Time,
           ),
         ),
       )
@@ -62,7 +62,7 @@ describe ChangeLastHeartbeatToNilForMachineMigration do
       expect(data).to include(
         data: include(
           attributes: include(
-            heartbeatStatus: nil,
+            lastHeartbeat: nil,
           ),
         ),
       )
@@ -79,7 +79,7 @@ describe ChangeLastHeartbeatToNilForMachineMigration do
       expect(data).to include(
         data: include(
           attributes: include(
-            heartbeatStatus: subject.last_heartbeat_at.iso8601(3),
+            lastHeartbeat: Time,
           ),
         ),
       )
@@ -89,7 +89,7 @@ describe ChangeLastHeartbeatToNilForMachineMigration do
       expect(data).to include(
         data: include(
           attributes: include(
-            heartbeatStatus: subject.last_heartbeat_at.iso8601(3),
+            lastHeartbeat: nil,
           ),
         ),
       )
