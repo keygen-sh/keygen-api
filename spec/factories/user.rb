@@ -90,21 +90,27 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      before :create do |user|
-        user.update(environment: build(:environment, :isolated, account: user.account))
-      end
+      environment { build(:environment, :isolated, account:) }
+    end
+
+    trait :isolated do
+      in_isolated_environment
     end
 
     trait :in_shared_environment do
-      before :create do |user|
-        user.update(environment: build(:environment, :shared, account: user.account))
-      end
+      environment { build(:environment, :shared, account:) }
+    end
+
+    trait :shared do
+      in_shared_environment
     end
 
     trait :in_nil_environment do
-      before :create do |user|
-        user.update(environment: nil)
-      end
+      environment { nil }
+    end
+
+    trait :global do
+      in_nil_environment
     end
   end
 end
