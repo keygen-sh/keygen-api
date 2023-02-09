@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-CURRENT_API_VERSION = '1.2'
+CURRENT_API_VERSION = '1.3'
 DEFAULT_API_VERSION = CURRENT_API_VERSION
 
 RequestMigrations.configure do |config|
@@ -14,6 +14,10 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.2' => %i[
+      change_alive_status_to_not_started_for_machine_migration
+      change_last_heartbeat_to_nil_for_machine_migration
+    ],
     '1.1' => %i[
       adjust_validity_for_validation_codes_migration
       rename_code_to_constant_for_validation_migration
