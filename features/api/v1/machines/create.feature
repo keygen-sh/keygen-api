@@ -4076,7 +4076,7 @@ Feature: Create machine
       }
       """
 
-  Scenario: Admin creates a machine that does not require a heartbeat
+  Scenario: Admin creates a machine that does not require a heartbeat (v1.2)
     Given time is frozen at "2023-02-04T03:28:50.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
@@ -4087,6 +4087,7 @@ Feature: Create machine
       """
     And the current account has 1 "license" for the last "policy"
     And I use an authentication token
+    And I use API version "1.2"
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
       {
@@ -4120,7 +4121,52 @@ Feature: Create machine
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
-  Scenario: Admin creates a machine that does require a heartbeat
+  Scenario: Admin creates a machine that does not require a heartbeat (v1.3)
+    Given time is frozen at "2023-02-04T03:28:50.000Z"
+    And I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireHeartbeat": false }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I use an authentication token
+    And I use API version "1.3"
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "57:1f:d2:13:38:54:08:c2:4f:0e:d5:a4:5d:4b:00:61"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following attributes:
+      """
+      {
+        "heartbeatStatus": "NOT_STARTED",
+        "lastHeartbeat": null
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin creates a machine that does require a heartbeat (v1.2)
     Given time is frozen at "2023-02-04T03:28:50.000Z"
     And I am an admin of account "test1"
     And the current account is "test1"
@@ -4131,6 +4177,52 @@ Feature: Create machine
       """
     And the current account has 1 "license" for the last "policy"
     And I use an authentication token
+    And I use API version "1.2"
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "57:1f:d2:13:38:54:08:c2:4f:0e:d5:a4:5d:4b:00:61"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following attributes:
+      """
+      {
+        "heartbeatStatus": "NOT_STARTED",
+        "lastHeartbeat": null
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin creates a machine that does require a heartbeat (v1.3)
+    Given time is frozen at "2023-02-04T03:28:50.000Z"
+    And I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireHeartbeat": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I use an authentication token
+    And I use API version "1.3"
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
       {
