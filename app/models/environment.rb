@@ -11,9 +11,6 @@ class Environment < ApplicationRecord
     SHARED
   ]
 
-  has_role :environment
-  has_permissions Permission::ENVIRONMENT_PERMISSIONS
-
   belongs_to :account
   has_many :tokens,
     class_name: Token.name,
@@ -45,6 +42,9 @@ class Environment < ApplicationRecord
   has_many :release_channels,   dependent: :nullify
   has_many :release_platforms,  dependent: :nullify
   has_many :release_arches,     dependent: :nullify
+
+  has_role :environment
+  has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
   before_create -> { self.isolation_strategy ||= 'ISOLATED' }
 

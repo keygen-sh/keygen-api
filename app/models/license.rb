@@ -10,47 +10,6 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_environment default: -> { policy&.environment_id },
-    constraint: -> {
-      return if
-        policy.nil?
-
-      throw :fail unless
-        case
-        when environment.nil?
-          policy.environment_id.nil? && (
-            group.nil? || group.environment_id.nil?
-          ) && (
-            user.nil? || user.environment_id.nil?
-          )
-        when environment.isolated?
-          policy.environment_id == environment_id && (
-            group.nil? || group.environment_id == environment_id
-          ) && (
-            user.nil? || user.environment_id == environment_id
-          )
-        when environment.shared?
-          policy.environment_id == environment_id || policy.environment_id.nil? && (
-            group.nil? || group.environment_id == environment_id || group.environment_id.nil?
-          ) && (
-            user.nil? || user.environment_id == environment_id || user.environment_id.nil?
-          )
-        end
-    }
-
-  has_role :license
-  has_permissions Permission::LICENSE_PERMISSIONS,
-    # NOTE(ezekg) Removing these from defaults for backwards compatibility
-    default: Permission::LICENSE_PERMISSIONS - %w[
-      account.read
-      product.read
-      policy.read
-      user.read
-    ]
-
-  encrypts :key,
-    deterministic: true
-
   belongs_to :account
   belongs_to :user,
     optional: true
@@ -67,6 +26,20 @@ class License < ApplicationRecord
     through: :product
   has_many :event_logs,
     as: :resource
+
+  has_environment default: -> { policy&.environment_id }
+  has_role :license
+  has_permissions Permission::LICENSE_PERMISSIONS,
+    # NOTE(ezekg) Removing these from defaults for backwards compatibility
+    default: Permission::LICENSE_PERMISSIONS - %w[
+      account.read
+      product.read
+      policy.read
+      user.read
+    ]
+
+  encrypts :key,
+    deterministic: true
 
   # Used for legacy encrypted licenses
   attr_reader :raw

@@ -14,10 +14,6 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
-  has_environment
-  has_role :product
-  has_permissions Permission::PRODUCT_PERMISSIONS
-
   belongs_to :account
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
@@ -32,6 +28,10 @@ class Product < ApplicationRecord
   has_many :release_arches, through: :release_artifacts, source: :arch
   has_many :event_logs,
     as: :resource
+
+  has_environment
+  has_role :product
+  has_permissions Permission::PRODUCT_PERMISSIONS
 
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
 
