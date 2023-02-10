@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class MachineHeartbeatWorker < BaseWorker
-  sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
     retry: 1_000_000, # retry forever
     lock: :until_executing,
@@ -9,6 +8,14 @@ class MachineHeartbeatWorker < BaseWorker
       client: :replace,
       server: :raise,
     }
+
+  sidekiq_retry_in { |count|
+    if count in 0..60
+      1.minute.to_i
+    else
+      10.minutes.to_i
+    end
+  }
 
   def perform(machine_id)
     machine = Machine.find(machine_id)
