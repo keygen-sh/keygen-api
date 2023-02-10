@@ -58,6 +58,7 @@ module TypedParameters
 
   class UndefinedActionError < StandardError; end
   class InvalidMethodError < StandardError; end
+  class ValidationError < StandardError; end
   class CoercionError < StandardError; end
 
   class InvalidParameterError < StandardError

@@ -8,15 +8,20 @@ module TypedParameters
       def call(value)
         case options
         in minimum: Numeric => n
-          value.length >= n
+          raise ValidationError, "length must be greater than or equal to #{n}" unless
+            value.length >= n
         in maximum: Numeric => n
-          value.length <= n
+          raise ValidationError, "length must be less than or equal to #{n}" unless
+            value.length <= n
         in within: Range | Array => e
-          e.include?(value.length)
+          raise ValidationError, "length must be between #{e.first} and #{e.last}" unless
+            e.include?(value.length)
         in in: Range | Array => e
-          e.include?(value.length)
+          raise ValidationError, 'length is invalid' unless
+            e.include?(value.length)
         in is: Numeric => n
-          value.length == n
+          raise ValidationError, "length must be equal to #{n}" unless
+            value.length == n
         end
       end
     end

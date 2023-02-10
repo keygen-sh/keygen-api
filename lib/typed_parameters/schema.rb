@@ -109,7 +109,7 @@ module TypedParameters
       @validations << Validations::Length.new(length) if
         length.present?
 
-      @validations << validate if
+      @validations << Validations::Validation.wrap(validate) if
         validate.present?
 
       # Transforms
