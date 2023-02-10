@@ -22,6 +22,6 @@ class EnvironmentSerializer < BaseSerializer
   end
 
   link :self do
-    @url_helpers.v1_account_environment_path @object.account_id, @object
+    @url_helpers.v1_account_environment_path @object.account_id, @object.environment_id
   end
 end

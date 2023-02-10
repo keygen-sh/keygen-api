@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseUploadLink < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -8,6 +9,10 @@ class ReleaseUploadLink < ApplicationRecord
   belongs_to :account
   belongs_to :release,
     inverse_of: :upload_links
+
+  has_environment default: -> { release&.environment_id }
+
+  encrypts :url
 
   validates :release,
     scope: { by: :account_id }

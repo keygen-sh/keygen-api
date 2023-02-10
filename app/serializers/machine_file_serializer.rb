@@ -22,6 +22,23 @@ class MachineFileSerializer < BaseSerializer
     end
   end
 
+  ee do
+    relationship :environment do
+      linkage always: true do
+        if @object.environment_id.present?
+          { type: :environments, id: @object.environment_id }
+        else
+          nil
+        end
+      end
+      link :related do
+        unless @object.environment_id.nil?
+          @url_helpers.v1_account_environment_path @object.account_id, @object.environment_id
+        end
+      end
+    end
+  end
+
   relationship :license do
     linkage always: true do
       { type: :licenses, id: @object.license_id }

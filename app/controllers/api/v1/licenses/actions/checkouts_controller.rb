@@ -85,6 +85,7 @@ module Api::V1::Licenses::Actions
         to: :check_out?
 
       license_file = LicenseCheckoutService.call(
+        environment: current_environment,
         account: current_account,
         license:,
         **kwargs,

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class LicenseEntitlement < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -9,6 +10,8 @@ class LicenseEntitlement < ApplicationRecord
   belongs_to :license
   belongs_to :entitlement
   has_one :policy, through: :license
+
+  has_environment default: -> { license&.environment_id }
 
   validates :license,
     scope: { by: :account_id }
