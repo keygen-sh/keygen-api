@@ -2,8 +2,6 @@
 
 module Api::V1::Releases::Relationships
   class UpgradesController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:product) { |c, s, v| s.for_product(v) }
 
     before_action :scope_to_current_account!

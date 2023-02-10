@@ -2,8 +2,6 @@
 
 module Api::V1::Users::Relationships
   class MachinesController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:fingerprint) { |c, s, v| s.with_fingerprint(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }

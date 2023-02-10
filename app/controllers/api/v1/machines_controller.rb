@@ -2,8 +2,6 @@
 
 module Api::V1
   class MachinesController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:fingerprint) { |c, s, v| s.with_fingerprint(v) }
     has_scope(:ip) { |c, s, v| s.with_ip(v) }

@@ -2,8 +2,6 @@
 
 module Api::V1::Metrics::Actions
   class CountsController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!

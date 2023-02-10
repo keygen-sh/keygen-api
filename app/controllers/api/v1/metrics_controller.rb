@@ -2,8 +2,6 @@
 
 module Api::V1
   class MetricsController < Api::V1::BaseController
-    supports_environment
-
     has_scope :date, type: :hash, using: [:start, :end], only: :index
     has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
     has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }

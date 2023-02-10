@@ -2,8 +2,6 @@
 
 module Api::V1
   class EventLogsController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:date, type: :hash, using: [:start, :end], only: :index)
     has_scope(:whodunnit, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_whodunnit(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
