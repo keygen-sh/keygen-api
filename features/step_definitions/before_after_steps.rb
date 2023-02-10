@@ -68,8 +68,6 @@ After do |scenario|
     )
   end
 
-  Rails.cache.clear
-
   @account = nil
   @token = nil
 end
