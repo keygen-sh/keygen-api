@@ -84,9 +84,9 @@ class Token < ApplicationRecord
       self.all
     in role: { name: 'environment' }
       self.for_environment(accessor)
-        .or(
-          where(bearer: accessor)
-        )
+          .or(
+            where(bearer: accessor)
+          )
     in role: { name: 'product' }
       self.for_product(accessor.id)
           .or(
