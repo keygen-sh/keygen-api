@@ -3690,3 +3690,214 @@ Feature: Create policy
       }
       """
     Then the response status should be "403"
+
+  Scenario: Admin creates a policy with a default heartbeat basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Default Heartbeat Basis"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_FIRST_PING" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Default Heartbeat Basis",
+            "requireHeartbeat": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_CREATION" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat, v1.3)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.3"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Default Heartbeat Basis",
+            "requireHeartbeat": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_CREATION" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat, v1.2)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.2"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Default Heartbeat Basis",
+            "requireHeartbeat": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_FIRST_PING" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy with a FROM_CREATION heartbeat basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "From Creation Heartbeat Basis",
+            "heartbeatBasis": "FROM_CREATION"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_CREATION" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy with a FROM_FIRST_PING heartbeat basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "From First Ping Heartbeat Basis",
+            "heartbeatBasis": "FROM_FIRST_PING"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "heartbeatBasis": "FROM_FIRST_PING" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

@@ -58,7 +58,7 @@ class Policy < ApplicationRecord
   TRANSFER_STRATEGIES = %w[
     RESET_EXPIRY
     KEEP_EXPIRY
-  ]
+  ].freeze
 
   AUTHENTICATION_STRATEGIES = %w[
     TOKEN
@@ -70,7 +70,7 @@ class Policy < ApplicationRecord
   HEARTBEAT_CULL_STRATEGIES = %w[
     DEACTIVATE_DEAD
     KEEP_DEAD
-  ]
+  ].freeze
 
   HEARTBEAT_RESURRECTION_STRATEGIES = %w[
     ALWAYS_REVIVE
@@ -80,12 +80,17 @@ class Policy < ApplicationRecord
     2_MINUTE_REVIVE
     1_MINUTE_REVIVE
     NO_REVIVE
-  ]
+  ].freeze
+
+  HEARTBEAT_BASES = %w[
+    FROM_CREATION
+    FROM_FIRST_PING
+  ].freeze
 
   LEASING_STRATEGIES = %w[
     PER_LICENSE
     PER_MACHINE
-  ]
+  ].freeze
 
   OVERAGE_STATEGIES = %w[
     ALWAYS_ALLOW_OVERAGE
@@ -93,7 +98,7 @@ class Policy < ApplicationRecord
     ALLOW_1_5X_OVERAGE
     ALLOW_2X_OVERAGE
     NO_OVERAGE
-  ]
+  ].freeze
 
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
@@ -124,6 +129,7 @@ class Policy < ApplicationRecord
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
   before_create :set_default_overage_strategy, unless: :overage_strategy?
+  before_create :set_default_heartbeat_basis, unless: :heartbeat_basis?
 
   validates :product,
     scope: { by: :account_id }
@@ -160,6 +166,10 @@ class Policy < ApplicationRecord
 
   validates :heartbeat_resurrection_strategy,
     inclusion: { in: HEARTBEAT_RESURRECTION_STRATEGIES, message: 'unsupported heartbeat resurrection strategy' },
+    allow_nil: true
+
+  validates :heartbeat_basis,
+    inclusion: { in: HEARTBEAT_BASES, message: "unsupported heartbeat basis" },
     allow_nil: true
 
   validates :transfer_strategy,
@@ -380,6 +390,18 @@ class Policy < ApplicationRecord
     ttl.to_i
   end
 
+  def heartbeat_from_creation?
+    heartbeat_basis == 'FROM_CREATION'
+  end
+
+  def heartbeat_from_first_ping?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      heartbeat_basis.nil?
+
+    heartbeat_basis == 'FROM_FIRST_PING'
+  end
+
   def fingerprint_uniq_per_account?
     fingerprint_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
   end
@@ -553,5 +575,16 @@ class Policy < ApplicationRecord
                             else
                               'NO_OVERAGE'
                             end
+  end
+
+  def set_default_heartbeat_basis
+    self.heartbeat_basis = case
+                           when api_version == '1.0' || api_version == '1.1' || api_version == '1.2'
+                             'FROM_FIRST_PING'
+                           when require_heartbeat?
+                             'FROM_CREATION'
+                           else
+                             'FROM_FIRST_PING'
+                           end
   end
 end
