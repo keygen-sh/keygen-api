@@ -137,6 +137,32 @@ Feature: Policy entitlements relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attaches empty entitlements to a policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "entitlements"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      { "data": [] }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "length must be greater than or equal to 1",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attaches entitlements to a policy that already exists
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -330,6 +356,31 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin detaches empty entitlements from a policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 3 "policy-entitlements" for existing "policies"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      { "data": [] }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "length must be greater than or equal to 1",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach entitlements from a policy with an invalid entitlement ID

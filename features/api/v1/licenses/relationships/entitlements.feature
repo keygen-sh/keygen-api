@@ -195,6 +195,30 @@ Feature: License entitlements relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attaches empty entitlements to a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      { "data": [] }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "length must be greater than or equal to 1",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attaches an entitlement to a license that already exists as a policy entitlement
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -432,6 +456,32 @@ Feature: License entitlements relationship
     And the current account should have 3 "entitlements"
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin detaches empty entitlements from a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "license"
+    And the current account has 3 "license-entitlements" for existing "licenses"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      { "data": [] }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "length must be greater than or equal to 1",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach entitlements from a license with an invalid entitlement ID
