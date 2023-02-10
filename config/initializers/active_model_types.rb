@@ -10,6 +10,9 @@ class ActiveModel::Type::UUID
   end
 
   def assert_valid_value(value)
+    return if
+      value.nil?
+
     raise ArgumentError, "#{value.inspect} is not a valid UUID v4" unless
       value.match?(UUID_RE)
   end
@@ -27,6 +30,9 @@ class ActiveModel::Type::Array
   end
 
   def assert_valid_value(value)
+    return if
+      value.nil?
+
     raise ArgumentError, "#{value.inspect} is not an array" unless
       value.is_a?(Array)
   end
@@ -44,6 +50,9 @@ class ActiveModel::Type::Hash
   end
 
   def assert_valid_value(value)
+    return if
+      value.nil?
+
     raise ArgumentError, "#{value.inspect} is not a hash" unless
       value.is_a?(Hash)
   end

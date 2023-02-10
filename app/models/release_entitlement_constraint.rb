@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseEntitlementConstraint < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -12,6 +13,8 @@ class ReleaseEntitlementConstraint < ApplicationRecord
     inverse_of: :release_entitlement_constraints
   has_one :product,
     through: :release
+
+  has_environment default: -> { release&.environment_id }
 
   validates :release,
     scope: { by: :account_id }

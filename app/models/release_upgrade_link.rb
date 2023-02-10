@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseUpgradeLink < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -9,6 +10,10 @@ class ReleaseUpgradeLink < ApplicationRecord
   belongs_to :release,
     counter_cache: :upgrade_count,
     inverse_of: :upgrade_links
+
+  has_environment default: -> { release&.environment_id }
+
+  encrypts :url
 
   validates :release,
     scope: { by: :account_id }

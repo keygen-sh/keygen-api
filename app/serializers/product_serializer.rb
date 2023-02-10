@@ -32,14 +32,16 @@ class ProductSerializer < BaseSerializer
   ee do
     relationship :environment do
       linkage always: true do
-        if @object.environment_id?
+        if @object.environment_id.present?
           { type: :environments, id: @object.environment_id }
         else
           nil
         end
       end
       link :related do
-        @url_helpers.v1_account_product_environment_path @object.account_id, @object
+        unless @object.environment_id.nil?
+          @url_helpers.v1_account_environment_path @object.account_id, @object.environment_id
+        end
       end
     end
   end

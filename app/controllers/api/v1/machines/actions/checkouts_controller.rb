@@ -85,6 +85,7 @@ module Api::V1::Machines::Actions
         to: :check_out?
 
       machine_file = MachineCheckoutService.call(
+        environment: current_environment,
         account: current_account,
         machine:,
         **kwargs,

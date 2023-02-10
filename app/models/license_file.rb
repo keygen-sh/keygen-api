@@ -4,13 +4,14 @@ class LicenseFile
   include ActiveModel::Model
   include ActiveModel::Attributes
 
-  attribute :account_id,  :uuid
-  attribute :license_id,  :uuid
-  attribute :certificate, :string
-  attribute :issued_at,   :datetime
-  attribute :expires_at,  :datetime
-  attribute :ttl,         :integer
-  attribute :includes,    :array
+  attribute :account_id,     :uuid
+  attribute :environment_id, :uuid
+  attribute :license_id,     :uuid
+  attribute :certificate,    :string
+  attribute :issued_at,      :datetime
+  attribute :expires_at,     :datetime
+  attribute :ttl,            :integer
+  attribute :includes,       :array
 
   validates :account_id,  presence: true
   validates :license_id,  presence: true
@@ -35,4 +36,10 @@ class LicenseFile
   def license    = @license ||= License.find_by(account_id: account_id, id: license_id)
   def product    = @product ||= license&.product
   def user       = @user    ||= license&.user
+
+  def environment
+    @environment ||= unless environment_id.nil?
+                       Environment.find_by(account_id: account_id, id: environment_id)
+                     end
+  end
 end

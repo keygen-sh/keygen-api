@@ -7,13 +7,14 @@ class LicenseCheckoutService < AbstractCheckoutService
 
   ALLOWED_INCLUDES = %w[
     entitlements
+    environment
     product
     policy
     group
     user
-  ]
+  ].freeze
 
-  def initialize(account:, license:, encrypt: false, ttl: 1.month, include: [])
+  def initialize(account:, license:, environment: nil, encrypt: false, ttl: 1.month, include: [])
     raise InvalidAccountError, 'account must be present' unless
       account.present?
 
@@ -23,8 +24,9 @@ class LicenseCheckoutService < AbstractCheckoutService
     raise InvalidIncludeError, 'invalid includes' if
       (include - ALLOWED_INCLUDES).any?
 
-    @account = account
-    @license = license
+    @account     = account
+    @license     = license
+    @environment = environment
 
     super(account:, encrypt:, ttl:, include:)
   end
@@ -64,6 +66,7 @@ class LicenseCheckoutService < AbstractCheckoutService
     TXT
 
     LicenseFile.new(
+      environment_id: environment&.id,
       account_id: account.id,
       license_id: license.id,
       certificate: cert,
@@ -76,7 +79,8 @@ class LicenseCheckoutService < AbstractCheckoutService
 
   private
 
-  attr_reader :account,
+  attr_reader :environment,
+              :account,
               :license
 
   def private_key
