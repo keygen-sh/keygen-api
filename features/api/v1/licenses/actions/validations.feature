@@ -8071,26 +8071,131 @@ Feature: License validation actions
 
   Scenario: Anonymous validates a license key that requires a machine heartbeat (not started)
     Given the current account is "test1"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
+    And the current account has 1 "policy" with the following:
       """
       {
         "heartbeatDuration": "$time.1.hour",
         "requireHeartbeat": true
       }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
-    And the current account has 1 "machine"
-    And the first "machine" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
-        "licenseId": "$licenses[0]"
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
       }
       """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "code": "VALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Anonymous validates a license key with optional machine heartbeat (not started)
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "heartbeatDuration": "$time.1.hour",
+        "requireHeartbeat": false
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "code": "VALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Anonymous validates a license key that requires a machine heartbeat (not started, FROM_CREATION basis)
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "heartbeatDuration": "$time.1.hour",
+        "heartbeatBasis": "FROM_CREATION",
+        "requireHeartbeat": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "code": "VALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Anonymous validates a license key that requires a machine heartbeat (not started, FROM_FIRST_PING basis)
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "heartbeatDuration": "$time.1.hour",
+        "heartbeatBasis": "FROM_FIRST_PING",
+        "requireHeartbeat": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -8120,26 +8225,16 @@ Feature: License validation actions
 
   Scenario: Anonymous validates a license key that requires a machine heartbeat (by ID)
     Given the current account is "test1"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
+    And the current account has 1 "policy" with the following:
       """
       {
         "heartbeatDuration": "$time.1.hour",
+        "heartbeatBasis": "FROM_FIRST_PING",
         "requireHeartbeat": true
       }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
-    And the current account has 1 "machine"
-    And the first "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]"
-      }
-      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {

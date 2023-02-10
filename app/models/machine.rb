@@ -34,7 +34,7 @@ class Machine < ApplicationRecord
 
   # Set initial heartbeat if heartbeat is required
   before_validation -> { self.last_heartbeat_at ||= Time.current },
-    if: :requires_heartbeat?,
+    if: :heartbeat_from_creation?,
     on: :create
 
   # Update license's total core count on machine create, update and destroy
@@ -365,7 +365,8 @@ class Machine < ApplicationRecord
     end
   }
 
-  delegate :resurrect_dead?, :lazarus_ttl,
+  delegate :heartbeat_from_creation?, :heartbeat_from_first_ping?,
+    :resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
 

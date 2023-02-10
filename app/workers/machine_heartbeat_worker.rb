@@ -22,7 +22,7 @@ class MachineHeartbeatWorker < BaseWorker
     return unless
       machine.requires_heartbeat?
 
-    if machine.dead?
+    if machine.not_started? || machine.dead?
       if machine.last_death_event_sent_at.nil?
         machine.touch(:last_death_event_sent_at)
 
