@@ -3,6 +3,7 @@
 class ProcessHeartbeatWorker < BaseWorker
   sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
+    retry: Float::INFINITY, # retry forever
     lock: :until_executing,
     on_conflict: {
       client: :replace,
