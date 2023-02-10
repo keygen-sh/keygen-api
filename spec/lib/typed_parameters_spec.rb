@@ -1641,11 +1641,11 @@ describe TypedParameters do
       let(:options) {{ in: %w[a b c] }}
 
       it 'should succeed' do
-        expect(validation.call('d')).to be true
+        expect { validation.call('d') }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('a')).to be false
+        expect { validation.call('a') }.to raise_error TypedParameters::ValidationError
       end
     end
   end
@@ -1658,11 +1658,11 @@ describe TypedParameters do
       let(:options) {{ without: /foo/ }}
 
       it 'should succeed' do
-        expect(validation.call('bar')).to be true
+        expect { validation.call('bar') }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('foo')).to be false
+        expect { validation.call('foo') }.to raise_error TypedParameters::ValidationError
       end
     end
 
@@ -1670,11 +1670,11 @@ describe TypedParameters do
       let(:options) {{ with: /foo/ }}
 
       it 'should succeed' do
-        expect(validation.call('foo')).to be true
+        expect { validation.call('foo') }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('bar')).to be false
+        expect { validation.call('bar') }.to raise_error TypedParameters::ValidationError
       end
     end
   end
@@ -1688,11 +1688,11 @@ describe TypedParameters do
         let(:options) {{ in: 0..9 }}
 
         it 'should succeed' do
-          expect(validation.call(0)).to be true
+          expect { validation.call(0) }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call(10)).to be false
+          expect { validation.call(10) }.to raise_error TypedParameters::ValidationError
         end
       end
 
@@ -1700,11 +1700,11 @@ describe TypedParameters do
         let(:options) {{ in: %w[a b c] }}
 
         it 'should succeed' do
-          expect(validation.call('a')).to be true
+          expect { validation.call('a') }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call('d')).to be false
+          expect { validation.call('d') }.to raise_error TypedParameters::ValidationError
         end
       end
     end
@@ -1718,11 +1718,11 @@ describe TypedParameters do
       let(:options) {{ minimum: 5 }}
 
       it 'should succeed' do
-        expect(validation.call('foobar')).to be true
+        expect { validation.call('foobar') }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('foo')).to be false
+        expect { validation.call('foo') }.to raise_error TypedParameters::ValidationError
       end
     end
 
@@ -1730,11 +1730,11 @@ describe TypedParameters do
       let(:options) {{ maximum: 5 }}
 
       it 'should succeed' do
-        expect(validation.call('foo')).to be true
+        expect { validation.call('foo') }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('foobarbaz')).to be false
+        expect { validation.call('foobarbaz') }.to raise_error TypedParameters::ValidationError
       end
     end
 
@@ -1743,11 +1743,11 @@ describe TypedParameters do
         let(:options) {{ within: 1..3 }}
 
         it 'should succeed' do
-          expect(validation.call('foo')).to be true
+          expect { validation.call('foo') }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call('foobar')).to be false
+          expect { validation.call('foobar') }.to raise_error TypedParameters::ValidationError
         end
       end
 
@@ -1755,11 +1755,11 @@ describe TypedParameters do
         let(:options) {{ within: [0, 2, 4, 6] }}
 
         it 'should succeed' do
-          expect(validation.call('foobar')).to be true
+          expect { validation.call('foobar') }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call('foo')).to be false
+          expect { validation.call('foo') }.to raise_error TypedParameters::ValidationError
         end
       end
     end
@@ -1769,11 +1769,11 @@ describe TypedParameters do
         let(:options) {{ in: 1...6 }}
 
         it 'should succeed' do
-          expect(validation.call('foo')).to be true
+          expect { validation.call('foo') }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call('foobar')).to be false
+          expect { validation.call('foobar') }.to raise_error TypedParameters::ValidationError
         end
       end
 
@@ -1781,11 +1781,11 @@ describe TypedParameters do
         let(:options) {{ in: [0, 2, 4, 6] }}
 
         it 'should succeed' do
-          expect(validation.call('foobar')).to be true
+          expect { validation.call('foobar') }.to_not raise_error
         end
 
         it 'should fail' do
-          expect(validation.call('foo')).to be false
+          expect { validation.call('foo') }.to raise_error TypedParameters::ValidationError
         end
       end
     end
@@ -1794,11 +1794,11 @@ describe TypedParameters do
       let(:options) {{ is: 42 }}
 
       it 'should succeed' do
-        expect(validation.call('a'*42)).to be true
+        expect { validation.call('a'*42) }.to_not raise_error
       end
 
       it 'should fail' do
-        expect(validation.call('a'*7)).to be false
+        expect { validation.call('a'*7) }.to raise_error TypedParameters::ValidationError
       end
     end
   end

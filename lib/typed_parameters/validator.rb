@@ -64,8 +64,11 @@ module TypedParameters
         end
 
         # Assert validations
-        raise InvalidParameterError.new('is invalid', path: param.path, source: schema.source) unless
-          schema.validations.all? { _1.call(param.value) }
+        schema.validations.each do |validation|
+          validation.call(param.value)
+        rescue ValidationError => e
+          raise InvalidParameterError.new(e.message, path: param.path, source: schema.source)
+        end
       end
     end
   end
