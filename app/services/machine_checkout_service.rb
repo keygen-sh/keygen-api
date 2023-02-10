@@ -12,10 +12,11 @@ class MachineCheckoutService < AbstractCheckoutService
     license.policy
     license.user
     license
+    environment
     group
-  ]
+  ].freeze
 
-  def initialize(account:, machine:, encrypt: false, ttl: 1.month, include: [])
+  def initialize(account:, machine:, environment: nil, encrypt: false, ttl: 1.month, include: [])
     raise InvalidAccountError, 'account must be present' unless
       account.present?
 
@@ -28,9 +29,10 @@ class MachineCheckoutService < AbstractCheckoutService
     raise InvalidIncludeError, 'invalid includes' if
       (include - ALLOWED_INCLUDES).any?
 
-    @account = account
-    @machine = machine
-    @license = machine.license
+    @account     = account
+    @machine     = machine
+    @license     = machine.license
+    @environment = environment
 
     super(account:, encrypt:, ttl:, include:)
   end
@@ -70,6 +72,7 @@ class MachineCheckoutService < AbstractCheckoutService
     TXT
 
     MachineFile.new(
+      environment_id: environment&.id,
       account_id: account.id,
       license_id: license.id,
       machine_id: machine.id,
@@ -83,7 +86,8 @@ class MachineCheckoutService < AbstractCheckoutService
 
   private
 
-  attr_reader :account,
+  attr_reader :environment,
+              :account,
               :machine,
               :license
 

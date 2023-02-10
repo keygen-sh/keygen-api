@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Key < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -11,6 +12,8 @@ class Key < ApplicationRecord
   has_one :product, through: :policy
   has_many :event_logs,
     as: :resource
+
+  has_environment default: -> { policy&.environment_id }
 
   validates :policy,
     scope: { by: :account_id }

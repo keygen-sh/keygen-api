@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePlatform < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -18,6 +19,8 @@ class ReleasePlatform < ApplicationRecord
     through: :products
   has_many :users,
     through: :licenses
+
+  has_environment
 
   validates :key,
     presence: true,

@@ -5,6 +5,7 @@ class SecondFactor < ApplicationRecord
   SECOND_FACTOR_IMAGE  = 'https://keygen.sh/authy-icon.png'
   SECOND_FACTOR_DRIFT  = 10
 
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -13,6 +14,8 @@ class SecondFactor < ApplicationRecord
 
   belongs_to :account
   belongs_to :user
+
+  has_environment default: -> { user&.environment_id }
 
   before_create :generate_secret!
 

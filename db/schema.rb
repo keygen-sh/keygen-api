@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_10_222710) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -131,7 +131,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id"], name: "index_group_owners_on_account_id"
+    t.index ["environment_id"], name: "index_group_owners_on_environment_id"
     t.index ["group_id", "user_id"], name: "index_group_owners_on_group_id_and_user_id", unique: true
     t.index ["group_id"], name: "index_group_owners_on_group_id"
     t.index ["user_id"], name: "index_group_owners_on_user_id"
@@ -166,11 +168,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.datetime "updated_at", precision: nil, null: false
     t.uuid "policy_id"
     t.uuid "account_id"
+    t.uuid "environment_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "keys_tsv_key_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at"
     t.index ["account_id", "key"], name: "index_keys_on_account_id_and_key", unique: true
     t.index ["created_at"], name: "index_keys_on_created_at", order: :desc
+    t.index ["environment_id"], name: "index_keys_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true
     t.index ["policy_id", "created_at"], name: "index_keys_on_policy_id_and_created_at"
   end
@@ -181,8 +185,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "license_id", "entitlement_id"], name: "license_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_license_entitlements_on_entitlement_id"
+    t.index ["environment_id"], name: "index_license_entitlements_on_environment_id"
     t.index ["license_id"], name: "index_license_entitlements_on_license_id"
   end
 
@@ -362,8 +368,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.string "leasing_strategy"
     t.integer "max_processes"
     t.string "overage_strategy"
-    t.string "heartbeat_basis"
     t.uuid "environment_id"
+    t.string "heartbeat_basis"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
@@ -380,8 +386,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "policy_id", "entitlement_id"], name: "policy_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_policy_entitlements_on_entitlement_id"
+    t.index ["environment_id"], name: "index_policy_entitlements_on_environment_id"
     t.index ["policy_id"], name: "index_policy_entitlements_on_policy_id"
   end
 
@@ -479,7 +487,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.integer "ttl"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_download_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_download_links_on_environment_id"
     t.index ["release_id"], name: "index_release_download_links_on_release_id"
   end
 
@@ -489,9 +499,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "release_entls_acct_created_idx", order: { created_at: :desc }
     t.index ["account_id", "release_id", "entitlement_id"], name: "release_entls_acct_rel_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_release_entitlement_constraints_on_entitlement_id"
+    t.index ["environment_id"], name: "index_release_entitlement_constraints_on_environment_id"
     t.index ["release_id"], name: "index_release_entitlement_constraints_on_release_id"
   end
 
@@ -527,7 +539,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.integer "ttl"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_upgrade_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_upgrade_links_on_environment_id"
     t.index ["release_id"], name: "index_release_upgrade_links_on_release_id"
   end
 
@@ -538,7 +552,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.integer "ttl"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_release_upload_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_upload_links_on_environment_id"
     t.index ["release_id"], name: "index_release_upload_links_on_release_id"
   end
 
@@ -640,7 +656,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_10_152346) do
     t.datetime "last_verified_at", precision: nil
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.uuid "environment_id"
     t.index ["account_id", "created_at"], name: "index_second_factors_on_account_id_and_created_at"
+    t.index ["environment_id"], name: "index_second_factors_on_environment_id"
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
     t.index ["secret"], name: "index_second_factors_on_secret", unique: true
     t.index ["user_id"], name: "index_second_factors_on_user_id", unique: true

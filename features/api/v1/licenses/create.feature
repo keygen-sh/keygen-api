@@ -413,7 +413,7 @@ Feature: Create license
       """
       {
         "environment": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/environment" },
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
           "data": { "type": "environments", "id": "$environments[0]" }
         }
       }
@@ -466,7 +466,7 @@ Feature: Create license
       """
       {
         "environment": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/environment" },
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
           "data": { "type": "environments", "id": "$environments[0]" }
         }
       }
@@ -475,6 +475,53 @@ Feature: Create license
     And the response should contain the following headers:
       """
       { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a license for the global environment
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Global License"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
@@ -575,7 +622,7 @@ Feature: Create license
       """
       {
         "environment": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/environment" },
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
           "data": { "type": "environments", "id": "$environments[0]" }
         }
       }
@@ -768,7 +815,7 @@ Feature: Create license
       """
       {
         "environment": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/environment" },
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
           "data": { "type": "environments", "id": "$environments[0]" }
         }
       }

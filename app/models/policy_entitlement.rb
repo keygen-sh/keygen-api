@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class PolicyEntitlement < ApplicationRecord
+  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -8,6 +9,8 @@ class PolicyEntitlement < ApplicationRecord
   belongs_to :account
   belongs_to :policy
   belongs_to :entitlement
+
+  has_environment default: -> { policy&.environment_id }
 
   validates :policy,
     scope: { by: :account_id }
