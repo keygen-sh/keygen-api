@@ -2,8 +2,6 @@
 
 module Api::V1::Products::Relationships
   class LicensesController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
     has_scope :suspended

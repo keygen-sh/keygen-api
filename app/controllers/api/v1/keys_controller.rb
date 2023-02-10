@@ -2,8 +2,6 @@
 
 module Api::V1
   class KeysController < Api::V1::BaseController
-    supports_environment
-
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
 
