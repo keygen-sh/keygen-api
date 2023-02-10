@@ -17,7 +17,7 @@ module TypedParameters
           raise ValidationError, "length must be between #{e.first} and #{e.last}" unless
             e.include?(value.length)
         in in: Range | Array => e
-          raise ValidationError, 'length is invalid' unless
+          raise ValidationError, "length must be between #{e.first} and #{e.last}" unless
             e.include?(value.length)
         in is: Numeric => n
           raise ValidationError, "length must be equal to #{n}" unless
