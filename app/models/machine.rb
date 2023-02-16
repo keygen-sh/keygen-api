@@ -467,8 +467,9 @@ class Machine < ApplicationRecord
 
   def resurrection_period_passed?
     return true unless
-      resurrect_dead? &&
-      requires_heartbeat?
+      next_heartbeat_at.present? &&
+      requires_heartbeat? &&
+      resurrect_dead?
 
     Time.current > next_heartbeat_at +
                    lazarus_ttl
