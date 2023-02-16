@@ -446,6 +446,8 @@ class Machine < ApplicationRecord
     last_heartbeat_at + heartbeat_duration
   end
 
+  def heartbeat? = next_heartbeat_at.present?
+
   def requires_heartbeat?
     policy&.require_heartbeat? || !last_heartbeat_at.nil?
   end
@@ -467,9 +469,9 @@ class Machine < ApplicationRecord
 
   def resurrection_period_passed?
     return true unless
-      next_heartbeat_at.present? &&
       requires_heartbeat? &&
-      resurrect_dead?
+      resurrect_dead? &&
+      heartbeat?
 
     Time.current > next_heartbeat_at +
                    lazarus_ttl
