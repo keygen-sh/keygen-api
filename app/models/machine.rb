@@ -458,7 +458,7 @@ class Machine < ApplicationRecord
 
     return 'NOT_STARTED' unless
       requires_heartbeat? &&
-      last_heartbeat_at?
+      heartbeat?
 
     if next_heartbeat_at >= Time.current
       'ALIVE'
