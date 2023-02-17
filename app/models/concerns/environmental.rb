@@ -48,9 +48,9 @@ module Environmental
       tracks_dirty_attributes :environment_id,
                               :environment
 
-      before_validation -> { self.environment ||= Current.environment },
+      after_initialize -> { self.environment ||= Current.environment },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-        on: %i[create]
+        if: :new_record?
 
       # Validate the association only if we've been given an environment (because it's optional).
       validates :environment,
@@ -69,8 +69,8 @@ module Environmental
       end
 
       unless default.nil?
-        # NOTE(ezekg) This before validation hook is in addition to the default hook above.
-        before_validation -> {
+        # NOTE(ezekg) This default hook is in addition to the default hook above.
+        after_initialize -> {
             value = case default.arity
                     when 1
                       instance_exec(self, &default)
@@ -90,7 +90,7 @@ module Environmental
                                     end
           },
           unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-          on: %i[create]
+          if: :new_record?
       end
 
       # We also want to assert that the model's current environment is compatible
