@@ -113,7 +113,7 @@ class Token < ApplicationRecord
   }
 
   scope :for_bearer_type, -> type {
-    bearer_type = type.to_s.underscore.singularize.classify
+    bearer_type = type.to_s.underscore.classify
     return none if
       bearer_type.empty?
 
