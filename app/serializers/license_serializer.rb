@@ -67,7 +67,7 @@ class LicenseSerializer < BaseSerializer
     linkage always: true do
       { type: :accounts, id: @object.account_id }
     end
-    link :self do
+    link :related do
       @url_helpers.v1_account_path @object.account_id
     end
   end
@@ -82,9 +82,6 @@ class LicenseSerializer < BaseSerializer
         end
       end
       link :related do
-        @url_helpers.v1_account_license_environment_path @object.account_id, @object
-      end
-      link :self do
         unless @object.environment_id.nil?
           @url_helpers.v1_account_environment_path @object.account_id, @object.environment_id
         end
