@@ -2,9 +2,7 @@
 
 FactoryBot.define do
   factory :metric do
-    data {
-      { data: { foo: 'bar' } }
-    }
+    data {{ data: { foo: 'bar' } }}
 
     event_type
   end

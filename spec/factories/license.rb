@@ -2,27 +2,10 @@
 
 FactoryBot.define do
   factory :license do
-    account { nil }
-    policy { nil }
-    user { nil }
-
-    after :build do |license, evaluator|
-      account     = evaluator.account.presence
-      environment = evaluator.environment.presence
-      policy      = evaluator.policy.presence || build(:policy, account:, environment:)
-      user        = case
-                    when evaluator.user.present?
-                      evaluator.user
-                    else
-                      nil
-                    end
-
-      license.assign_attributes(
-        account:,
-        policy:,
-        user:,
-      )
-    end
+    account     { nil }
+    environment { nil }
+    policy      { build(:policy, account:, environment:) }
+    user        { nil }
 
     trait :legacy_encrypt do
       after :build do |license, evaluator|
