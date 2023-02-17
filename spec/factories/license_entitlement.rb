@@ -5,15 +5,10 @@ FactoryBot.define do
     # Prevent duplicates due to cyclic entitlement codes.
     initialize_with { LicenseEntitlement.find_or_initialize_by(entitlement_id: entitlement&.id, license_id: license&.id) }
 
-    account { nil }
-    entitlement { nil }
-    license { nil }
-
-    after :build do |license_entitlement, evaluator|
-      license_entitlement.account     ||= evaluator.account.presence
-      license_entitlement.entitlement ||=
-        evaluator.entitlement.presence || build(:entitlement, account: license_entitlement.account)
-    end
+    account     { nil }
+    environment { nil }
+    entitlement { build(:entitlement, account:, environment:) }
+    license     { nil }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

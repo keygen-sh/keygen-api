@@ -7,17 +7,17 @@ FactoryBot.define do
     initialize_with { Environment.find_or_initialize_by(code:) }
 
     isolation_strategy { 'ISOLATED' }
-    code { "env-#{SecureRandom.hex}" }
-    name { code.humanize }
+    code               { "env-#{SecureRandom.hex}" }
+    name               { code.humanize }
 
     trait :isolated do
       isolation_strategy { 'ISOLATED' }
-      code { 'isolated' }
+      code               { 'isolated' }
     end
 
     trait :shared do
       isolation_strategy { 'SHARED' }
-      code { 'shared' }
+      code               { 'shared' }
     end
   end
 end

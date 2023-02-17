@@ -4,7 +4,8 @@ FactoryBot.define do
   factory :webhook_endpoint do
     url { "https://#{SecureRandom.hex}.example" }
 
-    account { nil }
+    account     { nil }
+    environment { nil }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

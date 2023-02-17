@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :account do
-    slug { [Faker::Internet.domain_name.parameterize, SecureRandom.hex(4)].join('-') }
+    slug { "#{Faker::Internet.domain_name.parameterize}-#{SecureRandom.hex(4)}" }
     name { Faker::Company.name }
 
     billing { nil }
@@ -14,15 +14,11 @@ FactoryBot.define do
     end
 
     trait :std do
-      before :create do |account|
-        account.plan = build(:plan, :std)
-      end
+      plan { build(:plan, :std) }
     end
 
     trait :ent do
-      before :create do |account|
-        account.plan = build(:plan, :ent)
-      end
+      plan { build(:plan, :ent) }
     end
 
     trait :unprotected do

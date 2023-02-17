@@ -4,6 +4,9 @@ FactoryBot.define do
   factory :group do
     name { Faker::Company.name }
 
+    account     { nil }
+    environment { nil }
+
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end

@@ -4,13 +4,9 @@ FactoryBot.define do
   factory :machine_process, aliases: %i[process] do
     pid { SecureRandom.hex(12) }
 
-    account { nil }
-    machine { nil }
-
-    after :build do |process, evaluator|
-      process.account ||= evaluator.account.presence
-      process.machine ||= evaluator.machine.presence || build(:machine, account: process.account)
-    end
+    account     { nil }
+    environment { nil }
+    machine     { build(:machine, account:, environment:) }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
