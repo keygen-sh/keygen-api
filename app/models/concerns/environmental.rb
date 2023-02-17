@@ -48,7 +48,7 @@ module Environmental
       tracks_dirty_attributes :environment_id,
                               :environment
 
-      after_initialize -> { self.environment ||= Current.environment },
+      before_create -> { self.environment ||= Current.environment },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? }
 
@@ -69,8 +69,8 @@ module Environmental
       end
 
       unless default.nil?
-        # NOTE(ezekg) This after initialize hook is in addition to the default one above.
-        after_initialize -> {
+        # NOTE(ezekg) This before validation hook is in addition to the default hook above.
+        before_create -> {
             value = case default.arity
                     when 1
                       instance_exec(self, &default)
