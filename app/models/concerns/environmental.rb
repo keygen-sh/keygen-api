@@ -120,7 +120,7 @@ module Environmental
 
             # Add a validation error if the current model's environment is incompatible with
             # its association's environment.
-            errors.add :environment, :not_allowed, message: "environment must be compatible with #{reflection.name} environment" unless
+            errors.add :environment, :not_allowed, message: "must be compatible with #{reflection.name} environment" unless
               case
               when environment.nil?
                 association.environment_id.nil?

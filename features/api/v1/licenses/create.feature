@@ -569,7 +569,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "environment must be compatible with policy environment",
+        "detail": "must be compatible with policy environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -758,7 +758,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "environment must be compatible with user environment",
+        "detail": "must be compatible with user environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -864,7 +864,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "environment must be compatible with user environment",
+        "detail": "must be compatible with user environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -910,7 +910,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "environment must be compatible with user environment",
+        "detail": "must be compatible with user environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
