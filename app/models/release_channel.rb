@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ReleaseChannel < ApplicationRecord
-  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -16,8 +15,6 @@ class ReleaseChannel < ApplicationRecord
     through: :products
   has_many :users,
     through: :licenses
-
-  has_environment
 
   validates :key,
     presence: true,

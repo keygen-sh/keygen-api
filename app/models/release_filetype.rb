@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ReleaseFiletype < ApplicationRecord
-  include Environmental
   include Limitable
   include Orderable
   include Pageable
@@ -13,8 +12,6 @@ class ReleaseFiletype < ApplicationRecord
     inverse_of: :filetype
   has_many :releases,
     through: :artifacts
-
-  has_environment
 
   validates :key,
     presence: true,
