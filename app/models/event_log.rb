@@ -41,7 +41,7 @@ class EventLog < ApplicationRecord
   }
 
   scope :search_whodunnit_type, -> (term) {
-    whodunnit_type = term.to_s.underscore.singularize.classify
+    whodunnit_type = term.to_s.underscore.classify
     return none if
       whodunnit_type.empty?
 
@@ -64,7 +64,7 @@ class EventLog < ApplicationRecord
   }
 
   scope :search_resource_type, -> (term) {
-    resource_type = term.to_s.underscore.singularize.classify
+    resource_type = term.to_s.underscore.classify
     return none if
       resource_type.empty?
 
