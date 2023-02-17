@@ -9,7 +9,7 @@ class Environment < ApplicationRecord
   ISOLATION_STRATEGIES = %w[
     ISOLATED
     SHARED
-  ]
+  ].freeze
 
   belongs_to :account
   has_many :tokens,
@@ -19,29 +19,30 @@ class Environment < ApplicationRecord
     as: :bearer
 
   ##
-  # _tokens association is only for cascading deletes.
+  # _tokens association is only for cascading deletes of all env-scoped
+  # tokens, including tokens belonging to other bearers.
   has_many :_tokens,
     class_name: Token.name,
     inverse_of: :environment,
-    dependent: :nullify
+    dependent: :destroy
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :webhooks_endpoints, dependent: :nullify
-  has_many :webhooks_event,     dependent: :nullify
-  has_many :entitlements,       dependent: :nullify
-  has_many :groups,             dependent: :nullify
-  has_many :products,           dependent: :nullify
-  has_many :policies,           dependent: :nullify
-  has_many :licenses,           dependent: :nullify
-  has_many :machines,           dependent: :nullify
-  has_many :machine_processes,  dependent: :nullify
-  has_many :users,              dependent: :nullify
-  has_many :releases,           dependent: :nullify
-  has_many :release_artifacts,  dependent: :nullify
-  has_many :release_filetypes,  dependent: :nullify
-  has_many :release_channels,   dependent: :nullify
-  has_many :release_platforms,  dependent: :nullify
-  has_many :release_arches,     dependent: :nullify
+  has_many :webhooks_endpoints, dependent: :destroy
+  has_many :webhooks_event,     dependent: :destroy
+  has_many :entitlements,       dependent: :destroy
+  has_many :groups,             dependent: :destroy
+  has_many :products,           dependent: :destroy
+  has_many :policies,           dependent: :destroy
+  has_many :licenses,           dependent: :destroy
+  has_many :machines,           dependent: :destroy
+  has_many :machine_processes,  dependent: :destroy
+  has_many :users,              dependent: :destroy
+  has_many :releases,           dependent: :destroy
+  has_many :release_artifacts,  dependent: :destroy
+  has_many :release_filetypes,  dependent: :destroy
+  has_many :release_channels,   dependent: :destroy
+  has_many :release_platforms,  dependent: :destroy
+  has_many :release_arches,     dependent: :destroy
 
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
