@@ -24,6 +24,30 @@ FactoryBot.define do
         "#{artifact.release.name}-#{artifact.release.version}+#{SecureRandom.hex}.#{artifact.filetype.key}"
     end
 
+    trait :darwin do
+      platform { build(:platform, key: 'darwin', account:) }
+    end
+
+    trait :linux do
+      platform { build(:platform, key: 'linux', account:) }
+    end
+
+    trait :win32 do
+      platform { build(:platform, key: 'win32', account:) }
+    end
+
+    trait :arm64 do
+      arch { build(:arch, key: 'arm64', account:) }
+    end
+
+    trait :amd64 do
+      arch { build(:arch, key: 'amd64', account:) }
+    end
+
+    trait :x86 do
+      arch { build(:arch, key: 'x86', account:) }
+    end
+
     trait :waiting do
       after :build do |artifact, evaluator|
         artifact.status = 'WAITING'
