@@ -257,3 +257,45 @@ Feature: List release arches
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
     And the JSON response should be an array of 0 "arches"
+
+  @ee
+  Scenario: Isolated license attempts to retrieve the arches for an account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 3 amd64 "artifacts" for each "release"
+    And the current account has 2 arm64 "artifacts" for each "release"
+    And the current account has 1 x86 "artifacts" for each "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/arches"
+    Then the response status should be "200"
+    And the JSON response should be an array of 3 "arches"
+
+  @ee
+  Scenario: Shared license attempts to retrieve the arches for an account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 3 amd64 "artifacts" for each "release"
+    And the current account has 2 arm64 "artifacts" for each "release"
+    And the current account has 1 x86 "artifacts" for each "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/arches"
+    Then the response status should be "200"
+    And the JSON response should be an array of 3 "arches"
