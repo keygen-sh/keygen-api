@@ -11,28 +11,19 @@ FactoryBot.define do
       ]
     }
 
-    account { nil }
-
-    after :build do |product, evaluator|
-      product.account ||= evaluator.account.presence
-    end
+    account     { nil }
+    environment { nil }
 
     trait :licensed do
-      after :build do |product, evaluator|
-        product.distribution_strategy = 'LICENSED'
-      end
+      distribution_strategy { 'LICENSED' }
     end
 
     trait :open do
-      after :build do |product, evaluator|
-        product.distribution_strategy = 'OPEN'
-      end
+      distribution_strategy { 'OPEN' }
     end
 
     trait :closed do
-      after :build do |product, evaluator|
-        product.distribution_strategy = 'CLOSED'
-      end
+      distribution_strategy { 'CLOSED' }
     end
 
     trait :in_isolated_environment do

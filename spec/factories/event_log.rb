@@ -2,7 +2,8 @@
 
 FactoryBot.define do
   factory :event_log do
-    account { nil }
+    account     { nil }
+    environment { nil }
     event_type
 
     after :build do |event_log, evaluator|

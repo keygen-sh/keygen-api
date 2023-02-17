@@ -2,17 +2,10 @@
 
 FactoryBot.define do
   factory :group_owner do
-    account { nil }
-    group { nil }
-    user { nil }
-
-    after :build do |group_owner, evaluator|
-      group_owner.account ||= evaluator.account.presence
-      group_owner.group   ||=
-        evaluator.group.presence || build(:group, account: group_owner.account)
-      group_owner.user    ||=
-        evaluator.user.presence || build(:user, account: group_owner.account)
-    end
+    account     { nil }
+    environment { nil }
+    group       { build(:group, account:, environment:) }
+    user        { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

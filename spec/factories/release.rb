@@ -2,20 +2,17 @@
 
 FactoryBot.define do
   factory :release do
-    name { Faker::App.name }
+    name    { Faker::App.name }
     version { nil }
-    status { 'PUBLISHED' }
+    status  { 'PUBLISHED' }
 
-    account { nil }
-    product { nil }
-    artifacts { [] }
-    channel { nil }
+    account     { nil }
+    environment { nil }
+    product     { build(:product, account:, environment:) }
+    channel     { build(:channel, key: 'stable', account:) }
+    artifacts   { [] }
 
     after :build do |release, evaluator|
-      release.account  ||= evaluator.account.presence
-      release.product  ||= evaluator.product.presence || build(:product, account: release.account)
-      release.channel  ||= evaluator.channel.presence || build(:channel, key: 'stable', account: release.account)
-
       # Add build tag so that there's no chance for collisions
       release.version ||=
         if release.channel.pre_release?
@@ -25,9 +22,7 @@ FactoryBot.define do
         end
 
       # Make sure channel matches semver prerelease channel
-      semver = Semverse::Version.coerce(release.version)
-
-      if semver.pre_release?
+      if (semver = Semverse::Version.coerce(release.version)).pre_release?
         key = semver.pre_release[/([^\.]+)/, 1]
 
         release.channel.assign_attributes(
@@ -38,46 +33,32 @@ FactoryBot.define do
     end
 
     trait :draft do
-      after :build do |release, evaluator|
-        release.status = 'DRAFT'
-      end
+      status { 'DRAFT' }
     end
 
     trait :published do
-      after :build do |release, evaluator|
-        release.status = 'PUBLISHED'
-      end
+      status { 'PUBLISHED' }
     end
 
     trait :yanked do
-      after :build do |release, evaluator|
-        release.yanked_at = Time.current
-        release.status    = 'YANKED'
-      end
+      yanked_at { Time.current }
+      status    { 'YANKED' }
     end
 
     trait :licensed do
-      after :build do |release, evaluator|
-        release.product = build(:product, :licensed, account: release.account)
-      end
+      product { build(:product, :licensed, account:) }
     end
 
     trait :open do
-      after :build do |release, evaluator|
-        release.product = build(:product, :open, account: release.account)
-      end
+      product { build(:product, :open, account:) }
     end
 
     trait :closed do
-      after :build do |release, evaluator|
-        release.product = build(:product, :closed, account: release.account)
-      end
+      product { build(:product, :closed, account:) }
     end
 
     trait :created_last_year do
-      after :build do |release, evaluator|
-        release.created_at = 1.year.ago
-      end
+      created_at { 1.year.ago }
     end
 
     trait :with_constraints do

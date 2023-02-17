@@ -49,7 +49,6 @@ module Environmental
                               :environment
 
       after_initialize -> { self.environment ||= Current.environment },
-        unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: :new_record?
 
       # Validate the association only if we've been given an environment (because it's optional).
@@ -69,28 +68,31 @@ module Environmental
       end
 
       unless default.nil?
-        # NOTE(ezekg) This default hook is in addition to the default hook above.
-        after_initialize -> {
-            value = case default.arity
-                    when 1
-                      instance_exec(self, &default)
-                    when 0
-                      instance_exec(&default)
-                    else
-                      raise ArgumentError, 'expected proc with 0..1 arguments'
-                    end
+        # NOTE(ezekg) These default hooks are in addition to the default hook above.
+        fn = -> {
+          value = case default.arity
+                  when 1
+                    instance_exec(self, &default)
+                  when 0
+                    instance_exec(&default)
+                  else
+                    raise ArgumentError, 'expected proc with 0..1 arguments'
+                  end
 
-            self.environment_id ||= case value
-                                    in Environment => env
-                                      env.id
-                                    in String => id
-                                      id
-                                    in nil
-                                      nil
-                                    end
-          },
-          unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-          if: :new_record?
+          self.environment_id ||= case value
+                                  in Environment => env
+                                    env.id
+                                  in String => id
+                                    id
+                                  in nil
+                                    nil
+                                  end
+        }
+
+        # Make absolutely sure our default is applied
+        after_initialize  unless: :environment_id?, if: :new_record?,                 &fn
+        before_validation unless: :environment_id?, if: :new_record?, on: %i[create], &fn
+        before_create     unless: :environment_id?, if: :new_record?,                 &fn
       end
 
       # We also want to assert that the model's current environment is compatible

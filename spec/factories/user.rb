@@ -3,21 +3,12 @@
 FactoryBot.define do
   factory :user do
     first_name { Faker::Name.name }
-    last_name { Faker::Name.name }
-    email { [SecureRandom.hex(4), Faker::Internet.safe_email].join('') }
-    password { "password" }
+    last_name  { Faker::Name.name }
+    email      { SecureRandom.hex(4) + Faker::Internet.safe_email }
+    password   { 'password' }
 
-    account { nil }
-
-    after :build do |user, evaluator|
-      account     = evaluator.account.presence
-      environment = evaluator.environment.presence
-
-      user.assign_attributes(
-        account:,
-        environment:,
-      )
-    end
+    account     { nil }
+    environment { nil }
 
     factory :admin do
       role { build(:role, :admin) }

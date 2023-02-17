@@ -3,10 +3,11 @@
 FactoryBot.define do
   factory :webhook_event do
     endpoint { Faker::Internet.url }
-    payload { { payload: "payload" }.to_json }
-    jid { SecureRandom.hex }
+    payload  { { payload: '{}' }.to_json }
+    jid      { SecureRandom.hex }
 
-    account { nil }
+    account     { nil }
+    environment { nil }
     event_type
 
     trait :in_isolated_environment do

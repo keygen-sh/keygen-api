@@ -2,24 +2,11 @@
 
 FactoryBot.define do
   factory :token do
-    account { nil }
-    bearer { nil }
+    digest { "test_#{SecureRandom.hex}" }
 
-    after :build do |token, evaluator|
-      account = evaluator.account.presence
-      bearer =
-        if evaluator.bearer.present?
-          evaluator.bearer
-        else
-          build(:user, account: account)
-        end
-
-      token.assign_attributes(
-        digest: "test_#{SecureRandom.hex}",
-        account: bearer.account,
-        bearer: bearer,
-      )
-    end
+    account     { nil }
+    environment { nil }
+    bearer      { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do
       before :create do |token|

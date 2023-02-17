@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :role_permission do
     permission { nil }
-    role { nil }
+    role       { nil }
   end
 end
