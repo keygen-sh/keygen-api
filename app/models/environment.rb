@@ -39,10 +39,6 @@ class Environment < ApplicationRecord
   has_many :users,              dependent: :destroy
   has_many :releases,           dependent: :destroy
   has_many :release_artifacts,  dependent: :destroy
-  has_many :release_filetypes,  dependent: :destroy
-  has_many :release_channels,   dependent: :destroy
-  has_many :release_platforms,  dependent: :destroy
-  has_many :release_arches,     dependent: :destroy
 
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
