@@ -42,8 +42,10 @@ class TokenSerializer < BaseSerializer
         end
       end
       link :related do
-        unless @object.environment_id.nil?
+        if @object.environment_id.present?
           @url_helpers.v1_account_environment_path @object.account_id, @object.environment_id
+        else
+          nil
         end
       end
     end
