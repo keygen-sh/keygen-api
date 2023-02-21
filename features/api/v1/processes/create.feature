@@ -1435,8 +1435,8 @@ Feature: Spawn machine process
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
     And the current account has 1 "policy" for the second "product"
-    And the current account has 1 "license" for the second "policy"
-    And the current account has 1 "machine" for the second "license"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes" with the following:

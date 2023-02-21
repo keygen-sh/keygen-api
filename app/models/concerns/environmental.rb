@@ -4,8 +4,6 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
-    include Dirtyable
-
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -45,11 +43,11 @@ module Environmental
       belongs_to :environment,
         optional: true
 
-      tracks_dirty_attributes :environment_id,
-                              :environment
-
-      after_initialize -> { self.environment ||= Current.environment },
-        if: :new_record?
+      # Make absolutely sure our current environment is applied.
+      after_initialize  -> { self.environment ||= Current.environment }, if: :new_record?
+      before_validation -> { self.environment ||= Current.environment },
+        if: :new_record?,
+        on: %i[create]
 
       # Validate the association only if we've been given an environment (because it's optional).
       validates :environment,
@@ -68,7 +66,7 @@ module Environmental
       end
 
       unless default.nil?
-        # NOTE(ezekg) These default hooks are in addition to the default hook above.
+        # NOTE(ezekg) These default hooks are in addition to the default hooks above.
         fn = -> {
           value = case default.arity
                   when 1
@@ -89,10 +87,9 @@ module Environmental
                                   end
         }
 
-        # Make absolutely sure our default is applied
-        after_initialize  unless: :environment_id?, if: :new_record?,                 &fn
-        before_validation unless: :environment_id?, if: :new_record?, on: %i[create], &fn
-        before_create     unless: :environment_id?, if: :new_record?,                 &fn
+        # Again, we want to make absolutely sure our default is applied.
+        after_initialize  if: :new_record?,                 &fn
+        before_validation if: :new_record?, on: %i[create], &fn
       end
 
       # We also want to assert that the model's current environment is compatible

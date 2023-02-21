@@ -8,93 +8,63 @@ FactoryBot.define do
     user        { nil }
 
     trait :legacy_encrypt do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :legacy_encrypt, account: license.account)
-      end
+      policy { build(:policy, :legacy_encrypt, account:, environment:) }
     end
 
     trait :rsa_2048_pkcs1_encrypt do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_pkcs1_encrypt, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_pkcs1_encrypt, account:, environment:) }
     end
 
     trait :rsa_2048_pkcs1_sign do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_pkcs1_sign, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_pkcs1_sign, account:, environment:) }
     end
 
     trait :rsa_2048_pkcs1_pss_sign do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_pkcs1_pss_sign, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_pkcs1_pss_sign, account:, environment:) }
     end
 
     trait :rsa_2048_jwt_rs256 do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_jwt_rs256, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_jwt_rs256, account:, environment:) }
     end
 
     trait :rsa_2048_pkcs1_sign_v2 do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_pkcs1_sign_v2, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_pkcs1_sign_v2, account:, environment:) }
     end
 
     trait :rsa_2048_pkcs1_pss_sign_v2 do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :rsa_2048_pkcs1_pss_sign_v2, account: license.account)
-      end
+      policy { build(:policy, :rsa_2048_pkcs1_pss_sign_v2, account:, environment:) }
     end
 
     trait :ed25519_sign do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :ed25519_sign, account: license.account)
-      end
+      policy { build(:policy, :ed25519_sign, account:, environment:) }
     end
 
     trait :day_check_in do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :day_check_in, account: license.account)
-      end
+      policy { build(:policy, :day_check_in, account:, environment:) }
     end
 
     trait :week_check_in do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :week_check_in, account: license.account)
-      end
+      policy { build(:policy, :week_check_in, account:, environment:) }
     end
 
     trait :month_check_in do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :month_check_in, account: license.account)
-      end
+      policy { build(:policy, :month_check_in, account:, environment:) }
     end
 
     trait :year_check_in do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :year_check_in, account: license.account)
-      end
+      policy { build(:policy, :year_check_in, account:, environment:) }
     end
 
     trait :restrict_access_expiration_strategy do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :restrict_access_expiration_strategy, account: license.account)
-      end
+      policy { build(:policy, :restrict_access_expiration_strategy, account:, environment:) }
     end
 
     trait :revoke_access_expiration_strategy do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :revoke_access_expiration_strategy, account: license.account)
-      end
+      policy { build(:policy, :revoke_access_expiration_strategy, account:, environment:) }
     end
 
     trait :allow_access_expiration_strategy do
-      after :build do |license, evaluator|
-        license.policy = build(:policy, :allow_access_expiration_strategy, account: license.account)
-      end
+      policy { build(:policy, :allow_access_expiration_strategy, account:, environment:) }
     end
 
     trait :userless do |license|
@@ -104,9 +74,7 @@ FactoryBot.define do
     end
 
     trait :expired do
-      after :build do |license|
-        license.expiry = 1.month.ago
-      end
+      expiry { 1.month.ago }
     end
 
     trait :protected do |license|
@@ -119,20 +87,16 @@ FactoryBot.define do
 
     trait :with_entitlements do
       after :create do |license|
-        create_list(:license_entitlement, 10, account: license.account, license:)
+        create_list(:license_entitlement, 10, account: license.account, environment: license.environment, license:)
       end
     end
 
     trait :with_user do
-      after :create do |license|
-        license.update(user: build(:user, account: license.account))
-      end
+      user { build(:user, account:, environment:) }
     end
 
     trait :with_group do
-      after :create do |license|
-        license.update(group: build(:group, account: license.account))
-      end
+      group { build(:group, account:, environment:) }
     end
 
     trait :in_isolated_environment do
@@ -152,7 +116,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |license|
+        license.environment = nil
+        license.save!(validate: false)
+      end
     end
 
     trait :global do

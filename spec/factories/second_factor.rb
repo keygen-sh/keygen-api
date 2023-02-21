@@ -23,9 +23,11 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |mfa|
+        mfa.environment = nil
+        mfa.save!(validate: false)
+      end
     end
-
     trait :global do
       in_nil_environment
     end

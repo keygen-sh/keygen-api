@@ -174,7 +174,7 @@ Feature: List machine processes
     And the current account has 1 "user"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "license" for the second "policy"
-    And the current account has 1 "license" for the third "policy"
+    And the current account has 1 "license" for the second "policy"
     And the first "license" has the following attributes:
       """
       { "userId": "$users[1]" }

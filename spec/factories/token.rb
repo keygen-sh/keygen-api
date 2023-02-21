@@ -9,12 +9,6 @@ FactoryBot.define do
     bearer      { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do
-      before :create do |token|
-        token.update(environment: build(:environment, :isolated, account: token.account))
-      end
-    end
-
-    trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end
 
@@ -31,7 +25,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |token|
+        token.environment = nil
+        token.save!(validate: false)
+      end
     end
 
     trait :global do

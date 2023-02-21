@@ -3,12 +3,15 @@
 FactoryBot.define do
   factory :policy_entitlement do
     # Prevent duplicates due to cyclic entitlement codes.
-    initialize_with { PolicyEntitlement.find_or_initialize_by(entitlement_id: entitlement&.id, policy_id: policy&.id) }
+    initialize_with do
+      PolicyEntitlement.find_by(entitlement_id: entitlement&.id, policy_id: policy&.id) ||
+        new(**attributes)
+    end
 
     account     { nil }
     environment { nil }
-    policy      { nil }
     entitlement { build(:entitlement, account:, environment:) }
+    policy      { nil }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
@@ -27,7 +30,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |entitlement|
+        entitlement.environment = nil
+        entitlement.save!(validate: false)
+      end
     end
 
     trait :global do
