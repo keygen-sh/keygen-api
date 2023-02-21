@@ -207,8 +207,8 @@ Feature: List release arches
   Scenario: Admin attempts to retrieve the arches for a product of another account
     Given the current account is "test1"
     And the current account has the following "release" rows:
-      | id                                   | product_id                           | version | channel |
-      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | id                                   | version | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 1.0.0   | stable  |
     And the current account has the following "artifact" rows:
       | release_id                           | filename              | filetype | platform | arch |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    | x86  |

@@ -3,7 +3,10 @@
 FactoryBot.define do
   factory :license_entitlement do
     # Prevent duplicates due to cyclic entitlement codes.
-    initialize_with { LicenseEntitlement.find_or_initialize_by(entitlement_id: entitlement&.id, license_id: license&.id) }
+    initialize_with do
+      LicenseEntitlement.find_by(entitlement_id: entitlement&.id, license_id: license&.id) ||
+        new(**attributes)
+    end
 
     account     { nil }
     environment { nil }
@@ -27,7 +30,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |entitlement|
+        entitlement.environment = nil
+        entitlement.save!(validate: false)
+      end
     end
 
     trait :global do

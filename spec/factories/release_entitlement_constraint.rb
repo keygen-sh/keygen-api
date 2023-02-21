@@ -2,6 +2,12 @@
 
 FactoryBot.define do
   factory :release_entitlement_constraint, aliases: %i[constraint] do
+    # Prevent duplicates due to cyclic entitlement codes.
+    initialize_with do
+      ReleaseEntitlementConstraint.find_by(entitlement_id: entitlement&.id, release_id: release&.id) ||
+        new(**attributes)
+    end
+
     account     { nil }
     environment { nil }
     entitlement { build(:entitlement, account:, environment:) }
@@ -24,7 +30,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |constraint|
+        constraint.environment = nil
+        constraint.save!(validate: false)
+      end
     end
 
     trait :global do

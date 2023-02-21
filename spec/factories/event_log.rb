@@ -4,27 +4,9 @@ FactoryBot.define do
   factory :event_log do
     account     { nil }
     environment { nil }
+    resource    { build(:license, account:, environment:) }
+    whodunnit   { build(:user, account:, environment:) }
     event_type
-
-    after :build do |event_log, evaluator|
-      account   = evaluator.account.presence
-      resource  = evaluator.resource.presence || build(:license, account:)
-      whodunnit =
-        case
-        when evaluator.whodunnit == false
-          nil
-        when evaluator.whodunnit.present?
-          evaluator.whodunnit
-        else
-          build(:user, account:)
-        end
-
-      event_log.assign_attributes(
-        account:,
-        whodunnit:,
-        resource:,
-      )
-    end
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
@@ -43,7 +25,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |log|
+        log.environment = nil
+        log.save!(validate: false)
+      end
     end
 
     trait :global do
