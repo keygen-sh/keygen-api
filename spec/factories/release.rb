@@ -46,15 +46,15 @@ FactoryBot.define do
     end
 
     trait :licensed do
-      product { build(:product, :licensed, account:) }
+      product { association(:product, :licensed, account:) }
     end
 
     trait :open do
-      product { build(:product, :open, account:) }
+      product { association(:product, :open, account:) }
     end
 
     trait :closed do
-      product { build(:product, :closed, account:) }
+      product { association(:product, :closed, account:) }
     end
 
     trait :created_last_year do
@@ -68,7 +68,7 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      environment { build(:environment, :isolated, account:) }
+      environment { association(:environment, :isolated, account:) }
     end
 
     trait :isolated do
@@ -76,7 +76,7 @@ FactoryBot.define do
     end
 
     trait :in_shared_environment do
-      environment { build(:environment, :shared, account:) }
+      environment { association(:environment, :shared, account:) }
     end
 
     trait :shared do
@@ -84,7 +84,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |release|
+        release.environment = nil
+        release.save!(validate: false)
+      end
     end
 
     trait :global do

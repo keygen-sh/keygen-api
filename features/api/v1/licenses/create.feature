@@ -534,10 +534,7 @@ Feature: Create license
     And the current account has 1 isolated "environment"
     And the current environment is "isolated"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy" with the following:
-      """
-      { "environmentId": null }
-      """
+    And the current account has 1 global "policy"
     And the current account has 1 "admin"
     And I am the last admin of account "ent1"
     And I use an authentication token
@@ -587,10 +584,7 @@ Feature: Create license
     And the current account has 1 shared "environment"
     And the current environment is "shared"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy" with the following:
-      """
-      { "environmentId": null }
-      """
+    And the current account has 1 global "policy"
     And the current account has 1 "admin"
     And I am the last admin of account "ent1"
     And I use an authentication token
@@ -720,10 +714,7 @@ Feature: Create license
     And the current environment is "isolated"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
-    And the current account has 1 "user" with the following:
-      """
-      { "environmentId": null }
-      """
+    And the current account has 1 global "user"
     And the current account has 1 "admin"
     And I am the last admin of account "ent1"
     And I use an authentication token
@@ -777,10 +768,7 @@ Feature: Create license
     And the current environment is "shared"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
-    And the current account has 1 "user" with the following:
-      """
-      { "environmentId": null }
-      """
+    And the current account has 1 global "user"
     And the current account has 1 "admin"
     And I am the last admin of account "ent1"
     And I use an authentication token

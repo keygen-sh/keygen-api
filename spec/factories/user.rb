@@ -36,36 +36,34 @@ FactoryBot.define do
 
     trait :with_licenses do
       after :create do |user|
-        create_list(:license, 3, account: user.account, user:)
+        create_list(:license, 3, account: user.account, environment: user.environment, user:)
       end
     end
 
     trait :with_expired_licenses do
       after :create do |user|
-        create_list(:license, 3, :expired, account: user.account, user:)
+        create_list(:license, 3, :expired, account: user.account, environment: user.environment, user:)
       end
     end
 
     trait :with_entitled_licenses do
       after :create do |user|
-        licenses = create_list(:license, 3, account: user.account, user:)
+        licenses = create_list(:license, 3, account: user.account, environment: user.environment, user:)
 
         licenses.each do |license|
-          create_list(:license_entitlement, 10, account: license.account, license:)
+          create_list(:license_entitlement, 10, account: license.account, environment: license.environment, license:)
         end
       end
     end
 
     trait :with_grouped_licenses do
       after :create do |user|
-        create_list(:license, 3, :with_group, account: user.account, user:)
+        create_list(:license, 3, :with_group, account: user.account, environment: user.environment, user:)
       end
     end
 
     trait :with_group do
-      after :create do |user|
-        user.update(group: build(:group, account: user.account))
-      end
+      group { build(:group, account:, environment:) }
     end
 
     trait :with_root_permissions do
@@ -97,7 +95,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |user|
+        user.environment = nil
+        user.save!(validate: false)
+      end
     end
 
     trait :global do

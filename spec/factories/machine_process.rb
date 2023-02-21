@@ -25,7 +25,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |process|
+        process.environment = nil
+        process.save!(validate: false)
+      end
     end
 
     trait :global do

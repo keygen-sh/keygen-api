@@ -6,6 +6,9 @@ FactoryBot.define do
     # to insert duplicate codes would fail, and this prevents that.
     initialize_with { Entitlement.find_or_initialize_by(code:) }
 
+    account     { nil }
+    environment { nil }
+
     # Our entitlement codes cycle in sets of 10, so we can do things like
     # constrain a release with 10 entitlements via the :with_constraints
     # trait, and subsequently entitle a license with the same 10
@@ -30,7 +33,10 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      environment { nil }
+      after :create do |entitlement|
+        entitlement.environment = nil
+        entitlement.save!(validate: false)
+      end
     end
 
     trait :global do

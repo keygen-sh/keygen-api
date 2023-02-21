@@ -32,12 +32,9 @@ module AuthorizationHelper
     def as_license(scenarios)
       case scenarios
       in []
-        let(:account)      { create(:account, *account_traits) }
-        let(:environment)  { nil }
-        let(:policy)       { create(:policy, *policy_traits, account:) }
-        let(:license_user) { nil }
-        let(:expiry)       { nil }
-        let(:bearer)       { create(:license, *license_traits, *bearer_traits, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
+        let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
+        let(:bearer)      { create(:license, *license_traits, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -1011,13 +1008,11 @@ module AuthorizationHelper
     end
 
     def accessing_a_license(scenarios)
-      let(:license_user) { nil }
-
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:license) { create(:license, *license_traits, user: license_user, account: other_account) }
+        let(:license) { create(:license, *license_traits, account: other_account) }
       else
-        let(:license) { create(:license, *license_traits, user: license_user, account:) }
+        let(:license) { create(:license, *license_traits, account:) }
       end
 
       let(:record) { license }
