@@ -30,7 +30,7 @@ class Role < ApplicationRecord
     autosave: true
 
   accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
-  tracks_attribute_assignments_for :role_permissions
+  tracks_nested_attributes_for :role_permissions
 
   # Set default permissions unless already set
   before_create :set_default_permissions,
