@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :key do
+    initialize_with { new(**attributes) }
+
     key { SecureRandom.hex(12).upcase.scan(/.{4}/).join "-" }
 
     account     { nil }

@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :account do
+    initialize_with { new(**attributes) }
+
     slug { "#{Faker::Internet.domain_name.parameterize}-#{SecureRandom.hex(4)}" }
     name { Faker::Company.name }
 

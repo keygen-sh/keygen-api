@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :machine do
+    initialize_with { new(**attributes) }
+
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name        { Faker::Company.buzzword }
 

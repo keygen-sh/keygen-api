@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :second_factor do
+    initialize_with { new(**attributes) }
+
     account     { nil }
     environment { nil }
     user        { build(:user, account:, environment:) }

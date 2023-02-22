@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :product do
+    initialize_with { new(**attributes) }
+
     name { Faker::App.name }
     platforms {
       [

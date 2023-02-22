@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :policy do
+    initialize_with { new(**attributes) }
+
     name                      { Faker::Company.buzzword }
     max_machines              { nil }
     duration                  { 2.weeks }

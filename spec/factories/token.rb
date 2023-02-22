@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :token do
+    initialize_with { new(**attributes) }
+
     digest { "test_#{SecureRandom.hex}" }
 
     account     { nil }
