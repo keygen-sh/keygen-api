@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :key do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     key { SecureRandom.hex(12).upcase.scan(/.{4}/).join "-" }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     policy      { build(:policy, :pooled, account:, environment:) }
 
     trait :in_isolated_environment do

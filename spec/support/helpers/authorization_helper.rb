@@ -1455,7 +1455,7 @@ module AuthorizationHelper
     # with_token_authentication defines a context using token authentication.
     def with_token_authentication(&)
       context 'with token authentication' do
-        let(:token) { create(:token, *token_traits, account:, bearer:, permissions: token_permissions) }
+        let(:token) { create(:token, *token_traits, account:, bearer:, environment: bearer.environment, permissions: token_permissions) }
 
         instance_exec(&)
       end

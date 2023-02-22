@@ -2,13 +2,13 @@
 
 FactoryBot.define do
   factory :machine do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name        { Faker::Company.buzzword }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     license     { build(:license, account:, environment:) }
 
     trait :in_isolated_environment do

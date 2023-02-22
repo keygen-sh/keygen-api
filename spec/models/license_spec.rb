@@ -80,10 +80,10 @@ describe License, type: :model do
           expect(license.environment).to eq Current.environment
         end
 
-        it 'should not set nil environment' do
+        it 'should set nil environment' do
           license = create(:license, account:, environment: nil)
 
-          expect(license.environment).to eq Current.environment
+          expect(license.environment).to be_nil
         end
       end
     end

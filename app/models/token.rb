@@ -26,7 +26,7 @@ class Token < ApplicationRecord
   has_environment default: -> { bearer&.environment_id }
 
   accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
-  tracks_dirty_attributes_for :token_permissions
+  tracks_attribute_assignments_for :token_permissions
 
   # Set default permissions unless already set
   before_validation :set_default_permissions,

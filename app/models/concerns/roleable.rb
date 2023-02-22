@@ -94,7 +94,7 @@ module Roleable
         through: :role
 
       accepts_nested_attributes_for :role, update_only: true
-      tracks_dirty_attributes_for :role
+      tracks_attribute_assignments_for :role
 
       delegate :permissions, :permission_ids, :role_permissions,
         :role_permissions_attributes_assigned?, :role_permissions_attributes,
