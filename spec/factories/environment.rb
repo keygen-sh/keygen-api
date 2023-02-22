@@ -7,7 +7,7 @@ FactoryBot.define do
     initialize_with { Environment.find_by(code:) || new(**attributes) }
 
     isolation_strategy { 'ISOLATED' }
-    code               { "env-#{SecureRandom.hex}" }
+    code               { SecureRandom.hex(4) }
     name               { code.humanize }
 
     trait :isolated do
