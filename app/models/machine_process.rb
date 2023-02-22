@@ -23,7 +23,7 @@ class MachineProcess < ApplicationRecord
     on: :create
 
   delegate :leasing_strategy, :lease_per_license?, :lease_per_machine?,
-    :resurrect_dead?, :lazarus_ttl,
+    :resurrect_dead?, :always_resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
 
@@ -163,6 +163,9 @@ class MachineProcess < ApplicationRecord
   end
 
   def resurrection_period_passed?
+    return false if
+      always_resurrect_dead?
+
     return true unless
       resurrect_dead?
 
