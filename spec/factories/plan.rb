@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :plan do
+    initialize_with { new(**attributes) }
+
     name         { Faker::Company.buzzword }
     price        { Faker::Number.number digits: 4 }
     max_admins   { Faker::Number.between from: 50, to: 5000 }

@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :license do
+    initialize_with { new(**attributes) }
+
     account     { nil }
     environment { nil }
     policy      { build(:policy, account:, environment:) }

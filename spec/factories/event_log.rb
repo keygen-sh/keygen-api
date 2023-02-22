@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :event_log do
+    initialize_with { new(**attributes) }
+
     account     { nil }
     environment { nil }
     resource    { build(:license, account:, environment:) }

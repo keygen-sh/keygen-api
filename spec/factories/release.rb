@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :release do
+    initialize_with { new(**attributes) }
+
     name    { Faker::App.name }
     version { nil }
     status  { 'PUBLISHED' }

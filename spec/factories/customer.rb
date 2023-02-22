@@ -4,6 +4,8 @@ FactoryBot.define do
   Stripe::Customer.send :alias_method, :save!, :save
 
   factory :customer, class: Stripe::Customer do
+    initialize_with { new(**attributes) }
+
     email { Faker::Internet.safe_email }
 
     trait :with_card do

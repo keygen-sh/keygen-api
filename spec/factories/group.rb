@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :group do
+    initialize_with { new(**attributes) }
+
     name { Faker::Company.name }
 
     account     { nil }
