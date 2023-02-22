@@ -45,8 +45,8 @@ module Environmental
       belongs_to :environment,
         optional: true
 
-      tracks_attribute_assignments :environment_id,
-                                   :environment
+      tracks_attributes :environment_id,
+                        :environment
 
       # Hook into both initialization and validation to ensure the current environment
       # is applied to new records (given no :environment was provided).

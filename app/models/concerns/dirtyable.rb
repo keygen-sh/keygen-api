@@ -5,8 +5,8 @@ module Dirtyable
 
   class_methods do
     ##
-    # tracks_attribute_assignments augments AR's assign_attributes method
-    # to check if an attribute was provided during class initialization.
+    # tracks_attributes augments AR's assign_attributes method to check if
+    # an attribute was provided during class initialization.
     #
     # This is especially when we want to check if a given attribute was
     # explicitly assigned nil.
@@ -34,7 +34,7 @@ module Dirtyable
     # This allows us to conditionally apply a default via the current environment
     # based on whether or not an environment was explicitly passed.
     #
-    def tracks_attribute_assignments(*attribute_names)
+    def tracks_attributes(*attribute_names)
       raise NotImplementedError, "attributes not accepted for #{self}: #{attribute_names.inspect}" unless
         attribute_names.empty? || attribute_names.all? {
           _1.to_s.in?(self.attribute_names) || (
@@ -93,14 +93,14 @@ module Dirtyable
     # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
     #              have been provided. This adds a flag we can check.
     #
-    # tracks_attribute_assignments_for adds a flag for checking if nested attributes
+    # tracks_nested_attributes_for adds a flag for checking if nested attributes
     # have been provided, vs. checking e.g. role.changed?, which may give false
     # positives since role can be changed outside nested attributes.
     #
     # For example,
     #
     #   accepts_nested_attributes_for :role
-    #   tracks_attribute_assignments_for :role
+    #   tracks_nested_attributes_for :role
     #
     # Adds the following method,
     #
@@ -113,7 +113,7 @@ module Dirtyable
     #   user.assign_attributes(role_attributes: { name: :admin })
     #   user.role_attributes_assigned? # => true
     #
-    def tracks_attribute_assignments_for(relation)
+    def tracks_nested_attributes_for(relation)
       raise NotImplementedError, 'tracking nested attributes is only supported for active records' unless
         self < ::ActiveRecord::Base
 
