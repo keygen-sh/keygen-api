@@ -44,9 +44,11 @@ module Environmental
         optional: true
 
       # Make absolutely sure our current environment is applied.
-      after_initialize  -> { self.environment_id ||= Current.environment&.id }, if: :new_record?
+      after_initialize  -> { self.environment_id ||= Current.environment&.id },
+        if: -> { new_record? && environment.nil? }
+
       before_validation -> { self.environment_id ||= Current.environment&.id },
-        if: :new_record?,
+        if: -> { new_record? && environment.nil? },
         on: %i[create]
 
       # Validate the association only if we've been given an environment (because it's optional).
@@ -88,8 +90,10 @@ module Environmental
         }
 
         # Again, we want to make absolutely sure our default is applied.
-        after_initialize  if: :new_record?,                 &fn
-        before_validation if: :new_record?, on: %i[create], &fn
+        after_initialize  if: -> { new_record? && environment.nil? }, &fn
+        before_validation if: -> { new_record? && environment.nil? },
+                          on: %i[create],
+                          &fn
       end
 
       # We also want to assert that the model's current environment is compatible
