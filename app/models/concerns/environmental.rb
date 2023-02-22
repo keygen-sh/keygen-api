@@ -48,6 +48,8 @@ module Environmental
       tracks_attribute_assignments :environment_id,
                                    :environment
 
+      # Hook into both initialization and validation to ensure the current environment
+      # is applied to new records (given no :environment was provided).
       after_initialize -> { self.environment_id ||= Current.environment&.id },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? && environment.nil? }
