@@ -7,7 +7,7 @@ describe Dirtyable, type: :concern do
   let(:account) { create(:account) }
 
   describe 'ActiveModel' do
-    describe '.tracks_attribute_assignments' do
+    describe '.tracks_attributes' do
       context 'when tracking some attributes' do
         let(:dirtyable) {
           Class.new {
@@ -18,7 +18,7 @@ describe Dirtyable, type: :concern do
             attribute :foo, :integer
             attribute :bar, :integer
             attribute :baz, :integer
-            tracks_attribute_assignments :foo
+            tracks_attributes :foo
           }
         }
 
@@ -43,7 +43,7 @@ describe Dirtyable, type: :concern do
             attribute :bar, :integer
             attribute :baz, :integer
 
-            tracks_attribute_assignments
+            tracks_attributes
           }
         }
 
@@ -65,7 +65,7 @@ describe Dirtyable, type: :concern do
             include ActiveModel::Attributes
             include Dirtyable
 
-            tracks_attribute_assignments :foo
+            tracks_attributes :foo
           }
         }
 
@@ -75,14 +75,14 @@ describe Dirtyable, type: :concern do
       end
     end
 
-    describe '.tracks_attribute_assignments_for' do
+    describe '.tracks_nested_attributes_for' do
       let(:dirtyable) {
         Class.new {
           include ActiveModel::Model
           include ActiveModel::Attributes
           include Dirtyable
 
-          tracks_attribute_assignments_for :foo
+          tracks_nested_attributes_for :foo
         }
       }
 
