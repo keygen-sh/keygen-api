@@ -44,8 +44,8 @@ module Environmental
         optional: true
 
       # Make absolutely sure our current environment is applied.
-      after_initialize  -> { self.environment ||= Current.environment }, if: :new_record?
-      before_validation -> { self.environment ||= Current.environment },
+      after_initialize  -> { self.environment_id ||= Current.environment&.id }, if: :new_record?
+      before_validation -> { self.environment_id ||= Current.environment&.id },
         if: :new_record?,
         on: %i[create]
 
@@ -102,6 +102,10 @@ module Environmental
           # to assert the :belongs_to has an :environment association to assert against.
           next unless
             (reflection.options in polymorphic: true) || reflection.klass < Environmental
+
+          # Validate associations (resolves an order issue for new records during tests).
+          validates_associated reflection.name,
+            on: %i[create]
 
           # Perform asserts on create and update.
           validate on: %i[create update] do
