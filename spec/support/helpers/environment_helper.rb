@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # NOTE(ezekg) This is used as a sentinel value during tests to determine
-#             whether or not a factory's environment is a default vs an
-#             explicit nil value given via initialization.
+#             whether or not a factory's environment should run through
+#             the default flow vs an explicit nil value given during
+#             factory initialization.
 DEFAULT_ENVIRONMENT = Environment.new(id: nil, code: 'FOR_TEST_ONLY').freeze
 
 module EnvironmentHelper

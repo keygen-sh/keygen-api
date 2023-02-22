@@ -6,7 +6,7 @@ module Dirtyable
   class_methods do
     ##
     # tracks_attribute_assignments augments AR's assign_attributes method
-    # to check is an attribute was provided during class initialization.
+    # to check if an attribute was provided during class initialization.
     #
     # This is especially when we want to check if a given attribute was
     # explicitly assigned nil.
