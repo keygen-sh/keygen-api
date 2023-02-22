@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :role do
+    initialize_with { new(**attributes) }
+
     resource { nil }
 
     trait :user do

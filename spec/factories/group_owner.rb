@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :group_owner do
+    initialize_with { new(**attributes) }
+
     account     { nil }
     environment { nil }
     group       { build(:group, account:, environment:) }

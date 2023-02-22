@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :billing do
+    initialize_with { new(**attributes) }
+
     customer_id         { Faker::Internet.password }
     subscription_id     { Faker::Internet.password }
     subscription_status { 'active' }

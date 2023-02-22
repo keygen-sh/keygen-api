@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :release_artifact, aliases: %i[artifact] do
+    initialize_with { new(**attributes) }
+
     filename { "#{release.name}-#{release.version}+#{SecureRandom.hex}.#{filetype.key}" }
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
     status   { 'UPLOADED' }

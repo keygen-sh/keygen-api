@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :webhook_event do
+    initialize_with { new(**attributes) }
+
     endpoint { Faker::Internet.url }
     payload  { { payload: '{}' }.to_json }
     jid      { SecureRandom.hex }

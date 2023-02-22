@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :machine_process, aliases: %i[process] do
+    initialize_with { new(**attributes) }
+
     pid { SecureRandom.hex(12) }
 
     account     { nil }

@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :release_platform, aliases: %i[platform] do
+    initialize_with { new(**attributes) }
+
     sequence :key, %w[darwin linux windows].cycle
 
     account { nil }

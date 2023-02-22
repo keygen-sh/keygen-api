@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :request_log do
+    initialize_with { new(**attributes) }
+
     account     { nil }
     environment { nil }
 

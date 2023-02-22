@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :user do
+    initialize_with { new(**attributes) }
+
     first_name { Faker::Name.name }
     last_name  { Faker::Name.name }
     email      { SecureRandom.hex(4) + Faker::Internet.safe_email }

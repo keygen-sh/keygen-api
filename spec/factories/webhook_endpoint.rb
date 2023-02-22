@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :webhook_endpoint do
+    initialize_with { new(**attributes) }
+
     url { "https://#{SecureRandom.hex}.example" }
 
     account     { nil }
