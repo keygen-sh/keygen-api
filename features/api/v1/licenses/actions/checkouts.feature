@@ -893,7 +893,6 @@ Feature: License checkout actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: Admin performs a license checkout with empty includes (GET)
     Given the current account is "test1"
