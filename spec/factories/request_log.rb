@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :request_log do
-    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     account     { nil }
-    environment { DEFAULT_ENVIRONMENT }
+    environment { NIL_ENVIRONMENT }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
