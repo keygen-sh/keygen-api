@@ -3,6 +3,7 @@
 module Api::V1
   class PasswordsController < Api::V1::BaseController
     skip_verify_authorized
+
     before_action :scope_to_current_account!
     before_action :set_user, only: [:reset]
 
