@@ -65,7 +65,6 @@ Feature: Process heartbeat actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: Admin pings a dead process's heartbeat
     Given time is frozen at "2022-10-16T14:52:48.000Z"
