@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :product do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     name { Faker::App.name }
     platforms {
@@ -14,7 +14,7 @@ FactoryBot.define do
     }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
 
     trait :licensed do
       distribution_strategy { 'LICENSED' }

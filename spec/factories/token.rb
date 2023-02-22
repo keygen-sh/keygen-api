@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :token do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     digest { "test_#{SecureRandom.hex}" }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     bearer      { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do

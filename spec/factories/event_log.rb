@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :event_log do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     resource    { build(:license, account:, environment:) }
     whodunnit   { build(:user, account:, environment:) }
     event_type

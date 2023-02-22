@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :webhook_endpoint do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     url { "https://#{SecureRandom.hex}.example" }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

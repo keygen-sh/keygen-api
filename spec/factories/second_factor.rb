@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :second_factor do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     user        { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do

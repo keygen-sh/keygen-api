@@ -4,6 +4,8 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
+    include Dirtyable
+
     ##
     # for_environment scopes the current resource to an environment.
     #
@@ -43,11 +45,15 @@ module Environmental
       belongs_to :environment,
         optional: true
 
-      # Make absolutely sure our current environment is applied.
-      after_initialize  -> { self.environment_id ||= Current.environment&.id },
+      tracks_attribute_assignments :environment_id,
+                                   :environment
+
+      after_initialize -> { self.environment_id ||= Current.environment&.id },
+        unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? && environment.nil? }
 
       before_validation -> { self.environment_id ||= Current.environment&.id },
+        unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? && environment.nil? },
         on: %i[create]
 
@@ -90,10 +96,14 @@ module Environmental
         }
 
         # Again, we want to make absolutely sure our default is applied.
-        after_initialize  if: -> { new_record? && environment.nil? }, &fn
-        before_validation if: -> { new_record? && environment.nil? },
-                          on: %i[create],
-                          &fn
+        after_initialize unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
+          if: -> { new_record? && environment.nil? },
+          &fn
+
+        before_validation unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
+          if: -> { new_record? && environment.nil? },
+          on: %i[create],
+          &fn
       end
 
       # We also want to assert that the model's current environment is compatible
