@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :group do
-    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     name { Faker::Company.name }
 
     account     { nil }
-    environment { DEFAULT_ENVIRONMENT }
+    environment { NIL_ENVIRONMENT }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

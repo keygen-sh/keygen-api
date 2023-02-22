@@ -2,14 +2,14 @@
 
 FactoryBot.define do
   factory :release do
-    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     name    { Faker::App.name }
     version { nil }
     status  { 'PUBLISHED' }
 
     account     { nil }
-    environment { DEFAULT_ENVIRONMENT }
+    environment { NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
     channel     { build(:channel, key: 'stable', account:) }
     artifacts   { [] }
