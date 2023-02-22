@@ -72,10 +72,7 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      after :create do |artifact|
-        artifact.environment = nil
-        artifact.save!(validate: false)
-      end
+      environment { nil }
     end
 
     trait :global do

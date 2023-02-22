@@ -30,10 +30,7 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      after :create do |constraint|
-        constraint.environment = nil
-        constraint.save!(validate: false)
-      end
+      environment { nil }
     end
 
     trait :global do
