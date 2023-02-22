@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :license do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     policy      { build(:policy, account:, environment:) }
     user        { nil }
 
@@ -102,7 +102,7 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      environment { build(:environment, :isolated, account:) }
+      environment { create(:environment, :isolated, account:) }
     end
 
     trait :isolated do
@@ -110,7 +110,7 @@ FactoryBot.define do
     end
 
     trait :in_shared_environment do
-      environment { build(:environment, :shared, account:) }
+      environment { create(:environment, :shared, account:) }
     end
 
     trait :shared do

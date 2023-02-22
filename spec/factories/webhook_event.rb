@@ -2,14 +2,14 @@
 
 FactoryBot.define do
   factory :webhook_event do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     endpoint { Faker::Internet.url }
     payload  { { payload: '{}' }.to_json }
     jid      { SecureRandom.hex }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     event_type
 
     trait :in_isolated_environment do

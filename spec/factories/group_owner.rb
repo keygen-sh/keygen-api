@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :group_owner do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     group       { build(:group, account:, environment:) }
     user        { build(:user, account:, environment:) }
 

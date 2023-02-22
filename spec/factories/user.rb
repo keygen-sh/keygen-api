@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :user do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 }) }
 
     first_name { Faker::Name.name }
     last_name  { Faker::Name.name }
@@ -10,7 +10,7 @@ FactoryBot.define do
     password   { 'password' }
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
 
     factory :admin do
       role { build(:role, :admin) }

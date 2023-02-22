@@ -5,11 +5,11 @@ FactoryBot.define do
     # Prevent duplicates due to cyclic entitlement codes.
     initialize_with do
       LicenseEntitlement.find_by(entitlement_id: entitlement&.id, license_id: license&.id) ||
-        new(**attributes)
+        new(**attributes.reject { DEFAULT_ENVIRONMENT == _2 })
     end
 
     account     { nil }
-    environment { nil }
+    environment { DEFAULT_ENVIRONMENT }
     entitlement { build(:entitlement, account:, environment:) }
     license     { nil }
 
