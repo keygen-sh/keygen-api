@@ -5,7 +5,7 @@ FactoryBot.define do
     initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     endpoint { Faker::Internet.url }
-    payload  { { payload: '{}' }.to_json }
+    payload  { '{}' }
     jid      { SecureRandom.hex }
 
     account     { nil }
@@ -29,10 +29,7 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      after :create do |event|
-        event.environment = nil
-        event.save!(validate: false)
-      end
+      environment { nil }
     end
 
     trait :global do

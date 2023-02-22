@@ -86,10 +86,7 @@ FactoryBot.define do
     end
 
     trait :in_nil_environment do
-      after :create do |release|
-        release.environment = nil
-        release.save!(validate: false)
-      end
+      environment { nil }
     end
 
     trait :global do
