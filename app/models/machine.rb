@@ -366,7 +366,7 @@ class Machine < ApplicationRecord
   }
 
   delegate :heartbeat_from_creation?, :heartbeat_from_first_ping?,
-    :resurrect_dead?, :lazarus_ttl,
+    :resurrect_dead?, :always_resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
 
@@ -468,6 +468,9 @@ class Machine < ApplicationRecord
   end
 
   def resurrection_period_passed?
+    return false if
+      always_resurrect_dead?
+
     return true unless
       requires_heartbeat? &&
       resurrect_dead? &&

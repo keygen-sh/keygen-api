@@ -17,6 +17,10 @@ Given /^I send and accept JSON$/ do
     rand(0...6) == 0 # Dice roll to test for no header
 end
 
+Given /^time is frozen (\d+) (\w+) into the future$/ do |duration_number, duration_word|
+  travel_to(duration_number.to_i.send(duration_word).from_now)
+end
+
 Given /^time is frozen at "([^\"]*)"$/ do |t|
   travel_to(t)
 end

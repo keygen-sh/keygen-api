@@ -278,6 +278,71 @@ Feature: Machine heartbeat actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin pings a dead machine's heartbeat that supports resurrection (always revive, from first ping basis)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
+        "heartbeatDuration": $time.1.month
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.2.months.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response should contain a valid signature header for "test1"
+    # NOTE(ezekg) To assert that the RESURRECTED status is transient
+    And the first "machine" should have the heartbeatStatus "ALIVE"
+    And sidekiq should have 1 "machine-heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin pings a dead machine's heartbeat that supports resurrection (always revive, from creation basis)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
+        "heartbeatDuration": $time.1.month,
+        "heartbeatBasis": "FROM_CREATION"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And time is frozen 2 months into the future
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response should contain a valid signature header for "test1"
+    # NOTE(ezekg) To assert that the RESURRECTED status is transient
+    And the first "machine" should have the heartbeatStatus "ALIVE"
+    And sidekiq should have 1 "machine-heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: Product pings a machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "product"
