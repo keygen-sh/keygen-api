@@ -22,7 +22,7 @@ describe Dirtyable, type: :concern do
           }
         }
 
-        it 'should track assigned attributes' do
+        it 'should track attribute assignment' do
           model = dirtyable.new
           model.assign_attributes(foo: 1, bar: 2)
 
@@ -47,7 +47,7 @@ describe Dirtyable, type: :concern do
           }
         }
 
-        it 'should track assigned attributes' do
+        it 'should track attribute assignment' do
           model = dirtyable.new
           model.assign_attributes(foo: 1, bar: 2)
 
@@ -93,6 +93,6 @@ describe Dirtyable, type: :concern do
   end
 
   describe 'ActiveRecord' do
-    # TODO(ezekg)
+    # NOTE(ezekg) See :dirtyable shared examples
   end
 end
