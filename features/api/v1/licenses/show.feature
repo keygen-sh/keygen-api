@@ -381,7 +381,7 @@ Feature: Show license
       { "status": "ACTIVE" }
       """
 
-  Scenario: Admin attempts to retrieves an inactive license for their account (inactive license, unused)
+  Scenario: Admin attempts to retrieves an inactive license for their account (inactive license, unvalidated)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
@@ -400,7 +400,7 @@ Feature: Show license
       { "status": "INACTIVE" }
       """
 
-   Scenario: Admin attempts to retrieves an active license for their account (old license, recently used)
+   Scenario: Admin attempts to retrieves an active license for their account (old license, recent validation)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
@@ -419,7 +419,7 @@ Feature: Show license
       { "status": "ACTIVE" }
       """
 
-  Scenario: Admin attempts to retrieves an inactive license for their account (old license, unused)
+  Scenario: Admin attempts to retrieves an inactive license for their account (old license, old validation)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
@@ -427,6 +427,82 @@ Feature: Show license
       """
       {
         "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "INACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an old license for their account (old license, recent checkout)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastCheckOutAt": "$time.20.days.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an old license for their account (old license, old checkout)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastCheckOutAt": "$time.101.days.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "INACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an old license for their account (old license, recent checkin)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastCheckInAt": "$time.20.days.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an old license for their account (old license, old checkin)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastCheckInAt": "$time.101.days.ago",
         "createdAt": "$time.1.year.ago"
       }
       """
