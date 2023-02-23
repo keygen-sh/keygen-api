@@ -1174,7 +1174,7 @@ Feature: List license
       """
       {
         "createdAt": "$time.4.days.ago",
-        "lastValidatedAt": "$time.1.day.ago",
+        "lastCheckOutAt": "$time.1.day.ago",
         "expiry": "$time.1.year.from_now",
         "suspended": true
       }
@@ -1584,7 +1584,7 @@ Feature: List license
       """
       {
         "createdAt": "$time.4.days.ago",
-        "lastValidatedAt": "$time.1.day.ago",
+        "lastCheckInAt": "$time.1.day.ago",
         "expiry": "$time.1.year.from_now",
         "suspended": true
       }

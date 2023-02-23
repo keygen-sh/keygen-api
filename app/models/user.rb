@@ -248,10 +248,11 @@ class User < ApplicationRecord
       .union(
         joins(:licenses)
           .where(banned_at: nil)
-          .where(
-            'licenses.created_at >= :t OR licenses.last_validated_at >= :t',
-            t: t,
-          )
+          .where(<<~SQL.squish, t:)
+            licenses.created_at >= :t OR licenses.last_validated_at >= :t
+              OR licenses.last_check_out_at >= :t
+              OR licenses.last_check_in_at >= :t
+          SQL
       )
   }
   scope :inactive, -> (t = 90.days.ago) {
@@ -262,10 +263,11 @@ class User < ApplicationRecord
         joins(:licenses)
           .where('users.created_at < ?', t)
           .where(banned_at: nil)
-          .where(
-            'licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t)',
-            t: t,
-          )
+          .where(<<~SQL.squish, t:)
+            licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t)
+              AND (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :t)
+              AND (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :t)
+          SQL
       )
   }
   scope :assigned, -> (status = true) {

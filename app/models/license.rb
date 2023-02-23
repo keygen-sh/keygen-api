@@ -343,10 +343,10 @@ class License < ApplicationRecord
     )
   }
 
-  scope :active, -> (start_date = 90.days.ago) { where 'licenses.created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
+  scope :active, -> (start_date = 90.days.ago) { where 'licenses.created_at >= :start_date OR last_validated_at >= :start_date OR last_check_out_at >= :start_date OR last_check_in_at >= :start_date', start_date: start_date }
   scope :inactive, -> (start_date = 90.days.ago) {
     where(
-      'licenses.created_at < :start_date AND (last_validated_at IS NULL OR last_validated_at < :start_date)',
+      'licenses.created_at < :start_date AND (last_validated_at IS NULL OR last_validated_at < :start_date) AND (last_check_out_at IS NULL OR last_check_out_at < :start_date OR last_check_in_at < :start_date)',
       start_date: start_date,
     )
   }
@@ -619,7 +619,10 @@ class License < ApplicationRecord
   end
 
   def active?(t = 90.days.ago)
-    (created_at >= t || last_validated_at >= t) rescue false
+    created_at >= t ||
+      (last_validated_at? && last_validated_at >= t) ||
+      (last_check_out_at? && last_check_out_at >= t) ||
+      (last_check_in_at?  && last_check_in_at  >= t)
   end
 
   def inactive?
