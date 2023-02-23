@@ -7,6 +7,42 @@ describe Release, type: :model do
   let(:account) { create(:account) }
   let(:product) { create(:product, account:) }
 
+  it_behaves_like :environmental
+
+  describe '#environment=' do
+    context 'on create' do
+      it 'should not raise when environment matches product' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+
+        expect { create(:release, account:, environment:, product:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match product' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment: nil)
+
+        expect { create(:release, account:, environment:, product:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'on update' do
+      it 'should not raise when environment matches product' do
+        environment = create(:environment, account:)
+        release     = create(:release, account:, environment:)
+
+        expect { release.update!(product: create(:product, account:, environment:)) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match product' do
+        environment = create(:environment, account:)
+        release     = create(:release, account:, environment:)
+
+        expect { release.update!(product: create(:product, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
   describe '.without_constraints' do
     let(:releases) { described_class.where(account:) }
 
@@ -78,112 +114,6 @@ describe Release, type: :model do
       expect(releases.within_constraints.ids).to match_array [
         releases.fifth.id,
       ]
-    end
-  end
-
-  describe '#environment=' do
-    context 'on create' do
-      it 'should not raise when environment exists' do
-        environment = create(:environment, account:)
-
-        expect { create(:release, account:, environment:) }.to_not raise_error
-      end
-
-      it 'should raise when environment does not exist' do
-        expect { create(:release, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should not raise when environment is nil' do
-        expect { create(:release, account:, environment: nil) }.to_not raise_error
-      end
-
-      it 'should not raise when environment matches product' do
-        environment = create(:environment, account:)
-        product     = create(:product, account:, environment:)
-
-        expect { create(:release, account:, environment:, product:) }.to_not raise_error
-      end
-
-      it 'should raise when environment does not match product' do
-        environment = create(:environment, account:)
-        product     = create(:product, account:, environment: nil)
-
-        expect { create(:release, account:, environment:, product:) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should set provided environment' do
-        environment = create(:environment, account:)
-        release     = create(:release, account:, environment:)
-
-        expect(release.environment).to eq environment
-      end
-
-      it 'should set nil environment' do
-        release = create(:release, account:, environment: nil)
-
-        expect(release.environment).to be_nil
-      end
-
-      context 'with current environment' do
-        before { Current.environment = create(:environment, account:) }
-        after  { Current.environment = nil }
-
-        it 'should set provided environment' do
-          environment = create(:environment, account:)
-          release     = create(:release, account:, environment:)
-
-          expect(release.environment).to eq environment
-        end
-
-        it 'should default to current environment' do
-          release = create(:release, account:)
-
-          expect(release.environment).to eq Current.environment
-        end
-
-        it 'should set nil environment' do
-          release = create(:release, account:, environment: nil)
-
-          expect(release.environment).to be_nil
-        end
-      end
-    end
-
-    context 'on update' do
-      it 'should raise when environment exists' do
-        environment = create(:environment, account:)
-        release     = create(:release, account:, environment:)
-
-        expect { release.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
-        expect { release.update!(environment: nil) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should raise when environment does not exist' do
-        environment = create(:environment, account:)
-        release     = create(:release, account:, environment:)
-
-        expect { release.update!(environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should raise when environment is nil' do
-        release = create(:release, account:, environment: nil)
-
-        expect { release.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should not raise when environment matches product' do
-        environment = create(:environment, account:)
-        release     = create(:release, account:, environment:)
-
-        expect { release.update!(product: create(:product, account:, environment:)) }.to_not raise_error
-      end
-
-      it 'should raise when environment does not match product' do
-        environment = create(:environment, account:)
-        release     = create(:release, account:, environment:)
-
-        expect { release.update!(product: create(:product, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
-      end
     end
   end
 
