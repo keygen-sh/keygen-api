@@ -166,4 +166,110 @@ describe ReleaseArtifact, type: :model do
       ]
     end
   end
+
+  describe '#environment=' do
+    context 'on create' do
+      it 'should not raise when environment exists' do
+        environment = create(:environment, account:)
+
+        expect { create(:artifact, account:, environment:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not exist' do
+        expect { create(:artifact, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should not raise when environment is nil' do
+        expect { create(:artifact, account:, environment: nil) }.to_not raise_error
+      end
+
+      it 'should not raise when environment matches release' do
+        environment = create(:environment, account:)
+        release     = create(:release, account:, environment:)
+
+        expect { create(:artifact, account:, environment:, release:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match release' do
+        environment = create(:environment, account:)
+        release     = create(:release, account:, environment: nil)
+
+        expect { create(:artifact, account:, environment:, release:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should set provided environment' do
+        environment = create(:environment, account:)
+        artifact    = create(:artifact, account:, environment:)
+
+        expect(artifact.environment).to eq environment
+      end
+
+      it 'should set nil environment' do
+        artifact = create(:artifact, account:, environment: nil)
+
+        expect(artifact.environment).to be_nil
+      end
+
+      context 'with current environment' do
+        before { Current.environment = create(:environment, account:) }
+        after  { Current.environment = nil }
+
+        it 'should set provided environment' do
+          environment = create(:environment, account:)
+          artifact    = create(:artifact, account:, environment:)
+
+          expect(artifact.environment).to eq environment
+        end
+
+        it 'should default to current environment' do
+          artifact = create(:artifact, account:)
+
+          expect(artifact.environment).to eq Current.environment
+        end
+
+        it 'should set nil environment' do
+          artifact = create(:artifact, account:, environment: nil)
+
+          expect(artifact.environment).to be_nil
+        end
+      end
+    end
+
+    context 'on update' do
+      it 'should raise when environment exists' do
+        environment = create(:environment, account:)
+        artifact    = create(:artifact, account:, environment:)
+
+        expect { artifact.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
+        expect { artifact.update!(environment: nil) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should raise when environment does not exist' do
+        environment = create(:environment, account:)
+        artifact    = create(:artifact, account:, environment:)
+
+        expect { artifact.update!(environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should raise when environment is nil' do
+        artifact = create(:artifact, account:, environment: nil)
+
+        expect { artifact.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should not raise when environment matches release' do
+        environment = create(:environment, account:)
+        artifact    = create(:artifact, account:, environment:)
+
+        expect { artifact.update!(release: create(:release, account:, environment:)) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match release' do
+        environment = create(:environment, account:)
+        artifact    = create(:artifact, account:, environment:)
+
+        expect { artifact.update!(release: create(:release, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
 end
