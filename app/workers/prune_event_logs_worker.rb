@@ -1,6 +1,7 @@
 class PruneEventLogsWorker < BaseWorker
-  BATCH_SIZE         = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
-  SLEEP_DURATION     = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
+  BACKLOG_DAYS       = ENV.fetch('PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
+  BATCH_SIZE         = ENV.fetch('PRUNE_BATCH_SIZE')         { 1_000 }.to_i
+  SLEEP_DURATION     = ENV.fetch('PRUNE_SLEEP_DURATION')     { 1 }.to_f
   HIGH_VOLUME_EVENTS = %w[
     license.validation.succeeded
     license.validation.failed
@@ -8,17 +9,29 @@ class PruneEventLogsWorker < BaseWorker
     machine.heartbeat.pong
     process.heartbeat.ping
     process.heartbeat.pong
-  ]
+  ].freeze
 
   sidekiq_options queue: :cron,
                   lock: :until_executed,
                   cronitor_disabled: false
 
   def perform
-    accounts = Account.joins(:event_logs)
-                      .where('event_logs.created_at < ?', 90.days.ago)
-                      .group('accounts.id')
-                      .having('count(event_logs.id) > 0')
+    return if
+      BACKLOG_DAYS <= 0
+
+    accounts = Account.where(<<~SQL.squish, BACKLOG_DAYS.days.ago.beginning_of_day)
+      EXISTS (
+        SELECT
+          1
+        FROM
+          "event_logs"
+        WHERE
+          "event_logs"."account_id" = "accounts"."id" AND
+          "event_logs"."created_at" < ?
+        LIMIT
+          1
+      )
+    SQL
 
     Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count}"
 
@@ -34,7 +47,7 @@ class PruneEventLogsWorker < BaseWorker
 
       loop do
         event_logs = account.event_logs
-                            .where('created_at < ?', 90.days.ago.beginning_of_day)
+                            .where('created_at < ?', BACKLOG_DAYS.days.ago.beginning_of_day)
                             .where(event_type_id: event_type_ids)
 
         batch += 1
