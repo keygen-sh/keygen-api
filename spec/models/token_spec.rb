@@ -7,35 +7,10 @@ describe Token, type: :model do
   let(:account) { create(:account) }
   let(:bearer) { create(:license, account:) }
 
+  it_behaves_like :environmental
+
   describe '#environment=' do
     context 'on create' do
-      it 'should not raise when environment exists' do
-        environment = create(:environment, account:)
-
-        expect { create(:token, account:, environment:) }.to_not raise_error
-      end
-
-      it 'should raise when environment does not exist' do
-        expect { create(:token, account:, environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should not raise when environment is nil' do
-        expect { create(:token, account:, environment: nil) }.to_not raise_error
-      end
-
-      it 'should set provided environment' do
-        environment = create(:environment, account:)
-        token    = create(:token, account:, environment:)
-
-        expect(token.environment).to eq environment
-      end
-
-      it 'should set nil environment' do
-        token = create(:token, account:, environment: nil)
-
-        expect(token.environment).to be_nil
-      end
-
       context 'with user bearer' do
         it 'should not raise when environment matches bearer' do
           environment = create(:environment, account:)
@@ -83,54 +58,9 @@ describe Token, type: :model do
           expect { create(:token, account:, environment:, bearer:) }.to raise_error ActiveRecord::RecordInvalid
         end
       end
-
-      context 'with current environment' do
-        before { Current.environment = create(:environment, account:) }
-        after  { Current.environment = nil }
-
-        it 'should set provided environment' do
-          environment = create(:environment, account:)
-          token     = create(:token, account:, environment:)
-
-          expect(token.environment).to eq environment
-        end
-
-        it 'should default to current environment' do
-          token = create(:token, account:)
-
-          expect(token.environment).to eq Current.environment
-        end
-
-        it 'should set nil environment' do
-          token = create(:token, account:, environment: nil)
-
-          expect(token.environment).to be_nil
-        end
-      end
     end
 
     context 'on update' do
-      it 'should raise when environment exists' do
-        environment = create(:environment, account:)
-        token     = create(:token, account:, environment:)
-
-        expect { token.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
-        expect { token.update!(environment: nil) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should raise when environment does not exist' do
-        environment = create(:environment, account:)
-        token       = create(:token, account:, environment:)
-
-        expect { token.update!(environment_id: SecureRandom.uuid) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
-      it 'should raise when environment is nil' do
-        token = create(:token, account:, environment: nil)
-
-        expect { token.update!(environment: create(:environment, account:)) }.to raise_error ActiveRecord::RecordInvalid
-      end
-
       context 'with user bearer' do
         it 'should not raise when environment matches bearer' do
           environment = create(:environment, account:)
