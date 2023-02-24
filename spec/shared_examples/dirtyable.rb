@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+require 'spec_helper'
+
 # FIXME(ezekg) This could be a lot more modular, not having dependencies
 #              on the :account and :environment associations, nor on the
 #              :created_at and :id columns, but I can't be bothered.
