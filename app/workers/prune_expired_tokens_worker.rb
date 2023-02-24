@@ -23,7 +23,7 @@ class PruneExpiredTokensWorker < BaseWorker
 
       sleep SLEEP_DURATION
 
-      break if count == 0
+      break if count < BATCH_SIZE
     end
 
     Keygen.logger.info "[workers.prune-expired-tokens] Done"
