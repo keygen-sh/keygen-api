@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+require 'spec_helper'
+
 shared_examples :environmental do
   let(:factory) { described_class.name.demodulize.underscore }
   let(:account) { create(:account) }
