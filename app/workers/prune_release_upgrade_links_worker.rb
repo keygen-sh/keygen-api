@@ -32,7 +32,7 @@ class PruneReleaseUpgradeLinksWorker < BaseWorker
 
         sleep SLEEP_DURATION
 
-        break if count == 0
+        break if count < BATCH_SIZE
       end
     end
 
