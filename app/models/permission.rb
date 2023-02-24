@@ -496,4 +496,8 @@ class Permission < ApplicationRecord
 
     exists?(id: identifiers, action: WILDCARD_PERMISSION)
   end
+
+  ##
+  # wildcard? checks if the current permission is the wildcard.
+  def wildcard? = action == WILDCARD_PERMISSION
 end

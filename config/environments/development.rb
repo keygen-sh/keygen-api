@@ -70,10 +70,15 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-  # Enable query logs.
-  config.active_record.query_log_tags = %i[application pid controller action job]
-  config.active_record.query_log_tags_enabled = true
-  config.active_record.verbose_query_logs = true
+  # Enable verbose query logs.
+  unless ENV.key?('KEYGEN_NO_QUERY_LOGS')
+    config.active_record.query_log_tags = %i[application pid controller action job]
+    config.active_record.query_log_tags_enabled = true
+    config.active_record.verbose_query_logs = true
+    config.active_record.logger = config.logger
+  else
+    config.active_record.logger = nil
+  end
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

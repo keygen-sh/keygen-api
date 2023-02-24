@@ -96,10 +96,20 @@ module Permissible
     alias_method :all_permissions?, :root?
 
     ##
-    # default_permissions? returns true if the model is the default permission set.
-    def default_permissions?
-      (permission_ids & default_permission_ids).size == default_permission_ids.size
+    # default_permissions? returns true if the model has the default permission set.
+    def default_permissions?(except: nil)
+      a = default_permission_ids - Permission.where(action: except)
+                                             .or(
+                                               Permission.where(id: except)
+                                             )
+                                             .pluck(:id)
+                                             .uniq
+      b = permission_ids
+
+      a.size == b.size && (a & b).size == a.size
     end
+
+    def wildcard_permissions? = permissions?(Permission::WILDCARD_PERMISSION)
   end
 
   class_methods do
