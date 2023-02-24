@@ -97,7 +97,8 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
   gem 'bullet', '~> 7.0.1'
-  gem 'parallel_tests', '~> 3.8'
+  gem 'parallel_tests', '~> 3.13'
+  gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
 end
 
 group :development do
