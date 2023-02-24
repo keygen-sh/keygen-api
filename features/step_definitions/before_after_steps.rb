@@ -64,10 +64,15 @@ After do |scenario|
         status: last_response.status,
         headers: (last_response.headers.to_h rescue {}),
         body: (JSON.parse(last_response.body) rescue last_response.body)
-      }
+      },
+      debug: {
+        env_number: ENV['TEST_ENV_NUMBER'].to_i,
+      },
     )
   end
 
   @account = nil
   @token = nil
 end
+
+AfterAll { Rails.cache.clear }
