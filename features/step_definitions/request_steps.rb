@@ -125,6 +125,30 @@ Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"
   end
 end
 
+Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following attributes:$/ do |count, resource, body|
+  body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json  = JSON.parse(last_response.body)
+  attrs = JSON.parse(body)
+
+  matches = json['data'].select { |data|
+    data['type'] == resource.pluralize && attrs <= data['attributes']
+  }
+
+  expect(matches.count).to eq count.to_i
+end
+
+Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following relationships:$/ do |count, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  rels = JSON.parse(body)
+
+  matches = json['data'].select { |data|
+    data['type'] == resource.pluralize && rels <= data['relationships']
+  }
+
+  expect(matches.count).to eq count.to_i
+end
+
 Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
