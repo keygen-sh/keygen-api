@@ -113,9 +113,9 @@ module Environmental
       unless (reflections = reflect_on_all_associations(:belongs_to)).empty?
         reflections.reject { _1.name == :environment }
                    .each do |reflection|
-          # Assert that we're either we're dealing with a polymorphic association (and in that
-          # case, we'll perform the environment assert later during validation), or we want
-          # to assert the :belongs_to has an :environment association to assert against.
+          # Assert that we're either dealing with a polymorphic association (and in that case
+          # we'll perform the environment assert later during validation), or we want to
+          # assert the :belongs_to has an :environment association to assert against.
           next unless
             (reflection.options in polymorphic: true) || reflection.klass < Environmental
 
