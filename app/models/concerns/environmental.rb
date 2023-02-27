@@ -16,10 +16,14 @@ module Environmental
     # results, enable :strict mode.
     scope :for_environment, -> environment, strict: false {
       environment = case environment
-                    when UUID_RE
-                      Environment.find(environment)
-                    else
-                      environment
+                    in String => code unless code in UUID_RE
+                      return none # We do not currently support filtering via environment codes.
+                    in UUID_RE => id
+                      Environment.find(id)
+                    in Environment => env
+                      env
+                    in nil
+                      nil
                     end
 
       case

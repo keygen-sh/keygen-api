@@ -623,3 +623,182 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "machines"
+
+  @ee
+  Scenario: Admin retrieves all machines for an isolated environment
+    And the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines for a shared environment
+    And the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 9 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
+          "data": { "type": "environments", "id": "$environments[1]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment (isolated environment filter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment=$environments[0]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment (shared environment filter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment=$environments[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
+          "data": { "type": "environments", "id": "$environments[1]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment (global environment filter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment="
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment (invalid environment filter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment=invalid"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
