@@ -71,6 +71,16 @@ describe Environmental, type: :concern do
           expect(instance.environment).to eq environment
         end
       end
+
+      context 'with other' do
+        before {
+          environmental.has_environment default: -> { Class.new }
+        }
+
+        it 'should have an environment default' do
+          expect { environmental.new }.to raise_error NoMatchingPatternError
+        end
+      end
     end
   end
 
