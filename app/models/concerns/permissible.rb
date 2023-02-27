@@ -97,6 +97,9 @@ module Permissible
 
     ##
     # default_permissions? returns true if the model has the default permission set.
+    #
+    # Use :except to exclude an array of permissions, e.g. in case we're querying
+    # the old default permissions after adding new permissions.
     def default_permissions?(except: nil)
       a = default_permission_ids - Permission.where(action: except)
                                              .or(
