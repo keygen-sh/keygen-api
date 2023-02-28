@@ -1,11 +1,15 @@
 @api/v1
 Feature: Show machine
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -289,3 +293,176 @@ Feature: Show machine
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  @ee
+  Scenario: Admin retrieves an isolated machine for their account (global environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/machines/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves a shared machine for their account (global environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/machines/$1"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
+          "data": { "type": "environments", "id": "$environments[1]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves a global machine for their account (global environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/machines/$2"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
+  @ee
+  Scenario: Admin retrieves an isolated machine for their account (isolated environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current environment is "isolated"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent1/machines/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Admin retrieves an isolated machine for their account (shared environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent1/machines/$0"
+    Then the response status should be "404"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Admin retrieves a shared machine for their account (isolated environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current environment is "isolated"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent1/machines/$1"
+    Then the response status should be "404"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Admin retrieves a shared machine for their account (shared environment)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 shared "machine"
+    And the current account has 1 global "machine"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent1/machines/$1"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
+          "data": { "type": "environments", "id": "$environments[1]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """

@@ -1,11 +1,15 @@
 @api/v1
 Feature: List machines
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -626,20 +630,20 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines for an isolated environment
-    And the current account is "test1"
+    And the current account is "ent1"
     And the current account has 1 isolated "environment"
     And the current environment is "isolated"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And the current account has 1 "admin"
-    And I am the last admin of account "test1"
+    And I am the last admin of account "ent1"
     And I use an authentication token
     And I send the following headers:
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/accounts/test1/machines"
+    When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -654,20 +658,20 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines for a shared environment
-    And the current account is "test1"
+    And the current account is "ent1"
     And the current account has 1 shared "environment"
     And the current environment is "shared"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And the current account has 1 "admin"
-    And I am the last admin of account "test1"
+    And I am the last admin of account "ent1"
     And I use an authentication token
     And I send the following headers:
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/accounts/test1/machines"
+    When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -691,13 +695,13 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines in the global environment
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines"
+    When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 9 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -730,13 +734,13 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines in the global environment (isolated environment filter)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines?environment=$environments[0]"
+    When I send a GET request to "/accounts/ent1/machines?environment=$environments[0]"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -751,13 +755,13 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines in the global environment (shared environment filter)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines?environment=$environments[1]"
+    When I send a GET request to "/accounts/ent1/machines?environment=$environments[1]"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -772,13 +776,13 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines in the global environment (global environment filter)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines?environment="
+    When I send a GET request to "/accounts/ent1/machines?environment="
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
     And the JSON response should be an array of 3 "machines" with the following relationships:
@@ -793,24 +797,24 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
 
   @ee
   Scenario: Admin retrieves all machines in the global environment (environment code filter)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines?environment=isolated"
+    When I send a GET request to "/accounts/ent1/machines?environment=isolated"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "machines"
 
   @ee
   Scenario: Admin retrieves all machines in the global environment (invalid environment filter)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
     And the current account has 3 isolated "machines"
     And the current account has 3 shared "machines"
     And the current account has 3 global "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines?environment=invalid"
+    When I send a GET request to "/accounts/ent1/machines?environment=invalid"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "machines"
