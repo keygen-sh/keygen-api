@@ -792,6 +792,18 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
       """
 
   @ee
+  Scenario: Admin retrieves all machines in the global environment (environment code filter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
+
+  @ee
   Scenario: Admin retrieves all machines in the global environment (invalid environment filter)
     Given I am an admin of account "test1"
     And the current account is "test1"
