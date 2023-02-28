@@ -1,11 +1,15 @@
 @api/v1
 Feature: List release arches
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -299,3 +303,115 @@ Feature: List release arches
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
     And the JSON response should be an array of 3 "arches"
+
+  @ee
+  Scenario: Admin retrieves their isolated release arches
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 shared "product"
+    And the current account has 1 global "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 "release" for the third "product"
+    And the current account has 3 amd64 "artifacts" for the first "release"
+    And the current account has 3 amd64 "artifacts" for the last "release"
+    And the current account has 2 arm64 "artifacts" for the last "release"
+    And the current account has 1 x86 "artifacts" for the second "release"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent1/arches"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "arch"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Admin retrieves their shared release arches
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 shared "product"
+    And the current account has 1 global "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 "release" for the third "product"
+    And the current account has 3 amd64 "artifacts" for the first "release"
+    And the current account has 3 amd64 "artifacts" for the last "release"
+    And the current account has 2 arm64 "artifacts" for the last "release"
+    And the current account has 1 x86 "artifacts" for the second "release"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent1/arches"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "arches"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Admin retrieves their global release arches
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 shared "product"
+    And the current account has 1 global "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 "release" for the third "product"
+    And the current account has 3 amd64 "artifacts" for the first "release"
+    And the current account has 3 amd64 "artifacts" for the last "release"
+    And the current account has 2 arm64 "artifacts" for the last "release"
+    And the current account has 1 x86 "artifacts" for the second "release"
+    And the current account has 1 global "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/arches"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "arches"
+
+  @ee
+  Scenario: Admin retrieves their global release arches (global environment filter)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 shared "product"
+    And the current account has 1 global "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 "release" for the third "product"
+    And the current account has 3 amd64 "artifacts" for the first "release"
+    And the current account has 3 amd64 "artifacts" for the last "release"
+    And the current account has 2 arm64 "artifacts" for the last "release"
+    And the current account has 1 x86 "artifacts" for the second "release"
+    And the current account has 1 global "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/arches?environment="
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "arches"

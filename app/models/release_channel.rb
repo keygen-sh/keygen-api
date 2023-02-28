@@ -23,6 +23,16 @@ class ReleaseChannel < ApplicationRecord
 
   before_create -> { self.key = key&.downcase&.strip }
 
+  scope :for_environment, -> environment, strict: false {
+    joins(:releases)
+      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .where(
+        releases: Release.where('releases.account_id = release_channels.account_id')
+                         .for_environment(environment, strict:),
+      )
+      .distinct
+  }
+
   scope :for_product, -> id {
     joins(:products)
       .reorder(created_at: DEFAULT_SORT_ORDER)
