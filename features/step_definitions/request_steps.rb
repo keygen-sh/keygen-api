@@ -895,11 +895,11 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
   aes = OpenSSL::Cipher::AES256.new(:GCM)
   aes.decrypt
 
-  key            = OpenSSL::Digest::SHA256.digest(secret)
+  key         = OpenSSL::Digest::SHA256.digest(secret)
   ciphertext,
   iv,
-  tag            = enc.split('.')
-                      .map { Base64.strict_decode64(_1) }
+  tag         = enc.split('.')
+                   .map { Base64.strict_decode64(_1) }
 
   aes.key = key
   aes.iv  = iv
@@ -1065,20 +1065,20 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
         account.machines.find(machine_id).fingerprint
     end
 
-    aes = OpenSSL::Cipher::AES256.new(:GCM)
-    aes.decrypt
+  aes = OpenSSL::Cipher::AES256.new(:GCM)
+  aes.decrypt
 
-    key            = OpenSSL::Digest::SHA256.digest(secret)
-    ciphertext,
-    iv,
-    tag            = enc.split('.')
-                        .map { Base64.strict_decode64(_1) }
+  key         = OpenSSL::Digest::SHA256.digest(secret)
+  ciphertext,
+  iv,
+  tag         = enc.split('.')
+                   .map { Base64.strict_decode64(_1) }
 
-    aes.key = key
-    aes.iv  = iv
+  aes.key = key
+  aes.iv  = iv
 
-    aes.auth_tag  = tag
-    aes.auth_data = ''
+  aes.auth_tag  = tag
+  aes.auth_data = ''
 
   plaintext = aes.update(ciphertext) + aes.final
   data      = JSON.parse(plaintext)
