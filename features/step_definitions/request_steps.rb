@@ -852,15 +852,15 @@ Then /^the response should be a "([^"]+)" certificate with the following encoded
   expected_incl = expected_json.fetch('included') { nil }
 
   if expected_data.present?
-    expect(actual_data).to include expected_data
+    expect(actual_data).to deep_include expected_data
   end
 
   if expected_meta.present?
-    expect(actual_meta).to include expected_meta
+    expect(actual_meta).to deep_include expected_meta
   end
 
   if expected_incl.present?
-    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+    expect(actual_incl).to deep_include *expected_incl
   else
     expect(actual_incl).to be_nil
   end
@@ -920,15 +920,15 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
   expected_incl = expected_json.fetch('included') { nil }
 
   if expected_data.present?
-    expect(actual_data).to include expected_data
+    expect(actual_data).to deep_include expected_data
   end
 
   if expected_meta.present?
-    expect(actual_meta).to include expected_meta
+    expect(actual_meta).to deep_include expected_meta
   end
 
   if expected_incl.present?
-    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+    expect(actual_incl).to deep_include *expected_incl
   else
     expect(actual_incl).to be_nil
   end
@@ -1014,15 +1014,15 @@ Then /^the JSON response should be a "([^"]+)" with the following encoded certif
   expected_incl = expected_json.fetch('included') { nil }
 
   if expected_data.present?
-    expect(actual_data).to include expected_data
+    expect(actual_data).to deep_include expected_data
   end
 
   if expected_meta.present?
-    expect(actual_meta).to include expected_meta
+    expect(actual_meta).to deep_include expected_meta
   end
 
   if expected_incl.present?
-    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+    expect(actual_incl).to deep_include *expected_incl
   else
     expect(actual_incl).to be_nil
   end
@@ -1093,15 +1093,15 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
   expected_incl = expected_json.fetch('included') { nil }
 
   if expected_data.present?
-    expect(actual_data).to include expected_data
+    expect(actual_data).to deep_include expected_data
   end
 
   if expected_meta.present?
-    expect(actual_meta).to include expected_meta
+    expect(actual_meta).to deep_include expected_meta
   end
 
   if expected_incl.present?
-    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+    expect(actual_incl).to deep_include *expected_incl
   else
     expect(actual_incl).to be_nil
   end

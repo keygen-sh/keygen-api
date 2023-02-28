@@ -757,6 +757,128 @@ Feature: License checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Admin performs an isolated license checkout with environment includes (POST)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out" with the following:
+      """
+      { "meta": { "include": ["environment"] } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license-file" with the following encoded certificate data:
+      """
+      {
+        "included": [
+          { "type": "environments", "id": "$environments[0]" }
+        ]
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin performs a shared license checkout with environment includes (GET)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=environment"
+    Then the response status should be "200"
+    And the response should be a "LICENSE" certificate with the following encoded data:
+      """
+      {
+        "included": [
+          { "type": "environments", "id": "$environments[0]" }
+        ]
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin performs a license checkout with environment includes (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out" with the following:
+      """
+      { "meta": { "include": ["environment"] } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license-file" with the following encoded certificate data:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "environment": {
+              "links": { "related": null },
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin performs a license checkout with environment includes (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=environment"
+    Then the response status should be "200"
+    And the response should be a "LICENSE" certificate with the following encoded data:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "environment": {
+              "links": { "related": null },
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin performs a license checkout with encrypted includes (POST)
     Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
