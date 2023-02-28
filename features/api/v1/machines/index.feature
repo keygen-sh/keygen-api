@@ -808,7 +808,19 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And the JSON response should be an array with 0 "machines"
 
   @ee
-  Scenario: Admin retrieves all machines in the global environment (invalid environment filter)
+  Scenario: Admin retrieves all machines in the global environment (invalid UUID environment filter)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent1/machines?environment=eb37c4ba-889e-4ec0-a309-9722c7b2f1e2"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
+
+  @ee
+  Scenario: Admin retrieves all machines in the global environment (invalid code environment filter)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
     And the current account has 3 isolated "machines"

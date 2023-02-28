@@ -67,6 +67,14 @@ class Environment < ApplicationRecord
     inclusion: { in: ISOLATION_STRATEGIES, message: 'unsupported isolation strategy' },
     presence: true
 
+  scope :isolated, -> {
+    where(isolation_strategy: 'ISOLATED')
+  }
+
+  scope :shared, -> {
+    where(isolation_strategy: 'SHARED')
+  }
+
   def self.cache_key(key, account:)      = [:envs, account.id, key, CACHE_KEY_VERSION].join(':')
   def self.clear_cache!(*keys, account:) = keys.each { Rails.cache.delete(cache_key(_1, account:)) }
 
