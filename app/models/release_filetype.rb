@@ -18,4 +18,14 @@ class ReleaseFiletype < ApplicationRecord
     uniqueness: { message: 'already exists', scope: :account_id }
 
   before_create -> { self.key = key.downcase.strip }
+
+  scope :for_environment, -> environment, strict: false {
+    joins(:artifacts)
+      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .where(
+        artifacts: ReleaseArtifact.where('release_artifacts.account_id = release_filetypes.account_id')
+                                  .for_environment(environment, strict:),
+      )
+      .distinct
+  }
 end

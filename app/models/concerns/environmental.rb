@@ -19,7 +19,10 @@ module Environmental
                     in String => code unless code in UUID_RE
                       return none # We do not currently support filtering via environment codes.
                     in UUID_RE => id
-                      Environment.find(id)
+                      return none unless
+                        env = Environment.find_by(id:)
+
+                      env
                     in Environment => env
                       env
                     in nil

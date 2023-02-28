@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:entitlements) { |c, s, v| s.within_constraints(v) }
     has_scope(:constraints) { |c, s, v| s.within_constraints(v) }
+    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }

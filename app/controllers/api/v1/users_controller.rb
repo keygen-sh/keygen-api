@@ -2,6 +2,7 @@
 
 module Api::V1
   class UsersController < Api::V1::BaseController
+    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:roles, type: :array, default: [:user]) { |c, s, v| s.with_roles(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
