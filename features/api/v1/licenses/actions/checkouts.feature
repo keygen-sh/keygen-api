@@ -760,15 +760,16 @@ Feature: License checkout actions
   @ee
   Scenario: Admin performs an isolated license checkout with environment includes (POST)
     Given the current account is "test1"
-    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 isolated "webhook-endpoint"
     And the current account has 1 global "webhook-endpoint"
-    And the current account has 1 shared "environment"
-    And the current account has 1 shared "license"
-    And I am an admin of account "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "license"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
-      { "Keygen-Environment": "shared" }
+      { "Keygen-Environment": "isolated" }
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out" with the following:
       """
@@ -785,7 +786,7 @@ Feature: License checkout actions
       """
     And the response should contain the following headers:
       """
-      { "Keygen-Environment": "shared" }
+      { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
