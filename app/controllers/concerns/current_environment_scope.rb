@@ -23,6 +23,9 @@ module CurrentEnvironmentScope
         next unless
           request.headers.key?(ENVIRONMENT_HEADER_KEY)
 
+        raise Keygen::Error::UnsupportedHeaderError.new('is unsupported (must have an EE license)', header: ENVIRONMENT_HEADER_KEY) unless
+          Keygen.ee? && Keygen.ee { _1.entitled?(:environments) }
+
         environment = (
           Current.environment ||= ResolveEnvironmentService.call(
             environment: request.headers[ENVIRONMENT_HEADER_KEY],
