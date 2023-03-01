@@ -33,14 +33,16 @@ module Keygen
     class InvalidHeaderError < StandardError
       attr_reader :source
 
-      def initialize(message, header:)
+      def initialize(message = 'is invalid', header:)
         @source = { header: }
 
         super(message)
       end
     end
 
-    class UnsupportedHeaderError < InvalidHeaderError; end
+    class UnsupportedHeaderError < InvalidHeaderError
+      def initialize(message = 'is unsupported', **) = super(message, **)
+    end
 
     class NotFoundError < ActiveRecord::RecordNotFound
       def initialize(message: nil, model: nil, primary_key: nil, id: nil)
