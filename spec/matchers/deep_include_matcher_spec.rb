@@ -10,11 +10,21 @@ describe :deep_include do
       data: {
         foo: {
           bar: 1,
+          baz: 2,
         },
-        baz: {
-          qux: 2,
+        qux: {
           quxx: 3,
-        }
+          corge: 4,
+        },
+        grault: {
+          garply: 5,
+          waldo: 6,
+        },
+        fred: {
+          plugh: 7,
+          xyzzy: 8,
+        },
+        thud: 9,
       },
     }
   }
@@ -27,13 +37,13 @@ describe :deep_include do
 
   it 'should not match a hash' do
     expect(hash).to_not deep_include(
-      data: { foo: { baz: Integer } },
+      data: { foo: { quxx: Integer } },
     )
   end
 
   it 'should match an array' do
     expect(array).to deep_include(
-      data: { baz: { qux: Integer } },
+      data: { qux: { quxx: Integer } },
     )
   end
 
