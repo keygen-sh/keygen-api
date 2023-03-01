@@ -36,14 +36,14 @@ class MachineFile
 
   def id      = @id      ||= SecureRandom.uuid
   def account = @account ||= Account.find_by(id: account_id)
-  def license = @license ||= License.find_by(account_id: account_id, id: license_id)
-  def machine = @machine ||= Machine.find_by(account_id: account_id, id: machine_id)
+  def license = @license ||= License.find_by(id: license_id, account_id:)
+  def machine = @machine ||= Machine.find_by(id: machine_id, account_id:)
   def product = @product ||= license&.product
   def user    = @user    ||= license&.user
 
   def environment
     @environment ||= unless environment_id.nil?
-                       Environment.find_by(account_id: account_id, id: environment_id)
+                       Environment.find_by(id: environment_id, account_id:)
                      end
   end
 end
