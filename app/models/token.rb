@@ -36,7 +36,10 @@ class Token < ApplicationRecord
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
   after_commit :clear_cache!,
-    on: %i[update destroy]
+    on: %i[
+      destroy
+      update
+    ]
 
   attr_reader :raw
 
@@ -212,29 +215,28 @@ class Token < ApplicationRecord
     update!(permissions: default_permission_ids)
   end
 
-  def self.cache_key(digest)
-    hash = Digest::SHA256.hexdigest digest
-
-    [:tokens, hash, CACHE_KEY_VERSION].join ":"
+  def self.cache_prefix(digest, account:, environment: nil)
+    [:tokens, account.id, digest].join(':')
   end
 
-  def cache_key
-    return if digest.nil?
-
-    Token.cache_key digest
+  def self.cache_key(digest, account:, environment: nil)
+    [
+      cache_prefix(digest, account:, environment:),
+      environment&.id,
+      CACHE_KEY_VERSION,
+    ].join(':')
   end
 
-  def self.clear_cache!(digest)
-    key = Token.cache_key digest
+  def self.clear_cache!(*digests, account:, environment: nil)
+    digests.compact_blank.uniq.each do |digest|
+      prefix = cache_prefix(digest, account:, environment:)
 
-    Rails.cache.delete key
+      Rails.cache.delete_matched("#{prefix}:*")
+    end
   end
 
-  def clear_cache!
-    return if digest.nil?
-
-    Token.clear_cache! digest
-  end
+  def cache_key    = Token.cache_key(id, account:, environment:)
+  def clear_cache! = Token.clear_cache!(id, digest, digest_previously_was, account:, environment:)
 
   def generate!(version: Tokenable::ALGO_VERSION)
     length =
