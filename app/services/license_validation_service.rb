@@ -30,6 +30,16 @@ class LicenseValidationService < BaseService
     return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
     # Scope validations (quick validation skips this by setting explicitly to false)
     if scope != false
+      # Check against environment scope requirements
+      if scope.present? && scope.key?(:environment)
+        return [false, "environment scope does not match", :ENVIRONMENT_SCOPE_MISMATCH] unless
+          license.environment&.code == scope[:environment] ||
+          license.environment&.id == scope[:environment]
+      else
+        return [false, "environment scope is required", :ENVIRONMENT_SCOPE_REQUIRED] if
+          license.policy.require_environment_scope?
+      end
+
       # Check against product scope requirements
       if scope.present? && scope.key?(:product)
         return [false, "product scope does not match", :PRODUCT_SCOPE_MISMATCH] if license.product.id != scope[:product]
