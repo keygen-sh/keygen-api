@@ -2,7 +2,6 @@
 
 module Api::V1
   class ArtifactsController < Api::V1::BaseController
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:release) { |c, s, v| s.for_release(v) }

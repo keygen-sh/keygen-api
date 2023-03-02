@@ -2,7 +2,6 @@
 
 module Api::V1
   class WebhookEventsController < Api::V1::BaseController
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!

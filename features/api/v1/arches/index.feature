@@ -390,28 +390,4 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
-
-  @ee
-  Scenario: Admin retrieves their global release arches (global environment filter)
-    Given the current account is "ent1"
-    And the current account has 1 isolated "environment"
-    And the current account has 1 shared "environment"
-    And the current account has 1 isolated "product"
-    And the current account has 1 shared "product"
-    And the current account has 1 global "product"
-    And the current account has 1 "policy" for the first "product"
-    And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "release" for the first "product"
-    And the current account has 1 "release" for the second "product"
-    And the current account has 1 "release" for the third "product"
-    And the current account has 3 amd64 "artifacts" for the first "release"
-    And the current account has 3 amd64 "artifacts" for the last "release"
-    And the current account has 2 arm64 "artifacts" for the last "release"
-    And the current account has 1 x86 "artifacts" for the second "release"
-    And the current account has 1 global "admin"
-    And I am the last admin of account "ent1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/ent1/arches?environment="
-    Then the response status should be "200"
     And the JSON response should be an array with 2 "arches"

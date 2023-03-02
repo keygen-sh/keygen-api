@@ -2,8 +2,6 @@
 
 module Api::V1
   class PlatformsController < Api::V1::BaseController
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
-
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token

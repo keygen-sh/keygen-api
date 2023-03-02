@@ -36,7 +36,6 @@ module Api::V1::Licenses::Actions
       param :meta, type: :hash, optional: true do
         param :nonce, type: :integer, optional: true
         param :scope, type: :hash, optional: true do
-          param :environment, type: :string, optional: true
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
           param :user, type: :string, allow_nil: true, optional: true
@@ -47,6 +46,13 @@ module Api::V1::Licenses::Actions
           end
           param :entitlements, type: :array, optional: true do
             items type: :string
+          end
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :string, optional: true
           end
         end
       end
@@ -96,7 +102,6 @@ module Api::V1::Licenses::Actions
         param :encrypted, type: :boolean, optional: true
         param :nonce, type: :integer, optional: true
         param :scope, type: :hash, optional: true do
-          param :environment, type: :string, optional: true
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
           param :user, type: :string, allow_nil: true, optional: true
@@ -107,6 +112,13 @@ module Api::V1::Licenses::Actions
           end
           param :entitlements, type: :array, optional: true do
             items type: :string
+          end
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :string, optional: true
           end
         end
       end
