@@ -36,6 +36,7 @@ module Api::V1::Licenses::Actions
       param :meta, type: :hash, optional: true do
         param :nonce, type: :integer, optional: true
         param :scope, type: :hash, optional: true do
+          param :environment, type: :string, optional: true
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
           param :user, type: :string, allow_nil: true, optional: true
@@ -95,6 +96,7 @@ module Api::V1::Licenses::Actions
         param :encrypted, type: :boolean, optional: true
         param :nonce, type: :integer, optional: true
         param :scope, type: :hash, optional: true do
+          param :environment, type: :string, optional: true
           param :product, type: :string, optional: true
           param :policy, type: :string, optional: true
           param :user, type: :string, allow_nil: true, optional: true
