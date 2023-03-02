@@ -1849,6 +1849,48 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by group type on name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "groups"
+    And the first "group" has the following attributes:
+      """
+      { "name": "ACME G1" }
+      """
+    And the second "group" has the following attributes:
+      """
+      { "name": "Foo G1" }
+      """
+    And the third "group" has the following attributes:
+      """
+      { "name": "ACME G2" }
+      """
+    And the fourth "group" has the following attributes:
+      """
+      { "name": "Bar G1" }
+      """
+    And the fifth "group" has the following attributes:
+      """
+      { "name": "ACME G3" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "groups",
+          "query": {
+            "name": "ACME"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "groups"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search with an empty query
     Given the current account is "test1"
     And I am an admin of account "test1"

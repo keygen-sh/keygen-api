@@ -37,4 +37,8 @@ class Group < ApplicationRecord
   scope :for_machine, -> m {
     joins(:machines).where(machines: { id: m })
   }
+
+  scope :search_name, -> term {
+    where('groups.name ILIKE ?', "%#{term}%")
+  }
 end
