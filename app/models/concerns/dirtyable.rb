@@ -6,7 +6,8 @@ module Dirtyable
   class_methods do
     ##
     # tracks_attributes augments AR's assign_attributes method to check if
-    # an attribute was provided during class initialization.
+    # an attribute was assigned during class initialization or through
+    # a direct assign_attributes call.
     #
     # This is especially when we want to check if a given attribute was
     # explicitly assigned nil.
@@ -27,9 +28,9 @@ module Dirtyable
     #   license.environment # => #<Environment id=2>
     #   license.environment_attribute_assigned? # => true
     #
-    # As you can see, our environment is nil for the second license. Without
-    # this override, we wouldn't be able to determine whether or not :environment
-    # was initialized as nil vs nil being explicitly provided.
+    # As you can see, our environment is nil for the second license. Without this
+    # override, we wouldn't be able to determine whether or not :environment
+    # was initialized with a nil default vs nil being explicitly provided.
     #
     # This allows us to conditionally apply a default via the current environment
     # based on whether or not an environment was explicitly passed.
@@ -94,7 +95,7 @@ module Dirtyable
     #              have been provided. This adds a flag we can check.
     #
     # tracks_nested_attributes_for adds a flag for checking if nested attributes
-    # have been provided, vs. checking e.g. role.changed?, which may give false
+    # have been assigned, vs. checking e.g. role.changed?, which may give false
     # positives since role can be changed outside nested attributes.
     #
     # For example,
