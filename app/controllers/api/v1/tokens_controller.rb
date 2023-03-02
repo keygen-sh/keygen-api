@@ -5,7 +5,6 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:bearer, type: :hash, using: %i[type id]) { |c, s, (t, id)| s.for_bearer(t, id) }
 
     before_action :scope_to_current_account!

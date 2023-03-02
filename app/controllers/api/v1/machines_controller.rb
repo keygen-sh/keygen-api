@@ -7,7 +7,6 @@ module Api::V1
     has_scope(:ip) { |c, s, v| s.with_ip(v) }
     has_scope(:hostname) { |c, s, v| s.with_hostname(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }

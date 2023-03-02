@@ -304,16 +304,7 @@ Feature: Show machine
     And I am the last admin of account "ent1"
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/machines/$0"
-    Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
-      """
-      {
-        "environment": {
-          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
-          "data": { "type": "environments", "id": "$environments[0]" }
-        }
-      }
-      """
+    Then the response status should be "404"
 
   @ee
   Scenario: Admin retrieves a shared machine for their account (global environment)
@@ -325,16 +316,7 @@ Feature: Show machine
     And I am the last admin of account "ent1"
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/machines/$1"
-    Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
-      """
-      {
-        "environment": {
-          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
-          "data": { "type": "environments", "id": "$environments[1]" }
-        }
-      }
-      """
+    Then the response status should be "404"
 
   @ee
   Scenario: Admin retrieves a global machine for their account (global environment)

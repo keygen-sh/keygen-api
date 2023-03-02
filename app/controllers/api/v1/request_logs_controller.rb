@@ -2,7 +2,6 @@
 
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:date, type: :hash, using: [:start, :end], only: :index)
     has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }

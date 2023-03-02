@@ -2,7 +2,6 @@
 
 module Api::V1
   class ProcessesController < Api::V1::BaseController
-    has_scope(:environment, allow_blank: true) { |c, s, v| s.for_environment(v.presence, strict: true) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }

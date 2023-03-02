@@ -2182,7 +2182,7 @@ Feature: License validation actions
       {
         "meta": {
           "scope": {
-            "environment": "$environments[1]"
+            "environment": "shared"
           }
         }
       }
@@ -3185,6 +3185,30 @@ Feature: License validation actions
     And the JSON response should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: An admin validates a valid license that requires an environment scope
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      { "requireEnvironmentScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "environment scope is required", "code": "ENVIRONMENT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -5884,6 +5908,38 @@ Feature: License validation actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ce
+  Scenario: Anonymous validates a valid license key scoped to an environment
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "environment": null
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/meta/scope/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Anonymous validates a valid license key scoped to an isolated environment (with environment header)
     Given the current account is "test1"
@@ -5899,7 +5955,7 @@ Feature: License validation actions
         "meta": {
           "key": "$licenses[0].key",
           "scope": {
-            "environment": "$environments[0]"
+            "environment": "isolated"
           }
         }
       }
