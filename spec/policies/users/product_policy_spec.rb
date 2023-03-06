@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Users::ProductPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, user:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, user:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_user accessing_its_products] do
@@ -18,6 +18,42 @@ describe Users::ProductPolicy, type: :policy do
         with_wildcard_permissions { allows :index }
         with_default_permissions  { allows :index }
         without_permissions       { denies :index }
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :index
+          end
+
+          allows :index
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :index
+          end
+
+          allows :index
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          allows :index
+        end
       end
     end
 
@@ -47,6 +83,42 @@ describe Users::ProductPolicy, type: :policy do
 
         without_permissions do
           denies :show
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :show
+          end
+
+          allows :show
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :show
+          end
+
+          allows :show
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          allows :show
         end
       end
     end

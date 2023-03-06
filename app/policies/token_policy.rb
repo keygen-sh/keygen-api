@@ -3,6 +3,9 @@
 class TokenPolicy < ApplicationPolicy
   def index?
     verify_permissions!('token.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -21,6 +24,9 @@ class TokenPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('token.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -32,6 +38,7 @@ class TokenPolicy < ApplicationPolicy
 
   def generate?
     verify_permissions!('token.generate')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -48,6 +55,7 @@ class TokenPolicy < ApplicationPolicy
 
   def regenerate?
     verify_permissions!('token.regenerate')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -59,6 +67,7 @@ class TokenPolicy < ApplicationPolicy
 
   def revoke?
     verify_permissions!('token.revoke')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

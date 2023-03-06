@@ -3,6 +3,9 @@
 class EntitlementPolicy < ApplicationPolicy
   def index?
     verify_permissions!('entitlement.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -16,6 +19,9 @@ class EntitlementPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('entitlement.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -29,6 +35,7 @@ class EntitlementPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('entitlement.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -40,6 +47,7 @@ class EntitlementPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('entitlement.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -51,6 +59,7 @@ class EntitlementPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('entitlement.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

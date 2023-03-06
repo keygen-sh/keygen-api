@@ -5,6 +5,9 @@ class UserPolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('user.read', *role_permissions_for(action: 'read'))
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -18,6 +21,9 @@ class UserPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('user.read', *role_permissions_for(action: 'read'))
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -35,6 +41,7 @@ class UserPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('user.create', *role_permissions_for(action: 'create'))
+    verify_environment!
     verify_privileges!
 
     case bearer
@@ -51,6 +58,7 @@ class UserPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('user.update', *role_permissions_for(action: 'update'))
+    verify_environment!
     verify_privileges!
 
     case bearer
@@ -67,6 +75,7 @@ class UserPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('user.delete', *role_permissions_for(action: 'delete'))
+    verify_environment!
     verify_privileges!
 
     case bearer
@@ -79,6 +88,7 @@ class UserPolicy < ApplicationPolicy
 
   def invite?
     verify_permissions!('user.invite', *role_permissions_for(action: 'invite'))
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -90,6 +100,7 @@ class UserPolicy < ApplicationPolicy
 
   def ban?
     verify_permissions!('user.ban')
+    verify_environment!
 
     deny! 'must have a user role' unless
       record.user?
@@ -106,6 +117,7 @@ class UserPolicy < ApplicationPolicy
 
   def unban?
     verify_permissions!('user.unban')
+    verify_environment!
 
     deny! 'must have a user role' unless
       record.user?
@@ -122,6 +134,7 @@ class UserPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('user.read')
+    verify_environment!
 
     record == bearer
   end

@@ -9,8 +9,8 @@ NIL_ENVIRONMENT = Environment.new(id: nil, code: 'FOR_TEST_EYES_ONLY').freeze
 module EnvironmentHelper
   module ClassMethods
     def within_environment(code, &)
-      context "when in the #{code} environment" do
-        let(:environment) { create(:environment, code, account:) }
+      context "when in the #{code.inspect} environment" do
+        let(:environment) { code.nil? ? nil : create(:environment, code, account:) }
 
         before { Current.environment = environment }
         after  { Current.environment = nil }

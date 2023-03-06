@@ -6,6 +6,9 @@ module Groups
 
     def index?
       verify_permissions!('group.owners.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -21,6 +24,9 @@ module Groups
 
     def show?
       verify_permissions!('group.owners.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -36,6 +42,7 @@ module Groups
 
     def attach?
       verify_permissions!('group.owners.attach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'product' }
@@ -47,6 +54,7 @@ module Groups
 
     def detach?
       verify_permissions!('group.owners.detach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'product' }

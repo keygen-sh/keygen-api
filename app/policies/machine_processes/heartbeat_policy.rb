@@ -6,6 +6,7 @@ module MachineProcesses
 
     def ping?
       verify_permissions!('process.heartbeat.ping')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' }

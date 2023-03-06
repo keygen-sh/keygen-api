@@ -23,12 +23,18 @@ class ReleaseChannelPolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('channel.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end
 
   def show?
     verify_permissions!('channel.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end

@@ -2,6 +2,10 @@
 
 class SearchPolicy < ApplicationPolicy
   def search?
+    verify_environment!(
+      strict: false,
+    )
+
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
       allow!

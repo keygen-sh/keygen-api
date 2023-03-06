@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe LicensePolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, environment:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, environment:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_licenses] do
@@ -38,6 +38,18 @@ describe LicensePolicy, type: :policy do
 
           with_bearer_and_token_trait :in_nil_environment do
             allows :index
+          end
+
+          allows :index
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
           end
 
           allows :index
@@ -152,6 +164,23 @@ describe LicensePolicy, type: :policy do
 
           with_bearer_and_token_trait :in_nil_environment do
             allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
+          end
+
+          with_license_trait :in_nil_environment do
+            denies :create, :update, :destroy, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
+            allows :show, :validate
+          end
+
+          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
           allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate

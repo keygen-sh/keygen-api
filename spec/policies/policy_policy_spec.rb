@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe PolicyPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_policies] do
@@ -18,6 +18,42 @@ describe PolicyPolicy, type: :policy do
         with_wildcard_permissions { allows :index }
         with_default_permissions  { allows :index }
         without_permissions       { denies :index }
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :index
+          end
+
+          allows :index
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :index
+          end
+
+          allows :index
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          allows :index
+        end
       end
     end
 
@@ -65,6 +101,42 @@ describe PolicyPolicy, type: :policy do
 
         without_permissions do
           denies :show, :create, :update, :destroy
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show, :create, :update, :destroy
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :show, :create, :update, :destroy
+          end
+
+          allows :show, :create, :update, :destroy
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show, :create, :update, :destroy
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :show, :create, :update, :destroy
+          end
+
+          allows :show, :create, :update, :destroy
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show, :create, :update, :destroy
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show, :create, :update, :destroy
+          end
+
+          allows :show, :create, :update, :destroy
         end
       end
     end

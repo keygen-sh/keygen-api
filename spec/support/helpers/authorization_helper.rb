@@ -216,6 +216,28 @@ module AuthorizationHelper
       let(:record) { webhook_event }
     end
 
+    def accessing_environments(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:environments) { create_list(:environment, 3, account: other_account) }
+      else
+        let(:environments) { create_list(:environment, 3, account:) }
+      end
+
+      let(:record) { environments }
+    end
+
+    def accessing_an_environment(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:_environment) { create(:environment, account: other_account) }
+      else
+        let(:_environment) { create(:environment, account:) }
+      end
+
+      let(:record) { _environment }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
@@ -349,7 +371,7 @@ module AuthorizationHelper
           [
             create(:token, account:, bearer: create(:product, account:)),
             create(:token, account:, bearer: create(:license, *license_traits, account:)),
-            create(:token, account:, bearer: create(:user, account:)),
+            create(:token, account:, bearer: create(:user, *user_traits, account:)),
           ]
         }
       end
@@ -449,9 +471,9 @@ module AuthorizationHelper
     def accessing_users(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:users) { create_list(:user, 3, account: other_account) }
+        let(:users) { create_list(:user, 3, *user_traits, account: other_account) }
       else
-        let(:users) { create_list(:user, 3, account:) }
+        let(:users) { create_list(:user, 3, *user_traits, account:) }
       end
 
       let(:record) { users }
@@ -460,9 +482,9 @@ module AuthorizationHelper
     def accessing_a_user(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:user) { create(:user, account: other_account) }
+        let(:user) { create(:user, *user_traits, account: other_account) }
       else
-        let(:user) { create(:user, account:) }
+        let(:user) { create(:user, *user_traits, account:) }
       end
 
       let(:record) { user }
@@ -480,18 +502,18 @@ module AuthorizationHelper
       in [:as_product, :accessing_a_group, *]
         let(:users) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
-          users  = create_list(:user, 3, account:, group:)
+          users  = create_list(:user, 3, *user_traits, account:, group:)
 
           users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
           users
         }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:users) { create_list(:user, 3, account: group.account, group:) }
+        let(:users) { create_list(:user, 3, *user_traits, account: group.account, group:) }
       in [:as_product, *]
         let(:users)     {
           policy = create(:policy, *policy_traits, account:, product: bearer)
-          users  = create_list(:user, 3, account:)
+          users  = create_list(:user, 3, *user_traits, account:)
 
           users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
@@ -520,18 +542,18 @@ module AuthorizationHelper
       in [:as_product, :accessing_a_group, *]
         let(:user) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
-          user   = create(:user, account:, group:)
+          user   = create(:user, *user_traits, account:, group:)
 
           create(:license, *license_traits, account:, policy:, user:)
 
           user
         }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:user) { create(:user, account: group.account, group:) }
+        let(:user) { create(:user, *user_traits, account: group.account, group:) }
       in [:as_product, *]
         let(:user) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
-          user   = create(:user, account:)
+          user   = create(:user, *user_traits, account:)
 
           create(:license, *license_traits, account:, policy:, user:)
 
@@ -650,11 +672,9 @@ module AuthorizationHelper
           constraint.entitlement
         }
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:entitlement)          { create(:entitlement, account: license.account) }
-        let!(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
+        let(:entitlement) { license.entitlements.first }
       in [*, :accessing_its_policy | :accessing_a_policy, *]
-        let(:entitlement)         { create(:entitlement, account: _policy.account) }
-        let!(:policy_entitlement) { create(:policy_entitlement, account: _policy.account, policy: _policy, entitlement:) }
+        let(:entitlement) { _policy.entitlements.first }
       in [:as_license, *]
         let(:entitlement) { bearer.entitlements.first }
       in [:as_user, *]
@@ -1372,6 +1392,7 @@ module AuthorizationHelper
         let(:policy_traits)      { [] }
         let(:license_traits)     { [] }
         let(:admin_traits)       { [] }
+        let(:user_traits)        { [] }
 
         instance_exec(&)
       end
@@ -1390,6 +1411,7 @@ module AuthorizationHelper
         let(:policy_traits)  { [] }
         let(:license_traits) { [] }
         let(:admin_traits)   { [] }
+        let(:user_traits)    { [] }
 
         instance_exec(&)
       end
@@ -1669,6 +1691,20 @@ module AuthorizationHelper
     def with_admin_trait(trait, &) = with_admin_traits(*trait, &)
 
     ##
+    # with_user_traits defines traits on the user context.
+    def with_user_traits(traits, &)
+      context "with user #{traits} traits" do
+        let(:user_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_user_trait defines a trait on the user context.
+    def with_user_trait(trait, &) = with_user_traits(*trait, &)
+
+    ##
     # with_account_protection enables account protection.
     def with_account_protection(&)
       with_account_traits %i[protected] do
@@ -1689,7 +1725,7 @@ module AuthorizationHelper
     # the given actions.
     def allows(*actions)
       actions.flatten.each do |action|
-        it "should allow #{action}" do
+        it "should allow #{action.inspect}" do
           expect(subject).to authorize(action)
         end
       end
@@ -1700,7 +1736,7 @@ module AuthorizationHelper
     # the given actions.
     def denies(*actions)
       actions.flatten.each do |action|
-        it "should deny #{action}" do
+        it "should deny #{action.inspect}" do
           expect(subject).to_not authorize(action)
         end
       end

@@ -23,12 +23,18 @@ class ReleasePlatformPolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('platform.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end
 
   def show?
     verify_permissions!('platform.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end

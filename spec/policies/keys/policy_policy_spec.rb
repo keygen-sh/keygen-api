@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Keys::PolicyPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, key: pooled_key) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, key: pooled_key) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_pooled_key accessing_its_policy] do
@@ -29,6 +29,42 @@ describe Keys::PolicyPolicy, type: :policy do
 
         without_permissions do
           denies :show
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :show
+          end
+
+          allows :show
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :show
+          end
+
+          allows :show
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          allows :show
         end
       end
     end
