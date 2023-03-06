@@ -6,6 +6,9 @@ module Machines
 
     def index?
       verify_permissions!('process.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -23,6 +26,9 @@ module Machines
 
     def show?
       verify_permissions!('process.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

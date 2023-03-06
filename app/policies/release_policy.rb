@@ -26,6 +26,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('release.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow! if
       record.all? { _1.open_distribution? && _1.constraints.none? }
@@ -82,6 +85,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('release.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow! if
       record.open_distribution? &&
@@ -125,6 +131,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('release.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -138,6 +145,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('release.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -151,6 +159,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('release.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -170,6 +179,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def upload?
     verify_permissions!('release.upload')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -183,6 +193,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def publish?
     verify_permissions!('release.publish')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -196,6 +207,7 @@ class ReleasePolicy < ApplicationPolicy
 
   def yank?
     verify_permissions!('release.yank')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

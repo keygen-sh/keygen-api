@@ -23,12 +23,18 @@ class ReleaseArchPolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('arch.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end
 
   def show?
     verify_permissions!('arch.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow!
   end

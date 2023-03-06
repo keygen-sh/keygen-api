@@ -3,6 +3,9 @@
 class ProductPolicy < ApplicationPolicy
   def index?
     verify_permissions!('product.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -18,6 +21,9 @@ class ProductPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('product.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -35,6 +41,7 @@ class ProductPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('product.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -46,6 +53,7 @@ class ProductPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('product.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -59,6 +67,7 @@ class ProductPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('product.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -70,6 +79,7 @@ class ProductPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('product.read')
+    verify_environment!
 
     case bearer
     in role: { name: 'product' } if record == bearer

@@ -8,6 +8,9 @@ module Products
 
     def index?
       verify_permissions!('release.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -25,6 +28,9 @@ module Products
 
     def show?
       verify_permissions!('release.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

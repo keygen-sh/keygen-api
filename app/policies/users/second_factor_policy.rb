@@ -6,6 +6,9 @@ module Users
 
     def index?
       verify_permissions!('user.second-factors.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' }
@@ -19,6 +22,9 @@ module Users
 
     def show?
       verify_permissions!('user.second-factors.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' }
@@ -32,6 +38,7 @@ module Users
 
     def create?
       verify_permissions!('user.second-factors.create')
+      verify_environment!
 
       # TODO(ezekg) Remove this and use permissions
       deny! if
@@ -49,6 +56,7 @@ module Users
 
     def update?
       verify_permissions!('user.second-factors.update')
+      verify_environment!
 
       # TODO(ezekg) Remove this and use permissions
       deny! if
@@ -66,6 +74,7 @@ module Users
 
     def destroy?
       verify_permissions!('user.second-factors.delete')
+      verify_environment!
 
       # TODO(ezekg) Remove this and use permissions
       deny! if

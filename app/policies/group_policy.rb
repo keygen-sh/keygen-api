@@ -3,6 +3,9 @@
 class GroupPolicy < ApplicationPolicy
   def index?
     verify_permissions!('group.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -18,6 +21,9 @@ class GroupPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('group.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
@@ -33,6 +39,7 @@ class GroupPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('group.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }
@@ -44,6 +51,7 @@ class GroupPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('group.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }
@@ -55,6 +63,7 @@ class GroupPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('group.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }

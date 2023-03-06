@@ -6,6 +6,9 @@ module Machines
 
     def show?
       verify_permissions!('group.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -23,6 +26,7 @@ module Machines
 
     def update?
       verify_permissions!('machine.group.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }

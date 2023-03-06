@@ -3,6 +3,9 @@
 class KeyPolicy < ApplicationPolicy
   def index?
     verify_permissions!('key.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
@@ -16,6 +19,9 @@ class KeyPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('key.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
@@ -29,6 +35,7 @@ class KeyPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('key.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -42,6 +49,7 @@ class KeyPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('key.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -55,6 +63,7 @@ class KeyPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('key.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

@@ -3,6 +3,9 @@
 class PolicyPolicy < ApplicationPolicy
   def index?
     verify_permissions!('policy.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -20,6 +23,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('policy.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -37,6 +43,7 @@ class PolicyPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('policy.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -50,6 +57,7 @@ class PolicyPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('policy.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -63,6 +71,7 @@ class PolicyPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('policy.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

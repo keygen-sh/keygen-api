@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Licenses::EntitlementPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, license:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
     with_license_traits %i[with_entitlements] do
@@ -19,6 +19,42 @@ describe Licenses::EntitlementPolicy, type: :policy do
           with_wildcard_permissions { allows :index }
           with_default_permissions  { allows :index }
           without_permissions       { denies :index }
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              denies :index
+            end
+
+            allows :index
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              allows :index
+            end
+
+            allows :index
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :index
+            end
+
+            allows :index
+          end
         end
       end
 
@@ -56,6 +92,42 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
           without_permissions do
             denies :show, :attach, :detach
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :show, :attach, :detach
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              denies :show, :attach, :detach
+            end
+
+            allows :show, :attach, :detach
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :show, :attach, :detach
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              allows :show, :attach, :detach
+            end
+
+            allows :show, :attach, :detach
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :show, :attach, :detach
+            end
+
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :show, :attach, :detach
+            end
+
+            allows :show, :attach, :detach
           end
         end
       end

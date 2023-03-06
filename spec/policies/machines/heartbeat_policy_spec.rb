@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Machines::HeartbeatPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, machine:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, machine:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_machine] do
@@ -39,6 +39,42 @@ describe Machines::HeartbeatPolicy, type: :policy do
 
         without_permissions do
           denies :ping, :reset
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :ping, :reset
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :ping, :reset
+          end
+
+          allows :ping, :reset
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :ping, :reset
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :ping, :reset
+          end
+
+          allows :ping, :reset
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :ping, :reset
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :ping, :reset
+          end
+
+          allows :ping, :reset
         end
       end
     end

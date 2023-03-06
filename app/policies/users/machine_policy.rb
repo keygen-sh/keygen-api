@@ -6,6 +6,9 @@ module Users
 
     def index?
       verify_permissions!('machine.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -21,6 +24,9 @@ module Users
 
     def show?
       verify_permissions!('machine.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

@@ -6,6 +6,9 @@ module Users
 
     def index?
       verify_permissions!('token.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -21,6 +24,9 @@ module Users
 
     def show?
       verify_permissions!('token.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -36,6 +42,7 @@ module Users
 
     def create?
       verify_permissions!('user.tokens.generate')
+      verify_environment!
 
       deny! 'must be a user' unless
         user.user?

@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe MachineProcesses::ProductPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, machine_process:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, machine_process:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_machine_process accessing_its_product] do
@@ -29,6 +29,42 @@ describe MachineProcesses::ProductPolicy, type: :policy do
 
         without_permissions do
           denies :show
+        end
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :show
+          end
+
+          allows :show
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :show
+          end
+
+          allows :show
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :show
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :show
+          end
+
+          allows :show
         end
       end
     end

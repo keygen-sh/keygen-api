@@ -6,6 +6,9 @@ module Policies
 
     def index?
       verify_permissions!('entitlement.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -19,6 +22,9 @@ module Policies
 
     def show?
       verify_permissions!('entitlement.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -32,6 +38,7 @@ module Policies
 
     def attach?
       verify_permissions!('policy.entitlements.attach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -45,6 +52,7 @@ module Policies
 
     def detach?
       verify_permissions!('policy.entitlements.detach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }

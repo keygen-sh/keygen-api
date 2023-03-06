@@ -6,6 +6,9 @@ module Releases::V1x0
 
     def download?
       verify_permissions!('release.download')
+      verify_environment!(
+        strict: false,
+      )
 
       deny! if record.nil?
 
@@ -25,6 +28,9 @@ module Releases::V1x0
 
     def upgrade?
       verify_permissions!('release.upgrade')
+      verify_environment!(
+        strict: false,
+      )
 
       # Upgrading could result in a nil record, e.g. when no upgrade is available.
       allow! if record.nil?

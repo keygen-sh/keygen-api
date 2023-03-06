@@ -22,6 +22,9 @@ module Groups
 
     def index?
       verify_permissions!('group.licenses.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -37,6 +40,9 @@ module Groups
 
     def show?
       verify_permissions!('group.licenses.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
