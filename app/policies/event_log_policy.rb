@@ -3,6 +3,9 @@
 class EventLogPolicy < ApplicationPolicy
   def index?
     verify_permissions!('event-log.read')
+    verify_environment!(
+      strict: false,
+    )
 
     deny! unless
       account.ent?
@@ -17,6 +20,9 @@ class EventLogPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('event-log.read')
+    verify_environment!(
+      strict: false,
+    )
 
     deny! unless
       account.ent?

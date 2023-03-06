@@ -3,6 +3,9 @@
 class RequestLogPolicy < ApplicationPolicy
   def index?
     verify_permissions!('request-log.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' }
@@ -14,6 +17,9 @@ class RequestLogPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('request-log.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' }

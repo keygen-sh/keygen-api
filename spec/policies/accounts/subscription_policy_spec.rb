@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Accounts::SubscriptionPolicy, type: :policy do
-  subject { described_class.new(account: record, bearer:, token:) }
+  subject { described_class.new(account: record, environment:, bearer:, token:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_its_account] do

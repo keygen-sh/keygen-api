@@ -3,6 +3,9 @@
 class MachinePolicy < ApplicationPolicy
   def index?
     verify_permissions!('machine.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -20,6 +23,9 @@ class MachinePolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('machine.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -37,6 +43,7 @@ class MachinePolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('machine.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -54,6 +61,7 @@ class MachinePolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('machine.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
@@ -71,6 +79,7 @@ class MachinePolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('machine.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -88,6 +97,7 @@ class MachinePolicy < ApplicationPolicy
 
   def check_out?
     verify_permissions!('machine.check-out')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }

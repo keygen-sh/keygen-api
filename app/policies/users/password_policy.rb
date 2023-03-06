@@ -8,6 +8,7 @@ module Users
 
     def update?
       verify_permissions!('user.password.update')
+      verify_environment!
 
       # TODO(ezekg) Remove this and use permissions
       deny! if
@@ -18,6 +19,7 @@ module Users
 
     def reset?
       verify_permissions!('user.password.reset')
+      verify_environment!
 
       # User's without a password set cannot reset their password if account is protected
       deny! if

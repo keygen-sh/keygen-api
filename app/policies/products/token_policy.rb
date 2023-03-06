@@ -6,6 +6,9 @@ module Products
 
     def index?
       verify_permissions!('token.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -19,6 +22,9 @@ module Products
 
     def show?
       verify_permissions!('token.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -32,6 +38,7 @@ module Products
 
     def create?
       verify_permissions!('product.tokens.generate')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' }

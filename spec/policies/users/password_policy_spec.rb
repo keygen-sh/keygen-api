@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Users::PasswordPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, user:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, user:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_itself] do
@@ -35,6 +35,18 @@ describe Users::PasswordPolicy, type: :policy do
 
         without_permissions do
           denies :update, :reset
+        end
+
+        within_environment :isolated do
+          allows :update, :reset
+        end
+
+        within_environment :shared do
+          allows :update, :reset
+        end
+
+        within_environment nil do
+          allows :update, :reset
         end
       end
     end

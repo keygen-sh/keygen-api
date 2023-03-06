@@ -6,6 +6,9 @@ module Licenses
 
     def index?
       verify_permissions!('entitlement.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -23,6 +26,9 @@ module Licenses
 
     def show?
       verify_permissions!('entitlement.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -40,6 +46,7 @@ module Licenses
 
     def attach?
       verify_permissions!('license.entitlements.attach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
@@ -53,6 +60,7 @@ module Licenses
 
     def detach?
       verify_permissions!('license.entitlements.detach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }

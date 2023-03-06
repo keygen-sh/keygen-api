@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Licenses::UserPolicy, type: :policy do
-  subject { described_class.new(record, account:, bearer:, token:, license:) }
+  subject { described_class.new(record, account:, environment:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
     with_license_trait :with_user do
@@ -40,6 +40,42 @@ describe Licenses::UserPolicy, type: :policy do
 
           without_permissions do
             denies :show, :update
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :show, :update
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              denies :show, :update
+            end
+
+            allows :show, :update
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :show, :update
+            end
+
+            with_bearer_and_token_trait :in_nil_environment do
+              allows :show, :update
+            end
+
+            allows :show, :update
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :in_isolated_environment do
+              denies :show, :update
+            end
+
+            with_bearer_and_token_trait :in_shared_environment do
+              denies :show, :update
+            end
+
+            allows :show, :update
           end
         end
       end

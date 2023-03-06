@@ -3,6 +3,9 @@
 class LicenseFilePolicy < ApplicationPolicy
   def show?
     verify_permissions!('license.read', *permissions_for_includes)
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

@@ -3,6 +3,9 @@
 class WebhookEventPolicy < ApplicationPolicy
   def index?
     verify_permissions!('webhook-event.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
@@ -14,6 +17,9 @@ class WebhookEventPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('webhook-event.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
@@ -25,6 +31,7 @@ class WebhookEventPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('webhook-event.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -36,6 +43,7 @@ class WebhookEventPolicy < ApplicationPolicy
 
   def retry?
     verify_permissions!('webhook-event.retry')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }

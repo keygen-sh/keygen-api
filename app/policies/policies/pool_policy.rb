@@ -6,6 +6,9 @@ module Policies
 
     def index?
       verify_permissions!('key.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -19,6 +22,9 @@ module Policies
 
     def show?
       verify_permissions!('key.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -32,6 +38,7 @@ module Policies
 
     def pop?
       verify_permissions!('policy.pool.pop')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' }

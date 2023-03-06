@@ -6,6 +6,9 @@ module Releases
 
     def index?
       verify_permissions!('constraint.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -23,6 +26,9 @@ module Releases
 
     def show?
       verify_permissions!('constraint.read')
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -40,6 +46,7 @@ module Releases
 
     def attach?
       verify_permissions!('release.constraints.attach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' }
@@ -53,6 +60,7 @@ module Releases
 
     def detach?
       verify_permissions!('release.constraints.detach')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' }

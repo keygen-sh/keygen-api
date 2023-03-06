@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Accounts::AnalyticsPolicy, type: :policy do
-  subject { described_class.new(account:, bearer:, token:) }
+  subject { described_class.new(account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do
     with_scenarios %i[accessing_analytics] do

@@ -3,6 +3,9 @@
 class WebhookEndpointPolicy < ApplicationPolicy
   def index?
     verify_permissions!('webhook-endpoint.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
@@ -14,6 +17,9 @@ class WebhookEndpointPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('webhook-endpoint.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
@@ -25,6 +31,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('webhook-endpoint.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }
@@ -36,6 +43,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('webhook-endpoint.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }
@@ -47,6 +55,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('webhook-endpoint.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'product' }

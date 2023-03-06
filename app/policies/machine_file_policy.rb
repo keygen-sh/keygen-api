@@ -3,6 +3,9 @@
 class MachineFilePolicy < ApplicationPolicy
   def show?
     verify_permissions!('machine.read', *permissions_for_includes)
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

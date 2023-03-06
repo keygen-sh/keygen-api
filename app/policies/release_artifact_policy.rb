@@ -29,18 +29,25 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def index?
     verify_permissions!('artifact.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow? :index, record.collect(&:release), skip_verify_permissions: true, with: ::ReleasePolicy
   end
 
   def show?
     verify_permissions!('artifact.read')
+    verify_environment!(
+      strict: false,
+    )
 
     allow? :show, record.release, skip_verify_permissions: true, with: ::ReleasePolicy
   end
 
   def create?
     verify_permissions!('artifact.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -54,6 +61,7 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('artifact.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -67,6 +75,7 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('artifact.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
