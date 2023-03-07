@@ -71,6 +71,52 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ce
+  Scenario: Global admin generates a token for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[-1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+     Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Isolated admin generates a token for an isolated environment
     Given the current account is "test1"
@@ -133,6 +179,11 @@ Feature: Generate authentication token
           "type": "tokens",
           "attributes": {
             "name": "Isolated Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
           }
         }
       }
@@ -423,14 +474,15 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
-          "pointer": "/data/relationships"
+          "pointer": "/data/relationships/environment"
         }
       }
       """
@@ -441,6 +493,149 @@ Feature: Generate authentication token
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for an isolated environment (from a shared environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I send the following headers:
+      """
+      {
+        "Authorization": "Basic \"$users[1].email:password\"",
+        "Keygen-Environment": "shared"
+      }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for a shared environment (from an isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "admin"
+    And I send the following headers:
+      """
+      {
+        "Authorization": "Basic \"$users[1].email:password\"",
+        "Keygen-Environment": "isolated"
+      }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for a shared environment (from the global environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   @ce
