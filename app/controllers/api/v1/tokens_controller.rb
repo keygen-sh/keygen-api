@@ -34,6 +34,19 @@ module Api::V1
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
         end
+        param :relationships, type: :hash, optional: true do
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
       end
       param :meta, type: :hash, optional: true do
         param :otp, type: :string
@@ -58,10 +71,14 @@ module Api::V1
         if user&.password? && user.authenticate(password)
           authorize! with: TokenPolicy, context: { bearer: user }
 
-          kwargs = token_params.slice(:expiry, :name)
-          if !kwargs.key?(:expiry)
+          kwargs = token_params.slice(:environment_id, :expiry, :name)
+          unless kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default
-            kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
+            kwargs[:expiry] = if user.has_role?(:user)
+                                Time.current + Token::TOKEN_DURATION
+                              else
+                                nil
+                              end
           end
 
           token = TokenGeneratorService.call(
