@@ -34,6 +34,19 @@ module Api::V1
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
         end
+        param :relationships, type: :hash, optional: true do
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
       end
       param :meta, type: :hash, optional: true do
         param :otp, type: :string
