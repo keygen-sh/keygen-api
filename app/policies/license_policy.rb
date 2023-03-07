@@ -215,7 +215,9 @@ class LicensePolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('license.read')
-    verify_environment!
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'license' } if record == bearer
