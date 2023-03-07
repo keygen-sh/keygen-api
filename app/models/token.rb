@@ -32,6 +32,9 @@ class Token < ApplicationRecord
     unless: :token_permissions_attributes_assigned?,
     on: :create
 
+  # Generate the actual token
+  after_create :generate!
+
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
   after_commit :clear_cache!,
