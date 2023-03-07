@@ -34,19 +34,6 @@ module Api::V1
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
         end
-        param :relationships, type: :hash, optional: true do
-          Keygen.ee do |license|
-            next unless
-              license.entitled?(:environments)
-
-            param :environment, type: :hash, optional: true do
-              param :data, type: :hash, allow_nil: true do
-                param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
-              end
-            end
-          end
-        end
       end
       param :meta, type: :hash, optional: true do
         param :otp, type: :string
@@ -54,7 +41,8 @@ module Api::V1
     }
     def generate
       authenticate_with_http_basic do |email, password|
-        user = current_account.users.find_by email: "#{email}".downcase
+        user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+                                    .find_by(email: "#{email}".downcase)
 
         if user&.second_factor_enabled?
           otp = token_meta[:otp]

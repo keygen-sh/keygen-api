@@ -5,7 +5,7 @@ class FindByAliasService < BaseService
     @table   = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
     @model   = scope.model_name.name
     @scope   = scope
-    @id      = id&.to_s&.squish
+    @id      = "#{id}".squish
     @aliases = aliases
     @reorder = reorder
   end
@@ -25,7 +25,7 @@ class FindByAliasService < BaseService
 
   def find_by_alias!
     raise Keygen::Error::NotFoundError.new(model:, id:) if
-      id.nil?
+      id.blank?
 
     # Strip out ID attribute if the ID doesn't resemble a UUID (pg will throw)
     columns = [PRIMARY_KEY, *aliases].uniq
