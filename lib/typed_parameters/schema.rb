@@ -136,6 +136,13 @@ module TypedParameters
         raise ArgumentError, "type #{@type} does not accept a block" if
           @type.present? && !@type.accepts_block?
 
+        @children = case
+                    when Types.array?(@type)
+                      []
+                    when Types.hash?(@type)
+                      {}
+                    end
+
         self.instance_exec &block
       end
     end
@@ -190,8 +197,6 @@ module TypedParameters
     ##
     # param defines a keyed parameter for a hash schema.
     def param(key, type:, **kwargs, &block)
-      @children ||= {} if hash?
-
       raise NotImplementedError, "cannot define param for non-hash type (got #{self.type})" unless
         Types.hash?(children)
 
@@ -208,8 +213,6 @@ module TypedParameters
     ##
     # item defines an indexed parameter for an array schema.
     def item(key = children&.size || 0, type:, **kwargs, &block)
-      @children ||= [] if array?
-
       raise NotImplementedError, "cannot define item for non-array type (got #{self.type})" unless
         Types.array?(children)
 

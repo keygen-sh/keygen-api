@@ -819,6 +819,14 @@ describe TypedParameters do
       expect { paramz.call(value: params) }.to raise_error TypedParameters::UnpermittedParameterError
     end
 
+    it 'should raise when schema has no children' do
+      schema = TypedParameters::Schema.new(type: :hash) {}
+      paramz = TypedParameters::Parameterizer.new(schema:)
+      params = { foo: 1 }
+
+      expect { paramz.call(value: params) }.to raise_error TypedParameters::UnpermittedParameterError
+    end
+
     context 'with non-strict schema' do
       let(:schema) { TypedParameters::Schema.new(strict: false) { param :foo, type: :string } }
 
