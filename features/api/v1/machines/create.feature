@@ -314,7 +314,7 @@ Feature: Create machine
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin creates a machine for the global environment (from shared environment)
+  Scenario: Admin creates a machine for the global environment (from a shared environment)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current environment is "shared"
@@ -333,7 +333,7 @@ Feature: Create machine
           "type": "machines",
           "attributes": {
             "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
-            "name": "Shared Machine"
+            "name": "Global Machine"
           },
           "relationships": {
             "environment": {
@@ -379,7 +379,7 @@ Feature: Create machine
           "type": "machines",
           "attributes": {
             "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
-            "name": "Global Machine"
+            "name": "Shared Machine"
           },
           "relationships": {
             "environment": {

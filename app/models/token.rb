@@ -13,10 +13,6 @@ class Token < ApplicationRecord
   include Permissible
   include Dirtyable
 
-  # Default to wildcard permission but allow all
-  has_permissions Permission::ALL_PERMISSIONS,
-    default: %w[*]
-
   belongs_to :account
   belongs_to :bearer, polymorphic: true
   has_many :token_permissions,
@@ -24,6 +20,9 @@ class Token < ApplicationRecord
     autosave: true
 
   has_environment default: -> { bearer&.environment_id }
+  has_permissions Permission::ALL_PERMISSIONS,
+    # Default to wildcard permission but allow all
+    default: %w[*]
 
   accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
   tracks_nested_attributes_for :token_permissions
