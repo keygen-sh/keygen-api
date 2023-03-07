@@ -24,9 +24,7 @@ module Users
 
     def update?
       verify_permissions!('user.group.update')
-      verify_environment!(
-        strict: false,
-      )
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
