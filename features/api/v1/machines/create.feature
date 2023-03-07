@@ -160,6 +160,256 @@ Feature: Create machine
       """
     Then the response status should be "403"
 
+  @ee
+  Scenario: Admin creates a machine for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "name": "Isolated Machine"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            },
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And the current account should have 1 "machine"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a machine for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "name": "Shared Machine"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            },
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 1 "machine"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a machine for the global environment
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "name": "Global Machine"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And the current account should have 1 "machine"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a machine for the global environment (from shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "name": "Shared Machine"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 0 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates a machine for a shared environment (from global environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 "license"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "name": "Global Machine"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            },
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And the current account should have 0 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a grouped machine for their account
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
