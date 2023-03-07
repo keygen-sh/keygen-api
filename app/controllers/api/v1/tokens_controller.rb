@@ -71,7 +71,11 @@ module Api::V1
         if user&.password? && user.authenticate(password)
           authorize! with: TokenPolicy, context: { bearer: user }
 
-          kwargs = token_params.slice(:environment_id, :expiry, :name)
+          kwargs = token_params.slice(
+            :environment_id,
+            :expiry,
+            :name,
+          )
           unless kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default
             kwargs[:expiry] = if user.has_role?(:user)
@@ -81,8 +85,7 @@ module Api::V1
                               end
           end
 
-          token = TokenGeneratorService.call(
-            account: current_account,
+          token = current_account.tokens.create!(
             bearer: user,
             **kwargs,
           )
