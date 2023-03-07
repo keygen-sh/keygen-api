@@ -389,8 +389,22 @@ end
 Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
-  resources = @account.send(resource.pluralize.underscore).limit(count)
+  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resources = @account.send(resource.pluralize.underscore)
+                      .first(count)
+
+  resources.each {
+    _1.assign_attributes(attrs)
+    _1.save!(validate: false)
+  }
+end
+
+Given /^the last (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resources = @account.send(resource.pluralize.underscore)
+                      .last(count)
 
   resources.each {
     _1.assign_attributes(attrs)

@@ -85,9 +85,13 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 15 "users"
-    And the first 10 "users" have the following attributes:
+    And the first 6 "users" have the following attributes:
       """
       { "lastName": "Doe" }
+      """
+    And the last 3 "users" have the following attributes:
+      """
+      { "lastName": "doe" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
@@ -102,7 +106,41 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "users"
+    And the JSON response should be an array with 9 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by user type without user.read permissions
+    Given the current account is "test1"
+    And the current account has 1 "admin"
+    And the last "admin" has the following permissions:
+      """
+      ["license.read", "license.validate"]
+      """
+    And the current account has 15 "users"
+    And the first 2 "users" have the following attributes:
+      """
+      { "lastName": "Doe" }
+      """
+    And the last 2 "users" have the following attributes:
+      """
+      { "lastName": "doe" }
+      """
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "lastName": "doe"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
