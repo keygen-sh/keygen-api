@@ -37,7 +37,7 @@ module TypedParameters
       param = Parameter.new(key:, value: [], schema:, parent:)
 
       value.each_with_index do |v, i|
-        if schema.children.any?
+        unless schema.children.nil?
           child = schema.children.fetch(i) { schema.boundless? ? schema.children.first : nil }
           if child.nil?
             raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, i), source: schema.source) if
@@ -62,7 +62,7 @@ module TypedParameters
       param = Parameter.new(key:, value: {}, schema:, parent:)
 
       value.each do |k, v|
-        if schema.children.any?
+        unless schema.children.nil?
           child = schema.children.fetch(k) { nil }
           if child.nil?
             raise UnpermittedParameterError.new('unpermitted parameter', path: Path.new(*param.path.keys, k), source: schema.source) if
