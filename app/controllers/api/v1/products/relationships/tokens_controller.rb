@@ -43,19 +43,32 @@ module Api::V1::Products::Relationships
             end
           end
         end
+        param :relationships, type: :hash, optional: true do
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
       end
     }
     def create
       authorize! with: Products::TokenPolicy
 
       kwargs = token_params.slice(
+        :environment_id,
         :permissions,
         :expiry,
         :name,
       )
 
-      token = TokenGeneratorService.call(
-        account: current_account,
+      token = current_account.tokens.create!(
         bearer: product,
         **kwargs,
       )

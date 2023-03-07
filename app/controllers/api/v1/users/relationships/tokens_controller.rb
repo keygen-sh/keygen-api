@@ -43,22 +43,40 @@ module Api::V1::Users::Relationships
             end
           end
         end
+        param :relationships, type: :hash, optional: true do
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
       end
     }
     def create
       authorize! with: Users::TokenPolicy
 
       kwargs = token_params.slice(
+        :environment_id,
         :permissions,
         :expiry,
         :name,
       )
+      unless kwargs.key?(:expiry)
+        kwargs[:expiry] = if user.user?
+                            Time.current + Token::TOKEN_DURATION
+                          else
+                            nil
+                          end
+      end
 
-      token = TokenGeneratorService.call(
-        account: current_account,
+      token = current_account.tokens.create!(
         bearer: user,
-        # NOTE(ezekg) This is a default (may be overridden by kwargs)
-        expiry: user.user? ? Time.current + Token::TOKEN_DURATION : nil,
         **kwargs,
       )
 
