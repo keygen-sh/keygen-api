@@ -65,17 +65,6 @@ module Api::V1
           end
         end
         param :relationships, type: :hash do
-          Keygen.ee do |license|
-            next unless
-              license.entitled?(:environments)
-
-            param :environment, type: :hash, optional: true do
-              param :data, type: :hash, allow_nil: true do
-                param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
-              end
-            end
-          end
           param :policy, type: :hash do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[policy policies] }
@@ -92,6 +81,18 @@ module Api::V1
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[group groups] }
               param :id, type: :string
+            end
+          end
+
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
             end
           end
         end
