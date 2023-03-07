@@ -32,6 +32,19 @@ module Api::V1
           param :max_machines, type: :integer, optional: true
           param :metadata, type: :metadata, allow_blank: true, optional: true
         end
+        param :relationships, type: :hash, optional: true do
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:environments)
+
+            param :environment, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: { in: %w[environment environments] }
+                param :id, type: :string
+              end
+            end
+          end
+        end
       end
     }
     def create
