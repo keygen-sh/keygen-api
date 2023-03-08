@@ -11,7 +11,7 @@ namespace :permissions do
       permissions    = args.extras
       admins         = User.includes(:account, role: { role_permissions: :permission })
                            .where(role: {
-                             name: %i[admin read_only support_agent sales_agent],
+                             name: %i[admin read_only developer support_agent sales_agent],
                            })
 
       Keygen.logger.info { "Adding #{permissions} permissions to #{admins.count} admins..." }
