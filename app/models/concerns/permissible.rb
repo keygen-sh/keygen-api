@@ -100,14 +100,11 @@ module Permissible
     #
     # Use :except to exclude an array of permissions, e.g. in case we're querying
     # the old default permissions after adding new permissions.
-    def default_permissions?(except: nil)
-      a = default_permission_ids - Permission.where(action: except)
-                                             .or(
-                                               Permission.where(id: except)
-                                             )
-                                             .pluck(:id)
-                                             .uniq
-      b = permission_ids
+    #
+    # Use :with to provide a set of preloaded permissions.
+    def default_permissions?(except: [], with: permissions.actions)
+      a = default_permissions - except
+      b = with
 
       a.size == b.size && (a & b).size == a.size
     end
