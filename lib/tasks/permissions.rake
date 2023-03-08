@@ -25,9 +25,15 @@ namespace :permissions do
 
         if permission_ids.any?
           puts "  => Adding #{permission_ids.size} to permission set..."
+
+          user.update!(
+            permissions: permission_ids,
+          )
         else
           puts "  => Skipping..."
         end
+
+        sleep ENV.fetch('SLEEP_DURATION') { 0.1 }.to_f
       end
     end
   end
