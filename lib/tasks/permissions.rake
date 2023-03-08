@@ -9,7 +9,7 @@ namespace :permissions do
       sleep_duration = ENV.fetch('SLEEP_DURATION') { 0.1 }.to_f
       batch_size     = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
       permissions    = args.extras
-      admins         = User.includes(role: { role_permissions: :permission })
+      admins         = User.includes(:account, role: { role_permissions: :permission })
                            .where(role: {
                              name: %i[admin read_only support_agent sales_agent],
                            })
