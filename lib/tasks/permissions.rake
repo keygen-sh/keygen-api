@@ -20,11 +20,11 @@ namespace :permissions do
         # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
         prev_permissions = user.role_permissions.map { _1.permission.action }
 
-        next Keygen.logger.info { "[#{i}] Skipping #{user.id}..." } unless
-          user.default_permissions?(
-            except: permissions,
-            with: prev_permissions,
-          )
+        unless user.default_permissions?(except: permissions, with: prev_permissions)
+          Keygen.logger.info { "[#{i}] Skipping #{user.id}..." }
+
+          next
+        end
 
         next_permissions = prev_permissions + (permissions & user.allowed_permissions)
 
