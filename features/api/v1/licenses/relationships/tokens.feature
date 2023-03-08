@@ -248,6 +248,616 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be a "token" with a nil expiry
 
+  @ce
+  Scenario: Global admin generates a shared token for a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And the current account has 1 global "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ce
+  Scenario: Shared admin generates a token for a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 shared "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported (must have an EE license)",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin generates a token for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And the current account has 1 isolated "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin generates a token for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 isolated "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin generates a token for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "admin"
+    And the current account has 1 isolated "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin generates a token for an shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 shared "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin generates a token for a shared license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "admin"
+    And the current account has 1 shared "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin generates a token for a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And the current account has 1 shared "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin generates a token for the global license
+    Given the current account is "test1"
+    And the current account has 1 global "admin"
+    And the current account has 1 global "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin generates a token for the global license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And the current account has 1 global "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin generates a token for the global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 global "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for the global license (from an isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And the current account has 1 isolated "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for an isolated license (from a shared environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 shared "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for a shared license (from an isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "admin"
+    And the current account has 1 isolated "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a token for a shared license (from the global environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And the current account has 1 global "license"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Product generates a license token with custom permissions (standard tier)
     Given the current account is "test1"
