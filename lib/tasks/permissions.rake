@@ -13,24 +13,24 @@ namespace :permissions do
       raise 'one or more permissions were not found' unless
         new_permission_actions.size == new_permission_ids.size
 
-      puts "Adding #{new_permission_actions} permissions to #{User.count} users..."
+      Keygen.logger.info { "Adding #{new_permission_actions} permissions to #{User.count} users..." }
 
       User.find_each.with_index do |user, i|
         next unless
           user.default_permissions?(except: new_permission_ids)
 
-        permission_ids = new_permission_ids & user.allowed_permission_ids
+        next_permission_ids = new_permission_ids & user.allowed_permission_ids
 
-        puts "[#{i}] #{user.role.name.humanize} #{user.email} has default permissions"
+        Keygen.logger.info { "[#{i}] #{user.role.name.humanize} #{user.email} has default permissions" }
 
-        if permission_ids.any?
-          puts "  => Adding #{permission_ids.size} to permission set..."
+        if next_permission_ids.any?
+          Keygen.logger.info { "  => Adding #{next_permission_ids.size} to permission set..." }
 
           user.update!(
-            permissions: permission_ids,
+            permissions: next_permission_ids,
           )
         else
-          puts "  => Skipping..."
+          Keygen.logger.info { "  => Skipping..." }
         end
 
         sleep ENV.fetch('SLEEP_DURATION') { 0.1 }.to_f
