@@ -2,7 +2,7 @@
 
 desc 'tasks for managing permissions'
 namespace :permissions do
-  desc 'tasks for managing user permissions'
+  desc 'tasks for managing admins permissions'
   namespace :admins do
     desc 'add a new set of permissions to all admins with default permissions'
     task add: %i[environment] do |_, args|
