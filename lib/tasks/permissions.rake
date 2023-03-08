@@ -17,14 +17,16 @@ namespace :permissions do
       Keygen.logger.info { "Adding #{permissions} permissions to #{admins.count} admins..." }
 
       admins.find_each(batch_size:).with_index do |user, i|
+        # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
+        prev_permissions = user.role_permissions.map { _1.permission.action }
+
         next Keygen.logger.info { "[#{i}] Skipping #{user.id}..." } unless
           user.default_permissions?(
             except: permissions,
-            # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
-            with: user.role_permissions.map { _1.permission.action },
+            with: prev_permissions,
           )
 
-        next_permissions = permissions & user.allowed_permissions
+        next_permissions = prev_permissions + (permissions & user.allowed_permissions)
 
         if next_permissions.any?
           Keygen.logger.info { "[#{i}] Adding #{next_permissions.join(',')} permissions to #{user.id}..." }
