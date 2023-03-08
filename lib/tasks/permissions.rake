@@ -14,7 +14,7 @@ namespace :permissions do
                              name: %i[admin read_only developer support_agent sales_agent],
                            })
 
-      Keygen.logger.info { "Adding #{permissions} permissions to #{admins.count} admins..." }
+      Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{admins.count} admins..." }
 
       admins.find_each(batch_size:).with_index do |user, i|
         # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
@@ -29,7 +29,9 @@ namespace :permissions do
         next_permissions = prev_permissions + (permissions & user.allowed_permissions)
 
         if next_permissions.any?
-          Keygen.logger.info { "[#{i}] Adding #{next_permissions.join(',')} permissions to #{user.id}..." }
+          new_permissions = next_permissions - prev_permissions
+
+          Keygen.logger.info { "[#{i}] Adding #{new_permissions.join(',')} permissions to #{user.id}..." }
 
           user.update!(
             permissions: next_permissions,
