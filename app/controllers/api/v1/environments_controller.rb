@@ -28,6 +28,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string
           param :code, type: :string
+          param :isolation_strategy, type: :string, optional: true
         end
       end
     }
@@ -85,7 +86,7 @@ module Api::V1
         resource: environment,
       )
 
-      environment.destroy
+      environment.destroy_async
     end
 
     private

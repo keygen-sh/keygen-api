@@ -69,7 +69,7 @@ Feature: Metric counts
         "$date.format": 19
       }
       """
-      And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: User attempts to retrieve metric counts for their account
     Given the current account is "test1"
