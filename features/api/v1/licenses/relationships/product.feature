@@ -21,7 +21,7 @@ Feature: License product relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
-     And the first "license" has the following attributes:
+    And the first "license" has the following attributes:
       """
       { "key": "test-key" }
       """

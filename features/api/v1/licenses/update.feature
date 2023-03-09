@@ -346,7 +346,7 @@ Feature: Update license
     And the current account is "test1"
     And the current account has 1 "webhook-endpoints"
     And the current account has 1 "policy"
-     And the first "policy" has the following attributes:
+    And the first "policy" has the following attributes:
       """
       { "maxProcesses": 1 }
       """
