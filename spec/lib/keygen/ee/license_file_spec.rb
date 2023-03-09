@@ -52,11 +52,11 @@ describe Keygen::EE::LicenseFile, type: :ee do
               expect(lic.license).to be_a Hash
             end
 
-            it 'should raise if clock is tampered' do
+            it 'should raise if clock is desynchronized' do
               lic = described_class.current
 
               with_time lic.issued - 1.minute do
-                expect(lic.tampered?).to be true
+                expect(lic.desync?).to be true
                 expect { lic.valid? }.to raise_error Keygen::EE::InvalidLicenseFileError
               end
             end
@@ -102,7 +102,7 @@ describe Keygen::EE::LicenseFile, type: :ee do
               end
             end
 
-            it 'should raise with tampered clock' do
+            it 'should raise with desynchronized clock' do
               lic = described_class.current
 
               with_time lic.expiry - 3.days do
