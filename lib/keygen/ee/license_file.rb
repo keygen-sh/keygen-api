@@ -36,7 +36,7 @@ module Keygen
 
       def valid?
         unless environment.nil? || (environment in attributes: { code: /#{Rails.env}/i => code })
-          raise InvalidLicenseFileError, "environment does not match (expected #{Rails.env.inspect} got #{code.inspect})"
+          raise InvalidLicenseFileError, "environment does not match (expected #{Rails.env.inspect} got #{code.inspect.downcase})"
         end
 
         raise InvalidLicenseFileError, 'system clock is desynchronised' if
