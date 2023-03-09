@@ -22,6 +22,7 @@ module Keygen
 
       def license      = data['data']
       def entitlements = data['included']&.filter { _1['type'] == 'entitlements' } || []
+      def environment  = data['included']&.find { _1['type'] == 'environments' }
       def product      = data['included']&.find { _1['type'] == 'products' }
       def policy       = data['included']&.find { _1['type'] == 'policies' }
 
@@ -30,12 +31,16 @@ module Keygen
       def expiry    = data['meta']['expiry'].present? ? Time.parse(data['meta']['expiry']) : nil
       def expires?  = expiry.present?
       def expiring? = expires? && expiry > Time.current && expiry < 30.days.from_now
-      def tampered? = issued > Time.current
       def expired?  = expires? && expiry < Time.current
+      def desync?   = issued > Time.current
 
       def valid?
-        raise InvalidLicenseFileError, 'system clock is out of sync' if
-          tampered?
+        unless environment.nil? || (environment in attributes: { code: /#{Rails.env}/i => code })
+          raise InvalidLicenseFileError, "environment does not match (expected #{Rails.env.inspect} got #{code.inspect})"
+        end
+
+        raise InvalidLicenseFileError, 'system clock is desynchronised' if
+          desync?
 
         raise ExpiredLicenseFileError, 'license file is expired' if
           expired? && expiry < 30.days.ago
