@@ -42,15 +42,15 @@ module Keygen
       puts
       puts '-' * CONSOLE_WIDTH
       puts " Ruby: #{RUBY_DESCRIPTION}"
-      puts " Rails: #{Rails.version} (RubyGems #{Gem::VERSION}, Rack #{Rack.release})"
+      puts " Rails: #{Rails.version} #{Rails.env} (RubyGems #{Gem::VERSION}, Rack #{Rack.release})"
       puts " Keygen: #{Keygen::VERSION} (#{Keygen.ee? ? 'EE' : 'CE'})"
       Keygen.ee do |key, lic|
         puts "   License: #{key.name || 'Unnamed'} (#{key.id})"
         puts "   Entitlements: #{key.entitlements.join(', ')}"
+        puts "   Environment: #{lic.environment || 'nil'}"
         puts "   Expiry: #{key.expiry || 'None'}"
         puts "   Reup: #{lic.expiry || 'None'}"
       end
-      puts " Env: #{Rails.env}"
       puts '-' * CONSOLE_WIDTH
 
       warn!
