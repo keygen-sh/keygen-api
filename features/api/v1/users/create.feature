@@ -146,6 +146,457 @@ Feature: Create user
     And sidekiq should have 1 "request-log" job
 
   @ce
+  Scenario: Admin creates a user for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "isolated@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported (must have an EE license)",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ce
+  Scenario: Admin creates a user for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "shared@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin creates a user for an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current environment is "isolated"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "isolated@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And the current account should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin creates a user for a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "shared@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Isolated admin creates a user for the global environment
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "global@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin creates a user for a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current environment is "shared"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "shared@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin creates a user for an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "isolated@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin creates a user for a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "global@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin creates a user for the global environment
+    Given the current account is "ent1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 global "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "global@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And the current account should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin creates a user for an isolated environment
+    Given the current account is "ent1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "isolated@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin creates a user for a shared environment
+    Given the current account is "ent1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And I am the last admin of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "shared@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ce
   Scenario: Anonymous creates a user with permissions (standard tier, CE)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
