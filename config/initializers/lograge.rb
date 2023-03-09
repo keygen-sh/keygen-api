@@ -8,6 +8,7 @@ Rails.application.configure do
     rate_limit_data = controller.rate_limiting_data || {}
     account_id = controller.current_account&.id
     account_slug = controller.current_account&.slug
+    env_id = controller.current_environment&.id
     env_code = controller.current_environment&.code
     bearer_type = controller.current_bearer&.class&.name&.underscore
     bearer_id = controller.current_bearer&.id
@@ -90,6 +91,7 @@ Rails.application.configure do
       query_params: query_params || 'N/A',
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
+      env_id: env_id || 'N/A',
       env_code: env_code || 'N/A',
       bearer_type: bearer_type || 'N/A',
       bearer_id: bearer_id || 'N/A',
