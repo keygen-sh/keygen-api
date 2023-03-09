@@ -162,7 +162,7 @@ Feature: List products
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: Product attempts to retrieves all products
+  Scenario: Product attempts to retrieve all products
     Given the current account is "test1"
     And the current account has 3 "products"
     And I am a product of account "test1"

@@ -452,7 +452,7 @@ Feature: List release artifacts
 
   Scenario: Admin attempts to retrieve the artifacts for a product of another account
     Given the current account is "test1"
-     And the current account has the following "product" rows:
+    And the current account has the following "product" rows:
       | id                                   | name   |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 2 |

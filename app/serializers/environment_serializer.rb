@@ -5,6 +5,7 @@ class EnvironmentSerializer < BaseSerializer
 
   attribute :name
   attribute :code
+  attribute :isolation_strategy
   attribute :created do
     @object.created_at
   end

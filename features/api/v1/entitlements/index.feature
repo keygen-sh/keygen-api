@@ -208,7 +208,7 @@ Feature: List entitlements
     Then the response status should be "200"
     And the JSON response should be an array with 5 "entitlements"
 
-  Scenario: Product attempts to retrieves all entitlements for their account
+  Scenario: Product attempts to retrieve all entitlements for their account
     Given the current account is "test1"
     And the current account has 3 "entitlements"
     And the current account has 1 "product"

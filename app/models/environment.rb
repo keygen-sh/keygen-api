@@ -27,23 +27,23 @@ class Environment < ApplicationRecord
     dependent: :destroy
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :webhooks_endpoints, dependent: :destroy
-  has_many :webhooks_event,     dependent: :destroy
-  has_many :entitlements,       dependent: :destroy
-  has_many :groups,             dependent: :destroy
-  has_many :products,           dependent: :destroy
-  has_many :policies,           dependent: :destroy
-  has_many :licenses,           dependent: :destroy
-  has_many :machines,           dependent: :destroy
-  has_many :machine_processes,  dependent: :destroy
-  has_many :users,              dependent: :destroy
-  has_many :releases,           dependent: :destroy
-  has_many :release_artifacts,  dependent: :destroy
+  has_many :webhook_endpoints, dependent: :destroy
+  has_many :webhook_event,     dependent: :destroy
+  has_many :entitlements,      dependent: :destroy
+  has_many :groups,            dependent: :destroy
+  has_many :products,          dependent: :destroy
+  has_many :policies,          dependent: :destroy
+  has_many :licenses,          dependent: :destroy
+  has_many :machines,          dependent: :destroy
+  has_many :machine_processes, dependent: :destroy
+  has_many :users,             dependent: :destroy
+  has_many :releases,          dependent: :destroy
+  has_many :release_artifacts, dependent: :destroy
 
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
-  before_create -> { self.isolation_strategy ||= 'ISOLATED' }
+  after_initialize -> { self.isolation_strategy ||= 'ISOLATED' }
 
   after_commit :clear_cache!,
     on: %i[
