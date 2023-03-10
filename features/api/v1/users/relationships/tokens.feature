@@ -463,7 +463,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Global admin generates a token for a shared environmeusernt
+  Scenario: Global admin generates a token for a shared environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global "admin"
@@ -600,7 +600,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin generates a token for the global user (from an isolated environment)
+  Scenario: Isolated admin generates a token for the global user (from an isolated environment)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "admin"
@@ -627,16 +627,12 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with bearer environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -649,7 +645,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin generates a token for an isolated user (from a shared environment)
+  Scenario: Shared admin generates a token for an isolated user (from a shared environment)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 shared "admin"
@@ -676,16 +672,12 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with bearer environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -698,7 +690,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin generates a token for a shared user (from an isolated environment)
+  Scenario: Isolated admin generates a token for a shared user (from an isolated environment)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 isolated "admin"
@@ -725,16 +717,12 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with bearer environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -747,7 +735,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin generates a token for a shared user (from the global environment)
+  Scenario: Global admin generates a token for a shared user (from the global environment)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global "admin"
@@ -790,11 +778,10 @@ Feature: User tokens relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin generates a shared token for themself (from the global environment)
+  Scenario: Global admin generates a shared token for themself (from the global environment)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global "admin"
-    And the current account has 1 global "user"
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
@@ -830,6 +817,102 @@ Feature: User tokens relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Global admin generates a global token for themself (from a shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And the current environment is "shared"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Shared admin generates a global token for themself (from a shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current environment is "shared"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Global Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with bearer environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
