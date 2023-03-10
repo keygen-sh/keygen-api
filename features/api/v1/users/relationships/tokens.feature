@@ -22,10 +22,18 @@ Feature: User tokens relationship
 
   Scenario: Admin generates an admin token (themself)
     Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a nil expiry
+    And the JSON response should be a "token" with the kind "admin-token"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with a token
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an admin token (another)
     Given the current account is "test1"
@@ -747,6 +755,49 @@ Feature: User tokens relationship
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$2/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin generates a shared token for themself (from the global environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
+    And the current account has 1 global "user"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
       """
       {
         "data": {

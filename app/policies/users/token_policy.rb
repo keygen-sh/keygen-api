@@ -42,13 +42,12 @@ module Users
 
     def create?
       verify_permissions!('user.tokens.generate')
-      verify_environment!
-
-      deny! 'must be a user' unless
-        user.user?
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: { name: 'admin' | 'developer' } if user == bearer || user.user?
         allow!
       in role: { name: 'product' } if user.user?
         allow!
