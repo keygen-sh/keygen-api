@@ -847,14 +847,12 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    Then the response status should be "403"
+    And the first error should have the following properties:
       """
       {
-        "environment": {
-          "links": { "related": null },
-          "data": null
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -863,7 +861,7 @@ Feature: User tokens relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -894,16 +892,12 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with bearer environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"

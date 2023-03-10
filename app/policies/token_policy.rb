@@ -39,7 +39,9 @@ class TokenPolicy < ApplicationPolicy
   def generate?
     verify_permissions!('token.generate')
     verify_environment!(
-      strict: false,
+      # NOTE(ezekg) We're lax in the nil environment i.e. we need to be able to generate a token
+      #             for a shared environment from the nil environment, but not vice-versa.
+      strict: environment.present?,
     )
 
     case bearer
