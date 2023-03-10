@@ -59,8 +59,6 @@ module Api::V1::Products::Relationships
       end
     }
     def create
-      authorize! with: Products::TokenPolicy
-
       kwargs = token_params.slice(
         :environment_id,
         :permissions,
@@ -68,18 +66,21 @@ module Api::V1::Products::Relationships
         :name,
       )
 
-      token = current_account.tokens.create!(
-        bearer: product,
-        **kwargs,
-      )
+      token = current_account.tokens.new(bearer: product, **kwargs)
+      authorize! token,
+        with: Products::TokenPolicy
 
-      BroadcastEventService.call(
-        event: 'token.generated',
-        account: current_account,
-        resource: token,
-      )
+      if token.save
+        BroadcastEventService.call(
+          event: 'token.generated',
+          account: current_account,
+          resource: token,
+        )
 
-      render jsonapi: token
+        render jsonapi: token
+      else
+        render_unprocessable_resource token
+      end
     end
 
     private

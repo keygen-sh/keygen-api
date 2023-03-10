@@ -61,8 +61,6 @@ module Api::V1::Licenses::Relationships
       end
     }
     def create
-      authorize! with: Licenses::TokenPolicy
-
       kwargs = token_params.slice(
         :environment_id,
         :max_activations,
@@ -72,12 +70,11 @@ module Api::V1::Licenses::Relationships
         :name,
       )
 
-      token = current_account.tokens.create!(
-        bearer: license,
-        **kwargs,
-      )
+      token = current_account.tokens.new(bearer: license, **kwargs)
+      authorize! token,
+        with: Licenses::TokenPolicy
 
-      if token.valid?
+      if token.save
         BroadcastEventService.call(
           event: 'token.generated',
           account: current_account,

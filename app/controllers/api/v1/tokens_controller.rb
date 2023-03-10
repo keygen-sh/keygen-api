@@ -69,8 +69,6 @@ module Api::V1
         end
 
         if user&.password? && user.authenticate(password)
-          authorize! with: TokenPolicy, context: { bearer: user }
-
           kwargs = token_params.slice(
             :environment_id,
             :expiry,
@@ -85,12 +83,12 @@ module Api::V1
                               end
           end
 
-          token = current_account.tokens.create!(
-            bearer: user,
-            **kwargs,
-          )
+          token = current_account.tokens.new(bearer: user, **kwargs)
+          authorize! token,
+            context: { bearer: user },
+            with: TokenPolicy
 
-          if token.valid?
+          if token.save
             BroadcastEventService.call(
               event: 'token.generated',
               account: current_account,
