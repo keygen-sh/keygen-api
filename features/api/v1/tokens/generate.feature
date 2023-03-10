@@ -654,14 +654,12 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    Then the response status should be "403"
+    And the first error should have the following properties:
       """
       {
-        "environment": {
-          "links": { "related": null },
-          "data": null
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -670,7 +668,7 @@ Feature: Generate authentication token
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
