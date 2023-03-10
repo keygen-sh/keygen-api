@@ -38,7 +38,9 @@ class TokenPolicy < ApplicationPolicy
 
   def generate?
     verify_permissions!('token.generate')
-    verify_environment!
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
