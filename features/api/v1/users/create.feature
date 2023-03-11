@@ -199,6 +199,11 @@ Feature: Create user
           "type": "users",
           "attributes": {
             "email": "shared@keygen.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
           }
         }
       }
