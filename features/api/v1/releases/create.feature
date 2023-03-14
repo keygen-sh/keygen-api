@@ -892,6 +892,78 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Admin creates a shared release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null,
+            "version": "1.0.0-dev.42",
+            "channel": "dev"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            },
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": null,
+        "channel": "dev",
+        "version": "1.0.0-dev.42",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": "dev.42",
+          "build": null
+        }
+      }
+      """
+    And the JSON response should be an "release" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a release with entitlement constraints
     Given I am an admin of account "test1"
     And the current account is "test1"
