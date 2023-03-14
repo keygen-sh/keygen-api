@@ -656,6 +656,309 @@ Feature: Upgrade release
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
+  @ce
+  Scenario: License retrieves an upgrade for a shared release
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name   | code   | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Shared | shared | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has the following "policy" rows:
+      | id                                   | product_id                           | authentication_strategy |
+      | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 | 6198261a-48b5-4445-a045-9fed4afc7735 | LICENSE                 |
+    And the current account has the following "license" rows:
+      | id                                   | environment_id                       | policy_id                            |
+      | a2fde824-2f58-4a89-b01b-75ed9a648ed7 | 19e494c9-42b3-463d-b29e-8212049c2e79 | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 |
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+
+  @ee
+  Scenario: Isolated license retrieves an upgrade for a isolated release
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name     | code     | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Isolated | isolated | ISOLATED           |
+    And the current account has the following "product" rows:
+      | id                                   | environment_id                       | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 19e494c9-42b3-463d-b29e-8212049c2e79 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has the following "policy" rows:
+      | id                                   | environment_id                       | product_id                           | authentication_strategy |
+      | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | LICENSE                 |
+    And the current account has the following "license" rows:
+      | id                                   | environment_id                       | policy_id                            |
+      | a2fde824-2f58-4a89-b01b-75ed9a648ed7 | 19e494c9-42b3-463d-b29e-8212049c2e79 | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 |
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.0",
+        "next": "1.3.0"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Shared license retrieves an upgrade for a shared release
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name   | code   | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Shared | shared | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has the following "policy" rows:
+      | id                                   | product_id                           | authentication_strategy |
+      | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 | 6198261a-48b5-4445-a045-9fed4afc7735 | LICENSE                 |
+    And the current account has the following "license" rows:
+      | id                                   | environment_id                       | policy_id                            |
+      | a2fde824-2f58-4a89-b01b-75ed9a648ed7 | 19e494c9-42b3-463d-b29e-8212049c2e79 | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 |
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.0",
+        "next": "1.3.0"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Shared license retrieves an upgrade for a global release
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name   | code   | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Shared | shared | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has the following "policy" rows:
+      | id                                   | product_id                           | authentication_strategy |
+      | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 | 6198261a-48b5-4445-a045-9fed4afc7735 | LICENSE                 |
+    And the current account has the following "license" rows:
+      | id                                   | environment_id                       | policy_id                            |
+      | a2fde824-2f58-4a89-b01b-75ed9a648ed7 | 19e494c9-42b3-463d-b29e-8212049c2e79 | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 |
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.0",
+        "next": "1.3.0"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Isolated license retrieves an upgrade for an open release (conflicts with shared open release)
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name     | code     | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Isolated | isolated | ISOLATED           |
+      | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | Shared   | shared   | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | environment_id                       | name         | distribution_strategy |
+      | 93bd02ef-4aba-44ac-ab8b-356a4a1d7a4e | 19e494c9-42b3-463d-b29e-8212049c2e79 | Isolated App | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | Shared App   | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | 85969670-d172-4202-b664-9001b443d1c6 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 93bd02ef-4aba-44ac-ab8b-356a4a1d7a4e | 1.0.0        | stable  |
+      | 9ed86386-23d9-4fe5-9057-c66dbb3b9b76 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 93bd02ef-4aba-44ac-ab8b-356a4a1d7a4e | 1.0.1        | stable  |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 62eb12c9-68eb-4e7e-ba59-d0575b69c3e7 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has the following "policy" rows:
+      | id                                   | environment_id                       | product_id                           | authentication_strategy |
+      | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 93bd02ef-4aba-44ac-ab8b-356a4a1d7a4e | LICENSE                 |
+    And the current account has the following "license" rows:
+      | id                                   | environment_id                       | policy_id                            |
+      | a2fde824-2f58-4a89-b01b-75ed9a648ed7 | 19e494c9-42b3-463d-b29e-8212049c2e79 | f5336a25-89a4-45b8-ad3a-6ccaa6477ef0 |
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Anonymous retrieves an upgrade for a shared open release (shared env)
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name   | code   | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Shared | shared | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.0",
+        "next": "1.3.0"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Anonymous retrieves an upgrade for a shared open release (nil env)
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name   | code   | isolation_strategy |
+      | 19e494c9-42b3-463d-b29e-8212049c2e79 | Shared | shared | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 19e494c9-42b3-463d-b29e-8212049c2e79 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "404"
+
   # Upgrade by version
   Scenario: Admin retrieves an upgrade by version
     Given the current account is "test1"
