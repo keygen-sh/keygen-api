@@ -173,7 +173,7 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "is unsupported (must have an EE license)",
+        "detail": "is unsupported",
         "source": {
           "header": "Keygen-Environment"
         }
