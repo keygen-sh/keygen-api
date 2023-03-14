@@ -67,6 +67,83 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Admin creates a shared artifact
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "dev.yml",
+            "filetype": "yml",
+            "filesize": 512,
+            "platform": "linux",
+            "arch": "x86"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "filename": "dev.yml",
+        "filetype": "yml",
+        "filesize": 512,
+        "platform": "linux",
+        "arch": "x86",
+        "status": "WAITING"
+      }
+      """
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 1 "artifact"
+    And the first "release" should have the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates an artifact (prefers no-redirect)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
