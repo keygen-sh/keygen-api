@@ -11,7 +11,7 @@ FactoryBot.define do
     account     { nil }
     environment { NIL_ENVIRONMENT }
     entitlement { build(:entitlement, account:, environment:) }
-    policy      { nil }
+    policy      { build(:policy, account:, environment:) }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

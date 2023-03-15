@@ -9,7 +9,8 @@ class LicenseEntitlement < ApplicationRecord
   belongs_to :account
   belongs_to :license
   belongs_to :entitlement
-  has_one :policy, through: :license
+  has_one :policy,
+    through: :license
 
   has_environment default: -> { license&.environment_id }
 
@@ -20,7 +21,10 @@ class LicenseEntitlement < ApplicationRecord
     scope: { by: :account_id }
 
   validate on: :create do
-    errors.add :entitlement, :conflict, message: 'already exists (entitlement is attached through policy)' if policy.policy_entitlements.exists?(entitlement_id: entitlement_id)
+    next unless
+      policy.present? && policy.policy_entitlements.exists?(entitlement_id:)
+
+    errors.add :entitlement, :conflict, message: 'already exists (entitlement is attached through policy)'
   end
 
   delegate :code,
