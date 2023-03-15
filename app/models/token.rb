@@ -217,13 +217,13 @@ class Token < ApplicationRecord
     update!(permissions: default_permission_ids)
   end
 
-  def self.cache_prefix(digest, account:, environment: nil)
+  def self.cache_prefix(digest, account:)
     [:tokens, account.id, digest].join(':')
   end
 
   def self.cache_key(digest, account:, environment: nil)
     [
-      cache_prefix(digest, account:, environment:),
+      cache_prefix(digest, account:),
       environment&.id,
       CACHE_KEY_VERSION,
     ].join(':')
@@ -231,7 +231,7 @@ class Token < ApplicationRecord
 
   def self.clear_cache!(*digests, account:, environment: nil)
     digests.compact_blank.uniq.each do |digest|
-      prefix = cache_prefix(digest, account:, environment:)
+      prefix = cache_prefix(digest, account:)
 
       Rails.cache.delete_matched("#{prefix}:*")
     end
