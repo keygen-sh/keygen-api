@@ -2,7 +2,7 @@
 
 module Keygen
   module EE
-    module ProtectedRecord
+    module ProtectedClass
       SINGLETON_METHODS = [:find_by_sql, :async_find_by_sql, :count_by_sql, :async_find_by_sql, :all, *ActiveRecord::Querying::QUERYING_METHODS].freeze
       INSTANCE_METHODS  = %i[reload].freeze
 
@@ -22,7 +22,7 @@ module Keygen
       end
 
       def self.included(klass)
-        klass.include ProtectedRecord[]
+        klass.include ProtectedClass[]
       end
     end
   end
