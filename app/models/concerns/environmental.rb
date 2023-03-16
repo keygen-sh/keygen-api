@@ -7,6 +7,12 @@ module Environmental
     include Dirtyable
 
     ##
+    # with_environment returns all resources that have an environment.
+    scope :with_environment, -> {
+      where.associated(:environment)
+    }
+
+    ##
     # for_environment scopes the current resource to an environment.
     #
     # When :strict is false, some environments MAY bleed into others. For example,
