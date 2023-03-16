@@ -12,6 +12,14 @@ describe Token, type: :model do
   describe '#environment=' do
     context 'on create' do
       context 'with user bearer' do
+        it 'should apply default environment matching user' do
+          environment = create(:environment, account:)
+          bearer      = create(:user, account:, environment:)
+          token       = create(:token, account:, bearer:)
+
+          expect(token.environment).to eq bearer.environment
+        end
+
         it 'should not raise when environment matches bearer' do
           environment = create(:environment, account:)
           bearer      = create(:user, account:, environment:)
@@ -28,6 +36,14 @@ describe Token, type: :model do
       end
 
       context 'with product bearer' do
+        it 'should apply default environment matching product' do
+          environment = create(:environment, account:)
+          bearer      = create(:product, account:, environment:)
+          token       = create(:token, account:, bearer:)
+
+          expect(token.environment).to eq bearer.environment
+        end
+
         it 'should not raise when environment matches bearer' do
           environment = create(:environment, account:)
           bearer      = create(:product, account:, environment:)
@@ -44,6 +60,14 @@ describe Token, type: :model do
       end
 
       context 'with license bearer' do
+        it 'should apply default environment matching license' do
+          environment = create(:environment, account:)
+          bearer      = create(:license, account:, environment:)
+          token       = create(:token, account:, bearer:)
+
+          expect(token.environment).to eq bearer.environment
+        end
+
         it 'should not raise when environment matches bearer' do
           environment = create(:environment, account:)
           bearer      = create(:license, account:, environment:)

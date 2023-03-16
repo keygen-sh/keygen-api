@@ -11,6 +11,14 @@ describe Release, type: :model do
 
   describe '#environment=' do
     context 'on create' do
+      it 'should apply default environment matching product' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+        release     = create(:release, account:)
+
+        expect(release.environment).to eq product.environment
+      end
+
       it 'should not raise when environment matches product' do
         environment = create(:environment, account:)
         product     = create(:product, account:, environment:)

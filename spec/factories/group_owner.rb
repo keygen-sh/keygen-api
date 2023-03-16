@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :group_owner do
+  factory :group_owner, aliases: %i[owner] do
     initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     account     { nil }
