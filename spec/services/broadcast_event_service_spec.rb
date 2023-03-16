@@ -235,6 +235,38 @@ describe BroadcastEventService do
     expect { create_webhook_event!(account, resource) }.to raise_error Exception
   end
 
+  context 'when endpoint has an environment' do
+    before do
+      create_list(:webhook_endpoint, 5, :in_isolated_environment, account:)
+      create_list(:webhook_endpoint, 2, :in_shared_environment, account:)
+      create_list(:webhook_endpoint, 3, :in_nil_environment, account:)
+    end
+
+    within_environment :isolated do
+      it 'should send to the isolated environment' do
+        expect { BroadcastEventService.call(account:, resource:, event: 'machine.created') }.to(
+          change { WebhookEvent.count }.by(5),
+        )
+      end
+    end
+
+    within_environment :shared do
+      it 'should send to the shared environment' do
+        expect { BroadcastEventService.call(account:, resource:, event: 'machine.created') }.to(
+          change { WebhookEvent.count }.by(2),
+        )
+      end
+    end
+
+    within_environment nil do
+      it 'should send to the nil environment' do
+        expect { BroadcastEventService.call(account:, resource:, event: 'machine.created') }.to(
+          change { WebhookEvent.count }.by(3),
+        )
+      end
+    end
+  end
+
   context 'when an ngrok tunnel is used' do
     let(:endpoint) { create(:webhook_endpoint, url: 'https://keygen.ngrok.io/webhooks', account: account) }
 
