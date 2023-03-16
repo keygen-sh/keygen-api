@@ -387,7 +387,8 @@ class Release < ApplicationRecord
   #
   #   count(constraints) = count(entitlements in :codes)
   #
-  # This avoids permissions issues later on.
+  # This avoids authz issues later on.
+  #
   scope :within_constraints, -> *codes, strict: false {
     codes = codes.flatten
                  .compact_blank

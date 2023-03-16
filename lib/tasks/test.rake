@@ -9,7 +9,7 @@ begin
   # We want to make sure that we stay within Redis' default 16 database limit,
   # without using database /0 (our potential development database).
   #
-  # Thus, we need to keep this in a range of 1..14.
+  # Thus, we need to keep this in the range of 1..14 for /1../15.
   ENV['PARALLEL_TEST_PROCESSORS'] = (Parallel.processor_count - 2).clamp(1, 14)
                                                                   .to_s
 
