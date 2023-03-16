@@ -11,6 +11,14 @@ describe ReleaseArtifact, type: :model do
 
   describe '#environment=' do
     context 'on create' do
+      it 'should apply default environment matching release' do
+        environment = create(:environment, account:)
+        release     = create(:release, account:, environment:)
+        artifact    = create(:artifact, account:, release:)
+
+        expect(artifact.environment).to eq release.environment
+      end
+
       it 'should not raise when environment matches release' do
         environment = create(:environment, account:)
         release     = create(:release, account:, environment:)
