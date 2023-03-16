@@ -14,7 +14,7 @@ describe Release, type: :model do
       it 'should apply default environment matching product' do
         environment = create(:environment, account:)
         product     = create(:product, account:, environment:)
-        release     = create(:release, account:)
+        release     = create(:release, account:, product:)
 
         expect(release.environment).to eq product.environment
       end
