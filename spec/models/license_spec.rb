@@ -11,6 +11,14 @@ describe License, type: :model do
 
   describe '#environment=' do
     context 'on create' do
+      it 'should apply default environment matching policy' do
+        environment = create(:environment, account:)
+        policy      = create(:policy, account:, environment:)
+        license     = create(:license, account:, policy:)
+
+        expect(license.environment).to eq policy.environment
+      end
+
       it 'should not raise when environment matches policy' do
         environment = create(:environment, account:)
         policy      = create(:policy, account:, environment:)
