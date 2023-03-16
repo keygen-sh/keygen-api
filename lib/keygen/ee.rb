@@ -3,7 +3,7 @@
 require_relative 'ee/license_file'
 require_relative 'ee/license'
 require_relative 'ee/protected_methods'
-require_relative 'ee/protected_record'
+require_relative 'ee/protected_class'
 require_relative 'ee/router'
 
 module Keygen

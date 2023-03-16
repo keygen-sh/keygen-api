@@ -5,18 +5,18 @@ require 'spec_helper'
 
 require_dependency Rails.root.join('lib', 'keygen')
 
-describe Keygen::EE::ProtectedRecord, type: :ee do
+describe Keygen::EE::ProtectedClass, type: :ee do
   subject do
     Class.new do
-      include Keygen::EE::ProtectedRecord
+      include Keygen::EE::ProtectedClass
 
-      Keygen::EE::ProtectedRecord::SINGLETON_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::SINGLETON_METHODS.each do |method|
         define_singleton_method method do |*args, **kwargs|
           nil
         end
       end
 
-      Keygen::EE::ProtectedRecord::INSTANCE_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::INSTANCE_METHODS.each do |method|
         define_method method do |*args, **kwargs|
           nil
         end
@@ -24,13 +24,13 @@ describe Keygen::EE::ProtectedRecord, type: :ee do
     end
   end
 
-  Keygen::EE::ProtectedRecord::SINGLETON_METHODS.each do |method|
+  Keygen::EE::ProtectedClass::SINGLETON_METHODS.each do |method|
     it "should allow querying the record with .#{method}" do
       expect { subject.send(method) }.to_not raise_error
     end
   end
 
-  Keygen::EE::ProtectedRecord::INSTANCE_METHODS.each do |method|
+  Keygen::EE::ProtectedClass::INSTANCE_METHODS.each do |method|
     it "should allow querying the record with ##{method}" do
       expect { subject.new.send(method) }.to_not raise_error
     end
@@ -38,13 +38,13 @@ describe Keygen::EE::ProtectedRecord, type: :ee do
 
   within_console do
     within_ce do
-      Keygen::EE::ProtectedRecord::SINGLETON_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::SINGLETON_METHODS.each do |method|
         it "should block querying the record with .#{method}" do
           expect { subject.send(method) }.to raise_error Keygen::EE::ProtectedMethodError
         end
       end
 
-      Keygen::EE::ProtectedRecord::INSTANCE_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::INSTANCE_METHODS.each do |method|
         it "should block querying the record with ##{method}" do
           expect { subject.new.send(method) }.to raise_error Keygen::EE::ProtectedMethodError
         end
@@ -52,13 +52,13 @@ describe Keygen::EE::ProtectedRecord, type: :ee do
     end
 
     within_ee do
-      Keygen::EE::ProtectedRecord::SINGLETON_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::SINGLETON_METHODS.each do |method|
         it "should allow querying the record with .#{method}" do
           expect { subject.send(method) }.to_not raise_error
         end
       end
 
-      Keygen::EE::ProtectedRecord::INSTANCE_METHODS.each do |method|
+      Keygen::EE::ProtectedClass::INSTANCE_METHODS.each do |method|
         it "should allow querying the record with ##{method}" do
           expect { subject.new.send(method) }.to_not raise_error
         end
@@ -68,7 +68,7 @@ describe Keygen::EE::ProtectedRecord, type: :ee do
     context 'when record is protected with entitlements' do
       subject do
         Class.new do
-          include Keygen::EE::ProtectedRecord[entitlements: %i[test]]
+          include Keygen::EE::ProtectedClass[entitlements: %i[test]]
 
           def self.all = nil
           def reload   = nil

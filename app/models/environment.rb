@@ -1,5 +1,5 @@
 class Environment < ApplicationRecord
-  include Keygen::EE::ProtectedRecord[entitlements: %i[environments]]
+  include Keygen::EE::ProtectedClass[entitlements: %i[environments]]
   include Limitable
   include Orderable
   include Pageable
