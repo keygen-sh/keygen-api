@@ -42,10 +42,10 @@ class Permission < ApplicationRecord
     entitlement.read
     entitlement.update
 
-    environment.read
     environment.create
-    environment.update
     environment.delete
+    environment.read
+    environment.update
 
     event-log.read
 
