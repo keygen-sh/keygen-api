@@ -166,7 +166,142 @@ class Permission < ApplicationRecord
   ].freeze
 
   # Available env permissions.
-  ENVIRONMENT_PERMISSIONS = [WILDCARD_PERMISSION].freeze
+  ENVIRONMENT_PERMISSIONS = %w[
+    account.read
+
+    arch.read
+
+    artifact.create
+    artifact.delete
+    artifact.read
+    artifact.update
+
+    channel.read
+
+    constraint.read
+
+    entitlement.create
+    entitlement.delete
+    entitlement.read
+    entitlement.update
+
+    environment.read
+
+    event-log.read
+
+    group.create
+    group.delete
+    group.licenses.read
+    group.machines.read
+    group.owners.attach
+    group.owners.detach
+    group.owners.read
+    group.read
+    group.update
+    group.users.read
+
+    key.create
+    key.delete
+    key.read
+    key.update
+
+    license.check-in
+    license.check-out
+    license.create
+    license.delete
+    license.entitlements.attach
+    license.entitlements.detach
+    license.group.update
+    license.policy.update
+    license.read
+    license.reinstate
+    license.renew
+    license.revoke
+    license.suspend
+    license.tokens.generate
+    license.update
+    license.usage.decrement
+    license.usage.increment
+    license.usage.reset
+    license.user.update
+    license.validate
+
+    machine.check-out
+    machine.create
+    machine.delete
+    machine.group.update
+    machine.heartbeat.ping
+    machine.heartbeat.reset
+    machine.proofs.generate
+    machine.read
+    machine.update
+
+    platform.read
+
+    policy.create
+    policy.delete
+    policy.entitlements.attach
+    policy.entitlements.detach
+    policy.pool.pop
+    policy.read
+    policy.update
+
+    process.create
+    process.delete
+    process.heartbeat.ping
+    process.read
+    process.update
+
+    product.create
+    product.delete
+    product.read
+    product.tokens.generate
+    product.update
+
+    release.constraints.attach
+    release.constraints.detach
+    release.create
+    release.delete
+    release.download
+    release.publish
+    release.read
+    release.update
+    release.upgrade
+    release.upload
+    release.yank
+
+    request-log.read
+
+    token.generate
+    token.read
+    token.regenerate
+    token.revoke
+
+    user.ban
+    user.create
+    user.delete
+    user.group.update
+    user.invite
+    user.password.reset
+    user.password.update
+    user.read
+    user.second-factors.create
+    user.second-factors.delete
+    user.second-factors.read
+    user.second-factors.update
+    user.tokens.generate
+    user.unban
+    user.update
+
+    webhook-endpoint.create
+    webhook-endpoint.delete
+    webhook-endpoint.read
+    webhook-endpoint.update
+
+    webhook-event.delete
+    webhook-event.read
+    webhook-event.retry
+  ].freeze
 
   # Available admin permissions.
   ADMIN_PERMISSIONS = ALL_PERMISSIONS.dup
