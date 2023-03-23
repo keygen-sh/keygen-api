@@ -39,15 +39,11 @@ class TokenLookupService < BaseService
     when 'v2'
       digest = OpenSSL::HMAC.hexdigest('SHA512', account.private_key, token)
 
-      with_cache digest do
-        tokens.find_by(digest:)
-      end
+      tokens.find_by(digest:)
     when 'v3'
       digest = OpenSSL::HMAC.hexdigest('SHA256', account.secret_key, token)
 
-      with_cache digest do
-        tokens.find_by(digest:)
-      end
+      tokens.find_by(digest:)
     end
   end
 
@@ -61,13 +57,4 @@ class TokenLookupService < BaseService
   #             so that we can't authenticate with a token from another environment,
   #             even if we have access to that environment's tokens.
   def tokens = account.tokens.for_environment(environment, strict: environment.nil?)
-  def cache  = Rails.cache
-
-  def with_cache(digest)
-    key = Token.cache_key(digest, account:, environment:)
-
-    cache.fetch(key, skip_nil: true, expires_in: TOKEN_CACHE_TTL) do
-      yield
-    end
-  end
 end
