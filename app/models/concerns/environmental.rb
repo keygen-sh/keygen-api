@@ -4,7 +4,7 @@ module Environmental
   extend ActiveSupport::Concern
 
   included do
-    include Keygen::EE::ProtectedMethods[:environment=, entitlements: %i[environments]]
+    include Keygen::EE::ProtectedMethods[:environment_id=, :environment=, entitlements: %i[environments]]
     include Dirtyable
 
     ##
