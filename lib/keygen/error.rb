@@ -3,22 +3,30 @@
 module Keygen
   module Error
     class UnauthorizedError < StandardError
-      attr_reader :code
-      attr_reader :detail
+      attr_reader :code,
+                  :detail,
+                  :source
 
-      def initialize(code:, detail: nil)
+      def initialize(message = 'is unauthorized', code:, detail: nil, parameter: nil, pointer: nil, header: nil)
         @code   = code
         @detail = detail
+        @source = { parameter:, pointer:, header: }.compact
+
+        super(message)
       end
     end
 
     class ForbiddenError < StandardError
-      attr_reader :code
-      attr_reader :detail
+      attr_reader :code,
+                  :detail,
+                  :source
 
-      def initialize(code:, detail: nil)
+      def initialize(message = 'is forbidden', code:, detail: nil, parameter: nil, pointer: nil, header: nil)
         @code   = code
         @detail = detail
+        @source = { parameter:, pointer:, header: }.compact
+
+        super(message)
       end
     end
 

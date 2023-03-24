@@ -9,6 +9,7 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: %i[index regenerate regenerate_current]
+    before_action :authenticate_with_password_or_token!, only: %i[generate]
     before_action :authenticate_with_token!, except: %i[generate]
     before_action :set_token, only: %i[show regenerate revoke]
 
@@ -35,6 +36,12 @@ module Api::V1
           param :name, type: :string, allow_nil: true, optional: true
         end
         param :relationships, type: :hash, optional: true do
+          param :bearer, type: :hash, optional: true do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[environment environments product products user users license licenses] }
+              param :id, type: :string
+            end
+          end
           Keygen.ee do |license|
             next unless
               license.entitled?(:environments)
@@ -53,58 +60,29 @@ module Api::V1
       end
     }
     def generate
-      authenticate_with_http_basic do |email, password|
-        user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
-                                    .find_by(email: "#{email}".downcase)
+      kwargs = token_params.slice(
+        :environment_id,
+        :bearer_id,
+        :expiry,
+        :name,
+      )
 
-        if user&.second_factor_enabled?
-          otp = token_meta[:otp]
-          if otp.nil?
-            return render_unauthorized detail: 'second factor is required', code: 'OTP_REQUIRED', source: { pointer: '/meta/otp' }
-          end
+      token = current_account.tokens.new(bearer: current_bearer, **kwargs)
+      authorize! token,
+        context: { bearer: current_bearer },
+        with: TokenPolicy
 
-          if !user.verify_second_factor(otp)
-            return render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' }
-          end
-        end
+      if token.save
+        BroadcastEventService.call(
+          event: 'token.generated',
+          account: current_account,
+          resource: token,
+        )
 
-        if user&.password? && user.authenticate(password)
-          kwargs = token_params.slice(
-            :environment_id,
-            :expiry,
-            :name,
-          )
-          unless kwargs.key?(:expiry)
-            # NOTE(ezekg) Admin tokens do not expire by default
-            kwargs[:expiry] = if user.has_role?(:user)
-                                Time.current + Token::TOKEN_DURATION
-                              else
-                                nil
-                              end
-          end
-
-          token = current_account.tokens.new(bearer: user, **kwargs)
-          authorize! token,
-            context: { bearer: user },
-            with: TokenPolicy
-
-          if token.save
-            BroadcastEventService.call(
-              event: 'token.generated',
-              account: current_account,
-              resource: token,
-            )
-
-            return render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
-          else
-            return render_unprocessable_resource token
-          end
-        end
-
-        return render_unauthorized detail: 'Credentials must be valid', code: 'CREDENTIALS_INVALID'
+        render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
+      else
+        render_unprocessable_resource token
       end
-
-      render_unauthorized detail: 'An email and password is required', code: 'CREDENTIALS_REQUIRED'
     rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
       render_bad_request
     end

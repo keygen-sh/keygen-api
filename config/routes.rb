@@ -308,8 +308,13 @@ Rails.application.routes.draw do
         end
       end
 
+      resources "environments" do
+        scope module: "environments/relationships" do
+          resources "tokens", only: %i[index show create]
+        end
+      end
+
       resources "event_logs", path: "event-logs", only: [:index, :show]
-      resources "environments"
     end
 
     resources "metrics", only: [:index, :show] do
