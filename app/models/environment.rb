@@ -12,19 +12,9 @@ class Environment < ApplicationRecord
   ].freeze
 
   belongs_to :account
-  has_many :tokens,
-    class_name: Token.name,
-    inverse_of: :bearer,
-    dependent: :destroy,
-    as: :bearer
-
-  ##
-  # _tokens association is only for cascading deletes of all env-scoped
-  # tokens, including tokens belonging to other bearers.
-  has_many :_tokens,
-    class_name: Token.name,
-    inverse_of: :environment,
-    dependent: :destroy
+  has_many :tokens, dependent: :destroy do
+    def owned = where(bearer: proxy_association.owner)
+  end
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
   has_many :webhook_endpoints, dependent: :destroy
