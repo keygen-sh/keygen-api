@@ -1234,7 +1234,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with a expiry
+    And the JSON response should be a "token" with an expiry
     And the JSON response should be a "token" with the following attributes:
       """
       { "kind": "user-token" }
@@ -1252,7 +1252,7 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with a expiry
+    And the JSON response should be a "token" with an expiry
     And the JSON response should be a "token" with the following attributes:
       """
       {
@@ -1265,6 +1265,87 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
+
+  Scenario: Developer generates a new token
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am the first developer of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Dev Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" without an expiry
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "kind": "developer-token" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Developer generates a token for an admin
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am the first developer of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Admin Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (ensure the token or license is allowed to access all resources)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a token for another user
     Given the current account is "test1"
@@ -1297,7 +1378,7 @@ Feature: Generate authentication token
 
   Scenario: User generates a token for an admin
     Given the current account is "test1"
-    And the current account has 1 "users"
+    And the current account has 1 "user"
     And I am the first user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/tokens" with the following:
