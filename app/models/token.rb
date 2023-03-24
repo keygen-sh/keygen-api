@@ -14,7 +14,10 @@ class Token < ApplicationRecord
   include Dirtyable
 
   belongs_to :account
-  belongs_to :bearer, polymorphic: true
+  belongs_to :bearer,
+    polymorphic: true,
+    optional: true
+
   has_many :token_permissions,
     dependent: :delete_all,
     autosave: true
@@ -45,10 +48,11 @@ class Token < ApplicationRecord
 
   validates :account, presence: true
   validates :bearer,
-    scope: { by: :account_id },
-    presence: true
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 
   validates :permission_ids,
+    if: :bearer_id?,
     inclusion: {
       message: 'unsupported permissions',
       in: -> token {
