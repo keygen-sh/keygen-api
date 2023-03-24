@@ -8,7 +8,7 @@ module Api::V1::Environments::Relationships
     before_action :set_environment
 
     def index
-      tokens = apply_pagination(authorized_scope(apply_scopes(environment.tokens)))
+      tokens = apply_pagination(authorized_scope(apply_scopes(environment.tokens)).preload(bearer: %i[role]))
       authorize! tokens,
         with: Environments::TokenPolicy
 

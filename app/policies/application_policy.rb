@@ -24,8 +24,10 @@ class ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
       relation.all
-    in role: { name: 'product' | 'user' | 'license' } if relation.respond_to?(:accessible_by)
+    in role: { name: 'environment' | 'product' | 'user' | 'license' } if relation.respond_to?(:accessible_by)
       relation.accessible_by(bearer)
+    in role: { name: 'environment' } if relation.respond_to?(:for_environment)
+      relation.for_environment(bearer.id)
     in role: { name: 'product' } if relation.respond_to?(:for_product)
       relation.for_product(bearer.id)
     in role: { name: 'user' } if relation.respond_to?(:for_user)
@@ -121,16 +123,23 @@ class ApplicationPolicy
     # environment or from the global environment. For the global environment,
     # the bearer must be from the global environment.
     deny! "#{whatami} environment is not compatible with the current environment" unless
-      bearer.nil? || (
+      bearer.nil? || begin
+        bearer_environment_id = case bearer
+                                in Environment(id: environment_id)
+                                  environment_id
+                                in environment_id:
+                                  environment_id
+                                end
+
         case
         when environment.nil?
-          bearer.environment_id.nil?
+          bearer_environment_id.nil?
         when environment.isolated?
-          bearer.environment_id == environment.id
+          bearer_environment_id == environment.id
         when environment.shared?
-          bearer.environment_id == environment.id || bearer.environment_id.nil?
+          bearer_environment_id == environment.id || bearer_environment_id.nil?
         end
-      )
+      end
 
     # ^^^ ditto for the token.
     deny! 'token environment is not compatible with the current environment' unless
