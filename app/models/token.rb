@@ -19,7 +19,7 @@ class Token < ApplicationRecord
     dependent: :delete_all,
     autosave: true
 
-  has_environment default: -> { bearer&.environment_id }
+  has_environment default: -> { bearer.environment_id if bearer in environment_id: }
   has_permissions Permission::ALL_PERMISSIONS,
     # Default to wildcard permission but allow all
     default: %w[*]
@@ -27,10 +27,16 @@ class Token < ApplicationRecord
   accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
   tracks_nested_attributes_for :token_permissions
 
+  tracks_attributes :expiry
+
   # Set default permissions unless already set
   before_validation :set_default_permissions,
     unless: :token_permissions_attributes_assigned?,
     on: :create
+
+  # Set default expiry unless already set
+  before_create :set_default_expiry,
+    unless: :expiry_attribute_assigned?
 
   # Generate the actual token
   after_create :generate!
@@ -251,6 +257,12 @@ class Token < ApplicationRecord
     bearer.nil?
   end
 
+  def environment_token?
+    return false if orphaned_token?
+
+    bearer.has_role? :environment
+  end
+
   def product_token?
     return false if orphaned_token?
 
@@ -303,6 +315,8 @@ class Token < ApplicationRecord
     case
     when orphaned_token?
       "orphaned-token"
+    when environment_token?
+      "environment-token"
     when product_token?
       "product-token"
     when admin_token?
@@ -326,6 +340,8 @@ class Token < ApplicationRecord
 
   def prefix
     case
+    when environment_token?
+      :env
     when product_token?
       :prod
     when admin_token?
@@ -361,6 +377,15 @@ class Token < ApplicationRecord
     assign_attributes(
       token_permissions_attributes: default_permission_ids.map {{ permission_id: _1 }},
     )
+  end
+
+  def set_default_expiry
+    # NOTE(ezekg) Non-user tokens do not expire by default (admin, env, product, license, etc.)
+    self.expiry = if bearer in role: { name: 'user' }
+                    Time.current + TOKEN_DURATION
+                  else
+                    nil
+                  end
   end
 
   ##

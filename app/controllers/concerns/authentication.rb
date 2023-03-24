@@ -7,31 +7,53 @@ module Authentication
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
   def authenticate_with_token!
-    @current_bearer =
-      case
-      when has_bearer_credentials?
-        authenticate_or_request_with_http_token(&method(:http_token_authenticator))
-      when has_basic_credentials?
-        authenticate_or_request_with_http_basic(&method(:http_basic_authenticator))
-      when has_license_credentials?
-        authenticate_or_request_with_http_license(&method(:http_license_authenticator))
-      else
-        authenticate_or_request_with_query_token(&method(:query_token_authenticator))
-      end
+    case
+    when has_bearer_credentials?
+      authenticate_or_request_with_http_token(&method(:http_token_authenticator))
+    when has_basic_credentials?
+      authenticate_or_request_with_http_basic(&method(:http_basic_authenticator))
+    when has_license_credentials?
+      authenticate_or_request_with_http_license(&method(:http_license_authenticator))
+    else
+      authenticate_or_request_with_query_token(&method(:query_token_authenticator))
+    end
   end
 
   def authenticate_with_token
-    @current_bearer =
-      case
-      when has_bearer_credentials?
-        authenticate_with_http_token(&method(:http_token_authenticator))
-      when has_basic_credentials?
-        authenticate_with_http_basic(&method(:http_basic_authenticator))
-      when has_license_credentials?
-        authenticate_with_http_license(&method(:http_license_authenticator))
-      else
-        authenticate_with_query_token(&method(:query_token_authenticator))
-      end
+    case
+    when has_bearer_credentials?
+      authenticate_with_http_token(&method(:http_token_authenticator))
+    when has_basic_credentials?
+      authenticate_with_http_basic(&method(:http_basic_authenticator))
+    when has_license_credentials?
+      authenticate_with_http_license(&method(:http_license_authenticator))
+    else
+      authenticate_with_query_token(&method(:query_token_authenticator))
+    end
+  end
+
+  def authenticate_with_password!
+    authenticate_or_request_with_http_basic(&method(:http_password_authenticator))
+  end
+
+  def authenticate_with_password
+    authenticate_with_http_basic(&method(:http_password_authenticator))
+  end
+
+  def authenticate_with_password_or_token!
+    if has_password_credentials?
+      authenticate_with_password!
+    else
+      authenticate_with_token!
+    end
+  end
+
+  def authenticate_with_password_or_token
+    if has_password_credentials?
+      authenticate_with_password
+    else
+      authenticate_with_token
+    end
   end
 
   private
@@ -72,6 +94,48 @@ module Authentication
       # NOTE(ezekg) For backwards compatibility
       http_token_authenticator(username)
     end
+  end
+
+  def http_password_authenticator(username = nil, password = nil)
+    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+                                .find_by(email: "#{username}".downcase)
+
+    unless user.present?
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'email and password must be valid',
+        code: 'CREDENTIALS_INVALID',
+        header: 'Authorization',
+      )
+    end
+
+    if user.second_factor_enabled?
+      otp = params.dig(:meta, :otp)
+      if otp.nil?
+        raise Keygen::Error::UnauthorizedError.new(
+          detail: 'second factor is required',
+          code: 'OTP_REQUIRED',
+          pointer: '/meta/otp',
+        )
+      end
+
+      unless user.verify_second_factor(otp)
+        raise Keygen::Error::UnauthorizedError.new(
+          detail: 'second factor must be valid',
+          code: 'OTP_INVALID',
+          pointer: '/meta/otp',
+        )
+      end
+    end
+
+    unless user.password? && user.authenticate(password)
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'email and password must be valid',
+        code: 'CREDENTIALS_INVALID',
+        header: 'Authorization',
+      )
+    end
+
+    @current_bearer = user
   end
 
   def http_basic_authenticator(username = nil, password = nil)
@@ -141,7 +205,7 @@ module Authentication
         current_bearer.supports_token_auth?
     end
 
-    current_bearer
+    @current_bearer = current_bearer
   end
 
   def http_license_authenticator(license_key, options = nil)
@@ -187,7 +251,7 @@ module Authentication
         current_license.supports_license_auth?
     end
 
-    current_license
+    @current_bearer = current_license
   end
 
   def request_http_token_authentication(realm = 'keygen', message = nil)
@@ -219,6 +283,17 @@ module Authentication
     authentication_scheme == 'license'
   end
 
+  def has_password_credentials?
+    return false unless
+      has_basic_credentials?
+
+    username, password = Base64.decode64(authentication_value.to_s)
+                               .split(':', 2)
+
+    # FIXME(ezekg) This will break if tokens ever include the @ symbol
+    username in /@/ and password in String
+  end
+
   def authentication_scheme
     return nil unless
       request.authorization.present?
@@ -229,5 +304,15 @@ module Authentication
       auth_scheme.nil?
 
     auth_scheme.downcase
+  end
+
+  def authentication_value
+    return nil unless
+      request.authorization.present?
+
+    auth_parts = request.authorization.to_s.split(' ', 2)
+    auth_value = auth_parts.second
+
+    auth_value
   end
 end
