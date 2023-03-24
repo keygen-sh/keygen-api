@@ -15,14 +15,22 @@ class Token < ApplicationRecord
 
   belongs_to :account
   belongs_to :bearer,
-    polymorphic: true,
-    optional: true
+    polymorphic: true
 
   has_many :token_permissions,
     dependent: :delete_all,
     autosave: true
 
-  has_environment default: -> { bearer.environment_id if bearer in environment_id: }
+  has_environment default: -> {
+    case bearer
+    in Environment(id: environment_id)
+      environment_id
+    in environment_id:
+      environment_id
+    else
+      nil
+    end
+  }
   has_permissions Permission::ALL_PERMISSIONS,
     # Default to wildcard permission but allow all
     default: %w[*]

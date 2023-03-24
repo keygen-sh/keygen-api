@@ -169,14 +169,32 @@ Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" (?:for|in)(?: an)? e
 end
 
 Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" (?:for|in) (?:all|each) "([^\"]*)"$/ do |count, trait, resource, association|
-  associated_records = @account.send(association.pluralize.underscore).all
+  associated_records = @account.send(association.pluralize.underscore)
+
+  if associated_records.respond_to?(:for_environment)
+    associated_records = case trait
+                         when 'isolated'
+                           environment = @account.environments.find_by_code!(:isolated)
+
+                           associated_records.for_environment(environment)
+                         when 'shared'
+                           environment = @account.environments.find_by_code!(:shared)
+
+                           associated_records.for_environment(environment)
+                         when 'global'
+                           associated_records.for_environment(nil)
+                         else
+                           associated_records
+                         end
+  end
+
   association_name =
-      case resource.singularize
-      when "token"
-        :bearer
-      else
-        association.singularize.underscore.to_sym
-      end
+    case resource.singularize
+    when 'token'
+      :bearer
+    else
+      association.singularize.underscore.to_sym
+    end
 
   associated_records.each do |record|
     count.to_i.times do

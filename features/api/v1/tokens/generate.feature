@@ -229,19 +229,15 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "BEARER_NOT_FOUND",
+        "title": "Bad request",
+        "detail": "cannot be null",
         "source": {
-          "pointer": "/data/relationships/bearer"
-        },
-        "links": {
-          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-relationships-bearer"
+          "pointer": "/data/relationships/bearer/data"
         }
       }
       """

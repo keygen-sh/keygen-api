@@ -14,6 +14,12 @@ module Environmental
     }
 
     ##
+    # without_environment returns all resources without an environment.
+    scope :without_environment, -> {
+      where.missing(:environment)
+    }
+
+    ##
     # for_environment scopes the current resource to an environment.
     #
     # When :strict is false, some environments MAY bleed into others. For example,
