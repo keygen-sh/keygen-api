@@ -153,6 +153,11 @@ Feature: Generate authentication token for environment
           "type": "tokens",
           "attributes": {
             "name": "Shared Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
           }
         }
       }
@@ -345,16 +350,12 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/relationships"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -388,16 +389,12 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/relationships"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -431,16 +428,12 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/relationships"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -469,16 +462,12 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/relationships"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
