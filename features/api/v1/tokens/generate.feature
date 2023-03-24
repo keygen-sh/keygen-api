@@ -31,6 +31,15 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[0]" },
+          "data": { "type": "users", "id": "$users[0]" }
+        }
+      }
+      """
     And the JSON response should be a "token" with the following attributes:
       """
       {
@@ -50,6 +59,15 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[0]" },
+          "data": { "type": "users", "id": "$users[0]" }
+        }
+      }
+      """
     And the JSON response should be a "token" with the following attributes:
       """
       {
@@ -1223,6 +1241,87 @@ Feature: Generate authentication token
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User generates a new token via token authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with a expiry
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "user-token",
+        "name": null,
+        "expiry": "2023-04-07T00:00:00.000Z"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: User generates a token for another user
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And I am the first user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "User Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[2]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User generates a token for an admin
+    Given the current account is "test1"
+    And the current account has 1 "users"
+    And I am the first user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "User Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a new token with inherited permissions (standard tier)
