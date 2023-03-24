@@ -7,7 +7,7 @@ describe TokenPolicy, type: :policy do
   subject { described_class.new(record, account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[accessing_tokens] do
+    with_scenarios %i[accessing_its_tokens] do
       with_token_authentication do
         with_permissions %w[token.read] do
           without_token_permissions { denies :index }
@@ -20,44 +20,20 @@ describe TokenPolicy, type: :policy do
         without_permissions       { denies :index }
 
         within_environment :isolated do
-          with_bearer_and_token_trait :in_shared_environment do
-            denies :index
-          end
-
-          with_bearer_and_token_trait :in_nil_environment do
-            denies :index
-          end
-
           allows :index
         end
 
         within_environment :shared do
-          with_bearer_and_token_trait :in_isolated_environment do
-            denies :index
-          end
-
-          with_bearer_and_token_trait :in_nil_environment do
-            allows :index
-          end
-
           allows :index
         end
 
         within_environment nil do
-          with_bearer_and_token_trait :in_isolated_environment do
-            denies :index
-          end
-
-          with_bearer_and_token_trait :in_shared_environment do
-            denies :index
-          end
-
           allows :index
         end
       end
     end
 
-    with_scenarios %i[accessing_a_token] do
+    with_scenarios %i[accessing_its_token] do
       with_basic_authentication do
         with_permissions %w[token.generate] do
           allows :generate
@@ -122,6 +98,136 @@ describe TokenPolicy, type: :policy do
         end
 
         within_environment :isolated do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        within_environment :shared do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        within_environment nil do
+          allows :show, :generate, :regenerate, :revoke
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_tokens] do
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          without_token_permissions { denies :index }
+
+          allows :index
+        end
+
+        with_wildcard_permissions { allows :index }
+        with_default_permissions  { allows :index }
+        without_permissions       { denies :index }
+
+        within_environment :isolated do
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            denies :index
+          end
+
+          allows :index
+        end
+
+        within_environment :shared do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_nil_environment do
+            allows :index
+          end
+
+          allows :index
+        end
+
+        within_environment nil do
+          with_bearer_and_token_trait :in_isolated_environment do
+            denies :index
+          end
+
+          with_bearer_and_token_trait :in_shared_environment do
+            denies :index
+          end
+
+          allows :index
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_token] do
+      with_basic_authentication do
+        with_permissions %w[token.generate] do
+          denies :generate
+        end
+
+        with_wildcard_permissions do
+          denies :generate
+        end
+
+        with_default_permissions do
+          denies :generate
+        end
+
+        without_permissions do
+          denies :generate
+        end
+      end
+
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          without_token_permissions { denies :show }
+
+          allows :show
+        end
+
+        with_permissions %w[token.generate] do
+          without_token_permissions { denies :generate }
+
+          denies :generate
+        end
+
+        with_permissions %w[token.regenerate] do
+          without_token_permissions { denies :regenerate }
+
+          denies :regenerate
+        end
+
+        with_permissions %w[token.revoke] do
+          without_token_permissions { denies :revoke }
+
+          allows :revoke
+        end
+
+        with_wildcard_permissions do
+          without_token_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          denies :generate, :regenerate
+          allows :show, :revoke
+        end
+
+        with_default_permissions do
+          without_token_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          denies :generate, :regenerate
+          allows :show, :revoke
+        end
+
+        without_permissions do
+          denies :show, :generate, :regenerate, :revoke
+        end
+
+        within_environment :isolated do
           with_bearer_and_token_trait :in_shared_environment do
             denies :show, :generate, :regenerate, :revoke
           end
@@ -130,7 +236,8 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          allows :show, :generate, :regenerate, :revoke
+          denies :generate, :regenerate
+          allows :show, :revoke
         end
 
         within_environment :shared do
@@ -139,10 +246,12 @@ describe TokenPolicy, type: :policy do
           end
 
           with_bearer_and_token_trait :in_nil_environment do
-            allows :show, :generate, :regenerate, :revoke
+            denies :generate, :regenerate
+            allows :show, :revoke
           end
 
-          allows :show, :generate, :regenerate, :revoke
+          denies :generate, :regenerate
+          allows :show, :revoke
         end
 
         within_environment nil do
@@ -154,7 +263,8 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          allows :show, :generate, :regenerate, :revoke
+          denies :generate, :regenerate
+          allows :show, :revoke
         end
       end
     end
