@@ -114,7 +114,7 @@ Given /^I send the following raw headers:$/ do |body|
 end
 
 Given /^I use an authentication token$/ do
-  @token = @bearer.tokens.first_or_create!(account: @bearer.account)
+  @token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
 
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to
