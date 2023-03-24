@@ -4,7 +4,7 @@ TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq
 
 World Rack::Test::Methods
 
-Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |named_idx, role, id|
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:of|for) account "([^\"]*)"$/ do |named_idx, role, id|
   named_idx ||= :first
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
@@ -16,6 +16,8 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
       account.products.send(named_idx)
     when "license"
       account.licenses.send(named_idx)
+    when "environment"
+      account.environments.send(named_idx)
     else
       raise 'invalid role'
     end
@@ -23,7 +25,7 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
   raise 'failed to find bearer' if @bearer.nil?
 end
 
-Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license) (?:of|for) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:of|for) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
   named_role_idx ||= :first
 
   account = Account.send(named_account_idx)
@@ -35,6 +37,8 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
       account.products.send(named_role_idx)
     when "license"
       account.licenses.send(named_role_idx)
+    when "environment"
+      account.environments.send(named_role_idx)
     else
       raise 'invalid role'
     end

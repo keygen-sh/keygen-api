@@ -1189,7 +1189,7 @@ Feature: Generate authentication token for product
     When I send a POST request to "/accounts/test1/products/$1/tokens"
     Then the response status should be "404"
 
-  Scenario: License attempst to generate token for their product
+  Scenario: License attempts to generate token for their product
     Given the current account is "test1"
     And the current account has 3 "products"
     And the current account has 1 "token" for each "product"
@@ -1200,7 +1200,7 @@ Feature: Generate authentication token for product
     When I send a POST request to "/accounts/test1/products/$2/tokens"
     Then the response status should be "403"
 
-  Scenario: License attempst to generate token for a product
+  Scenario: License attempts to generate token for a product
     Given the current account is "test1"
     And the current account has 3 "products"
     And the current account has 1 "token" for each "product"

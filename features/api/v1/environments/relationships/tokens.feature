@@ -475,11 +475,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with custom permissions (standard tier, EE)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
       """
       {
@@ -515,11 +520,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with custom permissions (ent tier, EE)
-    Given I am an admin of account "ent1"
-    And the current account is "ent1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "ent1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/ent1/environments/$0/tokens" with the following:
       """
       {
@@ -557,14 +567,19 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions that exceed the environment's permissions (standard tier)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment" with the following:
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment" with the following:
       """
       { "permissions": ["license.validate"] }
       """
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
       """
       {
@@ -604,14 +619,19 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions that exceed the environment's permissions (ent tier)
-    Given I am an admin of account "ent1"
-    And the current account is "ent1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment" with the following:
+    Given the current account is "ent1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment" with the following:
       """
       { "permissions": ["license.validate"] }
       """
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/ent1/environments/$0/tokens" with the following:
       """
       {
@@ -655,11 +675,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with unsupported permissions (standard tier)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
       """
       {
@@ -688,11 +713,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with unsupported permissions (ent tier)
-    Given I am an admin of account "ent1"
-    And the current account is "ent1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "ent1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/ent1/environments/$0/tokens" with the following:
       """
       {
@@ -725,11 +755,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with invalid permissions (standard tier)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
       """
       {
@@ -758,11 +793,16 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with invalid permissions (ent tier)
-    Given I am an admin of account "ent1"
-    And the current account is "ent1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment"
+    Given the current account is "ent1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/ent1/environments/$0/tokens" with the following:
       """
       {
@@ -795,14 +835,19 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions for environment with wildcard permission (standard tier)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment" with the following:
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment" with the following:
       """
       { "permissions": ["*"] }
       """
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
       """
       {
@@ -842,14 +887,19 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions for environment with wildcard permission (ent tier)
-    Given I am an admin of account "ent1"
-    And the current account is "ent1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "environment" with the following:
+    Given the current account is "ent1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment" with the following:
       """
       { "permissions": ["*"] }
       """
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "ent1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/ent1/environments/$0/tokens" with the following:
       """
       {
@@ -894,152 +944,269 @@ Feature: Generate authentication token for environment
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product attempts to generate a token
+  Scenario: Environment attempts to generate a token
     Given the current account is "test1"
-    And the current account has 1 "environment"
+    And the current account has 1 isolated "environment"
     And I am an environment of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "403"
 
-  Scenario: Product attempts to generate a token for another environment
+  Scenario: Environment attempts to generate a token (in isolated environment)
     Given the current account is "test1"
-    And the current account has 2 "environments"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
     And I am an environment of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$1/tokens"
     Then the response status should be "404"
 
-  Scenario: License attempst to generate token for their environment
+  Scenario: Environment attempts to generate a token (in shared environment)
     Given the current account is "test1"
-    And the current account has 3 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 1 "policy" for the last "environment"
-    And the current account has 1 "license" for the last "policy"
-    And I am a license of account "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/environments/$2/tokens"
-    Then the response status should be "403"
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/environments/$1/tokens"
+    Then the response status should be "401"
 
-  Scenario: License attempst to generate token for an environment
+  Scenario: Product attempts to generate a token
     Given the current account is "test1"
-    And the current account has 3 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 2 "licenses"
-    And the current account has 1 "token" for each "license"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "404"
+
+  Scenario: Product attempts to generate a token for another environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "404"
+
+  Scenario: License attempts to generate token for their environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "token" for each "environment"
+    And the current account has 1 shared "license"
     And I am a license of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "404"
+
+  Scenario: License attempts to generate token for another environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "token" for each "environment"
+    And the current account has 1 isolated "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "404"
 
   Scenario: User attempts to generate token for their environment
     Given the current account is "test1"
-    And the current account has 1 "environment"
-    And the current account has 1 "policy" for the last "environment"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "policy" for the last "environment"
+    And the current account has 1 shared "user"
+    And the current account has 1 shared "license" for the last "policy"
     And the last "license" is associated to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: User attempts to generate token for an environment
+  Scenario: User attempts to generate token for another environment
     Given the current account is "test1"
-    And the current account has 1 "environment"
-    And the current account has 1 "user"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "user"
     And I am a user of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "404"
 
   Scenario: Admin attempts to generate an environment token for another account
     Given I am an admin of account "test1"
     And the current account is "test2"
-    And the current account has 1 "environment"
+    And the current account has 1 shared "environment"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a POST request to "/accounts/test2/environments/$0/tokens"
     Then the response status should be "401"
 
   Scenario: Admin requests tokens for one of their environments
     Given the current account is "test1"
-    And I am an admin of account "test1"
-    And the current account has 3 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 5 "users"
-    And the current account has 1 "token" for each "user"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 5 isolated "users"
+    And the current account has 1 isolated "token" for each "user"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
-    Then the response status should be "201"
+    Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
-  Scenario: Product requests their tokens
+  Scenario: Environment requests their tokens
     Given the current account is "test1"
-    And the current account has 5 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 5 "users"
-    And the current environment has 2 "users"
-    And the current account has 1 "token" for each "user"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "tokens" for each "environment"
+    And the current account has 2 isolated "products"
+    And the current account has 1 isolated "token" for each "product"
     And I am an environment of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
-    Then the response status should be "201"
-    And the JSON response should be an array of 1 "token"
+    Then the response status should be "200"
+    And the JSON response should be an array of 2 "tokens"
+
+  Scenario: Environment requests tokens for another environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 1 shared "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "401"
+
+  Scenario: Product requests tokens for their environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 2 isolated "products"
+    And the current account has 1 isolated "token" for each "product"
+    And I am an product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "404"
 
   Scenario: Product requests tokens for another environment
     Given the current account is "test1"
-    And the current account has 5 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 5 "users"
-    And the current environment has 2 "users"
-    And the current account has 1 "token" for each "user"
-    And I am an environment of account "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 1 shared "product"
+    And I am an product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/environments/$2/tokens"
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "404"
 
   Scenario: License requests tokens for their environment
     Given the current account is "test1"
-    And the current account has 3 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 1 "policy" for the last "environment"
-    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 2 isolated "licenses"
+    And the current account has 1 isolated "token" for each "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/environments/$2/tokens"
-    Then the response status should be "403"
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/environments/$0/tokens"
+    Then the response status should be "404"
 
-  Scenario: License requests tokens for an environment
+  Scenario: License requests tokens for another environment
     Given the current account is "test1"
-    And the current account has 3 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 2 "licenses"
-    And the current account has 1 "token" for each "license"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 1 shared "license"
     And I am a license of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "404"
 
   Scenario: User requests tokens for their environment
     Given the current account is "test1"
-    And the current account has 1 "environment"
-    And the current account has 1 "policy" for the last "environment"
-    And the current account has 2 "users"
-    And the current account has 1 "token" for each "user"
-    And the current account has 3 "licenses" for the last "policy"
-    And the last "license" is associated to the last "user"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 2 isolated "users"
+    And the current account has 1 isolated "token" for each "user"
     And I am the last user of account "test1"
     And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: User requests tokens for an environment
+  Scenario: User requests tokens for another environment
     Given the current account is "test1"
-    And the current account has 4 "environments"
-    And the current account has 1 "token" for each "environment"
-    And the current account has 6 "users"
-    And the current account has 1 "token" for each "user"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 1 shared "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/environments/$1/tokens"
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "404"

@@ -164,15 +164,15 @@ describe TokenPolicy, type: :policy do
     with_scenarios %i[accessing_a_token] do
       with_basic_authentication do
         with_permissions %w[token.generate] do
-          denies :generate
+          allows :generate
         end
 
         with_wildcard_permissions do
-          denies :generate
+          allows :generate
         end
 
         with_default_permissions do
-          denies :generate
+          allows :generate
         end
 
         without_permissions do
@@ -190,13 +190,13 @@ describe TokenPolicy, type: :policy do
         with_permissions %w[token.generate] do
           without_token_permissions { denies :generate }
 
-          denies :generate
+          allows :generate
         end
 
         with_permissions %w[token.regenerate] do
           without_token_permissions { denies :regenerate }
 
-          denies :regenerate
+          allows :regenerate
         end
 
         with_permissions %w[token.revoke] do
@@ -210,8 +210,7 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          denies :generate, :regenerate
-          allows :show, :revoke
+          allows :show, :generate, :regenerate, :revoke
         end
 
         with_default_permissions do
@@ -219,8 +218,7 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          denies :generate, :regenerate
-          allows :show, :revoke
+          allows :show, :generate, :regenerate, :revoke
         end
 
         without_permissions do
@@ -236,8 +234,7 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          denies :generate, :regenerate
-          allows :show, :revoke
+          allows :show, :generate, :regenerate, :revoke
         end
 
         within_environment :shared do
@@ -246,12 +243,10 @@ describe TokenPolicy, type: :policy do
           end
 
           with_bearer_and_token_trait :in_nil_environment do
-            denies :generate, :regenerate
-            allows :show, :revoke
+            allows :show, :generate, :regenerate, :revoke
           end
 
-          denies :generate, :regenerate
-          allows :show, :revoke
+          allows :show, :generate, :regenerate, :revoke
         end
 
         within_environment nil do
@@ -263,8 +258,7 @@ describe TokenPolicy, type: :policy do
             denies :show, :generate, :regenerate, :revoke
           end
 
-          denies :generate, :regenerate
-          allows :show, :revoke
+          allows :show, :generate, :regenerate, :revoke
         end
       end
     end

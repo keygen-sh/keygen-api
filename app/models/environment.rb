@@ -67,6 +67,17 @@ class Environment < ApplicationRecord
     inclusion: { in: ISOLATION_STRATEGIES, message: 'unsupported isolation strategy' },
     presence: true
 
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: { name: 'admin' }
+      self.all
+    in role: { name: 'environment' }
+      self.where(id: accessor)
+    else
+      self.none
+    end
+  }
+
   scope :isolated, -> {
     where(isolation_strategy: 'ISOLATED')
   }
