@@ -1,26 +1,24 @@
 # frozen_string_literal: true
 
-module Api::V1::Users::Relationships
+module Api::V1::Environments::Relationships
   class TokensController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_user
-
-    authorize :user
+    before_action :set_environment
 
     def index
-      tokens = apply_pagination(authorized_scope(apply_scopes(user.tokens)))
+      tokens = apply_pagination(authorized_scope(apply_scopes(environment.tokens)))
       authorize! tokens,
-        with: Users::TokenPolicy
+        with: Environments::TokenPolicy
 
       render jsonapi: tokens
     end
 
     def show
-      token = user.tokens.find params[:id]
+      token = environment.tokens.find(params[:id])
       authorize! token,
-        with: Users::TokenPolicy
+        with: Environments::TokenPolicy
 
       render jsonapi: token
     end
@@ -38,7 +36,7 @@ module Api::V1::Users::Relationships
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :environment) } do
               items type: :string
             end
           end
@@ -66,9 +64,9 @@ module Api::V1::Users::Relationships
         :name,
       )
 
-      token = current_account.tokens.new(bearer: user, **kwargs)
+      token = current_account.tokens.new(bearer: environment, environment:, **kwargs)
       authorize! token,
-        with: Users::TokenPolicy
+        with: Environments::TokenPolicy
 
       if token.save
         BroadcastEventService.call(
@@ -77,7 +75,7 @@ module Api::V1::Users::Relationships
           resource: token,
         )
 
-        render jsonapi: token
+        render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
       else
         render_unprocessable_resource token
       end
@@ -85,14 +83,14 @@ module Api::V1::Users::Relationships
 
     private
 
-    attr_reader :user
+    attr_reader :environment
 
-    def set_user
-      scoped_users = authorized_scope(current_account.users)
+    def set_environment
+      scoped_environments = authorized_scope(current_account.environments)
 
-      @user = FindByAliasService.call(scoped_users, id: params[:user_id], aliases: :email)
+      @environment = scoped_environments.find(params[:environment_id])
 
-      Current.resource = user
+      Current.resource = environment
     end
   end
 end

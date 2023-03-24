@@ -45,6 +45,7 @@ class Permission < ApplicationRecord
     environment.create
     environment.delete
     environment.read
+    environment.tokens.generate
     environment.update
 
     event-log.read

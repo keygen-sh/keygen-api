@@ -353,6 +353,9 @@ class ApplicationController < ActionController::API
     kwargs[:detail] = e.detail if
       e.detail.present?
 
+    kwargs[:source] = e.source if
+      e.source.present?
+
     # Add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED',

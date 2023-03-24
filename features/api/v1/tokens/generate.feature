@@ -42,6 +42,25 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a new token via token authentication
+    Given the current account is "test1"
+    And the current account has 4 "webhook-endpoints"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "admin-token",
+        "expiry": null
+      }
+      """
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin generates a named token
     Given the current account is "test1"
     And the current account has 4 "webhook-endpoints"
@@ -70,6 +89,107 @@ Feature: Generate authentication token
     And sidekiq should have 4 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin generates a user token
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "User Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "user-token",
+        "name": "User Token",
+        "expiry": "2023-04-07T00:00:00.000Z"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin generates a user token without an expiry
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "User Token",
+            "expiry": null
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "user",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "user-token",
+        "name": "User Token",
+        "expiry": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
 
   @ce
   Scenario: Global admin generates a token for a shared environment
@@ -1285,8 +1405,11 @@ Feature: Generate authentication token
       """
       {
         "title": "Unauthorized",
-        "detail": "Credentials must be valid",
-        "code": "CREDENTIALS_INVALID"
+        "detail": "email and password must be valid",
+        "code": "CREDENTIALS_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
       }
       """
 
@@ -1350,8 +1473,11 @@ Feature: Generate authentication token
       """
       {
         "title": "Unauthorized",
-        "detail": "Credentials must be valid",
-        "code": "CREDENTIALS_INVALID"
+        "detail": "email and password must be valid",
+        "code": "CREDENTIALS_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs

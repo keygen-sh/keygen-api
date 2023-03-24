@@ -38,6 +38,7 @@ permissions = %w[
   environment.create
   environment.delete
   environment.read
+  environment.tokens.generate
   environment.update
 
   event-log.read
