@@ -146,7 +146,6 @@ Feature: Generate authentication token
     And the current account has 1 "user"
     And I am an admin of account "test1"
     And I use an authentication token
-    And time is frozen at "2023-03-24T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/tokens" with the following:
       """
       {
@@ -189,7 +188,48 @@ Feature: Generate authentication token
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
+
+  Scenario: Admin generates a token without a bearer
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "BEARER_NOT_FOUND",
+        "source": {
+          "pointer": "/data/relationships/bearer"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-relationships-bearer"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ce
   Scenario: Global admin generates a token for a shared environment
@@ -216,7 +256,7 @@ Feature: Generate authentication token
         }
       }
       """
-     Then the response status should be "400"
+    Then the response status should be "400"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
