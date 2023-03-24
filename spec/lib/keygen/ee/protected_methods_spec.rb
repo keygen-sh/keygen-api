@@ -83,7 +83,38 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
       end
     end
 
-    context 'when protecting singleton methods' do
+    context 'when protecting singleton methods defined before inclusion' do
+      subject do
+        Class.new do
+          def self.foo = nil
+          def foo = nil
+
+          include Keygen::EE::ProtectedMethods[singleton_methods: %i[foo]]
+        end
+      end
+
+      within_ce do
+        it 'should block the singleton method' do
+          expect { subject.foo }.to raise_error Keygen::EE::ProtectedMethodError
+        end
+
+        it 'should allow the instance method' do
+          expect { subject.new.foo }.to_not raise_error
+        end
+      end
+
+      within_ee do
+        it 'should allow the singleton method' do
+          expect { subject.foo }.to_not raise_error
+        end
+
+        it 'should allow the instance method' do
+          expect { subject.new.foo }.to_not raise_error
+        end
+      end
+    end
+
+    context 'when protecting singleton methods defined after inclusion' do
       subject do
         Class.new do
           include Keygen::EE::ProtectedMethods[singleton_methods: %i[foo]]
@@ -114,7 +145,38 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
       end
     end
 
-    context 'when protecting instance methods' do
+    context 'when protecting instance methods defined before inclusion' do
+      subject do
+        Class.new do
+          def self.foo = nil
+          def foo = nil
+
+          include Keygen::EE::ProtectedMethods[instance_methods: %i[foo]]
+        end
+      end
+
+      within_ce do
+        it 'should allow the singleton method' do
+          expect { subject.foo }.to_not raise_error
+        end
+
+        it 'should block the instance method' do
+          expect { subject.new.foo }.to raise_error Keygen::EE::ProtectedMethodError
+        end
+      end
+
+      within_ee do
+        it 'should allow the singleton method' do
+          expect { subject.foo }.to_not raise_error
+        end
+
+        it 'should allow the instance method' do
+          expect { subject.new.foo }.to_not raise_error
+        end
+      end
+    end
+
+    context 'when protecting instance methods defined after inclusion' do
       subject do
         Class.new do
           include Keygen::EE::ProtectedMethods[instance_methods: %i[foo]]
@@ -193,6 +255,60 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
       within_ee entitlements: [] do
         it 'should block protected method when unentitled' do
           expect { subject.new.foo }.to raise_error Keygen::EE::ProtectedMethodError
+        end
+      end
+    end
+
+    context 'when included multiple times' do
+      subject do
+        Class.new do
+          include Keygen::EE::ProtectedMethods[:foo, entitlements: %i[foo]]
+          include Keygen::EE::ProtectedMethods[:bar, entitlements: %i[bar]]
+          include Keygen::EE::ProtectedMethods[:baz]
+
+          def foo = nil
+          def bar = nil
+          def baz = nil
+        end
+      end
+
+      within_ce do
+        it 'should block protected method' do
+          expect { subject.new.foo }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.bar }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.baz }.to raise_error Keygen::EE::ProtectedMethodError
+        end
+      end
+
+      within_ee entitlements: %i[foo bar] do
+        it 'should allow protected method when entitled' do
+          expect { subject.new.foo }.to_not raise_error
+          expect { subject.new.bar }.to_not raise_error
+          expect { subject.new.baz }.to_not raise_error
+        end
+      end
+
+      within_ee entitlements: %i[foo] do
+        it 'should allow protected method when entitled' do
+          expect { subject.new.foo }.to_not raise_error
+          expect { subject.new.bar }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.baz }.to_not raise_error
+        end
+      end
+
+      within_ee entitlements: %i[bar] do
+        it 'should allow protected method when entitled' do
+          expect { subject.new.foo }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.bar }.to_not raise_error
+          expect { subject.new.baz }.to_not raise_error
+        end
+      end
+
+      within_ee entitlements: [] do
+        it 'should block protected method when unentitled' do
+          expect { subject.new.foo }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.bar }.to raise_error Keygen::EE::ProtectedMethodError
+          expect { subject.new.baz }.to_not raise_error
         end
       end
     end

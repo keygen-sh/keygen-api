@@ -4,10 +4,16 @@ module Keygen
 
     module ProtectedMethods
       class MethodProxy
+        attr_reader :singleton_methods,
+                    :instance_methods,
+                    :entitlements
+
         def initialize(singleton_methods:, instance_methods:, entitlements:)
-          @singleton_methods = singleton_methods.reduce({}) { |h, v| h.merge(v => nil) }
-          @instance_methods  = instance_methods.reduce({}) { |h, v| h.merge(v => nil) }
-          @entitlements      = entitlements
+          @proxied_singleton_methods = singleton_methods.reduce({}) { |h, v| h.merge(v => nil) }
+          @proxied_instance_methods  = instance_methods.reduce({}) { |h, v| h.merge(v => nil) }
+          @singleton_methods         = singleton_methods
+          @instance_methods          = instance_methods
+          @entitlements              = entitlements
         end
 
         def run_protected_singleton_method(method, ...)
@@ -35,51 +41,53 @@ module Keygen
         end
 
         def protected_singleton_method?(method)
-          singleton_methods.key?(method.name)
+          proxied_singleton_methods.key?(method.name)
         end
 
         def protected_instance_method?(method)
-          instance_methods.key?(method.name)
+          proxied_instance_methods.key?(method.name)
         end
 
         def proxied_singleton_method?(method)
-          singleton_methods[method.name] == method
+          proxied_singleton_methods[method.name] == method
         end
 
         def proxied_instance_method?(method)
-          instance_methods[method.name] == method
+          proxied_instance_methods[method.name] == method
         end
 
         def proxy_singleton_method!(method)
           raise ArgumentError, "method #{method} is not a protected method" unless
             protected_singleton_method?(method)
 
-          singleton_methods[method.name] = method
+          proxied_singleton_methods[method.name] = method
         end
 
         def proxy_instance_method!(method)
           raise ArgumentError, "method #{method} is not a protected method" unless
             protected_instance_method?(method)
 
-          instance_methods[method.name] = method
+          proxied_instance_methods[method.name] = method
         end
 
         private
 
-        attr_reader :singleton_methods,
-                    :instance_methods,
-                    :entitlements
+        attr_reader :proxied_singleton_methods,
+                    :proxied_instance_methods
       end
 
       module MethodBouncer
         def instrument_protected_methods!(singleton_methods:, instance_methods:, entitlements:)
-          @protected_singleton_methods = singleton_methods
-          @protected_instance_methods  = instance_methods
-          @protected_method_proxy    ||= MethodProxy.new(
-            singleton_methods:,
-            instance_methods:,
-            entitlements:,
-          )
+          @protected_singleton_methods = [*@protected_singleton_methods, *singleton_methods]
+          @protected_instance_methods  = [*@protected_instance_methods, *instance_methods]
+          @protected_method_proxies    = [
+            *@protected_method_proxies,
+            MethodProxy.new(
+              singleton_methods:,
+              instance_methods:,
+              entitlements:,
+            ),
+          ]
 
           protect_singleton_methods!
           protect_instance_methods!
@@ -90,22 +98,22 @@ module Keygen
         ##
         # protect_singleton_methods! decorates singleton methods added before our module was included.
         def protect_singleton_methods!
-          proxy = @protected_method_proxy
+          @protected_method_proxies.each do |proxy|
+            proxy.singleton_methods.each do |method_name|
+              next unless
+                singleton_methods.include?(method_name)
 
-          @protected_singleton_methods.each do |method_name|
-            next unless
-              singleton_methods.include?(method_name)
+              method = method(method_name)
+              next unless
+                proxy.protected_singleton_method?(method)
 
-            method = method(method_name)
-            next unless
-              proxy.protected_singleton_method?(method)
-
-            redefine_singleton_method(method_name) do |*args, **kwargs|
-              proxy.run_protected_singleton_method(
-                method,
-                *args,
-                **kwargs,
-              )
+              redefine_singleton_method(method_name) do |*args, **kwargs|
+                proxy.run_protected_singleton_method(
+                  method,
+                  *args,
+                  **kwargs,
+                )
+              end
             end
           end
         end
@@ -113,24 +121,24 @@ module Keygen
         ##
         # protect_instance_methods! decorates instance methods added before our module was included.
         def protect_instance_methods!
-          proxy = @protected_method_proxy
+          @protected_method_proxies.each do |proxy|
+            proxy.instance_methods.each do |method_name|
+              next unless
+                instance_methods.include?(method_name)
 
-          @protected_instance_methods.each do |method_name|
-            next unless
-              instance_methods.include?(method_name)
+              method = instance_method(method_name)
+              next unless
+                proxy.protected_instance_method?(method)
 
-            method = instance_method(method_name)
-            next unless
-              proxy.protected_instance_method?(method)
+              redefine_instance_method(method_name) do |*args, **kwargs|
+                bound_method = method.bind(self)
 
-            redefine_instance_method(method_name) do |*args, **kwargs|
-              bound_method = method.bind(self)
-
-              proxy.run_protected_instance_method(
-                bound_method,
-                *args,
-                **kwargs,
-              )
+                proxy.run_protected_instance_method(
+                  bound_method,
+                  *args,
+                  **kwargs,
+                )
+              end
             end
           end
         end
@@ -142,22 +150,23 @@ module Keygen
           return super unless
             method.present?
 
-          proxy = @protected_method_proxy
-          return super unless
-            proxy.protected_singleton_method?(method)
+          @protected_method_proxies.each do |proxy|
+            next unless
+              proxy.protected_singleton_method?(method)
 
-          return super if
-            proxy.proxied_singleton_method?(method)
+            next if
+              proxy.proxied_singleton_method?(method)
 
-          proxy.proxy_singleton_method!(
-            redefine_singleton_method(method_name) { |*args, **kwargs|
-              proxy.run_protected_singleton_method(
-                method,
-                *args,
-                **kwargs,
-              )
-            },
-          )
+            proxy.proxy_singleton_method!(
+              redefine_singleton_method(method_name) { |*args, **kwargs|
+                proxy.run_protected_singleton_method(
+                  method,
+                  *args,
+                  **kwargs,
+                )
+              },
+            )
+          end
 
           super
         end
@@ -169,24 +178,25 @@ module Keygen
           return super unless
             method.present?
 
-          proxy = @protected_method_proxy
-          return super unless
-            proxy.protected_instance_method?(method)
+          @protected_method_proxies.each do |proxy|
+            next unless
+              proxy.protected_instance_method?(method)
 
-          return super if
-            proxy.proxied_instance_method?(method)
+            next if
+              proxy.proxied_instance_method?(method)
 
-          proxy.proxy_instance_method!(
-            redefine_instance_method(method_name) { |*args, **kwargs|
-              bound_method = method.bind(self)
+            proxy.proxy_instance_method!(
+              redefine_instance_method(method_name) { |*args, **kwargs|
+                bound_method = method.bind(self)
 
-              proxy.run_protected_instance_method(
-                bound_method,
-                *args,
-                **kwargs,
-              )
-            },
-          )
+                proxy.run_protected_instance_method(
+                  bound_method,
+                  *args,
+                  **kwargs,
+                )
+              },
+            )
+          end
 
           super
         end
