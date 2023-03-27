@@ -96,7 +96,7 @@ module AuthorizationHelper
 
     def accessing_accounts(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:accounts) { create_list(:account, 3) }
       end
 
@@ -105,14 +105,14 @@ module AuthorizationHelper
 
     def accessing_another_account(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
         let(:other_account) { create(:account) }
       end
     end
 
     def accessing_an_account(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:_account) { create(:account) }
       end
 
@@ -121,7 +121,7 @@ module AuthorizationHelper
 
     def accessing_its_account(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
         # noop
       end
 
@@ -130,7 +130,7 @@ module AuthorizationHelper
 
     def accessing_billing(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:billing) { create(:billing, account:) }
       end
 
@@ -139,7 +139,7 @@ module AuthorizationHelper
 
     def accessing_plan(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         # noop
       end
 
@@ -148,14 +148,14 @@ module AuthorizationHelper
 
     def accessing_analytics(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         # noop
       end
     end
 
     def accessing_metrics(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:metrics) { create_list(:metric, 3, account:) }
       end
 
@@ -164,7 +164,7 @@ module AuthorizationHelper
 
     def accessing_a_metric(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:metric) { create(:metric, account:) }
       end
 
@@ -173,7 +173,7 @@ module AuthorizationHelper
 
     def accessing_request_logs(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:request_logs) { create_list(:request_log, 3, account:) }
       end
 
@@ -182,7 +182,7 @@ module AuthorizationHelper
 
     def accessing_a_request_log(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:request_log) { create(:request_log, account:) }
       end
 
@@ -191,7 +191,7 @@ module AuthorizationHelper
 
     def accessing_webhook_endpoints(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:webhook_endpoints) { create_list(:webhook_endpoint, 3, account:) }
       end
 
@@ -200,7 +200,7 @@ module AuthorizationHelper
 
     def accessing_a_webhook_endpoint(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:webhook_endpoint) { create(:webhook_endpoint, account:) }
       end
 
@@ -209,7 +209,7 @@ module AuthorizationHelper
 
     def accessing_webhook_events(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:webhook_events) { create_list(:webhook_event, 3, account:) }
       end
 
@@ -218,7 +218,7 @@ module AuthorizationHelper
 
     def accessing_a_webhook_event(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:webhook_event) { create(:webhook_event, account:) }
       end
 
@@ -409,7 +409,7 @@ module AuthorizationHelper
         let(:tokens)   { create_list(:token, 3, account: user.account, bearer: user) }
       in [*, :accessing_itself, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
-      in [:as_admin | :as_product | :as_license | :as_user, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
       end
 
@@ -426,7 +426,7 @@ module AuthorizationHelper
         let(:_token) { create(:token, account: user.account, bearer: user) }
       in [*, :accessing_itself, *]
         let(:_token) { create(:token, account: bearer.account, bearer:) }
-      in [:as_admin | :as_product | :as_license | :as_user, *]
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
         let(:_token) { create(:token, account: bearer.account, bearer:) }
       end
 
