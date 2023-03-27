@@ -18,6 +18,8 @@ class EnvironmentPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
+    in role: { name: 'environment' } if record == bearer
+      allow!
     else
       deny!
     end

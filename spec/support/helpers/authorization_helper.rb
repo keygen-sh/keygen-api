@@ -82,6 +82,9 @@ module AuthorizationHelper
       in [:as_admin, *]
         let(:user)   { bearer }
         let(:record) { bearer }
+      in [:as_environment, *]
+        let(:environment) { bearer }
+        let(:record)      { bearer }
       in [:as_product, *]
         let(:product) { bearer }
         let(:record)  { bearer }

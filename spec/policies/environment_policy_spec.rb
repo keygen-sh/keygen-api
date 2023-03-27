@@ -18,42 +18,6 @@ describe EnvironmentPolicy, type: :policy do
         with_wildcard_permissions { allows :index }
         with_default_permissions  { allows :index }
         without_permissions       { denies :index }
-
-        # within_environment :isolated do
-        #   with_bearer_and_token_trait :in_shared_environment do
-        #     denies :index
-        #   end
-
-        #   with_bearer_and_token_trait :in_nil_environment do
-        #     denies :index
-        #   end
-
-        #   allows :index
-        # end
-
-        # within_environment :shared do
-        #   with_bearer_and_token_trait :in_isolated_environment do
-        #     denies :index
-        #   end
-
-        #   with_bearer_and_token_trait :in_nil_environment do
-        #     allows :index
-        #   end
-
-        #   allows :index
-        # end
-
-        # within_environment nil do
-        #   with_bearer_and_token_trait :in_isolated_environment do
-        #     denies :index
-        #   end
-
-        #   with_bearer_and_token_trait :in_shared_environment do
-        #     denies :index
-        #   end
-
-        #   allows :index
-        # end
       end
     end
 
@@ -102,42 +66,6 @@ describe EnvironmentPolicy, type: :policy do
         without_permissions do
           denies :show, :create, :update, :destroy
         end
-
-        # within_environment :isolated do
-        #   with_bearer_and_token_trait :in_shared_environment do
-        #     denies :show, :create, :update, :destroy
-        #   end
-
-        #   with_bearer_and_token_trait :in_nil_environment do
-        #     denies :show, :create, :update, :destroy
-        #   end
-
-        #   allows :show, :create, :update, :destroy
-        # end
-
-        # within_environment :shared do
-        #   with_bearer_and_token_trait :in_isolated_environment do
-        #     denies :show, :create, :update, :destroy
-        #   end
-
-        #   with_bearer_and_token_trait :in_nil_environment do
-        #     allows :show, :create, :update, :destroy
-        #   end
-
-        #   allows :show, :create, :update, :destroy
-        # end
-
-        # within_environment nil do
-        #   with_bearer_and_token_trait :in_isolated_environment do
-        #     denies :show, :create, :update, :destroy
-        #   end
-
-        #   with_bearer_and_token_trait :in_shared_environment do
-        #     denies :show, :create, :update, :destroy
-        #   end
-
-        #   allows :show, :create, :update, :destroy
-        # end
       end
     end
 
@@ -181,6 +109,68 @@ describe EnvironmentPolicy, type: :policy do
 
         without_permissions do
           denies :show, :create, :update, :destroy
+        end
+      end
+    end
+  end
+
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_environments] do
+        with_token_authentication do
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_an_environment] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy
+            end
+
+            denies :show, :create, :update, :destroy
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy
+            end
+
+            denies :show, :create, :update, :destroy
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_itself] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy
+            end
+
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy
+            end
+
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
         end
       end
     end
