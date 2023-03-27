@@ -48,6 +48,38 @@ describe MetricPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_metrics] do
+        with_token_authentication do
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_metric] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            without_token_permissions { denies :show, :count }
+
+            denies :show, :count
+          end
+
+          with_default_permissions do
+            without_token_permissions { denies :show, :count }
+
+            denies :show, :count
+          end
+
+          without_permissions do
+            denies :show, :count
+          end
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_metrics] do
       with_token_authentication do

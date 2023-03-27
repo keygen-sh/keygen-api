@@ -321,9 +321,9 @@ module AuthorizationHelper
     def accessing_policies(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:policies) { create_list(:policy, 3, account: other_account) }
+        let(:policies) { create_list(:policy, 3, *policy_traits, account: other_account) }
       else
-        let(:policies) { create_list(:policy, 3, account:) }
+        let(:policies) { create_list(:policy, 3, *policy_traits, account:) }
       end
 
       let(:record) { policies }
@@ -343,9 +343,9 @@ module AuthorizationHelper
     def accessing_its_policies(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:policies) { create_list(:policy, 3, account: product.account, product:) }
+        let(:policies) { create_list(:policy, 3, *policy_traits, account: product.account, product:) }
       in [:as_product, *]
-        let(:policies) { create_list(:policy, 3, account: bearer.account, product: bearer) }
+        let(:policies) { create_list(:policy, 3, *policy_traits, account: bearer.account, product: bearer) }
       in [:as_license, *]
         let(:policies) { [bearer.policy] }
       in [:as_user, *]
