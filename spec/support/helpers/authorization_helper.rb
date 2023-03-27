@@ -20,6 +20,15 @@ module AuthorizationHelper
       end
     end
 
+    def as_environment(scenarios)
+      case scenarios
+      in []
+        let(:account)     { create(:account, *account_traits) }
+        let(:bearer)      { create(:environment, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:environment) { bearer }
+      end
+    end
+
     def as_product(scenarios)
       case scenarios
       in []
@@ -1477,7 +1486,16 @@ module AuthorizationHelper
     # with_token_authentication defines a context using token authentication.
     def with_token_authentication(&)
       context 'with token authentication' do
-        let(:token) { create(:token, *token_traits, account:, bearer:, environment: bearer.environment, permissions: token_permissions) }
+        let(:token) {
+          environment = case bearer
+                        in Environment => env
+                          env
+                        in environment: env
+                          env
+                        end
+
+          create(:token, *token_traits, account:, bearer:, environment:, permissions: token_permissions)
+        }
 
         instance_exec(&)
       end

@@ -8,7 +8,7 @@ class EntitlementPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
       allow!
     in role: { name: 'user' | 'license' } if record.all? { _1.id.in?(bearer.entitlement_ids) }
       allow!
@@ -24,7 +24,7 @@ class EntitlementPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
       allow!
     in role: { name: 'user' | 'license' } if record.id.in?(bearer.entitlement_ids)
       allow!
@@ -38,7 +38,7 @@ class EntitlementPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
@@ -50,7 +50,7 @@ class EntitlementPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
@@ -62,7 +62,7 @@ class EntitlementPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
