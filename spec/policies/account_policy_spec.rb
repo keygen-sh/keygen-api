@@ -78,6 +78,48 @@ describe AccountPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    with_scenarios %i[accessing_accounts] do
+      with_token_authentication do
+        with_permissions %w[account.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_its_account] do
+      with_token_authentication do
+        with_permissions %w[account.read] do
+          without_token_permissions { denies :show }
+
+          allows :show
+        end
+
+        with_wildcard_permissions do
+          without_token_permissions { denies :show, :create, :update, :destroy }
+
+          denies :create, :update, :destroy
+          allows :show
+        end
+
+        with_default_permissions do
+          without_token_permissions { denies :show, :create, :update, :destroy }
+
+          denies :create, :update, :destroy
+          allows :show
+        end
+
+        without_permissions do
+          denies :show, :create, :update, :destroy
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_accounts] do
       with_token_authentication do
