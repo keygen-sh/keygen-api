@@ -89,65 +89,83 @@ describe ReleasePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[release.upload] do
+          without_token_permissions { denies :upload }
+
+          allows :upload
+        end
+
+        with_permissions %w[release.publish] do
+          without_token_permissions { denies :publish }
+
+          allows :publish
+        end
+
+        with_permissions %w[release.yank] do
+          without_token_permissions { denies :yank }
+
+          allows :yank
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         within_environment :isolated do
           with_bearer_and_token_trait :in_shared_environment do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           with_bearer_and_token_trait :in_nil_environment do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         within_environment :shared do
           with_bearer_and_token_trait :in_isolated_environment do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           with_bearer_and_token_trait :in_nil_environment do
-            allows :show, :upgrade, :create, :update, :destroy
+            allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           with_release_trait :in_nil_environment do
-            denies :create, :update, :destroy
+            denies :create, :update, :destroy, :upload, :publish, :yank
             allows :show, :upgrade
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         within_environment nil do
           with_bearer_and_token_trait :in_isolated_environment do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           with_bearer_and_token_trait :in_shared_environment do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -186,16 +204,211 @@ describe ReleasePolicy, type: :policy do
           denies :destroy
         end
 
+        with_permissions %w[release.upload] do
+          denies :upload
+        end
+
+        with_permissions %w[release.publish] do
+          denies :publish
+        end
+
+        with_permissions %w[release.yank] do
+          denies :yank
+        end
+
         with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+        end
+      end
+    end
+  end
+
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_releases] do
+        with_token_authentication do
+          with_permissions %w[release.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              with_release_trait :in_shared_environment do
+                denies :index
+              end
+
+              with_release_trait :in_nil_environment do
+                denies :index
+              end
+
+              allows :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              with_release_trait :in_isolated_environment do
+                denies :index
+              end
+
+              with_release_trait :in_nil_environment do
+                allows :index
+              end
+
+              allows :index
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_a_release] do
+        with_token_authentication do
+          with_permissions %w[release.upgrade] do
+            without_token_permissions { denies :upgrade }
+
+            allows :upgrade
+          end
+
+          with_permissions %w[release.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[release.create] do
+            without_token_permissions { denies :create }
+
+            allows :create
+          end
+
+          with_permissions %w[release.update] do
+            without_token_permissions { denies :update }
+
+            allows :update
+          end
+
+          with_permissions %w[release.delete] do
+            without_token_permissions { denies :destroy }
+
+            allows :destroy
+          end
+
+          with_permissions %w[release.upload] do
+            without_token_permissions { denies :upload }
+
+            allows :upload
+          end
+
+          with_permissions %w[release.publish] do
+            without_token_permissions { denies :publish }
+
+            allows :publish
+          end
+
+          with_permissions %w[release.yank] do
+            without_token_permissions { denies :yank }
+
+            allows :yank
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+
+            allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+
+            allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+
+          without_permissions do
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              with_release_trait :in_shared_environment do
+                denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+              end
+
+              with_release_trait :in_nil_environment do
+                denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+              end
+
+              allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+
+            with_bearer_and_token_trait :shared do
+              with_release_trait :in_isolated_environment do
+                denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+              end
+
+              with_release_trait :in_nil_environment do
+                denies :create, :update, :destroy, :upload, :publish, :yank
+                allows :show, :upgrade
+              end
+
+              allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+            end
+          end
         end
       end
     end
@@ -248,24 +461,42 @@ describe ReleasePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[release.upload] do
+          without_token_permissions { denies :upload }
+
+          allows :upload
+        end
+
+        with_permissions %w[release.publish] do
+          without_token_permissions { denies :publish }
+
+          allows :publish
+        end
+
+        with_permissions %w[release.yank] do
+          without_token_permissions { denies :yank }
+
+          allows :yank
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
-          allows :show, :upgrade, :create, :update, :destroy
+          allows :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -304,16 +535,28 @@ describe ReleasePolicy, type: :policy do
           denies :destroy
         end
 
+        with_permissions %w[release.upload] do
+          denies :upload
+        end
+
+        with_permissions %w[release.publish] do
+          denies :publish
+        end
+
+        with_permissions %w[release.yank] do
+          denies :yank
+        end
+
         with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -399,17 +642,17 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :create, :update, :destroy
+          denies :create, :update, :destroy, :upload, :publish, :yank
           allows :show, :upgrade
         end
 
         with_default_permissions do
-          denies :create, :update, :destroy
+          denies :create, :update, :destroy, :upload, :publish, :yank
           allows :show, :upgrade
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
 
@@ -427,17 +670,17 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :create, :update, :destroy
+          denies :create, :update, :destroy, :upload, :publish, :yank
           allows :show, :upgrade
         end
 
         with_default_permissions do
-          denies :create, :update, :destroy
+          denies :create, :update, :destroy, :upload, :publish, :yank
           allows :show, :upgrade
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -475,15 +718,15 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
 
@@ -497,15 +740,15 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -536,17 +779,17 @@ describe ReleasePolicy, type: :policy do
           end
 
           with_wildcard_permissions do
-            denies :create, :update, :destroy
+            denies :create, :update, :destroy, :upload, :publish, :yank
             allows :show, :upgrade
           end
 
           with_default_permissions do
-            denies :create, :update, :destroy
+            denies :create, :update, :destroy, :upload, :publish, :yank
             allows :show, :upgrade
           end
 
           without_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
         end
       end
@@ -574,15 +817,15 @@ describe ReleasePolicy, type: :policy do
           end
 
           with_wildcard_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           with_default_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
 
           without_permissions do
-            denies :show, :upgrade, :create, :update, :destroy
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
           end
         end
       end
@@ -629,15 +872,15 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
 
         without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
         end
       end
     end
@@ -652,7 +895,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release] do
       without_authentication do
-        denies :show, :upgrade, :create, :update, :destroy
+        denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
       end
     end
   end
