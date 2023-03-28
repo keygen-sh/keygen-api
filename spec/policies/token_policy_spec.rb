@@ -308,6 +308,254 @@ describe TokenPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_its_tokens] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :index
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_its_token] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[token.generate] do
+            without_token_permissions { denies :generate }
+
+            allows :generate
+          end
+
+          with_permissions %w[token.regenerate] do
+            without_token_permissions { denies :regenerate }
+
+            allows :regenerate
+          end
+
+          with_permissions %w[token.revoke] do
+            without_token_permissions { denies :revoke }
+
+            allows :revoke
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            allows :show, :generate, :regenerate, :revoke
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            allows :show, :generate, :regenerate, :revoke
+          end
+
+          without_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :generate, :regenerate, :revoke
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :show, :generate, :regenerate, :revoke
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :generate, :regenerate, :revoke
+            end
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_tokens] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :index
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_a_token] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[token.generate] do
+            without_token_permissions { denies :generate }
+
+            allows :generate
+          end
+
+          with_permissions %w[token.regenerate] do
+            without_token_permissions { denies :regenerate }
+
+            allows :regenerate
+          end
+
+          with_permissions %w[token.revoke] do
+            without_token_permissions { denies :revoke }
+
+            allows :revoke
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            allows :show, :generate, :regenerate, :revoke
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            allows :show, :generate, :regenerate, :revoke
+          end
+
+          without_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :generate, :regenerate, :revoke
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :show, :generate, :regenerate, :revoke
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :generate, :regenerate, :revoke
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :generate, :regenerate, :revoke
+            end
+          end
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_tokens] do
       with_token_authentication do
