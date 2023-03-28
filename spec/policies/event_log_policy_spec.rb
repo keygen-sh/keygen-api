@@ -16,7 +16,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_wildcard_permissions do
             without_token_permissions { denies :show, :count }
@@ -88,7 +88,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_permissions %w[event-log.read] do
             without_token_permissions { denies :show, :count }
@@ -163,7 +163,7 @@ describe EventLogPolicy, type: :policy do
           end
         end
 
-        with_scenarios %i[accessing_a_event_log] do
+        with_scenarios %i[accessing_an_event_log] do
           with_token_authentication do
             with_wildcard_permissions do
               without_token_permissions { denies :show, :count }
@@ -229,7 +229,7 @@ describe EventLogPolicy, type: :policy do
           end
         end
 
-        with_scenarios %i[accessing_a_event_log] do
+        with_scenarios %i[accessing_an_event_log] do
           with_token_authentication do
             with_permissions %w[event-log.read] do
               without_token_permissions { denies :show, :count }
@@ -298,7 +298,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_wildcard_permissions do
             without_token_permissions { denies :show, :count }
@@ -328,7 +328,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_wildcard_permissions do
             without_token_permissions { denies :show, :count }
@@ -366,7 +366,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_license_authentication do
           with_wildcard_permissions do
             denies :show, :count
@@ -416,7 +416,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_license_authentication do
           with_wildcard_permissions do
             denies :show, :count
@@ -458,7 +458,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_wildcard_permissions do
             without_token_permissions { denies :show, :count }
@@ -488,7 +488,7 @@ describe EventLogPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         with_token_authentication do
           with_wildcard_permissions do
             without_token_permissions { denies :show, :count }
@@ -516,7 +516,7 @@ describe EventLogPolicy, type: :policy do
         without_authentication { denies :index }
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         without_authentication { denies :show, :count }
       end
     end
@@ -526,7 +526,7 @@ describe EventLogPolicy, type: :policy do
         without_authentication { denies :index }
       end
 
-      with_scenarios %i[accessing_a_event_log] do
+      with_scenarios %i[accessing_an_event_log] do
         without_authentication { denies :show, :count }
       end
     end
