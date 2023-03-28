@@ -120,6 +120,110 @@ describe RequestLogPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_request_logs] do
+        with_token_authentication do
+          with_permissions %w[request-log.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :index
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :index
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :index
+            end
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_a_request_log] do
+        with_token_authentication do
+          with_permissions %w[request-log.read] do
+            without_token_permissions { denies :show, :count }
+
+            allows :show, :count
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions { denies :show, :count }
+
+            allows :show, :count
+          end
+
+          with_default_permissions do
+            without_token_permissions { denies :show, :count }
+
+            allows :show, :count
+          end
+
+          without_permissions do
+            denies :show, :count
+          end
+
+          within_environment :isolated do
+            with_bearer_and_token_trait :isolated do
+              allows :show, :count
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :count
+            end
+          end
+
+          within_environment :shared do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :count
+            end
+
+            with_bearer_and_token_trait :shared do
+              allows :show, :count
+            end
+          end
+
+          within_environment nil do
+            with_bearer_and_token_trait :isolated do
+              denies :show, :count
+            end
+
+            with_bearer_and_token_trait :shared do
+              denies :show, :count
+            end
+          end
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_request_logs] do
       with_token_authentication do

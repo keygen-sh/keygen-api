@@ -192,6 +192,24 @@ module AuthorizationHelper
       let(:record) { request_log }
     end
 
+    def accessing_event_logs(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:event_logs) { create_list(:event_log, 3, account:) }
+      end
+
+      let(:record) { event_logs }
+    end
+
+    def accessing_a_event_log(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:event_log) { create(:event_log, account:) }
+      end
+
+      let(:record) { event_log }
+    end
+
     def accessing_webhook_endpoints(scenarios)
       case scenarios
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
