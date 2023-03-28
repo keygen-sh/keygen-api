@@ -201,7 +201,7 @@ module AuthorizationHelper
       let(:record) { event_logs }
     end
 
-    def accessing_a_event_log(scenarios)
+    def accessing_an_event_log(scenarios)
       case scenarios
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
         let(:event_log) { create(:event_log, account:) }
