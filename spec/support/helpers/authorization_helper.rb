@@ -253,9 +253,9 @@ module AuthorizationHelper
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:product) { create(:product, account: other_account) }
+        let(:product) { create(:product, *product_traits, account: other_account) }
       else
-        let(:product) { create(:product, account:) }
+        let(:product) { create(:product, *product_traits, account:) }
       end
 
       let(:record) { product }
@@ -293,9 +293,9 @@ module AuthorizationHelper
     def accessing_products(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:products) { [create(:product, account: other_account)] }
+        let(:products) { [create(:product, *product_traits, account: other_account)] }
       else
-        let(:products) { [create(:product, account:)] }
+        let(:products) { [create(:product, *product_traits, account:)] }
       end
 
       let(:record) { products }
@@ -381,7 +381,7 @@ module AuthorizationHelper
       else
         let(:tokens) {
           [
-            create(:token, account:, bearer: create(:product, account:)),
+            create(:token, account:, bearer: create(:product, *product_traits, account:)),
             create(:token, account:, bearer: create(:license, *license_traits, account:)),
             create(:token, account:, bearer: create(:user, *user_traits, account:)),
           ]
@@ -1401,6 +1401,7 @@ module AuthorizationHelper
         let(:bearer_traits)      { [] }
         let(:token_traits)       { [] }
         let(:release_traits)     { [] }
+        let(:product_traits)     { [] }
         let(:policy_traits)      { [] }
         let(:license_traits)     { [] }
         let(:admin_traits)       { [] }
@@ -1420,6 +1421,7 @@ module AuthorizationHelper
         let(:bearer_traits)  { [] }
         let(:token_traits)   { [] }
         let(:release_traits) { [] }
+        let(:product_traits) { [] }
         let(:policy_traits)  { [] }
         let(:license_traits) { [] }
         let(:admin_traits)   { [] }
@@ -1668,6 +1670,20 @@ module AuthorizationHelper
     ##
     # with_release_trait defines a trait on the release context.
     def with_release_trait(trait, &) = with_release_traits(*trait, &)
+
+    ##
+    # with_product_traits defines traits on the product context.
+    def with_product_traits(traits, &)
+      context "with product #{traits} traits" do
+        let(:product_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_product_trait defines a trait on the product context.
+    def with_product_trait(trait, &) = with_product_traits(*trait, &)
 
     ##
     # with_policy_traits defines traits on the policy context.
