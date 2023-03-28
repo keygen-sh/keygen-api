@@ -1401,6 +1401,15 @@ module AuthorizationHelper
 
       let(:record) { arch }
     end
+
+    def searching(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:search_results) { create_list(:license, 3, account:) }
+      end
+
+      let(:record) { search_results }
+    end
   end
 
   ##
