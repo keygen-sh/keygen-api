@@ -8,7 +8,7 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'product' }
       record.all? { _1 in { bearer_type: ^(Product.name), bearer_id: ^(bearer.id) } |
@@ -29,7 +29,7 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     else
       record.bearer == bearer
@@ -45,9 +45,9 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' } if record.bearer == bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' } if record.bearer == bearer
       allow!
-    in role: { name: 'admin' | 'developer' } if record.bearer.user?
+    in role: { name: 'admin' | 'developer'  | 'environment' } if record.bearer.user?
       allow!
     in role: { name: 'user' } if record.bearer == bearer
       deny! 'user is banned' if
@@ -64,7 +64,7 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' } if record.bearer == bearer || record.bearer.user?
+    in role: { name: 'admin' | 'developer' | 'environment' } if record.bearer == bearer || record.bearer.user?
       allow!
     else
       record.bearer == bearer
@@ -76,7 +76,7 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       record.bearer == bearer
