@@ -10,6 +10,8 @@ class ReleasePolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
       relation.all
+    in role: { name: 'environment' } if relation.respond_to?(:for_environment)
+      relation.for_environment(bearer.id)
     in role: { name: 'product' } if relation.respond_to?(:for_product)
       relation.for_product(bearer.id)
     in role: { name: 'user' } if relation.respond_to?(:for_user)
@@ -37,7 +39,7 @@ class ReleasePolicy < ApplicationPolicy
       bearer.nil?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'product' } if record.all? { _1.product == bearer }
       allow!
@@ -97,7 +99,7 @@ class ReleasePolicy < ApplicationPolicy
       bearer.nil?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -134,7 +136,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -148,7 +150,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -162,7 +164,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -182,7 +184,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -196,7 +198,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -210,7 +212,7 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
