@@ -7,7 +7,8 @@
 NIL_ENVIRONMENT = Environment.new(id: nil, code: 'FOR_TEST_EYES_ONLY').freeze
 
 module EnvironmentHelper
-  CURRENT_ENVIRONMENT = Object.new
+  CURRENT_ENVIRONMENT = Class.new { def inspect = 'current' }
+                             .new
 
   module ClassMethods
     def within_environment(code = CURRENT_ENVIRONMENT, &)
