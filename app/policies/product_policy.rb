@@ -8,7 +8,7 @@ class ProductPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'user' } if record_ids & bearer.product_ids == record_ids
       allow!
@@ -26,7 +26,7 @@ class ProductPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'product' } if record == bearer
       allow!
@@ -44,7 +44,7 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
@@ -56,7 +56,7 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     in role: { name: 'product' } if record == bearer
       allow!
@@ -70,7 +70,7 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
