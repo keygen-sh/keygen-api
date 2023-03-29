@@ -104,6 +104,66 @@ describe Licenses::PolicyPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_a_license accessing_its_policy] do
+        with_token_authentication do
+          with_permissions %w[policy.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[license.policy.update] do
+            without_token_permissions { denies :update }
+
+            allows :update
+          end
+
+          with_wildcard_permissions do
+            allows :show, :update
+          end
+
+          with_default_permissions do
+            allows :show, :update
+          end
+
+          without_permissions do
+            denies :show, :update
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_license accessing_its_policy] do
+      with_token_authentication do
+        with_permissions %w[policy.read] do
+          without_token_permissions { denies :show }
+
+          denies :show
+        end
+
+        with_permissions %w[license.policy.update] do
+          without_token_permissions { denies :update }
+
+          denies :update
+        end
+
+        with_wildcard_permissions do
+          denies :show, :update
+        end
+
+        with_default_permissions do
+          denies :show, :update
+        end
+
+        without_permissions do
+          denies :show, :update
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_license accessing_its_policy] do
       with_token_authentication do
