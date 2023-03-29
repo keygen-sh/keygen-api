@@ -13,7 +13,7 @@ module Users
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
-      in role: { name: 'product' } if user.user?
+      in role: { name: 'product' | 'environment' } if user.user?
         allow!
       in role: { name: 'user' } if user == bearer
         allow!
@@ -31,7 +31,7 @@ module Users
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
-      in role: { name: 'product' } if user.user?
+      in role: { name: 'product' | 'environment' } if user.user?
         allow!
       in role: { name: 'user' } if user == bearer
         allow!
@@ -51,7 +51,7 @@ module Users
       case bearer
       in role: { name: 'admin' | 'developer' } if user == bearer || user.user?
         allow!
-      in role: { name: 'product' } if user.user?
+      in role: { name: 'product' | 'environment' } if user.user?
         allow!
       else
         deny!

@@ -11,7 +11,7 @@ module Users
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if user.user?
         record.all? { _1.product == bearer }
@@ -29,7 +29,7 @@ module Users
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if user.user?
         record.product == bearer
