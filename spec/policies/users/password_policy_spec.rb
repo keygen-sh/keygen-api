@@ -100,6 +100,42 @@ describe Users::PasswordPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment :current do
+      with_scenarios %i[accessing_a_user] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            denies :update, :reset
+          end
+
+          with_default_permissions do
+            denies :update, :reset
+          end
+
+          without_permissions do
+            denies :update, :reset
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_user] do
+      with_token_authentication do
+        with_wildcard_permissions do
+          denies :update, :reset
+        end
+
+        with_default_permissions do
+          denies :update, :reset
+        end
+
+        without_permissions do
+          denies :update, :reset
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_user] do
       with_token_authentication do

@@ -108,6 +108,82 @@ describe Users::MachinePolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment :current do
+      with_scenarios %i[accessing_a_user accessing_its_machines] do
+        with_token_authentication do
+          with_permissions %w[machine.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_user accessing_its_machine] do
+        with_token_authentication do
+          with_permissions %w[machine.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            allows :show
+          end
+
+          with_default_permissions do
+            allows :show
+          end
+
+          without_permissions do
+            denies :show
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_user accessing_its_machines] do
+      with_token_authentication do
+        with_permissions %w[machine.read] do
+          without_token_permissions { denies :index }
+
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_user accessing_its_machine] do
+      with_token_authentication do
+        with_permissions %w[machine.read] do
+          without_token_permissions { denies :show }
+
+          denies :show
+        end
+
+        with_wildcard_permissions do
+          denies :show
+        end
+
+        with_default_permissions do
+          denies :show
+        end
+
+        without_permissions do
+          denies :show
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_user accessing_its_machines] do
       with_token_authentication do

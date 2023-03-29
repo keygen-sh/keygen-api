@@ -248,6 +248,58 @@ describe Users::SecondFactorPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment :current do
+      with_scenarios %i[accessing_a_user accessing_its_second_factors] do
+        with_token_authentication do
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_user accessing_its_second_factor] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            denies :show, :create, :update, :destroy
+          end
+
+          with_default_permissions do
+            denies :show, :create, :update, :destroy
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_user accessing_its_second_factors] do
+      with_token_authentication do
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_user accessing_its_second_factor] do
+      with_token_authentication do
+        with_wildcard_permissions do
+          denies :show, :create, :update, :destroy
+        end
+
+        with_default_permissions do
+          denies :show, :create, :update, :destroy
+        end
+
+        without_permissions do
+          denies :show, :create, :update, :destroy
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_user accessing_its_second_factors] do
       with_token_authentication do
