@@ -11,7 +11,7 @@ module Licenses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if license.product == bearer
         allow!
@@ -27,7 +27,7 @@ module Licenses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if license.product == bearer
         allow!
@@ -41,7 +41,7 @@ module Licenses
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
         allow!
       in role: { name: 'product' } if license.product == bearer
         allow!
