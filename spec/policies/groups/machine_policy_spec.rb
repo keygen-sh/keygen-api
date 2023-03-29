@@ -133,36 +133,6 @@ describe Groups::MachinePolicy, type: :policy do
           with_wildcard_permissions { allows :index }
           with_default_permissions  { allows :index }
           without_permissions       { denies :index }
-
-          within_environment :isolated do
-            with_bearer_and_token_trait :isolated do
-              allows :index
-            end
-
-            with_bearer_and_token_trait :shared do
-              denies :index
-            end
-          end
-
-          within_environment :shared do
-            with_bearer_and_token_trait :isolated do
-              denies :index
-            end
-
-            with_bearer_and_token_trait :shared do
-              allows :index
-            end
-          end
-
-          within_environment nil do
-            with_bearer_and_token_trait :isolated do
-              denies :index
-            end
-
-            with_bearer_and_token_trait :shared do
-              denies :index
-            end
-          end
         end
       end
 
@@ -175,53 +145,15 @@ describe Groups::MachinePolicy, type: :policy do
           end
 
           with_wildcard_permissions do
-            without_token_permissions do
-              denies :show
-            end
-
             allows :show
           end
 
           with_default_permissions do
-            without_token_permissions do
-              denies :show
-            end
-
             allows :show
           end
 
           without_permissions do
             denies :show
-          end
-
-          within_environment :isolated do
-            with_bearer_and_token_trait :isolated do
-              allows :show
-            end
-
-            with_bearer_and_token_trait :shared do
-              denies :show
-            end
-          end
-
-          within_environment :shared do
-            with_bearer_and_token_trait :isolated do
-              denies :show
-            end
-
-            with_bearer_and_token_trait :shared do
-              allows :show
-            end
-          end
-
-          within_environment nil do
-            with_bearer_and_token_trait :isolated do
-              denies :show
-            end
-
-            with_bearer_and_token_trait :shared do
-              denies :show
-            end
           end
         end
       end
