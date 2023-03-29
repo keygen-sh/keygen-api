@@ -8,7 +8,7 @@ class WebhookEventPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' | 'environment' }
       allow!
     else
       deny!
@@ -22,7 +22,7 @@ class WebhookEventPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' | 'environment' }
       allow!
     else
       deny!
@@ -34,7 +34,7 @@ class WebhookEventPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
@@ -46,7 +46,7 @@ class WebhookEventPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: { name: 'admin' | 'developer' | 'environment' }
       allow!
     else
       deny!
