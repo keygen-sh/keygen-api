@@ -17,7 +17,7 @@ describe SearchPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment do
+    within_environment :current do
       with_scenarios %i[searching] do
         with_token_authentication do
           with_wildcard_permissions { denies :search }

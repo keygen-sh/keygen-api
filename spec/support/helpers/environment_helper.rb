@@ -7,17 +7,19 @@
 NIL_ENVIRONMENT = Environment.new(id: nil, code: 'FOR_TEST_EYES_ONLY').freeze
 
 module EnvironmentHelper
-  AUTHZ_ENVIRONMENT = Class.new { def inspect = '<bearer>' }
-                           .new.freeze
-
   module ClassMethods
-    def within_environment(code = AUTHZ_ENVIRONMENT, &)
+    def within_environment(code, &)
       context "when in the #{code.inspect} environment" do
-        unless code == AUTHZ_ENVIRONMENT
-          let(:environment) { code.nil? ? nil : create(:environment, code, account:) }
-        else
-          let(:environment) { bearer }
-        end
+        let(:environment) {
+          case code
+          in :current
+            bearer
+          in nil
+            nil
+          else
+            create(:environment, code, account:)
+          end
+        }
 
         before { Current.environment = environment }
         after  { Current.environment = nil }

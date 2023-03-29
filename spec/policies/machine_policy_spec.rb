@@ -197,7 +197,7 @@ describe MachinePolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment do
+    within_environment :current do
       with_scenarios %i[accessing_machines] do
         with_token_authentication do
           with_permissions %w[machine.read] do
