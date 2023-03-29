@@ -62,10 +62,11 @@ module Permissible
                             .actions
                             .uniq
 
-      return true if
-        actual.include?(Permission::WILDCARD_PERMISSION)
-
-      actual.size == expected.size
+      if actual.include?(Permission::WILDCARD_PERMISSION)
+        (allowed_permissions & expected).size == expected.size
+      else
+        actual.size == expected.size
+      end
     end
     alias_method :permissions?, :can?
 
