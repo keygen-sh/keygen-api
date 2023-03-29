@@ -12,7 +12,7 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' } if record.all?(&:user?)
+    in role: { name: 'product' | 'environment' } if record.all?(&:user?)
       allow!
     else
       deny!
@@ -28,7 +28,7 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' } if record.user?
+    in role: { name: 'product' | 'environment' } if record.user?
       allow!
     in role: { name: 'user' } if record == bearer
       allow!
@@ -47,7 +47,7 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' }
       allow!
-    in role: { name: 'product' } if record.user?
+    in role: { name: 'product' | 'environment' } if record.user?
       allow!
     in nil
       !account.protected?
@@ -64,7 +64,7 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' }
       allow!
-    in role: { name: 'product' } if record.user?
+    in role: { name: 'product' | 'environment' } if record.user?
       allow!
     in role: { name: 'user' } if record == bearer
       allow!
@@ -81,6 +81,8 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' }
       allow!
+    in role: { name: 'environment' } if record.user?
+      allow!
     else
       deny!
     end
@@ -92,6 +94,8 @@ class UserPolicy < ApplicationPolicy
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'environment' } if record.user?
       allow!
     else
       deny!
@@ -106,9 +110,7 @@ class UserPolicy < ApplicationPolicy
       record.user?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
-      allow!
-    in role: { name: 'product' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'product' | 'environment' }
       allow!
     else
       deny!
@@ -123,9 +125,7 @@ class UserPolicy < ApplicationPolicy
       record.user?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
-      allow!
-    in role: { name: 'product' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'product' | 'environment' }
       allow!
     else
       deny!
