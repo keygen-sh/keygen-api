@@ -130,6 +130,94 @@ describe Policies::PoolPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment :current do
+      with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
+        with_token_authentication do
+          with_permissions %w[key.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
+        with_token_authentication do
+          with_permissions %w[key.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[policy.pool.pop] do
+            without_token_permissions { denies :pop }
+
+            allows :pop
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :pop
+            end
+
+            allows :show, :pop
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :pop
+            end
+
+            allows :show, :pop
+          end
+
+          without_permissions do
+            denies :show, :pop
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
+      with_token_authentication do
+        with_permissions %w[key.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
+      with_token_authentication do
+        with_permissions %w[key.read] do
+          denies :show
+        end
+
+        with_permissions %w[policy.pool.pop] do
+          denies :pop
+        end
+
+        with_wildcard_permissions do
+          denies :show, :pop
+        end
+
+        with_default_permissions do
+          denies :show, :pop
+        end
+
+        without_permissions do
+          denies :show, :pop
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_policy accessing_its_pooled_keys] do
       with_token_authentication do
