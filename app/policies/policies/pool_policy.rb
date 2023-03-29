@@ -11,7 +11,7 @@ module Policies
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if policy.product == bearer
         record.all? { _1.product == bearer }
@@ -27,7 +27,7 @@ module Policies
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if policy.product == bearer
         record.product == bearer
@@ -41,7 +41,7 @@ module Policies
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: { name: 'admin' | 'developer' | 'environment' }
         allow!
       in role: { name: 'product' } if policy.product == bearer
         allow!
