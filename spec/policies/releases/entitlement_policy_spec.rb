@@ -121,7 +121,7 @@ describe Releases::EntitlementPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment :current do
+    within_environment :self do
       with_scenarios %i[accessing_a_release accessing_its_entitlements] do
         with_token_authentication do
           with_permissions %w[entitlement.read] do

@@ -163,7 +163,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment :current do
+    within_environment :self do
       with_license_traits %i[with_entitlements] do
         with_scenarios %i[accessing_a_license accessing_its_entitlements] do
           with_token_authentication do

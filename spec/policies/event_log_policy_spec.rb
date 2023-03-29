@@ -153,7 +153,7 @@ describe EventLogPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment :current do
+    within_environment :self do
       with_account_trait :std do
         with_scenarios %i[accessing_event_logs] do
           with_token_authentication do

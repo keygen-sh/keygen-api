@@ -164,7 +164,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
   with_role_authorization :environment do
     with_policy_traits %i[with_entitlements] do
-      within_environment :current do
+      within_environment :self do
         with_scenarios %i[accessing_a_policy accessing_its_entitlements] do
           with_token_authentication do
             with_permissions %w[entitlement.read] do
