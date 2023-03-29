@@ -24,8 +24,8 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account)     { create(:account, *account_traits) }
+        let(:environment) { nil }
         let(:bearer)      { create(:environment, *bearer_traits, account:, permissions: bearer_permissions) }
-        let(:environment) { bearer }
       end
     end
 
