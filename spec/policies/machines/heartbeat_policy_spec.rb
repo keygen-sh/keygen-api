@@ -104,6 +104,70 @@ describe Machines::HeartbeatPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_a_machine] do
+        with_token_authentication do
+          with_permissions %w[machine.heartbeat.ping] do
+            without_token_permissions { denies :ping }
+
+            allows :ping
+          end
+
+          with_permissions %w[machine.heartbeat.reset] do
+            without_token_permissions { denies :reset }
+
+            allows :reset
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :ping, :reset
+            end
+
+            allows :ping, :reset
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :ping, :reset
+            end
+
+            allows :ping, :reset
+          end
+
+          without_permissions do
+            denies :ping, :reset
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_machine] do
+      with_token_authentication do
+        with_permissions %w[machine.heartbeat.ping] do
+          denies :ping
+        end
+
+        with_permissions %w[machine.heartbeat.reset] do
+          denies :reset
+        end
+
+        with_wildcard_permissions do
+          denies :ping, :reset
+        end
+
+        with_default_permissions do
+          denies :ping, :reset
+        end
+
+        without_permissions do
+          denies :ping, :reset
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_machine] do
       with_token_authentication do
