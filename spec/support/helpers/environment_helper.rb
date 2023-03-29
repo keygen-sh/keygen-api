@@ -12,7 +12,7 @@ module EnvironmentHelper
       context "when in the #{code.inspect} environment" do
         let(:environment) {
           case code
-          in :current
+          in :self
             bearer
           in nil
             nil

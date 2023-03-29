@@ -105,7 +105,7 @@ describe Licenses::PolicyPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment :current do
+    within_environment :self do
       with_scenarios %i[accessing_a_license accessing_its_policy] do
         with_token_authentication do
           with_permissions %w[policy.read] do
