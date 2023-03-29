@@ -11,7 +11,7 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
         allow!
       in role: { name: 'user' } if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
         allow!
@@ -29,7 +29,7 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
         allow!
       in role: { name: 'user' } if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
         allow!
@@ -45,7 +45,7 @@ module Groups
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'product' }
+      in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
         allow!
       else
         deny!
@@ -57,7 +57,7 @@ module Groups
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'product' }
+      in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
         allow!
       else
         deny!

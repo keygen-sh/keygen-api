@@ -196,7 +196,7 @@ describe KeyPolicy, type: :policy do
           with_default_permissions  { allows :index }
           without_permissions       { denies :index }
 
-           within_environment :isolated do
+          within_environment :isolated do
             with_bearer_and_token_trait :isolated do
               allows :index
             end
