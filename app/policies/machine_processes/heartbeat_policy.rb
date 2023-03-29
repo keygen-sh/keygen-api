@@ -9,7 +9,7 @@ module MachineProcesses
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: { name: 'admin' | 'developer' | 'environment' }
         allow!
       in role: { name: 'product' } if machine_process.product == bearer
         allow!

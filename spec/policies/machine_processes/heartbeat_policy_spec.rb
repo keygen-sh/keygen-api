@@ -94,6 +94,60 @@ describe MachineProcesses::HeartbeatPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_a_machine_process] do
+        with_token_authentication do
+          with_permissions %w[process.heartbeat.ping] do
+            without_token_permissions { denies :ping }
+
+            allows :ping
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :ping
+            end
+
+            allows :ping
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :ping
+            end
+
+            allows :ping
+          end
+
+          without_permissions do
+            denies :ping
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_machine_process] do
+      with_token_authentication do
+        with_permissions %w[process.heartbeat.ping] do
+          denies :ping
+        end
+
+        with_wildcard_permissions do
+          denies :ping
+        end
+
+        with_default_permissions do
+          denies :ping
+        end
+
+        without_permissions do
+          denies :ping
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_machine_process] do
       with_token_authentication do
