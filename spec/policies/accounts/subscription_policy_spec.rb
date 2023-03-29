@@ -64,6 +64,34 @@ describe Accounts::SubscriptionPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_its_account] do
+        with_token_authentication do
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :manage, :pause, :resume, :cancel, :renew
+            end
+
+            denies :manage, :pause, :resume, :cancel, :renew
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :manage, :pause, :resume, :cancel, :renew
+            end
+
+            denies :manage, :pause, :resume, :cancel, :renew
+          end
+
+          without_permissions do
+            denies :manage, :pause, :resume, :cancel, :renew
+          end
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_account] do
       with_token_authentication do
