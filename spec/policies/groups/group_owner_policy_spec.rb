@@ -173,7 +173,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    within_environment :current do
+    within_environment :self do
       with_scenarios %i[accessing_a_group accessing_its_owners] do
         with_token_authentication do
           with_permissions %w[group.owners.read] do
