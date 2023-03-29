@@ -210,6 +210,52 @@ describe Licenses::EntitlementPolicy, type: :policy do
         end
       end
     end
+
+    with_license_traits %i[with_entitlements] do
+      with_scenarios %i[accessing_a_license accessing_its_entitlements] do
+        with_token_authentication do
+          with_permissions %w[entitlement.read] do
+            without_token_permissions { denies :index }
+
+            denies :index
+          end
+
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_license accessing_its_entitlement] do
+        with_token_authentication do
+          with_permissions %w[entitlement.read] do
+            without_token_permissions { denies :show }
+
+            denies :show
+          end
+
+          with_permissions %w[license.entitlements.attach] do
+            denies :attach
+          end
+
+          with_permissions %w[license.entitlements.detach] do
+            denies :detach
+          end
+
+          with_wildcard_permissions do
+            denies :show, :attach, :detach
+          end
+
+          with_default_permissions do
+            denies :show, :attach, :detach
+          end
+
+          without_permissions do
+            denies :show, :attach, :detach
+          end
+        end
+      end
+    end
   end
 
   with_role_authorization :product do
