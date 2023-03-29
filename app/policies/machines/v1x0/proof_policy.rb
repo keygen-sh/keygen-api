@@ -6,6 +6,7 @@ module Machines::V1x0
 
     def create?
       verify_permissions!('machine.proofs.generate')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
