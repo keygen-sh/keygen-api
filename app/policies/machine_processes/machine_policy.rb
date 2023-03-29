@@ -11,7 +11,7 @@ module MachineProcesses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if machine_process.product == bearer
         allow!
