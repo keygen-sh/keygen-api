@@ -9,7 +9,7 @@ module Machines
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: { name: 'admin' | 'developer' | 'environment' }
         allow!
       in role: { name: 'product' } if machine.product == bearer
         allow!
@@ -27,7 +27,7 @@ module Machines
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
         allow!
       in role: { name: 'product' } if machine.product == bearer
         allow!

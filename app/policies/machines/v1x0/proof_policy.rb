@@ -8,7 +8,7 @@ module Machines::V1x0
       verify_permissions!('machine.proofs.generate')
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
         allow!
       in role: { name: 'product' } if machine.product == bearer
         allow!
