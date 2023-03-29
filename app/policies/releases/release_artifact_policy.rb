@@ -13,7 +13,7 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if release.product == bearer
         allow!
@@ -33,7 +33,7 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
         allow!
       in role: { name: 'product' } if release.product == bearer
         allow!
