@@ -166,6 +166,76 @@ describe Products::TokenPolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment :current do
+      with_scenarios %i[accessing_a_product accessing_its_tokens] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_product accessing_its_token] do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            denies :create
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :create
+            allows :show
+          end
+
+          without_permissions do
+            denies :show, :create
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_product accessing_its_tokens] do
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_product accessing_its_token] do
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          denies :show
+        end
+
+        with_wildcard_permissions do
+          denies :show, :create
+        end
+
+        with_default_permissions do
+          denies :show, :create
+        end
+
+        without_permissions do
+          denies :show, :create
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_itself accessing_its_tokens] do
       with_token_authentication do
