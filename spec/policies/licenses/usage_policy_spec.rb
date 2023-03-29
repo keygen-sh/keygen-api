@@ -114,6 +114,80 @@ describe Licenses::UsagePolicy, type: :policy do
     end
   end
 
+  with_role_authorization :environment do
+    within_environment do
+      with_scenarios %i[accessing_a_license] do
+        with_token_authentication do
+          with_permissions %w[license.usage.increment] do
+            without_token_permissions { denies :increment }
+
+            allows :increment
+          end
+
+          with_permissions %w[license.usage.decrement] do
+            without_token_permissions { denies :decrement }
+
+            allows :decrement
+          end
+
+          with_permissions %w[license.usage.reset] do
+            without_token_permissions { denies :reset }
+
+            allows :reset
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :increment, :decrement, :reset
+            end
+
+            allows :increment, :decrement, :reset
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :increment, :decrement, :reset
+            end
+
+            allows :increment, :decrement, :reset
+          end
+
+          without_permissions do
+            denies :increment, :decrement, :reset
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_license] do
+      with_token_authentication do
+        with_permissions %w[license.usage.increment] do
+          denies :increment
+        end
+
+        with_permissions %w[license.usage.decrement] do
+          denies :decrement
+        end
+
+        with_permissions %w[license.usage.reset] do
+          denies :reset
+        end
+
+        with_wildcard_permissions do
+          denies :increment, :decrement, :reset
+        end
+
+        with_default_permissions do
+          denies :increment, :decrement, :reset
+        end
+
+        without_permissions do
+          denies :increment, :decrement, :reset
+        end
+      end
+    end
+  end
+
   with_role_authorization :product do
     with_scenarios %i[accessing_its_license] do
       with_token_authentication do
