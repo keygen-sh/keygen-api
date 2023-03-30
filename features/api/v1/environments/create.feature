@@ -220,6 +220,32 @@ Feature: Create environments
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Environment attempts to create an environment for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environment",
+          "attributes": {
+            "name": "Other",
+            "code": "other"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create an environment for their account
     Given the current account is "test1"
     And the current account has 1 "product"

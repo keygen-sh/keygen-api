@@ -162,6 +162,19 @@ Feature: List environments
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  Scenario: Environment attempts to retrieve all environments
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/environments"
+    Then the response status should be "403"
+
   Scenario: Product attempts to retrieve all environments (no environment)
     Given the current account is "test1"
     And the current account has 3 "environments"

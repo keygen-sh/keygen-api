@@ -235,6 +235,59 @@ Feature: Update environments
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Environment attempts to updates itself
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/environments/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "name": "Staging"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Environment attempts to update an environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/environments/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "name": "Staging"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to update an environment
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

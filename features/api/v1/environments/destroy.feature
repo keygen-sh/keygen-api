@@ -100,6 +100,22 @@ Feature: Delete environments
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Environment attempts to delete an environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environments"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/environments/$0"
+    Then the response status should be "403"
+    And the current account should have 1 "environment"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to delete an environment
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
