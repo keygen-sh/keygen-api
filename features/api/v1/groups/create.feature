@@ -206,6 +206,49 @@ Feature: Create groups
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment attempts to create a group for their environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/groups" with the following:
+      """
+      {
+        "data": {
+          "type": "group",
+          "attributes": {
+            "name": "Isolated Group"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "group" with the following attributes:
+      """
+      { "name": "Isolated Group" }
+      """
+    And the JSON response should be a "group" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create a group for their account
     Given the current account is "test1"
     And the current account has 1 "product"
