@@ -441,7 +441,6 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uniform_notifier (1.16.0)
-    uri (0.12.1)
     webmock (3.14.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -519,12 +518,11 @@ DEPENDENCIES
   stripe-ruby-mock!
   timecop (~> 0.9.5)
   tracer
-  uri (>= 0.12.1)
   webmock (~> 3.14.0)
   whacamole
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.2.2p53
 
 BUNDLED WITH
    2.4.1
