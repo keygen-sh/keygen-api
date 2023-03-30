@@ -90,6 +90,50 @@ Feature: Show entitlement
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ce
+  Scenario: Environment retrieves an entitlement (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "entitlement"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Environment retrieves an entitlement (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "entitlement"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "entitlement"
+
+  @ee
+  Scenario: Environment retrieves an entitlement (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "entitlement"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "entitlement"
+
   Scenario: Product retrieves an entitlement
     Given the current account is "test1"
     And the current account has 3 "entitlements"

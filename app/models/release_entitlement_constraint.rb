@@ -26,6 +26,8 @@ class ReleaseEntitlementConstraint < ApplicationRecord
     case accessor
     in role: { name: 'admin' }
       self.all
+    in role: { name: 'environment' }
+      self.for_environment(accessor.id)
     in role: { name: 'product' }
       self.for_product(accessor.id)
     in role: { name: 'license' }
