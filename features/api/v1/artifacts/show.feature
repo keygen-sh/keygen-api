@@ -123,6 +123,50 @@ Feature: Show release artifact
       }
       """
 
+  @ce
+  Scenario: Environment retrieves an artifact (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Environment retrieves an artifact (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+
+  @ee
+  Scenario: Environment retrieves an arch (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+
   Scenario: Product retrieves an artifact for their product
     Given the current account is "test1"
     And the current account has 1 "product"

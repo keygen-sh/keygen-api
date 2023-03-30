@@ -1072,6 +1072,443 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ce
+  Scenario: Environment creates an isolated artifact (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an isolated artifact (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "filename": "App-Setup-1-0-0.exe",
+        "filetype": "exe",
+        "filesize": 512,
+        "platform": "win32",
+        "arch": "amd64",
+        "status": "WAITING"
+      }
+      """
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a shared artifact (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[1]"
+              }
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an global artifact (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a shared artifact (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "filename": "App-Setup-1-0-0.exe",
+        "filetype": "exe",
+        "filesize": 512,
+        "platform": "win32",
+        "arch": "amd64",
+        "status": "WAITING"
+      }
+      """
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an isolated artifact (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[1]"
+              }
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an global artifact (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an global artifact (in nil environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            },
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

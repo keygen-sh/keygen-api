@@ -449,6 +449,88 @@ Feature: Update artifact
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an artifact (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
+            "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
+        "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates an artifact (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
+            "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
+        "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

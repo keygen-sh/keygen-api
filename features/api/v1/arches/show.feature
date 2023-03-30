@@ -26,7 +26,7 @@ Feature: Show release arch
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the JSON response should be an "arch"
 
   Scenario: Developer retrieves an arch for their account
     Given the current account is "test1"
@@ -84,11 +84,11 @@ Feature: Show release arch
       """
 
   @ce
-  Scenario: Product retrieves an arch for their product (isolated)
+  Scenario: Environment retrieves an arch (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "artifact"
-    And I am a product of account "test1"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -98,11 +98,11 @@ Feature: Show release arch
     Then the response status should be "400"
 
   @ee
-  Scenario: Product retrieves an arch for their product (isolated)
+  Scenario: Environment retrieves an arch (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "artifact"
-    And I am a product of account "test1"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -110,14 +110,14 @@ Feature: Show release arch
       """
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the JSON response should be an "arch"
 
   @ee
-  Scenario: Product retrieves an arch for their product (shared)
+  Scenario: Environment retrieves an arch (shared)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "artifact"
-    And I am a product of account "test1"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -125,7 +125,7 @@ Feature: Show release arch
       """
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the JSON response should be an "arch"
 
   Scenario: Product retrieves an arch for their product
     Given the current account is "test1"
@@ -137,7 +137,7 @@ Feature: Show release arch
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the JSON response should be an "arch"
 
   Scenario: Product retrieves an arch for another product
     Given the current account is "test1"
