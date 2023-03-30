@@ -114,6 +114,44 @@ Feature: Delete artifact
     When I send a DELETE request to "/accounts/test1/artifacts/$1"
     Then the response status should be "403"
 
+  @ee
+  Scenario: Environment deletes an artifact (isolated)
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "artifacts"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "204"
+    And the current account should have 2 "artifacts"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment deletes an artifact (shared)
+    Given the current account is "test1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 3 shared "artifacts"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "204"
+    And the current account should have 2 "artifacts"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product deletes one of their artifacts
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
