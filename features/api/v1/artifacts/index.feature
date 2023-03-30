@@ -265,6 +265,15 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "artifacts"
+    And the JSON response should be an array of 10 "artifacts" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/e24-351d-47d0-b3c3-2c576a63d22f" },
+          "data": { "type": "environments", "id": "e24-351d-47d0-b3c3-2c576a63d22f" }
+        }
+      }
+      """
 
   @ee
   Scenario: Environment retrieves their release artifacts (shared)
@@ -332,6 +341,15 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "artifact"
+    And the JSON response should be an array of 1 "artifact" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/60e7f35f-5401-4cc2-abd3-999b2a758ee1" },
+          "data": { "type": "environments", "id": "60e7f35f-5401-4cc2-abd3-999b2a758ee1" }
+        }
+      }
+      """
 
   @ee
   Scenario: Environment retrieves their release artifacts (global)
