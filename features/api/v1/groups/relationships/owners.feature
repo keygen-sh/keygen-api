@@ -27,6 +27,22 @@ Feature: Group owners relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "group-owners"
 
+  @ee
+  Scenario: Environment retrieves the owners of a group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "groups"
+    And the current account has 2 isolated "group-owners" for the first "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/groups/$0/owners"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "group-owners"
+
   Scenario: Product retrieves the owners of a group
     Given the current account is "test1"
     And the current account has 1 "product"
