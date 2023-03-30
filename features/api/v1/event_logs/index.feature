@@ -236,6 +236,74 @@ Feature: List event logs
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  Scenario: Environment retrieves all logs for their environment (in isolated environment)
+    Given the current account is "ent"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "event-logs"
+    And the current account has 3 shared "event-logs"
+    And the current account has 3 global "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs"
+    Then the response status should be "200"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "event-logs"
+    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  Scenario: Environment retrieves all logs for their environment (in shared environment)
+    Given the current account is "ent"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "event-logs"
+    And the current account has 3 shared "event-logs"
+    And the current account has 3 global "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "event-logs"
+    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
   Scenario: Product attempts to retrieve all logs for their account
     Given the current account is "ent"
     And the current account has 1 "product"
