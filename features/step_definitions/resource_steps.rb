@@ -82,11 +82,11 @@ Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |id, resource
   account.plan.update! "max_#{resource.pluralize.underscore}" => limit.to_i
 end
 
-Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
+Given /^the account "([^\"]*)" has (\d+) (?:(\w+) )?"([^\"]*)"$/ do |id, count, trait, resource|
   account = FindByAliasService.call(Account, id:, aliases: :slug)
 
   count.to_i.times do
-    create resource.singularize.underscore, account: account
+    create resource.singularize.underscore, trait, account: account
   end
 end
 

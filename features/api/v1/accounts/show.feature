@@ -63,6 +63,66 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
 
+  @ce
+  Scenario: Environment retrieves their account (isolated)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment retrieves their account (isolated)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment retrieves their account (shared)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment retrieves their account (global)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "401"
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Product retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
     And I use an authentication token
