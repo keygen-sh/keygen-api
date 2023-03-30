@@ -73,6 +73,87 @@ Feature: Show event logs
     Then the response status should be "404"
     And the JSON response should be an array of 1 error
 
+  Scenario: Environment attempts to retrieve a log for an isolated environment (in isolated environment)
+    Given the current account is "ent"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "event-log"
+
+  Scenario: Environment attempts to retrieve a log for a shared environment (in isolated environment)
+    Given the current account is "ent"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 shared "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "404"
+
+  Scenario: Environment attempts to retrieve a log for a global environment (in isolated environment)
+    Given the current account is "ent"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 global "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "404"
+
+  Scenario: Environment attempts to retrieve a log for an isolated environment (in shared environment)
+    Given the current account is "ent"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "404"
+
+  Scenario: Environment attempts to retrieve a log for a shared environment (in shared environment)
+    Given the current account is "ent"
+    And the current account has 1 shared "environment"
+    And the current account has 3 shared "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "event-log"
+
+  Scenario: Environment attempts to retrieve a log for a global environment (in shared environment)
+    Given the current account is "ent"
+    And the current account has 1 shared "environment"
+    And the current account has 3 global "event-logs"
+    And I am an environment of account "ent"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/ent/event-logs/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "event-log"
+
   Scenario: License attempts to retrieve a log for their account
     Given the current account is "ent"
     And the current account has 1 "license"
