@@ -91,7 +91,7 @@ Feature: Show group
     And the JSON response should be an array of 1 error
 
   @ce
-  Scenario: Environment retrieves an group (isolated)
+  Scenario: Environment retrieves a group (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "group"
@@ -105,7 +105,7 @@ Feature: Show group
     Then the response status should be "400"
 
   @ee
-  Scenario: Environment retrieves an group (isolated)
+  Scenario: Environment retrieves a group (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "group"
@@ -120,7 +120,7 @@ Feature: Show group
     And the JSON response should be an "group"
 
   @ee
-  Scenario: Environment retrieves an group (shared)
+  Scenario: Environment retrieves a group (shared)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "group"
