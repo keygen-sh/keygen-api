@@ -70,6 +70,29 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/manage-subscription"
     Then the response status should be "403"
 
+  @ee
+  Scenario: Environment attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
+  Scenario: Product attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

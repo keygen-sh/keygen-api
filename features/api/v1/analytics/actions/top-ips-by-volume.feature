@@ -67,6 +67,31 @@ Feature: Analytics of top IPs by volume
       """
     And sidekiq should have 0 "request-log" jobs
 
+  @ee
+  Scenario: Environment attempts to retrieve analytic counts for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Product attempts to retrieve analytic counts for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: User attempts to retrieve analytics for their account
     Given the current account is "test1"
     And the current account has 1 "user"
