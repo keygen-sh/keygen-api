@@ -138,6 +138,35 @@ Feature: Update key
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates a key for their environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "key"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "shrd_b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "key" with the key "shrd_b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates a key for their product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
