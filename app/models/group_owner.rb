@@ -20,6 +20,8 @@ class GroupOwner < ApplicationRecord
     case accessor
     in role: { name: 'admin' | 'product' }
       self.all
+    in role: { name: 'environment' }
+      self.for_environment(accessor.id)
     in role: { name: 'user' }
       self.where(group_id: accessor.group_id)
           .or(

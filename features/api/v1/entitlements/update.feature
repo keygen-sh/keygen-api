@@ -211,6 +211,110 @@ Feature: Update entitlements
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an isolated entitlement (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 2 isolated "entitlements"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/entitlements/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Isolated Entitlement"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      { "name": "Isolated Entitlement" }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a shared entitlement (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 2 shared "entitlements"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/entitlements/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Shared Entitlement"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      { "name": "Shared Entitlement" }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a global entitlement (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "entitlement"
+    And the current account has 1 global "entitlement"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/entitlements/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Global Entitlement"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to update an entitlement
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

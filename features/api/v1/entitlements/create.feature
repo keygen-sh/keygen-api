@@ -163,6 +163,665 @@ Feature: Create entitlements
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Admin creates an entitlement for an isolated environment (from isolated environment, implicit)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Isolated Entitlement",
+            "code": "ISOLATED_ENTITLEMENT"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Isolated Entitlement",
+        "code": "ISOLATED_ENTITLEMENT"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for an isolated environment (from isolated environment, explicit)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Isolated Entitlement",
+            "code": "ISOLATED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Isolated Entitlement",
+        "code": "ISOLATED_ENTITLEMENT"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for a shared environment (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Shared Entitlement",
+            "code": "SHARED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for the nil environment (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Global Entitlement",
+            "code": "GLOBAL_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for an isolated environment (from shared environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Isolated Entitlement",
+            "code": "ISOLATED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for a shared environment (in shared environment, implicit)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Shared Entitlement",
+            "code": "SHARED_ENTITLEMENT"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Shared Entitlement",
+        "code": "SHARED_ENTITLEMENT"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for a shared environment (in shared environment, explicit)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Shared Entitlement",
+            "code": "SHARED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Shared Entitlement",
+        "code": "SHARED_ENTITLEMENT"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for the nil environment (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Global Entitlement",
+            "code": "GLOBAL_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for an isolated environment (from nil environment)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 isolated "environment"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Isolated Entitlement",
+            "code": "ISOLATED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for a shared environment (in nil environment)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 shared "environment"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Shared Entitlement",
+            "code": "SHARED_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin creates an entitlement for the nil environment (in nil environment)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 isolated "environment"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "attributes": {
+            "name": "Global Entitlement",
+            "code": "GLOBAL_ENTITLEMENT"
+          },
+          "relationships": {
+            "environment": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Global Entitlement",
+        "code": "GLOBAL_ENTITLEMENT"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an entitlement (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlement",
+          "attributes": {
+            "name": "Isolated Feature",
+            "code": "ISOLATED_FEATURE"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Isolated Feature",
+        "code": "ISOLATED_FEATURE"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an entitlement (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlement",
+          "attributes": {
+            "name": "Shared Feature",
+            "code": "SHARED_FEATURE"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Shared Feature",
+        "code": "SHARED_FEATURE"
+      }
+      """
+    And the JSON response should be an "entitlement" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates an entitlement (global)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlement",
+          "attributes": {
+            "name": "Global Feature",
+            "code": "GLOBAL_FEATURE"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create an entitlement for their account
     Given the current account is "test1"
     And the current account has 1 "product"
