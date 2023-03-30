@@ -28,6 +28,22 @@ Feature: Key product relationship
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment retrieves the product for a key
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "keys"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/keys/$0/product"
+    Then the response status should be "200"
+    And the JSON response should be a "product"
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product retrieves the product for a key
     Given the current account is "test1"
     And the current account has 3 "keys"

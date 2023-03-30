@@ -44,6 +44,50 @@ Feature: Show key
       """
     And sidekiq should have 1 "request-log" job
 
+  @ce
+  Scenario: Environment retrieves a key (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "key"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/keys/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Environment retrieves a key (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "key"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/keys/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "key"
+
+  @ee
+  Scenario: Environment retrieves a key (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "key"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/keys/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "key"
+
   Scenario: Product retrieves a key for their product
     Given the current account is "test1"
     And the current account has 1 "product"
