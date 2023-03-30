@@ -42,6 +42,23 @@ Feature: Group users relationship
     When I send a GET request to "/accounts/test1/groups/770e6d1e-e102-4492-bafa-0dd3c886fe93/users"
     Then the response status should be "404"
 
+  @ee
+  Scenario: Environment retrieves all users for a group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "groups"
+    And the current account has 5 isolated "users" for the first "group"
+    And the current account has 2 isolated "users" for the second "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/groups/$0/users"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "users"
+
   Scenario: Product retrieves all users for a group (not associated)
     Given the current account is "test1"
     And the current account has 2 "groups"

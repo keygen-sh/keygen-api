@@ -90,6 +90,50 @@ Feature: Show group
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ce
+  Scenario: Environment retrieves an group (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Environment retrieves an group (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "group"
+
+  @ee
+  Scenario: Environment retrieves an group (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "group"
+
   Scenario: Product retrieves a group
     Given the current account is "test1"
     And the current account has 3 "groups"

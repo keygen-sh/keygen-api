@@ -136,6 +136,25 @@ Feature: Delete groups
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment attempts to delete a group
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 2 isolated "groups"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/groups/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "group"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to delete a group
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
