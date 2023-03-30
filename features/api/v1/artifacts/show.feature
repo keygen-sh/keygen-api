@@ -153,7 +153,7 @@ Feature: Show release artifact
     And the JSON response should be an "artifact"
 
   @ee
-  Scenario: Environment retrieves an arch (shared)
+  Scenario: Environment retrieves an artifact (shared)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "artifact"
