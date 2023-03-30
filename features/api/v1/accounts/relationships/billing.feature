@@ -66,6 +66,58 @@ Feature: Account billing relationship
     Then the response status should be "403"
     And sidekiq should have 0 "request-log" jobs
 
+  @ce
+  Scenario: Environment attempts to retrieve the billing info for their account (isolated)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should be "400"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to retrieve the billing info for their account (isolated)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should be "403"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to retrieve the billing info for their account (shared)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should be "403"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to retrieve the billing info for their account (global)
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should be "401"
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Product attempts to retrieve the billing info for their account
     Given the account "test1" is subscribed
     And the account "test1" has 1 "product"

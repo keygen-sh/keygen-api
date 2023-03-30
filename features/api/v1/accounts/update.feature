@@ -189,6 +189,127 @@ Feature: Update account
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @ce
+  Scenario: Environment attempts to update an account (isolated)
+    Given the account "test1" has 1 isolated "environment"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "hax"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to update an account (isolated)
+    Given the account "test1" has 1 isolated "environment"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "hax"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to update an account (shared)
+    Given the account "test1" has 1 shared "environment"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "hax"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Environment attempts to update an account (global)
+    Given the account "test1" has 1 isolated "environment"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "hax"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Product attempts to update an account
+    Given the account "test1" has 1 "product"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "hax"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: User attempts to update an account
     Given the account "test1" has 1 "user"
     And the account "test1" has 1 "webhook-endpoint"
