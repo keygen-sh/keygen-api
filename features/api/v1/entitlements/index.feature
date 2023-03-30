@@ -217,3 +217,72 @@ Feature: List entitlements
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "entitlements"
+
+  @ee
+  Scenario: Environment retrieves all isolated entitlements (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "entitlements"
+    And the current account has 3 shared "entitlements"
+    And the current account has 3 global "entitlements"
+    And I am the first environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "entitlements"
+    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Environment retrieves all shared entitlements (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "entitlements"
+    And the current account has 3 shared "entitlements"
+    And the current account has 3 global "entitlements"
+    And I am the first environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "entitlements"
+    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """

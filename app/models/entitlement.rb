@@ -25,6 +25,8 @@ class Entitlement < ApplicationRecord
     case accessor
     in role: { name: 'admin' | 'product' }
       self.all
+    in role: { name: 'environment' }
+      self.for_environment(accessor)
     in role: { name: 'user' | 'license' }
       self.merge(accessor.entitlements)
     else
