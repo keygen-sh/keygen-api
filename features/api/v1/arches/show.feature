@@ -18,7 +18,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves a arch for their account
+  Scenario: Admin retrieves an arch for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
@@ -28,7 +28,7 @@ Feature: Show release arch
     Then the response status should be "200"
     And the JSON response should be a "arch"
 
-  Scenario: Developer retrieves a arch for their account
+  Scenario: Developer retrieves an arch for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
     And I am a developer of account "test1"
@@ -38,7 +38,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: Sales retrieves a arch for their account
+  Scenario: Sales retrieves an arch for their account
     Given the current account is "test1"
     And the current account has 1 "sales-agent"
     And I am a sales agent of account "test1"
@@ -48,7 +48,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: Support retrieves a arch for their account
+  Scenario: Support retrieves an arch for their account
     Given the current account is "test1"
     And the current account has 1 "support-agent"
     And I am a support agent of account "test1"
@@ -58,7 +58,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: Read-only retrieves a arch for their account
+  Scenario: Read-only retrieves an arch for their account
     Given the current account is "test1"
     And the current account has 1 "read-only"
     And I am a read only of account "test1"
@@ -83,7 +83,51 @@ Feature: Show release arch
       }
       """
 
-  Scenario: Product retrieves a arch for their product
+  @ce
+  Scenario: Product retrieves an arch for their product (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/arches/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Product retrieves an arch for their product (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/arches/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "arch"
+
+  @ee
+  Scenario: Product retrieves an arch for their product (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "artifact"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/arches/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "arch"
+
+  Scenario: Product retrieves an arch for their product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
@@ -95,7 +139,7 @@ Feature: Show release arch
     Then the response status should be "200"
     And the JSON response should be a "arch"
 
-  Scenario: Product retrieves a arch for another product
+  Scenario: Product retrieves an arch for another product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release"
@@ -105,7 +149,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "404"
 
-  Scenario: User retrieves a arch without a license for it
+  Scenario: User retrieves an arch without a license for it
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "release"
@@ -115,7 +159,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "404"
 
-  Scenario: User retrieves a arch with a license for it
+  Scenario: User retrieves an arch with a license for it
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -129,7 +173,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: License retrieves a arch of a different product
+  Scenario: License retrieves an arch of a different product
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "release"
@@ -139,7 +183,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "404"
 
-  Scenario: License retrieves a arch of their product
+  Scenario: License retrieves an arch of their product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
@@ -151,14 +195,14 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: Anonymous retrieves a arch
+  Scenario: Anonymous retrieves an arch
     Given the current account is "test1"
     And the current account has 1 "release"
     And the current account has 1 "artifact" for the last "release"
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "404"
 
-  Scenario: Admin attempts to retrieve a arch for another account
+  Scenario: Admin attempts to retrieve an arch for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
     And the account "test1" has 3 "releases"
@@ -168,7 +212,7 @@ Feature: Show release arch
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: Anonymous attempts to retrieves a arch for an account (LICENSED distribution strategy)
+  Scenario: Anonymous attempts to retrieves an arch for an account (LICENSED distribution strategy)
    Given the current account is "test1"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
@@ -180,7 +224,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "404"
 
-  Scenario: Anonymous attempts to retrieves a arch for an account (OPEN distribution strategy)
+  Scenario: Anonymous attempts to retrieves an arch for an account (OPEN distribution strategy)
    Given the current account is "test1"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
@@ -192,7 +236,7 @@ Feature: Show release arch
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
 
-  Scenario: Anonymous attempts to retrieves a arch for an account (CLOSED distribution strategy)
+  Scenario: Anonymous attempts to retrieves an arch for an account (CLOSED distribution strategy)
    Given the current account is "test1"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
