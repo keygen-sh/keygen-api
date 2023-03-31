@@ -82,9 +82,9 @@ Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |id, resource
   account.plan.update! "max_#{resource.pluralize.underscore}" => limit.to_i
 end
 
-Given /^the account "([^\"]*)" has (\d+) (?:([\w+,\s]+) )?"([^\"]*)"$/ do |id, count, traits, resource|
+Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |id, count, traits, resource|
   account = FindByAliasService.call(Account, id:, aliases: :slug)
-  traits  = traits&.split(/,\s*/)&.map(&:to_sym)
+  traits  = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
     create resource.singularize.underscore, *traits, account: account
@@ -105,19 +105,19 @@ Given /^the current account has the following attributes:$/ do |body|
   @account.update!(attributes)
 end
 
-Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)"$/ do |count, traits, resource|
-  traits = traits&.split(/,\s*/)&.map(&:to_sym)
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |count, traits, resource|
+  traits = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
     create resource.singularize.underscore, *traits, account: @account
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" with the following:$/ do |count, traits, resource, body|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following:$/ do |count, traits, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
-  traits = traits&.split(/,\s*/)&.map(&:to_sym)
+  traits = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
     create resource.singularize.underscore, *traits, **attrs, account: @account
@@ -163,19 +163,19 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" (?:for|in)(?: an)? existing "([^\"]*)"$/ do |count, traits, resource, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in)(?: an)? existing "([^\"]*)"$/ do |count, traits, resource, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).all.sample
     association_name  = association.singularize.underscore.to_sym
-    traits            = traits&.split(/,\s*/)&.map(&:to_sym)
+    traits            = traits&.split('+')&.map(&:to_sym)
 
     create resource.singularize.underscore, *traits, account: @account, association_name => associated_record
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" (?:for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
   associated_records = @account.send(association.pluralize.underscore)
-  traits             = traits&.split(/,\s*/)&.map(&:to_sym)
+  traits             = traits&.split()&.map(&:to_sym)
 
   if associated_records.respond_to?(:for_environment)
     associated_records = case traits
@@ -209,7 +209,7 @@ Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" (?:for|in) (?:
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
     association_name  =
@@ -219,7 +219,7 @@ Given /^the current account has (\d+) (?:([\w+,\s]+) )?"([^\"]*)" (?:for|in) the
       else
         association.singularize.underscore.to_sym
       end
-    traits = traits&.split(/,\s*/)&.map(&:to_sym)
+    traits = traits&.split('+')&.map(&:to_sym)
 
     create resource.singularize.underscore, *traits, account: @account, association_name => associated_record
   end
