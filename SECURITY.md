@@ -1,50 +1,41 @@
-# Security policy
+Thanks for helping make Keygen safe for everyone.
 
-Contact: security@keygen.sh
+# Security
 
-At Keygen, we consider the security of our systems a top priority. But
-no matter how much effort we put into system security, there can still
-be vulnerabilities present. If you find one, please let us know.
+We take the security of Keygen seriously.
 
-## Reporting security issues
+We will ensure that your finding gets passed along to the appropriate maintainers for remediation.
 
-If you think you have found a security vulnerability, please send a report
-to security@keygen.sh. This address can be used for all of Keygen's open
-source and commercial products (including but not limited to Keygen CE,
-Keygen EE, and Keygen Cloud).
+## Reporting Security Issues
 
-We can only accept vulnerability reports at the above address.
+If you believe you have found a security vulnerability in this repository, please report it to us through coordinated disclosure.
 
-Please encrypt your message to us using our PGP key. The key
-fingerprint is:
+Please do not report security vulnerabilities through public GitHub issues, discussions, or pull requests.
+
+Instead, please send an email to: security[@]keygen.sh.
+
+Please include as much of the information listed below as you can to help us better understand and resolve the issue:
+
+- The type of issue (e.g., buffer overflow, SQL injection, or cross-site scripting)
+- Full paths of source file(s) related to the manifestation of the issue
+- The location of the affected source code (tag/branch/commit or direct URL)
+- Any special configuration required to reproduce the issue
+- Step-by-step instructions to reproduce the issue
+- Proof-of-concept or exploit code (if possible)
+- Impact of the issue, including how an attacker might exploit the issue
+
+This information will help us triage your report more quickly.
+
+We can only accept vulnerability reports at the above email address.
+
+## Encrypting Messages
+
+You may encrypt your message to us using our PGP key, available at the following URL:
+
+- https://keygen.sh/pgp-key.txt
+
+The key fingerprint is:
 
 ```
 E2A3 C809 9721 7FB6 A578 D08A E3C6 4A7B FE47 7AAA
 ```
-
-The key is available at the following address: https://keygen.sh/pgp-key.txt.
-
-Keygen will send you a response indicating next steps in handling your
-report. After the initial reply to your report, the security team will
-keep you informed of the progress towards a fix and full announcement,
-and may ask for additional information or guidance.
-
-**Important: we ask you to not disclose the vulnerability before
-it has been fixed and announced, unless you received a response
-from the Keygen security team that you may do so.**
-
-## Security annoucements
-
-We maintain a category in [the forum][forum] called **Security Announcements**,
-where we will post a summary, remediation, and mitigation details for
-any release containing security fixes.
-
-You can also subscribe to email updates by having a keygen.sh account, or
-you can join [the mailing list][mailing-list].
-
-## Supported versions
-
-We only add security updates to the latest `MAJOR.MINOR` version of the
-project. No security updates are backported to previous versions. If
-you want be up to date on security patches, please make sure your
-Keygen installation is running the latest release.
