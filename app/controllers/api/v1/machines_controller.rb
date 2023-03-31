@@ -54,7 +54,7 @@ module Api::V1
               param :id, type: :string
             end
           end
-          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[group groups] }
               param :id, type: :string
@@ -136,7 +136,7 @@ module Api::V1
           param :ip, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :hostname, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :platform, type: :string, allow_blank: true, allow_nil: true, optional: true
-          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) } do
+          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) } do
             param :cores, type: :integer, allow_nil: true, optional: true
             param :metadata, type: :metadata, allow_blank: true, optional: true
           end

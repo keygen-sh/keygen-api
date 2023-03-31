@@ -12,7 +12,7 @@ module Api::V1::Machines::Actions::V1x0
     typed_params {
       format :jsonapi
 
-      param :meta, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+      param :meta, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
         param :dataset, type: :hash
       end
     }

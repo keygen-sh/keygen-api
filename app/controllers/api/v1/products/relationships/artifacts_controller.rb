@@ -25,7 +25,7 @@ module Api::V1::Products::Relationships
     end
 
     typed_query {
-      param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+      param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) }
     }
     def show
       authorize! artifact,

@@ -87,7 +87,7 @@ module Api::V1
         param :type, type: :string, inclusion: { in: %w[process processes] }
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
-          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) }
+          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) }
         end
       end
     }
