@@ -77,6 +77,92 @@ Feature: Delete license
     Then the response status should be "403"
     And the current account should have 3 "licenses"
 
+  @ee
+  Scenario: Environment attempts to delete an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "licenses"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attempts to delete a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "licenses"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attempts to delete a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 2 global "licenses"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0"
+    Then the response status should be "403"
+    And the current account should have 2 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to delete their license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 2 "licenses" for the last "policy"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to delete another product's license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 2 "licenses"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0"
+    Then the response status should be "404"
+    And the current account should have 2 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License attempts to delete themself
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

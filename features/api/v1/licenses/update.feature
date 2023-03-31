@@ -690,6 +690,97 @@ Feature: Update license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Isolated License"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "name": "Isolated License" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Shared License"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "name": "Shared License" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Global License"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Product updates a license for their product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
