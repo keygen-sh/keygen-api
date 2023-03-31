@@ -11,7 +11,7 @@ module Orderable
       when 'ASC'
         reorder(created_at: :asc)
       else
-        raise Keygen::Error::InvalidScopeError.new(parameter: 'order'), 'order is invalid'
+        raise Keygen::Error::InvalidParameterError.new(parameter: 'order'), 'order is invalid'
       end
     }
   end
