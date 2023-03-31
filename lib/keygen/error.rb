@@ -30,12 +30,18 @@ module Keygen
       end
     end
 
-    class InvalidScopeError < StandardError
+    class InvalidParameterError < StandardError
       attr_reader :source
 
-      def initialize(parameter:)
+      def initialize(message = 'is invalid', parameter:)
         @source = { parameter: }
+
+        super(message)
       end
+    end
+
+    class UnsupportedParameterError < InvalidParameterError
+      def initialize(message = 'is unsupported', **) = super(message, **)
     end
 
     class InvalidHeaderError < StandardError

@@ -14,12 +14,12 @@ module DateRangeable
         diff = (date_end.to_i - date_start.to_i) / 1.day
 
         if diff < MIN_RANGE || diff > MAX_RANGE
-          raise Keygen::Error::InvalidScopeError.new(parameter: "date"), "date range must be between #{MIN_RANGE} and #{MAX_RANGE} days (got #{diff})"
+          raise Keygen::Error::InvalidParameterError.new(parameter: "date"), "date range must be between #{MIN_RANGE} and #{MAX_RANGE} days (got #{diff})"
         end
 
         where created_at: (date_start..date_end)
       rescue ArgumentError
-        raise Keygen::Error::InvalidScopeError.new(parameter: "date"), "invalid date range"
+        raise Keygen::Error::InvalidParameterError.new(parameter: "date"), "invalid date range"
       end
     }
   end
