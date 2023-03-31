@@ -508,7 +508,7 @@ Feature: Create key
   Scenario: Environment attempts to create a key for their environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 isolated, pooled "policy"
+    And the current account has 1 isolated+pooled "policy"
     And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
