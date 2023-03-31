@@ -124,7 +124,7 @@ Feature: Show release artifact
       """
 
   @ce
-  Scenario: Environment retrieves an artifact (isolated)
+  Scenario: Environment retrieves an isolated artifact (via environment header)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "artifact"
@@ -136,9 +136,39 @@ Feature: Show release artifact
       """
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+
+  @ce
+  Scenario: Environment retrieves an artifact (via environment param)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?environment=isolated"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported",
+        "source": {
+          "parameter": "environment"
+        }
+      }
+      """
 
   @ee
-  Scenario: Environment retrieves an artifact (isolated)
+  Scenario: Environment retrieves an isolated artifact (via environment header)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "artifact"
@@ -153,7 +183,18 @@ Feature: Show release artifact
     And the JSON response should be an "artifact"
 
   @ee
-  Scenario: Environment retrieves an artifact (shared)
+  Scenario: Environment retrieves an isolated artifact (via environment param)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?environment=isolated"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+
+  @ee
+  Scenario: Environment retrieves a shared artifact (via environment header)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "artifact"
@@ -164,6 +205,17 @@ Feature: Show release artifact
       { "Keygen-Environment": "shared" }
       """
     When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+
+  @ee
+  Scenario: Environment retrieves a shared artifact (via environment param)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "artifact"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?environment=shared"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 

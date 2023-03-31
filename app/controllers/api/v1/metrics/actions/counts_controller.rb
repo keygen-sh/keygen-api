@@ -23,7 +23,7 @@ module Api::V1::Metrics::Actions
         if (event_params - valid_events).any?
           diff = event_params - valid_events
 
-          raise Keygen::Error::InvalidScopeError.new(parameter: "metrics"), "one or more metric is invalid: #{diff.join(', ')}"
+          raise Keygen::Error::InvalidParameterError.new(parameter: "metrics"), "one or more metric is invalid: #{diff.join(', ')}"
         end
 
         # Select the event types from the event params

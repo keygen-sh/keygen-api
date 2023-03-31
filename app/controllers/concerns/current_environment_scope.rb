@@ -4,6 +4,7 @@ module CurrentEnvironmentScope
   extend ActiveSupport::Concern
 
   ENVIRONMENT_HEADER_KEY = 'Keygen-Environment'.freeze
+  ENVIRONMENT_PARAM_KEY  = 'environment'.freeze
 
   included do
     include ActiveSupport::Callbacks
@@ -20,15 +21,25 @@ module CurrentEnvironmentScope
         current_account.nil?
 
       run_callbacks :current_environment_scope do
-        next unless
-          request.headers.key?(ENVIRONMENT_HEADER_KEY)
+        environment_id =
+          case
+          when request.headers.key?(ENVIRONMENT_HEADER_KEY)
+            raise Keygen::Error::UnsupportedHeaderError.new('is unsupported', header: ENVIRONMENT_HEADER_KEY) unless
+              Keygen.ee? && Keygen.ee { _1.entitled?(:environments) }
 
-        raise Keygen::Error::UnsupportedHeaderError.new('is unsupported', header: ENVIRONMENT_HEADER_KEY) unless
-          Keygen.ee? && Keygen.ee { _1.entitled?(:environments) }
+            request.headers[ENVIRONMENT_HEADER_KEY]
+          when request.params.key?(ENVIRONMENT_PARAM_KEY)
+            raise Keygen::Error::UnsupportedParameterError.new('is unsupported', parameter: ENVIRONMENT_PARAM_KEY) unless
+              Keygen.ee? && Keygen.ee { _1.entitled?(:environments) }
+
+            request.params[ENVIRONMENT_PARAM_KEY]
+          else
+            next
+          end
 
         environment = (
           Current.environment ||= ResolveEnvironmentService.call(
-            environment: request.headers[ENVIRONMENT_HEADER_KEY],
+            environment: environment_id,
             account: current_account,
           )
         )

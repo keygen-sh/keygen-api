@@ -342,10 +342,13 @@ class ApplicationController < ActionController::API
          ActionController::UnpermittedParameters,
          ActionController::ParameterMissing => e
     render_bad_request detail: e.message
+  rescue Keygen::Error::UnsupportedParameterError,
+         Keygen::Error::InvalidParameterError => e
+    render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnsupportedHeaderError,
          Keygen::Error::InvalidHeaderError => e
     render_bad_request detail: e.message, source: e.source
-  rescue Keygen::Error::InvalidScopeError => e
+  rescue Keygen::Error::InvalidParameterError => e
     render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnauthorizedError => e
     kwargs = { code: e.code }
