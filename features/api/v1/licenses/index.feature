@@ -1763,3 +1763,72 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "licenses"
+
+  @ee
+  Scenario: Environment retrieves all isolated licenses
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "licenses"
+    And the current account has 3 shared "licenses"
+    And the current account has 3 global "licenses"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+    And the JSON response should be an array of 3 "licenses" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Environment retrieves all shared licenses
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "licenses"
+    And the current account has 3 shared "licenses"
+    And the current account has 3 global "licenses"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "licenses"
+    And the JSON response should be an array of 3 "licenses" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "licenses" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
