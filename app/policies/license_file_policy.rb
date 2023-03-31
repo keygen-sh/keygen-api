@@ -8,7 +8,7 @@ class LicenseFilePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
@@ -29,6 +29,7 @@ class LicenseFilePolicy < ApplicationPolicy
     perms = []
 
     perms << 'entitlement.read' if record.includes.include?('entitlements')
+    perms << 'environment.read' if record.includes.include?('environment')
     perms << 'group.read'       if record.includes.include?('group')
     perms << 'user.read'        if record.includes.include?('user')
     perms << 'product.read'     if record.includes.include?('product')
