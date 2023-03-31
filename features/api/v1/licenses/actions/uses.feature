@@ -200,6 +200,36 @@ Feature: License usage actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment increments the usage count for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "policies" with the following:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "uses": 3 }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "uses": 4 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product increments the usage count for a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -567,6 +597,36 @@ Feature: License usage actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment decrements the usage count for a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "policies" with the following:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 shared "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "uses": 3 }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "uses": 2 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product decrements the usage count for a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -746,6 +806,36 @@ Feature: License usage actions
       }
       """
     And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "uses": 0 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment resets the usage count for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "policies" with the following:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "uses": 3 }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "200"
     And the JSON response should be a "license" with the following attributes:
