@@ -40,11 +40,11 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[license licenses] }
-        param :id, type: :string, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) }
+        param :id, type: :string, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
         param :attributes, type: :hash, optional: true do
           param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :key, type: :string, optional: true
-          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product) } do
+          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) } do
             param :protected, type: :boolean, optional: true
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :suspended, type: :boolean, optional: true
@@ -59,7 +59,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product, :environment) } do
               items type: :string
             end
           end
@@ -77,7 +77,7 @@ module Api::V1
               param :id, type: :string
             end
           end
-          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+          param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[group groups] }
               param :id, type: :string
@@ -123,7 +123,7 @@ module Api::V1
         param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
           param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
-          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) } do
+          with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
             param :expiry, type: :time, optional: true, coerce: true, allow_nil: true
             param :protected, type: :boolean, optional: true
             param :suspended, type: :boolean, optional: true
@@ -138,7 +138,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product, :environment) } do
               items type: :string
             end
           end
