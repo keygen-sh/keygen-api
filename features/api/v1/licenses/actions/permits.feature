@@ -49,6 +49,46 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment checks in an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And the current account has 1 isolated "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": null
+      }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with a lastCheckIn that is not nil
+    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product checks in a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -238,6 +278,28 @@ Feature: License permit actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment suspends a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "suspended": true }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User suspends their license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -375,6 +437,28 @@ Feature: License permit actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment reinstates an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated+suspended "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "suspended": false }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User reinstates their license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -489,22 +573,17 @@ Feature: License permit actions
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
-      {
-        "duration": $time.90.days.to_i
-      }
+      { "duration": $time.3.months.to_i }
       """
-    And the current account has 1 "license"
+    And the current account has 1 "license" for the last "policy"
     And all "licenses" have the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2021-07-19T00:00:00.000Z"
-      }
+      { "expiry": "2021-07-19T00:00:00.000Z" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2021-10-17T00:00:00.000Z"
+    And the JSON response should be a "license" with the expiry "2021-10-19T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -539,6 +618,34 @@ Feature: License permit actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment renews a shared license
+    Given the current account is "test1"
+    And time is frozen at "2023-03-31T00:00:00.000Z"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "policy" with the following:
+      """
+      { "duration": 31556952 }
+      """
+    And the current account has 1 shared "license" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "expiry": "2025-03-31T00:00:00.000Z" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
 
   Scenario: User renews their license
     Given I am an admin of account "test1"
@@ -607,7 +714,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.60.days.to_i,
+        "duration": $time.2.months.to_i,
         "protected": true
       }
       """
@@ -622,7 +729,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-11-04T22:53:37.000Z"
+    And the JSON response should be a "license" with the expiry "2016-11-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -711,6 +818,24 @@ Feature: License permit actions
     When I send a DELETE request to "/accounts/test1/licenses/$0/actions/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment revokes an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0/actions/revoke"
+    Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

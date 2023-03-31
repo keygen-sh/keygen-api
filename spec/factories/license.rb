@@ -83,6 +83,10 @@ FactoryBot.define do
       expiry { 1.month.ago }
     end
 
+    trait :suspended do
+      suspended { true }
+    end
+
     trait :protected do |license|
       protected { true }
     end
