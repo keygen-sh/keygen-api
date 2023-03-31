@@ -40,7 +40,7 @@ module Api::V1::Licenses::Relationships
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product) } do
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product, :environment) } do
               items type: :string
             end
           end
