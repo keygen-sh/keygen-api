@@ -845,6 +845,201 @@ Feature: Generate authentication token for license
     And sidekiq should have 1 "request-log" job
 
   @ee
+  Scenario: Environment generates a token for an isolated license (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Isolated Token" }
+      """
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Environment generates a token for a shared license (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+
+  @ee
+  Scenario: Environment generates a token for a global license (in isolated environment)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+
+  @ee
+  Scenario: Environment generates a token for an isolated license (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+
+  @ee
+  Scenario: Environment generates a token for a shared license (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Shared Token" }
+      """
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
+  Scenario: Environment generates a token for a global license (in shared environment)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "name": "Shared Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Shared Token" }
+      """
+    And the JSON response should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+
+  @ee
   Scenario: Product generates a license token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"

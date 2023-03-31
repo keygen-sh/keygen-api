@@ -210,6 +210,8 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) (?:all
 end
 
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
+  traits = traits&.split('+')&.map(&:to_sym)
+
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
     association_name  =
@@ -219,7 +221,6 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\
       else
         association.singularize.underscore.to_sym
       end
-    traits = traits&.split('+')&.map(&:to_sym)
 
     create resource.singularize.underscore, *traits, account: @account, association_name => associated_record
   end

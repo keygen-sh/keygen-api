@@ -52,6 +52,22 @@ Feature: License entitlements relationship
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "401"
 
+  @ee
+  Scenario: Environment retrieves the entitlements for an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "license"
+    And the current account has 3 isolated "license-entitlements" for each "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "entitlements"
+
   Scenario: Product retrieves the entitlements for a license
     Given the current account is "test1"
     And the current account has 1 "product"
