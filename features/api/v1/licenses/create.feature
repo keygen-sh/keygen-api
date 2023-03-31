@@ -1632,6 +1632,54 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment creates a grouped license for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "policy"
+    And the current account has 1 isolated "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses?environment=isolated" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Grouped License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        },
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product creates a grouped license for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
