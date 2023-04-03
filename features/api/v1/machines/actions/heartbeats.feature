@@ -343,6 +343,56 @@ Feature: Machine heartbeat actions
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
+  @ee
+  Scenario: Environment pings an isolated machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 shared "machine" with the following:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "machine-heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment pings a shared machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "machine" with the following:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "machine-heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product pings a machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -563,6 +613,54 @@ Feature: Machine heartbeat actions
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does not requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the JSON response should be a "machine" with a nil lastHeartbeat
+    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment pings an isolated machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 shared "machine" with the following:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does not requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the JSON response should be a "machine" with a nil lastHeartbeat
+    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment pings a shared machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "machine" with the following:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat?environment=shared"
     Then the response status should be "200"
     And the JSON response should be a "machine" that does not requireHeartbeat
     And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
