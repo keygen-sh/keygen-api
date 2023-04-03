@@ -1803,11 +1803,7 @@ Feature: List license
     And the current account has 3 global "licenses"
     And I am an environment of account "test1"
     And I use an authentication token
-    And I send the following headers:
-      """
-      { "Keygen-Environment": "shared" }
-      """
-    When I send a GET request to "/accounts/test1/licenses"
+    When I send a GET request to "/accounts/test1/licenses?environment=shared"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "licenses"
     And the JSON response should be an array of 3 "licenses" with the following relationships:
