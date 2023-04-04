@@ -45,6 +45,7 @@ class Policy < ApplicationRecord
   EXPIRATION_STRATEGIES = %w[
     RESTRICT_ACCESS
     REVOKE_ACCESS
+    MAINTAIN_ACCESS
     ALLOW_ACCESS
   ].freeze
 
@@ -451,6 +452,10 @@ class Policy < ApplicationRecord
       expiration_strategy.nil?
 
     expiration_strategy == 'REVOKE_ACCESS'
+  end
+
+  def maintain_access?
+    expiration_strategy == 'MAINTAIN_ACCESS'
   end
 
   def allow_access?

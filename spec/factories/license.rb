@@ -65,6 +65,10 @@ FactoryBot.define do
       policy { build(:policy, :revoke_access_expiration_strategy, account:, environment:) }
     end
 
+    trait :maintain_access_expiration_strategy do
+      policy { build(:policy, :maintain_access_expiration_strategy, account:, environment:) }
+    end
+
     trait :allow_access_expiration_strategy do
       policy { build(:policy, :allow_access_expiration_strategy, account:, environment:) }
     end

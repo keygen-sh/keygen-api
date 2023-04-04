@@ -120,6 +120,10 @@ FactoryBot.define do
       expiration_strategy { 'REVOKE_ACCESS' }
     end
 
+    trait :maintain_access_expiration_strategy do
+      expiration_strategy { 'MAINTAIN_ACCESS' }
+    end
+
     trait :allow_access_expiration_strategy do
       expiration_strategy { 'ALLOW_ACCESS' }
     end

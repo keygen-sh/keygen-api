@@ -353,6 +353,10 @@ describe ReleasePolicy, type: :policy do
             denies :show, :upgrade
           end
 
+          with_bearer_traits %i[expired maintain_access_expiration_strategy] do
+            allows :show, :upgrade
+          end
+
           with_bearer_traits %i[expired allow_access_expiration_strategy] do
             allows :show, :upgrade
           end
@@ -371,6 +375,10 @@ describe ReleasePolicy, type: :policy do
         end
 
         with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+          denies :show, :upgrade
+        end
+
+        with_bearer_traits %i[expired maintain_access_expiration_strategy] do
           denies :show, :upgrade
         end
 

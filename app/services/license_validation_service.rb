@@ -143,7 +143,7 @@ class LicenseValidationService < BaseService
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).
     if !license.policy.strict?
       # Check if license is expired after checking machine requirements.
-      return [license.allow_access?, "is expired", :EXPIRED] if
+      return [license.allow_access? || license.maintain_access?, "is expired", :EXPIRED] if
         license.expired?
 
       return [true, "is valid", :VALID]
@@ -220,7 +220,7 @@ class LicenseValidationService < BaseService
     end
 
     # Check if license is expired after checking machine requirements.
-    return [license.allow_access?, "is expired", :EXPIRED] if
+    return [license.allow_access? || license.maintain_access?, "is expired", :EXPIRED] if
       license.expired?
 
     # All good

@@ -1031,6 +1031,42 @@ Feature: License validation actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin quick validates a license by key that is expired (maintain strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationStrategy": "MAINTAIN_ACCESS"
+      }
+      """
+    And the current account has 3 "licenses"
+    And the current account has 1 "webhook-endpoint"
+    And the first "license" has the following attributes:
+      """
+      { "key": "foo-bar" }
+      """
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is expired", "code": "EXPIRED" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin quick validates a license by key that is expired (allow strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2781,6 +2817,63 @@ Feature: License validation actions
       {
         "productId": "$products[0]",
         "expirationStrategy": "RESTRICT_ACCESS"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.month.ago"
+      }
+      """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[1].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": false,
+        "detail": "fingerprint is not activated (does not match any associated machines)",
+        "code": "FINGERPRINT_SCOPE_MISMATCH",
+        "scope": {
+          "fingerprint": "$machines[1].fingerprint"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: maintain)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "expirationStrategy": "MAINTAIN_ACCESS"
       }
       """
     And the current account has 1 "license"

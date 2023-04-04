@@ -228,6 +228,10 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
             denies :show
           end
 
+          with_bearer_traits %i[expired maintain_access_expiration_strategy] do
+            allows :show
+          end
+
           with_bearer_traits %i[expired allow_access_expiration_strategy] do
             allows :show
           end
@@ -246,6 +250,10 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
         end
 
         with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+          denies :show
+        end
+
+        with_bearer_traits %i[expired maintain_access_expiration_strategy] do
           denies :show
         end
 
