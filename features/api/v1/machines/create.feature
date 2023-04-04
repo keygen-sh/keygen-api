@@ -4069,6 +4069,44 @@ Feature: Create machine
       """
     Then the response status should be "403"
 
+  Scenario: License activates a machine with their key (auth strategy allowed, expired, maintain access)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationStrategy": "MAINTAIN_ACCESS",
+        "authenticationStrategy": "LICENSE"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.2.weeks.ago"
+      }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
   Scenario: License activates a machine with their key (auth strategy allowed, expired, allow access)
     Given the current account is "test1"
     And the current account has 1 "policies"
