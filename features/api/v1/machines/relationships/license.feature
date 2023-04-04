@@ -27,6 +27,47 @@ Feature: Machine license relationship
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Isolated environment retrieves the license for an isolated machine
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/license"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a shared machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/license?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a global machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/license"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
   Scenario: Product retrieves the license for a machine
     Given the current account is "test1"
     And the current account has 2 "products"
