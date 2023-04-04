@@ -29,6 +29,50 @@ Feature: Machine user relationship
     And the JSON response should be a "user"
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Isolated environment retrieves the product for an isolated machine
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated+user "license"
+    And the current account has 1 isolated "machine" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/user"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
+  @ee
+  Scenario: Shared environment retrieves the product for a shared machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared+user "license"
+    And the current account has 1 shared "machine" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/user?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
+  @ee
+  Scenario: Shared environment retrieves the product for a global machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global+user "license"
+    And the current account has 1 global "machine" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/user"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
   Scenario: Product retrieves the user for a machine
     Given the current account is "test1"
     And the current account has 2 "products"
