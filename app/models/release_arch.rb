@@ -90,5 +90,5 @@ class ReleaseArch < ApplicationRecord
   }
 
 
-  scope :with_releases, -> { joins(products: %i[releases]).distinct }
+  scope :with_releases, -> { where_assoc_exists(:releases) }
 end
