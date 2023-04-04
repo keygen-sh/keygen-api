@@ -81,6 +81,50 @@ Feature: Machine processes relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "processes"
 
+  @ee
+  Scenario: Isolated environment retrieves the processes for an isolated machine
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "machine"
+    And the current account has 3 isolated "processes" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/processes"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "processes"
+
+  @ee
+  Scenario: Shared environment retrieves the processes for a shared machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "machine"
+    And the current account has 3 shared "processes" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/processes?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "processes"
+
+  @ee
+  Scenario: Shared environment retrieves the processes for a global machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "machine"
+    And the current account has 3 global "processes" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/processes"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "processes"
+
   Scenario: Product retrieves the processes for a machine
     Given the current account is "test1"
     And the current account has 2 "products"
@@ -160,6 +204,50 @@ Feature: Machine processes relationship
       { "machineId": "$machines[0]" }
       """
     And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
+  @ee
+  Scenario: Isolated environment retrieves the license for an isolated machine
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "machine"
+    And the current account has 1 isolated "process" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a shared machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "machine"
+    And the current account has 1 shared "process" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/processes/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a global machine
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "machine"
+    And the current account has 1 global "process" for each "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"
     And the JSON response should be a "process"
