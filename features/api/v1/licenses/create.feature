@@ -1112,7 +1112,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Environment creates an global license (in isolated environment)
+  Scenario: Environment creates a global license (in isolated environment)
     Given the current account is "test1"
     And the current account has 1 isolated "webhook-endpoint"
     And the current account has 1 isolated "environment"
@@ -1264,7 +1264,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Environment creates an global license (in shared environment)
+  Scenario: Environment creates a global license (in shared environment)
     Given the current account is "test1"
     And the current account has 1 shared "webhook-endpoint"
     And the current account has 1 shared "environment"
@@ -1311,7 +1311,7 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Environment creates an global license (in nil environment)
+  Scenario: Environment creates a global license (in nil environment)
     Given the current account is "test1"
     And the current account has 1 shared "webhook-endpoint"
     And the current account has 1 shared "environment"
