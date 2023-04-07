@@ -713,3 +713,68 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
         }
       }
       """
+
+    @ee
+  Scenario: Environment retrieves all isolated machines
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+
+  @ee
+  Scenario: Environment retrieves all shared machines
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "machines"
+    And the current account has 3 shared "machines"
+    And the current account has 3 global "machines"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "machines"
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "machines" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """

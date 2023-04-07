@@ -241,11 +241,11 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "machine" with the following attributes:
+    And the JSON response should be a "machine" with the following attributes:
       """
       { "name": "Isolated Machine" }
       """
-    And the JSON response should be an "machine" with the following relationships:
+    And the JSON response should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -387,11 +387,11 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "machine" with the following attributes:
+    And the JSON response should be a "machine" with the following attributes:
       """
       { "name": "Shared Machine" }
       """
-    And the JSON response should be an "machine" with the following relationships:
+    And the JSON response should be a "machine" with the following relationships:
       """
       {
         "environment": {

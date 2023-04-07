@@ -448,3 +448,62 @@ Feature: Show machine
       """
       { "Keygen-Environment": "shared" }
       """
+
+  @ce
+  Scenario: Environment retrieves a machine (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "400"
+
+  @ee
+  Scenario: Environment retrieves a machine (isolated)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "machine"
+
+  @ee
+  Scenario: Environment retrieves a machine (shared)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "machine"
+
+  @ee
+  Scenario: Environment retrieves a machine (global)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "machine"

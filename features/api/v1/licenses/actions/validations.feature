@@ -3431,7 +3431,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: An admin validates an license scoped to a mismatched policy
+  Scenario: An admin validates a license scoped to a mismatched policy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -7725,7 +7725,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous validates an license key scoped to a mismatched policy
+  Scenario: Anonymous validates a license key scoped to a mismatched policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
