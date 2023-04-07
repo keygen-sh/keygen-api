@@ -1039,11 +1039,11 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "license" with the following attributes:
+    And the JSON response should be a "license" with the following attributes:
       """
       { "name": "Isolated License" }
       """
-    And the JSON response should be an "license" with the following relationships:
+    And the JSON response should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -1191,11 +1191,11 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "license" with the following attributes:
+    And the JSON response should be a "license" with the following attributes:
       """
       { "name": "Shared License" }
       """
-    And the JSON response should be an "license" with the following relationships:
+    And the JSON response should be a "license" with the following relationships:
       """
       {
         "environment": {

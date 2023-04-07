@@ -84,6 +84,63 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 3 "machines"
 
+  @ee
+  Scenario: Environment attempts to delete an isolated machine
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "machines"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "machine"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attempts to delete a shared machine
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "machines"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "204"
+    And the current account should have 1 "machine"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attempts to delete a global machine
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 2 global "machines"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "403"
+    And the current account should have 2 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product deletes a machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"

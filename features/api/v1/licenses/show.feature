@@ -563,7 +563,7 @@ Feature: Show license
       """
 
   @ce
-  Scenario: Environment retrieves an license (isolated)
+  Scenario: Environment retrieves a license (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "license"
@@ -577,7 +577,7 @@ Feature: Show license
     Then the response status should be "400"
 
   @ee
-  Scenario: Environment retrieves an license (isolated)
+  Scenario: Environment retrieves a license (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "license"
@@ -589,10 +589,10 @@ Feature: Show license
       """
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be an "license"
+    And the JSON response should be a "license"
 
   @ee
-  Scenario: Environment retrieves an license (shared)
+  Scenario: Environment retrieves a license (shared)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "license"
@@ -604,7 +604,22 @@ Feature: Show license
       """
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be an "license"
+    And the JSON response should be a "license"
+
+  @ee
+  Scenario: Environment retrieves a license (global)
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
 
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
@@ -677,7 +692,7 @@ Feature: Show license
       }
       """
 
-  # Scenario: Admin requests an license with an invalid URI
+  # Scenario: Admin requests a license with an invalid URI
   #   Given I am an admin of account "test1"
   #   And the current account is "test1"
   #   And the current account has 1 "webhook-endpoint"
