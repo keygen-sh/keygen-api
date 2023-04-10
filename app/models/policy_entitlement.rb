@@ -14,6 +14,7 @@ class PolicyEntitlement < ApplicationRecord
 
   validates :policy,
     scope: { by: :account_id }
+
   validates :entitlement,
     uniqueness: { message: 'already exists', scope: [:account_id, :policy_id, :entitlement_id] },
     scope: { by: :account_id }

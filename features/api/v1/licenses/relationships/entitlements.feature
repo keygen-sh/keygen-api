@@ -17,6 +17,7 @@ Feature: License entitlements relationship
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "403"
 
+  # Retrieval
   Scenario: Admin retrieves the entitlements for a license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -186,6 +187,7 @@ Feature: License entitlements relationship
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements/$0"
     Then the response status should be "404"
 
+  # Attachment
   Scenario: Admin attaches entitlements to a license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -216,7 +218,7 @@ Feature: License entitlements relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 shared "entitlements"
-    And the current account has 1 "license"
+    And the current account has 1 global "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
       """
@@ -228,16 +230,12 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with entitlement environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -303,16 +301,12 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "403"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be compatible with entitlement environment",
-        "code": "ENVIRONMENT_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        }
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -365,10 +359,10 @@ Feature: License entitlements relationship
       {
         "title": "Unprocessable resource",
         "detail": "already exists (entitlement is attached through policy)",
+        "code": "ENTITLEMENT_CONFLICT",
         "source": {
           "pointer": "/data/relationships/entitlement"
-        },
-        "code": "ENTITLEMENT_CONFLICT"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -429,10 +423,10 @@ Feature: License entitlements relationship
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
+        "code": "ENTITLEMENT_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/entitlement"
-        },
-        "code": "ENTITLEMENT_NOT_FOUND"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -455,6 +449,112 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches shared entitlements to a global license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 shared "entitlements"
+    And the current account has 1 global "license"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" },
+          { "type": "entitlements", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "license-entitlements"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 3 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches shared entitlements to a shared license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 shared "entitlements"
+    And the current account has 1 global "entitlements"
+    And the current account has 1 shared "license"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" },
+          { "type": "entitlements", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "license-entitlements"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 3 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches mixed entitlements to a shared license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 isolated "entitlement"
+    And the current account has 1 shared "entitlement"
+    And the current account has 1 global "entitlement"
+    And the current account has 1 shared "license"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" },
+          { "type": "entitlements", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -557,6 +657,7 @@ Feature: License entitlements relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  # Detachment
   Scenario: Admin detaches entitlements from a license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -686,6 +787,98 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "401"
+
+  @ee
+  Scenario: Admin detaches shared entitlements from a shared license
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the current account should have 0 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin detaches shared entitlements from a global license
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "license"
+    And the current account has 2 global "license-entitlements" for the last "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[2]" },
+          { "type": "entitlements", "id": "$entitlements[3]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the current account should have 2 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 4 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin detaches global entitlements from a global license
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "license"
+    And the current account has 2 global "license-entitlements" for the last "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the current account should have 4 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 4 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product detaches entitlements from a license
     Given the current account is "test1"
