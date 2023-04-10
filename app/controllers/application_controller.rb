@@ -194,8 +194,8 @@ class ApplicationController < ActionController::API
         # back together as a proper pointer: /users/data/0/attributes/email
         path    = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
         src     = path.map { |p| p.to_s.camelize :lower }
-        pointer = nil
         klass   = resource.class
+        pointer = nil
 
         if klass.respond_to?(:reflect_on_association) &&
            klass.reflect_on_association(path.first) &&
@@ -220,6 +220,8 @@ class ApplicationController < ActionController::API
           pointer = "/data/relationships/#{src.join '/'}"
         elsif path.first == "base"
           pointer = "/data"
+        elsif path.first == "entitlements"
+          pointer = "/data/relationships/entitlements"
         elsif path.first == "permission_ids" ||
               path.first == "role"
           pointer = if path.any? { _1 =~ /permissions?/ }

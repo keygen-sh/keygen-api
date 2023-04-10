@@ -16,6 +16,7 @@ class LicenseEntitlement < ApplicationRecord
 
   validates :license,
     scope: { by: :account_id }
+
   validates :entitlement,
     uniqueness: { message: 'already exists', scope: [:account_id, :license_id, :entitlement_id] },
     scope: { by: :account_id }
