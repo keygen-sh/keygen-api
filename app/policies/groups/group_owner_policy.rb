@@ -42,7 +42,12 @@ module Groups
 
     def attach?
       verify_permissions!('group.owners.attach')
-      verify_environment!
+      verify_environment!(
+        # NOTE(ezekg) This seems weird, but we want to allow attaching global entitlements
+        #             to shared groups, but not vice-versa. Essentially, we're checking
+        #             for read permissions before inserting rows in the join table.
+        strict: group.environment.nil?,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
@@ -54,7 +59,10 @@ module Groups
 
     def detach?
       verify_permissions!('group.owners.detach')
-      verify_environment!
+      verify_environment!(
+        # NOTE(ezekg) ^^^ ditto above except for detaching.
+        strict: group.environment.nil?,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
