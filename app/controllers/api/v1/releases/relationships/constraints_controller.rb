@@ -43,15 +43,13 @@ module Api::V1::Releases::Relationships
       end
     }
     def attach
-      authorize! with: Releases::ReleaseEntitlementConstraintPolicy
+      entitlements = current_account.entitlements.where(id: entitlement_ids)
+      authorize! entitlements,
+        with: Releases::ReleaseEntitlementConstraintPolicy
 
-      constraints_data = constraint_params
-        .uniq { |constraint| constraint[:entitlement_id] }
-        .map { |constraint|
-          constraint.merge(account_id: current_account.id)
-        }
-
-      attached = release.constraints.create!(constraints_data)
+      attached = release.constraints.create!(
+        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+      )
 
       BroadcastEventService.call(
         event: 'release.constraints.attached',
@@ -73,18 +71,19 @@ module Api::V1::Releases::Relationships
       end
     }
     def detach
-      authorize! with: Releases::ReleaseEntitlementConstraintPolicy
+      constraints = release.constraints.where(id: constraint_ids)
+      authorize! constraints,
+        with: Releases::ReleaseEntitlementConstraintPolicy
 
-      constraint_ids = constraint_params.collect { |e| e[:id] }.compact
       constraints = release.constraints.where(id: constraint_ids)
 
       # Ensure all entitlement constraints exist. Deleting non-existent constraints would be
       # a noop, but responding with a 2xx status code is a confusing DX.
-      if constraints.size != constraint_ids.size
+      unless constraints.size == constraint_ids.size
         existing_constraint_ids = constraints.pluck(:id)
-        invalid_constraint_ids = constraint_ids - existing_constraint_ids
-        invalid_constraint_id = invalid_constraint_ids.first
-        invalid_idx = constraint_ids.find_index(invalid_constraint_id)
+        invalid_constraint_ids  = constraint_ids - existing_constraint_ids
+        invalid_constraint_id   = invalid_constraint_ids.first
+        invalid_idx             = constraint_ids.find_index(invalid_constraint_id)
 
         return render_unprocessable_entity(
           detail: "constraint '#{invalid_constraint_id}' relationship not found",
@@ -107,7 +106,8 @@ module Api::V1::Releases::Relationships
 
     attr_reader :release
 
-    def entitlement_ids = entitlement_params.pluck(:entitlement_id)
+    def entitlement_ids = constraint_params.pluck(:entitlement_id)
+    def constraint_ids  = constraint_params.pluck(:id)
 
     def set_release
       scoped_releases = authorized_scope(current_account.releases)
