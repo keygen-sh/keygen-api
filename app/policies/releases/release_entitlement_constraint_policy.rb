@@ -46,7 +46,12 @@ module Releases
 
     def attach?
       verify_permissions!('release.constraints.attach')
-      verify_environment!
+      verify_environment!(
+        # NOTE(ezekg) This seems weird, but we want to allow attaching global entitlements
+        #             to shared releases, but not vice-versa. Essentially, we're checking
+        #             for read permissions before inserting rows in the join table.
+        strict: release.environment.nil?,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'environment' }
@@ -60,7 +65,10 @@ module Releases
 
     def detach?
       verify_permissions!('release.constraints.detach')
-      verify_environment!
+      verify_environment!(
+        # NOTE(ezekg) ^^^ ditto above except for detaching.
+        strict: release.environment.nil?,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'environment' }

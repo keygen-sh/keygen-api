@@ -17,6 +17,7 @@ Feature: Release constraints relationship
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "403"
 
+  # Retrieval
   Scenario: Admin retrieves the constraints for a release
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -24,6 +25,18 @@ Feature: Release constraints relationship
     And the current account has 3 "release-entitlement-constraints" for existing "releases"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "constraints"
+
+  @ee
+  Scenario: Environment retrieves the constraints for a shared release
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And the current account has 3 shared "release-entitlement-constraints" for each "release"
+    Given I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints?environment=shared"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "constraints"
 
@@ -276,6 +289,7 @@ Feature: Release constraints relationship
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "404"
 
+  # Attachment
   Scenario: Admin attaches constraints to a release
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -489,6 +503,157 @@ Feature: Release constraints relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment attaches isolated constraints to an isolated release
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 4 isolated "entitlements"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases/$0/constraints?environment=isolated" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[0]" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[2]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "constraints"
+    And the JSON response should be an array of 2 "constraints" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attaches shared constraints to an isolated release
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 4 shared "entitlements"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases/$0/constraints?environment=isolated" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[0]" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[2]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attaches shared constraints to a shared release
+    Given the current account is "test1"
+    And the current account has 2 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "entitlements"
+    And the current account has 1 global "entitlements"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases/$0/constraints?environment=shared" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[0]" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[2]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "constraints"
+    And the JSON response should be an array of 2 "constraints" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attaches constraints to a release
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoint"
@@ -626,6 +791,7 @@ Feature: Release constraints relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  # Detachment
   Scenario: Admin detaches constraints from a release
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -699,6 +865,136 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment detaches isolated constraints from an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "release"
+    And the current account has 3 isolated "release-entitlement-constraints" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[1]" },
+          { "type": "constraint", "id": "$constraints[2]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And the current account should have 0 "release-entitlement-constraints"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment detaches shared constraints from a shared release
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And the current account has 3 shared "release-entitlement-constraints" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[1]" },
+          { "type": "constraint", "id": "$constraints[2]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 0 "release-entitlement-constraints"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment detaches shared constraints from a global release
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "release"
+    And the current account has 2 shared "release-entitlement-constraints" for each "release"
+    And the current account has 1 global "release-entitlement-constraints" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[1]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 1 "release-entitlement-constraint"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment detaches global constraints from a global release
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "release"
+    And the current account has 3 global "release-entitlement-constraints" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          { "type": "constraint", "id": "$constraints[2]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 3 "release-entitlement-constraints"
+    And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
