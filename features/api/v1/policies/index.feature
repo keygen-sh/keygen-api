@@ -138,6 +138,32 @@ Feature: List policies
     When I send a GET request to "/accounts/test1/policies?limit=-10"
     Then the response status should be "400"
 
+  @ee
+  Scenario: Environment retrieves all isolated policies
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "policy"
+    And the current account has 1 shared "policy"
+    And the current account has 1 global "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "policies"
+
+  @ee
+  Scenario: Environment retrieves all shared policies
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "policy"
+    And the current account has 1 shared "policy"
+    And the current account has 1 global "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "policies"
+
   Scenario: Product retrieves all policies for their product
     Given the current account is "test1"
     And the current account has 1 "product"
