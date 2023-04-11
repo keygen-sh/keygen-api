@@ -256,6 +256,39 @@ Feature: Update policy
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an isolated policy
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "name": "Isolated Policy"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      { "name": "Isolated Policy" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to update a policy for another product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
