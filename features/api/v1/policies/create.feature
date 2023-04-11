@@ -2440,6 +2440,144 @@ Feature: Create policy
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment creates an isolated policy for an isolated product
+    Given the current account is "test1"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Isolated Policy"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "products", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a shared policy for a shared product
+    Given the current account is "test1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Shared Policy"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "products", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a shared policy for a global product
+    Given the current account is "test1"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Shared Policy"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "products", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create a policy for their product
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"

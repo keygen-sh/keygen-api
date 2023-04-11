@@ -88,6 +88,51 @@ Feature: Delete policy
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment deletes an isolated policy
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 3 isolated "policies"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2?environment=isolated"
+    Then the response status should be "204"
+    And the current account should have 2 "policies"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment deletes a shared policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 3 shared "policies"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$1?environment=shared"
+    Then the response status should be "204"
+    And the current account should have 2 "policies"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment deletes a global policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 3 global "policies"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0?environment=shared"
+    Then the response status should be "403"
+    And the current account should have 3 "policies"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product deletes one of their policies
     Given the current account is "test1"
     And the current account has 1 "product"
