@@ -531,7 +531,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "users", "id": "$users[1]" }
         ]
       }
       """
@@ -556,7 +556,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "users", "id": "$users[1]" }
         ]
       }
       """
@@ -591,7 +591,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
@@ -611,7 +611,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
@@ -635,7 +635,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
@@ -969,7 +969,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "users", "id": "$users[1]" }
         ]
       }
       """
@@ -1002,7 +1002,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "users", "id": "$users[1]" }
         ]
       }
       """
@@ -1037,7 +1037,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
@@ -1065,7 +1065,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
@@ -1097,7 +1097,7 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" }
         ]
       }
       """
