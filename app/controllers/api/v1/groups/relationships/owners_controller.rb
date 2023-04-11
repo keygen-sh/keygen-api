@@ -36,13 +36,13 @@ module Api::V1::Groups::Relationships
       end
     }
     def attach
-      authorize! with: Groups::GroupOwnerPolicy
+      users = current_account.users.where(id: user_ids)
+      authorize! users,
+        with: Groups::GroupOwnerPolicy
 
-      owners_data = owner_params.map do |owner|
-        owner.merge(account_id: current_account.id)
-      end
-
-      attached = group.owners.create!(owners_data)
+      attached = group.owners.create!(
+        user_ids.map {{ account_id: current_account.id, user_id: _1 }},
+      )
 
       BroadcastEventService.call(
         event: 'group.owners.attached',
@@ -64,14 +64,15 @@ module Api::V1::Groups::Relationships
       end
     }
     def detach
-      authorize! with: Groups::GroupOwnerPolicy
+      users = current_account.users.where(id: user_ids)
+      authorize! users,
+        with: Groups::GroupOwnerPolicy
 
-      user_ids = owner_params.collect { |e| e[:user_id] }.compact
-      owners   = group.owners.where(user_id: user_ids)
+      owners = group.owners.where(user_id: user_ids)
 
       # Ensure all owners exist. Deleting non-existing owners would be a noop, but
       # responding with a 2xx status code is a confusing DX.
-      if owners.size != user_ids.size
+      unless owners.size == user_ids.size
         valid_user_ids   = owners.pluck(:user_id)
         invalid_user_ids = user_ids - valid_user_ids
         invalid_user_id  = invalid_user_ids.first
@@ -97,6 +98,8 @@ module Api::V1::Groups::Relationships
     private
 
     attr_reader :group
+
+    def user_ids = owner_params.pluck(:user_id)
 
     def set_group
       scoped_groups = authorized_scope(current_account.groups)
