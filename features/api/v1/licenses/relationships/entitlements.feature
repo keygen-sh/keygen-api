@@ -454,11 +454,82 @@ Feature: License entitlements relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin attaches shared entitlements to a global license
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Environment attaches isolated entitlements to an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "entitlements"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" },
+          { "type": "entitlements", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "license-entitlements"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And the current account should have 3 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attaches shared entitlements to an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 shared "entitlements"
+    And the current account has 1 isolated "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" },
+          { "type": "entitlements", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attaches shared entitlements to a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
     And the current account has 3 shared "entitlements"
     And the current account has 1 global "license"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -489,12 +560,13 @@ Feature: License entitlements relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin attaches shared entitlements to a shared license
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Environment attaches shared entitlements to a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
     And the current account has 2 shared "entitlements"
     And the current account has 1 global "entitlements"
     And the current account has 1 shared "license"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -525,13 +597,14 @@ Feature: License entitlements relationship
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Admin attaches mixed entitlements to a shared license
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Environment attaches mixed entitlements to a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
     And the current account has 1 isolated "entitlement"
     And the current account has 1 shared "entitlement"
     And the current account has 1 global "entitlement"
     And the current account has 1 shared "license"
+    And I am an environment of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -879,6 +952,84 @@ Feature: License entitlements relationship
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment detaches isolated entitlements from an isolated license
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "license"
+    And the current account has 4 isolated "license-entitlements" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements?environment=isolated" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[3]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+
+  @ee
+  Scenario: Environment detaches shared entitlements from a shared license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements?environment=shared" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+
+  @ee
+  Scenario: Environment detaches shared entitlements from a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And the current account has 2 global "license-entitlements" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements?environment=shared" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+
+  @ee
+  Scenario: Environment detaches global entitlements from a global license
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "license"
+    And the current account has 2 shared "license-entitlements" for the last "license"
+    And the current account has 2 global "license-entitlements" for the last "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements?environment=shared" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[2]" },
+          { "type": "entitlement", "id": "$entitlements[3]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
 
   Scenario: Product detaches entitlements from a license
     Given the current account is "test1"
