@@ -36,13 +36,13 @@ module Api::V1::Policies::Relationships
       end
     }
     def attach
-      authorize! with: Policies::EntitlementPolicy
+      entitlements = current_account.entitlements.where(id: entitlement_ids)
+      authorize! entitlements,
+        with: Policies::EntitlementPolicy
 
-      entitlements_data = entitlement_params.map do |entitlement|
-        entitlement.merge(account_id: current_account.id)
-      end
-
-      attached = policy.policy_entitlements.create!(entitlements_data)
+      attached = policy.policy_entitlements.create!(
+        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+      )
 
       BroadcastEventService.call(
         event: 'policy.entitlements.attached',
@@ -64,14 +64,15 @@ module Api::V1::Policies::Relationships
       end
     }
     def detach
-      authorize! with: Policies::EntitlementPolicy
+      entitlements = current_account.entitlements.where(id: entitlement_ids)
+      authorize! entitlements,
+        with: Policies::EntitlementPolicy
 
-      entitlement_ids     = entitlement_params.map { |e| e[:entitlement_id] }.compact
+      # Ensure all entitlements exist. Again, non-existing license entitlements would be
+      # a noop, but responding with a 2xx status code is a confusing DX.
       policy_entitlements = policy.policy_entitlements.where(entitlement_id: entitlement_ids)
 
-      # Ensure all entitlements exist. Deleting non-existing policy entitlements would be
-      # a noop, but responding with a 2xx status code is a confusing DX.
-      if policy_entitlements.size != entitlement_ids.size
+      unless policy_entitlements.size == entitlement_ids.size
         policy_entitlement_ids  = policy_entitlements.pluck(:entitlement_id)
         invalid_entitlement_ids = entitlement_ids - policy_entitlement_ids
         invalid_entitlement_id  = invalid_entitlement_ids.first
@@ -80,8 +81,8 @@ module Api::V1::Policies::Relationships
         return render_unprocessable_entity(
           detail: "entitlement '#{invalid_entitlement_id}' relationship not found",
           source: {
-            pointer: "/data/#{invalid_idx}"
-          }
+            pointer: "/data/#{invalid_idx}",
+          },
         )
       end
 
@@ -97,6 +98,8 @@ module Api::V1::Policies::Relationships
     private
 
     attr_reader :policy
+
+    def entitlement_ids = entitlement_params.pluck(:entitlement_id)
 
     def set_policy
       scoped_policies = authorized_scope(current_account.policies)

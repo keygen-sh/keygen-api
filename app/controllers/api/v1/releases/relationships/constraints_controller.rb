@@ -107,6 +107,8 @@ module Api::V1::Releases::Relationships
 
     attr_reader :release
 
+    def entitlement_ids = entitlement_params.pluck(:entitlement_id)
+
     def set_release
       scoped_releases = authorized_scope(current_account.releases)
 
