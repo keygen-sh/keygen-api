@@ -31,6 +31,43 @@ Feature: Policy licenses relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "licenses"
 
+  @ee
+  Scenario: Environment retrieves the licenses for an isolated policy
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "policy"
+    And the current account has 3 isolated "licenses" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  @ee
+  Scenario: Environment retrieves the licenses for a shared policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "policy"
+    And the current account has 3 shared "licenses" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  @ee
+  Scenario: Environment retrieves the licenses for a global policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "policy"
+    And the current account has 3 shared "licenses" for the last "policy"
+    And the current account has 2 global "licenses" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "licenses"
+
   Scenario: Product retrieves the licenses for a policy
     Given the current account is "test1"
     And the current account has 1 "policy"

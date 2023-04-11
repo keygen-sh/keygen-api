@@ -83,6 +83,43 @@ Feature: Policy pool relationship
     When I send a GET request to "/accounts/test1/policies/$0/pool/$0"
     Then the response status should be "404"
 
+  @ee
+  Scenario: Environment retrieves the pool for an isolated policy
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated+pooled "policy"
+    And the current account has 3 isolated "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/pool?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "keys"
+
+  @ee
+  Scenario: Environment retrieves the pool for a shared policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared+pooled "policy"
+    And the current account has 3 shared "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/pool?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "keys"
+
+  @ee
+  Scenario: Environment retrieves the pool for a global policy
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global+pooled "policy"
+    And the current account has 3 shared "keys" for the last "policy"
+    And the current account has 2 global "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/pool?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "keys"
+
   Scenario: Product retrieves the pool for a policy
     Given the current account is "test1"
     And the current account has 2 "products"
@@ -246,6 +283,58 @@ Feature: Policy pool relationship
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment pops a key from an isolated policy's pool
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated+pooled "policy"
+    And the current account has 3 isolated "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "key"
+
+  @ee
+  Scenario: Environment pops a key from a shared policy's pool
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared+pooled "policy"
+    And the current account has 3 shared "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "key"
+
+  @ee
+  Scenario: Environment pops a shared key from a global policy's pool
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global+pooled "policy"
+    And the current account has 3 shared "keys" for the last "policy"
+    And the current account has 2 global "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "key"
+
+  # FIXME(ezekg) This probably shouldn't be allowed, but it's such a rarely used feature
+  #              that our time would probably be better spent fully deprecating it.
+  @ee
+  Scenario: Environment pops a global key from a global policy's pool
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global+pooled "policy"
+    And the current account has 2 global "keys" for the last "policy"
+    And the current account has 3 shared "keys" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "key"
 
   Scenario: Product pops a key from a pool
     Given the current account is "test1"
