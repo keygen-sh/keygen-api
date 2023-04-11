@@ -17,6 +17,7 @@ Feature: Policy entitlements relationship
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
     Then the response status should be "403"
 
+  # Retrieval
   Scenario: Admin retrieves the entitlements for a policy
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -47,6 +48,22 @@ Feature: Policy entitlements relationship
     When I send a GET request to "/accounts/test1/policies/$0/entitlements/$0"
     Then the response status should be "200"
     And the JSON response should be a "entitlement"
+
+  @ee
+  Scenario: Environment retrieves the entitlements for an isolated policy
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "policy"
+    And the current account has 3 isolated "policy-entitlements" for each "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/policies/$0/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "entitlements"
 
   Scenario: Product retrieves an entitlement for a policy
     Given the current account is "test1"
@@ -114,6 +131,7 @@ Feature: Policy entitlements relationship
     When I send a GET request to "/accounts/test1/policies/$0/entitlements/$0"
     Then the response status should be "403"
 
+  # Attachment
   Scenario: Admin attaches entitlements to a policy
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -135,6 +153,106 @@ Feature: Policy entitlements relationship
     And the JSON response should be an array with 3 "policy-entitlements"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches shared entitlements to a global policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 shared "entitlements"
+    And the current account has 1 global "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[1]" },
+          { "type": "entitlement", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches shared entitlements to a shared policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 shared "entitlements"
+    And the current account has 1 global "entitlements"
+    And the current account has 1 shared "policy"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[1]" },
+          { "type": "entitlement", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And the current account should have 0 "license-entitlements"
+    And the current account should have 3 "policy-entitlements"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin attaches mixed entitlements to a shared policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 isolated "entitlement"
+    And the current account has 1 shared "entitlement"
+    And the current account has 1 global "entitlement"
+    And the current account has 1 shared "policy"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlement", "id": "$entitlements[0]" },
+          { "type": "entitlement", "id": "$entitlements[1]" },
+          { "type": "entitlement", "id": "$entitlements[2]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (a record's environment is not compatible with the current environment)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches empty entitlements to a policy
@@ -335,6 +453,7 @@ Feature: Policy entitlements relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  # Detachment
   Scenario: Admin detaches entitlements from a policy
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -356,6 +475,98 @@ Feature: Policy entitlements relationship
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin detaches shared entitlements from a shared policy
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "policy"
+    And the current account has 2 shared "policy-entitlements" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the current account should have 0 "license-entitlements"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin detaches shared entitlements from a global policy
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "policy"
+    And the current account has 2 global "policy-entitlements" for the last "policy"
+    And the current account has 2 shared "policy-entitlements" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[2]" },
+          { "type": "entitlements", "id": "$entitlements[3]" }
+        ]
+      }
+      """
+    Then the response status should be "204"
+    And the current account should have 0 "license-entitlements"
+    And the current account should have 2 "policy-entitlements"
+    And the current account should have 4 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin detaches global entitlements from a global policy
+    Given the current account is "test1"
+    And the current account has 1 global "webhook-endpoint"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "policy"
+    And the current account has 2 global "policy-entitlements" for the last "policy"
+    And the current account has 2 shared "policy-entitlements" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/policies/$0/entitlements" with the following:
+      """
+      {
+        "data": [
+          { "type": "entitlements", "id": "$entitlements[0]" },
+          { "type": "entitlements", "id": "$entitlements[1]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And the current account should have 0 "license-entitlements"
+    And the current account should have 4 "policy-entitlements"
+    And the current account should have 4 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin detaches empty entitlements from a policy
