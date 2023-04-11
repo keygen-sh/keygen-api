@@ -120,7 +120,7 @@ module Api::V1::Licenses::Relationships
 
     attr_reader :license
 
-    def entitlement_ids = entitlement_params.pluck(:entitlement_id).compact
+    def entitlement_ids = entitlement_params.pluck(:entitlement_id)
 
     def set_license
       scoped_licenses = authorized_scope(current_account.licenses)
