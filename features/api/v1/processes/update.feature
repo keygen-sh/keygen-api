@@ -159,6 +159,113 @@ Feature: Update machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an isolated process
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/processes/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "metadata": { "name": "Isolated Process" }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "process" with the following attributes:
+      """
+      { "metadata": { "name": "Isolated Process" } }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a shared process
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/processes/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "metadata": { "name": "Shared Process" }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "process" with the following attributes:
+      """
+      { "metadata": { "name": "Shared Process" } }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a global process
+    Given the current account is "test1"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/processes/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "metadata": { "name": "Global Process" }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates a process
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
