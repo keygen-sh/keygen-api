@@ -321,6 +321,98 @@ Feature: Update product
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates an isolated product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Isolated Product"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "product" with the following attributes:
+      """
+      { "name": "Isolated Product" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a shared product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 shared "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Shared Product"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "product" with the following attributes:
+      """
+      { "name": "Shared Product" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment updates a global product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 1 global "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Global Product"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates the platforms for itself
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
