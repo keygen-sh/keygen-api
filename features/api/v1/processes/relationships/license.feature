@@ -27,6 +27,47 @@ Feature: Process license relationship
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Isolated environment retrieves the license for an isolated process
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/processes/$0/license"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a shared process
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0/license?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
+  @ee
+  Scenario: Shared environment retrieves the license for a global process
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/processes/$0/license"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
   Scenario: Product retrieves the license for a process
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
