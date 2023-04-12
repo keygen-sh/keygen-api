@@ -31,6 +31,31 @@ Feature: Product policies relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "policies"
 
+  @ee
+  Scenario: Environment retrieves the policies for an isolated product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 3 isolated "policies" for the last "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/policies?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "policies"
+
+  @ee
+  Scenario: Environment retrieves the policies for a global product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "product"
+    And the current account has 3 shared "policies" for the last "product"
+    And the current account has 3 global "policies" for the last "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/policies?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "policies"
+
   Scenario: Product retrieves the policies for a product
     Given the current account is "test1"
     And the current account has 1 "product"

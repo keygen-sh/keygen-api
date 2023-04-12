@@ -41,7 +41,7 @@ module Products
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: { name: 'admin' | 'developer' | 'environment' }
         allow!
       else
         deny!
