@@ -51,9 +51,9 @@ Feature: List release channels
   Scenario: Environment retrieves their release channels (isolated)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated | ISOLATED           |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
@@ -117,9 +117,9 @@ Feature: List release channels
   Scenario: Environment retrieves their release channels (isolated)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated | ISOLATED           |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
@@ -184,9 +184,9 @@ Feature: List release channels
   Scenario: Environment retrieves their release channels (shared)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated | ISOLATED           |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
@@ -251,9 +251,9 @@ Feature: List release channels
   Scenario: Environment retrieves their release channels (global)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Isolated | isolated | ISOLATED           |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
