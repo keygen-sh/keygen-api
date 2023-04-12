@@ -1124,6 +1124,55 @@ Feature: Spawn machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment spawns an isolated process for their account
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 1 isolated "machine"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the following attributes:
+      """
+      {
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
+        "status": "ALIVE",
+        "pid": "1"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "process-heartbeat" job
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: User spawns a process for their machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"

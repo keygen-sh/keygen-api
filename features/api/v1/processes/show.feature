@@ -113,6 +113,39 @@ Feature: Show machine process
       }
       """
 
+  @ee
+  Scenario: Environment retrieves an isolated process
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
+  @ee
+  Scenario: Environment retrieves a shared process
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
+  @ee
+  Scenario: Environment retrieves a global process
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "process"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "process"
+
   Scenario: Product retrieves a process for their product
     Given the current account is "test1"
     And the current account has 1 "product"
