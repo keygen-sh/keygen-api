@@ -49,6 +49,33 @@ Feature: Product users relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "users"
 
+  @ee
+  Scenario: Environment retrieves the users for an isolated product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 isolated "policy" for the last "product"
+    And the current account has 3 isolated+user "licenses" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/users?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "users"
+
+  @ee
+  Scenario: Environment retrieves the users for a global product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "product"
+    And the current account has 1 global "policy" for the last "product"
+    And the current account has 1 global+user "license" for the last "policy"
+    And the current account has 1 shared+user "license" for the last "policy"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/users?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "users"
+
   Scenario: Product retrieves the users for a product
     Given the current account is "test1"
     And the current account has 1 "product"

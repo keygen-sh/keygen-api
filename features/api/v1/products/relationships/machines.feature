@@ -41,6 +41,35 @@ Feature: Product machines relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
+  @ee
+  Scenario: Environment retrieves the machines for an isolated product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And the current account has 1 isolated "policy" for the last "product"
+    And the current account has 3 isolated "licenses" for the last "policy"
+    And the current account has 2 isolated "machines" for each "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/machines?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "machines"
+
+  @ee
+  Scenario: Environment retrieves the machines for a global product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 global "product"
+    And the current account has 1 global "policy" for the last "product"
+    And the current account has 1 global "license" for the last "policy"
+    And the current account has 1 shared "license" for the last "policy"
+    And the current account has 2 shared "machines" for each "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/machines?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "machines"
+
   Scenario: Product retrieves the machines for a product
     Given the current account is "test1"
     And the current account has 1 "product"
