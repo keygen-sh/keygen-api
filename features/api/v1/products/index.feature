@@ -162,6 +162,57 @@ Feature: List products
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ee
+  Scenario: Environment retrieves all isolated products
+    Given the current account is "test1"
+    And the current account has 3 isolated "products"
+    And the current account has 3 shared "products"
+    And the current account has 3 global "products"
+    And I am the first environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "products"
+    And the JSON response should be an array of 3 "products" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+
+  @ee
+  Scenario: Environment retrieves all shared products
+    Given the current account is "test1"
+    And the current account has 3 isolated "products"
+    And the current account has 3 shared "products"
+    And the current account has 3 global "products"
+    And I am the second environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "products"
+    And the JSON response should be an array of 3 "products" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[1]" },
+          "data": { "type": "environments", "id": "$environments[1]" }
+        }
+      }
+      """
+    And the JSON response should be an array of 3 "products" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
   Scenario: Product attempts to retrieve all products
     Given the current account is "test1"
     And the current account has 3 "products"
