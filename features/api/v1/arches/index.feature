@@ -80,9 +80,9 @@ Feature: List release arches
   Scenario: Environment retrieves their release arches (isolated)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
@@ -146,9 +146,9 @@ Feature: List release arches
   Scenario: Environment retrieves their release arches (isolated)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
@@ -213,9 +213,9 @@ Feature: List release arches
   Scenario: Environment retrieves their release arches (shared)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
@@ -280,9 +280,9 @@ Feature: List release arches
   Scenario: Environment retrieves their release arches (global)
     Given the current account is "test1"
     And the current account has the following "environment" rows:
-      | id                                   | name     | code     |
-      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated |
-      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   |
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
       | id                                   | environment_id                       | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
