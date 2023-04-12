@@ -348,7 +348,7 @@ Feature: Machine heartbeat actions
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "webhook-endpoint"
-    And the current account has 1 shared "machine" with the following:
+    And the current account has 1 isolated "machine" with the following:
       """
       { "lastHeartbeatAt": null }
       """
