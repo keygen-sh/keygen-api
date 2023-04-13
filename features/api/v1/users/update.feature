@@ -1514,6 +1514,35 @@ Feature: Update user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Product updates an isolated user
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Isolated Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the firstName "Isolated Robot"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates a user for their product
     Given the current account is "test1"
     And the current account has 1 "product"
