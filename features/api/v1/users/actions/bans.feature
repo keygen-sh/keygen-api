@@ -56,6 +56,71 @@ Feature: User ban actions
     And the response should contain a valid signature header for "test1"
     Then the response status should be "403"
 
+  @ee
+  Scenario: Environment bans an isolated user
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/ban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      { "status": "BANNED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment bans a shared user
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/ban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      { "status": "BANNED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment bans a global user
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/ban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product bans a user
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -153,6 +218,80 @@ Feature: User ban actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment unbans an isolated user
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user" with the following:
+      """
+      { "bannedAt": "$time.1.minute.ago" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/unban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment unbans a shared user
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user" with the following:
+      """
+      { "bannedAt": "$time.1.minute.ago" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/unban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment unbans a global user
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 global "user" with the following:
+      """
+      { "bannedAt": "$time.1.minute.ago" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/actions/unban"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product unbans a user
