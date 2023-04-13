@@ -27,6 +27,22 @@ Feature: Release entitlements relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "entitlements"
 
+  @ee
+  Scenario: Product retrieves the entitlements for an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "release"
+    And the current account has 3 isolated "release-entitlement-constraints" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/releases/$0/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "entitlements"
+
   Scenario: Product retrieves the entitlements for a release
     Given the current account is "test1"
     And the current account has 1 "product"
