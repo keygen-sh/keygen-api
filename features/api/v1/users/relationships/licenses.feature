@@ -37,6 +37,18 @@ Feature: User licenses relationship
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an array with 3 "licenses"
 
+  @ee
+  Scenario: Environment retrieves the licenses for an isolated user
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "user"
+    And the current account has 3 isolated "licenses" for the last "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/licenses?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
   Scenario: Product retrieves the licenses for a user
     Given the current account is "test1"
     And the current account has 1 "product"

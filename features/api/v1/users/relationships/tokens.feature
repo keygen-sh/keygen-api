@@ -164,6 +164,26 @@ Feature: User tokens relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment generates a shared user token
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/tokens"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
+    And the JSON response should be a "token" with the kind "user-token"
+    And the JSON response should be a "token" with a token
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product generates a user token
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -1391,6 +1411,20 @@ Feature: User tokens relationship
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an array of 1 "token"
+
+  @ee
+  Scenario: Environment requests tokens for one of their isolated users
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 5 isolated "products"
+    And the current account has 1 isolated "token" for each "product"
+    And the current account has 5 isolated "users"
+    And the current account has 1 isolated "token" for each "user"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/tokens?environment=isolated"
+    Then the response status should be "200"
 
   Scenario: Product requests tokens for one of their users
     Given the current account is "test1"
