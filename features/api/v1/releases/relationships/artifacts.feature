@@ -49,6 +49,18 @@ Feature: Release artifacts relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
+  @ee
+  Scenario: Environment retrieves the artifact for an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "releases"
+    And the current account has 3 isolated "artifact" for each "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
   Scenario: Product retrieves the artifacts for a release
     Given the current account is "test1"
     And the current account has 1 "product"

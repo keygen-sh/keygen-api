@@ -65,6 +65,28 @@ Feature: Yank release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment publishes an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "status": "YANKED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product yanks a release
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

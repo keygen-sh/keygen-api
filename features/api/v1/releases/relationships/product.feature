@@ -26,6 +26,17 @@ Feature: Release product relationship
     Then the response status should be "200"
     And the JSON response should be a "product"
 
+  @ee
+  Scenario: Environment retrieves the product for an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "releases"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/product?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "product"
+
   Scenario: Product retrieves the product for a release
     Given the current account is "test1"
     And the current account has 3 "releases"
