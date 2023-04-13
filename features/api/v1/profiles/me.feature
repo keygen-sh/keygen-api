@@ -37,6 +37,16 @@ Feature: Display who the current API token bearer is
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment requests their profile
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/me?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "environment"
+
   Scenario: Product requests their profile
     Given the current account is "test1"
     And the current account has 1 "product"
