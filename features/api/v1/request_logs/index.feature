@@ -111,6 +111,32 @@ Feature: List request logs
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ee
+  Scenario: Environment attempts to retrieve all isolated logs for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "request-logs"
+    And the current account has 3 shared "request-logs"
+    And the current account has 3 global "request-logs"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "request-logs"
+
+  @ee
+  Scenario: Environment attempts to retrieve all shared logs for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "request-logs"
+    And the current account has 3 shared "request-logs"
+    And the current account has 3 global "request-logs"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "request-logs"
+
   Scenario: Product attempts to retrieve all logs for their account
     Given the current account is "test1"
     And the current account has 1 "product"
