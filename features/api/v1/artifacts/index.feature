@@ -269,8 +269,8 @@ Feature: List release artifacts
       """
       {
         "environment": {
-          "links": { "related": "/v1/accounts/$account/environments/e24-351d-47d0-b3c3-2c576a63d22f" },
-          "data": { "type": "environments", "id": "e24-351d-47d0-b3c3-2c576a63d22f" }
+          "links": { "related": "/v1/accounts/$account/environments/bf20fe24-351d-47d0-b3c3-2c576a63d22f" },
+          "data": { "type": "environments", "id": "bf20fe24-351d-47d0-b3c3-2c576a63d22f" }
         }
       }
       """
