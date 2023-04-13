@@ -111,6 +111,42 @@ Feature: List webhook endpoints
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ee
+  Scenario: Environment attempts to retrieve all isolated webhook endpoints for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "webhook-endpoints"
+    And the current account has 3 shared "webhook-endpoints"
+    And the current account has 3 global "webhook-endpoints"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "webhook-endpoints"
+
+  @ee
+  Scenario: Environment attempts to retrieve all shared webhook endpoints for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "webhook-endpoints"
+    And the current account has 3 shared "webhook-endpoints"
+    And the current account has 3 global "webhook-endpoints"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "webhook-endpoints"
+
+  Scenario: Product attempts to retrieve all webhook endpoints for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "webhook-endpoints"
+
   Scenario: License attempts to retrieve all webhook endpoints for their account
     Given the current account is "test1"
     And the current account has 1 "license"

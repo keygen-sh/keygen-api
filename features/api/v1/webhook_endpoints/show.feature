@@ -51,6 +51,26 @@ Feature: Show webhook endpoint
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  @ee
+  Scenario: Environment retrieves an isolated webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "webhook-endpoints"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints/$0?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "webhook-endpoint"
+
+  Scenario: Product retrieves an isolated webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "webhook-endpoints"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
+    Then the response status should be "404"
+
   Scenario: License retrieves a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"

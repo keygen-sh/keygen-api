@@ -81,6 +81,39 @@ Feature: Retry webhook events
     And the JSON response should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
+  @ee
+  Scenario: Environment retries an isolated webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "webhook-endpoint" with the following:
+      """
+      { "url": "https://isolated.example/webhooks" }
+      """
+    And the current account has 1 isolated "webhook-event" with the following:
+      """
+      { "endpoint": "https://isolated.example/webhooks" }
+      """
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "201"
+
+  Scenario: Product retries a webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "webhook-events"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: License retries a webhook event for their account
     Given the current account is "test1"
     And the current account has 1 "license"
