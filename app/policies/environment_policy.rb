@@ -57,4 +57,15 @@ class EnvironmentPolicy < ApplicationPolicy
       deny!
     end
   end
+
+  def me?
+    verify_permissions!('environment.read')
+
+    case bearer
+    in role: { name: 'environment' } if record == bearer
+      allow!
+    else
+      deny!
+    end
+  end
 end
