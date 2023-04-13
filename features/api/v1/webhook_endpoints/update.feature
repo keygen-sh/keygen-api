@@ -163,6 +163,50 @@ Feature: Update webhook endpoint
       }
       """
 
+  @ee
+  Scenario: Environment attempts to update a shared webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 shared "webhook-endpoints"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://shared.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "webhook-endpoint" with the url "https://shared.example"
+
+  Scenario: Product attempts to update a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+
   Scenario: License attempts to update a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"

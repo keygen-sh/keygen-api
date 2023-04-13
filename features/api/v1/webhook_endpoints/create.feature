@@ -495,3 +495,129 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "401"
+
+  @ee
+  Scenario: Environment creates an isolated webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://isolated.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://isolated.example"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      ["*"]
+      """
+    And the response should contain a valid signature header for "test1"
+
+  @ee
+  Scenario: Environment creates a shared webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://shared.example"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environment", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://shared.example"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      ["*"]
+      """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Product creates a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://app.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://app.example"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      ["*"]
+      """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: License creates a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://app.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
+  Scenario: User creates a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://app.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"

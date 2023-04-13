@@ -10,13 +10,15 @@ class RetryWebhookEventService < BaseService
     account = event.account
 
     # FIXME(ezekg) Add an association so we don't have to do this stupid lookup
-    endpoint = account.webhook_endpoints.find_by url: event.endpoint
-    return if endpoint.nil?
+    endpoint = account.webhook_endpoints.find_by(url: event.endpoint)
+    return if
+      endpoint.nil?
 
     new_event = account.webhook_events.create(
       idempotency_token: event.idempotency_token,
       endpoint: event.endpoint,
       payload: event.payload,
+      environment_id: event.environment_id,
       event_type: event.event_type,
       status: 'DELIVERING',
     )
