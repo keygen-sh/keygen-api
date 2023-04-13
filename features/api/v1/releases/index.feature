@@ -588,6 +588,20 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 
+  @ee
+  Scenario: Environment retrieves all shared releases
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "releases"
+    And the current account has 3 shared "releases"
+    And the current account has 3 global "releases"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And the current product has 1 "release"
+    When I send a GET request to "/accounts/test1/releases?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "releases"
+
   Scenario: Product retrieves all releases
     Given the current account is "test1"
     And the current account has 1 "product"
