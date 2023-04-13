@@ -108,6 +108,103 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Admin generates an environment token
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "environment"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Environment Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "environments",
+                "id": "$environments[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin generates a product token
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Product Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin generates a license token
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And time is frozen at "2023-03-24T00:00:00.000Z"
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "License Token"
+          },
+          "relationships": {
+            "bearer": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: Admin generates a user token
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

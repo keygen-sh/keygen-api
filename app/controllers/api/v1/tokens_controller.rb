@@ -62,6 +62,7 @@ module Api::V1
     def generate
       kwargs = token_params.slice(
         :environment_id,
+        :bearer_type,
         :bearer_id,
         :expiry,
         :name,
