@@ -272,6 +272,18 @@ Feature: Show release
       }
       """
 
+  @ee
+  Scenario: Environment retrieves a release for their shared product
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And the current product has 1 "release"
+    When I send a GET request to "/accounts/test1/releases/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "release"
+
   Scenario: Product retrieves a release for their product
     Given the current account is "test1"
     And the current account has 1 "product"

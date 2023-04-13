@@ -314,6 +314,38 @@ Feature: Update release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment updates one of their isolated releases
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "webhook-endpoints"
+    And the current account has 1 isolated "release"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Isolated Release"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "name": "Isolated Release" }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates one of their releases
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
