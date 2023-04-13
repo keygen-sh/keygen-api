@@ -110,6 +110,68 @@ Feature: Upgrade release
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
+  # Environments
+  @ee
+  Scenario: Environment retrieves an upgrade for an isolated release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | environment_id                       | name         |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated App |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c |                                      | Mixed App   |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 4.3.0   | stable  |
+      | 1c7e3e60-248c-4149-9583-26f4d8f99c78 |                                      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | d79f5ffb-f772-4232-94d5-c5563c431ff9 | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 3.0.0   | stable  |
+    And I am the first environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/c8b55f91-e66f-4093-ae4d-7f3d390eae8d/upgrade?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "4.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1",
+        "next": "4.3.0"
+      }
+      """
+
+  @ee
+  Scenario: Environment retrieves an upgrade for a shared release (no upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | environment_id                       | name         |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated App |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c |                                      | Mixed App   |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 4.3.0   | stable  |
+      | 1c7e3e60-248c-4149-9583-26f4d8f99c78 |                                      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | d79f5ffb-f772-4232-94d5-c5563c431ff9 | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 3.0.0   | stable  |
+    And I am the second environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/d79f5ffb-f772-4232-94d5-c5563c431ff9/upgrade?environment=shared"
+    Then the response status should be "404"
+
   # Products
   Scenario: Product retrieves an upgrade for a release (upgrade available)
     Given the current account is "test1"

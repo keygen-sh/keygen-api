@@ -173,6 +173,26 @@ Feature: Release artifact relationship
       }
       """
 
+  @ee
+  Scenario: Environment retrieves the artifact for an isolated release
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "releases"
+    And the current account has 1 isolated "artifact" for each "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "App.dmg" }
+      """
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/$0/artifact?environment=isolated"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "key": "App.dmg" }
+      """
+
   Scenario: Product retrieves the artifact for a release of their product
     Given the current account is "test1"
     And the current account has 1 "product"

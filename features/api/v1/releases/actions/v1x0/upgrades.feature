@@ -161,6 +161,46 @@ Feature: Release upgrade actions
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
+  # Environments
+  @ee
+  Scenario: Environment retrieves an upgrade for an isolated release
+    Given the current account is "test1"
+    And the current account has the following "environment" rows:
+      | id                                   | name     | code     | isolation_strategy |
+      | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
+      | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
+    And the current account has the following "product" rows:
+      | id                                   | environment_id                       | name         |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated App |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared App   |
+    And the current account has the following "release" rows:
+      | id                                   | environment_id                       | product_id                           | version      | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | c09699a3-5cee-4188-8e3c-51483d418a19 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | f1f7fe53-b502-4ec3-ab70-9ca1d1d0ccbd | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable  |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0-beta.1 | dev     |
+    And the current account has the following "artifact" rows:
+      | release_id                           | environment_id                       | filename                  | filetype | platform | arch  |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test-App-1.0.0.zip        | zip      | macos    | x86   |
+      | c09699a3-5cee-4188-8e3c-51483d418a19 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test-App-1.0.1.zip        | zip      | macos    | x86   |
+      | f1f7fe53-b502-4ec3-ab70-9ca1d1d0ccbd | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test-App-1.1.0.zip        | zip      | macos    | x86   |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Test-App-1.0.0.zip        | zip      | win32    | amd64 |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Test-App-2.0.0-beta.1.zip | zip      | win32    | amd64 |
+    And I am a product of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/$1/actions/upgrade?environment=isolated"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1",
+        "next": "1.1.0"
+      }
+      """
+
   # Products
   Scenario: Product retrieves an upgrade for a release (upgrade available)
     Given the current account is "test1"
