@@ -72,6 +72,23 @@ Feature: List authentication tokens
     Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
+  @ee
+  Scenario: Environment requests their tokens while authenticated
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "token" for each "environment"
+    And the current account has 2 isolated "products"
+    And the current account has 1 isolated "token" for each "product"
+    And the current account has 2 isolated "users"
+    And the current account has 1 isolated "token" for each "user"
+    And the current account has 2 isolated "licenses"
+    And the current account has 1 isolated "token" for each "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be an array of 7 "tokens"
+
   Scenario: Product requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 3 "products"
