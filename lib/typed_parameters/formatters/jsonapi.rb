@@ -76,8 +76,12 @@ module TypedParameters
             res[:"#{key.to_s.singularize}_ids"] = linkage.map { _1[:id] }
           in data: []
             res[:"#{key.to_s.singularize}_ids"] = []
-          in data: { type:, id:, **nil } => linkage
-            res[:"#{key}_id"] = linkage[:id]
+          # FIXME(ezekg) Not sure how to make this cleaner, but this handles polymorphic relationships.
+          in data: { type:, id:, **nil } if key.to_s.underscore.classify != type.underscore.classify
+            res[:"#{key}_type"] = type.underscore.classify
+            res[:"#{key}_id"]   = id
+          in data: { type:, id:, **nil }
+            res[:"#{key}_id"] = id
           in data: nil
             res[:"#{key}_id"] = nil
           else

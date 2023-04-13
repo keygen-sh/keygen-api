@@ -195,10 +195,11 @@ class Role < ApplicationRecord
     rank > comparison_role.rank
   end
 
-  def user?    = name.to_sym == :user
-  def admin?   = name.to_sym == :admin
-  def product? = name.to_sym == :product
-  def license? = name.to_sym == :license
+  def user?        = name.to_sym == :user
+  def admin?       = name.to_sym == :admin
+  def environment? = name.to_sym == :environment
+  def product?     = name.to_sym == :product
+  def license?     = name.to_sym == :license
 
   def changed_for_autosave?
     super || role_permissions_attributes_assigned?

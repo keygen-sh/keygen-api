@@ -913,6 +913,12 @@ describe TypedParameters do
             param :password, type: :string
           end
           param :relationships, type: :hash do
+            param :inviter, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: { in: %w[users user] }
+                param :id, type: :string
+              end
+            end
             param :note, type: :hash do
               param :data, type: :hash do
                 param :type, type: :string, inclusion: { in: %w[notes note] }
@@ -962,6 +968,9 @@ describe TypedParameters do
           password: SecureRandom.hex,
         },
         relationships: {
+          inviter: {
+            data: { type: 'users', id: SecureRandom.base58 },
+          },
           note: {
             data: { type: 'notes', id: SecureRandom.base58, attributes: { content: 'Test' } },
           },
@@ -1001,6 +1010,8 @@ describe TypedParameters do
         id: data[:id],
         email: data[:attributes][:email],
         password: data[:attributes][:password],
+        inviter_type: data[:relationships][:inviter][:data][:type].classify,
+        inviter_id: data[:relationships][:inviter][:data][:id],
         note_attributes: {
           id: data[:relationships][:note][:data][:id],
           content: data[:relationships][:note][:data][:attributes][:content],
