@@ -130,6 +130,16 @@ Feature: Show user
       }
       """
 
+  @ee
+  Scenario: Environment retrieves an isolated user for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "users"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$3?environment=isolated"
+    Then the response status should be "200"
+
   Scenario: Product retrieves a user for their product
     Given the current account is "test1"
     And the current account has 1 "product"
