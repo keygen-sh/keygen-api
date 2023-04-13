@@ -74,6 +74,21 @@ Feature: Delete release
     When I send a DELETE request to "/accounts/test1/releases/$2"
     Then the response status should be "403"
 
+  @ee
+  Scenario: Environment deletes one of their shared releases
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "webhook-endpoints"
+    And the current account has 3 shared "releases"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/releases/$2?environment=shared"
+    Then the response status should be "204"
+    And the current account should have 2 "releases"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product deletes one of their releases
     Given the current account is "test1"
     And the current account has 1 "product"
