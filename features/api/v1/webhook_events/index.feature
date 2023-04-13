@@ -27,6 +27,34 @@ Feature: List webhook events
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an array with 3 "webhook-events"
 
+  @ee
+  Scenario: Environment retrieves all isolated webhook events for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "webhook-events"
+    And the current account has 3 shared "webhook-events"
+    And the current account has 3 global "webhook-events"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?environment=isolated"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array with 3 "webhook-events"
+
+  @ee
+  Scenario: Environment retrieves all shared webhook events for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 3 isolated "webhook-events"
+    And the current account has 3 shared "webhook-events"
+    And the current account has 3 global "webhook-events"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?environment=shared"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array with 6 "webhook-events"
+
   Scenario: Product retrieves all webhook events for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"

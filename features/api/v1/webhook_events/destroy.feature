@@ -27,6 +27,27 @@ Feature: Delete webhook event
     And the current account should have 2 "webhook-events"
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Environment attempts to delete an isolated webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 3 isolated "webhook-events"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/webhook-events/$1?environment=isolated"
+    Then the response status should be "204"
+
+  Scenario: Product attempts to delete a webhook event for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-events"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/webhook-events/$1"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: License attempts to delete a webhook event for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
