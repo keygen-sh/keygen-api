@@ -14,6 +14,8 @@ module Api::V1::RequestLogs::Actions
         start_date = Date.current - 13.days
         end_date   = Date.current
 
+        # FIXME(ezekg) Counts should take into account the current environment. Need to update
+        #              indexes and all that jazz to also include the environment_id.
         rows = conn.execute(<<~SQL.squish)
           SELECT
             coalesce(logs.count, 0) AS count,

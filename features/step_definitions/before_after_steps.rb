@@ -26,6 +26,10 @@ Before do |scenario|
     Keygen.ee? && scenario.tags.any? { _1.name == '@ce' } ||
     Keygen.ce? && scenario.tags.any? { _1.name == '@ee' }
 
+  # And of course, skip if we need to skip.
+  return skip_this_scenario if
+    scenario.tags.any? { _1.name == '@skip' }
+
   Bullet.start_request if Bullet.enable?
 
   ActionMailer::Base.deliveries.clear
