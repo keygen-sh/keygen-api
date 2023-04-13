@@ -50,6 +50,22 @@ Feature: User group relationship
     And the JSON response should be a "group"
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Environment retrieves the group for a shared user
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "group"
+    And the current account has 1 shared "user" for the last "group"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a GET request to "/accounts/test1/users/$1/group"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
+
   Scenario: Product retrieves the group for a user
     Given the current account is "test1"
     And the current account has 1 "product"
