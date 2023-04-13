@@ -153,6 +153,44 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment lists an isolated admin's second factors
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "admin"
+    And the last "admin" has 2FA enabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment lists an isolated user's second factors
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user"
+    And the last "user" has 2FA enabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product lists an admin's second factors
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -251,6 +289,21 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment retrieve a shared user's second factor
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user"
+    And the last "user" has 2FA enabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors/$0?environment=shared"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product retrieve a user's second factor
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -303,6 +356,32 @@ Feature: Manage second factors for user
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a second factor for an isolated user with no other second factor and provides a correct password
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "webhook-endpoint"
+    And the current account has 1 isolated "user"
+    And the last "user" does not have 2FA
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/users/$1/second-factors" with the following:
+      """
+      {
+        "meta": {
+          "password": "password"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a second factor for a user with no other second factor and provides a correct password
@@ -659,6 +738,38 @@ Feature: Manage second factors for user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment attempts to enable a shared user's second factor
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user"
+    And the last "user" has 2FA disabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second_factor",
+          "attributes": {
+            "enabled": true
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to enable a user's second factor
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -831,6 +942,38 @@ Feature: Manage second factors for user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment attempts to disable a shared user's second factor
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user"
+    And the last "user" has 2FA enabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second_factor",
+          "attributes": {
+            "enabled": false
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to disable a user's second factor
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -938,6 +1081,28 @@ Feature: Manage second factors for user
     Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment attempts to delete a shared user's second factor
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "webhook-endpoint"
+    And the current account has 1 shared "user"
+    And the first "user" has 2FA enabled
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1/second-factors/$0?environment=shared" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete a user's second factor
