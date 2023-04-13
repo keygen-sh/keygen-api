@@ -1958,6 +1958,28 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @ee
+  Scenario: Environment performs a search
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search?environment=shared" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "email": "test@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Product performs a search
     Given the current account is "test1"
     And the current account has 1 "product"
