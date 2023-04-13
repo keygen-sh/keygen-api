@@ -1768,6 +1768,65 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment creates an isolated admin for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Ironman",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "my suit's cool",
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Environment creates a shared user for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "test@keygen.example"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the role "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product creates an admin for their account
     Given the current account is "test1"
     And the current account has 1 "product"

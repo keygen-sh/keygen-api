@@ -91,6 +91,21 @@ Feature: Delete user
     And the JSON response should be an array of 1 error
     And the current account should have 3 "users"
 
+  @ee
+  Scenario: Environment attempts to delete one of their isolated users
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "webhook-endpoints"
+    And the current account has 3 isolated "users"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3?environment=isolated"
+    Then the response status should be "204"
+    And the current account should have 2 "users"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to delete one of their users
     Given the current account is "test1"
     And the current account has 1 "product"
