@@ -38,6 +38,15 @@ Feature: Revoke authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
+  Scenario: Environment revokes one of their tokens
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0?environment=shared"
+    Then the response status should be "204"
+
   Scenario: Product revokes one of their tokens
     Given the current account is "test1"
     And the current account has 1 "product"
