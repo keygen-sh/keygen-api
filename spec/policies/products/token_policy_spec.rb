@@ -183,17 +183,23 @@ describe Products::TokenPolicy, type: :policy do
       with_scenarios %i[accessing_a_product accessing_its_token] do
         with_token_authentication do
           with_permissions %w[token.read] do
+            without_token_permissions { denies :show }
+
             allows :show
+          end
+
+          with_permissions %w[product.tokens.generate] do
+            without_token_permissions { denies :create }
+
+            allows :create
           end
 
           with_wildcard_permissions do
-            denies :create
-            allows :show
+            allows :show, :create
           end
 
           with_default_permissions do
-            denies :create
-            allows :show
+            allows :show, :create
           end
 
           without_permissions do
