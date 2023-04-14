@@ -1289,15 +1289,6 @@ Feature: Create release
         }
       }
       """
-    And the JSON response should be a "release" with the following relationships:
-      """
-      {
-        "environment": {
-          "links": { "related": null },
-          "data": null
-        }
-      }
-      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

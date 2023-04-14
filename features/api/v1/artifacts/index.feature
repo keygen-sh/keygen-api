@@ -141,9 +141,9 @@ Feature: List release artifacts
       | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Isolated | isolated | ISOLATED           |
       | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Shared   | shared   | SHARED             |
     And the current account has the following "product" rows:
-      | id                                   | name   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
+      | id                                   | environment_id                       | name   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 60e7f35f-5401-4cc2-abd3-999b2a758ee1 | Test 2 |
     And the current account has the following "release" rows:
       | id                                   | environment_id                       | product_id                           | version                    | channel |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | bf20fe24-351d-47d0-b3c3-2c576a63d22f | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | alpha   |
