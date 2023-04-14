@@ -24,7 +24,7 @@ gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 
 # XML/HTML
-gem 'nokogiri', '~> 1.14.0.rc1'
+gem 'nokogiri', '~> 1.14.3'
 gem 'rails-html-sanitizer', '~> 1.4.4'
 gem 'loofah', '~> 2.19.1'
 

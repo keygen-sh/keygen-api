@@ -293,7 +293,7 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.14.2)
+    nokogiri (1.14.3)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     oj (3.13.23)
@@ -485,7 +485,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   lograge
   loofah (~> 2.19.1)
-  nokogiri (~> 1.14.0.rc1)
+  nokogiri (~> 1.14.3)
   oj
   openssl (~> 3.1.0)
   parallel_tests (~> 3.13)
