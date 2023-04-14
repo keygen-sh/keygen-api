@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module KeygenHelper
-  module ClassMethods
+  module ScenarioMethods
     def within_ee(expiry: 1.year.from_now.iso8601, issued: 1.day.ago.iso8601, entitlements: %i[request_logs event_logs permissions environments multiplayer], &block)
       context 'when in an EE context' do
         before do
@@ -33,6 +33,6 @@ module KeygenHelper
   end
 
   def self.included(klass)
-    klass.extend ClassMethods
+    klass.extend ScenarioMethods
   end
 end
