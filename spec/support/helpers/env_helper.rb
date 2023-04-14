@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EnvHelper
-  module InstanceMethods
+  module WorldMethods
     def with_prestine_env(&)
       prev_env = ENV.to_hash
       ENV.clear
@@ -28,7 +28,7 @@ module EnvHelper
     end
   end
 
-  module ClassMethods
+  module ScenarioMethods
     def with_prestine_env(&)
       prev_env = ENV.to_hash
 
@@ -60,7 +60,7 @@ module EnvHelper
   end
 
   def self.included(klass)
-    klass.include InstanceMethods
-    klass.extend ClassMethods
+    klass.include WorldMethods
+    klass.extend ScenarioMethods
   end
 end

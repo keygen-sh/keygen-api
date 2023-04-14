@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FileHelper
-  module ClassMethods
+  module ScenarioMethods
     def with_file(path:, content: nil, fixture: nil, &)
       p = if (p = Pathname.new(path)) && p.relative?
             Rails.root.join(p)
@@ -31,6 +31,6 @@ module FileHelper
   end
 
   def self.included(klass)
-    klass.extend ClassMethods
+    klass.extend ScenarioMethods
   end
 end
