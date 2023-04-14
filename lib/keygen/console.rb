@@ -43,7 +43,7 @@ module Keygen
       puts '-' * CONSOLE_WIDTH
       puts " Ruby: #{RUBY_DESCRIPTION}"
       puts " Rails: #{Rails.version} #{Rails.env} (RubyGems #{Gem::VERSION}, Rack #{Rack.release})"
-      puts " Keygen: #{Keygen::VERSION} (#{Keygen.ee? ? 'EE' : 'CE'})"
+      puts " Keygen: #{Keygen::VERSION} (#{Keygen.ee? ? 'EE' : 'CE'}, #{Keygen.multiplayer? ? 'multiplayer' : 'singleplayer'})"
       Keygen.ee do |key, lic|
         puts "   License: #{key.name || 'Unnamed'} (#{key.id})"
         puts "   Entitlements: #{key.entitlements.join(', ')}"

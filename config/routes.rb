@@ -342,7 +342,12 @@ Rails.application.routes.draw do
   scope module: "api", constraints: { format: "jsonapi" } do
     namespace "v1" do
       constraints subdomain: %w[api], **domain_constraints do
-        post "stripe", to: "stripe#receive_webhook"
+        if Keygen.cloud?
+          post "stripe", to: "stripe#receive_webhook"
+
+          # Pricing
+          resources "plans", only: %i[index show]
+        end
 
         # Health checks
         get "health", to: "health#general_health"
@@ -351,28 +356,30 @@ Rails.application.routes.draw do
         # Recover
         post "recover", to: "recoveries#recover"
 
-        # Pricing
-        resources "plans", only: [:index, :show]
-
-        # Routes with :account namespace
-        resources "accounts", concerns: %i[v1], except: [:index] do
-          scope module: "accounts/relationships" do
-            resource "billing", only: [:show, :update]
-            resource "plan", only: [:show, :update]
-          end
-          member do
-            scope "actions", module: "accounts/actions" do
-              post "manage-subscription", to: "subscription#manage"
-              post "pause-subscription", to: "subscription#pause"
-              post "resume-subscription", to: "subscription#resume"
-              post "cancel-subscription", to: "subscription#cancel"
-              post "renew-subscription", to: "subscription#renew"
+        # Routes with :account namespace i.e. multiplayer mode.
+        if Keygen.multiplayer?
+          resources "accounts", concerns: %i[v1], except: %i[index] do
+            if Keygen.cloud?
+              scope module: "accounts/relationships" do
+                resource "billing", only: %i[show update]
+                resource "plan", only: %i[show update]
+              end
+              member do
+                scope "actions", module: "accounts/actions" do
+                  post "manage-subscription", to: "subscription#manage"
+                  post "pause-subscription", to: "subscription#pause"
+                  post "resume-subscription", to: "subscription#resume"
+                  post "cancel-subscription", to: "subscription#cancel"
+                  post "renew-subscription", to: "subscription#renew"
+                end
+              end
             end
           end
         end
       end
 
-      # Routes without :account namespace (used via CNAMEs)
+      # Routes without :account namespace i.e. singleplayer mode. This is
+      # also used for CNAME routing (under multiplayer mode).
       concerns :v1
     end
   end
