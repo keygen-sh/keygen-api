@@ -78,8 +78,7 @@ module TypedParameters
             res[:"#{key.to_s.singularize}_ids"] = []
           # FIXME(ezekg) Not sure how to make this cleaner, but this handles polymorphic relationships.
           in data: { type:, id:, **nil } if key.to_s.underscore.classify != type.underscore.classify
-            res[:"#{key}_type"] = type.underscore.classify
-            res[:"#{key}_id"]   = id
+            res[:"#{key}_type"], res[:"#{key}_id"] = type.underscore.classify, id
           in data: { type:, id:, **nil }
             res[:"#{key}_id"] = id
           in data: nil
