@@ -14,11 +14,13 @@ module FileHelper
             content
           end
 
-      before do
-        allow(File).to receive(:read).with(p).and_return(v || '')
-      end
+      context "with file #{path.inspect}" do
+        before do
+          allow(File).to receive(:read).with(p).and_return(v || '')
+        end
 
-      yield
+        instance_exec(&)
+      end
     end
 
     def file_fixture(fixture)

@@ -19,13 +19,13 @@ module Keygen
     def test?    = Rails.env.test?
     def worker?  = sidekiq?
 
-    def multiplayer?  = ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) }
+    def multiplayer?  = !!(ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) })
     def singleplayer? = !multiplayer?
 
     def cloud? = ENV['KEYGEN_HOST'] == 'api.keygen.sh'
 
-    def ce? = !lic? && !key?
-    def ee? = !ce?
+    def ee? = lic? && key?
+    def ce? = !ee?
 
     def ee(&block)
       return unless
