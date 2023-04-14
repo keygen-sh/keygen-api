@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  module ClassMethods
+  module ScenarioMethods
     def within_console(&)
       context 'when in a Rails console environment' do
         before { stub_const('Rails::Console', Class.new) }
@@ -31,6 +31,6 @@ module ApplicationHelper
   end
 
   def self.included(klass)
-    klass.extend ClassMethods
+    klass.extend ScenarioMethods
   end
 end

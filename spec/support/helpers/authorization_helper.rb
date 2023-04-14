@@ -1413,9 +1413,9 @@ module AuthorizationHelper
   end
 
   ##
-  # ClassMethods contains class methods that are mixed in when
+  # ScenarioMethods contains scenario methods that are mixed in when
   # the AuthorizationHelper is included.
-  module ClassMethods
+  module ScenarioMethods
     ##
     # with_role_authorization starts an authorization test for a given role.
     def with_role_authorization(role, &)
@@ -1839,8 +1839,8 @@ module AuthorizationHelper
   end
 
   ##
-  # included mixes in ClassMethods on include.
+  # included mixes in ScenarioMethods on include.
   def self.included(klass)
-    klass.extend ClassMethods
+    klass.extend ScenarioMethods
   end
 end
