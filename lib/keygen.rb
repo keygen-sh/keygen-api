@@ -16,7 +16,13 @@ module Keygen
 
     def console? = Rails.const_defined?(:Console)
     def server?  = Rails.const_defined?(:Server) || puma?
+    def test?    = Rails.env.test?
     def worker?  = sidekiq?
+
+    def multiplayer?  = ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) }
+    def singleplayer? = !multiplayer?
+
+    def cloud? = ENV['KEYGEN_HOST'] == 'api.keygen.sh'
 
     def ce? = !lic? && !key?
     def ee? = !ce?
