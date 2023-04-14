@@ -78,6 +78,104 @@ describe Keygen, type: :ee do
     end
   end
 
+  describe '.multiplayer?' do
+    within_ce do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return false in multiplayer mode' do
+          expect(Keygen.multiplayer?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer' do
+        it 'should return false in singleplayer mode' do
+          expect(Keygen.multiplayer?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: nil do
+        it 'should return false in nil mode' do
+          expect(Keygen.multiplayer?).to be false
+        end
+      end
+    end
+
+    within_ee do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return true in multiplayer mode' do
+          expect(Keygen.multiplayer?).to be true
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer' do
+        it 'should return false in singleplayer mode' do
+          expect(Keygen.multiplayer?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: nil do
+        it 'should return false in nil mode' do
+          expect(Keygen.multiplayer?).to be false
+        end
+      end
+    end
+  end
+
+  describe '.singleplayer?' do
+    within_ce do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return true in multiplayer mode' do
+          expect(Keygen.singleplayer?).to be true
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer' do
+        it 'should return true in singleplayer mode' do
+          expect(Keygen.singleplayer?).to be true
+        end
+      end
+
+      with_env KEYGEN_MODE: nil do
+        it 'should return true in nil mode' do
+          expect(Keygen.singleplayer?).to be true
+        end
+      end
+    end
+
+    within_ee do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return false in multiplayer mode' do
+          expect(Keygen.singleplayer?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer' do
+        it 'should return true in singleplayer mode' do
+          expect(Keygen.singleplayer?).to be true
+        end
+      end
+
+      with_env KEYGEN_MODE: nil do
+        it 'should return true in nil mode' do
+          expect(Keygen.singleplayer?).to be true
+        end
+      end
+    end
+  end
+
+  describe '.cloud?' do
+    with_env KEYGEN_HOST: 'api.keygen.sh' do
+      it 'should return true in a Keygen Cloud env' do
+        expect(Keygen.cloud?).to be true
+      end
+    end
+
+    with_env KEYGEN_HOST: 'api.example' do
+      it 'should return false in a non-Cloud env' do
+        expect(Keygen.cloud?).to be false
+      end
+    end
+  end
+
   describe '.ce?' do
     within_ce do
       it 'should return true in a CE env' do
