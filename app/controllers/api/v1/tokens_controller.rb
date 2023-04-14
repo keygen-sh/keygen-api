@@ -34,6 +34,14 @@ module Api::V1
         param :attributes, type: :hash do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
+          Keygen.ee do |license|
+            next unless
+              license.entitled?(:permissions)
+
+            param :permissions, type: :array, optional: true, if: -> { current_account.ent? } do
+              items type: :string
+            end
+          end
         end
         param :relationships, type: :hash, optional: true do
           param :bearer, type: :hash, optional: true do
@@ -64,6 +72,7 @@ module Api::V1
         :environment_id,
         :bearer_type,
         :bearer_id,
+        :permissions,
         :expiry,
         :name,
       )

@@ -1108,20 +1108,15 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the JSON response should be a "token" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": ["license.validate"]
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin with 2FA enabled generates a new token via basic authentication without an OTP code
@@ -1571,7 +1566,8 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token with custom permissions (standard tier)
+  @ce
+  Scenario: User attempts to generate a new token with custom permissions (standard tier, CE)
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -1606,7 +1602,8 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token with custom permissions (ent tier)
+  @ce
+  Scenario: User attempts to generate a new token with custom permissions (ent tier, CE)
     Given the current account is "ent1"
     And the current account has 1 "user"
     And I am a user of account "ent1"
@@ -1632,6 +1629,76 @@ Feature: Generate authentication token
       {
         "title": "Bad request",
         "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: User generates a new token with allowed permissions (ent tier, EE)
+    Given the current account is "ent1"
+    And the current account has 4 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "permissions": ["license.validate"]
+      }
+      """
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: User generates a new token with disallowed permissions (ent tier, EE)
+    Given the current account is "ent1"
+    And the current account has 4 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["admin.create"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
         }
