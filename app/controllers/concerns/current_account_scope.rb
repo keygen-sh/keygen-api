@@ -15,10 +15,16 @@ module CurrentAccountScope
 
     def scope_to_current_account!
       run_callbacks :current_account_scope do
-        Current.account ||= ResolveAccountService.call!(request:)
+        account = (
+          Current.account ||= case
+                              when Keygen.singleplayer?
+                                ResolveAccountService.call!(request: nil)
+                              when Keygen.multiplayer?
+                                ResolveAccountService.call!(request:)
+                              end
+        )
 
-        # TODO(ezekg) Should we deprecate this?
-        @current_account = Current.account
+        @current_account = account
       end
     end
 
