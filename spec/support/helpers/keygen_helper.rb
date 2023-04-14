@@ -2,7 +2,7 @@
 
 module KeygenHelper
   module ClassMethods
-    def within_ee(expiry: 1.year.from_now.iso8601, issued: 1.day.ago.iso8601, entitlements: %i[request_logs event_logs permissions], &block)
+    def within_ee(expiry: 1.year.from_now.iso8601, issued: 1.day.ago.iso8601, entitlements: %i[request_logs event_logs permissions environments], &block)
       context 'when in an EE context' do
         before do
           allow(Keygen).to receive(:ce?).and_return false
