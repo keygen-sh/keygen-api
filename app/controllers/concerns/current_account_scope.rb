@@ -16,12 +16,7 @@ module CurrentAccountScope
     def scope_to_current_account!
       run_callbacks :current_account_scope do
         account = (
-          Current.account ||= case
-                              when Keygen.singleplayer?
-                                ResolveAccountService.call!(request: nil)
-                              when Keygen.multiplayer?
-                                ResolveAccountService.call!(request:)
-                              end
+          Current.account ||= ResolveAccountService.call!(request:)
         )
 
         @current_account = account

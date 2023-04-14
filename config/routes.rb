@@ -358,7 +358,7 @@ Rails.application.routes.draw do
 
         # Routes with :account namespace i.e. multiplayer mode.
         if Keygen.multiplayer?
-          resources "accounts", concerns: %i[v1], except: %i[index] do
+          resources "accounts", except: %i[index] do
             if Keygen.cloud?
               scope module: "accounts/relationships" do
                 resource "billing", only: %i[show update]
@@ -374,7 +374,13 @@ Rails.application.routes.draw do
                 end
               end
             end
+
+            concerns :v1
           end
+        else
+          resources "accounts",
+            except: %i[create index],
+            concerns: %i[v1]
         end
       end
 

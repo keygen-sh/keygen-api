@@ -9,24 +9,30 @@ class ResolveAccountService < BaseService
   end
 
   def call!
-    account_id = request.params[:account_id] ||
-                 request.params[:id]
+    case
+    when Keygen.singleplayer?
+      # TODO(ezekg) Replace this with an ENV lookup?
+      Account.first
+    when Keygen.multiplayer?
+      account_id = request.params[:account_id] ||
+                   request.params[:id]
 
-    # Adds CNAME support for custom domains
-    account = find_by_account_domain(request.host) ||
-              find_by_account_id!(account_id)
-
-    account
+      # Adds CNAME support for custom domains
+      find_by_account_domain(request.host) || find_by_account_id!(account_id)
+    end
   end
 
   def call
-    account_id = request.params[:account_id] ||
-                 request.params[:id]
+    case
+    when Keygen.singleplayer?
+      # TODO(ezekg) Replace this with an ENV lookup?
+      Account.first
+    when Keygen.multiplayer?
+      account_id = request.params[:account_id] ||
+                   request.params[:id]
 
-    account = find_by_account_domain(request.host) ||
-              find_by_account_id(account_id)
-
-    account
+      find_by_account_domain(request.host) || find_by_account_id(account_id)
+    end
   end
 
   private
