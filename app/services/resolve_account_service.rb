@@ -11,7 +11,7 @@ class ResolveAccountService < BaseService
   def call!
     case
     when Keygen.singleplayer?
-      account_id = ENV['KEYGEN_ACCOUNT_ID'] || request.params[:account_id] || request.params[:id]
+      account_id = request.params[:account_id]
       raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
         account_id.present?
 
@@ -21,10 +21,9 @@ class ResolveAccountService < BaseService
 
       account
     when Keygen.multiplayer?
-      account_id   = request.params[:account_id] || request.params[:id]
+      account_id   = request.params[:account_id]
       account_host = request.host
 
-      # Adds CNAME support for custom domains
       account = find_by_account_cname(account_host) ||
                 find_by_account_id!(account_id)
 
