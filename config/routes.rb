@@ -336,55 +336,64 @@ Rails.application.routes.draw do
       end
     end
 
-    post "search", to: "searches#search"
+    post :search, to: 'searches#search'
   end
 
-  scope module: "api", constraints: { format: "jsonapi" } do
-    namespace "v1" do
+  scope module: :api, constraints: { format: :jsonapi } do
+    namespace :v1 do
       constraints subdomain: %w[api], **domain_constraints do
         if Keygen.cloud?
-          post "stripe", to: "stripe#receive_webhook"
+          post :stripe, to: 'stripe#receive_webhook'
 
           # Pricing
-          resources "plans", only: %i[index show]
+          resources :plans,
+            only: %i[index show]
         end
 
         # Health checks
-        get "health", to: "health#general_health"
-        get "health/webhooks", to: "health#webhook_health"
+        get :health,
+          to: 'health#general_health'
+
+        scope :health do
+          get :webhooks,
+            to: 'health#webhook_health'
+        end
 
         # Recover
-        post "recover", to: "recoveries#recover"
+        post :recover,
+          to: 'recoveries#recover'
 
-        # Routes with :account namespace i.e. multiplayer mode.
-        if Keygen.multiplayer?
-          resources :accounts, except: %i[index] do
-            if Keygen.cloud?
-              scope module: "accounts/relationships" do
-                resource :billing, only: %i[show update]
-                resource :plan, only: %i[show update]
-              end
-              member do
-                scope :actions, module: "accounts/actions" do
-                  post "manage-subscription", to: "subscription#manage"
-                  post "pause-subscription", to: "subscription#pause"
-                  post "resume-subscription", to: "subscription#resume"
-                  post "cancel-subscription", to: "subscription#cancel"
-                  post "renew-subscription", to: "subscription#renew"
-                end
-              end
+        # Account
+        case
+        when Keygen.singleplayer?
+          resources :account, param: :account_id, only: %i[show update]
+        when Keygen.multiplayer?
+          resources :account, param: :account_id, only: %i[show create update]
+        end
+
+        # Routes with :account_id scope i.e. multiplayer mode. Most of these
+        # routes are also available in singleplayer mode for compatiblity.
+        scope 'accounts/:account_id', as: :account do
+          if Keygen.cloud?
+            scope module: :relationships do
+              resource :billing, only: %i[show update]
+              resource :plan,    only: %i[show update]
             end
 
-            concerns :v1
+            scope :actions, module: :actions do
+              post :manage_subscription, path: 'manage-subscription', to: 'subscription#manage'
+              post :pause_subscription,  path: 'pause-subscription',  to: 'subscription#pause'
+              post :resume_subscription, path: 'resume-subscription', to: 'subscription#resume'
+              post :cancel_subscription, path: 'cancel-subscription', to: 'subscription#cancel'
+              post :renew_subscription,  path: 'renew-subscription',  to: 'subscription#renew'
+            end
           end
-        else
-          resources :accounts, except: %i[create index] do
-            concerns :v1
-          end
+
+          concerns :v1
         end
       end
 
-      # Routes without :account namespace i.e. singleplayer mode. This is
+      # Routes without :account_id scope i.e. singleplayer mode. This is
       # also used for CNAME routing (under multiplayer mode).
       concerns :v1
     end
