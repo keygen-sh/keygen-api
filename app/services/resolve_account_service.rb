@@ -11,35 +11,40 @@ class ResolveAccountService < BaseService
   def call!
     case
     when Keygen.singleplayer?
-      # TODO(ezekg) Replace this with an ENV lookup?
-      Account.first
+      account_id = ENV['KEYGEN_ACCOUNT_ID'] || request.params[:account_id] || request.params[:id]
+      raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
+        account_id.present?
+
+      account = find_by_account_id!(account_id)
+      raise Keygen::Error::InvalidAccountIdError, 'account must match KEYGEN_ACCOUNT_ID' unless
+        account.id == ENV['KEYGEN_ACCOUNT_ID']
+
+      account
     when Keygen.multiplayer?
-      account_id = request.params[:account_id] ||
-                   request.params[:id]
+      account_id   = request.params[:account_id] || request.params[:id]
+      account_host = request.host
 
       # Adds CNAME support for custom domains
-      find_by_account_domain(request.host) || find_by_account_id!(account_id)
+      account = find_by_account_cname(account_host) ||
+                find_by_account_id!(account_id)
+
+      account
     end
   end
 
   def call
-    case
-    when Keygen.singleplayer?
-      # TODO(ezekg) Replace this with an ENV lookup?
-      Account.first
-    when Keygen.multiplayer?
-      account_id = request.params[:account_id] ||
-                   request.params[:id]
-
-      find_by_account_domain(request.host) || find_by_account_id(account_id)
-    end
+    call!
+  rescue Keygen::Error::InvalidAccountDomainError,
+         Keygen::Error::InvalidAccountIdError,
+         Keygen::Error::NotFoundError
+    nil
   end
 
   private
 
   attr_reader :request
 
-  def find_by_account_domain!(domain)
+  def find_by_account_cname!(domain)
     raise Keygen::Error::InvalidAccountDomainError, 'domain is required' unless
       domain.present?
 
@@ -54,15 +59,15 @@ class ResolveAccountService < BaseService
     end
   end
 
-  def find_by_account_domain(...)
-    find_by_account_domain!(...)
+  def find_by_account_cname(...)
+    find_by_account_cname!(...)
   rescue Keygen::Error::InvalidAccountDomainError,
          Keygen::Error::NotFoundError
     nil
   end
 
   def find_by_account_id!(id)
-    raise Keygen::Error::InvalidAccountIdError, 'id is required' unless
+    raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
       id.present?
 
     cache_key = Account.cache_key(id)
