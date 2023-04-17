@@ -1120,7 +1120,8 @@ Feature: Generate authentication token
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin with 2FA enabled generates a new token via basic authentication without an OTP code
-    Given I am an admin of account "test1"
+    Given the current account is "test1"
+    And I am an admin of account "test1"
     And I have 2FA enabled
     And I send the following headers:
       """
@@ -1142,7 +1143,8 @@ Feature: Generate authentication token
       """
 
   Scenario: Admin with 2FA enabled generates a new token via basic authentication with an invalid OTP code
-    Given I am an admin of account "test1"
+    Given the current account is "test1"
+    And I am an admin of account "test1"
     And I have 2FA enabled
     And I send the following headers:
       """
@@ -1171,7 +1173,8 @@ Feature: Generate authentication token
       """
 
   Scenario: Admin with 2FA enabled generates a new token via basic authentication with a valid OTP code
-    Given I am an admin of account "test1"
+    Given the current account is "test1"
+    And I am an admin of account "test1"
     And I have 2FA enabled
     And I send the following headers:
       """

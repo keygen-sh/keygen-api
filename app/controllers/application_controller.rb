@@ -396,8 +396,8 @@ class ApplicationController < ActionController::API
       render_not_found
     end
   rescue Keygen::Error::InvalidAccountDomainError,
-         Keygen::Error::InvalidAccountIdError
-    render_not_found
+         Keygen::Error::InvalidAccountIdError => e
+    render_not_found detail: e.message
   rescue Keygen::Error::InvalidEnvironmentError => e
     render_bad_request detail: e.message, source: { header: 'Keygen-Environment' }
   rescue ActiveModel::RangeError
