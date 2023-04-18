@@ -16,7 +16,7 @@ class ResolveAccountService < BaseService
         account_id.present?
 
       account = find_by_account_id!(account_id)
-      raise Keygen::Error::InvalidAccountIdError, 'account must match KEYGEN_ACCOUNT_ID' unless
+      raise Keygen::Error::InvalidAccountIdError, "account is invalid (expected #{ENV['KEYGEN_ACCOUNT_ID']})" unless
         account.id == ENV['KEYGEN_ACCOUNT_ID']
 
       account
