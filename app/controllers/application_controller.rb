@@ -113,7 +113,7 @@ class ApplicationController < ActionController::API
       meta: { id: request.request_id },
       errors: [{
         title: "Not found",
-        detail: "The requested resource was not found",
+        detail: "The requested endpoint was not found (check your HTTP method and resource path)",
         code: "NOT_FOUND",
         **kwargs,
       }],
@@ -393,7 +393,7 @@ class ApplicationController < ActionController::API
         render_not_found detail: "The requested #{resource} was not found"
       end
     else
-      render_not_found
+      render_not_found detail: 'The requested resource was not found'
     end
   rescue Keygen::Error::InvalidAccountDomainError,
          Keygen::Error::InvalidAccountIdError => e
@@ -447,8 +447,9 @@ class ApplicationController < ActionController::API
     end
   rescue ActionPolicy::NotFound => e
     Keygen.logger.warn { "[action_policy] message=#{e.message}" }
+    Keygen.logger.exception(e)
 
-    render_not_found
+    render_internal_server_error
   rescue ActionPolicy::Unauthorized => e
     Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
 
