@@ -141,11 +141,21 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
 
+  @mp
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
     And I use an authentication token
     When I send a GET request to "/accounts/test1"
     Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "request-log" jobs
+
+  @sp
+  Scenario: Admin attempts to retrieve another account
+    Given I am an admin of account "test2"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "404"
     And the JSON response should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 

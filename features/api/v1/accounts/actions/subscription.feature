@@ -1,6 +1,6 @@
 @api/v1
+@mp
 Feature: Account subscription actions
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
