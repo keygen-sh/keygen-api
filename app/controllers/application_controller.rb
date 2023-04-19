@@ -457,10 +457,12 @@ class ApplicationController < ActionController::API
     reasons = [].tap do |accum|
       e.result.reasons.details.each do |policy, rules|
         case rules
-        in [Symbol, *]
+        in [Symbol, *] => symbols
           # We should always use inline_reasons: when calling allowed_to?().
           # Consider symbol reasons a bug, as they are noncommunicative.
-          Keygen.logger.warn { "[action_policy] policy=#{policy} symbol=#{_1}" }
+          symbols.each do |symbol|
+            Keygen.logger.warn { "[action_policy] policy=#{policy} symbol=#{symbol}" }
+          end
         in [String, *]
           rules.each { accum << _1 }
         in [Hash, *]
