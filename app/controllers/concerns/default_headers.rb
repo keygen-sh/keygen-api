@@ -63,6 +63,7 @@ module DefaultHeaders
     add_whoami_headers
     add_environment_header
     add_license_header
+    add_edition_header
     add_mode_header
     add_version_header
     add_powered_by_header
@@ -120,12 +121,12 @@ module DefaultHeaders
     end
   end
 
+  def add_edition_header
+    response.headers['Keygen-Edition'] = Keygen.edition
+  end
+
   def add_mode_header
-    response.headers['Keygen-Mode'] = if Keygen.multiplayer?
-                                        'multiplayer'
-                                      else
-                                        'singleplayer'
-                                      end
+    response.headers['Keygen-Mode'] = Keygen.mode
   end
 
   def add_version_header
