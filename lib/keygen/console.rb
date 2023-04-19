@@ -32,10 +32,7 @@ module Keygen
                                 .°°..
     TXT
 
-    def welcome!
-      return unless
-        Keygen.server? || Keygen.worker?
-
+    def about!
       puts '-' * CONSOLE_WIDTH
       puts
       puts LOGOMARK.lines.map { ' ' * LOGOMARK_PAD + _1 }.join
@@ -52,7 +49,13 @@ module Keygen
         puts "   Reup: #{lic.expiry || 'None'}"
       end
       puts '-' * CONSOLE_WIDTH
+    end
 
+    def welcome!
+      return unless
+        Keygen.server? || Keygen.worker?
+
+      about!
       warn!
       err!
     end
