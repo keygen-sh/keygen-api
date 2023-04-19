@@ -15,22 +15,26 @@ class AccountSerializer < BaseSerializer
     @object.updated_at
   end
 
-  relationship :billing, unless: -> { @object.billing.nil? } do
-    linkage always: true do
-      { type: :billings, id: @object.billing&.id }
+  if Keygen.multiplayer?
+    relationship :billing, unless: -> { @object.billing.nil? } do
+      linkage always: true do
+        { type: :billings, id: @object.billing&.id }
+      end
+      link :related do
+        @url_helpers.v1_account_billing_path @object if @object.billing.present?
+      end
     end
-    link :related do
-      @url_helpers.v1_account_billing_path @object if @object.billing.present?
+
+    relationship :plan, unless: -> { @object.plan_id.nil? } do
+      linkage always: true do
+        { type: :plans, id: @object.plan_id }
+      end
+      link :related do
+        @url_helpers.v1_account_plan_path @object if @object.plan_id.present?
+      end
     end
   end
-  relationship :plan, unless: -> { @object.plan_id.nil? } do
-    linkage always: true do
-      { type: :plans, id: @object.plan_id }
-    end
-    link :related do
-      @url_helpers.v1_account_plan_path @object if @object.plan_id.present?
-    end
-  end
+
   relationship :webhook_endpoints do
     link :related do
       @url_helpers.v1_account_webhook_endpoints_path @object

@@ -1,4 +1,5 @@
 @api/v1
+@mp
 Feature: Account plan relationship
   Background:
     Given the following "accounts" exist:

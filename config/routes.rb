@@ -342,7 +342,7 @@ Rails.application.routes.draw do
   scope module: :api, constraints: { format: :jsonapi } do
     namespace :v1 do
       constraints subdomain: %w[api], **domain_constraints do
-        if Keygen.cloud?
+        if Keygen.multiplayer?
           post :stripe, to: 'stripe#receive_webhook'
 
           # Pricing
@@ -366,21 +366,21 @@ Rails.application.routes.draw do
         # Account
         case
         when Keygen.singleplayer?
-          resources :account, param: :account_id, only: %i[show update]
+          resources :accounts, param: :account_id, only: %i[show update destroy]
         when Keygen.multiplayer?
-          resources :account, param: :account_id, only: %i[show create update]
+          resources :accounts, param: :account_id, only: %i[show create update destroy]
         end
 
         # Routes with :account_id scope i.e. multiplayer mode. Most of these
         # routes are also available in singleplayer mode for compatiblity.
         scope 'accounts/:account_id', as: :account do
-          if Keygen.cloud?
-            scope module: :relationships do
+          if Keygen.multiplayer?
+            scope module: 'accounts/relationships' do
               resource :billing, only: %i[show update]
               resource :plan,    only: %i[show update]
             end
 
-            scope :actions, module: :actions do
+            scope :actions, module: 'accounts/actions' do
               post :manage_subscription, path: 'manage-subscription', to: 'subscription#manage'
               post :pause_subscription,  path: 'pause-subscription',  to: 'subscription#pause'
               post :resume_subscription, path: 'resume-subscription', to: 'subscription#resume'

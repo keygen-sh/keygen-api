@@ -22,8 +22,6 @@ module Keygen
     def multiplayer?  = !!(ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) })
     def singleplayer? = !multiplayer?
 
-    def cloud? = ENV['KEYGEN_HOST'] == 'api.keygen.sh'
-
     def ee? = lic? && key?
     def ce? = !ee?
 
