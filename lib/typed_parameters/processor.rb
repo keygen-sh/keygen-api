@@ -3,13 +3,13 @@
 module TypedParameters
   class Processor
     def initialize(schema:, controller: nil)
-      @pipeline   = Pipeline.new
       @controller = controller
       @schema     = schema
     end
 
     def call(value)
-      params = Parameterizer.new(schema:).call(value:)
+      params   = Parameterizer.new(schema:).call(value:)
+      pipeline = Pipeline.new
 
       pipeline << Bouncer.new(controller:, schema:)
       pipeline << Coercer.new(schema:)
@@ -22,7 +22,6 @@ module TypedParameters
     private
 
     attr_reader :controller,
-                :pipeline,
                 :schema
   end
 end
