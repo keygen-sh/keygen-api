@@ -1,6 +1,6 @@
 @api/v1.1
+@mp
 Feature: Short URLs
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug   |

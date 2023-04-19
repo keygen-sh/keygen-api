@@ -1,6 +1,5 @@
 @lib/typed_parameters
 Feature: Typed parameters
-
   Background:
     Given I send and accept JSON
     And the following "accounts" exist:
@@ -133,6 +132,7 @@ Feature: Typed parameters
       }
       """
 
+  @mp
   Scenario: User sends a request with unpermitted parameters that match other permitted keys
     When I send a POST request to "/v1/accounts" with the following:
       """
