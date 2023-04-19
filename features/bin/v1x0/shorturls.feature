@@ -1,6 +1,6 @@
 @api/v1.0 @deprecated
+@mp
 Feature: Short bin URLs
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug   |

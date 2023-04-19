@@ -1,6 +1,6 @@
 @api/v1
+@mp
 Feature: Process Stripe webhook events
-
   Background:
     Given we are receiving Stripe webhook events
     And I send and accept JSON
