@@ -25,6 +25,9 @@ module Keygen
     def ee? = lic? && key?
     def ce? = !ee?
 
+    def mode    = multiplayer? ? 'multiplayer' : 'singleplayer'
+    def edition = ee? ? 'EE' : 'CE'
+
     def ee(&block)
       return unless
         ee?
