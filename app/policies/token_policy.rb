@@ -64,7 +64,9 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' } if record.bearer == bearer || record.bearer.user?
+    in role: { name: 'admin' | 'developer' } if record.bearer == bearer || record.bearer.environment? || record.bearer.product? || record.bearer.license? || record.bearer.user?
+      allow!
+    in role: { name: 'environment' } if record.bearer == bearer || record.bearer.product? || record.bearer.license? || record.bearer.user?
       allow!
     else
       record.bearer == bearer

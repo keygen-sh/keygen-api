@@ -50,11 +50,12 @@ module Roleable
       name.to_s == role.name_was.to_s
     end
 
-    def role?    = role.present? && role.name?
-    def user?    = role? && role.user?
-    def admin?   = role? && role.admin?
-    def product? = role? && role.product?
-    def license? = role? && role.license?
+    def role?        = role.present? && role.name?
+    def user?        = role? && role.user?
+    def admin?       = role? && role.admin?
+    def environment? = role? && role.environment?
+    def product?     = role? && role.product?
+    def license?     = role? && role.license?
 
     def changed_for_autosave?
       super || role_attributes_assigned?

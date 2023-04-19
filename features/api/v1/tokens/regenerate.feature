@@ -150,6 +150,76 @@ Feature: Regenerate authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "401"
 
+  @ee
+  Scenario: Admin resets a shared environment token by id
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "token" for the last "environment"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
+  Scenario: Admin resets a product token by id
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "token" for the last "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
+  Scenario: Admin resets a license token by id
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "token" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
+  Scenario: Admin resets an admin token by id
+    Given the current account is "test1"
+    And the current account has 1 "admin"
+    And the current account has 1 "token" for the last "admin"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "403"
+
+  Scenario: Admin resets a user token by id
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "token" for the last "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
+  @ee
+  Scenario: Environment resets their isolated token by id
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0?environment=isolated"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
+  @ee
+  Scenario: Environment resets their shared token by id
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0?environment=shared"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+
   Scenario: Product resets their token by id
     Given the current account is "test1"
     And the current account has 1 "product"
