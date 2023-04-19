@@ -1,6 +1,6 @@
 @api/v1
+@mp
 Feature: List plans
-
   Background:
     Given I send and accept JSON
 

@@ -36,22 +36,24 @@ Rails.application.routes.draw do
     }
   end
 
-  scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
-    version_constraint '<=1.0' do
-      scope module: :v1x0 do
-        get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'artifacts#index', as: 'bin_artifacts'
-        get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'artifacts#show',  as: 'bin_artifact'
+  if Keygen.multiplayer?
+    scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
+      version_constraint '<=1.0' do
+        scope module: :v1x0 do
+          get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'artifacts#index', as: 'bin_artifacts'
+          get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'artifacts#show',  as: 'bin_artifact'
+        end
+      end
+
+      version_constraint '>=1.1' do
+        get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'artifacts#index'
+        get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'artifacts#show'
       end
     end
 
-    version_constraint '>=1.1' do
-      get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'artifacts#index'
-      get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'artifacts#show'
+    scope module: :stdout, constraints: { subdomain: %w[stdout], **domain_constraints, format: :jsonapi } do
+      get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: 'stdout_unsubscribe'
     end
-  end
-
-  scope module: :stdout, constraints: { subdomain: %w[stdout], **domain_constraints, format: :jsonapi } do
-    get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: 'stdout_unsubscribe'
   end
 
   concern :v1 do

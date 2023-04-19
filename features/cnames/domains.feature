@@ -1,6 +1,6 @@
 @api/v1
+@mp
 Feature: Custom domains via CNAME
-
   Background:
     Given the following "accounts" exist:
       | name     | slug         | cname                 |
