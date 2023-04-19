@@ -19,20 +19,11 @@ Feature: Delete account
     When I send a DELETE request to "/accounts/test1"
     Then the response status should be "403"
 
-  @mp
   Scenario: Admin attempts to delete another account
     Given I am an admin of account "test2"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1"
     Then the response status should be "401"
-    And sidekiq should have 0 "request-log" jobs
-
-  @sp
-  Scenario: Admin attempts to delete another account
-    Given I am an admin of account "test2"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1"
-    Then the response status should be "404"
     And sidekiq should have 0 "request-log" jobs
 
   @ee

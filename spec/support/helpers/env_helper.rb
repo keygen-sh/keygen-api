@@ -2,6 +2,7 @@
 
 module EnvHelper
   module WorldMethods
+    def stub_prestine_env(key, value) = stub_const('ENV', { key.to_s => value.to_s })
     def with_prestine_env(&)
       prev_env = ENV.to_hash
 
@@ -12,6 +13,7 @@ module EnvHelper
       ENV.replace(prev_env)
     end
 
+    def stub_env(key, value) = stub_const('ENV', ENV.to_hash.merge(key.to_s => value.to_s))
     def with_env(**next_env, &)
       prev_env = ENV.to_hash
 

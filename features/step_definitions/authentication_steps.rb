@@ -9,10 +9,6 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
 
-  if Keygen.singleplayer?
-    ENV['KEYGEN_ACCOUNT_ID'] = account.id
-  end
-
   @bearer =
     case role
     when "admin", "user", "read only", "developer", "sales agent", "support agent"
