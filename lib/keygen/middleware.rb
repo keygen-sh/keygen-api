@@ -128,7 +128,8 @@ module Keygen
             [{
               errors: [{
                 title: "Not found",
-                detail: "The requested resource was not found (please ensure your API endpoint is correct)"
+                detail: "The requested endpoint was not found (check your HTTP method and resource path)",
+                code: "NOT_FOUND",
               }]
             }.to_json]
           ]
