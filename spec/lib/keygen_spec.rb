@@ -162,20 +162,6 @@ describe Keygen, type: :ee do
     end
   end
 
-  describe '.cloud?' do
-    with_env KEYGEN_HOST: 'api.keygen.sh' do
-      it 'should return true in a Keygen Cloud env' do
-        expect(Keygen.cloud?).to be true
-      end
-    end
-
-    with_env KEYGEN_HOST: 'api.example' do
-      it 'should return false in a non-Cloud env' do
-        expect(Keygen.cloud?).to be false
-      end
-    end
-  end
-
   describe '.ce?' do
     within_ce do
       it 'should return true in a CE env' do

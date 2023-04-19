@@ -11,7 +11,8 @@ class ResolveAccountService < BaseService
   def call!
     case
     when Keygen.singleplayer?
-      account_id = request.params[:account_id] || ENV['KEYGEN_ACCOUNT_ID']
+      account_id = request.params[:account_id] ||
+                   ENV['KEYGEN_ACCOUNT_ID']
       raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
         account_id.present?
 

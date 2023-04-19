@@ -26,6 +26,12 @@ Before do |scenario|
     Keygen.ee? && scenario.tags.any? { _1.name == '@ce' } ||
     Keygen.ce? && scenario.tags.any? { _1.name == '@ee' }
 
+  # Skip multiplayer if we're running in singleplayer mode,
+  # and vice-versa for singleplayer in multiplayer mode.
+  return skip_this_scenario if
+    Keygen.singleplayer? && scenario.tags.any? { _1.name == '@mp' } ||
+    Keygen.multiplayer? && scenario.tags.any? { _1.name == '@sp' }
+
   # And of course, skip if we need to skip.
   return skip_this_scenario if
     scenario.tags.any? { _1.name == '@skip' }

@@ -1,6 +1,6 @@
 @api/v1
+@mp
 Feature: Create account
-
   Background:
     Given I send and accept JSON
     And there exists 1 "plan"
