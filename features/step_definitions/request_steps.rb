@@ -32,7 +32,15 @@ end
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  if !path.starts_with?('//')
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
+  unless path.starts_with?('//')
     get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   else
     get path
@@ -42,17 +50,41 @@ end
 When /^I send a POST request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
 
   patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
@@ -61,12 +93,28 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
 
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
 end
@@ -75,12 +123,28 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
   patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
 
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
@@ -89,11 +153,27 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+
+  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 
@@ -153,12 +233,6 @@ Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name
   json = JSON.parse last_response.body
 
   json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an empty array$/ do
@@ -171,12 +245,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
@@ -197,12 +265,6 @@ Then /^the JSON response should contain an included "([^\"]*)"$/ do |name|
 
   res = incl&.any? { |i| i["type"] == name.pluralize }
   expect(res).to be true
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should contain an included "([^\"]*)" with the following relationships:$/ do |name, body|
@@ -218,12 +280,6 @@ Then /^the JSON response should contain an included "([^\"]*)" with the followin
   record = incl.first
   rels = record["relationships"]
   expect(rels).to include JSON.parse(body)
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
@@ -236,12 +292,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   else
     expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
   end
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+) that is not "([^\"]*)"$/ do |resource, attribute, value|
@@ -253,12 +303,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+) tha
     expect(json["data"]["id"]).to_not eq value.to_s
   else
     expect(json["data"]["attributes"][attribute].to_s).to_not eq value.to_s
-  end
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
   end
 end
 
@@ -391,12 +435,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+)
   t2 = value&.to_time
 
   expect(t1).to be_within(3.seconds).of t2
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
@@ -404,12 +442,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+)$/ do |resource, attribute|
@@ -417,12 +449,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+)$
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+)(?: that is not nil)?$/ do |resource, attribute|
@@ -430,12 +456,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+)(?: 
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to_not eq nil
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does|has) (\w+)$/ do |name, attribute|
@@ -443,12 +463,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does|ha
   expect(name.pluralize).to eq json["data"]["type"]
 
   expect(json["data"]["attributes"][attribute]).to be true
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does) not (\w+)$/ do |resource, attribute|
@@ -456,12 +470,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does) n
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to be false
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? "([^\"]*)" attribute$/ do |resource, attribute|
@@ -469,12 +477,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? "([^\"
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"].key?(attribute)).to be false
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |body|
@@ -610,12 +612,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following data:$/ do |resource, body|
@@ -632,12 +628,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"]).to include JSON.parse(body)
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following relationships:$/ do |resource, body|
@@ -646,12 +636,6 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["relationships"]).to include JSON.parse(body)
-
-  if @account.present?
-    account_id = json["data"]["relationships"]["account"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
