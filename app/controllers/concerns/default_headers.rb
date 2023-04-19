@@ -62,6 +62,7 @@ module DefaultHeaders
     add_signature_headers
     add_whoami_headers
     add_environment_header
+    add_mode_header
     add_version_header
     add_powered_by_header
   end
@@ -102,14 +103,22 @@ module DefaultHeaders
 
   def add_whoami_headers
     response.headers['Keygen-Account-Id'] = current_account&.id
-    response.headers['Keygen-Bearer-Id'] = current_bearer&.id
-    response.headers['Keygen-Token-Id'] = current_token&.id
+    response.headers['Keygen-Bearer-Id']  = current_bearer&.id
+    response.headers['Keygen-Token-Id']   = current_token&.id
   rescue => e
     Keygen.logger.exception e
   end
 
   def add_environment_header
     response.headers['Keygen-Environment'] = current_environment&.code
+  end
+
+  def add_mode_header
+    response.headers['Keygen-Mode'] = if Keygen.multiplayer?
+                                        'multiplayer'
+                                      else
+                                        'singleplayer'
+                                      end
   end
 
   def add_version_header
