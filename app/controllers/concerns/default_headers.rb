@@ -62,6 +62,7 @@ module DefaultHeaders
     add_signature_headers
     add_whoami_headers
     add_environment_header
+    add_license_header
     add_mode_header
     add_version_header
     add_powered_by_header
@@ -111,6 +112,12 @@ module DefaultHeaders
 
   def add_environment_header
     response.headers['Keygen-Environment'] = current_environment&.code
+  end
+
+  def add_license_header
+    response.headers['Keygen-License'] = Keygen.ee do |key, lic|
+      %(id="#{key.id}", iss="#{lic.issued}", exp="#{lic.expiry}")
+    end
   end
 
   def add_mode_header
