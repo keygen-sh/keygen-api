@@ -51,6 +51,7 @@ namespace :keygen do
 
         account = Account.create!(
           users_attributes: [{ email:, password: }],
+          plan_attributes: { name: 'Ent 0' },
           id:,
         )
 
@@ -76,6 +77,7 @@ namespace :keygen do
 
           account = Account.create!(
             users_attributes: [{ email:, password: }],
+            plan_attributes: { name: 'Ent 0' },
             id:,
           )
 
