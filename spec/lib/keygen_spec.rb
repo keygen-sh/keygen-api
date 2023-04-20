@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-require_dependency Rails.root.join('lib', 'keygen')
+require_dependency Rails.root / 'lib' / 'keygen'
 
 describe Keygen, type: :ee do
   describe '.console?' do
