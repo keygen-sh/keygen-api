@@ -4,7 +4,7 @@ require_dependency Rails.root / 'lib' / 'keygen'
 
 Rails.application.config.to_prepare do
   next if
-    Keygen.task?('keygen:setup') # Skip ENV assertions during setup
+    Keygen.test? || Keygen.task?('keygen:setup')
 
   case
   when Keygen.singleplayer?

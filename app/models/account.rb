@@ -9,7 +9,7 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  belongs_to :plan, optional: -> { Keygen.singleplayer? }
+  belongs_to :plan, optional: true
   has_one :billing
   has_many :environments
   has_many :webhook_endpoints
@@ -63,11 +63,15 @@ class Account < ApplicationRecord
   before_create :generate_rsa_keys!
   before_create :generate_ed25519_keys!
 
+  validates :plan,
+    presence: true,
+    if: -> { Keygen.multiplayer? }
+
   validates :users,
     length: { minimum: 1, message: "must have at least one admin user" }
 
   validates :slug,
-    format: { with: /\A[A-Za-z0-9][-A-Za-z0-9]+\z/, message: "can only contain letters, numbers and dashes (but cannot start with dash)" },
+    format: { with: /\A[a-z0-9][-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes (but cannot start with dash)" },
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
     uniqueness: { case_sensitive: false },
     length: { maximum: 255 },
