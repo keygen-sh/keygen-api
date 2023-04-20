@@ -446,7 +446,7 @@ Feature: Create user
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Shared admin creates a user for a shared environment
+  Scenario: Shared admin creates a user for the global environment
     Given the current account is "ent1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "webhook-endpoint"
