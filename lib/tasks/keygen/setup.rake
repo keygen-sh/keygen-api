@@ -9,17 +9,19 @@ namespace :keygen do
     def gets(...) = STDIN.gets(...).chomp
 
     ActiveRecord::Base.logger.silence do
-      edition = args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }.upcase
-      mode    = args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }.downcase
+      edition = (args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }).upcase
+      mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
 
       case edition
       when 'CE'
         puts 'Setting up CE edition...'
+        puts
 
         config['KEYGEN_EDITION'] = edition
       when 'EE'
         puts 'Setting up EE edition...'
+        puts
 
         license_key = ENV.fetch('KEYGEN_LICENSE_KEY') {
           print 'Enter your EE license key: '
@@ -36,7 +38,9 @@ namespace :keygen do
       case mode
       when 'singleplayer',
           nil
+        puts
         puts 'Setting up singleplayer mode...'
+        puts
 
         id = ENV.fetch('KEYGEN_ACCOUNT_ID') {
           print 'Choose an account ID (leave blank for default): '
@@ -67,7 +71,9 @@ namespace :keygen do
         config['KEYGEN_MODE']       = 'singleplayer'
         config['KEYGEN_ACCOUNT_ID'] = account.id
       when 'multiplayer'
+        puts
         puts 'Setting up multiplayer mode...'
+        puts
 
         unless edition == 'EE'
           abort "Multiplayer mode is not supported in CE"
