@@ -8,24 +8,26 @@ namespace :keygen do
     def getp(...) = STDIN.getpass(...).chomp
     def gets(...) = STDIN.gets(...).chomp
 
-    edition = args.extras[0]&.upcase || 'CE'
-    mode    = args.extras[1]&.downcase || 'singleplayer'
+    edition = args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }.upcase
+    mode    = args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }.downcase
     config  = {}
 
     case edition
     when 'CE'
       puts 'Setting up CE edition...'
 
-      config[:KEYGEN_EDITION] = edition
+      config['KEYGEN_EDITION'] = edition
     when 'EE'
       puts 'Setting up EE edition...'
 
-      print 'Enter your EE license key: '
-      license_key = gets
+      license_key = ENV.fetch('KEYGEN_LICENSE_KEY') {
+        print 'Enter your EE license key: '
+        gets
+      }
 
-      config[:KEYGEN_LICENSE_FILE_PATH] = '/etc/keygen/ee.lic'
-      config[:KEYGEN_LICENSE_KEY]       = license_key
-      config[:KEYGEN_EDITION]           = edition
+      config['KEYGEN_LICENSE_FILE_PATH'] = '/etc/keygen/ee.lic'
+      config['KEYGEN_LICENSE_KEY']       = license_key
+      config['KEYGEN_EDITION']           = edition
     else
       abort "Invalid edition: #{edition}"
     end
@@ -35,14 +37,16 @@ namespace :keygen do
          nil
       puts 'Setting up singleplayer mode...'
 
-      print 'Enter an account ID: '
-      account_id = gets
+      account_id = ENV.fetch('KEYGEN_ACCOUNT_ID') {
+        print 'Enter an account ID: '
+        gets
+      }
 
       # TODO(ezekg) Create the account
       # TODO(ezekg) Admin setup
 
-      config[:KEYGEN_MODE]       = 'singleplayer'
-      config[:KEYGEN_ACCOUNT_ID] = account_id
+      config['KEYGEN_MODE']       = 'singleplayer'
+      config['KEYGEN_ACCOUNT_ID'] = account_id
     when 'multiplayer'
       puts 'Setting up multiplayer mode...'
 
@@ -52,7 +56,7 @@ namespace :keygen do
 
       # TODO(ezekg) Account and admin setup
 
-      config[:KEYGEN_MODE] = 'multiplayer'
+      config['KEYGEN_MODE'] = 'multiplayer'
     else
       abort "Invalid mode: #{mode}"
     end
