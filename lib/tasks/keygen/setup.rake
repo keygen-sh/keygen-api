@@ -5,26 +5,8 @@ namespace :keygen do
   task setup: %i[environment] do |_, args|
     require 'io/console'
 
-    module Console
-      refine Kernel do
-        def getp(...) = STDIN.getpass(...).chomp
-        def gets(...) = STDIN.gets(...).chomp
-      end
-
-      refine String do
-        def black   = "\e[30m#{self}\e[0m"
-        def red     = "\e[31m#{self}\e[0m"
-        def green   = "\e[32m#{self}\e[0m"
-        def brown   = "\e[33m#{self}\e[0m"
-        def blue    = "\e[34m#{self}\e[0m"
-        def magenta = "\e[35m#{self}\e[0m"
-        def cyan    = "\e[36m#{self}\e[0m"
-        def gray    = "\e[37m#{self}\e[0m"
-        def yellow  = "\e[1;33m#{self}\e[0m"
-      end
-    end
-
-    using Console
+    def getp(...) = STDIN.getpass(...).chomp
+    def gets(...) = STDIN.gets(...).chomp
 
     edition = args.extras[0]&.upcase || 'CE'
     mode    = args.extras[1]&.downcase || 'singleplayer'
