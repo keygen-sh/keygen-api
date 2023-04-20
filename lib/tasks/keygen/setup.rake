@@ -49,7 +49,10 @@ namespace :keygen do
         print 'Choose a password: '
         password = getp
 
-        account = Account.create!(id:, users_attributes: [{ email:, password: }])
+        account = Account.create!(
+          users_attributes: [{ email:, password: }],
+          id:,
+        )
 
         config['KEYGEN_MODE']       = 'singleplayer'
         config['KEYGEN_ACCOUNT_ID'] = account.id
@@ -61,13 +64,28 @@ namespace :keygen do
         end
 
         # TODO(ezekg) Allow multiple accounts to be created in a transaction?
-        print 'Choose a primary email: '
-        email = gets
+        Account.transaction do
+          print 'Choose an account ID (leave blank for default): '
+          id = gets
 
-        print 'Choose a password: '
-        password = getp
+          print 'Choose a primary email: '
+          email = gets
 
-        account = Account.create!(id:, users_attributes: [{ email:, password: }])
+          print 'Choose a password: '
+          password = getp
+
+          account = Account.create!(
+            users_attributes: [{ email:, password: }],
+            id:,
+          )
+
+          print 'Would you like to create another account? y/N '
+          answer = gets
+
+          if answer.downcase == 'y'
+            redo
+          end
+        end
 
         config['KEYGEN_MODE'] = 'multiplayer'
       else
@@ -83,7 +101,7 @@ namespace :keygen do
 
           Account ID: #{account.id}
           Account slug: #{account.slug}
-          Admin email: #{email}
+          Admin email: #{account.email}
 
         Then run the following:
 
@@ -91,7 +109,8 @@ namespace :keygen do
 
         Happy hacking!
       MSG
-    rescue ActiveRecord::RecordInvalid => e
+    rescue ActiveRecord::RecordNotSaved,
+           ActiveRecord::RecordInvalid => e
       errs = e.record.errors
 
       abort <<~MSG
