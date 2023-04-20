@@ -4,7 +4,7 @@ module Welcomeable
   extend ActiveSupport::Concern
 
   included do
-    after_commit :send_welcome_email, on: :create
+    after_commit :send_welcome_email, on: :create, unless: -> { Keygen.singleplayer? }
   end
 
   def send_welcome_email
