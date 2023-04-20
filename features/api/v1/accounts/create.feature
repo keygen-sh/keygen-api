@@ -467,7 +467,7 @@ Feature: Create account
       """
       {
         "title": "Unprocessable resource",
-        "detail": "has already been taken",
+        "detail": "can only contain lowercase letters, numbers and dashes (but cannot start with dash)",
         "source": {
           "pointer": "/data/attributes/slug"
         }
@@ -477,7 +477,7 @@ Feature: Create account
       """
       {
         "title": "Unprocessable resource",
-        "detail": "can only contain lowercase letters, numbers and dashes",
+        "detail": "has already been taken",
         "source": {
           "pointer": "/data/attributes/slug"
         }
@@ -665,7 +665,7 @@ Feature: Create account
       """
       {
         "title": "Unprocessable resource",
-        "detail": "can only contain lowercase letters, numbers and dashes",
+        "detail": "can only contain lowercase letters, numbers and dashes (but cannot start with dash)",
         "source": {
           "pointer": "/data/attributes/slug"
         }
@@ -1310,7 +1310,7 @@ Feature: Create account
       """
       {
         "title": "Unprocessable resource",
-        "detail": "can only contain lowercase letters, numbers and dashes",
+        "detail": "can only contain lowercase letters, numbers and dashes (but cannot start with dash)",
         "source": {
           "pointer": "/data/attributes/slug"
         }
