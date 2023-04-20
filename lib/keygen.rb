@@ -14,10 +14,11 @@ module Keygen
   class << self
     def logger = Logger
 
-    def console? = Rails.const_defined?(:Console)
-    def server?  = Rails.const_defined?(:Server) || puma?
-    def test?    = Rails.env.test?
-    def worker?  = sidekiq?
+    def console?   = Rails.const_defined?(:Console)
+    def server?    = Rails.const_defined?(:Server) || puma?
+    def test?      = Rails.env.test?
+    def worker?    = sidekiq?
+    def task?(...) = rake?(...)
 
     def multiplayer?  = !!(ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) })
     def singleplayer? = !multiplayer?
@@ -50,7 +51,14 @@ module Keygen
     def lic? = ENV.key?('KEYGEN_LICENSE_FILE_PATH') || ENV.key?('KEYGEN_LICENSE_FILE')
     def key? = ENV.key?('KEYGEN_LICENSE_KEY')
 
-    def puma?    = Puma.const_defined?(:Server) && $0.include?('puma')
+    def puma?    = Puma.const_defined?(:Server) && $0.ends_with?('puma')
     def sidekiq? = Sidekiq.const_defined?(:CLI)
+
+    def rake?(*tasks)
+      Rails.const_defined?(:Rake) && $0.ends_with?('rake') &&
+        tasks.all? { |task|
+          $*.any? { |arg| arg.starts_with?(task) }
+        }
+    end
   end
 end

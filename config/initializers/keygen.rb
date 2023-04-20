@@ -3,6 +3,9 @@
 require_dependency Rails.root / 'lib' / 'keygen'
 
 Rails.application.config.to_prepare do
+  next if
+    Keygen.task?('keygen:setup') # Skip ENV assertions during setup
+
   if Keygen.singleplayer?
     account_id = ENV['KEYGEN_ACCOUNT_ID']
     abort 'environment variable KEYGEN_ACCOUNT_ID is required when running in singleplayer mode' unless
