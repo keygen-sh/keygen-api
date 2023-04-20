@@ -65,7 +65,7 @@ class Account < ApplicationRecord
 
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
-  validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }
+  validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[a-z0-9][-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }
 
   validates :api_version,
     allow_nil: true,
