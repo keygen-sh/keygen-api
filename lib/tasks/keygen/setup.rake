@@ -9,6 +9,8 @@ namespace :keygen do
     def gets(...) = STDIN.gets(...).chomp
 
     ActiveRecord::Base.logger.silence do
+      Rake::Task['db:prepare'].invoke # Calling this after we silence the logger
+
       edition = (args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }).upcase
       mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
