@@ -23,7 +23,7 @@ module Keygen
     def multiplayer?  = !!(ENV['KEYGEN_MODE'] == 'multiplayer' && ee { _1.entitled?(:multiplayer) })
     def singleplayer? = !multiplayer?
 
-    def ee? = lic? && key?
+    def ee? = ENV['KEYGEN_EDITION'] == 'EE'
     def ce? = !ee?
 
     def mode    = multiplayer? ? 'multiplayer' : 'singleplayer'
@@ -47,9 +47,6 @@ module Keygen
     end
 
     private
-
-    def lic? = ENV.key?('KEYGEN_LICENSE_FILE_PATH') || ENV.key?('KEYGEN_LICENSE_FILE')
-    def key? = ENV.key?('KEYGEN_LICENSE_KEY')
 
     def puma?    = Puma.const_defined?(:Server) && $0.ends_with?('puma')
     def sidekiq? = Sidekiq.const_defined?(:CLI)
