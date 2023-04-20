@@ -9,7 +9,7 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  belongs_to :plan
+  belongs_to :plan, optional: -> { Keygen.singleplayer? }
   has_one :billing
   has_many :environments
   has_many :webhook_endpoints
@@ -63,9 +63,15 @@ class Account < ApplicationRecord
   before_create :generate_rsa_keys!
   before_create :generate_ed25519_keys!
 
-  validates :users, length: { minimum: 1, message: "must have at least one admin user" }
+  validates :users,
+    length: { minimum: 1, message: "must have at least one admin user" }
 
-  validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[a-z0-9][-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }
+  validates :slug,
+    format: { with: /\A[A-Za-z0-9][-A-Za-z0-9]+\z/, message: "can only contain letters, numbers and dashes (but cannot start with dash)" },
+    exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    uniqueness: { case_sensitive: false },
+    length: { maximum: 255 },
+    unless: -> { slug.nil? }
 
   validates :api_version,
     allow_nil: true,
@@ -74,9 +80,19 @@ class Account < ApplicationRecord
       in: RequestMigrations.supported_versions,
     }
 
-  validate on: [:create, :update] do
-    clean_slug = "#{slug}".tr "-", ""
-    errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_RE
+  validate on: %i[create], if: -> { id_before_type_cast.present? } do
+    errors.add :id, :invalid, message: 'must be a valid UUID' if
+      !UUID_RE.match?(id_before_type_cast)
+
+    errors.add :id, :conflict, message: 'must not conflict with another account' if
+      Account.exists?(id)
+  end
+
+  validate on: %i[create update] do
+    clean_slug = "#{slug}".tr('-', '')
+
+    errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if
+      clean_slug =~ UUID_RE
   end
 
   scope :active, -> (with_activity_from: 90.days.ago) {

@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 namespace :keygen do
+  task(:no_query_logs) { ENV['KEYGEN_NO_QUERY_LOGS'] = '1' }
+
   desc 'Setup Keygen and the environment'
-  task setup: %i[environment] do |_, args|
+  task setup: %i[no_query_logs environment] do |_, args|
     require 'io/console'
 
     def getp(...) = STDIN.getpass(...).chomp
@@ -37,16 +39,34 @@ namespace :keygen do
          nil
       puts 'Setting up singleplayer mode...'
 
-      account_id = ENV.fetch('KEYGEN_ACCOUNT_ID') {
-        print 'Enter an account ID: '
+      id = ENV.fetch('KEYGEN_ACCOUNT_ID') {
+        print 'Choose an account ID (leave blank for default): '
         gets
       }
 
-      # TODO(ezekg) Create the account
-      # TODO(ezekg) Admin setup
+      print 'Choose a primary email: '
+      email = gets
+
+      print 'Choose a password: '
+      password = getp
+
+      account = Account.create(id:, users_attributes: [{ email:, password: }])
+
+      unless account.errors.empty?
+        errs = account.errors
+
+        puts
+        abort <<~MSG
+          Please resolve the following errors before continuing:
+
+            #{errs.reduce(+'') { |s, e| s << "#{e.full_message}\n  " }.strip.chomp}
+
+          To continue, rerun this task.
+        MSG
+      end
 
       config['KEYGEN_MODE']       = 'singleplayer'
-      config['KEYGEN_ACCOUNT_ID'] = account_id
+      config['KEYGEN_ACCOUNT_ID'] = account.id
     when 'multiplayer'
       puts 'Setting up multiplayer mode...'
 
@@ -54,7 +74,27 @@ namespace :keygen do
         abort "Multiplayer mode is not supported in CE"
       end
 
-      # TODO(ezekg) Account and admin setup
+      # TODO(ezekg) Allow multiple accounts to be created in a transaction?
+      print 'Choose a primary email: '
+      email = gets
+
+      print 'Choose a password: '
+      password = getp
+
+      account = Account.create(id:, users_attributes: [{ email:, password: }])
+
+      unless account.errors.empty?
+        errs = account.errors
+
+        puts
+        abort <<~MSG
+          Please resolve the following errors before continuing:
+
+            #{errs.reduce(+'') { |s, e| s << "#{e.full_message}\n  " }.strip.chomp}
+
+          To continue, rerun this task.
+        MSG
+      end
 
       config['KEYGEN_MODE'] = 'multiplayer'
     else
@@ -66,6 +106,12 @@ namespace :keygen do
       To complete setup, run the following in a shell, or add it to a shell profile:
 
         #{config.reduce(+'') { |s, (k, v)| s << "export #{k}=#{v}\n  " }.strip.chomp}
+
+      In addition, you may want to keep track of the following information:
+
+        Account ID: #{account.id}
+        Account slug: #{account.slug}
+        Admin email: #{email}
 
       Then run the following:
 
