@@ -66,7 +66,6 @@ namespace :keygen do
           abort "Multiplayer mode is not supported in CE"
         end
 
-        # TODO(ezekg) Allow multiple accounts to be created in a transaction?
         Account.transaction do
           print 'Choose an account ID (leave blank for default): '
           id = gets
