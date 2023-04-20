@@ -107,11 +107,11 @@ namespace :keygen do
           Account slug: #{account.slug}
           Admin email: #{account.email}
 
-        Then run the following:
+        Then run the following to start the server:
 
           rails s
 
-        Happy hacking!
+        *keygen music intensifies*
       MSG
     rescue ActiveRecord::RecordNotSaved,
            ActiveRecord::RecordInvalid => e
