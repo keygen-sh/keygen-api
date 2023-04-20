@@ -174,6 +174,12 @@ describe Keygen, type: :ee do
         expect(Keygen.ce?).to be false
       end
     end
+
+    with_env KEYGEN_EDITION: nil do
+      it 'should return true with nil edition' do
+        expect(Keygen.ce?).to be true
+      end
+    end
   end
 
   describe '.ee?' do
@@ -186,6 +192,12 @@ describe Keygen, type: :ee do
     within_ee do
       it 'should return true in an EE env' do
         expect(Keygen.ee?).to be true
+      end
+    end
+
+    with_env KEYGEN_EDITION: nil do
+      it 'should return false with nil edition' do
+        expect(Keygen.ee?).to be false
       end
     end
   end
