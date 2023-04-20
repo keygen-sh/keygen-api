@@ -25,6 +25,7 @@ end
 
 roles = {
   admin: Permission::ADMIN_PERMISSIONS,
+  environments: Permission::ENVIRONMENT_PERMISSIONS,
   product: Permission::PRODUCT_PERMISSIONS,
   license: Permission::LICENSE_PERMISSIONS,
   user: Permission::USER_PERMISSIONS,
