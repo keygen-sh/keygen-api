@@ -45,6 +45,9 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users, limit: 10
   tracks_nested_attributes_for :users
 
+  accepts_nested_attributes_for :plan
+  tracks_nested_attributes_for :plan
+
   encrypts :ed25519_private_key
   encrypts :private_key
   encrypts :secret_key
