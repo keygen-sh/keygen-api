@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-require_dependency Rails.root.join('lib', 'keygen')
+require_dependency Rails.root / 'lib' / 'keygen'
 
 describe Keygen::EE::LicenseFile, type: :ee do
   public_key   = ['775e65407f3d86de55efbac47d1bbeab79768a21a406e39976606a704984e7d1'].pack('H*')

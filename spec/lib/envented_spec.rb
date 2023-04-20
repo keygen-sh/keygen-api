@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-require_dependency Rails.root.join "lib", "envented"
+require_dependency Rails.root / 'lib' / 'envented'
 
 describe Envented do
   let(:eventable) do
