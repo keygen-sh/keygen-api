@@ -35,19 +35,11 @@ module Api::V1
                 param :type, type: :string, inclusion: { in: %w[user users] }
                 param :attributes, type: :hash do
                   param :email, type: :string
-                  param :password, type: :string
+                  param :password, type: :string, allow_blank: true, allow_nil: true, optional: true
                   param :first_name, type: :string, allow_blank: true, allow_nil: true, optional: true
                   param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
                   param :metadata, type: :metadata, allow_blank: true, optional: true
                   param :role, type: :string, optional: true, noop: true
-                end
-                param :relationships, type: :hash, optional: true, noop: true do
-                  param :group, type: :hash, optional: true do
-                    param :data, type: :hash, allow_nil: true do
-                      param :type, type: :string, inclusion: { in: %w[group groups] }
-                      param :id, type: :string
-                    end
-                  end
                 end
               end
             end
