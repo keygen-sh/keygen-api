@@ -2,6 +2,7 @@ class Environment < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[environments]]
   include Limitable
   include Orderable
+  include Dirtyable
   include Pageable
   include Roleable
   include Diffable
@@ -33,7 +34,14 @@ class Environment < ApplicationRecord
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 
+  accepts_nested_attributes_for :users, limit: 10
+  tracks_nested_attributes_for :users
+
   after_initialize -> { self.isolation_strategy ||= 'ISOLATED' }
+
+  before_validation :set_founding_users_account_and_roles!,
+    if: :users_attributes_assigned?,
+    on: :create
 
   after_commit :clear_cache!,
     on: %i[
@@ -88,4 +96,18 @@ class Environment < ApplicationRecord
   ##
   # codes returns the codes of the environments.
   def self.codes = reorder(code: :asc).pluck(:code)
+
+  private
+
+  def set_founding_users_account_and_roles!
+    users.each do |user|
+      next unless
+        user.new_record?
+
+      user.assign_attributes(
+        role_attributes: { name: :admin },
+        account_id:,
+      )
+    end
+  end
 end

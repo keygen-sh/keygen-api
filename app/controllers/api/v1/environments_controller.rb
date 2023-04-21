@@ -30,6 +30,23 @@ module Api::V1
           param :code, type: :string
           param :isolation_strategy, type: :string, optional: true
         end
+        param :relationships, type: :hash, optional: true do
+          param :admins, type: :hash, as: :users do
+            param :data, type: :array do
+              items type: :hash do
+                param :type, type: :string, inclusion: { in: %w[user users] }
+                param :attributes, type: :hash do
+                  param :email, type: :string
+                  param :password, type: :string, allow_blank: true, allow_nil: true, optional: true
+                  param :first_name, type: :string, allow_blank: true, allow_nil: true, optional: true
+                  param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
+                  param :metadata, type: :metadata, allow_blank: true, optional: true
+                  param :role, type: :string, optional: true, noop: true
+                end
+              end
+            end
+          end
+        end
       end
     }
     def create

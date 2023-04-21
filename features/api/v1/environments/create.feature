@@ -108,6 +108,102 @@ Feature: Create environments
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates an isolated environment for their account with an admin
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "isolationStrategy": "ISOLATED",
+            "name": "Isolated Environment",
+            "code": "ISOLATED"
+          },
+          "relationships": {
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "admin@isolated.example",
+                    "password": "$ecr3t"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "environment" with the following attributes:
+      """
+      {
+        "isolationStrategy": "ISOLATED",
+        "name": "Isolated Environment",
+        "code": "ISOLATED"
+      }
+      """
+    And the current account should have 2 "admins"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a shared environment for their account with 2 admins
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "isolationStrategy": "SHARED",
+            "name": "Shared Environment",
+            "code": "SHARED"
+          },
+          "relationships": {
+            "admins": {
+              "data": [
+                {
+                  "type": "users",
+                  "attributes": {
+                    "email": "admin@shared.example",
+                    "password": "$ecr3t"
+                  }
+                },
+                {
+                  "type": "users",
+                  "attributes": {
+                    "email": "dev@shared.example"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "environment" with the following attributes:
+      """
+      {
+        "isolationStrategy": "SHARED",
+        "name": "Shared Environment",
+        "code": "SHARED"
+      }
+      """
+    And the current account should have 3 "admins"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attempts to create an incomplete environment for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
