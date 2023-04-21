@@ -32,6 +32,14 @@ FactoryBot.define do
       role { build(:role, :read_only) }
     end
 
+    trait :admin do
+      role { build(:role, :admin) }
+    end
+
+    trait :read_only do
+      role { build(:role, :read_only) }
+    end
+
     trait :passwordless do
       password { nil }
     end
