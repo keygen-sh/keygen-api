@@ -79,6 +79,48 @@ describe AccountPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
+    within_environment :self do
+      with_scenarios %i[accessing_accounts] do
+        with_token_authentication do
+          with_permissions %w[account.read] do
+            denies :index
+          end
+
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_its_account] do
+        with_token_authentication do
+          with_permissions %w[account.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions { denies :show, :create, :update, :destroy }
+
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          with_default_permissions do
+            without_token_permissions { denies :show, :create, :update, :destroy }
+
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
+        end
+      end
+    end
+
     with_scenarios %i[accessing_accounts] do
       with_token_authentication do
         with_permissions %w[account.read] do
@@ -94,28 +136,12 @@ describe AccountPolicy, type: :policy do
     with_scenarios %i[accessing_its_account] do
       with_token_authentication do
         with_permissions %w[account.read] do
-          without_token_permissions { denies :show }
-
-          allows :show
+          denies :show
         end
 
-        with_wildcard_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
-          denies :create, :update, :destroy
-          allows :show
-        end
-
-        with_default_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
-          denies :create, :update, :destroy
-          allows :show
-        end
-
-        without_permissions do
-          denies :show, :create, :update, :destroy
-        end
+        with_wildcard_permissions { denies :show, :create, :update, :destroy }
+        with_default_permissions  { denies :show, :create, :update, :destroy }
+        without_permissions       { denies :show, :create, :update, :destroy }
       end
     end
   end

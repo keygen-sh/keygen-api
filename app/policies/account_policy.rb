@@ -11,6 +11,9 @@ class AccountPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('account.read')
+    verify_environment!(
+      strict: false,
+    )
 
     record == bearer.account
   end
@@ -23,6 +26,7 @@ class AccountPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('account.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
