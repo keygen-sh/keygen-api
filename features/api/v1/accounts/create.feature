@@ -625,7 +625,7 @@ Feature: Create account
       }
       """
 
-  Scenario: Anonymous creates an account with a UUID slug only a dash
+  Scenario: Anonymous creates an account with a dash slug
     When I send a POST request to "/accounts" with the following:
       """
       {
