@@ -92,8 +92,8 @@ class ApplicationPolicy
       next unless
         model.respond_to?(:account_id)
 
-      deny! "#{whatami} account does not match current #{context.to_s.underscore.humanize(capitalize: false)} account" if
-        bearer.present? && bearer.account_id != model.account_id
+      deny! "#{context.to_s.underscore.humanize(capitalize: false)} account does not match current account" if
+        model.account_id != account.id
     end
 
     case record
@@ -154,8 +154,25 @@ class ApplicationPolicy
         end
       )
 
-    # Same as bearer/token, except when we're within the global environment,
-    # we're allowed to read records from any environment (i.e. non-strict).
+    # ^^^ ditto for the remaining authz contexts.
+    authorization_context.except(:account, :environment, :bearer, :token)
+                         .each do |context, model|
+      next unless
+        model.respond_to?(:environment_id)
+
+      deny! "#{context.to_s.underscore.humanize(capitalize: false)} environment is not compatible with the current environment" unless
+        case
+        when environment.nil?
+          model.environment_id.nil?
+        when environment.isolated?
+          model.environment_id == environment.id
+        when environment.shared?
+          model.environment_id == environment.id || model.environment_id.nil?
+        end
+    end
+
+    # ^^^ ditto for the record, except we're potentially allowed to access records
+    # from other environments if strict-mode is disabled.
     case record
     in [{ environment_id: _ }, *] => records
       deny! "a record's environment is not compatible with the current environment" unless
