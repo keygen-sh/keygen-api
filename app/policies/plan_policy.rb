@@ -5,6 +5,6 @@ class PlanPolicy < ApplicationPolicy
 
   authorize :account, allow_nil: true
 
-  def index? = true
-  def show?  = true
+  def index? = allow!
+  def show?  = allow!
 end

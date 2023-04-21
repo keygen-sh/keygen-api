@@ -156,30 +156,35 @@ class ApplicationPolicy
 
     # Same as bearer/token, except when we're within the global environment,
     # we're allowed to read records from any environment (i.e. non-strict).
-    #
-    # FIXME(ezekg) Formatting?
     case record
-    in [{ environment_id: _ }, *] => records unless records.all? { |record|
-      case
-      when environment.nil?
-        !strict || record.environment_id.nil?
-      when environment.isolated?
-        record.environment_id == environment.id
-      when environment.shared?
-        record.environment_id == environment.id || !strict && record.environment_id.nil?
-      end
-    }
-      deny! "a record's environment is not compatible with the current environment"
-    in { environment_id: } unless case
-                                  when environment.nil?
-                                    !strict || record.environment_id.nil?
-                                  when environment.isolated?
-                                    environment_id == environment.id
-                                  when environment.shared?
-                                    environment_id == environment.id || !strict && environment_id.nil?
-                                  end
-      deny! 'record environment is not compatible with the current environment'
+    in [{ environment_id: _ }, *] => records
+      deny! "a record's environment is not compatible with the current environment" unless
+        records.all? { |record|
+          case
+          when environment.nil?
+            !strict || record.environment_id.nil?
+          when environment.isolated?
+            record.environment_id == environment.id
+          when environment.shared?
+            record.environment_id == environment.id || !strict && record.environment_id.nil?
+          end
+        }
+    in { environment_id: }
+      deny! 'record environment is not compatible with the current environment' unless
+        case
+        when environment.nil?
+          !strict || record.environment_id.nil?
+        when environment.isolated?
+          environment_id == environment.id
+        when environment.shared?
+          environment_id == environment.id || !strict && environment_id.nil?
+        end
+    in [*] => records
+      deny! 'records are not compatible with the current environment' unless
+        !strict || environment.nil?
     else
+      deny! 'record is not compatible with the current environment' unless
+        !strict || environment.nil?
     end
   end
 

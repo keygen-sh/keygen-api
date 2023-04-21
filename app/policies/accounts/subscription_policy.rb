@@ -4,6 +4,7 @@ module Accounts
   class SubscriptionPolicy < ApplicationPolicy
     def manage?
       verify_permissions!('account.subscription.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' }
@@ -15,6 +16,7 @@ module Accounts
 
     def pause?
       verify_permissions!('account.subscription.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' }
@@ -26,6 +28,7 @@ module Accounts
 
     def resume?
       verify_permissions!('account.subscription.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' }
@@ -37,6 +40,7 @@ module Accounts
 
     def cancel?
       verify_permissions!('account.subscription.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' }
@@ -48,6 +52,7 @@ module Accounts
 
     def renew?
       verify_permissions!('account.subscription.update')
+      verify_environment!
 
       case bearer
       in role: { name: 'admin' }

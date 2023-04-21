@@ -58,7 +58,9 @@ class User < ApplicationRecord
 
       case role
       # FIXME(ezekg) Should these be separate permissions? All but admin are being
-      #              deprecated, but still may be a good idea.
+      #              deprecated, but still may be a good idea for correctness.
+      #              When the admin is in an environment, we should also remove
+      #              permissions such as account.billing.update, etc.
       in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
         Permission::ADMIN_PERMISSIONS
       in name: 'read_only'

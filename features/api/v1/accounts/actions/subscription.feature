@@ -26,12 +26,28 @@ Feature: Account subscription actions
       """
     And the JSON response should be meta with the following:
       """
-      {
-        "url": "https://billing.stripe.com/session/test_session_secret"
-      }
+      { "url": "https://billing.stripe.com/session/test_session_secret" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Isolated admin manages their subscription account
+    Given the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription?environment=isolated"
+    Then the response status should be "403"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin manages their subscription account
+    Given the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription?environment=shared"
+    Then the response status should be "403"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Developer attempts to manage their subscription account

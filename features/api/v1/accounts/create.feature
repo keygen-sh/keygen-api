@@ -58,6 +58,63 @@ Feature: Create account
     And the account "google" should not have a referral
     And the account "google" should have 1 "admin"
 
+  Scenario: Anonymous creates an account with multiple admins
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "lpage@google.example",
+                    "password": "googling"
+                  }
+                },
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "sbrin@google.example"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be an "account" with the name "Google"
+    And the JSON response should be an "account" with the slug "google"
+    And the JSON response should be an "account" with the following meta:
+      """
+      {
+        "publicKey": "$~accounts[0].public_key",
+        "keys": {
+          "ed25519": "$~accounts[0].ed25519_public_key",
+          "rsa2048": "$~accounts[0].public_key"
+        }
+      }
+      """
+    And the account should receive a "prompt-for-first-impression" email
+    And sidekiq should have 1 "initialize-billing" job
+    And sidekiq should have 0 "request-log" jobs
+    And the account "google" should not have a referral
+    And the account "google" should have 2 "admins"
+
   Scenario: Anonymous creates an account with a referral ID
     When I send a POST request to "/accounts" with the following:
       """

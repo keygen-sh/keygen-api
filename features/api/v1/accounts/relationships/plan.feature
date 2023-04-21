@@ -1,6 +1,5 @@
 @api/v1
 Feature: Account plan relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -13,6 +12,7 @@ Feature: Account plan relationship
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should not be "403"
 
+  # Retrieve
   Scenario: Admin retrieves the plan for their account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
@@ -20,6 +20,24 @@ Feature: Account plan relationship
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "200"
     And the JSON response should be a "plan"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Isolated admin retrieves the plan for their account
+    Given the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan?environment=isolated"
+    Then the response status should be "200"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin retrieves the plan for their account
+    Given the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan?environment=shared"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Developer attempts to retrieve the plan for their account
@@ -123,6 +141,7 @@ Feature: Account plan relationship
     Then the response status should be "401"
     And sidekiq should have 0 "request-log" jobs
 
+  # Update
   Scenario: Admin changes subscribed account to a new plan
     Given the account "test1" is subscribed
     And there exists 3 "plans"
@@ -249,6 +268,44 @@ Feature: Account plan relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Isolated admin updates the plan for their account
+    Given the account "test1" is subscribed
+    And there exists 3 "plans"
+    And the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/plan?environment=isolated" with the following:
+      """
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin updates the plan for their account
+    Given the account "test1" is subscribed
+    And there exists 3 "plans"
+    And the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/plan?environment=shared" with the following:
+      """
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to change plan for another account
