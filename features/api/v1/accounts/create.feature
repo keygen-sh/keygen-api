@@ -1082,7 +1082,18 @@ Feature: Create account
         }
       }
       """
-    Then the response status should be "201"
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "pointer": "/data/relationships/admins/data/0/attributes/role"
+        }
+      }
+      """
 
   Scenario: Anonymous attempts to create a duplicate account with an invalid plan
     Given there exists an account "test1"
