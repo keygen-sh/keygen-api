@@ -81,6 +81,12 @@ describe Keygen, type: :ee do
   describe '.multiplayer?' do
     within_ce do
       with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return true in lax multiplayer mode' do
+          expect(Keygen.multiplayer?(strict: false)).to be true
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer' do
         it 'should return false in multiplayer mode' do
           expect(Keygen.multiplayer?).to be false
         end
@@ -100,6 +106,12 @@ describe Keygen, type: :ee do
     end
 
     within_ee do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return true in lax multiplayer mode' do
+          expect(Keygen.multiplayer?(strict: false)).to be true
+        end
+      end
+
       with_env KEYGEN_MODE: 'multiplayer' do
         it 'should return true in multiplayer mode' do
           expect(Keygen.multiplayer?).to be true
@@ -123,6 +135,12 @@ describe Keygen, type: :ee do
   describe '.singleplayer?' do
     within_ce do
       with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return false in lax multiplayer mode' do
+          expect(Keygen.singleplayer?(strict: false)).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer' do
         it 'should return true in multiplayer mode' do
           expect(Keygen.singleplayer?).to be true
         end
@@ -142,6 +160,12 @@ describe Keygen, type: :ee do
     end
 
     within_ee do
+      with_env KEYGEN_MODE: 'multiplayer' do
+        it 'should return false in lax multiplayer mode' do
+          expect(Keygen.singleplayer?(strict: false)).to be false
+        end
+      end
+
       with_env KEYGEN_MODE: 'multiplayer' do
         it 'should return false in multiplayer mode' do
           expect(Keygen.singleplayer?).to be false

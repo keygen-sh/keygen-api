@@ -7,18 +7,6 @@ Rails.application.config.to_prepare do
     Keygen.test? || Keygen.task?('keygen:setup') # Skip in test and during setup
 
   case
-  when Keygen.singleplayer?
-    account_id = ENV['KEYGEN_ACCOUNT_ID']
-    unless account_id.present?
-      abort 'Environment variable KEYGEN_ACCOUNT_ID is required when running in singleplayer mode'
-    end
-
-    unless Account.exists?(id: account_id)
-      abort "Account #{account_id} does not exist (run `rake keygen:setup` to create it)"
-    end
-  end
-
-  case
   when Keygen.ee?
     unless ENV.key?('KEYGEN_LICENSE_FILE_PATH') || ENV.key?('KEYGEN_LICENSE_FILE')
       abort "Environment variable KEYGEN_LICENSE_FILE_PATH or KEYGEN_LICENSE_FILE is required in EE"
@@ -28,8 +16,24 @@ Rails.application.config.to_prepare do
       abort "Environment variable KEYGEN_LICENSE_KEY is required in EE"
     end
   when Keygen.ce?
-    if ENV['KEYGEN_MODE'] == 'multiplayer'
+    if Keygen.multiplayer?(strict: false)
       abort "Multiplayer mode is only available in EE (use KEYGEN_MODE=singleplayer instead)"
+    end
+  end
+
+  case
+  when Keygen.multiplayer?(strict: false)
+    unless Keygen.ee { _1.entitled?(:multiplayer) }
+      abort "Keygen EE license is missing the multiplayer entitlement (use KEYGEN_MODE=singleplayer instead)"
+    end
+  when Keygen.singleplayer?
+    account_id = ENV['KEYGEN_ACCOUNT_ID']
+    unless account_id.present?
+      abort 'Environment variable KEYGEN_ACCOUNT_ID is required when running in singleplayer mode'
+    end
+
+    unless Account.exists?(id: account_id)
+      abort "Account #{account_id} does not exist (run `rake keygen:setup` to create it)"
     end
   end
 end

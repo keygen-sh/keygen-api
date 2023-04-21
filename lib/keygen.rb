@@ -20,8 +20,8 @@ module Keygen
     def worker?    = sidekiq?
     def task?(...) = rake?(...)
 
-    def multiplayer?  = ENV['KEYGEN_MODE'] == 'multiplayer' && !!ee { _1.entitled?(:multiplayer) }
-    def singleplayer? = !multiplayer?
+    def multiplayer?(strict: true) = ENV['KEYGEN_MODE'] == 'multiplayer' && (!strict || !!ee { _1.entitled?(:multiplayer) })
+    def singleplayer?(...)         = !multiplayer?(...)
 
     def ee? = ENV['KEYGEN_EDITION'] == 'EE'
     def ce? = !ee?
