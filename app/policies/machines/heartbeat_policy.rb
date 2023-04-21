@@ -6,7 +6,9 @@ module Machines
 
     def ping?
       verify_permissions!('machine.heartbeat.ping')
-      verify_environment!
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'environment' }
@@ -24,7 +26,9 @@ module Machines
 
     def reset?
       verify_permissions!('machine.heartbeat.reset')
-      verify_environment!
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
