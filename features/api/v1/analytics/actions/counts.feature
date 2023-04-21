@@ -71,6 +71,28 @@ Feature: Analytic counts
     And sidekiq should have 0 "request-log" jobs
 
   @ee
+  Scenario: Isolated admin attempts to retrieve analytic counts for their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/actions/count?environment=isolated"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin attempts to retrieve analytic counts for their account
+    Given the current account is "test1"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/analytics/actions/count?environment=shared"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
   Scenario: Environment attempts to retrieve analytic counts for their account
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
