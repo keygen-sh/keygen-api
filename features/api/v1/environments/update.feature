@@ -116,7 +116,7 @@ Feature: Update environments
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates an environment's admins relationships
+  Scenario: Admin updates an environment's admins relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -127,12 +127,19 @@ Feature: Update environments
       {
         "data": {
           "type": "environments",
-          "id": "$environments[0].id",
           "attributes": {},
           "relationships": {
-            "admins": [
-              { "email": "admin@environment.example", "password": "$ecr3t" }
-            ]
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "admin@environment.example",
+                    "password": "$ecr3t"
+                  }
+                }
+              ]
+            }
           }
         }
       }
