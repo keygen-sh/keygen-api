@@ -38,7 +38,9 @@ module Policies
 
     def pop?
       verify_permissions!('policy.pool.pop')
-      verify_environment!
+      verify_environment!(
+        strict: false,
+      )
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'environment' }
