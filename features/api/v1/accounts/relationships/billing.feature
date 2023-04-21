@@ -1,6 +1,5 @@
 @api/v1
 Feature: Account billing relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -13,6 +12,7 @@ Feature: Account billing relationship
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should not be "403"
 
+  # Retrieve
   Scenario: Admin retrieves the billing info for their account (not initialized)
     Given the account "test1" has its billing uninitialized
     And I am an admin of account "test1"
@@ -28,6 +28,24 @@ Feature: Account billing relationship
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should be "200"
     And the JSON response should be a "billing"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Isolated admin retrieves the billing info for their account
+    Given the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/billing?environment=isolated"
+    Then the response status should be "200"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin retrieves the billing info for their account
+    Given the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/billing?environment=shared"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Developer attempts to retrieve the billing info for their account
@@ -135,6 +153,7 @@ Feature: Account billing relationship
     Then the response status should be "401"
     And sidekiq should have 0 "request-log" jobs
 
+  # Update
   Scenario: Admin updates the billing info for their account (not initialized)
     Given the account "test1" has its billing uninitialized
     And I am an admin of account "test1"
@@ -177,6 +196,46 @@ Feature: Account billing relationship
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Isolated admin updates the billing info for their account
+    Given the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I have a valid payment token
+    When I send a PATCH request to "/accounts/test1/billing?environment=isolated" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin updates the billing info for their account
+    Given the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I have a valid payment token
+    When I send a PATCH request to "/accounts/test1/billing?environment=shared" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to update the billing info for their account

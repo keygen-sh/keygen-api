@@ -31,6 +31,24 @@ Feature: Show account
       """
     And sidekiq should have 0 "request-log" jobs
 
+  @ee
+  Scenario: Isolated admin retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1?environment=isolated"
+    Then the response status should be "200"
+
+  @ee
+  Scenario: Shared admin retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1?environment=shared"
+    Then the response status should be "200"
+
   Scenario: Developer retrieves their account
     Given the current account is "test1"
     And the current account has 1 "developer"

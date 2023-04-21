@@ -12,7 +12,7 @@ FactoryBot.define do
 
     after :build do |account|
       account.billing = build(:billing, account:)
-      account.users << build(:admin, account:)
+      account.users << build(:admin, account:, environment: nil)
     end
 
     trait :std do

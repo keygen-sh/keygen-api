@@ -3,6 +3,9 @@
 class EnvironmentPolicy < ApplicationPolicy
   def index?
     verify_permissions!('environment.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -14,6 +17,9 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def show?
     verify_permissions!('environment.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -27,6 +33,7 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def create?
     verify_permissions!('environment.create')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -38,6 +45,7 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def update?
     verify_permissions!('environment.update')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -49,6 +57,7 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def destroy?
     verify_permissions!('environment.delete')
+    verify_environment!
 
     case bearer
     in role: { name: 'admin' | 'developer' }
@@ -60,6 +69,9 @@ class EnvironmentPolicy < ApplicationPolicy
 
   def me?
     verify_permissions!('environment.read')
+    verify_environment!(
+      strict: false,
+    )
 
     case bearer
     in role: { name: 'environment' } if record == bearer

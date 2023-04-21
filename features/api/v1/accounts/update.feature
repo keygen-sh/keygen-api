@@ -45,6 +45,58 @@ Feature: Update account
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  @ee
+  Scenario: Isolated admin updates their account
+    Given the account "test1" has 1 isolated "webhook-endpoint"
+    And the account "test1" has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Isolated Account"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  @ee
+  Scenario: Shared admin updates their account
+    Given the account "test1" has 1 shared "webhook-endpoint"
+    And the account "test1" has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "shared" }
+      """
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Shared Account"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin updates the name for their account
     Given I am an admin of account "test1"
     And the account "test1" has 1 "webhook-endpoint"
