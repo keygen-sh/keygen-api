@@ -39,7 +39,7 @@ module Keygen
           raise InvalidLicenseFileError, "environment does not match (expected #{Rails.env.inspect} got #{code.inspect.downcase})"
         end
 
-        raise InvalidLicenseFileError, 'system clock is desynchronised' if
+        raise InvalidLicenseFileError, 'system clock is desynchronized' if
           desync?
 
         raise ExpiredLicenseFileError, 'license file is expired' if
