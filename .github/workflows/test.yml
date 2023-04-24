@@ -1,0 +1,57 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    strategy:
+      matrix:
+        edition:
+          - CE
+          - EE
+        mode:
+          - singleplayer
+          - multiplayer
+    env:
+      KEYGEN_LICENSE_FILE: ${{secrets.KEYGEN_LICENSE_FILE}}
+      KEYGEN_LICENSE_KEY: ${{secrets.KEYGEN_LICENSE_KEY}}
+      KEYGEN_EDITION: ${{matrix.edition}}
+      KEYGEN_MODE: ${{matrix.mode}}
+      KEYGEN_HOST: api.keygen.test
+      ENCRYPTION_DETERMINISTIC_KEY: ${{secrets.ENCRYPTION_DETERMINISTIC_KEY}}
+      ENCRYPTION_PRIMARY_KEY: ${{secrets.ENCRYPTION_PRIMARY_KEY}}
+      ENCRYPTION_KEY_DERIVATION_SALT: ${{secrets.ENCRYPTION_KEY_DERIVATION_SALT}}
+      SECRET_KEY_BASE: ${{secrets.SECRET_KEY_BASE}}
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      RAILS_ENV: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+          bundler-cache: true
+      - name: Setup
+        run: bundle exec rake parallel:create parallel:setup parallel:seed
+      - name: Test
+        run: bundle exec rake test
