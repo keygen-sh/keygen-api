@@ -2587,7 +2587,7 @@ describe TypedParameters do
     it 'should coerce time' do
       now = Time.now
 
-      params  = TypedParameters::Parameterizer.new(schema:).call(value: { time: now.strftime('%H:%M:%S.%6N') })
+      params  = TypedParameters::Parameterizer.new(schema:).call(value: { time: now.strftime('%H:%M:%S.%9N') })
       coercer = TypedParameters::Coercer.new(schema:)
 
       coercer.call(params)
