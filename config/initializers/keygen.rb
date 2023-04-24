@@ -32,6 +32,10 @@ Rails.application.config.to_prepare do
       abort 'Environment variable KEYGEN_ACCOUNT_ID is required when running in singleplayer mode'
     end
 
+    unless account_id in UUID_RE
+      abort 'Environment variable KEYGEN_ACCOUNT_ID must be a valid UUID'
+    end
+
     unless Account.exists?(id: account_id)
       abort "Account #{account_id} does not exist (run `rake keygen:setup` to create it)"
     end
