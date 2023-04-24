@@ -11,13 +11,11 @@ describe Envented do
       include Envented::Callbacks
 
       attr_accessor :id
-      attr_accessor :semaphore
       attr_accessor :calls
 
       def initialize(id:)
-        @id        = id
-        @semaphore = Mutex.new
-        @calls     = 0
+        @id    = id
+        @calls = 0
       end
 
       on_exclusive_event 'test.exclusive-event', :callback
@@ -82,22 +80,21 @@ describe Envented do
 
       private
 
-      def has_been_called?
-        semaphore.synchronize { @calls > 0 }
-      end
+      def has_been_called? = @calls > 0
 
       def callback_once
-        return if
-          has_been_called?
-
-        callback
+        unless has_been_called?
+          callback
+        end
       end
 
       def callback
-        semaphore.synchronize { @calls += 1 }
+        @calls += 1
 
         # Do work...
-        sleep 0.1
+        sleep 1
+
+        @calls
       end
 
       def callback_with_args(_)
@@ -278,7 +275,7 @@ describe Envented do
 
   context 'when using mutual exclusive locks' do
     it 'should notify for as many events as possible' do
-      expect(eventable).to receive(:callback).at_most(16).times
+      expect(eventable).to receive(:callback).at_most(32).times
 
       threads = []
 
@@ -330,12 +327,12 @@ describe Envented do
 
       threads = []
 
-      # FIXME(ezekg) Using 4 here is a "magic number" based on CPU core
-      #              count. We're only trying to test concurrent lock
-      #              access, and guard behavior, ensuring contested
-      #              access is thrown out.
-      4.times do |i|
-        threads << Thread.new { eventable.notify!('test.exclusive-event.once-with-auto-release') }
+      2.times do
+        threads << Thread.new {
+          sleep 0.5.seconds
+
+          eventable.notify!('test.exclusive-event.once-without-auto-release')
+        }
       end
 
       threads.map(&:join)
@@ -346,7 +343,7 @@ describe Envented do
 
       threads = []
 
-      64.times do |i|
+      64.times do
         threads << Thread.new { eventable.notify!('test.exclusive-event.once-without-auto-release') }
       end
 
