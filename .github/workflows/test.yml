@@ -42,6 +42,8 @@ jobs:
       ENCRYPTION_KEY_DERIVATION_SALT: ${{secrets.ENCRYPTION_KEY_DERIVATION_SALT}}
       SECRET_KEY_BASE: ${{secrets.SECRET_KEY_BASE}}
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      PARALLEL_TEST_PROCESSORS: '2'
+      PARALLEL_TEST_FIRST_IS_1: '1'
       RAILS_ENV: test
     steps:
       - name: Checkout
