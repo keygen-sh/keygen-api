@@ -28,6 +28,14 @@ begin
       Rails.env = 'test'
     end
 
+    desc 'setup test suite'
+    task setup: %i[
+      test:environment
+      log:clear
+      parallel:setup
+      parallel:seed
+    ]
+
     desc 'run rspec test suite'
     task rspec: %i[
       test:environment
