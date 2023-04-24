@@ -52,6 +52,6 @@ jobs:
           ruby-version: '3.2.2'
           bundler-cache: true
       - name: Setup
-        run: bundle exec rake parallel:create parallel:setup parallel:seed
+        run: bundle exec rake test:setup
       - name: Test
         run: bundle exec rake test
