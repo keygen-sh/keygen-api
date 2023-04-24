@@ -8,6 +8,8 @@ begin
 
   desc 'run test suite'
   task test: %i[
+    test:environment
+    log:clear
     test:rspec
     test:cucumber
   ]
@@ -23,6 +25,11 @@ begin
 
       # We don't want to interfere with our development/test databases.
       ENV['PARALLEL_TEST_FIRST_IS_1'] = '1'
+
+      # Ensure we always have a test number set (various parts of our suite rely on it).
+      #
+      # See: https://github.com/grosser/parallel_tests/issues/505
+      ENV['TEST_ENV_NUMBER'] ||= '1'
 
       # Ensure we're always in the test environment.
       Rails.env = 'test'
