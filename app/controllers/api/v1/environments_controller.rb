@@ -2,6 +2,7 @@
 
 module Api::V1
   class EnvironmentsController < Api::V1::BaseController
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -116,6 +117,10 @@ module Api::V1
       @environment = FindByAliasService.call(scoped_environments, id: params[:id], aliases: :code)
 
       Current.resource = environment
+    end
+
+    def require_ee!
+      super(entitlements: %i[environments])
     end
   end
 end

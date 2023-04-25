@@ -2,6 +2,7 @@
 
 module Api::V1::Environments::Relationships
   class TokensController < Api::V1::BaseController
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -91,6 +92,10 @@ module Api::V1::Environments::Relationships
       @environment = scoped_environments.find(params[:environment_id])
 
       Current.resource = environment
+    end
+
+    def require_ee!
+      super(entitlements: %i[environments])
     end
   end
 end
