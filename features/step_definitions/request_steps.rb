@@ -32,7 +32,7 @@ end
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -50,7 +50,7 @@ end
 When /^I send a POST request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -64,7 +64,7 @@ end
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -78,7 +78,7 @@ end
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -93,7 +93,7 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -108,7 +108,7 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -123,7 +123,7 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -138,7 +138,7 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -153,7 +153,7 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
@@ -167,7 +167,7 @@ end
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
-  case %r{/accounts/(?<account>[^/]+)}.match(path)
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
   in account: id if Keygen.singleplayer?
     account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
 
