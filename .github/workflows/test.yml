@@ -36,10 +36,19 @@ jobs:
       KEYGEN_EDITION: ${{matrix.edition}}
       KEYGEN_MODE: ${{matrix.mode}}
       KEYGEN_HOST: api.keygen.test
-      ENCRYPTION_DETERMINISTIC_KEY: ${{secrets.ENCRYPTION_DETERMINISTIC_KEY}}
-      ENCRYPTION_PRIMARY_KEY: ${{secrets.ENCRYPTION_PRIMARY_KEY}}
-      ENCRYPTION_KEY_DERIVATION_SALT: ${{secrets.ENCRYPTION_KEY_DERIVATION_SALT}}
-      SECRET_KEY_BASE: ${{secrets.SECRET_KEY_BASE}}
+      SECRET_KEY_BASE: 1b39b6912d39c7dd412d9f5795dd9cdaed7f97d7d02cf0bdac7c9878830b16462af858027e2a51e9c63ff95edd505d461536829bbbce6bfb2db69963c014597a
+      ENCRYPTION_DETERMINISTIC_KEY: GZ5FU0dXHcFxJVqPVpZSihVVqiScvQNq
+      ENCRYPTION_PRIMARY_KEY: r9ay7kGB1p7pEtuRQ6r1gSEZhShPonMz
+      ENCRYPTION_KEY_DERIVATION_SALT: tCf2PKf9LZ6vgfYgf7sAXRg7sDNYj0DP
+      CF_ACCESS_KEY_ID: test
+      CF_SECRET_ACCESS_KEY: test
+      CF_ACCOUNT_ID: test
+      CF_BUCKET: test
+      CF_REGION: auto
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_BUCKET: test
+      AWS_REGION: us-east-2
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
