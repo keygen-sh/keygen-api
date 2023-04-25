@@ -395,7 +395,8 @@ class License < ApplicationRecord
       else
         none
       end
-    rescue ActiveSupport::Duration::ISO8601Parser::ParsingError
+    rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
+           ArgumentError # to_time raises for invalid input
       none
     end
   }
