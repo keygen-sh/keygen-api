@@ -15,6 +15,23 @@ namespace :keygen do
       mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
 
+      # Secrets
+      unless ENV.key?('NO_SECRETS')
+        config['SECRET_KEY_BASE']                = SecureRandom.hex(64)
+        config['ENCRYPTION_DETERMINISTIC_KEY']   = SecureRandom.base58(32)
+        config['ENCRYPTION_PRIMARY_KEY']         = SecureRandom.base58(32)
+        config['ENCRYPTION_KEY_DERIVATION_SALT'] = SecureRandom.base58(32)
+      end
+
+      # General config
+      config['KEYGEN_HOST'] = host = ENV.fetch('KEYGEN_HOST') {
+        print 'Enter your domain: '
+        gets
+      }
+
+      # TODO(ezekg) Cloudflare R2 and AWS S3 config
+
+      # Variable config
       case edition
       when 'CE'
         puts 'Setting up CE edition...'
