@@ -65,7 +65,8 @@ Keygen Enterprise Edition:
 - **SSO/SAML**: support for SSO/SAML coming soon.
 
 Keygen uses Keygen EE in production to run Keygen Cloud, which is used to
-license Keygen EE. It's ~~turtles~~ Keygens all the way down.
+license Keygen EE. It's ~~turtles~~ Keygens all the way down (we love
+dogfooding our own products).
 
 To obtain a license key, please [reach out][sales].
 
