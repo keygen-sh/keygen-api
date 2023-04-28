@@ -60,7 +60,9 @@ Sidekiq.configure_server do |config|
 
   config.server_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Server
-    chain.add Sidekiq::Cronitor::ServerMiddleware
+    unless ENV.key?('NO_CRONITOR')
+      chain.add Sidekiq::Cronitor::ServerMiddleware
+    end
   end
 
   SidekiqUniqueJobs::Server.configure(config)
