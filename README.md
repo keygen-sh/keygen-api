@@ -105,6 +105,7 @@ To initialize the database, run:
 
 ```bash
 rails db:setup
+rails db:seed
 ```
 
 To setup Keygen, run:
