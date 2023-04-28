@@ -44,7 +44,7 @@ any bugs before the general self-hosted release. Every 6 months, we
 combine all the changes into a new self-hosted release.
 
 Keygen CE does lack a few features from Keygen Cloud, which are available
-in [Keygen EE][keygen-ee].
+in Keygen EE.
 
 Interested in self-hosting Keygen? Take a look at our [self-hosting docs][self-hosting].
 
