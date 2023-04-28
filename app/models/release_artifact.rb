@@ -85,7 +85,7 @@ class ReleaseArtifact < ApplicationRecord
 
   validates :filesize,
     allow_blank: true,
-    numericality: { greater_than_or_equal_to: 0 }
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5.gigabytes }
 
   validates :status,
     presence: true,

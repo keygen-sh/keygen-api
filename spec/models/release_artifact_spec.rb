@@ -210,4 +210,18 @@ describe ReleaseArtifact, type: :model do
       ]
     end
   end
+
+  describe 'filesize=' do
+    it 'should not raise on positive filesize' do
+      expect { create(:artifact, filesize: 1, account:) }.to_not raise_error
+    end
+
+    it 'should raise on negative filesize' do
+      expect { create(:artifact, filesize: -1, account:) }.to raise_error ActiveRecord::RecordInvalid
+    end
+
+    it 'should raise on filesize > 5GB' do
+      expect { create(:artifact, filesize: 5.gigabytes + 1.kilobyte, account:) }.to raise_error ActiveRecord::RecordInvalid
+    end
+  end
 end
