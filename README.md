@@ -172,7 +172,7 @@ If the ELv2 license doesn't work for your company, please [reach out][sales].
 
 ## Is it any good?
 
-Yes.
+[Yes](https://news.ycombinator.com/item?id=3067434).
 
 [keygen-cloud]: https://keygen.sh
 [self-hosting]: https://keygen.sh/docs/self-hosting/
