@@ -11,7 +11,7 @@ server applications, on-premise software, and other products.
 ## Software licensing for everyone
 
 Keygen comes in two editions. Keygen CE is our Community Edition, and is
-free (as in beer) to self-hosted for personal and commercial use. Keygen
+free (as in beer) to self-host for personal and commercial use. Keygen
 EE is our Enterprise Edition, and it requires a license key to use.
 Keygen EE comes with enterprise-grade features like request logs,
 audit logs, permissions, environments, and more.
