@@ -212,7 +212,7 @@ Feature: Delete machine
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -321,9 +321,9 @@ Feature: Delete machine
     # Sanity check on license's machine counter
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "machines": {
@@ -448,7 +448,7 @@ Feature: Delete machine
     And the current account has 3 "machines"
     When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -462,7 +462,7 @@ Feature: Delete machine
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

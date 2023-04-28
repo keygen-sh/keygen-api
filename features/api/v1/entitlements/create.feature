@@ -37,7 +37,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Test Entitlement",
@@ -188,14 +188,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Isolated Entitlement",
         "code": "ISOLATED_ENTITLEMENT"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -245,14 +245,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Isolated Entitlement",
         "code": "ISOLATED_ENTITLEMENT"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -302,7 +302,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -348,7 +348,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -397,7 +397,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -438,14 +438,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Shared Entitlement",
         "code": "SHARED_ENTITLEMENT"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -495,14 +495,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Shared Entitlement",
         "code": "SHARED_ENTITLEMENT"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -549,7 +549,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -593,7 +593,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -637,7 +637,7 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -678,14 +678,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Global Entitlement",
         "code": "GLOBAL_ENTITLEMENT"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -726,14 +726,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Isolated Feature",
         "code": "ISOLATED_FEATURE"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {
@@ -774,14 +774,14 @@ Feature: Create entitlements
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "name": "Shared Feature",
         "code": "SHARED_FEATURE"
       }
       """
-    And the JSON response should be an "entitlement" with the following relationships:
+    And the response body should be an "entitlement" with the following relationships:
       """
       {
         "environment": {

@@ -35,7 +35,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin updates a webhook endpoint's url to localhosts
@@ -85,7 +85,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint" with the following attributes:
+    And the response body should be a "webhook-endpoint" with the following attributes:
       """
       { "apiVersion": "1.0" }
       """
@@ -107,7 +107,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint" with the following attributes:
+    And the response body should be a "webhook-endpoint" with the following attributes:
       """
       { "apiVersion": "1.1" }
       """
@@ -129,7 +129,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint" with the following attributes:
+    And the response body should be a "webhook-endpoint" with the following attributes:
       """
       { "apiVersion": "1.2" }
       """
@@ -151,7 +151,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -186,7 +186,7 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint" with the url "https://shared.example"
+    And the response body should be a "webhook-endpoint" with the url "https://shared.example"
 
   Scenario: Product attempts to update a webhook endpoint for their account
     Given the current account is "test1"

@@ -34,7 +34,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for an isolated product
@@ -47,7 +47,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for a global product
@@ -61,7 +61,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Product retrieves the licenses for a product
     Given the current account is "test1"
@@ -80,7 +80,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves a license for a product
     Given I am an admin of account "test1"
@@ -99,7 +99,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves a license for a product
     Given the current account is "test1"
@@ -118,7 +118,7 @@ Feature: Product licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves the licenses of another product
     Given the current account is "test1"

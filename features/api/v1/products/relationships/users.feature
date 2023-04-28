@@ -47,7 +47,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   @ee
   Scenario: Environment retrieves the users for an isolated product
@@ -60,7 +60,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   @ee
   Scenario: Environment retrieves the users for a global product
@@ -74,7 +74,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "users"
+    And the response body should be an array with 2 "users"
 
   Scenario: Product retrieves the users for a product
     Given the current account is "test1"
@@ -102,7 +102,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Admin retrieves a user for a product
     Given I am an admin of account "test1"
@@ -122,7 +122,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Product retrieves a user for a product
     Given the current account is "test1"
@@ -142,7 +142,7 @@ Feature: Product users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Product retrieves the users of another product
     Given the current account is "test1"

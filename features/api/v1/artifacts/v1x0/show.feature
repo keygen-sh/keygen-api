@@ -58,7 +58,7 @@ Feature: Show release artifact
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/artifacts/latest-mac.yml"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "product": {
@@ -81,7 +81,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "key": "latest-mac.yml" }
       """

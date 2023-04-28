@@ -33,8 +33,8 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "machines"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 2 "machines"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
@@ -66,8 +66,8 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "machines"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "machines"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
@@ -98,7 +98,7 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/test-key/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   @ee
   Scenario: Environment retrieves the machines for an isolated license
@@ -114,7 +114,7 @@ Feature: License machines relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Product retrieves the machines for a license
     Given the current account is "test1"
@@ -130,7 +130,7 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin retrieves a machine for a license
     Given I am an admin of account "test1"
@@ -144,7 +144,7 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves a machine for a license
     Given the current account is "test1"
@@ -169,7 +169,7 @@ Feature: License machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves the machines for a license of another product
     Given the current account is "test1"
@@ -255,7 +255,7 @@ Feature: License machines relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Environment retrieves a shared machine for a shared license
@@ -271,7 +271,7 @@ Feature: License machines relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Environment retrieves a shared machine for a global license
@@ -287,4 +287,4 @@ Feature: License machines relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"

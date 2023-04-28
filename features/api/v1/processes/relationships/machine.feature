@@ -24,7 +24,7 @@ Feature: Process machine relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -40,7 +40,7 @@ Feature: Process machine relationship
       """
     When I send a GET request to "/accounts/test1/processes/$0/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Shared environment retrieves the machine for a shared process
@@ -51,7 +51,7 @@ Feature: Process machine relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Shared environment retrieves the machine for a global process
@@ -66,7 +66,7 @@ Feature: Process machine relationship
       """
     When I send a GET request to "/accounts/test1/processes/$0/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves the machine for a process
     Given the current account is "test1"
@@ -80,7 +80,7 @@ Feature: Process machine relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves the machine for a process of different product
     Given the current account is "test1"
@@ -102,7 +102,7 @@ Feature: Process machine relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: User attempts to retrieve the machine for a process they don't own
     Given the current account is "test1"
@@ -122,7 +122,7 @@ Feature: Process machine relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$1/machine"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: License attempts to retrieve the machine for a process they don't own
     Given the current account is "test1"

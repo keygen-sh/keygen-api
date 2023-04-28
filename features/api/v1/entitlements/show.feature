@@ -24,7 +24,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Developer retrieves an entitlement for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Sales retrieves an entitlement for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Support retrieves an entitlement for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Read-only retrieves an entitlement for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Admin retrieves an invalid entitlement for their account
     Given I am an admin of account "test1"
@@ -88,7 +88,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ce
   Scenario: Environment retrieves an entitlement (isolated)
@@ -117,7 +117,7 @@ Feature: Show entitlement
       """
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be an "entitlement"
+    And the response body should be an "entitlement"
 
   @ee
   Scenario: Environment retrieves an entitlement (shared)
@@ -132,7 +132,7 @@ Feature: Show entitlement
       """
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be an "entitlement"
+    And the response body should be an "entitlement"
 
   Scenario: Product retrieves an entitlement
     Given the current account is "test1"
@@ -142,7 +142,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: License retrieves an entitlement (does not have entitlement)
     Given the current account is "test1"
@@ -163,7 +163,7 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be an "entitlement"
+    And the response body should be an "entitlement"
 
   Scenario: User retrieves an entitlement (does not have entitlement)
     Given the current account is "test1"
@@ -186,4 +186,4 @@ Feature: Show entitlement
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be an "entitlement"
+    And the response body should be an "entitlement"

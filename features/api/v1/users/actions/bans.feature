@@ -26,7 +26,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "BANNED" }
       """
@@ -71,7 +71,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "BANNED" }
       """
@@ -94,7 +94,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "BANNED" }
       """
@@ -131,7 +131,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "BANNED" }
       """
@@ -212,7 +212,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/unban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -238,7 +238,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/unban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -264,7 +264,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/unban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -308,7 +308,7 @@ Feature: User ban actions
     When I send a POST request to "/accounts/test1/users/$1/actions/unban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "status": "ACTIVE" }
       """

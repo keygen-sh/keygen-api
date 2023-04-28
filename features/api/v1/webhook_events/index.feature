@@ -25,7 +25,7 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "webhook-events"
+    And the response body should be an array with 3 "webhook-events"
 
   @ee
   Scenario: Environment retrieves all isolated webhook events for their account
@@ -39,7 +39,7 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events?environment=isolated"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "webhook-events"
+    And the response body should be an array with 3 "webhook-events"
 
   @ee
   Scenario: Environment retrieves all shared webhook events for their account
@@ -53,7 +53,7 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events?environment=shared"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 6 "webhook-events"
+    And the response body should be an array with 6 "webhook-events"
 
   Scenario: Product retrieves all webhook events for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "webhook-events"
+    And the response body should be an array with 3 "webhook-events"
 
   Scenario: Admin retrieves a paginated list of webhook events
     Given I am an admin of account "test1"
@@ -73,8 +73,8 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "webhook-events"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "webhook-events"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/webhook-events?page[number]=2&page[size]=5",
@@ -91,8 +91,8 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "webhook-events"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "webhook-events"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/webhook-events?page[number]=1&page[size]=5",
@@ -109,8 +109,8 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?page[number]=5&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "webhook-events"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 2 "webhook-events"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/webhook-events?page[number]=5&page[size]=5",
@@ -151,7 +151,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "webhook-events"
+    And the response body should be an array with 10 "webhook-events"
 
   Scenario: Admin retrieves all webhook events with a low limit for their account
     Given I am an admin of account "test1"
@@ -160,7 +160,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "webhook-events"
+    And the response body should be an array with 5 "webhook-events"
 
   Scenario: Admin retrieves all webhook events with a high limit for their account
     Given I am an admin of account "test1"
@@ -169,7 +169,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "webhook-events"
+    And the response body should be an array with 20 "webhook-events"
 
   Scenario: Admin retrieves all webhook events with a limit that is too high
     Given I am an admin of account "test1"
@@ -198,7 +198,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?events[]=real.event"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "webhook-event"
+    And the response body should be an array with 1 "webhook-event"
 
   Scenario: Admin retrieves filters webhook events by event type that doesn't exist
     Given I am an admin of account "test1"
@@ -207,7 +207,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?events[]=bad.event"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "webhook-events"
+    And the response body should be an array with 0 "webhook-events"
 
   Scenario: Admin attempts to retrieve all webhook events for another account
     Given I am an admin of account "test2"
@@ -215,7 +215,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve all webhook events for their account
     Given the current account is "test1"
@@ -225,7 +225,7 @@ Feature: List webhook events
     And the current account has 3 "webhook-events"
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all webhook events for their account
     Given the current account is "test1"
@@ -235,11 +235,11 @@ Feature: List webhook events
     And the current account has 3 "webhook-events"
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to retrieve all webhook events for an account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

@@ -45,7 +45,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the response body should be an array with 3 "platforms"
 
   Scenario: Admin retrieves their release platforms (some have associated releases)
     Given the current account is "test1"
@@ -70,7 +70,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the response body should be an array with 3 "platforms"
 
   @ce
   Scenario: Environment retrieves their release arches (isolated)
@@ -203,7 +203,7 @@ Feature: List release platforms
       """
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the response body should be an array with 3 "platforms"
 
   @ee
   Scenario: Environment retrieves their release platforms (shared)
@@ -270,7 +270,7 @@ Feature: List release platforms
       """
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "platform"
+    And the response body should be an array with 1 "platform"
 
   @ee
   Scenario: Environment retrieves their release platforms (global)
@@ -390,7 +390,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the response body should be an array with 3 "platforms"
 
   Scenario: Product retrieves the platforms of another product
     Given the current account is "test1"
@@ -410,7 +410,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the response body should be an array of 0 "platforms"
 
   Scenario: User attempts to retrieve the platforms for a product (licensed)
     Given the current account is "test1"
@@ -425,7 +425,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "platform"
+    And the response body should be an array of 1 "platform"
 
   Scenario: User attempts to retrieve the platforms for a product (unlicensed)
     Given the current account is "test1"
@@ -439,7 +439,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the response body should be an array of 0 "platforms"
 
   Scenario: License attempts to retrieve the platforms for their product
     Given the current account is "test1"
@@ -452,7 +452,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "platform"
+    And the response body should be an array of 1 "platform"
 
   Scenario: License attempts to retrieve the platforms for a different product
    Given the current account is "test1"
@@ -464,7 +464,7 @@ Feature: List release platforms
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the response body should be an array of 0 "platforms"
 
   Scenario: Admin attempts to retrieve the platforms for a product of another account
     Given the current account is "test1"
@@ -492,7 +492,7 @@ Feature: List release platforms
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the response body should be an array of 0 "platforms"
 
   Scenario: Anonymous attempts to retrieve the platforms for an account (OPEN distribution strategy)
    Given the current account is "test1"
@@ -505,7 +505,7 @@ Feature: List release platforms
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "platform"
+    And the response body should be an array of 1 "platform"
 
   Scenario: Anonymous attempts to retrieve the platforms for an account (CLOSED distribution strategy)
    Given the current account is "test1"
@@ -518,4 +518,4 @@ Feature: List release platforms
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the response body should be an array of 0 "platforms"

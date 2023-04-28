@@ -26,7 +26,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "group-owners"
+    And the response body should be an array with 3 "group-owners"
 
   @ee
   Scenario: Environment retrieves the owners of a group
@@ -42,7 +42,7 @@ Feature: Group owners relationship
       """
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "group-owners"
+    And the response body should be an array with 2 "group-owners"
 
   Scenario: Product retrieves the owners of a group
     Given the current account is "test1"
@@ -53,7 +53,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "group-owners"
+    And the response body should be an array with 3 "group-owners"
 
   Scenario: Admin retrieves an owner of a group
     Given the current account is "test1"
@@ -63,7 +63,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group-owner"
+    And the response body should be a "group-owner"
 
   Scenario: Product retrieves an owner of a group
     Given the current account is "test1"
@@ -74,7 +74,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group-owner"
+    And the response body should be a "group-owner"
 
   Scenario: User attempts to retrieve the owners of a group (is owner)
     Given the current account is "test1"
@@ -93,7 +93,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "group-owners"
+    And the response body should be an array with 4 "group-owners"
 
   Scenario: User attempts to retrieve the owners of a group (is not member)
     Given the current account is "test1"
@@ -118,7 +118,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "group-owners"
+    And the response body should be an array with 3 "group-owners"
 
   Scenario: License attempts to retrieve the owners of a group (is not member)
     Given the current account is "test1"
@@ -142,7 +142,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "group-owners"
+    And the response body should be an array with 3 "group-owners"
 
   Scenario: Admin attempts to retrieve the owners of a group of another account
     Given the current account is "test1"
@@ -177,7 +177,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group-owner"
+    And the response body should be a "group-owner"
 
   Scenario: User attempts to retrieve an owner of a group (is owner)
     Given the current account is "test1"
@@ -196,7 +196,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group-owner"
+    And the response body should be a "group-owner"
 
   Scenario: User attempts to retrieve an owner of a group (is not member)
     Given the current account is "test1"
@@ -221,7 +221,7 @@ Feature: Group owners relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group-owner"
+    And the response body should be a "group-owner"
 
   # Attachment
   Scenario: Admin attaches owners to a group
@@ -242,7 +242,7 @@ Feature: Group owners relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "group-owners"
+    And the response body should be an array with 3 "group-owners"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -359,8 +359,8 @@ Feature: Group owners relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "group-owners"
-    And the JSON response should be an array of 2 "group-owners" with the following relationships:
+    And the response body should be an array with 2 "group-owners"
+    And the response body should be an array of 2 "group-owners" with the following relationships:
       """
       {
         "environment": {
@@ -439,8 +439,8 @@ Feature: Group owners relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "group-owners"
-    And the JSON response should be an array of 2 "group-owners" with the following relationships:
+    And the response body should be an array with 2 "group-owners"
+    And the response body should be an array of 2 "group-owners" with the following relationships:
       """
       {
         "environment": {
@@ -514,7 +514,7 @@ Feature: Group owners relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "group-owners"
+    And the response body should be an array with 2 "group-owners"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

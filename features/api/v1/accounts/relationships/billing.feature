@@ -28,7 +28,7 @@ Feature: Account billing relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should be "200"
-    And the JSON response should be a "billing"
+    And the response body should be a "billing"
     And sidekiq should have 0 "request-log" jobs
 
   @ee

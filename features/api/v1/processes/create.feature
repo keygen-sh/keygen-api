@@ -47,7 +47,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -197,7 +197,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the response body should be a "process" with the pid "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -431,7 +431,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -473,7 +473,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -514,7 +514,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -556,7 +556,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -598,7 +598,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -641,7 +641,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -789,7 +789,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -833,7 +833,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -875,7 +875,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -969,7 +969,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1065,7 +1065,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1"
+    And the response body should be a "process" with the pid "1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1157,7 +1157,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -1201,7 +1201,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "2"
+    And the response body should be a "process" with the pid "2"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1284,7 +1284,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1337"
+    And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1317,7 +1317,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1337"
+    And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1354,7 +1354,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the pid "1337"
+    And the response body should be a "process" with the pid "1337"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1627,7 +1627,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "process" with the id "00000000-2521-4033-9f4f-3675387016f7"
+    And the response body should be a "process" with the id "00000000-2521-4033-9f4f-3675387016f7"
     And the current account should have 1 "process"
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
@@ -1663,7 +1663,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1703,7 +1703,7 @@ Feature: Spawn machine process
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

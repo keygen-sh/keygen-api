@@ -51,7 +51,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with a key that is not nil
+    And the response body should be a "license" with a key that is not nil
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -85,7 +85,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with a key that is not nil
+    And the response body should be a "license" with a key that is not nil
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -320,7 +320,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the name "Some License Name"
+    And the response body should be a "license" with the name "Some License Name"
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
@@ -453,7 +453,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -506,7 +506,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -553,7 +553,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -656,7 +656,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -843,7 +843,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -986,7 +986,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1039,11 +1039,11 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "name": "Isolated License" }
       """
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -1099,7 +1099,7 @@ Feature: Create license
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1146,7 +1146,7 @@ Feature: Create license
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1191,11 +1191,11 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "name": "Shared License" }
       """
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -1251,7 +1251,7 @@ Feature: Create license
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1298,7 +1298,7 @@ Feature: Create license
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1372,7 +1372,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -1414,7 +1414,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -1617,7 +1617,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -1661,7 +1661,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "environment": {
@@ -1712,7 +1712,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -1806,7 +1806,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1940,7 +1940,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       {
         "metadata": {
@@ -1991,7 +1991,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following "metadata":
+    And the response body should be a "license" with the following "metadata":
       """
       {
         "object": {
@@ -2045,7 +2045,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2094,7 +2094,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       {
         "metadata": {
@@ -2136,7 +2136,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with an expiry "2016-09-05T22:53:37.000Z"
+    And the response body should be a "license" with an expiry "2016-09-05T22:53:37.000Z"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2168,7 +2168,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the key "a-license-key"
+    And the response body should be a "license" with the key "a-license-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2271,7 +2271,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the key "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the response body should be a "license" with the key "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
@@ -2320,10 +2320,10 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with key "977f1752-d6a9-4669-a6af-b039154ec40f"
-    And the JSON response should be a "license" with maxMachines "3"
-    And the JSON response should be a "license" with maxCores "32"
-    And the JSON response should be a "license" with maxUses "100"
+    And the response body should be a "license" with key "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the response body should be a "license" with maxMachines "3"
+    And the response body should be a "license" with maxCores "32"
+    And the response body should be a "license" with maxUses "100"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2367,8 +2367,8 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxMachines "3"
-    And the JSON response should be a "license" with the key "a-duplicate-key"
+    And the response body should be a "license" with maxMachines "3"
+    And the response body should be a "license" with the key "a-duplicate-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2412,8 +2412,8 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the scheme "LEGACY_ENCRYPT"
-    And the JSON response should be a "license" that is encrypted
+    And the response body should be a "license" with the scheme "LEGACY_ENCRYPT"
+    And the response body should be a "license" that is encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2460,7 +2460,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2514,7 +2514,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_ENCRYPT" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_ENCRYPT" key with the following dataset:
       """
       {
         "id": "$licenses[0].id",
@@ -2567,9 +2567,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_PKCS1_ENCRYPT"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_ENCRYPT"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_PKCS1_ENCRYPT"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_ENCRYPT"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2614,7 +2614,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2670,7 +2670,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_SIGN" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -2734,9 +2734,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_SIGN"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2774,7 +2774,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -2835,9 +2835,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2882,7 +2882,7 @@ Feature: Create license
       """
     Then the response status should be "400"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2936,7 +2936,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_JWT_RS256" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_JWT_RS256" key with the following dataset:
       """
       {
         "iss": "https://keygen.sh",
@@ -2991,7 +2991,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -3047,7 +3047,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -3109,9 +3109,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the JWT key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
-    And the JSON response should be a "license" with the scheme "RSA_2048_JWT_RS256"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the JWT key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
+    And the response body should be a "license" with the scheme "RSA_2048_JWT_RS256"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3155,7 +3155,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -3219,9 +3219,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN_V2"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_SIGN_V2"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN_V2"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_SIGN_V2"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3259,7 +3259,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -3320,9 +3320,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN_V2"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3361,9 +3361,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
-    And the JSON response should be a "license" with the signed key of "id=00000000-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
+    And the response body should be a "license" with the signed key of "id=00000000-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3399,9 +3399,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
-    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
+    And the response body should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
+    And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -3463,7 +3463,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 1 "license"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -3513,7 +3513,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -3562,7 +3562,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
       """
       {
         "account": { "id": "$accounts[0].id" },
@@ -3623,9 +3623,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "ed25519-signed-payload" using "ED25519_SIGN"
-    And the JSON response should be a "license" with the scheme "ED25519_SIGN"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "ed25519-signed-payload" using "ED25519_SIGN"
+    And the response body should be a "license" with the scheme "ED25519_SIGN"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3670,9 +3670,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the signed key of "short" using "ED25519_SIGN"
-    And the JSON response should be a "license" with the scheme "ED25519_SIGN"
-    And the JSON response should be a "license" that is not encrypted
+    And the response body should be a "license" with the signed key of "short" using "ED25519_SIGN"
+    And the response body should be a "license" with the scheme "ED25519_SIGN"
+    And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3700,7 +3700,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" that is not protected
+    And the response body should be a "license" that is not protected
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3847,7 +3847,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -4014,7 +4014,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4063,7 +4063,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4110,7 +4110,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4159,7 +4159,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4208,7 +4208,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4334,7 +4334,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And the current account should have 3 "keys"
-    And the JSON response should be a "license" that is strict
+    And the response body should be a "license" that is strict
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4376,7 +4376,7 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4424,7 +4424,7 @@ Feature: Create license
       """
     Then the response status should be "401"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4475,9 +4475,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" that is protected
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" that is protected
+    And the response body should be a "license" that is not strict
+    And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4523,9 +4523,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" that is protected
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" that is protected
+    And the response body should be a "license" that is not strict
+    And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4571,9 +4571,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" that is protected
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" that is protected
+    And the response body should be a "license" that is not strict
+    And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4619,9 +4619,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" that is not protected
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" that is not protected
+    And the response body should be a "license" that is not strict
+    And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4668,8 +4668,8 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" that is protected
-    And the JSON response should be a "license" that is requireCheckIn
+    And the response body should be a "license" that is protected
+    And the response body should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4717,9 +4717,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the id "00000000-e0e1-4c06-a313-cba8cce6be00"
-    And the JSON response should be a "license" that is protected
-    And the JSON response should be a "license" that is requireCheckIn
+    And the response body should be a "license" with the id "00000000-e0e1-4c06-a313-cba8cce6be00"
+    And the response body should be a "license" that is protected
+    And the response body should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -4755,7 +4755,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4798,7 +4798,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4841,7 +4841,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4885,7 +4885,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       {
         "permissions": [
@@ -4942,7 +4942,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4999,7 +4999,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       {
         "permissions": [
@@ -5042,7 +5042,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5084,7 +5084,7 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -5133,7 +5133,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5175,7 +5175,7 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -5230,7 +5230,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -5281,7 +5281,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -5400,7 +5400,7 @@ Feature: Create license
       }
       """
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5438,7 +5438,7 @@ Feature: Create license
       }
       """
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5548,7 +5548,7 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5587,7 +5587,7 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5691,7 +5691,7 @@ Feature: Create license
       }
       """
     Then the response status should be "402"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5735,7 +5735,7 @@ Feature: Create license
       }
       """
     Then the response status should be "402"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5782,7 +5782,7 @@ Feature: Create license
       """
     Then the response status should be "401"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5828,8 +5828,8 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxMachines "9"
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" with maxMachines "9"
+    And the response body should be a "license" that is floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5869,7 +5869,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -5918,8 +5918,8 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxMachines "5"
-    And the JSON response should be a "license" that is floating
+    And the response body should be a "license" with maxMachines "5"
+    And the response body should be a "license" that is floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5958,8 +5958,8 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxMachines "1"
-    And the JSON response should be a "license" that is not floating
+    And the response body should be a "license" with maxMachines "1"
+    And the response body should be a "license" that is not floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5997,7 +5997,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxCores "32"
+    And the response body should be a "license" with maxCores "32"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -6035,7 +6035,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxCores "16"
+    And the response body should be a "license" with maxCores "16"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -6073,7 +6073,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxUses "500"
+    And the response body should be a "license" with maxUses "500"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -6111,7 +6111,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with maxUses "100"
+    And the response body should be a "license" with maxUses "100"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -6147,7 +6147,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "maxProcesses": 32 }
       """
@@ -6186,7 +6186,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "maxProcesses": 16 }
       """
@@ -6236,7 +6236,7 @@ Feature: Create license
       """
     Then the response status should be "400"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -6290,7 +6290,7 @@ Feature: Create license
       """
     Then the response status should be "400"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -6313,7 +6313,7 @@ Feature: Create license
   #   And I use an authentication token
   #   When I send a POST request to "/accounts/test1/licenses?meta=%7B+++++%4"
   #   Then the response status should be "400"
-  #   And the JSON response should be an array of 1 error
+  #   And the response body should be an array of 1 error
   #   And the first error should have the following properties:
   #     """
   #     {
@@ -6489,7 +6489,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
       """
       {
         "id": "$licenses[0].id",
@@ -6547,8 +6547,8 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the id "75481f3c-bf58-4d3f-8457-eea2b7291f4e"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
+    And the response body should be a "license" with the id "75481f3c-bf58-4d3f-8457-eea2b7291f4e"
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
       """
       {
         "id": "75481f3c-bf58-4d3f-8457-eea2b7291f4e",
@@ -6617,7 +6617,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
       """
       {
         "account": "$accounts[0].id",
@@ -6681,7 +6681,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
       """
       {
         "account": "$accounts[0].id",
@@ -6726,7 +6726,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the key "{{account}}-{{product}}-{{id}}"
+    And the response body should be a "license" with the key "{{account}}-{{product}}-{{id}}"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -6765,7 +6765,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+    And the response body should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
       """
       { "foo": "", "baz": "", "qux": "{{}}" }
       """

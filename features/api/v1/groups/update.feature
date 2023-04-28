@@ -39,7 +39,7 @@ Feature: Update groups
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "group" with the following attributes:
+    And the response body should be a "group" with the following attributes:
       """
       {
         "maxMachines": 100,
@@ -75,7 +75,7 @@ Feature: Update groups
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "group" with the following attributes:
+    And the response body should be a "group" with the following attributes:
       """
       { "maxMachines": null }
       """
@@ -125,7 +125,7 @@ Feature: Update groups
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "group" with the name "Updated Group"
+    And the response body should be a "group" with the name "Updated Group"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

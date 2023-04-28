@@ -52,7 +52,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the response body should be an array with 6 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -87,7 +87,7 @@ Feature: List releases
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -118,7 +118,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -167,7 +167,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta&platform=win32"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the response body should be an array with 6 "releases"
 
   Scenario: Admin retrieves all releases filtered by arch
     Given I am an admin of account "test1"
@@ -194,7 +194,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?arch=x64"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the response body should be an array with 6 "releases"
 
   Scenario: Admin retrieves all win32 product releases for their account
     Given I am an admin of account "test1"
@@ -222,7 +222,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?product=121f9da8-dbe6-4d51-ac6c-dbbb024725ec&channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: Admin retrieves all stable releases for their account
     Given I am an admin of account "test1"
@@ -258,7 +258,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
     And the first "release" should have the following data:
       """
       { "id": "028a38a2-0d17-4871-acb8-c5e6f040fc12" }
@@ -306,7 +306,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "releases"
+    And the response body should be an array with 7 "releases"
     And the first "release" should have the following data:
       """
       { "id": "2d2e4756-0ff8-4142-8132-762f836a0c76" }
@@ -362,7 +362,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=rc"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "releases"
+    And the response body should be an array with 4 "releases"
     And the first "release" should have the following data:
       """
       { "id": "571114ac-af22-4d4b-99ce-f0e3d921c192" }
@@ -414,7 +414,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "releases"
+    And the response body should be an array with 9 "releases"
 
   Scenario: Admin retrieves all dev releases for their account
     Given I am an admin of account "test1"
@@ -450,7 +450,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=dev"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
     And the first "release" should have the following relationships:
       """
       {
@@ -484,7 +484,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "releases"
+    And the response body should be an array with 5 "releases"
 
   Scenario: Admin retrieves all releases filtered by filetype
     Given I am an admin of account "test1"
@@ -510,7 +510,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "releases"
+    And the response body should be an array with 5 "releases"
 
   Scenario: Admin retrieves all non-yanked stable releases for their account
     Given I am an admin of account "test1"
@@ -529,7 +529,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=false&channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Admin retrieves all non-yanked releases for their account
     Given I am an admin of account "test1"
@@ -548,7 +548,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "releases"
+    And the response body should be an array with 5 "releases"
 
   Scenario: Admin retrieves all yanked stable releases for their account
     Given I am an admin of account "test1"
@@ -567,7 +567,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=true&channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Admin retrieves all yanked releases for their account
     Given I am an admin of account "test1"
@@ -586,7 +586,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
 
   @ee
   Scenario: Environment retrieves all shared releases
@@ -600,7 +600,7 @@ Feature: List releases
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/releases?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the response body should be an array with 6 "releases"
 
   Scenario: Product retrieves all releases
     Given the current account is "test1"
@@ -611,7 +611,7 @@ Feature: List releases
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
 
   Scenario: User retrieves all releases for their products
     Given the current account is "test1"
@@ -626,7 +626,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: License retrieves all releases for their product
     Given the current account is "test1"
@@ -639,7 +639,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "releases"
+    And the response body should be an array with 9 "releases"
 
   Scenario: Anonymous attempts to retrieve all accessible releases
     Given the current account is "test1"
@@ -661,7 +661,7 @@ Feature: List releases
     And the current account has 7 "releases" for the third "product"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "releases"
+    And the response body should be an array with 5 "releases"
 
   Scenario: License attempts to retrieve all draft releases
     Given the current account is "test1"
@@ -690,7 +690,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=DRAFT"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: License attempts to retrieve all published releases
     Given the current account is "test1"
@@ -724,7 +724,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=PUBLISHED"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: License attempts to retrieve all yanked releases
     Given the current account is "test1"
@@ -752,7 +752,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=YANKED"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "release"
+    And the response body should be an array with 0 "release"
 
   Scenario: License attempts to retrieve all accessible releases
     Given the current account is "test1"
@@ -778,7 +778,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "releases"
+    And the response body should be an array with 8 "releases"
 
   Scenario: License attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
@@ -804,7 +804,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?product=$products[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: User attempts to retrieve all accessible releases
     Given the current account is "test1"
@@ -832,7 +832,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "releases"
+    And the response body should be an array with 8 "releases"
 
   Scenario: User attempts to retrieve all accessible releases (limit)
     Given the current account is "test1"
@@ -860,7 +860,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?limit=1"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
 
   Scenario: User attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
@@ -888,7 +888,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "releases"
+    And the response body should be an array with 5 "releases"
 
   Scenario: Admin attempts to retrieve releases for another account
     Given I am an admin of account "test2"
@@ -897,7 +897,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   # Draft releases
   Scenario: Anonymous retrieves draft releases
@@ -906,7 +906,7 @@ Feature: List releases
     And the current account has 3 draft "releases" for the last "product"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: License retrieves draft releases without a license for any
     Given the current account is "test1"
@@ -917,7 +917,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: License retrieves draft releases with a license for them
     Given the current account is "test1"
@@ -929,7 +929,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: User retrieves draft releases without a license for any
     Given the current account is "test1"
@@ -941,7 +941,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: User retrieves draft releases with a license for them
     Given the current account is "test1"
@@ -955,7 +955,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Product retrieves draft releases
     Given the current account is "test1"
@@ -965,7 +965,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Product retrieves draft releases of another product
     Given the current account is "test1"
@@ -975,7 +975,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Admin retrieves draft releases
     Given the current account is "test1"
@@ -985,7 +985,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   # Yanked releases
   Scenario: Anonymous retrieves yanked releases
@@ -994,7 +994,7 @@ Feature: List releases
     And the current account has 3 yanked "releases" for the last "product"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: License retrieves yanked releases without a license for any
     Given the current account is "test1"
@@ -1005,7 +1005,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: License retrieves yanked releases with a license for them
     Given the current account is "test1"
@@ -1017,7 +1017,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: User retrieves yanked releases without a license for any
     Given the current account is "test1"
@@ -1029,7 +1029,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: User retrieves yanked releases with a license for them
     Given the current account is "test1"
@@ -1043,7 +1043,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Product retrieves yanked releases
     Given the current account is "test1"
@@ -1053,7 +1053,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Product retrieves yanked releases of another product
     Given the current account is "test1"
@@ -1063,7 +1063,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Admin retrieves yanked releases
     Given the current account is "test1"
@@ -1073,7 +1073,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: License retrieves their product releases with constraints (no entitlements)
     Given the current account is "test1"
@@ -1086,7 +1086,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: License retrieves their product releases with constraints (some entitlements)
     Given the current account is "test1"
@@ -1134,7 +1134,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: License retrieves their product releases with constraints (all entitlements)
     Given the current account is "test1"
@@ -1189,7 +1189,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: User retrieves their product releases with constraints (no entitlements)
     Given the current account is "test1"
@@ -1204,7 +1204,7 @@ Feature: List releases
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: User retrieves their product releases with constraints (some entitlements)
     Given the current account is "test1"
@@ -1254,7 +1254,7 @@ Feature: List releases
     And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: User retrieves their product releases with constraints (all entitlements)
     Given the current account is "test1"
@@ -1311,4 +1311,4 @@ Feature: List releases
     And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"

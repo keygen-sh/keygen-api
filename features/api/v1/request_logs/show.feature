@@ -24,7 +24,7 @@ Feature: Show request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "request-log"
+    And the response body should be a "request-log"
 
   Scenario: Admin retrieves an invalid log for their account
     Given I am an admin of account "test1"
@@ -48,7 +48,7 @@ Feature: Show request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment attempts to retrieve an isolated log for their account
@@ -59,7 +59,7 @@ Feature: Show request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "request-log"
+    And the response body should be a "request-log"
 
   @ee
   Scenario: Environment attempts to retrieve a shared log for their account
@@ -70,7 +70,7 @@ Feature: Show request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "request-log"
+    And the response body should be a "request-log"
 
   @ee
   Scenario: Environment attempts to retrieve a global log for their account
@@ -81,7 +81,7 @@ Feature: Show request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "request-log"
+    And the response body should be a "request-log"
 
   Scenario: Product attempts to retrieve a log for their account
     Given the current account is "test1"
@@ -91,7 +91,7 @@ Feature: Show request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve a log for their account
     Given the current account is "test1"
@@ -101,7 +101,7 @@ Feature: Show request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve a log for their account
     Given the current account is "test1"
@@ -111,4 +111,4 @@ Feature: Show request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

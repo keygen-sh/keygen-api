@@ -24,7 +24,7 @@ Feature: Account subscription actions
       """
       { "Location": "https://billing.stripe.com/session/test_session_secret" }
       """
-    And the JSON response should be meta with the following:
+    And the response body should be meta with the following:
       """
       { "url": "https://billing.stripe.com/session/test_session_secret" }
       """

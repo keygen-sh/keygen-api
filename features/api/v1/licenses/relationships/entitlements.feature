@@ -26,7 +26,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Admin retrieves the entitlements for a license key
     Given I am an admin of account "test1"
@@ -42,7 +42,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/example-license-key/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "entitlements"
+    And the response body should be an array with 7 "entitlements"
 
   Scenario: Admin attempts to retrieve the entitlements for a license of another account
     Given I am an admin of account "test2"
@@ -67,7 +67,7 @@ Feature: License entitlements relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Product retrieves the entitlements for a license
     Given the current account is "test1"
@@ -79,7 +79,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Product retrieves the entitlements for a license of another product
     Given the current account is "test1"
@@ -111,7 +111,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "entitlements"
+    And the response body should be an array with 4 "entitlements"
 
   Scenario: User attempts to retrieve the entitlements for their license
     Given the current account is "test1"
@@ -124,7 +124,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "entitlements"
+    And the response body should be an array with 2 "entitlements"
 
   Scenario: User attempts to retrieve the entitlements for a license they don't own
     Given the current account is "test1"
@@ -144,7 +144,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Product retrieves an entitlement for a license
     Given the current account is "test1"
@@ -156,7 +156,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: User attempts to retrieve an entitlements for their license
     Given the current account is "test1"
@@ -171,7 +171,7 @@ Feature: License entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be an "entitlement"
+    And the response body should be an "entitlement"
 
   Scenario: User attempts to retrieve an entitlements for a license they don't own
     Given the current account is "test1"
@@ -205,7 +205,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "license-entitlements"
+    And the response body should be an array with 3 "license-entitlements"
     And the current account should have 3 "license-entitlements"
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
@@ -265,7 +265,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "license-entitlements"
+    And the response body should be an array with 3 "license-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -476,7 +476,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "license-entitlements"
+    And the response body should be an array with 3 "license-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -546,7 +546,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "license-entitlements"
+    And the response body should be an array with 3 "license-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -583,7 +583,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "license-entitlements"
+    And the response body should be an array with 3 "license-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -651,7 +651,7 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "license-entitlements"
+    And the response body should be an array with 2 "license-entitlements"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

@@ -49,7 +49,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
 
   Scenario: Admin retrieves their release arches (some have associated releases)
     Given the current account is "test1"
@@ -74,7 +74,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
 
   @ce
   Scenario: Environment retrieves their release arches (isolated)
@@ -207,7 +207,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
 
   @ee
   Scenario: Environment retrieves their release arches (shared)
@@ -274,7 +274,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "arch"
+    And the response body should be an array with 1 "arch"
 
   @ee
   Scenario: Environment retrieves their release arches (global)
@@ -394,7 +394,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
 
   Scenario: Product retrieves the arches of another product
     Given the current account is "test1"
@@ -414,7 +414,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "arches"
+    And the response body should be an array of 0 "arches"
 
   Scenario: User attempts to retrieve the arches for a product (licensed)
     Given the current account is "test1"
@@ -429,7 +429,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "arch"
+    And the response body should be an array of 1 "arch"
 
   Scenario: User attempts to retrieve the arches for a product (unlicensed)
     Given the current account is "test1"
@@ -443,7 +443,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "arches"
+    And the response body should be an array of 0 "arches"
 
   Scenario: License attempts to retrieve the arches for their product
     Given the current account is "test1"
@@ -456,7 +456,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "arch"
+    And the response body should be an array of 1 "arch"
 
   Scenario: License attempts to retrieve the arches for a different product
    Given the current account is "test1"
@@ -468,7 +468,7 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "arches"
+    And the response body should be an array of 0 "arches"
 
   Scenario: Admin attempts to retrieve the arches for a product of another account
     Given the current account is "test1"
@@ -496,7 +496,7 @@ Feature: List release arches
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "arches"
+    And the response body should be an array of 0 "arches"
 
   Scenario: Anonymous attempts to retrieve the arches for an account (OPEN distribution strategy)
    Given the current account is "test1"
@@ -509,7 +509,7 @@ Feature: List release arches
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "arch"
+    And the response body should be an array of 1 "arch"
 
   Scenario: Anonymous attempts to retrieve the arches for an account (CLOSED distribution strategy)
    Given the current account is "test1"
@@ -522,7 +522,7 @@ Feature: List release arches
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "arches"
+    And the response body should be an array of 0 "arches"
 
   @ee
   Scenario: Isolated license attempts to retrieve the arches for an account
@@ -543,7 +543,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 3 "arches"
+    And the response body should be an array of 3 "arches"
 
   @ee
   Scenario: Shared license attempts to retrieve the arches for an account
@@ -564,7 +564,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/test1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array of 3 "arches"
+    And the response body should be an array of 3 "arches"
 
   @ee
   Scenario: Admin retrieves their isolated release arches
@@ -592,7 +592,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/ent1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "arch"
+    And the response body should be an array with 1 "arch"
     And the response should contain the following headers:
       """
       { "Keygen-Environment": "isolated" }
@@ -624,7 +624,7 @@ Feature: List release arches
       """
     When I send a GET request to "/accounts/ent1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
     And the response should contain the following headers:
       """
       { "Keygen-Environment": "shared" }
@@ -652,4 +652,4 @@ Feature: List release arches
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "arches"
+    And the response body should be an array with 2 "arches"

@@ -35,7 +35,7 @@ Feature: User licenses relationship
     When I send a GET request to "/accounts/test1/users/$1/licenses"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for an isolated user
@@ -47,7 +47,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Product retrieves the licenses for a user
     Given the current account is "test1"
@@ -67,7 +67,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves a license for a user
     Given I am an admin of account "test1"
@@ -87,7 +87,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves a license for a user
     Given the current account is "test1"
@@ -107,7 +107,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves the licenses of a user from another product
     Given the current account is "test1"
@@ -139,7 +139,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "license"
+    And the response body should be an array of 1 "license"
 
   Scenario: License attempts to retrieve the licenses for another user
     Given the current account is "test1"
@@ -184,7 +184,7 @@ Feature: User licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Anonymous attempts to retrieve licenses for a user
     Given the current account is "test1"

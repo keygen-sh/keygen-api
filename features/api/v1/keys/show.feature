@@ -24,7 +24,7 @@ Feature: Show key
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "request-log" job
 
@@ -71,7 +71,7 @@ Feature: Show key
       """
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
-    And the JSON response should be an "key"
+    And the response body should be an "key"
 
   @ee
   Scenario: Environment retrieves a key (shared)
@@ -86,7 +86,7 @@ Feature: Show key
       """
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
-    And the JSON response should be an "key"
+    And the response body should be an "key"
 
   Scenario: Product retrieves a key for their product
     Given the current account is "test1"
@@ -97,7 +97,7 @@ Feature: Show key
     And the current product has 1 "key"
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to retrieve a key for another product
@@ -137,5 +137,5 @@ Feature: Show key
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 1 "request-log" job

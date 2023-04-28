@@ -28,7 +28,7 @@ Feature: License product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/test-key/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -44,7 +44,7 @@ Feature: License product relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a license
     Given the current account is "test1"
@@ -55,7 +55,7 @@ Feature: License product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a license of another product
     Given the current account is "test1"

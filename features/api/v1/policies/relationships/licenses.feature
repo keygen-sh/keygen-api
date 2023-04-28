@@ -29,7 +29,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for an isolated policy
@@ -41,7 +41,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for a shared policy
@@ -53,7 +53,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   @ee
   Scenario: Environment retrieves the licenses for a global policy
@@ -66,7 +66,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "licenses"
+    And the response body should be an array with 5 "licenses"
 
   Scenario: Product retrieves the licenses for a policy
     Given the current account is "test1"
@@ -82,7 +82,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves a license for a policy
     Given I am an admin of account "test1"
@@ -96,7 +96,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves a license for a policy
     Given the current account is "test1"
@@ -112,7 +112,7 @@ Feature: Policy licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves the licenses for a policy of another product
     Given the current account is "test1"

@@ -36,7 +36,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the name "Home iMac"
+    And the response body should be a "machine" with the name "Home iMac"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -151,7 +151,7 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       { "name": "Isolated Machine" }
       """
@@ -184,7 +184,7 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       { "name": "Shared Machine" }
       """
@@ -242,7 +242,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with a nil ip
+    And the response body should be a "machine" with a nil ip
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -291,7 +291,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the cores "12"
+    And the response body should be a "machine" with the cores "12"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -400,7 +400,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the cores "32"
+    And the response body should be a "machine" with the cores "32"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -448,7 +448,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the name "Work MacBook Pro"
+    And the response body should be a "machine" with the name "Work MacBook Pro"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -495,7 +495,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the name "Office Mac"
+    And the response body should be a "machine" with the name "Office Mac"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -574,7 +574,7 @@ Feature: Update machine
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the name "Office Mac"
+    And the response body should be a "machine" with the name "Office Mac"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

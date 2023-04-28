@@ -26,7 +26,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "constraints"
+    And the response body should be an array with 3 "constraints"
 
   @ee
   Scenario: Environment retrieves the constraints for a shared release
@@ -38,7 +38,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "constraints"
+    And the response body should be an array with 3 "constraints"
 
   Scenario: Product retrieves the constraints for a release
     Given the current account is "test1"
@@ -49,7 +49,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "constraints"
+    And the response body should be an array with 3 "constraints"
 
   Scenario: Admin retrieves an constraints for a release
     Given I am an admin of account "test1"
@@ -59,7 +59,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "constraint"
+    And the response body should be a "constraint"
 
   Scenario: Product retrieves an constraints for a release
     Given the current account is "test1"
@@ -70,7 +70,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "constraint"
+    And the response body should be a "constraint"
 
   Scenario: Product retrieves the constraints for a release of another product
     Given the current account is "test1"
@@ -127,7 +127,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "constraints"
+    And the response body should be an array with 3 "constraints"
 
   Scenario: User attempts to retrieve the constraints for a release they don't have a license for
     Given the current account is "test1"
@@ -176,7 +176,7 @@ Feature: Release constraints relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "constraints"
+    And the response body should be an array with 3 "constraints"
 
   Scenario: Admin attempts to retrieve the constraints for a release of another account
     Given I am an admin of account "test2"
@@ -206,7 +206,7 @@ Feature: Release constraints relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "constraint"
+    And the response body should be a "constraint"
 
   Scenario: License attempts to retrieve a constraint for a release of their product (no entitlements)
     Given the current account is "test1"
@@ -256,7 +256,7 @@ Feature: Release constraints relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "constraint"
+    And the response body should be a "constraint"
 
   Scenario: User attempts to retrieve a constraint for a release they do have a license for (no entitlements)
     Given the current account is "test1"
@@ -329,7 +329,7 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array of 3 "constraints"
+    And the response body should be an array of 3 "constraints"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -461,7 +461,7 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -536,8 +536,8 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "constraints"
-    And the JSON response should be an array of 2 "constraints" with the following relationships:
+    And the response body should be an array with 2 "constraints"
+    And the response body should be an array of 2 "constraints" with the following relationships:
       """
       {
         "environment": {
@@ -636,8 +636,8 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "constraints"
-    And the JSON response should be an array of 2 "constraints" with the following relationships:
+    And the response body should be an array with 2 "constraints"
+    And the response body should be an array of 2 "constraints" with the following relationships:
       """
       {
         "environment": {
@@ -686,7 +686,7 @@ Feature: Release constraints relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "constraints"
+    And the response body should be an array with 2 "constraints"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

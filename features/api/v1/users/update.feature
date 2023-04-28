@@ -37,7 +37,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the firstName "Elliot"
+    And the response body should be a "user" with the firstName "Elliot"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -60,7 +60,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the firstName "Mr. Robot"
+    And the response body should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -177,7 +177,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
     And the account "test1" should have 2 "admins"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -199,7 +199,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -220,7 +220,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -241,7 +241,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -262,7 +262,7 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -655,7 +655,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following "metadata":
+    And the response body should be a "user" with the following "metadata":
       """
       { "customerId": "cust_gV4dW9jrc" }
       """
@@ -683,7 +683,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following "metadata":
+    And the response body should be a "user" with the following "metadata":
       """
       {
         "object": { "key": "value" }
@@ -949,7 +949,7 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -979,7 +979,7 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1009,7 +1009,7 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1039,7 +1039,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["license.validate"],
@@ -1065,7 +1065,7 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1095,7 +1095,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": [],
@@ -1121,7 +1121,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["license.read", "machine.read"],
@@ -1147,7 +1147,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["license.read", "machine.read"],
@@ -1177,7 +1177,7 @@ Feature: Update user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1267,7 +1267,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["license.read", "machine.read"],
@@ -1292,7 +1292,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["*"],
@@ -1327,7 +1327,7 @@ Feature: Update user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1363,7 +1363,7 @@ Feature: Update user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1391,7 +1391,7 @@ Feature: Update user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1419,7 +1419,7 @@ Feature: Update user
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1458,7 +1458,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following "metadata":
+    And the response body should be a "user" with the following "metadata":
       """
       { "customerId": "cust_gV4dW9jrc" }
       """
@@ -1538,7 +1538,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the firstName "Isolated Robot"
+    And the response body should be a "user" with the firstName "Isolated Robot"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1563,7 +1563,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the firstName "Mr. Robot"
+    And the response body should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1587,7 +1587,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the firstName "Mr. Robot"
+    And the response body should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

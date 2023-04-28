@@ -42,7 +42,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
 
   Scenario: Admin retrieves all tar.gz releases for their account
     Given I am an admin of account "test1"
@@ -69,7 +69,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Admin retrieves all exe releases for their account
     Given I am an admin of account "test1"
@@ -96,7 +96,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?filetype=exe"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Admin retrieves all dmg releases for their account
     Given I am an admin of account "test1"
@@ -123,7 +123,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?filetype=dmg&channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Admin retrieves all macos releases for their account
     Given I am an admin of account "test1"
@@ -150,7 +150,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?platform=macos&channel=beta"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Admin retrieves all win32 releases for their account
     Given I am an admin of account "test1"
@@ -177,7 +177,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?platform=win32&channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"
 
   Scenario: Admin retrieves all linux releases for their account
     Given I am an admin of account "test1"
@@ -204,7 +204,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?platform=linux"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the response body should be an array with 0 "releases"
 
   Scenario: Admin retrieves all win32 beta releases for their account
     Given I am an admin of account "test1"
@@ -232,7 +232,7 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?channel=beta&platform=win32"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
 
   Scenario: Admin retrieves all x86 releases for their account
     Given I am an admin of account "test1"
@@ -260,4 +260,4 @@ Feature: List releases
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases?arch=x64"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the response body should be an array with 1 "release"

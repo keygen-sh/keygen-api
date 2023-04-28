@@ -29,8 +29,8 @@ Feature: Update account
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the name "Company Name"
-    And the JSON response should be an "account" with the following meta:
+    And the response body should be an "account" with the name "Company Name"
+    And the response body should be an "account" with the following meta:
       """
       {
         "publicKey": "$~accounts[0].public_key",
@@ -112,7 +112,7 @@ Feature: Update account
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the slug "new-name"
+    And the response body should be an "account" with the slug "new-name"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -133,7 +133,7 @@ Feature: Update account
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the following attributes:
+    And the response body should be an "account" with the following attributes:
       """
       { "apiVersion": "1.0" }
       """
@@ -157,7 +157,7 @@ Feature: Update account
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the following attributes:
+    And the response body should be an "account" with the following attributes:
       """
       { "apiVersion": "1.1" }
       """
@@ -181,7 +181,7 @@ Feature: Update account
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the following attributes:
+    And the response body should be an "account" with the following attributes:
       """
       { "apiVersion": "1.2" }
       """
@@ -205,7 +205,7 @@ Feature: Update account
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

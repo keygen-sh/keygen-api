@@ -45,7 +45,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "platforms"
+    And the response body should be an array with 2 "platforms"
 
   @ee
   Scenario: Environment retrieves the platforms for an isolated product
@@ -74,7 +74,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "platform"
+    And the response body should be an array with 1 "platform"
 
   @ee
   Scenario: Environment retrieves the platforms for a mixed product
@@ -101,7 +101,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "platforms"
+    And the response body should be an array with 2 "platforms"
 
   Scenario: Product retrieves the platforms for a product
     Given the current account is "test1"
@@ -120,7 +120,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the response body should be an array with 3 "platforms"
 
   Scenario: Admin retrieves a platform for a product
     Given the current account is "test1"
@@ -139,7 +139,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   Scenario: Product retrieves a platform for their product
     Given the current account is "test1"
@@ -158,7 +158,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   Scenario: Product retrieves the platforms of another product
     Given the current account is "test1"
@@ -192,7 +192,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "platform"
+    And the response body should be an array with 1 "platform"
 
   Scenario: User attempts to retrieve the platforms for a product (unlicensed)
     Given the current account is "test1"
@@ -218,7 +218,7 @@ Feature: Product platforms relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/platforms"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "platform"
+    And the response body should be an array with 1 "platform"
 
   Scenario: License attempts to retrieve the platforms for a different product
    Given the current account is "test1"

@@ -45,7 +45,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Fixed Release",
@@ -58,7 +58,7 @@ Feature: Update release
         }
       }
       """
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifact": {
@@ -94,7 +94,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "name": "Renamed Release" }
       """
@@ -125,7 +125,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "name": null }
       """
@@ -157,7 +157,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "filesize": 20971520 }
       """
@@ -189,7 +189,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "filesize": null }
       """
@@ -220,7 +220,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "description": "a different note" }
       """
@@ -251,7 +251,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "description": null }
       """
@@ -283,7 +283,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==" }
       """
@@ -315,7 +315,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "signature": null }
       """
@@ -347,7 +347,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "checksum": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b" }
       """
@@ -379,7 +379,7 @@ Feature: Update release
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "checksum": null }
       """
@@ -406,7 +406,7 @@ Feature: Update release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -440,7 +440,7 @@ Feature: Update release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -474,7 +474,7 @@ Feature: Update release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -508,7 +508,7 @@ Feature: Update release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -542,7 +542,7 @@ Feature: Update release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

@@ -45,7 +45,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "artifacts"
+    And the response body should be an array with 7 "artifacts"
 
   Scenario: Admin retrieves all stable release artifacts
     Given the current account is "test1"
@@ -75,7 +75,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "artifacts"
+    And the response body should be an array with 4 "artifacts"
 
   Scenario: Admin retrieves all beta release artifacts
     Given the current account is "test1"
@@ -105,7 +105,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?channel=beta"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "artifacts"
+    And the response body should be an array with 7 "artifacts"
 
   Scenario: Admin retrieves all alpha release artifacts
     Given the current account is "test1"
@@ -131,7 +131,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   @ce
   Scenario: Environment retrieves their release artifacts (isolated)
@@ -264,8 +264,8 @@ Feature: List release artifacts
       """
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "artifacts"
-    And the JSON response should be an array of 10 "artifacts" with the following relationships:
+    And the response body should be an array with 10 "artifacts"
+    And the response body should be an array of 10 "artifacts" with the following relationships:
       """
       {
         "environment": {
@@ -340,8 +340,8 @@ Feature: List release artifacts
       """
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
-    And the JSON response should be an array of 1 "artifact" with the following relationships:
+    And the response body should be an array with 1 "artifact"
+    And the response body should be an array of 1 "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -471,7 +471,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "artifacts"
+    And the response body should be an array with 5 "artifacts"
 
   Scenario: Admin retrieves all artifacts by filetype
     Given the current account is "test1"
@@ -501,7 +501,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?filetype=zip"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "artifacts"
+    And the response body should be an array with 4 "artifacts"
 
   Scenario: Admin retrieves all artifacts by platform
     Given the current account is "test1"
@@ -531,7 +531,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?platform=macos"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "artifacts"
+    And the response body should be an array with 4 "artifacts"
 
   Scenario: Admin retrieves all artifacts by arch
     Given the current account is "test1"
@@ -561,7 +561,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?arch=amd64"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Admin retrieves all artifacts by platform and arch
     Given the current account is "test1"
@@ -591,7 +591,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?platform=macos&arch=amd64"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Admin retrieves all artifacts by release
     Given the current account is "test1"
@@ -621,7 +621,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?release=0a027f00-0860-4fa7-bd37-5900c8866818"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Read-only retrieves all artifacts by release
     Given the current account is "test1"
@@ -652,7 +652,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?release=0a027f00-0860-4fa7-bd37-5900c8866818"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Product retrieves the artifacts of another product
     Given the current account is "test1"
@@ -672,7 +672,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "artifacts"
+    And the response body should be an array of 0 "artifacts"
 
   Scenario: User attempts to retrieve the artifacts for their products (licensed)
     Given the current account is "test1"
@@ -689,7 +689,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 4 "artifacts"
+    And the response body should be an array of 4 "artifacts"
 
   Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
     Given the current account is "test1"
@@ -703,7 +703,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "artifacts"
+    And the response body should be an array of 0 "artifacts"
 
   Scenario: License attempts to retrieve the artifacts for their product
     Given the current account is "test1"
@@ -716,7 +716,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 3 "artifacts"
+    And the response body should be an array of 3 "artifacts"
 
   Scenario: License attempts to retrieve the artifacts for a different product
    Given the current account is "test1"
@@ -728,7 +728,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "artifacts"
+    And the response body should be an array of 0 "artifacts"
 
   Scenario: Admin attempts to retrieve the artifacts for a product of another account
     Given the current account is "test1"
@@ -770,7 +770,7 @@ Feature: List release artifacts
     And the current account has 1 "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "artifacts"
+    And the response body should be an array with 5 "artifacts"
 
   Scenario: License attempts to retrieve all accessible releases
     Given the current account is "test1"
@@ -797,7 +797,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "artifacts"
+    And the response body should be an array with 8 "artifacts"
 
   Scenario: License attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
@@ -824,7 +824,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts?product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "artifacts"
+    And the response body should be an array with 5 "artifacts"
 
   Scenario: User attempts to retrieve all accessible releases
     Given the current account is "test1"
@@ -853,7 +853,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "artifacts"
+    And the response body should be an array with 8 "artifacts"
 
   Scenario: User attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
@@ -882,7 +882,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts?product=$products[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Draft releases
   Scenario: Anonymous retrieves artifacts for draft releases
@@ -892,7 +892,7 @@ Feature: List release artifacts
     And the current account has 1 "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves artifacts for draft releases without a license for any
     Given the current account is "test1"
@@ -904,7 +904,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves artifacts for draft releases with a license for them
     Given the current account is "test1"
@@ -917,7 +917,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves artifacts for draft releases without a license for any
     Given the current account is "test1"
@@ -930,7 +930,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves artifacts for draft releases with a license for them
     Given the current account is "test1"
@@ -945,7 +945,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Product retrieves artifacts for draft releases
     Given the current account is "test1"
@@ -956,7 +956,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves artifacts for draft releases of another product
     Given the current account is "test1"
@@ -967,7 +967,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Admin retrieves artifacts for draft releases
     Given the current account is "test1"
@@ -978,7 +978,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Yanked releases
   Scenario: Anonymous retrieves artifacts for yanked releases
@@ -988,7 +988,7 @@ Feature: List release artifacts
     And the current account has 1 "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves artifacts for yanked releases without a license for any
     Given the current account is "test1"
@@ -1000,7 +1000,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves artifacts for yanked releases with a license for them
     Given the current account is "test1"
@@ -1013,7 +1013,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves artifacts for yanked releases without a license for any
     Given the current account is "test1"
@@ -1026,7 +1026,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves artifacts for yanked releases with a license for them
     Given the current account is "test1"
@@ -1041,7 +1041,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Product retrieves artifacts for yanked releases
     Given the current account is "test1"
@@ -1052,7 +1052,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves artifacts for yanked releases of another product
     Given the current account is "test1"
@@ -1063,7 +1063,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Admin retrieves artifacts for yanked releases
     Given the current account is "test1"
@@ -1074,7 +1074,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Waiting artifacts
   Scenario: Anonymous retrieves waiting artifacts
@@ -1084,7 +1084,7 @@ Feature: List release artifacts
     And the current account has 1 waiting "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves waiting artifacts without a license for any
     Given the current account is "test1"
@@ -1096,7 +1096,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves waiting artifacts with a license for them
     Given the current account is "test1"
@@ -1109,7 +1109,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves waiting artifacts without a license for any
     Given the current account is "test1"
@@ -1122,7 +1122,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves waiting artifacts with a license for them
     Given the current account is "test1"
@@ -1137,7 +1137,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Product retrieves waiting artifacts
     Given the current account is "test1"
@@ -1148,7 +1148,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves waiting artifacts of another product
     Given the current account is "test1"
@@ -1159,7 +1159,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Admin retrieves waiting artifacts
     Given the current account is "test1"
@@ -1170,7 +1170,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Failed artifacts
   Scenario: Anonymous retrieves failed artifacts
@@ -1180,7 +1180,7 @@ Feature: List release artifacts
     And the current account has 1 failed "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves failed artifacts without a license for any
     Given the current account is "test1"
@@ -1192,7 +1192,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves failed artifacts with a license for them
     Given the current account is "test1"
@@ -1205,7 +1205,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves failed artifacts without a license for any
     Given the current account is "test1"
@@ -1218,7 +1218,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves failed artifacts with a license for them
     Given the current account is "test1"
@@ -1233,7 +1233,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Product retrieves failed artifacts
     Given the current account is "test1"
@@ -1244,7 +1244,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves failed artifacts of another product
     Given the current account is "test1"
@@ -1255,7 +1255,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Admin retrieves failed artifacts
     Given the current account is "test1"
@@ -1266,7 +1266,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Yanked artifacts
   Scenario: Anonymous retrieves yanked artifacts
@@ -1276,7 +1276,7 @@ Feature: List release artifacts
     And the current account has 1 yanked "artifact" for each "release"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves yanked artifacts without a license for any
     Given the current account is "test1"
@@ -1288,7 +1288,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License retrieves yanked artifacts with a license for them
     Given the current account is "test1"
@@ -1301,7 +1301,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves yanked artifacts without a license for any
     Given the current account is "test1"
@@ -1314,7 +1314,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User retrieves yanked artifacts with a license for them
     Given the current account is "test1"
@@ -1329,7 +1329,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Product retrieves yanked artifacts
     Given the current account is "test1"
@@ -1340,7 +1340,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves yanked artifacts of another product
     Given the current account is "test1"
@@ -1351,7 +1351,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "artifacts"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: Admin retrieves yanked artifacts
     Given the current account is "test1"
@@ -1362,7 +1362,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: License retrieves their product artifacts with constraints (no entitlements)
     Given the current account is "test1"
@@ -1376,7 +1376,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
+    And the response body should be an array with 2 "artifacts"
 
   Scenario: License retrieves their product artifacts with constraints (some entitlements)
     Given the current account is "test1"
@@ -1425,7 +1425,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
+    And the response body should be an array with 2 "artifacts"
 
   Scenario: License retrieves their product artifacts with constraints (all entitlements)
     Given the current account is "test1"
@@ -1481,7 +1481,7 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: User retrieves their product artifacts with constraints (no entitlements)
     Given the current account is "test1"
@@ -1497,7 +1497,7 @@ Feature: List release artifacts
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
+    And the response body should be an array with 2 "artifacts"
 
   Scenario: User retrieves their product artifacts with constraints (some entitlements)
     Given the current account is "test1"
@@ -1548,7 +1548,7 @@ Feature: List release artifacts
     And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
+    And the response body should be an array with 2 "artifacts"
 
   Scenario: User retrieves their product artifacts with constraints (all entitlements)
     Given the current account is "test1"
@@ -1606,4 +1606,4 @@ Feature: List release artifacts
     And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"

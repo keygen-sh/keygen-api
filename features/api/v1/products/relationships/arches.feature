@@ -45,7 +45,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "arches"
+    And the response body should be an array with 2 "arches"
 
   @ee
   Scenario: Environment retrieves the arches for an isolated product
@@ -72,7 +72,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "arches"
+    And the response body should be an array with 2 "arches"
 
   @ee
   Scenario: Environment retrieves the arches for a mixed product
@@ -99,7 +99,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "arches"
+    And the response body should be an array with 2 "arches"
 
   Scenario: Product retrieves the arches for a product
     Given the current account is "test1"
@@ -118,7 +118,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "arches"
+    And the response body should be an array with 3 "arches"
 
   Scenario: Admin retrieves a arch for a product
     Given the current account is "test1"
@@ -137,7 +137,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the response body should be a "arch"
 
   Scenario: Product retrieves a arch for their product
     Given the current account is "test1"
@@ -156,7 +156,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches/$0"
     Then the response status should be "200"
-    And the JSON response should be a "arch"
+    And the response body should be a "arch"
 
   Scenario: Product retrieves the arches of another product
     Given the current account is "test1"
@@ -190,7 +190,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "arch"
+    And the response body should be an array with 1 "arch"
 
   Scenario: User attempts to retrieve the arches for a product (unlicensed)
     Given the current account is "test1"
@@ -216,7 +216,7 @@ Feature: Product arches relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/arches"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "arch"
+    And the response body should be an array with 1 "arch"
 
   Scenario: License attempts to retrieve the arches for a different product
    Given the current account is "test1"

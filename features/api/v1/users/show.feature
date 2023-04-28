@@ -24,7 +24,7 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/$0"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Developer retrieves a user for their account
     Given the current account is "test1"
@@ -76,9 +76,9 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/user@example.com"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "user"
-    And the JSON response should be a "user" with the role "user"
-    And the JSON response should be a "user" with no meta
+    And the response body should be a "user"
+    And the response body should be a "user" with the role "user"
+    And the response body should be a "user" with no meta
 
   Scenario: Admin retrieves a user for their account by email with a different casing
     Given I am an admin of account "test1"
@@ -94,9 +94,9 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/SomeUser123@example.com"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "user"
-    And the JSON response should be a "user" with the role "user"
-    And the JSON response should be a "user" with no meta
+    And the response body should be a "user"
+    And the response body should be a "user" with the role "user"
+    And the response body should be a "user" with no meta
 
   Scenario: Admin retrieves another admin for their account by email
     Given I am an admin of account "test1"
@@ -112,8 +112,8 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/user@example.com"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "user"
-    And the JSON response should be a "user" with the role "admin"
+    And the response body should be a "user"
+    And the response body should be a "user" with the role "admin"
 
   Scenario: Admin retrieves an invalid user for their account
     Given I am an admin of account "test1"
@@ -151,7 +151,7 @@ Feature: Show user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Product retrieves a user for another product
     Given the current account is "test1"
@@ -161,7 +161,7 @@ Feature: Show user
     And the current account has 1 "user"
     When I send a GET request to "/accounts/test1/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: License retrieves their user (with permissions)
     Given the current account is "test1"
@@ -175,7 +175,7 @@ Feature: Show user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
    Scenario: License retrieves their user (without permissions)
     Given the current account is "test1"
@@ -223,7 +223,7 @@ Feature: Show user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Admin attempts to retrieve a user for another account
     Given I am an admin of account "test2"
@@ -231,4 +231,4 @@ Feature: Show user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

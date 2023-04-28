@@ -37,7 +37,7 @@ Feature: Show event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "event-log"
+    And the response body should be a "event-log"
 
   Scenario: Admin retrieves an invalid log for their account
     Given I am an admin of account "ent"
@@ -61,7 +61,7 @@ Feature: Show event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Product attempts to retrieve a log for their account
     Given the current account is "ent"
@@ -71,7 +71,7 @@ Feature: Show event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Environment attempts to retrieve a log for an isolated environment (in isolated environment)
     Given the current account is "ent"
@@ -85,7 +85,7 @@ Feature: Show event logs
       """
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "event-log"
+    And the response body should be a "event-log"
 
   Scenario: Environment attempts to retrieve a log for a shared environment (in isolated environment)
     Given the current account is "ent"
@@ -138,7 +138,7 @@ Feature: Show event logs
       """
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "event-log"
+    And the response body should be a "event-log"
 
   Scenario: Environment attempts to retrieve a log for a global environment (in shared environment)
     Given the current account is "ent"
@@ -152,7 +152,7 @@ Feature: Show event logs
       """
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "event-log"
+    And the response body should be a "event-log"
 
   Scenario: License attempts to retrieve a log for their account
     Given the current account is "ent"
@@ -162,7 +162,7 @@ Feature: Show event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve a log for their account
     Given the current account is "ent"
@@ -172,4 +172,4 @@ Feature: Show event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

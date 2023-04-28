@@ -28,7 +28,7 @@ Feature: License policy relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/test-key/policy"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -44,7 +44,7 @@ Feature: License policy relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product retrieves the policy for a license
     Given the current account is "test1"
@@ -55,7 +55,7 @@ Feature: License policy relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product retrieves the policy for a license of another product
     Given the current account is "test1"
@@ -112,7 +112,7 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -166,7 +166,7 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -504,7 +504,7 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -543,8 +543,8 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -586,8 +586,8 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -629,8 +629,8 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -672,8 +672,8 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with an expiry within seconds of "$time.1.year.from_now"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with an expiry within seconds of "$time.1.year.from_now"
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -715,8 +715,8 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with a nil expiry
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with a nil expiry
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -747,7 +747,7 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {
@@ -834,7 +834,7 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "policy": {

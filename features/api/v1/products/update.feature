@@ -36,7 +36,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the name "New App"
+    And the response body should be a "product" with the name "New App"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -60,7 +60,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the distributionStrategy "OPEN"
+    And the response body should be a "product" with the distributionStrategy "OPEN"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -84,7 +84,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the url "https://example.com"
+    And the response body should be a "product" with the url "https://example.com"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -114,7 +114,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with a nil url
+    And the response body should be a "product" with a nil url
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -167,7 +167,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with a nil platforms
+    And the response body should be a "product" with a nil platforms
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -212,7 +212,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following "platforms":
+    And the response body should be a "product" with the following "platforms":
       """
       [
         "iOS",
@@ -244,7 +244,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the name "Updated App"
+    And the response body should be a "product" with the name "Updated App"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -345,7 +345,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following attributes:
+    And the response body should be a "product" with the following attributes:
       """
       { "name": "Isolated Product" }
       """
@@ -377,7 +377,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following attributes:
+    And the response body should be a "product" with the following attributes:
       """
       { "name": "Shared Product" }
       """
@@ -431,7 +431,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following "platforms":
+    And the response body should be a "product" with the following "platforms":
       """
       ["Nintendo"]
       """

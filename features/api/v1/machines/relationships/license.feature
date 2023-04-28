@@ -24,7 +24,7 @@ Feature: Machine license relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -40,7 +40,7 @@ Feature: Machine license relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   @ee
   Scenario: Shared environment retrieves the license for a shared machine
@@ -51,7 +51,7 @@ Feature: Machine license relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/license?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   @ee
   Scenario: Shared environment retrieves the license for a global machine
@@ -66,7 +66,7 @@ Feature: Machine license relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves the license for a machine
     Given the current account is "test1"
@@ -90,7 +90,7 @@ Feature: Machine license relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves the license for a machine of another product
     Given the current account is "test1"
@@ -132,7 +132,7 @@ Feature: Machine license relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: User attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"
@@ -162,7 +162,7 @@ Feature: Machine license relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$1/license"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: License attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"

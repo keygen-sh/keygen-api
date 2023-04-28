@@ -24,7 +24,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policies"
+    And the response body should be an array with 3 "policies"
 
   Scenario: Developer retrieves all policies for their account
     Given the current account is "test1"
@@ -69,7 +69,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "policies"
+    And the response body should be an array with 5 "policies"
 
   Scenario: Admin retrieves a paginated list of policies with a page size that is too high
     Given I am an admin of account "test1"
@@ -102,7 +102,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "policies"
+    And the response body should be an array with 10 "policies"
 
   Scenario: Admin retrieves all policies with a low limit for their account
     Given I am an admin of account "test1"
@@ -111,7 +111,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "policies"
+    And the response body should be an array with 5 "policies"
 
   Scenario: Admin retrieves all policies with a high limit for their account
     Given I am an admin of account "test1"
@@ -120,7 +120,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "policies"
+    And the response body should be an array with 20 "policies"
 
   Scenario: Admin retrieves all policies with a limit that is too high
     Given I am an admin of account "test1"
@@ -149,7 +149,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policies"
+    And the response body should be an array with 3 "policies"
 
   @ee
   Scenario: Environment retrieves all shared policies
@@ -162,7 +162,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "policies"
+    And the response body should be an array with 2 "policies"
 
   Scenario: Product retrieves all policies for their product
     Given the current account is "test1"
@@ -173,7 +173,7 @@ Feature: List policies
     And the current product has 1 "policy"
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "policy"
+    And the response body should be an array with 1 "policy"
 
   Scenario: Admin attempts to retrieve all policies for another account
     Given I am an admin of account "test2"
@@ -181,7 +181,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve their policies (default permissions)
     Given the current account is "test1"
@@ -207,7 +207,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "policy"
+    And the response body should be an array with 1 "policy"
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to retrieve their policies (no permission)
@@ -265,7 +265,7 @@ Feature: List policies
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "policies"
+    And the response body should be an array with 2 "policies"
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to retrieve their policies (no permission)

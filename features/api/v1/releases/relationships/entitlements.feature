@@ -25,7 +25,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   @ee
   Scenario: Product retrieves the entitlements for an isolated release
@@ -41,7 +41,7 @@ Feature: Release entitlements relationship
       """
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Product retrieves the entitlements for a release
     Given the current account is "test1"
@@ -52,7 +52,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Admin retrieves an entitlement for a release
     Given I am an admin of account "test1"
@@ -62,7 +62,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Product retrieves an entitlement for a release
     Given the current account is "test1"
@@ -73,7 +73,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Product retrieves the entitlements for a release of another product
     Given the current account is "test1"
@@ -130,7 +130,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: User attempts to retrieve the entitlements for a release they don't have a license for
     Given the current account is "test1"
@@ -179,7 +179,7 @@ Feature: Release entitlements relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Admin attempts to retrieve the entitlements for a release of another account
     Given I am an admin of account "test2"
@@ -209,7 +209,7 @@ Feature: Release entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: License attempts to retrieve an entitlement for a release of their product (no entitlements)
     Given the current account is "test1"
@@ -259,7 +259,7 @@ Feature: Release entitlements relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: User attempts to retrieve an entitlement for a release they do have a license for (no entitlements)
     Given the current account is "test1"

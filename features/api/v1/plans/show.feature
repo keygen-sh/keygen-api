@@ -8,7 +8,7 @@ Feature: Show plan
     Given there exists 3 "plans"
     When I send a GET request to "/plans/$0"
     Then the response status should be "200"
-    And the JSON response should be a "plan"
+    And the response body should be a "plan"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a plan
@@ -18,7 +18,7 @@ Feature: Show plan
     And I use an authentication token
     When I send a GET request to "/plans/$0"
     Then the response status should be "200"
-    And the JSON response should be a "plan"
+    And the response body should be a "plan"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves a private plan
@@ -29,7 +29,7 @@ Feature: Show plan
       """
     When I send a GET request to "/plans/$0"
     Then the response status should be "200"
-    And the JSON response should be a "plan" that is private
+    And the response body should be a "plan" that is private
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves an invalid plan

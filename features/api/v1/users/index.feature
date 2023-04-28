@@ -24,7 +24,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Admin retrieves all users for their account (inactive)
     Given I am an admin of account "test1"
@@ -38,7 +38,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Developer retrieves all users for their account
     Given the current account is "test1"
@@ -48,7 +48,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Sales retrieves all users for their account
     Given the current account is "test1"
@@ -58,7 +58,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Support retrieves all users for their account
     Given the current account is "test1"
@@ -68,7 +68,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Read-only retrieves all users for their account
     Given the current account is "test1"
@@ -78,7 +78,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Admin retrieves a paginated list of users
     Given I am an admin of account "test1"
@@ -87,8 +87,8 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "users"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "users"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/users?page[number]=2&page[size]=5",
@@ -135,7 +135,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "users"
+    And the response body should be an array with 10 "users"
 
   Scenario: Admin retrieves all users with a low limit for their account
     Given I am an admin of account "test1"
@@ -144,7 +144,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "users"
+    And the response body should be an array with 5 "users"
 
   Scenario: Admin retrieves all users with a high limit for their account
     Given I am an admin of account "test1"
@@ -153,7 +153,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "users"
+    And the response body should be an array with 20 "users"
 
   Scenario: Admin retrieves all users with a limit that is too high
     Given I am an admin of account "test1"
@@ -201,7 +201,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?product=$products[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "users"
+    And the response body should be an array with 2 "users"
 
  Scenario: Admin retrieves all active (assigned) users
     Given I am an admin of account "test1"
@@ -223,7 +223,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?active=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Admin retrieves all inactive (unassigned) users
     Given I am an admin of account "test1"
@@ -241,7 +241,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?active=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "users"
+    And the response body should be an array with 7 "users"
 
   Scenario: Admin retrieves all users filtered by metadata customer email
     Given I am an admin of account "test1"
@@ -267,7 +267,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?metadata[customer]=john.doe@example.com"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
 
   Scenario: Admin retrieves all users filtered by metadata customer email (excluding admins)
     Given I am an admin of account "test1"
@@ -284,7 +284,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?metadata[customer]=john.doe@example.com"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "users"
+    And the response body should be an array with 0 "users"
 
   Scenario: Admin retrieves all users filtered by metadata customer ID and product ID
     Given I am an admin of account "test1"
@@ -325,7 +325,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?metadata[customerId]=a81b9d89dec6&product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
 
   @ee
   Scenario: Environment retrieves all isolated users for their account
@@ -338,7 +338,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   @ee
   Scenario: Environment retrieves all shared users for their account
@@ -351,7 +351,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "users"
+    And the response body should be an array with 6 "users"
 
   Scenario: Product retrieves all users
     Given the current account is "test1"
@@ -371,7 +371,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
 
   Scenario: Product retrieves all users for their product
     Given the current account is "test1"
@@ -391,7 +391,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?product=$products[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
 
   Scenario: Admin retrieves users filtered by status (active)
     Given I am an admin of account "test1"
@@ -443,7 +443,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=ACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "users"
+    And the response body should be an array with 5 "users"
 
   Scenario: Admin retrieves users filtered by status (inactive)
     Given I am an admin of account "test1"
@@ -493,7 +493,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "users"
+    And the response body should be an array with 2 "users"
 
   Scenario: Admin retrieves users filtered by status (banned)
     Given I am an admin of account "test1"
@@ -543,7 +543,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=BANNED"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
 
   Scenario: Admin retrieves users filtered by status (invalid)
     Given I am an admin of account "test1"
@@ -593,7 +593,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INVALID"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "users"
+    And the response body should be an array with 0 "users"
 
   Scenario: Product retrieves all users for their product (multiple licenses per-user)
     Given the current account is "test1"
@@ -633,7 +633,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?product=$products[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "users"
+    And the response body should be an array with 2 "users"
 
   Scenario: Product retrieves all users of another product
     Given the current account is "test1"
@@ -653,7 +653,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
 
   Scenario: Admin attempts to retrieve all users for another account
     Given I am an admin of account "test2"
@@ -661,7 +661,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Admin attempts to retrieve all users for another account via search
     Given I am an admin of account "test2"
@@ -678,7 +678,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?metadata[foo]=bar"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve all users for their account
     Given the current account is "test1"
@@ -688,7 +688,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all users for their account
     Given the current account is "test1"
@@ -697,7 +697,7 @@ Feature: List users
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all users for their group
     Given the current account is "test1"

@@ -28,7 +28,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Developer retrieves all machines for their account
@@ -74,7 +74,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "machines"
+    And the response body should be an array with 5 "machines"
 
   Scenario: Admin retrieves a paginated list of machines scoped to policy
     Given I am an admin of account "test1"
@@ -93,8 +93,8 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 1 "machine"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]",
@@ -130,8 +130,8 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 1 "machine"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]",
@@ -185,7 +185,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "machines"
+    And the response body should be an array with 10 "machines"
 
   Scenario: Admin retrieves all machines with a low limit for their account
     Given I am an admin of account "test1"
@@ -194,7 +194,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "machines"
+    And the response body should be an array with 5 "machines"
 
   Scenario: Admin retrieves all machines with a high limit for their account
     Given I am an admin of account "test1"
@@ -203,7 +203,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "machines"
+    And the response body should be an array with 20 "machines"
 
   Scenario: Admin retrieves all machines with a limit that is too high
     Given I am an admin of account "test1"
@@ -232,7 +232,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?fingerprint=foo:bar:baz:qux"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin retrieves all machines filtered by IP
     Given I am an admin of account "test1"
@@ -245,7 +245,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?ip=127.0.1.1"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin retrieves all machines filtered by hostname
     Given I am an admin of account "test1"
@@ -258,7 +258,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?hostname=SomeHostname"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin retrieves all machines filtered by metadata node ID (camelcase)
     Given I am an admin of account "test1"
@@ -283,7 +283,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?metadata[nodeId]=68666bf8b"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin retrieves all machines filtered by metadata node ID (snakecase)
     Given I am an admin of account "test1"
@@ -308,7 +308,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?metadata[node_id]=68666bf8b"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin retrieves all alive machines
     Given I am an admin of account "test1"
@@ -370,7 +370,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?status=alive"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin retrieves all dead machines
     Given I am an admin of account "test1"
@@ -432,7 +432,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?status=dead"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "machines"
+    And the response body should be an array with 2 "machines"
 
   Scenario: Product retrieves all machines for their product
     Given the current account is "test1"
@@ -443,7 +443,7 @@ Feature: List machines
     And the current product has 1 "machine"
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: Admin attempts to retrieve all machines for another account
     Given I am an admin of account "test2"
@@ -451,7 +451,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all machines for their group
     Given the current account is "test1"
@@ -495,7 +495,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: User attempts to retrieve all machines for their account
     Given the current account is "test1"
@@ -514,7 +514,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: User attempts to retrieve machines for their account scoped by a fingerprint that exists
     Given the current account is "test1"
@@ -537,7 +537,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?fingerprint=test"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: User attempts to retrieve machines for their account scoped by a fingerprint that doesn't exist
     Given the current account is "test1"
@@ -560,7 +560,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?fingerprint=invalid"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "machines"
+    And the response body should be an array with 0 "machines"
 
   Scenario: User attempts to retrieve machines for their account scoped by a license key that exists
     Given the current account is "test1"
@@ -579,7 +579,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?key=a-license-key"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
 Scenario: User attempts to retrieve machines for their account scoped by a license key that doesn't exist
     Given the current account is "test1"
@@ -602,7 +602,7 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?key=invalid"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "machines"
+    And the response body should be an array with 0 "machines"
 
   Scenario: License retrieves all machines for their license with matches
     Given the current account is "test1"
@@ -616,7 +616,7 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
 
   Scenario: License retrieves all machines for their license with no matches
     Given the current account is "test1"
@@ -626,7 +626,7 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "machines"
+    And the response body should be an array with 0 "machines"
 
   @ee
   Scenario: Admin retrieves all machines for an isolated environment
@@ -645,8 +645,8 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
       """
     When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array with 3 "machines"
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -673,8 +673,8 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
       """
     When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "machines"
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array with 6 "machines"
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -683,7 +683,7 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
         }
       }
       """
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -703,8 +703,8 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array with 3 "machines"
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -729,8 +729,8 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
       """
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array with 3 "machines"
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -755,8 +755,8 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "machines"
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array with 6 "machines"
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {
@@ -765,7 +765,7 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
         }
       }
       """
-    And the JSON response should be an array of 3 "machines" with the following relationships:
+    And the response body should be an array of 3 "machines" with the following relationships:
       """
       {
         "environment": {

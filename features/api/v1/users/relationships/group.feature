@@ -29,7 +29,7 @@ Feature: User group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves the group for a user (by email)
@@ -47,7 +47,7 @@ Feature: User group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/test@keygen.example/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -64,7 +64,7 @@ Feature: User group relationship
       """
     When I send a GET request to "/accounts/test1/users/$1/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a user
     Given the current account is "test1"
@@ -92,7 +92,7 @@ Feature: User group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a user of another product
     Given the current account is "test1"
@@ -133,7 +133,7 @@ Feature: User group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User attempts to retrieve the group of another user
     Given the current account is "test1"
@@ -220,7 +220,7 @@ Feature: User group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -249,7 +249,7 @@ Feature: User group relationship
       { "data": null }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -360,7 +360,7 @@ Feature: User group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -408,7 +408,7 @@ Feature: User group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {

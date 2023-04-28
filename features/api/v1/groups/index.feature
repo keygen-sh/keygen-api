@@ -24,7 +24,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "groups"
+    And the response body should be an array with 3 "groups"
 
   Scenario: Developer retrieves all groups for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "groups"
+    And the response body should be an array with 2 "groups"
 
   Scenario: Sales retrieves all groups for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "groups"
+    And the response body should be an array with 2 "groups"
 
   Scenario: Support retrieves all groups for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "groups"
+    And the response body should be an array with 5 "groups"
 
   Scenario: Read-only retrieves all groups for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "groups"
+    And the response body should be an array with 5 "groups"
 
   Scenario: Admin retrieves a paginated list of groups
     Given I am an admin of account "test1"
@@ -73,8 +73,8 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "groups"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "groups"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/groups?page[number]=1&page[size]=5",
@@ -118,7 +118,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "groups"
+    And the response body should be an array with 10 "groups"
 
   Scenario: Admin retrieves all groups with a low limit for their account
     Given I am an admin of account "test1"
@@ -127,7 +127,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "groups"
+    And the response body should be an array with 5 "groups"
 
   Scenario: Admin retrieves all groups with a high limit for their account
     Given I am an admin of account "test1"
@@ -136,7 +136,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "groups"
+    And the response body should be an array with 20 "groups"
 
   Scenario: Admin retrieves all groups with a limit that is too high
     Given I am an admin of account "test1"
@@ -160,7 +160,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment attempts to retrieve all isolated groups (in isolated environment)
@@ -177,8 +177,8 @@ Feature: List groups
       """
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "groups"
-    And the JSON response should be an array of 3 "groups" with the following relationships:
+    And the response body should be an array with 3 "groups"
+    And the response body should be an array of 3 "groups" with the following relationships:
       """
       {
         "environment": {
@@ -207,8 +207,8 @@ Feature: List groups
       """
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "groups"
-    And the JSON response should be an array of 3 "groups" with the following relationships:
+    And the response body should be an array with 6 "groups"
+    And the response body should be an array of 3 "groups" with the following relationships:
       """
       {
         "environment": {
@@ -217,7 +217,7 @@ Feature: List groups
         }
       }
       """
-    And the JSON response should be an array of 3 "groups" with the following relationships:
+    And the response body should be an array of 3 "groups" with the following relationships:
       """
       {
         "environment": {
@@ -239,7 +239,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "groups"
+    And the response body should be an array with 3 "groups"
 
   Scenario: User attempts to retrieve all their groups (group owner and member)
     Given the current account is "test1"
@@ -261,7 +261,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "groups"
+    And the response body should be an array with 2 "groups"
 
   Scenario: User attempts to retrieve all their groups (group member)
     Given the current account is "test1"
@@ -275,7 +275,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "group"
+    And the response body should be an array with 1 "group"
 
   Scenario: User attempts to retrieve all their groups (no groups)
     Given the current account is "test1"
@@ -285,7 +285,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "groups"
+    And the response body should be an array with 0 "groups"
 
   Scenario: License attempts to retrieve all their groups (group member)
     Given the current account is "test1"
@@ -299,7 +299,7 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "group"
+    And the response body should be an array with 1 "group"
 
   Scenario: License attempts to retrieve all their groups (no groups)
     Given the current account is "test1"
@@ -309,11 +309,11 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "groups"
+    And the response body should be an array with 0 "groups"
 
   Scenario: Anonymous attempts to retrieve all groups for their account
     Given the current account is "test1"
     And the current account has 3 "groups"
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

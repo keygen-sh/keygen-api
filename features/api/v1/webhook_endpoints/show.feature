@@ -24,7 +24,7 @@ Feature: Show webhook endpoint
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint"
+    And the response body should be a "webhook-endpoint"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves an invalid webhook endpoint for their account
@@ -49,7 +49,7 @@ Feature: Show webhook endpoint
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment retrieves an isolated webhook endpoint for their account
@@ -60,7 +60,7 @@ Feature: Show webhook endpoint
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "webhook-endpoint"
+    And the response body should be a "webhook-endpoint"
 
   Scenario: Product retrieves an isolated webhook endpoint for their account
     Given the current account is "test1"

@@ -27,8 +27,8 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "admin-token",
@@ -50,9 +50,9 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a kind "user-token"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now.iso"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a kind "user-token"
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now.iso"
+    And the response body should be a "token" with a token
 
   Scenario: User resets their current token that is expired
     Given the current account is "test1"
@@ -76,7 +76,7 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -97,8 +97,8 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "product-token",
@@ -117,9 +117,9 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a kind "activation-token"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now.iso"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a kind "activation-token"
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now.iso"
+    And the response body should be a "token" with a token
 
   Scenario: Admin resets their token by id
     Given the current account is "test1"
@@ -127,7 +127,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: User resets their token by id
     Given the current account is "test1"
@@ -136,7 +136,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: User resets their token by id with a bad reset token
     Given the current account is "test1"
@@ -159,7 +159,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: Admin resets a product token by id
     Given the current account is "test1"
@@ -169,7 +169,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: Admin resets a license token by id
     Given the current account is "test1"
@@ -179,7 +179,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: Admin resets an admin token by id
     Given the current account is "test1"
@@ -198,7 +198,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   @ee
   Scenario: Environment resets their isolated token by id
@@ -208,7 +208,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   @ee
   Scenario: Environment resets their shared token by id
@@ -218,7 +218,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: Product resets their token by id
     Given the current account is "test1"
@@ -227,7 +227,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a token
 
   Scenario: License resets their current token while authenticating with a license key
     Given the current account is "test1"

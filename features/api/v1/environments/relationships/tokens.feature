@@ -45,7 +45,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -54,7 +54,7 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "name": "Isolated Token",
@@ -163,7 +163,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -237,7 +237,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -504,7 +504,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -549,7 +549,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -603,7 +603,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -655,7 +655,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -697,7 +697,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -735,7 +735,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -777,7 +777,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -815,7 +815,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -871,7 +871,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -923,7 +923,7 @@ Feature: Generate authentication token for environment
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -1092,7 +1092,7 @@ Feature: Generate authentication token for environment
       """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Environment requests their tokens
     Given the current account is "test1"
@@ -1108,7 +1108,7 @@ Feature: Generate authentication token for environment
       """
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 2 "tokens"
+    And the response body should be an array of 2 "tokens"
 
   Scenario: Environment requests tokens for another environment
     Given the current account is "test1"

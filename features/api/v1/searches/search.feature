@@ -44,7 +44,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "users"
+    And the response body should be an array with 5 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -76,7 +76,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "users"
+    And the response body should be an array with 10 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -106,7 +106,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "users"
+    And the response body should be an array with 9 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -166,8 +166,8 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "users"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "users"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/search?page[number]=1&page[size]=5",
@@ -200,7 +200,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "users"
+    And the response body should be an array with 1 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -418,7 +418,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -447,7 +447,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -475,7 +475,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "users"
+    And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -518,7 +518,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -540,7 +540,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -580,7 +580,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -620,7 +620,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -660,7 +660,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "users"
+    And the response body should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -690,7 +690,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the response body should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -759,7 +759,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -789,7 +789,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "users"
+    And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -821,7 +821,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "users"
+    And the response body should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -857,7 +857,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -890,7 +890,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -920,7 +920,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -950,7 +950,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -978,7 +978,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1006,7 +1006,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1034,7 +1034,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1062,7 +1062,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1090,7 +1090,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1118,7 +1118,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1159,7 +1159,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1206,7 +1206,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1229,7 +1229,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "licenses"
+    And the response body should be an array with 7 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1252,7 +1252,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "licenses"
+    And the response body should be an array with 5 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1281,7 +1281,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "policy"
+    And the response body should be an array with 1 "policy"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1328,7 +1328,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "policies"
+    And the response body should be an array with 2 "policies"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1375,7 +1375,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the response body should be an array with 2 "releases"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1404,7 +1404,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "machines"
+    And the response body should be an array with 5 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1426,7 +1426,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1468,7 +1468,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "machines"
+    And the response body should be an array with 2 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1503,7 +1503,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    And the response body should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1538,7 +1538,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "machine"
+    And the response body should be an array with 10 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1568,7 +1568,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "request-logs"
+    And the response body should be an array with 9 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1598,7 +1598,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "request-logs"
+    And the response body should be an array with 3 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1633,7 +1633,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "request-logs"
+    And the response body should be an array with 4 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1668,7 +1668,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "request-logs"
+    And the response body should be an array with 10 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1703,7 +1703,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "request-logs"
+    And the response body should be an array with 2 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1738,7 +1738,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "request-logs"
+    And the response body should be an array with 10 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1768,7 +1768,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "request-logs"
+    And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1798,7 +1798,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "request-logs"
+    And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1828,7 +1828,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "request-log"
+    And the response body should be an array with 1 "request-log"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1882,7 +1882,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "request-logs"
+    And the response body should be an array with 2 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1924,7 +1924,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "groups"
+    And the response body should be an array with 3 "groups"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1943,7 +1943,7 @@ Feature: Search
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of errors
+    And the response body should be an array of errors
     And the first error should have the following properties:
       """
       {
@@ -2079,7 +2079,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "request-logs"
+    And the response body should be an array with 0 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs

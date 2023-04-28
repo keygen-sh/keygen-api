@@ -45,12 +45,12 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the maxMachines "1"
-    And the JSON response should be a "policy" with a nil maxUses
-    And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with a nil scheme
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" that is not floating
+    And the response body should be a "policy" with the maxMachines "1"
+    And the response body should be a "policy" with a nil maxUses
+    And the response body should be a "policy" that is not strict
+    And the response body should be a "policy" with a nil scheme
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" that is not floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -84,7 +84,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "name": "Premium Add-On",
@@ -144,14 +144,14 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the maxMachines "3"
-    And the JSON response should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_PRODUCT"
-    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
-    And the JSON response should be a "policy" with a nil maxUses
-    And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with a nil scheme
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" that is floating
+    And the response body should be a "policy" with the maxMachines "3"
+    And the response body should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_PRODUCT"
+    And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" with a nil maxUses
+    And the response body should be a "policy" that is not strict
+    And the response body should be a "policy" with a nil scheme
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -194,7 +194,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "name": "Actionsack Map Pack",
@@ -245,8 +245,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Large Usage Policy"
-    And the JSON response should be a "policy" with the maxUses "2147483646"
+    And the response body should be a "policy" with the name "Large Usage Policy"
+    And the response body should be a "policy" with the maxUses "2147483646"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -282,8 +282,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Larger Usage Policy"
-    And the JSON response should be a "policy" with the maxUses "2147483647"
+    And the response body should be a "policy" with the name "Larger Usage Policy"
+    And the response body should be a "policy" with the maxUses "2147483647"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -319,7 +319,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -362,7 +362,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -405,7 +405,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -448,8 +448,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Maintain Expiration Strategy"
-    And the JSON response should be a "policy" with the expirationStrategy "MAINTAIN_ACCESS"
+    And the response body should be a "policy" with the name "Maintain Expiration Strategy"
+    And the response body should be a "policy" with the expirationStrategy "MAINTAIN_ACCESS"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -481,8 +481,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Expiration Strategy"
-    And the JSON response should be a "policy" with the expirationStrategy "ALLOW_ACCESS"
+    And the response body should be a "policy" with the name "Allow Expiration Strategy"
+    And the response body should be a "policy" with the expirationStrategy "ALLOW_ACCESS"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -514,7 +514,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -557,8 +557,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
-    And the JSON response should be a "policy" with the name "Creation Expiration Basis"
+    And the response body should be a "policy" with the expirationBasis "FROM_CREATION"
+    And the response body should be a "policy" with the name "Creation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -590,8 +590,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
-    And the JSON response should be a "policy" with the name "Validation Expiration Basis"
+    And the response body should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
+    And the response body should be a "policy" with the name "Validation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -623,8 +623,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
-    And the JSON response should be a "policy" with the name "Activation Expiration Basis"
+    And the response body should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
+    And the response body should be a "policy" with the name "Activation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -656,8 +656,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_USE"
-    And the JSON response should be a "policy" with the name "Use Expiration Basis"
+    And the response body should be a "policy" with the expirationBasis "FROM_FIRST_USE"
+    And the response body should be a "policy" with the name "Use Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -689,8 +689,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_DOWNLOAD"
-    And the JSON response should be a "policy" with the name "Download Expiration Basis"
+    And the response body should be a "policy" with the expirationBasis "FROM_FIRST_DOWNLOAD"
+    And the response body should be a "policy" with the name "Download Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -722,7 +722,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -765,7 +765,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -808,7 +808,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -851,7 +851,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -895,7 +895,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -938,7 +938,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -980,8 +980,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Default Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" with the name "Default Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1013,8 +1013,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Default Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" with the name "Default Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1046,8 +1046,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Default Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the response body should be a "policy" with the name "Default Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1079,8 +1079,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Default Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the response body should be a "policy" with the name "Default Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1112,8 +1112,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1147,8 +1147,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1182,7 +1182,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1228,8 +1228,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1264,7 +1264,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1310,8 +1310,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1346,7 +1346,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1391,7 +1391,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1436,8 +1436,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1471,7 +1471,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1517,8 +1517,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1553,7 +1553,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1599,8 +1599,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1635,7 +1635,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1680,7 +1680,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1723,8 +1723,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "ALLOW_2X_OVERAGE"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_2X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1756,8 +1756,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Disallow Overage Strategy"
-    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" with the name "Disallow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1789,7 +1789,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1833,7 +1833,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "name": "Allow Overage Strategy",
@@ -1873,7 +1873,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "name": "Disallow Overage Strategy",
@@ -1916,8 +1916,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Long Heartbeat Policy"
-    And the JSON response should be a "policy" with the heartbeatDuration "604800"
+    And the response body should be a "policy" with the name "Long Heartbeat Policy"
+    And the response body should be a "policy" with the heartbeatDuration "604800"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1952,8 +1952,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Normal Heartbeat Policy"
-    And the JSON response should be a "policy" with a nil heartbeatDuration
+    And the response body should be a "policy" with the name "Normal Heartbeat Policy"
+    And the response body should be a "policy" with a nil heartbeatDuration
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1989,7 +1989,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2036,7 +2036,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2082,7 +2082,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that is not protected
+    And the response body should be a "policy" that is not protected
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2118,7 +2118,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that is protected
+    And the response body should be a "policy" that is protected
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2154,7 +2154,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that is not protected
+    And the response body should be a "policy" that is not protected
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2247,7 +2247,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 2 errors
+    And the response body should be an array of 2 errors
     And the first error should have the following properties:
       """
       {
@@ -2302,7 +2302,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2346,7 +2346,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2390,7 +2390,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2469,7 +2469,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following relationships:
+    And the response body should be a "policy" with the following relationships:
       """
       {
         "environment": {
@@ -2515,7 +2515,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following relationships:
+    And the response body should be a "policy" with the following relationships:
       """
       {
         "environment": {
@@ -2561,7 +2561,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following relationships:
+    And the response body should be a "policy" with the following relationships:
       """
       {
         "environment": {
@@ -2705,8 +2705,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that is requireFingerprintScope
-    And the JSON response should be a "policy" that is requireProductScope
+    And the response body should be a "policy" that is requireFingerprintScope
+    And the response body should be a "policy" that is requireProductScope
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2827,7 +2827,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that does requireHeartbeat
+    And the response body should be a "policy" that does requireHeartbeat
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2859,7 +2859,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" that does not requireHeartbeat
+    And the response body should be a "policy" that does not requireHeartbeat
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3008,9 +3008,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "RSA Signed"
+    And the response body should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3042,9 +3042,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
+    And the response body should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3076,9 +3076,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_ENCRYPT"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "RSA Encrypted"
+    And the response body should be a "policy" with the scheme "RSA_2048_PKCS1_ENCRYPT"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3110,9 +3110,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_JWT_RS256"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "JWT RS256"
+    And the response body should be a "policy" with the scheme "RSA_2048_JWT_RS256"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "JWT RS256"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3144,9 +3144,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN_V2"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "RSA Signed"
+    And the response body should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN_V2"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3178,9 +3178,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
+    And the response body should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3213,9 +3213,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
-    And the JSON response should be a "policy" that is encrypted
-    And the JSON response should be a "policy" with the name "Legacy Encrypted"
+    And the response body should be a "policy" with the scheme "LEGACY_ENCRYPT"
+    And the response body should be a "policy" that is encrypted
+    And the response body should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3247,9 +3247,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "ED25519_SIGN"
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" with the name "Ed25519"
+    And the response body should be a "policy" with the scheme "ED25519_SIGN"
+    And the response body should be a "policy" that is not encrypted
+    And the response body should be a "policy" with the name "Ed25519"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3281,9 +3281,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
-    And the JSON response should be a "policy" that is encrypted
-    And the JSON response should be a "policy" with the name "Legacy Encrypted"
+    And the response body should be a "policy" with the scheme "LEGACY_ENCRYPT"
+    And the response body should be a "policy" that is encrypted
+    And the response body should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3442,9 +3442,9 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
-    And the JSON response should be a "policy" that is encrypted
-    And the JSON response should be a "policy" with the name "Default Scheme"
+    And the response body should be a "policy" with the scheme "LEGACY_ENCRYPT"
+    And the response body should be a "policy" that is encrypted
+    And the response body should be a "policy" with the name "Default Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3509,8 +3509,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
-    And the JSON response should be a "policy" that is concurrent
+    And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the response body should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3543,8 +3543,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
-    And the JSON response should be a "policy" that is concurrent
+    And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the response body should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3622,8 +3622,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Long Heartbeat Policy"
-    And the JSON response should be a "policy" with the maxCores "32"
+    And the response body should be a "policy" with the name "Long Heartbeat Policy"
+    And the response body should be a "policy" with the maxCores "32"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3701,7 +3701,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "name": "Per-Process",
@@ -3888,7 +3888,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """
@@ -3923,7 +3923,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_CREATION" }
       """
@@ -3959,7 +3959,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_CREATION" }
       """
@@ -3995,7 +3995,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """
@@ -4030,7 +4030,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_CREATION" }
       """
@@ -4065,7 +4065,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """

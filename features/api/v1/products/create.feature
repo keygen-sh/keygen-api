@@ -61,7 +61,7 @@ Feature: Create product
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "product" with the distributionStrategy "LICENSED"
+    And the response body should be a "product" with the distributionStrategy "LICENSED"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -84,7 +84,7 @@ Feature: Create product
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "product" with the distributionStrategy "OPEN"
+    And the response body should be a "product" with the distributionStrategy "OPEN"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -107,7 +107,7 @@ Feature: Create product
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "product" with the distributionStrategy "CLOSED"
+    And the response body should be a "product" with the distributionStrategy "CLOSED"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -296,7 +296,7 @@ Feature: Create product
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "product" with the following relationships:
+    And the response body should be a "product" with the following relationships:
       """
       {
         "environment": {
@@ -337,7 +337,7 @@ Feature: Create product
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "product" with the following relationships:
+    And the response body should be a "product" with the following relationships:
       """
       {
         "environment": {
@@ -401,7 +401,7 @@ Feature: Create product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -436,7 +436,7 @@ Feature: Create product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -471,7 +471,7 @@ Feature: Create product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -507,7 +507,7 @@ Feature: Create product
       """
     Then the response status should be "201"
     And the current account should have 1 "product"
-    And the JSON response should be a "product" with the following attributes:
+    And the response body should be a "product" with the following attributes:
       """
       {
         "permissions": [
@@ -542,7 +542,7 @@ Feature: Create product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -575,7 +575,7 @@ Feature: Create product
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -615,7 +615,7 @@ Feature: Create product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -648,7 +648,7 @@ Feature: Create product
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {

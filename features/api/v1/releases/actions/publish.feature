@@ -25,7 +25,7 @@ Feature: Publish release
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "status": "PUBLISHED" }
       """
@@ -41,7 +41,7 @@ Feature: Publish release
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "status": "PUBLISHED" }
       """
@@ -57,7 +57,7 @@ Feature: Publish release
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "status": "PUBLISHED" }
       """
@@ -79,7 +79,7 @@ Feature: Publish release
       """
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "status": "PUBLISHED" }
       """
@@ -96,7 +96,7 @@ Feature: Publish release
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "status": "PUBLISHED" }
       """

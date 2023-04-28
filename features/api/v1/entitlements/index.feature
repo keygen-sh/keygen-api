@@ -24,7 +24,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Developer retrieves all entitlements for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "entitlements"
+    And the response body should be an array with 2 "entitlements"
 
   Scenario: Sales retrieves all entitlements for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "entitlements"
+    And the response body should be an array with 2 "entitlements"
 
   Scenario: Support retrieves all entitlements for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "entitlements"
+    And the response body should be an array with 5 "entitlements"
 
   Scenario: Read-only retrieves all entitlements for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "entitlements"
+    And the response body should be an array with 5 "entitlements"
 
   Scenario: Admin retrieves a paginated list of entitlements
     Given I am an admin of account "test1"
@@ -73,8 +73,8 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "entitlements"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "entitlements"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/entitlements?page[number]=1&page[size]=5",
@@ -118,7 +118,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "entitlements"
+    And the response body should be an array with 10 "entitlements"
 
   Scenario: Admin retrieves all entitlements with a low limit for their account
     Given I am an admin of account "test1"
@@ -127,7 +127,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "entitlements"
+    And the response body should be an array with 5 "entitlements"
 
   Scenario: Admin retrieves all entitlements with a high limit for their account
     Given I am an admin of account "test1"
@@ -136,7 +136,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?limit=10"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "entitlements"
+    And the response body should be an array with 10 "entitlements"
 
   Scenario: Admin retrieves all entitlements with a limit that is too high
     Given I am an admin of account "test1"
@@ -160,7 +160,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License retrieves all their entitlements (has no entitlements)
     Given the current account is "test1"
@@ -170,7 +170,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "entitlements"
+    And the response body should be an array with 0 "entitlements"
 
   Scenario: License retrieves all their entitlements (has entitlements)
     Given the current account is "test1"
@@ -182,7 +182,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "entitlements"
+    And the response body should be an array with 4 "entitlements"
 
   Scenario: User retrieves all their entitlements (has no entitlements)
     Given the current account is "test1"
@@ -192,7 +192,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "entitlements"
+    And the response body should be an array with 0 "entitlements"
 
   Scenario: User retrieves all their entitlements (has entitlements)
     Given the current account is "test1"
@@ -206,7 +206,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "entitlements"
+    And the response body should be an array with 5 "entitlements"
 
   Scenario: Product attempts to retrieve all entitlements for their account
     Given the current account is "test1"
@@ -216,7 +216,7 @@ Feature: List entitlements
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   @ee
   Scenario: Environment retrieves all isolated entitlements (in isolated environment)
@@ -233,8 +233,8 @@ Feature: List entitlements
       """
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
-    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+    And the response body should be an array with 3 "entitlements"
+    And the response body should be an array of 3 "entitlements" with the following relationships:
       """
       {
         "environment": {
@@ -263,8 +263,8 @@ Feature: List entitlements
       """
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "entitlements"
-    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+    And the response body should be an array with 6 "entitlements"
+    And the response body should be an array of 3 "entitlements" with the following relationships:
       """
       {
         "environment": {
@@ -273,7 +273,7 @@ Feature: List entitlements
         }
       }
       """
-    And the JSON response should be an array of 3 "entitlements" with the following relationships:
+    And the response body should be an array of 3 "entitlements" with the following relationships:
       """
       {
         "environment": {

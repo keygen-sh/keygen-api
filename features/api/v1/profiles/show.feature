@@ -23,8 +23,8 @@ Feature: Show profile of current bearer
     And I use an authentication token
     When I send a GET request to "/accounts/test1/profile"
     Then the response status should be "200"
-    And the JSON response should be a "user"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be a "user"
+    And the response body should contain meta which includes the following:
       """
       { "tokenId": "$tokens[0].id" }
       """
@@ -40,7 +40,7 @@ Feature: Show profile of current bearer
     And I use an authentication token
     When I send a GET request to "/accounts/test1/profile?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Product requests their profile
     Given the current account is "test1"
@@ -49,7 +49,7 @@ Feature: Show profile of current bearer
     And I use an authentication token
     When I send a GET request to "/accounts/test1/profile"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: User requests their profile
     Given the current account is "test1"
@@ -58,7 +58,7 @@ Feature: Show profile of current bearer
     And I use an authentication token
     When I send a GET request to "/accounts/test1/profile"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: Anonymous requests their profile
     Given the current account is "test1"

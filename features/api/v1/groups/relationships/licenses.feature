@@ -32,7 +32,7 @@ Feature: Group licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves all licenses for a group that doesn't exist
     Given the current account is "test1"
@@ -57,7 +57,7 @@ Feature: Group licenses relationship
       """
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "licenses"
+    And the response body should be an array with 5 "licenses"
 
   Scenario: Product retrieves all licenses for a group (not associated)
     Given the current account is "test1"
@@ -84,7 +84,7 @@ Feature: Group licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Product retrieves all licenses for a group (associated)
     Given the current account is "test1"
@@ -112,7 +112,7 @@ Feature: Group licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: User retrieves all licenses for their group (is owner)
     Given the current account is "test1"
@@ -147,7 +147,7 @@ Feature: Group licenses relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: User retrieves all licenses for their group (is member)
     Given the current account is "test1"

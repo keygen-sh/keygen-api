@@ -45,7 +45,7 @@ Feature: Delete webhook event
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
   Scenario: License attempts to delete a webhook event for their account
@@ -56,7 +56,7 @@ Feature: Delete webhook event
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
   Scenario: User attempts to delete a webhook event for their account
@@ -67,7 +67,7 @@ Feature: Delete webhook event
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
   Scenario: Anonymous user attempts to delete a webhook event for their account
@@ -75,7 +75,7 @@ Feature: Delete webhook event
     And the current account has 3 "webhook-events"
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
   Scenario: Admin attempts to delete a webhook event for another account
@@ -85,5 +85,5 @@ Feature: Delete webhook event
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "webhook-events"

@@ -31,7 +31,7 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -54,7 +54,7 @@ Feature: Product releases relationship
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/products/$0/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -77,7 +77,7 @@ Feature: Product releases relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/products/$0/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
     And the first "release" should have the following relationships:
       """
       {
@@ -117,8 +117,8 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
-    And the JSON response should be an array of 3 "releases" with the following relationships:
+    And the response body should be an array with 3 "releases"
+    And the response body should be an array of 3 "releases" with the following relationships:
       """
       {
         "environment": {
@@ -157,8 +157,8 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/releases?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
-    And the JSON response should be an array of 2 "releases" with the following relationships:
+    And the response body should be an array with 2 "releases"
+    And the response body should be an array of 2 "releases" with the following relationships:
       """
       {
         "environment": {
@@ -197,8 +197,8 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/releases?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
-    And the JSON response should be an array of 1 "release" with the following relationships:
+    And the response body should be an array with 2 "releases"
+    And the response body should be an array of 1 "release" with the following relationships:
       """
       {
         "environment": {
@@ -207,7 +207,7 @@ Feature: Product releases relationship
         }
       }
       """
-    And the JSON response should be an array of 1 "release" with the following relationships:
+    And the response body should be an array of 1 "release" with the following relationships:
       """
       {
         "environment": {
@@ -229,7 +229,7 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: Admin retrieves a release for a product
     Given I am an admin of account "test1"
@@ -243,7 +243,7 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release"
+    And the response body should be a "release"
 
   Scenario: Product retrieves a release for a product
     Given the current account is "test1"
@@ -257,7 +257,7 @@ Feature: Product releases relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release"
+    And the response body should be a "release"
 
   Scenario: Product retrieves the releases of another product
     Given the current account is "test1"

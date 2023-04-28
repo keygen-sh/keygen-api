@@ -20,7 +20,7 @@ Feature: Account plan relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "200"
-    And the JSON response should be a "plan"
+    And the response body should be a "plan"
     And sidekiq should have 0 "request-log" jobs
 
   @ee

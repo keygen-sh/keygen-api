@@ -39,7 +39,7 @@ Feature: Update entitlements
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       {
         "code": "NEW_FEATURE",
@@ -77,7 +77,7 @@ Feature: Update entitlements
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -134,7 +134,7 @@ Feature: Update entitlements
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "entitlement" with the name "Updated Feature"
+    And the response body should be an "entitlement" with the name "Updated Feature"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -236,7 +236,7 @@ Feature: Update entitlements
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       { "name": "Isolated Entitlement" }
       """
@@ -273,7 +273,7 @@ Feature: Update entitlements
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "entitlement" with the following attributes:
+    And the response body should be an "entitlement" with the following attributes:
       """
       { "name": "Shared Entitlement" }
       """

@@ -32,7 +32,7 @@ Feature: Group machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin retrieves all machines for a group that doesn't exist
     Given the current account is "test1"
@@ -57,7 +57,7 @@ Feature: Group machines relationship
       """
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "machines"
+    And the response body should be an array with 5 "machines"
 
   Scenario: Product retrieves all machines for a group (not associated)
     Given the current account is "test1"
@@ -84,7 +84,7 @@ Feature: Group machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "machines"
+    And the response body should be an array with 0 "machines"
 
   Scenario: Product retrieves all machines for a group (associated)
     Given the current account is "test1"
@@ -113,7 +113,7 @@ Feature: Group machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: User retrieves all machines for their group (is owner)
     Given the current account is "test1"
@@ -148,7 +148,7 @@ Feature: Group machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "machines"
+    And the response body should be an array with 2 "machines"
 
   Scenario: User retrieves all machines for their group (is member)
     Given the current account is "test1"

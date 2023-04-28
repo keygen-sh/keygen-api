@@ -29,7 +29,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policies"
+    And the response body should be an array with 3 "policies"
 
   @ee
   Scenario: Environment retrieves the policies for an isolated product
@@ -41,7 +41,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policies"
+    And the response body should be an array with 3 "policies"
 
   @ee
   Scenario: Environment retrieves the policies for a global product
@@ -54,7 +54,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "policies"
+    And the response body should be an array with 6 "policies"
 
   Scenario: Product retrieves the policies for a product
     Given the current account is "test1"
@@ -68,7 +68,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policies"
+    And the response body should be an array with 3 "policies"
 
   Scenario: Admin retrieves a policy for a product
     Given I am an admin of account "test1"
@@ -82,7 +82,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product retrieves a policy for a product
     Given the current account is "test1"
@@ -96,7 +96,7 @@ Feature: Product policies relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product retrieves the policies of another product
     Given the current account is "test1"

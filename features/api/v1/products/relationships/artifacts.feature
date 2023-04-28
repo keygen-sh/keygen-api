@@ -46,7 +46,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "artifacts"
+    And the response body should be an array with 6 "artifacts"
 
   Scenario: Admin retrieves stable artifacts for a product
     Given the current account is "test1"
@@ -76,7 +76,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts?channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Admin retrieves the failed artifacts for a product
     Given the current account is "test1"
@@ -106,7 +106,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts?status=failed"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Admin retrieves the waiting artifacts for a product
     Given the current account is "test1"
@@ -136,7 +136,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts?status=WAITING"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Admin retrieves the uploaded artifacts for a product
     Given the current account is "test1"
@@ -166,7 +166,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts?status=uPlOaDeD"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
+    And the response body should be an array with 2 "artifacts"
 
   @ee
   Scenario: Environment retrieves the artifacts for an isolated product
@@ -197,8 +197,8 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
-    And the JSON response should be an array of 3 "artifacts" with the following relationships:
+    And the response body should be an array with 3 "artifacts"
+    And the response body should be an array of 3 "artifacts" with the following relationships:
       """
       {
         "environment": {
@@ -237,8 +237,8 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
-    And the JSON response should be an array of 2 "artifacts" with the following relationships:
+    And the response body should be an array with 2 "artifacts"
+    And the response body should be an array of 2 "artifacts" with the following relationships:
       """
       {
         "environment": {
@@ -277,8 +277,8 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "artifacts"
-    And the JSON response should be an array of 1 "artifact" with the following relationships:
+    And the response body should be an array with 2 "artifacts"
+    And the response body should be an array of 1 "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -287,7 +287,7 @@ Feature: Product artifacts relationship
         }
       }
       """
-    And the JSON response should be an array of 1 "artifact" with the following relationships:
+    And the response body should be an array of 1 "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -314,7 +314,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves the artifacts of another product
     Given the current account is "test1"
@@ -348,7 +348,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: User attempts to retrieve the artifacts for a product (licensed, expired)
     Given the current account is "test1"
@@ -392,7 +392,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: License attempts to retrieve the artifacts for their product (expired)
     Given the current account is "test1"
@@ -459,7 +459,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Developer retrieves an artifact for their account
     Given the current account is "test1"
@@ -526,7 +526,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0?environment=isolated"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves an artifact for their product
     Given the current account is "test1"
@@ -538,7 +538,7 @@ Feature: Product artifacts relationship
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves an artifact for another product
     Given the current account is "test1"
@@ -620,5 +620,5 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 

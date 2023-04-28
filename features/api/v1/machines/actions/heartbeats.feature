@@ -39,10 +39,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does not requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
-    And the JSON response should be a "machine" with a nil lastHeartbeat
-    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response body should be a "machine" that does not requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the response body should be a "machine" with a nil lastHeartbeat
+    And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -60,10 +60,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -81,10 +81,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "DEAD"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "DEAD"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -114,10 +114,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -139,11 +139,11 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -162,10 +162,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -225,10 +225,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
@@ -299,10 +299,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
@@ -330,10 +330,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
@@ -360,10 +360,10 @@ Feature: Machine heartbeat actions
       """
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -383,10 +383,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -407,10 +407,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -449,10 +449,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
-    And the JSON response should be a "machine" with a nextHeartbeat within seconds of "$time.10.minutes.from_now.iso"
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
+    And the response body should be a "machine" with a nextHeartbeat within seconds of "$time.10.minutes.from_now.iso"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job queued in 10.5 minutes
     And sidekiq should have 1 "webhook" job
@@ -482,10 +482,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
-    And the JSON response should be a "machine" with a nextHeartbeat within seconds of "$time.1.week.from_now.iso"
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
+    And the response body should be a "machine" with a nextHeartbeat within seconds of "$time.1.week.from_now.iso"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job queued in 1 week
     And sidekiq should have 1 "webhook" job
@@ -532,10 +532,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
-    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
-    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response body should be a "machine" that does requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
+    And the response body should be a "machine" with a lastHeartbeat that is not nil
+    And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
@@ -614,10 +614,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does not requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
-    And the JSON response should be a "machine" with a nil lastHeartbeat
-    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response body should be a "machine" that does not requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the response body should be a "machine" with a nil lastHeartbeat
+    And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -640,10 +640,10 @@ Feature: Machine heartbeat actions
       """
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does not requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
-    And the JSON response should be a "machine" with a nil lastHeartbeat
-    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response body should be a "machine" that does not requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the response body should be a "machine" with a nil lastHeartbeat
+    And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -662,10 +662,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does not requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
-    And the JSON response should be a "machine" with a nil lastHeartbeat
-    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response body should be a "machine" that does not requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the response body should be a "machine" with a nil lastHeartbeat
+    And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -685,10 +685,10 @@ Feature: Machine heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "200"
-    And the JSON response should be a "machine" that does not requireHeartbeat
-    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
-    And the JSON response should be a "machine" with a nil lastHeartbeat
-    And the JSON response should be a "machine" with a nil nextHeartbeat
+    And the response body should be a "machine" that does not requireHeartbeat
+    And the response body should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the response body should be a "machine" with a nil lastHeartbeat
+    And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
