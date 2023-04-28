@@ -86,7 +86,7 @@ to the long-term sustainability of the project.
 Keygen CE is a community supported project and there are **no guarantees** that
 you will receive support from the creators of Keygen to troubleshoot your
 self-hosting issues. There is [a community-supported Discord server][discord]
-where you can ask for help with self-hosting.
+and [a forum][forum] where you can ask for help with self-hosting.
 
 If you do need support guantantees, consider becoming a [Keygen Cloud][keygen-cloud]
 customer, or [purchasing Keygen EE][sales].
@@ -179,6 +179,7 @@ If the ELv2 license doesn't work for your company, please [reach out][sales].
 [sponsor]: https://github.com/sponsors/ezekg
 [support]: mailto:support@keygen.sh
 [discord]: https://discord.gg/yednR566
+[forum]: https://github.com/keygen-sh/community/discussions
 [contribute]: https://keygen.sh/contrib/
 [license]: https://keygen.sh/license/
 [sales]: mailto:sales@keygen.sh
