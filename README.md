@@ -119,7 +119,7 @@ rake keygen:setup
 To start the server, run:
 
 ```bash
-bundle exec rails s
+bundle exec rails server
 ```
 
 To start a worker, run:
