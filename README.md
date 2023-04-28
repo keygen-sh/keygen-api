@@ -172,7 +172,7 @@ If the ELv2 license doesn't work for your company, please [reach out][sales].
 [self-hosting]: https://keygen.sh/docs/self-hosting/
 [sponsor]: https://github.com/sponsors/ezekg
 [support]: mailto:support@keygen.sh
-[forum]:
+[discord]: https://discord.gg/yednR566
 [contribute]: https://keygen.sh/contrib/
 [license]: https://keygen.sh/license/
 [sales]: mailto:sales@keygen.sh
