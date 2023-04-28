@@ -85,8 +85,11 @@ gem 'semverse'
 
 group :production do
   # Monitoring/APM
-  gem 'rails_autoscale_agent'
   gem 'barnes'
+
+  unless ENV.key?('NO_RAILS_AUTOSCALE')
+    gem 'rails_autoscale_agent'
+  end
 
   # Dyno management
   gem 'whacamole'
