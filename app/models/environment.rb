@@ -50,6 +50,7 @@ class Environment < ApplicationRecord
     ]
 
   validates :code,
+    exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
     uniqueness: { case_sensitive: false, scope: :account_id },
     length: { minimum: 1, maximum: 255 },
     format: { without: UUID_RE },
