@@ -24,7 +24,7 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Developer retrieves a policy for their account
     Given the current account is "test1"
@@ -86,7 +86,7 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product retrieves a policy for their product
     Given the current account is "test1"
@@ -97,7 +97,7 @@ Feature: Show policy
     And the current product has 1 "policy"
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
 
   Scenario: Product attempts to retrieve a policy for another product
     Given the current account is "test1"
@@ -115,7 +115,7 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve their policy (default permissions)
     Given the current account is "test1"
@@ -143,7 +143,7 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to retrieve their policy (no permission)
@@ -201,7 +201,7 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "200"
-    And the JSON response should be a "policy"
+    And the response body should be a "policy"
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to retrieve their policy (no permission)

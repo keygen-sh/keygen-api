@@ -24,7 +24,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Developer retrieves all processes for their account
@@ -70,7 +70,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "processes"
+    And the response body should be an array with 5 "processes"
 
   Scenario: Admin retrieves a paginated list of processes scoped to product
     Given I am an admin of account "test1"
@@ -87,8 +87,8 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=100&product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 6 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/processes?page[number]=1&page[size]=100&product=$products[1]",
@@ -118,8 +118,8 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=100&license=$licenses[0]"
     Then the response status should be "200"
-    And the JSON response should be an array with 13 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 13 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/processes?license=$licenses[0]&page[number]=1&page[size]=100",
@@ -149,8 +149,8 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=10&machine=$machines[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 10 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/processes?machine=$machines[1]&page[number]=1&page[size]=10",
@@ -192,8 +192,8 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=10&user=$users[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 10 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/processes?page[number]=1&page[size]=10&user=$users[1]",
@@ -247,7 +247,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "processes"
+    And the response body should be an array with 10 "processes"
 
   Scenario: Admin retrieves all processes with a low limit for their account
     Given I am an admin of account "test1"
@@ -256,7 +256,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "processes"
+    And the response body should be an array with 5 "processes"
 
   Scenario: Admin retrieves all processes with a high limit for their account
     Given I am an admin of account "test1"
@@ -265,7 +265,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "processes"
+    And the response body should be an array with 20 "processes"
 
   Scenario: Admin retrieves all processes with a limit that is too high
     Given I am an admin of account "test1"
@@ -310,7 +310,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?status=alive"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: Admin retrieves all dead processes
     Given I am an admin of account "test1"
@@ -339,7 +339,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?status=dead"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "processes"
+    And the response body should be an array with 2 "processes"
 
   @ee
   Scenario: Product retrieves all isolated processes
@@ -352,7 +352,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   @ee
   Scenario: Product retrieves all shared processes
@@ -365,7 +365,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "processes"
+    And the response body should be an array with 2 "processes"
 
   Scenario: Product retrieves all processes for their product
     Given the current account is "test1"
@@ -379,7 +379,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "process"
+    And the response body should be an array with 1 "process"
 
   Scenario: Admin attempts to retrieve all processes for another account
     Given I am an admin of account "test2"
@@ -387,7 +387,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all processes for their group
     Given the current account is "test1"
@@ -412,7 +412,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "processes"
+    And the response body should be an array with 0 "processes"
 
   Scenario: User attempts to retrieve all processes for their account
     Given the current account is "test1"
@@ -425,7 +425,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: License retrieves all processes for their license with matches
     Given the current account is "test1"
@@ -437,7 +437,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: License retrieves all processes for their license with no matches
     Given the current account is "test1"
@@ -447,4 +447,4 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "processes"
+    And the response body should be an array with 0 "processes"

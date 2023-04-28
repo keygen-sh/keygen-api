@@ -28,7 +28,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?limit=100"
     Then the response status should be "200"
-    And the JSON response should be an array of 11 "tokens"
+    And the response body should be an array of 11 "tokens"
 
   Scenario: Admin requests all tokens for a specific user
     Given the current account is "test1"
@@ -42,7 +42,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[3]"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Admin requests all tokens for a specific product
     Given the current account is "test1"
@@ -56,7 +56,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=product&bearer[id]=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Admin requests all tokens for a specific license
     Given the current account is "test1"
@@ -70,7 +70,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[0]"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   @ee
   Scenario: Environment requests their tokens while authenticated
@@ -87,7 +87,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array of 7 "tokens"
+    And the response body should be an array of 7 "tokens"
 
   Scenario: Product requests their tokens while authenticated
     Given the current account is "test1"
@@ -102,7 +102,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests all tokens for a specific license
     Given the current account is "test1"
@@ -115,7 +115,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[0]"
     Then the response status should be "200"
-    And the JSON response should be an array of 2 "tokens"
+    And the response body should be an array of 2 "tokens"
 
   Scenario: Product requests all tokens for a specific user
     Given the current account is "test1"
@@ -130,7 +130,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[2]"
     Then the response status should be "200"
-    And the JSON response should be an array of 2 "tokens"
+    And the response body should be an array of 2 "tokens"
 
   Scenario: License requests their tokens while authenticated
     Given the current account is "test1"
@@ -144,7 +144,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: License requests tokens for another license
     Given the current account is "test1"
@@ -158,7 +158,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[1]"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "tokens"
+    And the response body should be an array of 0 "tokens"
 
   Scenario: User requests their tokens while authenticated
     Given the current account is "test1"
@@ -172,7 +172,7 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: User requests another user's tokens
     Given the current account is "test1"
@@ -185,7 +185,7 @@ Feature: List authentication tokens
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[0]"
-    And the JSON response should be an array of 0 "tokens"
+    And the response body should be an array of 0 "tokens"
 
   Scenario: User requests a product's tokens
     Given the current account is "test1"
@@ -198,7 +198,7 @@ Feature: List authentication tokens
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=product&bearer[id]=$products[0]"
-    And the JSON response should be an array of 0 "tokens"
+    And the response body should be an array of 0 "tokens"
 
   Scenario: User requests a license's tokens
     Given the current account is "test1"
@@ -211,7 +211,7 @@ Feature: List authentication tokens
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[1]"
-    And the JSON response should be an array of 0 "tokens"
+    And the response body should be an array of 0 "tokens"
 
   Scenario: Anonymous requests a user's tokens
     Given the current account is "test1"

@@ -24,7 +24,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Developer retrieves a product for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Sales retrieves a product for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Support retrieves a product for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Read-only retrieves a product for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Admin retrieves an invalid product for their account
     Given I am an admin of account "test1"
@@ -88,7 +88,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment retrieves an isolated product
@@ -99,7 +99,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Environment retrieves a shared product
@@ -110,7 +110,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Environment retrieves a global product
@@ -121,7 +121,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves itself
     Given the current account is "test1"
@@ -130,7 +130,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product attempts to retrieve another product
     Given the current account is "test1"
@@ -166,7 +166,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to retrieve their product (no permission)
@@ -224,7 +224,7 @@ Feature: Show product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to retrieve their product (no permission)

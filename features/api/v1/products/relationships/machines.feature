@@ -39,7 +39,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   @ee
   Scenario: Environment retrieves the machines for an isolated product
@@ -53,7 +53,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "machines"
+    And the response body should be an array with 6 "machines"
 
   @ee
   Scenario: Environment retrieves the machines for a global product
@@ -68,7 +68,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "machines"
+    And the response body should be an array with 4 "machines"
 
   Scenario: Product retrieves the machines for a product
     Given the current account is "test1"
@@ -92,7 +92,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin retrieves a machine for a product
     Given I am an admin of account "test1"
@@ -116,7 +116,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines/$1"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves a machine for a product
     Given the current account is "test1"
@@ -140,7 +140,7 @@ Feature: Product machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves the machines of another product
     Given the current account is "test1"

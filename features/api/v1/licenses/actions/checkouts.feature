@@ -59,8 +59,8 @@ Feature: License checkout actions
       """
       Content-Type: application/vnd.api+json
       """
-    And the JSON response should be a "license-file" with a certificate signed using "ed25519"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with a certificate signed using "ed25519"
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "meta": {
@@ -74,7 +74,7 @@ Feature: License checkout actions
         }
       }
       """
-    And the JSON response should be a "license-file" with the following attributes:
+    And the response body should be a "license-file" with the following attributes:
       """
       {
         "issued": "2022-10-16T14:52:48.000Z",
@@ -82,7 +82,7 @@ Feature: License checkout actions
         "ttl": 2629746
       }
       """
-    And the JSON response should be a "license-file" with the following relationships:
+    And the response body should be a "license-file" with the following relationships:
       """
       {
         "license": {
@@ -150,8 +150,8 @@ Feature: License checkout actions
       { "meta": { "encrypt": true } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with a certificate signed using "ed25519"
-    And the JSON response should be a "license-file" with the following encrypted certificate data:
+    And the response body should be a "license-file" with a certificate signed using "ed25519"
+    And the response body should be a "license-file" with the following encrypted certificate data:
       """
       {
         "meta": {
@@ -211,8 +211,8 @@ Feature: License checkout actions
       { "meta": { "encrypt": null } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with a certificate signed using "ed25519"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with a certificate signed using "ed25519"
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "meta": {
@@ -273,7 +273,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with a certificate signed using "ed25519"
+    And the response body should be a "license-file" with a certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -309,7 +309,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with a certificate signed using "rsa-pss-sha256"
+    And the response body should be a "license-file" with a certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -345,7 +345,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with a certificate signed using "rsa-sha256"
+    And the response body should be a "license-file" with a certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -380,7 +380,7 @@ Feature: License checkout actions
       { "meta": { "ttl": 86400 } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "meta": {
@@ -430,7 +430,7 @@ Feature: License checkout actions
       { "meta": { "ttl": null } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "meta": {
@@ -571,7 +571,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "included": [
@@ -617,7 +617,7 @@ Feature: License checkout actions
       { "meta": { "include": ["product"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "included": [
@@ -665,7 +665,7 @@ Feature: License checkout actions
       { "meta": { "include": ["entitlements"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "included": [
@@ -720,7 +720,7 @@ Feature: License checkout actions
       { "meta": { "include": ["group"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "included": [
@@ -776,7 +776,7 @@ Feature: License checkout actions
       { "meta": { "include": ["environment"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "included": [
@@ -835,7 +835,7 @@ Feature: License checkout actions
       { "meta": { "include": ["environment"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "data": {
@@ -899,7 +899,7 @@ Feature: License checkout actions
       { "meta": { "encrypt": true } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encrypted certificate data:
+    And the response body should be a "license-file" with the following encrypted certificate data:
       """
       {
         "included": [
@@ -1009,7 +1009,7 @@ Feature: License checkout actions
       { "meta": { "include": [] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       { "included": [] }
       """
@@ -1045,7 +1045,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/0092E3-41347C-7EB2AD-65965A-0C3224-V3/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file"
+    And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1119,7 +1119,7 @@ Feature: License checkout actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "data": {
@@ -1199,7 +1199,7 @@ Feature: License checkout actions
       { "meta": { "include": ["environment"] } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license-file" with the following encoded certificate data:
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
         "data": {
@@ -1260,7 +1260,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file"
+    And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1314,7 +1314,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file"
+    And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1427,7 +1427,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "200"
-    And the JSON response should be a "license-file"
+    And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1469,7 +1469,7 @@ Feature: License checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
     Then the response status should be "200"
-    And the JSON response should be a "license-file"
+    And the response body should be a "license-file"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

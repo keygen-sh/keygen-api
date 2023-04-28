@@ -37,7 +37,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Admin retrieves artifacts for a release that has more than 1 artifact
     Given I am an admin of account "test1"
@@ -47,7 +47,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   @ee
   Scenario: Environment retrieves the artifact for an isolated release
@@ -59,7 +59,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves the artifacts for a release
     Given the current account is "test1"
@@ -70,7 +70,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   Scenario: Product retrieves the artifacts for a release of another product
     Given the current account is "test1"
@@ -102,7 +102,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: User attempts to retrieve the artifacts for a release they don't have a license for
     Given the current account is "test1"
@@ -127,7 +127,7 @@ Feature: Release artifacts relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the response body should be an array with 1 "artifact"
 
   Scenario: Admin attempts to retrieve the artifacts for a release of another account
     Given I am an admin of account "test2"
@@ -144,7 +144,7 @@ Feature: Release artifacts relationship
     And the current account has 3 "artifacts" for each "release"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "artifacts"
+    And the response body should be an array with 3 "artifacts"
 
   # Download artifact
   Scenario: Admin retrieves the artifact for a release
@@ -155,7 +155,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Admin retrieves an artifact that does not exist
     Given I am an admin of account "test1"
@@ -174,7 +174,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$1"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following data:
+    And the response body should be an "artifact" with the following data:
       """
       {
         "type": "artifacts",
@@ -209,7 +209,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves the artifact for a release of their product (1 week TTL)
     Given the current account is "test1"
@@ -220,7 +220,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=604800"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves the artifact for a release of a different product
     Given the current account is "test1"
@@ -263,7 +263,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release that has not been uploaded
     Given the current account is "test1"
@@ -300,7 +300,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=86400"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired)
     Given the current account is "test1"
@@ -341,7 +341,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, revoke access)
     Given the current account is "test1"
@@ -390,7 +390,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, allow access)
     Given the current account is "test1"
@@ -415,7 +415,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired before release, restrict access)
     Given the current account is "test1"
@@ -476,7 +476,7 @@ Feature: Release artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (suspended)
     Given the current account is "test1"
@@ -543,7 +543,7 @@ Feature: Release artifacts relationship
     And I authenticate with my license key
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, expired after release, revoke access)
     Given the current account is "test1"
@@ -598,7 +598,7 @@ Feature: Release artifacts relationship
     And I authenticate with my license key
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, suspended)
     Given the current account is "test1"
@@ -759,7 +759,7 @@ Feature: Release artifacts relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release that has not been uploaded
     Given the current account is "test1"
@@ -802,7 +802,7 @@ Feature: Release artifacts relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=120"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: User retrieves a release artifact with a license for it (expired)
     Given the current account is "test1"
@@ -843,7 +843,7 @@ Feature: Release artifacts relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: User retrieves a release artifact with a license for it (suspended)
     Given the current account is "test1"

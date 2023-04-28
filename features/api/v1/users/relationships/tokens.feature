@@ -27,10 +27,10 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a nil expiry
-    And the JSON response should be a "token" with the kind "admin-token"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with a nil expiry
+    And the response body should be a "token" with the kind "admin-token"
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with a token
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -51,9 +51,9 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
-    And the JSON response should be a "token" with the kind "user-token"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
+    And the response body should be a "token" with the kind "user-token"
+    And the response body should be a "token" with a token
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -70,9 +70,9 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
-    And the JSON response should be a "token" with the kind "user-token"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
+    And the response body should be a "token" with the kind "user-token"
+    And the response body should be a "token" with a token
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -95,8 +95,8 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Client Token" }
       """
@@ -122,8 +122,8 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -152,8 +152,8 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -177,9 +177,9 @@ Feature: User tokens relationship
       """
     When I send a POST request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
-    And the JSON response should be a "token" with the kind "user-token"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
+    And the response body should be a "token" with the kind "user-token"
+    And the response body should be a "token" with a token
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -192,9 +192,9 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
-    And the JSON response should be a "token" with the kind "user-token"
-    And the JSON response should be a "token" with a token
+    And the response body should be a "token" with an expiry within seconds of "$time.2.weeks.from_now"
+    And the response body should be a "token" with the kind "user-token"
+    And the response body should be a "token" with a token
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -224,7 +224,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -273,7 +273,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -317,7 +317,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -430,7 +430,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -506,7 +506,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -543,7 +543,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -779,7 +779,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -821,7 +821,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -949,7 +949,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -981,7 +981,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "ent1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1013,7 +1013,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1045,7 +1045,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "ent1"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "permissions": ["license.validate"] }
       """
@@ -1082,7 +1082,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1123,7 +1123,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "422"
     And the response should contain a valid signature header for "ent1"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1162,7 +1162,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1194,7 +1194,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "422"
     And the response should contain a valid signature header for "ent1"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1233,7 +1233,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1265,7 +1265,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "422"
     And the response should contain a valid signature header for "ent1"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1313,7 +1313,7 @@ Feature: User tokens relationship
       """
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1353,7 +1353,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -1410,7 +1410,7 @@ Feature: User tokens relationship
     When I send a GET request to "/accounts/test1/users/$3/tokens"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   @ee
   Scenario: Environment requests tokens for one of their isolated users
@@ -1484,7 +1484,7 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: User requests tokens for another user
     Given the current account is "test1"

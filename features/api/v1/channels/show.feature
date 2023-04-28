@@ -24,7 +24,7 @@ Feature: Show release channel
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be a "channel"
+    And the response body should be a "channel"
 
   Scenario: Developer retrieves a channel for their account
     Given the current account is "test1"
@@ -104,7 +104,7 @@ Feature: Show release channel
       """
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be an "channel"
+    And the response body should be an "channel"
 
   @ee
   Scenario: Environment retrieves an channel (shared)
@@ -119,7 +119,7 @@ Feature: Show release channel
       """
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be an "channel"
+    And the response body should be an "channel"
 
   Scenario: Product retrieves a channel for their product
     Given the current account is "test1"
@@ -130,7 +130,7 @@ Feature: Show release channel
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be a "channel"
+    And the response body should be a "channel"
 
   Scenario: Product retrieves a channel for another product
     Given the current account is "test1"
@@ -196,7 +196,7 @@ Feature: Show release channel
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to retrieves a channel for an account (LICENSED distribution strategy)
    Given the current account is "test1"

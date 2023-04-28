@@ -24,7 +24,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "request-logs"
+    And the response body should be an array with 3 "request-logs"
 
   Scenario: Admin retrieves a list of logs that is automatically limited
     Given I am an admin of account "test1"
@@ -37,7 +37,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "request-logs"
+    And the response body should be an array with 10 "request-logs"
 
   Scenario: Admin retrieves a list of logs with a limit
     Given I am an admin of account "test1"
@@ -50,7 +50,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=75"
     Then the response status should be "200"
-    And the JSON response should be an array with 75 "request-logs"
+    And the response body should be an array with 75 "request-logs"
 
   Scenario: Admin retrieves an unsupported paginated list of logs
     Given I am an admin of account "test1"
@@ -59,8 +59,8 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "request-logs"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "request-logs"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/request-logs?page[number]=2&page[size]=5",
@@ -76,7 +76,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "request-logs"
+    And the response body should be an array with 20 "request-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's empty
     Given I am an admin of account "test1"
@@ -85,7 +85,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?date[start]=2017-1-2&date[end]=2017-01-03"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "request-logs"
+    And the response body should be an array with 0 "request-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's too far
     Given I am an admin of account "test1"
@@ -109,7 +109,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment attempts to retrieve all isolated logs for their account
@@ -122,7 +122,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "request-logs"
+    And the response body should be an array with 3 "request-logs"
 
   @ee
   Scenario: Environment attempts to retrieve all shared logs for their account
@@ -135,7 +135,7 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "request-logs"
+    And the response body should be an array with 6 "request-logs"
 
   Scenario: Product attempts to retrieve all logs for their account
     Given the current account is "test1"
@@ -145,7 +145,7 @@ Feature: List request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve all logs for their account
     Given the current account is "test1"
@@ -155,7 +155,7 @@ Feature: List request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all logs for their account
     Given the current account is "test1"
@@ -165,4 +165,4 @@ Feature: List request logs
     And the current account has 3 "request-logs"
     When I send a GET request to "/accounts/test1/request-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

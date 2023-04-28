@@ -42,8 +42,8 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/test-key/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -79,8 +79,8 @@ Feature: License permit actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And the response should contain the following headers:
       """
       { "Keygen-Environment": "isolated" }
@@ -115,8 +115,8 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -145,8 +145,8 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -177,8 +177,8 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -210,8 +210,8 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a lastCheckIn that is not nil
-    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And the response body should be a "license" with a lastCheckIn that is not nil
+    And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -255,7 +255,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is suspended
+    And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -292,7 +292,7 @@ Feature: License permit actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "suspended": true }
       """
@@ -337,7 +337,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/test-key/actions/suspend"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is suspended
+    And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -366,7 +366,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is suspended
+    And the response body should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -414,7 +414,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is not suspended
+    And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -451,7 +451,7 @@ Feature: License permit actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "suspended": false }
       """
@@ -502,7 +502,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is not suspended
+    And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -532,7 +532,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "200"
-    And the JSON response should be a "license" that is not suspended
+    And the response body should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -583,7 +583,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2021-10-19T00:00:00.000Z"
+    And the response body should be a "license" with the expiry "2021-10-19T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -638,7 +638,7 @@ Feature: License permit actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "expiry": "2025-03-31T00:00:00.000Z" }
       """
@@ -672,7 +672,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
+    And the response body should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -729,7 +729,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-11-05T22:53:37.000Z"
+    And the response body should be a "license" with the expiry "2016-11-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -761,7 +761,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

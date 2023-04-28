@@ -24,7 +24,7 @@ Feature: Policy product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Environment retrieves the product for an isolated policy
@@ -35,7 +35,7 @@ Feature: Policy product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/product?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a policy
     Given the current account is "test1"
@@ -46,7 +46,7 @@ Feature: Policy product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a policy of another product
     Given the current account is "test1"

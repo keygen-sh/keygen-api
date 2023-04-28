@@ -32,7 +32,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -49,7 +49,7 @@ Feature: License validation actions
     And I use API version "1.2"
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -66,7 +66,7 @@ Feature: License validation actions
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -83,7 +83,7 @@ Feature: License validation actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -105,7 +105,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -181,7 +181,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -203,7 +203,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -312,9 +312,9 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -354,9 +354,9 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
@@ -401,8 +401,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -448,8 +448,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
@@ -479,8 +479,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
@@ -526,8 +526,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -566,8 +566,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -606,8 +606,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -650,8 +650,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -694,8 +694,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -738,8 +738,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -771,8 +771,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -804,8 +804,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -848,8 +848,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -892,8 +892,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -936,8 +936,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -980,8 +980,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -1012,8 +1012,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1045,8 +1045,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
@@ -1078,8 +1078,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
@@ -1112,8 +1112,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1148,8 +1148,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
@@ -1184,8 +1184,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
@@ -1220,8 +1220,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
@@ -1256,8 +1256,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
@@ -1291,8 +1291,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1326,8 +1326,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1351,8 +1351,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1385,8 +1385,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1419,8 +1419,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1453,8 +1453,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1487,8 +1487,8 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1511,7 +1511,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1555,7 +1555,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1579,7 +1579,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1606,7 +1606,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1623,7 +1623,7 @@ Feature: License validation actions
     And I use API version "1.2"
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1640,7 +1640,7 @@ Feature: License validation actions
     And I use API version "1.1"
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -1657,7 +1657,7 @@ Feature: License validation actions
     And I use API version "1.0"
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -1679,7 +1679,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1755,7 +1755,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1777,7 +1777,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1880,9 +1880,9 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1915,9 +1915,9 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
@@ -1956,8 +1956,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -1997,8 +1997,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
@@ -2024,8 +2024,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
@@ -2065,8 +2065,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -2107,8 +2107,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2149,8 +2149,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2189,8 +2189,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -2231,8 +2231,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2281,8 +2281,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -2321,8 +2321,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2353,8 +2353,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2386,8 +2386,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
@@ -2423,8 +2423,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/a-b-c-d-e/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
@@ -2449,8 +2449,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
@@ -2486,8 +2486,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2549,8 +2549,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2579,8 +2579,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2635,8 +2635,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
@@ -2665,8 +2665,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
@@ -2707,8 +2707,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2749,8 +2749,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
@@ -2784,8 +2784,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2819,8 +2819,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2854,8 +2854,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
@@ -2903,8 +2903,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -2952,8 +2952,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
@@ -3001,8 +3001,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -3057,8 +3057,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -3114,8 +3114,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -3171,8 +3171,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -3228,8 +3228,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -3285,8 +3285,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -3336,8 +3336,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
@@ -3380,8 +3380,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
@@ -3422,8 +3422,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3465,8 +3465,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
@@ -3515,8 +3515,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3565,8 +3565,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
@@ -3598,8 +3598,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3622,8 +3622,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "environment scope is required", "code": "ENVIRONMENT_SCOPE_REQUIRED" }
       """
@@ -3656,8 +3656,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
@@ -3690,8 +3690,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
@@ -3724,8 +3724,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
@@ -3758,8 +3758,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
@@ -3792,8 +3792,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
@@ -3824,8 +3824,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3843,8 +3843,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3862,8 +3862,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3880,8 +3880,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3899,8 +3899,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3918,8 +3918,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3936,8 +3936,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3954,8 +3954,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -3989,8 +3989,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -4024,8 +4024,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -4083,8 +4083,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4116,8 +4116,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4149,8 +4149,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4182,8 +4182,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4215,8 +4215,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4248,8 +4248,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4281,8 +4281,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4314,8 +4314,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4347,8 +4347,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4380,8 +4380,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4413,8 +4413,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4446,8 +4446,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
@@ -4480,8 +4480,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -4523,8 +4523,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4566,8 +4566,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4609,8 +4609,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4653,8 +4653,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "constant": "TOO_MANY_PROCESSES" }
       """
@@ -4696,8 +4696,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4730,8 +4730,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4773,8 +4773,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4807,8 +4807,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4850,8 +4850,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4884,8 +4884,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4927,8 +4927,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -4961,8 +4961,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5004,8 +5004,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5038,8 +5038,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5081,8 +5081,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5115,8 +5115,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5158,8 +5158,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5192,8 +5192,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5235,8 +5235,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5269,8 +5269,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
       """
@@ -5313,8 +5313,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5357,8 +5357,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5401,8 +5401,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5445,8 +5445,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5489,8 +5489,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5533,8 +5533,8 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
@@ -5558,7 +5558,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5603,7 +5603,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5628,7 +5628,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/ent1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5659,7 +5659,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5681,7 +5681,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5703,7 +5703,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -5725,7 +5725,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -5756,9 +5756,9 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5788,8 +5788,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -5820,8 +5820,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5852,8 +5852,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -5884,8 +5884,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -5908,8 +5908,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5932,8 +5932,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -5956,8 +5956,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -5980,8 +5980,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6004,8 +6004,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6028,8 +6028,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6052,8 +6052,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6076,8 +6076,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6100,8 +6100,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6124,8 +6124,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6148,8 +6148,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6172,8 +6172,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6196,8 +6196,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6220,8 +6220,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6257,8 +6257,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6289,8 +6289,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6379,8 +6379,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6406,7 +6406,7 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6436,8 +6436,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6463,7 +6463,7 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6489,8 +6489,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6522,8 +6522,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "environment scope does not match", "code": "ENVIRONMENT_SCOPE_MISMATCH" }
       """
@@ -6564,8 +6564,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6606,8 +6606,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
@@ -6648,8 +6648,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -6697,8 +6697,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6746,8 +6746,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
@@ -6790,8 +6790,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
@@ -6834,8 +6834,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
@@ -6883,8 +6883,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -6932,8 +6932,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
@@ -6975,8 +6975,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -7028,8 +7028,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7082,8 +7082,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7138,8 +7138,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7193,8 +7193,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7247,8 +7247,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
@@ -7299,8 +7299,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
@@ -7351,8 +7351,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7406,8 +7406,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (does not match all associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
@@ -7460,8 +7460,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7515,8 +7515,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7564,8 +7564,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint scope is empty", "code": "FINGERPRINT_SCOPE_EMPTY" }
       """
@@ -7674,8 +7674,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
@@ -7716,8 +7716,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7758,8 +7758,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
@@ -7800,8 +7800,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should not contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should not contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -7850,8 +7850,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7900,8 +7900,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
@@ -7940,8 +7940,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -7980,8 +7980,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
@@ -8020,8 +8020,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
@@ -8060,8 +8060,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
@@ -8100,8 +8100,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
@@ -8142,8 +8142,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
@@ -8185,8 +8185,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -8228,8 +8228,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
@@ -8271,8 +8271,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -8314,8 +8314,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
@@ -8405,8 +8405,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -8441,9 +8441,9 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -8477,8 +8477,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -8514,8 +8514,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -8557,8 +8557,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -8604,8 +8604,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -8647,8 +8647,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -8686,8 +8686,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -8895,8 +8895,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -8942,8 +8942,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -8989,8 +8989,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -9036,8 +9036,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -9086,8 +9086,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -9136,8 +9136,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -9174,8 +9174,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -9212,8 +9212,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -9251,8 +9251,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": true,
@@ -9290,8 +9290,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -9329,8 +9329,8 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should contain a "license"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
       """
       {
         "valid": false,
@@ -9369,7 +9369,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9400,7 +9400,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9455,7 +9455,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9488,7 +9488,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9519,7 +9519,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9551,7 +9551,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9583,7 +9583,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9615,7 +9615,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9644,7 +9644,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9673,7 +9673,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9702,7 +9702,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9731,7 +9731,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
@@ -9760,7 +9760,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
@@ -9789,7 +9789,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """

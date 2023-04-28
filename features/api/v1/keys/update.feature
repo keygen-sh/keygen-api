@@ -36,7 +36,7 @@ Feature: Update key
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "key" with the key "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
+    And the response body should be a "key" with the key "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -162,7 +162,7 @@ Feature: Update key
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "key" with the key "shrd_b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
+    And the response body should be a "key" with the key "shrd_b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -187,7 +187,7 @@ Feature: Update key
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "key" with the key "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
+    And the response body should be a "key" with the key "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

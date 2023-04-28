@@ -38,7 +38,7 @@ Feature: Delete product
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

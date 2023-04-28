@@ -29,7 +29,7 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "activation-token",
@@ -62,7 +62,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Client Token" }
       """
@@ -87,7 +87,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "activation-token",
@@ -116,7 +116,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -146,7 +146,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -176,7 +176,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "activation-token",
@@ -205,7 +205,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "activation-token",
@@ -246,7 +246,7 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a nil expiry
+    And the response body should be a "token" with a nil expiry
 
   @ce
   Scenario: Global admin generates a shared token for a global license
@@ -273,7 +273,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -322,7 +322,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -366,7 +366,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -479,7 +479,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -555,7 +555,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -592,7 +592,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -867,11 +867,11 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Isolated Token" }
       """
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -980,11 +980,11 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Shared Token" }
       """
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -1021,11 +1021,11 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Shared Token" }
       """
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -1062,7 +1062,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1097,7 +1097,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -1137,7 +1137,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1179,7 +1179,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1218,7 +1218,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1250,7 +1250,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1289,7 +1289,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1321,7 +1321,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1370,7 +1370,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1412,7 +1412,7 @@ Feature: Generate authentication token for license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -1473,7 +1473,7 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests a license's tokens
     Given the current account is "test1"
@@ -1485,7 +1485,7 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests a license's token
     Given the current account is "test1"
@@ -1497,7 +1497,7 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens/$1"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the response body should be a "token"
 
   Scenario: Product attempts to request tokens for a license it doesn't own
     Given the current account is "test1"

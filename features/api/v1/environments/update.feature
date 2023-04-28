@@ -36,7 +36,7 @@ Feature: Update environments
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       { "code": "test" }
       """
@@ -67,7 +67,7 @@ Feature: Update environments
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -101,7 +101,7 @@ Feature: Update environments
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -145,7 +145,7 @@ Feature: Update environments
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -202,7 +202,7 @@ Feature: Update environments
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "environment" with the name "Local"
+    And the response body should be an "environment" with the name "Local"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

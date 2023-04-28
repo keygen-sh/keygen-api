@@ -37,8 +37,8 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
-    And the JSON response should be a "license" with the name "Some Name"
+    And the response body should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
+    And the response body should be a "license" with the name "Some Name"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -63,7 +63,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
+    And the response body should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -88,7 +88,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
+    And the response body should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -122,7 +122,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxMachines "10"
+    And the response body should be a "license" with the maxMachines "10"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -159,7 +159,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxMachines "5"
+    And the response body should be a "license" with the maxMachines "5"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -193,7 +193,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxMachines "5"
+    And the response body should be a "license" with the maxMachines "5"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -227,7 +227,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxCores "32"
+    And the response body should be a "license" with the maxCores "32"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -264,7 +264,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxCores "4"
+    And the response body should be a "license" with the maxCores "4"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -298,7 +298,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxUses "500"
+    And the response body should be a "license" with the maxUses "500"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -335,7 +335,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the maxUses "100"
+    And the response body should be a "license" with the maxUses "100"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -368,7 +368,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "maxProcesses": 10 }
       """
@@ -407,7 +407,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "maxProcesses": 5 }
       """
@@ -523,7 +523,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with a nil name
+    And the response body should be a "license" with a nil name
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -548,7 +548,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" that is protected
+    And the response body should be a "license" that is protected
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -573,7 +573,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" that is not protected
+    And the response body should be a "license" that is not protected
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -602,7 +602,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with a nil name
+    And the response body should be a "license" with a nil name
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -632,8 +632,8 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" that is not protected
-    And the JSON response should be a "license" with the key "test"
+    And the response body should be a "license" that is not protected
+    And the response body should be a "license" with the key "test"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -715,7 +715,7 @@ Feature: Update license
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "name": "Isolated License" }
       """
@@ -748,7 +748,7 @@ Feature: Update license
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "name": "Shared License" }
       """
@@ -801,7 +801,7 @@ Feature: Update license
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1020,8 +1020,8 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
-    And the JSON response should be a "license" that is suspended
+    And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the response body should be a "license" that is suspended
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1044,7 +1044,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with a nil expiry
+    And the response body should be a "license" with a nil expiry
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1079,7 +1079,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the name "Jackie's License"
+    And the response body should be a "license" with the name "Jackie's License"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1104,7 +1104,7 @@ Feature: Update license
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

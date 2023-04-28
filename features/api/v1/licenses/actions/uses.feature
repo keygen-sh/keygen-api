@@ -59,7 +59,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/key1/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 1 }
       """
@@ -94,7 +94,7 @@ Feature: License usage actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 100 }
       """
@@ -192,7 +192,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 1 }
       """
@@ -222,7 +222,7 @@ Feature: License usage actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 4 }
       """
@@ -252,7 +252,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 4 }
       """
@@ -282,7 +282,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 5 }
       """
@@ -346,7 +346,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 6 }
       """
@@ -411,7 +411,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 5 }
       """
@@ -554,7 +554,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 1 }
       """
@@ -589,7 +589,7 @@ Feature: License usage actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 25 }
       """
@@ -619,7 +619,7 @@ Feature: License usage actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 2 }
       """
@@ -649,7 +649,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 4 }
       """
@@ -808,7 +808,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 0 }
       """
@@ -838,7 +838,7 @@ Feature: License usage actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 0 }
       """
@@ -868,7 +868,7 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "uses": 0 }
       """

@@ -30,8 +30,8 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following relationships:
       """
       {
         "bearer": {
@@ -40,7 +40,7 @@ Feature: Generate authentication token
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "admin-token",
@@ -58,8 +58,8 @@ Feature: Generate authentication token
     And I use an authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following relationships:
       """
       {
         "bearer": {
@@ -68,7 +68,7 @@ Feature: Generate authentication token
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "admin-token",
@@ -99,8 +99,8 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Client Token" }
       """
@@ -232,8 +232,8 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following relationships:
       """
       {
         "bearer": {
@@ -242,7 +242,7 @@ Feature: Generate authentication token
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -282,8 +282,8 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following relationships:
       """
       {
         "bearer": {
@@ -292,7 +292,7 @@ Feature: Generate authentication token
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -327,7 +327,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -368,7 +368,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -413,7 +413,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -527,7 +527,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -602,7 +602,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -641,7 +641,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -879,7 +879,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -1001,7 +1001,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1037,7 +1037,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1073,7 +1073,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1109,7 +1109,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": ["license.validate"]
@@ -1129,7 +1129,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1159,7 +1159,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1189,8 +1189,8 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "admin-token"
@@ -1207,8 +1207,8 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "developer-token",
@@ -1229,8 +1229,8 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "sales-token",
@@ -1251,8 +1251,8 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "support-token",
@@ -1272,8 +1272,8 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "read-only-token",
@@ -1304,9 +1304,9 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with an expiry "2531-01-01T00:00:00.000Z"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with an expiry "2531-01-01T00:00:00.000Z"
+    And the response body should be a "token" with the following attributes:
       """
       { "kind": "admin-token" }
       """
@@ -1324,9 +1324,9 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with an expiry
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with an expiry
+    And the response body should be a "token" with the following attributes:
       """
       { "kind": "user-token" }
       """
@@ -1342,9 +1342,9 @@ Feature: Generate authentication token
     And time is frozen at "2023-03-24T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with an expiry
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with an expiry
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -1382,9 +1382,9 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" without an expiry
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" without an expiry
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following relationships:
       """
       {
         "bearer": {
@@ -1393,7 +1393,7 @@ Feature: Generate authentication token
         }
       }
       """
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "kind": "developer-token" }
       """
@@ -1426,7 +1426,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1509,7 +1509,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" without a "permissions" attribute
+    And the response body should be a "token" without a "permissions" attribute
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1527,7 +1527,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/ent1/tokens"
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "permissions": ["license.read", "license.validate", "token.generate"] }
       """
@@ -1590,7 +1590,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1626,7 +1626,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1663,7 +1663,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": ["license.validate"]
@@ -1695,7 +1695,7 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1731,9 +1731,9 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with an expiry "2049-01-01T00:00:00.000Z"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with an expiry "2049-01-01T00:00:00.000Z"
+    And the response body should be a "token" with the following attributes:
       """
       { "kind": "user-token" }
       """
@@ -1761,8 +1761,8 @@ Feature: Generate authentication token
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with a token
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "user-token",
@@ -1783,7 +1783,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1884,7 +1884,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

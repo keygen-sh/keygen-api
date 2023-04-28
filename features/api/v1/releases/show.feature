@@ -31,7 +31,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/1.0.0-beta.1"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifacts": {
@@ -48,7 +48,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifacts": {
@@ -66,7 +66,7 @@ Feature: Show release
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifacts": {
@@ -84,7 +84,7 @@ Feature: Show release
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifact": {
@@ -102,7 +102,7 @@ Feature: Show release
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifact": {
@@ -123,7 +123,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the status "DRAFT"
+    And the response body should be a "release" with the status "DRAFT"
 
   Scenario: Admin retrieves a published release for their account
     Given I am an admin of account "test1"
@@ -136,7 +136,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the status "PUBLISHED"
+    And the response body should be a "release" with the status "PUBLISHED"
 
   Scenario: Admin retrieves a yanked release for their account
     Given I am an admin of account "test1"
@@ -149,7 +149,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the status "YANKED"
+    And the response body should be a "release" with the status "YANKED"
 
   Scenario: License retrieves a release with a conflicting version (open/licensed)
     Given the current account is "test1"
@@ -167,7 +167,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -181,7 +181,7 @@ Feature: Show release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
       """
@@ -202,7 +202,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0?product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -216,7 +216,7 @@ Feature: Show release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
       """
@@ -282,7 +282,7 @@ Feature: Show release
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/releases/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "release"
+    And the response body should be a "release"
 
   Scenario: Product retrieves a release for their product
     Given the current account is "test1"
@@ -293,7 +293,7 @@ Feature: Show release
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release"
+    And the response body should be a "release"
 
   Scenario: Product retrieves a release for another product
     Given the current account is "test1"
@@ -831,7 +831,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   # Draft releases
   Scenario: Anonymous retrieves a draft release

@@ -43,7 +43,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "key": "App.dmg" }
       """
@@ -74,7 +74,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=3600"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Admin retrieves the artifact for a release (10 second TTL)
     Given I am an admin of account "test1"
@@ -188,7 +188,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?environment=isolated"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "key": "App.dmg" }
       """
@@ -203,7 +203,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves the artifact for a release of their product (1 week TTL)
     Given the current account is "test1"
@@ -215,7 +215,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=604800"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves the artifact for a release of a different product
     Given the current account is "test1"
@@ -240,7 +240,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (1 day TTL)
     Given the current account is "test1"
@@ -254,7 +254,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=86400"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired)
     Given the current account is "test1"
@@ -297,7 +297,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, revoke access)
     Given the current account is "test1"
@@ -392,7 +392,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, expired after release, revoke access)
     Given the current account is "test1"
@@ -588,7 +588,7 @@ Feature: Release artifact relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: User retrieves a release artifact with a license for it (2 minute TTL)
     Given the current account is "test1"
@@ -604,7 +604,7 @@ Feature: Release artifact relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=120"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: User retrieves a release artifact with a license for it (expired)
     Given the current account is "test1"
@@ -647,7 +647,7 @@ Feature: Release artifact relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: User retrieves a release artifact with a license for it (suspended)
     Given the current account is "test1"
@@ -1271,7 +1271,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "307"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "status": "WAITING",
@@ -1292,7 +1292,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "307"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Admin uploads an artifact for a release that has been yanked
     Given I am an admin of account "test1"
@@ -1325,7 +1325,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "307"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product uploads an artifact for a release of a different product
     Given the current account is "test1"
@@ -1594,7 +1594,7 @@ Feature: Release artifact relationship
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

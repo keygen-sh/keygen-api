@@ -31,9 +31,9 @@ Feature: Show machine
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
-    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the response body should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Developer retrieves a machine for their account
@@ -82,9 +82,9 @@ Feature: Show machine
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
-    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the response body should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a machine for their account by UUID fingerprint
@@ -97,9 +97,9 @@ Feature: Show machine
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/a06b4343-d2cf-45e7-b9a2-b11c618993f3"
-    And the JSON response should be a "machine" with the fingerprint "a06b4343-d2cf-45e7-b9a2-b11c618993f3"
+    And the response body should be a "machine" with the fingerprint "a06b4343-d2cf-45e7-b9a2-b11c618993f3"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a license for their account that has a user
@@ -119,9 +119,9 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "user": {
@@ -147,9 +147,9 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "user": {
@@ -185,7 +185,7 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/95a4a5dc-fd79-4108-ba73-c3610ccfcab1%0A"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a machine for their account with a newline character in the ID (not found)
@@ -212,7 +212,7 @@ Feature: Show machine
     And the current product has 1 "machine"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: User retrieves a machine for their license
     Given the current account is "test1"
@@ -223,7 +223,7 @@ Feature: Show machine
     And the current user has 1 "machine"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: License retrieves a machine for their license
     Given the current account is "test1"
@@ -237,7 +237,7 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: License retrieves a machine for another license
     Given the current account is "test1"
@@ -274,7 +274,7 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/xxx"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product attempts to retrieve a machine for another product
     Given the current account is "test1"
@@ -292,7 +292,7 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Admin retrieves an isolated machine for their account (global environment)
@@ -329,7 +329,7 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/ent1/machines/$2"
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -357,7 +357,7 @@ Feature: Show machine
       """
     When I send a GET request to "/accounts/ent1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -435,7 +435,7 @@ Feature: Show machine
       """
     When I send a GET request to "/accounts/ent1/machines/$1"
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -476,7 +476,7 @@ Feature: Show machine
       """
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Environment retrieves a machine (shared)
@@ -491,7 +491,7 @@ Feature: Show machine
       """
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   @ee
   Scenario: Environment retrieves a machine (global)
@@ -506,4 +506,4 @@ Feature: Show machine
       """
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"

@@ -24,7 +24,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Developer retrieves a group for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Sales retrieves a group for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Support retrieves a group for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Read-only retrieves a group for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Admin retrieves an invalid group for their account
     Given I am an admin of account "test1"
@@ -88,7 +88,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ce
   Scenario: Environment retrieves a group (isolated)
@@ -117,7 +117,7 @@ Feature: Show group
       """
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be an "group"
+    And the response body should be an "group"
 
   @ee
   Scenario: Environment retrieves a group (shared)
@@ -132,7 +132,7 @@ Feature: Show group
       """
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be an "group"
+    And the response body should be an "group"
 
   Scenario: Product retrieves a group
     Given the current account is "test1"
@@ -142,7 +142,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User retrieves a group (not a member)
     Given the current account is "test1"
@@ -165,7 +165,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User retrieves a group (an owner)
     Given the current account is "test1"
@@ -183,7 +183,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: License retrieves a group (not a member)
     Given the current account is "test1"
@@ -206,7 +206,7 @@ Feature: Show group
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Anonymous retrieves a group
     Given the current account is "test1"

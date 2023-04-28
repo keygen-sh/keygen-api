@@ -45,7 +45,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "channels"
+    And the response body should be an array with 2 "channels"
 
   @ce
   Scenario: Environment retrieves their release channels (isolated)
@@ -178,7 +178,7 @@ Feature: List release channels
       """
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "channel"
+    And the response body should be an array with 1 "channel"
 
   @ee
   Scenario: Environment retrieves their release channels (shared)
@@ -245,7 +245,7 @@ Feature: List release channels
       """
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "channels"
+    And the response body should be an array with 3 "channels"
 
   @ee
   Scenario: Environment retrieves their release channels (global)
@@ -400,7 +400,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "channels"
+    And the response body should be an array with 5 "channels"
 
   Scenario: Product retrieves the channels of another product
     Given the current account is "test1"
@@ -420,7 +420,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "channels"
+    And the response body should be an array of 0 "channels"
 
   Scenario: User attempts to retrieve the channels for a product (licensed)
     Given the current account is "test1"
@@ -435,7 +435,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "channel"
+    And the response body should be an array of 1 "channel"
 
   Scenario: User attempts to retrieve the channels for a product (unlicensed)
     Given the current account is "test1"
@@ -449,7 +449,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "channels"
+    And the response body should be an array of 0 "channels"
 
   Scenario: License attempts to retrieve the channels for their product
     Given the current account is "test1"
@@ -462,7 +462,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "channel"
+    And the response body should be an array of 1 "channel"
 
   Scenario: License attempts to retrieve the channels for a different product
    Given the current account is "test1"
@@ -474,7 +474,7 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "channels"
+    And the response body should be an array of 0 "channels"
 
   Scenario: Admin attempts to retrieve the channels for a product of another account
     Given the current account is "test1"
@@ -506,7 +506,7 @@ Feature: List release channels
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "channels"
+    And the response body should be an array of 0 "channels"
 
   Scenario: Anonymous attempts to retrieve the channels for an account (OPEN distribution strategy)
    Given the current account is "test1"
@@ -519,7 +519,7 @@ Feature: List release channels
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "channel"
+    And the response body should be an array of 1 "channel"
 
   Scenario: Anonymous attempts to retrieve the channels for an account (CLOSED distribution strategy)
    Given the current account is "test1"
@@ -532,4 +532,4 @@ Feature: List release channels
     And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "channels"
+    And the response body should be an array of 0 "channels"

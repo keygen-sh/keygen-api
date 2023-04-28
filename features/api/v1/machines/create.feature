@@ -46,7 +46,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the response body should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -190,7 +190,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -241,11 +241,11 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       { "name": "Isolated Machine" }
       """
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -299,7 +299,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -344,7 +344,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -387,11 +387,11 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       { "name": "Shared Machine" }
       """
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -445,7 +445,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -490,7 +490,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -569,7 +569,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -622,7 +622,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -669,7 +669,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -812,7 +812,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -853,7 +853,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -1047,7 +1047,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -1098,7 +1098,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -1142,14 +1142,14 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       {
         "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
         "name": "Isolated Machine"
       }
       """
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "environment": {
@@ -1205,7 +1205,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -1336,7 +1336,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the response body should be a "machine" with the fingerprint "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -1511,7 +1511,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1519,9 +1519,9 @@ Feature: Create machine
     # Sanity check on license's machine counter
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "machines": {
@@ -1599,7 +1599,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1630,7 +1630,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And the current token should have the following attributes:
       """
       {
@@ -1672,7 +1672,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And the current token should have the following attributes:
       """
       {
@@ -2098,7 +2098,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2139,7 +2139,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2244,7 +2244,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2362,7 +2362,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2480,7 +2480,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2534,7 +2534,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2652,7 +2652,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2706,7 +2706,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2888,7 +2888,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2946,7 +2946,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And the current token should have the following attributes:
       """
       {
@@ -3072,7 +3072,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And the current token should have the following attributes:
       """
       {
@@ -3205,7 +3205,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    And the response body should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And the current token should have the following attributes:
       """
       {
@@ -3337,7 +3337,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "12"
+    And the response body should be a "machine" with the cores "12"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3464,7 +3464,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "32"
+    And the response body should be a "machine" with the cores "32"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3523,7 +3523,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "16"
+    And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3580,7 +3580,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "16"
+    And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3702,7 +3702,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "16"
+    And the response body should be a "machine" with the cores "16"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3818,7 +3818,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "8"
+    And the response body should be a "machine" with the cores "8"
     And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3953,7 +3953,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "machine" with the cores "2147483647"
+    And the response body should be a "machine" with the cores "2147483647"
     And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -4228,7 +4228,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the id "00000000-2521-4033-9f4f-3675387016f7"
+    And the response body should be a "machine" with the id "00000000-2521-4033-9f4f-3675387016f7"
     And the current account should have 1 "machine"
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
@@ -4264,7 +4264,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4304,7 +4304,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -4826,7 +4826,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       {
         "heartbeatStatus": "NOT_STARTED",
@@ -4870,7 +4870,7 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "machine" with the following attributes:
+    And the response body should be a "machine" with the following attributes:
       """
       {
         "heartbeatStatus": "ALIVE",

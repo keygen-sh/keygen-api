@@ -25,7 +25,7 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Developer retrieves all licenses for their account
     Given the current account is "test1"
@@ -35,7 +35,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Sales retrieves all licenses for their account
     Given the current account is "test1"
@@ -45,7 +45,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Support retrieves all licenses for their account
     Given the current account is "test1"
@@ -55,7 +55,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Read-only retrieves all licenses for their account
     Given the current account is "test1"
@@ -65,7 +65,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves a paginated list of licenses
     Given I am an admin of account "test1"
@@ -74,8 +74,8 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?page[number]=4&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "licenses"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "licenses"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/licenses?page[number]=4&page[size]=5",
@@ -128,7 +128,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "licenses"
+    And the response body should be an array with 10 "licenses"
 
   Scenario: Admin retrieves all licenses with a low limit for their account
     Given I am an admin of account "test1"
@@ -137,7 +137,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "licenses"
+    And the response body should be an array with 5 "licenses"
 
   Scenario: Admin retrieves all licenses with a high limit for their account
     Given I am an admin of account "test1"
@@ -146,7 +146,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "licenses"
+    And the response body should be an array with 20 "licenses"
 
   Scenario: Admin retrieves all licenses with a limit that is too high
     Given I am an admin of account "test1"
@@ -175,7 +175,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?suspended=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves all non-suspended licenses
     Given I am an admin of account "test1"
@@ -188,7 +188,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?suspended=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "licenses"
+    And the response body should be an array with 9 "licenses"
 
   Scenario: Admin retrieves all expired licenses
     Given I am an admin of account "test1"
@@ -205,7 +205,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expired=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves all non-expired licenses
     Given I am an admin of account "test1"
@@ -222,7 +222,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expired=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 9 "licenses"
+    And the response body should be an array with 9 "licenses"
 
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
@@ -243,7 +243,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?unassigned=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves all expiring licenses
     Given I am an admin of account "test1"
@@ -272,7 +272,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expiring=1"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves all non-expiring licenses
     Given I am an admin of account "test1"
@@ -301,7 +301,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expiring=0"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "licenses"
+    And the response body should be an array with 6 "licenses"
 
   Scenario: Admin retrieves all licenses expiring within the next 30 days (seconds)
     Given I am an admin of account "test1"
@@ -331,7 +331,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[within]=2629746"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring within the next 2 weeks (simple ISO)
@@ -362,7 +362,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[within]=2w"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring within the next 13 days, 59 minutes and 59 seconds (complex ISO)
@@ -393,7 +393,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[within]=P13DT59M59S"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring in the next 30 days (seconds)
@@ -424,7 +424,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[in]=2629746"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring in the next 2 weeks (simple ISO)
@@ -455,7 +455,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[in]=2w"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring in the next 13 days, 59 minutes and 59 seconds (complex ISO)
@@ -486,7 +486,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[in]=P13DT59M59S"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring within some invalid duration
@@ -517,7 +517,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[within]=invalid"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring before a specific date (ISO)
@@ -548,7 +548,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[before]=2022-06-12T00:00:00.000Z"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring before a specific date (unix)
@@ -579,7 +579,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[before]=1654992000"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring before an invalid date
@@ -610,7 +610,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[before]=0"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring before a duration (unsupported)
@@ -641,7 +641,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[before]=90d"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring after a specific date (ISO)
@@ -672,7 +672,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[after]=2022-06-12T00:00:00.000Z"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring after a specific date (unix)
@@ -703,7 +703,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[after]=1654992000"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all licenses expiring after an invalid date
@@ -733,7 +733,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[after]=invalid"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Admin retrieves all licenses expiring after a duration (unsupported)
     Given I am an admin of account "test1"
@@ -763,7 +763,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expires[after]=30d"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
   Scenario: Admin retrieves all unassigned licenses
@@ -785,7 +785,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?unassigned=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves 1 license filtered by metadata ID
     Given I am an admin of account "test1"
@@ -806,7 +806,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=e029e80d-7649-4770-8744-74bd794ddc08"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves 1 license filtered by metadata ID and user email
     Given I am an admin of account "test1"
@@ -827,7 +827,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f-7649-4770-8744-74bd794ddc08&metadata[user]=foo-1@example.com"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves 3 licenses filtered by metadata ID (prefix)
     Given I am an admin of account "test1"
@@ -848,7 +848,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Admin retrieves 3 licenses filtered by metadata ID (full)
     Given I am an admin of account "test1"
@@ -869,7 +869,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f-7649-4770-8744-74bd794ddc08"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves licenses filtered by a boolean metadata value
     Given I am an admin of account "test1"
@@ -890,7 +890,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[deleted]=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves licenses filtered by an integer metadata value
     Given I am an admin of account "test1"
@@ -911,7 +911,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[tos]=1"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by an float metadata value
     Given I am an admin of account "test1"
@@ -932,7 +932,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[score]=0.9"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by a null metadata value
     Given I am an admin of account "test1"
@@ -953,7 +953,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[deletedAt]=null"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves licenses filtered by a numeric string metadata value
     Given I am an admin of account "test1"
@@ -974,7 +974,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[internalId]=1624214637&metadata[tenantId]=2"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by an object metadata value (integers)
     Given I am an admin of account "test1"
@@ -995,7 +995,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[hardware][cores]=64"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Admin retrieves licenses filtered by an object metadata value (strings)
     Given I am an admin of account "test1"
@@ -1016,7 +1016,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[hardware][cpu]=ryzen-threadripper"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by an array metadata value (integers)
     Given I am an admin of account "test1"
@@ -1037,7 +1037,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[ids][]=2"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Admin retrieves licenses filtered by an array metadata value (strings)
     Given I am an admin of account "test1"
@@ -1058,7 +1058,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[ids][]=2"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves licenses filtered by user ID
     Given I am an admin of account "test1"
@@ -1088,7 +1088,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?user=$users[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves licenses filtered by user email
     Given I am an admin of account "test1"
@@ -1126,7 +1126,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?user=luca@keygen.example"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by policy ID
     Given I am an admin of account "test1"
@@ -1156,7 +1156,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?policy=$policies[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves licenses filtered by product ID
     Given I am an admin of account "test1"
@@ -1195,7 +1195,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?product=$products[1]"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "licenses"
+    And the response body should be an array with 4 "licenses"
 
   Scenario: Admin retrieves licenses filtered by status (active)
     Given I am an admin of account "test1"
@@ -1254,7 +1254,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=ACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves licenses filtered by status (active, lowercase)
     Given I am an admin of account "test1"
@@ -1308,7 +1308,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=active"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Admin retrieves licenses filtered by status (inactive)
     Given I am an admin of account "test1"
@@ -1362,7 +1362,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=INACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Admin retrieves licenses filtered by status (expiring)
     Given I am an admin of account "test1"
@@ -1416,7 +1416,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=EXPIRING"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by status (expired)
     Given I am an admin of account "test1"
@@ -1470,7 +1470,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=EXPIRED"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by status (suspended)
     Given I am an admin of account "test1"
@@ -1524,7 +1524,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=SUSPENDED"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by status (banned)
     Given the current account is "test1"
@@ -1550,7 +1550,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=BANNED"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin retrieves licenses filtered by status (invalid)
     Given I am an admin of account "test1"
@@ -1604,7 +1604,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=INVALID"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   Scenario: Product retrieves licenses filtered by status (active)
     Given the current account is "test1"
@@ -1665,7 +1665,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=ACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
+    And the response body should be an array with 3 "licenses"
 
   Scenario: Product retrieves licenses filtered by status (inactive)
     Given the current account is "test1"
@@ -1721,7 +1721,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?status=INACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the response body should be an array with 2 "licenses"
 
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
@@ -1732,7 +1732,7 @@ Feature: List license
     And the current product has 1 "license"
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: Admin attempts to retrieve all licenses for another account
     Given I am an admin of account "test2"
@@ -1740,7 +1740,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User retrieves all licenses for their account
     Given the current account is "test1"
@@ -1751,7 +1751,7 @@ Feature: List license
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: User retrieves all licenses for their group
     Given the current account is "test1"
@@ -1790,7 +1790,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: User retrieves all licenses for their account filtered by metadata ID
     Given the current account is "test1"
@@ -1813,7 +1813,7 @@ Feature: List license
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f-7649-4770-8744-74bd794ddc08"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: User attempts an SQL injection attack for all licenses
     Given the current account is "test1"
@@ -1824,7 +1824,7 @@ Feature: List license
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the response body should be an array with 0 "licenses"
 
   @ee
   Scenario: Environment retrieves all isolated licenses
@@ -1841,8 +1841,8 @@ Feature: List license
       """
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "licenses"
-    And the JSON response should be an array of 3 "licenses" with the following relationships:
+    And the response body should be an array with 3 "licenses"
+    And the response body should be an array of 3 "licenses" with the following relationships:
       """
       {
         "environment": {
@@ -1867,8 +1867,8 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "licenses"
-    And the JSON response should be an array of 3 "licenses" with the following relationships:
+    And the response body should be an array with 6 "licenses"
+    And the response body should be an array of 3 "licenses" with the following relationships:
       """
       {
         "environment": {
@@ -1877,7 +1877,7 @@ Feature: List license
         }
       }
       """
-    And the JSON response should be an array of 3 "licenses" with the following relationships:
+    And the response body should be an array of 3 "licenses" with the following relationships:
       """
       {
         "environment": {

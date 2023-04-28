@@ -35,7 +35,7 @@ Feature: User products relationship
     When I send a GET request to "/accounts/test1/users/$1/products"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 1 "product"
+    And the response body should be an array with 1 "product"
 
   @ee
   Scenario: Environment retrieves the products for an isolated user
@@ -47,7 +47,7 @@ Feature: User products relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "products"
+    And the response body should be an array with 3 "products"
 
   Scenario: Product retrieves the products for a user
     Given the current account is "test1"
@@ -60,7 +60,7 @@ Feature: User products relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "product"
+    And the response body should be an array with 1 "product"
 
   Scenario: Admin retrieves a product for a user
     Given I am an admin of account "test1"
@@ -80,7 +80,7 @@ Feature: User products relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves a product for a user
     Given the current account is "test1"
@@ -100,7 +100,7 @@ Feature: User products relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products/$0"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the products of a user from another product
     Given the current account is "test1"
@@ -114,7 +114,7 @@ Feature: User products relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "product"
+    And the response body should be an array with 1 "product"
 
   Scenario: License attempts to retrieve the products for their user
     Given the current account is "test1"

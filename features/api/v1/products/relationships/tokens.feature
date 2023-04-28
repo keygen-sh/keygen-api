@@ -29,7 +29,7 @@ Feature: Generate authentication token for product
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "kind": "product-token",
@@ -58,7 +58,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       { "name": "Server Token" }
       """
@@ -91,7 +91,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -140,7 +140,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -184,7 +184,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -297,7 +297,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -373,7 +373,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -410,7 +410,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -685,7 +685,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following relationships:
+    And the response body should be a "token" with the following relationships:
       """
       {
         "environment": {
@@ -729,7 +729,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -770,7 +770,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -811,7 +811,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -852,7 +852,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -902,7 +902,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -950,7 +950,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -987,7 +987,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1021,7 +1021,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1059,7 +1059,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1093,7 +1093,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1145,7 +1145,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1193,7 +1193,7 @@ Feature: Generate authentication token for product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "token" with the following attributes:
+    And the response body should be a "token" with the following attributes:
       """
       {
         "permissions": [
@@ -1291,7 +1291,7 @@ Feature: Generate authentication token for product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests their tokens
     Given the current account is "test1"
@@ -1304,7 +1304,7 @@ Feature: Generate authentication token for product
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    And the response body should be an array of 1 "token"
 
   Scenario: Product requests tokens for another product
     Given the current account is "test1"

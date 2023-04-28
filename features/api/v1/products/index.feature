@@ -24,7 +24,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "products"
+    And the response body should be an array with 3 "products"
 
   Scenario: Developer retrieves all products for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "products"
+    And the response body should be an array with 2 "products"
 
   Scenario: Sales retrieves all products for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "products"
+    And the response body should be an array with 2 "products"
 
   Scenario: Support retrieves all products for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "products"
+    And the response body should be an array with 5 "products"
 
   Scenario: Read-only retrieves all products for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "products"
+    And the response body should be an array with 5 "products"
 
   Scenario: Admin retrieves a paginated list of products
     Given I am an admin of account "test1"
@@ -73,8 +73,8 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "products"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "products"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/products?page[number]=1&page[size]=5",
@@ -118,7 +118,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "products"
+    And the response body should be an array with 10 "products"
 
   Scenario: Admin retrieves all products with a low limit for their account
     Given I am an admin of account "test1"
@@ -127,7 +127,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "products"
+    And the response body should be an array with 5 "products"
 
   Scenario: Admin retrieves all products with a high limit for their account
     Given I am an admin of account "test1"
@@ -136,7 +136,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "products"
+    And the response body should be an array with 20 "products"
 
   Scenario: Admin retrieves all products with a limit that is too high
     Given I am an admin of account "test1"
@@ -160,7 +160,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment retrieves all isolated products
@@ -172,8 +172,8 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "products"
-    And the JSON response should be an array of 3 "products" with the following relationships:
+    And the response body should be an array with 3 "products"
+    And the response body should be an array of 3 "products" with the following relationships:
       """
       {
         "environment": {
@@ -193,8 +193,8 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "products"
-    And the JSON response should be an array of 3 "products" with the following relationships:
+    And the response body should be an array with 6 "products"
+    And the response body should be an array of 3 "products" with the following relationships:
       """
       {
         "environment": {
@@ -203,7 +203,7 @@ Feature: List products
         }
       }
       """
-    And the JSON response should be an array of 3 "products" with the following relationships:
+    And the response body should be an array of 3 "products" with the following relationships:
       """
       {
         "environment": {
@@ -220,7 +220,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to retrieve their products (default permissions)
@@ -247,7 +247,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "product"
+    And the response body should be an array with 1 "product"
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to retrieve their products (no permission)
@@ -305,7 +305,7 @@ Feature: List products
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "products"
+    And the response body should be an array with 2 "products"
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to retrieve their products (no permission)

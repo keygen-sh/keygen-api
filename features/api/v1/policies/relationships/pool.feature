@@ -35,7 +35,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "keys"
+    And the response body should be an array with 5 "keys"
 
   Scenario: Admin retrieves a key from the pool
     Given I am an admin of account "test1"
@@ -55,7 +55,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool/$0"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
 
   Scenario: Admin retrieves the pool of an unpooled policy
     Given I am an admin of account "test1"
@@ -68,7 +68,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
-    And the JSON response should be an empty array
+    And the response body should be an empty array
 
   Scenario: Admin retrieves a key from the pool of an unpooled policy
     Given I am an admin of account "test1"
@@ -93,7 +93,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "keys"
+    And the response body should be an array with 3 "keys"
 
   @ee
   Scenario: Environment retrieves the pool for a shared policy
@@ -105,7 +105,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "keys"
+    And the response body should be an array with 3 "keys"
 
   @ee
   Scenario: Environment retrieves the pool for a global policy
@@ -118,7 +118,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "keys"
+    And the response body should be an array with 5 "keys"
 
   Scenario: Product retrieves the pool for a policy
     Given the current account is "test1"
@@ -143,7 +143,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "keys"
+    And the response body should be an array with 5 "keys"
 
   Scenario: Product retrieves the pool for a policy of another product
     Given the current account is "test1"
@@ -242,7 +242,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -294,7 +294,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
 
   @ee
   Scenario: Environment pops a key from a shared policy's pool
@@ -306,7 +306,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
 
   @ee
   Scenario: Environment pops a shared key from a global policy's pool
@@ -319,7 +319,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
 
   # FIXME(ezekg) This probably shouldn't be allowed, but it's such a rarely used feature
   #              that our time would probably be better spent fully deprecating it.
@@ -334,7 +334,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
 
   Scenario: Product pops a key from a pool
     Given the current account is "test1"
@@ -359,7 +359,7 @@ Feature: Policy pool relationship
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
-    And the JSON response should be a "key"
+    And the response body should be a "key"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 

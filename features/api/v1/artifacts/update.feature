@@ -38,7 +38,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filesize": 123456789 }
       """
@@ -71,7 +71,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filesize": null }
       """
@@ -98,7 +98,7 @@ Feature: Update artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -133,7 +133,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw" }
       """
@@ -165,7 +165,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": null }
       """
@@ -193,7 +193,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": "" }
       """
@@ -221,7 +221,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA" }
       """
@@ -253,7 +253,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": null }
       """
@@ -281,7 +281,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": "" }
       """
@@ -309,7 +309,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": { "foo": "bar" } }
       """
@@ -341,7 +341,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": { "foo": "bar" } }
       """
@@ -373,7 +373,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": {} }
       """
@@ -400,7 +400,7 @@ Feature: Update artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -434,7 +434,7 @@ Feature: Update artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -475,7 +475,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
@@ -516,7 +516,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",
@@ -553,7 +553,7 @@ Feature: Update artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw",

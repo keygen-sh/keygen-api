@@ -29,7 +29,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves the group for a license (by key)
@@ -47,7 +47,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/24b0f13bdde2fa58038ec4a813631708/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -64,7 +64,7 @@ Feature: License group relationship
       """
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a license
     Given the current account is "test1"
@@ -87,7 +87,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a license of another product
     Given the current account is "test1"
@@ -136,7 +136,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User attempts to retrieve the group for a license they own (in group)
     Given the current account is "test1"
@@ -158,7 +158,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User attempts to retrieve the group for a license they don't own
     Given the current account is "test1"
@@ -182,7 +182,7 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: License attempts to retrieve the group for their license (no group)
     Given the current account is "test1"
@@ -217,7 +217,7 @@ Feature: License group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -251,7 +251,7 @@ Feature: License group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -280,7 +280,7 @@ Feature: License group relationship
       { "data": null }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {
@@ -393,7 +393,7 @@ Feature: License group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "group": {

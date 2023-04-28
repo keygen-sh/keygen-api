@@ -24,7 +24,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "metrics"
+    And the response body should be an array with 3 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics that is automatically limited
@@ -38,7 +38,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "metrics"
+    And the response body should be an array with 10 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics with a limit
@@ -52,7 +52,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
-    And the JSON response should be an array with 100 "metrics"
+    And the response body should be an array with 100 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves an unsupported paginated list of metrics
@@ -62,8 +62,8 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "metrics"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "metrics"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=5",
@@ -80,8 +80,8 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=100"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "metrics"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 0 "metrics"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=100",
@@ -98,7 +98,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "metrics"
+    And the response body should be an array with 20 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics within a date range that's empty
@@ -108,7 +108,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=2017-1-2&date[end]=2017-01-03"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "metrics"
+    And the response body should be an array with 0 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics within a date range that's too far
@@ -142,7 +142,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?metrics[]=real.metric"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "metrics"
+    And the response body should be an array with 1 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves filters metrics by metric type that doesn't exist
@@ -152,7 +152,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?metrics[]=bad.metric"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "metrics"
+    And the response body should be an array with 0 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to retrieve all metrics for another account
@@ -161,7 +161,7 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   @ee
@@ -173,7 +173,7 @@ Feature: List metrics
     And the current account has 3 "metrics"
     When I send a GET request to "/accounts/test1/metrics?environment=shared"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to retrieve all metrics for their account
@@ -184,7 +184,7 @@ Feature: List metrics
     And the current account has 3 "metrics"
     When I send a GET request to "/accounts/test1/metrics"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: License attempts to retrieve all metrics for their account
@@ -195,7 +195,7 @@ Feature: List metrics
     And the current account has 3 "metrics"
     When I send a GET request to "/accounts/test1/metrics"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: User attempts to retrieve all metrics for their account
@@ -206,5 +206,5 @@ Feature: List metrics
     And the current account has 3 "metrics"
     When I send a GET request to "/accounts/test1/metrics"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs

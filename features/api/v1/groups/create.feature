@@ -39,7 +39,7 @@ Feature: Create groups
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "group" with the following attributes:
+    And the response body should be a "group" with the following attributes:
       """
       {
         "name": "Test Group",
@@ -228,11 +228,11 @@ Feature: Create groups
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "group" with the following attributes:
+    And the response body should be a "group" with the following attributes:
       """
       { "name": "Isolated Group" }
       """
-    And the JSON response should be a "group" with the following relationships:
+    And the response body should be a "group" with the following relationships:
       """
       {
         "environment": {

@@ -73,7 +73,7 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "product": {
@@ -96,11 +96,11 @@ Feature: Release upgrade actions
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "key": "Test-App-2.0.1.dmg" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -192,8 +192,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$1/actions/upgrade?environment=isolated"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -226,8 +226,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -305,8 +305,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -461,8 +461,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -708,8 +708,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -773,8 +773,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade?channel=alpha"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -906,8 +906,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade?channel=beta"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -1039,8 +1039,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1106,8 +1106,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -1233,11 +1233,11 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.1.1&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "key": "Test-App-1.7.0.dmg" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.1.1",
@@ -1324,8 +1324,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1355,8 +1355,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1429,8 +1429,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1553,8 +1553,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1657,8 +1657,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.6.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.6.0",
@@ -1760,8 +1760,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-dev%2bbuild.0&channel=rc&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-dev+build.0",
@@ -1863,8 +1863,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=2.0.0&channel=beta&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "2.0.0",
@@ -1966,8 +1966,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-alpha.1&channel=alpha&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -2069,8 +2069,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.7.0-dev%2bbuild.1624653614&channel=dev&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.7.0-dev+build.1624653614",
@@ -2105,8 +2105,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2142,8 +2142,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2201,8 +2201,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2276,8 +2276,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2313,8 +2313,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2344,8 +2344,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2457,8 +2457,8 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2491,8 +2491,8 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-    And the JSON response should contain meta which includes the following:
+    And the response body should be an "artifact"
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -2648,11 +2648,11 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "Test-App-1.4.0.dmg" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -2693,7 +2693,7 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

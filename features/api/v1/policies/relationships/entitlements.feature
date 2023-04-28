@@ -26,7 +26,7 @@ Feature: Policy entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Product retrieves the entitlements for a policy
     Given the current account is "test1"
@@ -37,7 +37,7 @@ Feature: Policy entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Admin retrieves an entitlement for a policy
     Given I am an admin of account "test1"
@@ -47,7 +47,7 @@ Feature: Policy entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   @ee
   Scenario: Environment retrieves the entitlements for an isolated policy
@@ -63,7 +63,7 @@ Feature: Policy entitlements relationship
       """
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "entitlements"
+    And the response body should be an array with 3 "entitlements"
 
   Scenario: Product retrieves an entitlement for a policy
     Given the current account is "test1"
@@ -74,7 +74,7 @@ Feature: Policy entitlements relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements/$0"
     Then the response status should be "200"
-    And the JSON response should be a "entitlement"
+    And the response body should be a "entitlement"
 
   Scenario: Product retrieves the entitlements for a policy of another product
     Given the current account is "test1"
@@ -150,7 +150,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response body should be an array with 3 "policy-entitlements"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -207,7 +207,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response body should be an array with 3 "policy-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -385,7 +385,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response body should be an array with 3 "policy-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -455,7 +455,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response body should be an array with 3 "policy-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -492,7 +492,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "policy-entitlements"
+    And the response body should be an array with 3 "policy-entitlements"
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
@@ -559,7 +559,7 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "policy-entitlements"
+    And the response body should be an array with 2 "policy-entitlements"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

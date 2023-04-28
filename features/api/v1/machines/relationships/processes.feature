@@ -26,8 +26,8 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 2 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/machines/$machines[0]/processes?page[number]=1&page[size]=5",
@@ -51,8 +51,8 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "processes"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "processes"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/machines/$machines[0]/processes?page[number]=1&page[size]=5",
@@ -79,7 +79,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/foo/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   @ee
   Scenario: Isolated environment retrieves the processes for an isolated machine
@@ -95,7 +95,7 @@ Feature: Machine processes relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   @ee
   Scenario: Shared environment retrieves the processes for a shared machine
@@ -107,7 +107,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   @ee
   Scenario: Shared environment retrieves the processes for a global machine
@@ -123,7 +123,7 @@ Feature: Machine processes relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: Product retrieves the processes for a machine
     Given the current account is "test1"
@@ -136,7 +136,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: Product retrieves the processes for a different product's machine
     Given the current account is "test1"
@@ -159,7 +159,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: License retrieves the processes for different license's machine
     Given the current account is "test1"
@@ -181,7 +181,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "processes"
+    And the response body should be an array with 3 "processes"
 
   Scenario: User retrieves the processes for different user's machine
     Given the current account is "test1"
@@ -206,7 +206,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   @ee
   Scenario: Isolated environment retrieves the license for an isolated machine
@@ -222,7 +222,7 @@ Feature: Machine processes relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   @ee
   Scenario: Shared environment retrieves the license for a shared machine
@@ -234,7 +234,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   @ee
   Scenario: Shared environment retrieves the license for a global machine
@@ -250,7 +250,7 @@ Feature: Machine processes relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: Product retrieves a process for a machine
     Given the current account is "test1"
@@ -264,7 +264,7 @@ Feature: Machine processes relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: Product retrieves the processes for a different product's machine
     Given the current account is "test1"

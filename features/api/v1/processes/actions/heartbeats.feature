@@ -27,7 +27,7 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -60,7 +60,7 @@ Feature: Process heartbeat actions
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
     And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -116,7 +116,7 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -181,7 +181,7 @@ Feature: Process heartbeat actions
     And time is frozen at "2022-10-16T14:52:48.000Z"
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -211,7 +211,7 @@ Feature: Process heartbeat actions
     And time is frozen at "2022-10-16T14:52:48.000Z"
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -239,7 +239,7 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -279,7 +279,7 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -310,7 +310,7 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -361,7 +361,7 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",

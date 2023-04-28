@@ -53,7 +53,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Launch Release",
@@ -75,7 +75,7 @@ Feature: Create release
         }
       }
       """
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "artifacts": {
@@ -162,7 +162,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Launch Release",
@@ -223,7 +223,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -269,7 +269,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Launch Release",
@@ -320,7 +320,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Launch Release",
@@ -371,7 +371,7 @@ Feature: Create release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -420,7 +420,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -469,7 +469,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -547,7 +547,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": null,
@@ -596,7 +596,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Alpha Release",
@@ -644,7 +644,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": null,
@@ -694,7 +694,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": null,
@@ -744,7 +744,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -788,7 +788,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -832,7 +832,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -876,7 +876,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -932,7 +932,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": null,
@@ -947,7 +947,7 @@ Feature: Create release
         }
       }
       """
-    And the JSON response should be an "release" with the following relationships:
+    And the response body should be an "release" with the following relationships:
       """
       {
         "environment": {
@@ -1013,7 +1013,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release"
+    And the response body should be a "release"
     And the current account should have 2 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 1 "webhook" job
@@ -1048,7 +1048,7 @@ Feature: Create release
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1120,7 +1120,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of errors
+    And the response body should be an array of errors
     And the first error should have the following properties:
       """
       {
@@ -1194,7 +1194,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Isolated Release",
@@ -1216,7 +1216,7 @@ Feature: Create release
         }
       }
       """
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "environment": {
@@ -1267,7 +1267,7 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "name": "Product Release",

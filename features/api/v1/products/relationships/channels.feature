@@ -45,7 +45,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "channels"
+    And the response body should be an array with 2 "channels"
 
   @ee
   Scenario: Environment retrieves the channels for an isolated product
@@ -74,7 +74,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "channel"
+    And the response body should be an array with 1 "channel"
 
   @ee
   Scenario: Environment retrieves the channels for a mixed product
@@ -101,7 +101,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "channels"
+    And the response body should be an array with 2 "channels"
 
   Scenario: Product retrieves the channels for a product
     Given the current account is "test1"
@@ -194,7 +194,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "channels"
+    And the response body should be an array with 5 "channels"
 
   Scenario: Admin retrieves a channel for a product
     Given the current account is "test1"
@@ -213,7 +213,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be a "channel"
+    And the response body should be a "channel"
 
   Scenario: Product retrieves a channel for their product
     Given the current account is "test1"
@@ -232,7 +232,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels/$0"
     Then the response status should be "200"
-    And the JSON response should be a "channel"
+    And the response body should be a "channel"
 
   Scenario: Product retrieves the channels of another product
     Given the current account is "test1"
@@ -266,7 +266,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "channel"
+    And the response body should be an array with 1 "channel"
 
   Scenario: User attempts to retrieve the channels for a product (unlicensed)
     Given the current account is "test1"
@@ -292,7 +292,7 @@ Feature: Product channels relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "channel"
+    And the response body should be an array with 1 "channel"
 
   Scenario: License attempts to retrieve the channels for a different product
    Given the current account is "test1"

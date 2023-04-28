@@ -34,7 +34,7 @@ Feature: Create environments
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       {
         "isolationStrategy": "ISOLATED",
@@ -65,7 +65,7 @@ Feature: Create environments
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       {
         "isolationStrategy": "ISOLATED",
@@ -96,7 +96,7 @@ Feature: Create environments
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       {
         "isolationStrategy": "SHARED",
@@ -140,7 +140,7 @@ Feature: Create environments
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       {
         "isolationStrategy": "ISOLATED",
@@ -191,7 +191,7 @@ Feature: Create environments
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "environment" with the following attributes:
+    And the response body should be an "environment" with the following attributes:
       """
       {
         "isolationStrategy": "SHARED",

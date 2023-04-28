@@ -48,11 +48,11 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with a duration that is not nil
-    And the JSON response should be a "policy" with a requireFingerprintScope
-    And the JSON response should be a "policy" with the name "Trial"
-    And the JSON response should be a "policy" with the maxCores "32"
-    And the JSON response should be a "policy" with the maxUses "3"
+    And the response body should be a "policy" with a duration that is not nil
+    And the response body should be a "policy" with a requireFingerprintScope
+    And the response body should be a "policy" with the name "Trial"
+    And the response body should be a "policy" with the maxCores "32"
+    And the response body should be a "policy" with the maxUses "3"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -88,7 +88,7 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       {
         "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
@@ -200,11 +200,11 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" that does not requireUserScope
-    And the JSON response should be a "policy" that does not requireCheckIn
-    And the JSON response should be a "policy" with a nil checkInInterval
-    And the JSON response should be a "policy" with a nil checkInIntervalCount
-    And the JSON response should be a "policy" with a nil duration
+    And the response body should be a "policy" that does not requireUserScope
+    And the response body should be a "policy" that does not requireCheckIn
+    And the response body should be a "policy" with a nil checkInInterval
+    And the response body should be a "policy" with a nil checkInIntervalCount
+    And the response body should be a "policy" with a nil duration
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -251,7 +251,7 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with a nil duration
+    And the response body should be a "policy" with a nil duration
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -281,7 +281,7 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with the following attributes:
+    And the response body should be a "policy" with the following attributes:
       """
       { "name": "Isolated Policy" }
       """
@@ -422,8 +422,8 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with an overageStrategy "NO_OVERAGE"
-    And the JSON response should be a "policy" that is not concurrent
+    And the response body should be a "policy" with an overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -448,8 +448,8 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with an overageStrategy "NO_OVERAGE"
-    And the JSON response should be a "policy" that is not concurrent
+    And the response body should be a "policy" with an overageStrategy "NO_OVERAGE"
+    And the response body should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

@@ -24,7 +24,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Developer retrieves a license for their account
@@ -35,7 +35,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Sales retrieves a license for their account
@@ -46,7 +46,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Support retrieves a license for their account
@@ -57,7 +57,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Read-only retrieves a license for their account
@@ -68,7 +68,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a license for their account with a valid accept header
@@ -82,7 +82,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain the following raw headers:
       """
       Content-Type: application/json
@@ -100,7 +100,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain the following raw headers:
       """
       Content-Type: application/vnd.api+json
@@ -122,7 +122,7 @@ Feature: Show license
       """
       Content-Type: application/vnd.api+json
       """
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a license for their account with an unsupported accept header
@@ -157,9 +157,9 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "user": {
@@ -180,9 +180,9 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "user": {
@@ -203,7 +203,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/a-license-key"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Admin retrieves a license for their account by UUID key that matches another account license by ID
     Given I am an admin of account "test1"
@@ -226,8 +226,8 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/977f1752-d6a9-4669-a6af-b039154ec40f"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the id "a9ad138d-a603-4309-85d0-764585bba99b"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the id "a9ad138d-a603-4309-85d0-764585bba99b"
+    And the response body should be a "license" with the following attributes:
       """
       {
         "key": "977f1752-d6a9-4669-a6af-b039154ec40f"
@@ -255,8 +255,8 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/977f1752-d6a9-4669-a6af-b039154ec40f"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the id "977f1752-d6a9-4669-a6af-b039154ec40f"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the id "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the response body should be a "license" with the following attributes:
       """
       {
         "key": "a9ad138d-a603-4309-85d0-764585bba99b"
@@ -286,7 +286,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" without a "key" attribute
+    And the response body should be a "license" without a "key" attribute
 
   Scenario: Admin attempts to retrieve a legacy encrypted license for their account by key
     Given I am an admin of account "test1"
@@ -376,7 +376,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -395,7 +395,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "INACTIVE" }
       """
@@ -414,7 +414,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -433,7 +433,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "INACTIVE" }
       """
@@ -452,7 +452,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -471,7 +471,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "INACTIVE" }
       """
@@ -490,7 +490,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "ACTIVE" }
       """
@@ -509,7 +509,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "INACTIVE" }
       """
@@ -525,7 +525,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "EXPIRED" }
       """
@@ -541,7 +541,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "EXPIRING" }
       """
@@ -557,7 +557,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the following attributes:
+    And the response body should be a "license" with the following attributes:
       """
       { "status": "SUSPENDED" }
       """
@@ -589,7 +589,7 @@ Feature: Show license
       """
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   @ee
   Scenario: Environment retrieves a license (shared)
@@ -604,7 +604,7 @@ Feature: Show license
       """
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   @ee
   Scenario: Environment retrieves a license (global)
@@ -619,7 +619,7 @@ Feature: Show license
       """
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
@@ -630,7 +630,7 @@ Feature: Show license
     And the current product has 1 "license"
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: Product attempts to retrieve a license for another product
     Given the current account is "test1"
@@ -648,7 +648,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License retrieves their license
     Given the current account is "test1"
@@ -682,7 +682,7 @@ Feature: Show license
     And I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "license" with the following relationships:
+    And the response body should be a "license" with the following relationships:
       """
       {
         "machines": {
@@ -699,7 +699,7 @@ Feature: Show license
   #   And I use an authentication token
   #   When I send a GET request to "/accounts/test1/licenses/[invalid-url]"
   #   Then the response status should be "400"
-  #   And the JSON response should be an array of 1 error
+  #   And the response body should be an array of 1 error
   #   And the first error should have the following properties:
   #     """
   #     {

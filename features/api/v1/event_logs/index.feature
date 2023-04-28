@@ -37,7 +37,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "event-logs"
+    And the response body should be an array with 3 "event-logs"
 
   Scenario: Admin retrieves a list of logs that is automatically limited
     Given I am an admin of account "ent"
@@ -50,7 +50,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "event-logs"
+    And the response body should be an array with 10 "event-logs"
 
   Scenario: Admin retrieves a list of logs with a limit
     Given I am an admin of account "ent"
@@ -63,7 +63,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=75"
     Then the response status should be "200"
-    And the JSON response should be an array with 75 "event-logs"
+    And the response body should be an array with 75 "event-logs"
 
   Scenario: Admin retrieves an unsupported paginated list of logs
     Given I am an admin of account "ent"
@@ -72,8 +72,8 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "event-logs"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "event-logs"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/ent/event-logs?page[number]=2&page[size]=5",
@@ -89,7 +89,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "event-logs"
+    And the response body should be an array with 20 "event-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's empty
     Given I am an admin of account "ent"
@@ -98,7 +98,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?date[start]=2017-1-2&date[end]=2017-01-03"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "event-logs"
+    And the response body should be an array with 0 "event-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's too far
     Given I am an admin of account "ent"
@@ -140,7 +140,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?whodunnit[type]=license&whodunnit[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "event-logs"
+    And the response body should be an array with 3 "event-logs"
 
   Scenario: Admin retrieves a list of logs filtered by resource
     Given I am an admin of account "ent"
@@ -167,7 +167,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?resource[type]=license&resource[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "event-logs"
+    And the response body should be an array with 6 "event-logs"
 
   Scenario: Admin retrieves a list of logs filtered by event
     Given I am an admin of account "ent"
@@ -195,7 +195,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?event=test.license.validation.failed"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "event-logs"
+    And the response body should be an array with 2 "event-logs"
 
   Scenario: Admin retrieves a list of logs filtered by request
     Given I am an admin of account "ent"
@@ -226,7 +226,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs?request=97708dc6-9dd2-4de1-84be-24f50287296c"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "event-log"
+    And the response body should be an array with 1 "event-log"
 
   Scenario: Admin attempts to retrieve all logs for another account
     Given I am an admin of account "standard"
@@ -234,7 +234,7 @@ Feature: List event logs
     And I use an authentication token
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Environment retrieves all logs for their environment (in isolated environment)
     Given the current account is "ent"
@@ -251,8 +251,8 @@ Feature: List event logs
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "200"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "event-logs"
-    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+    And the response body should be an array with 3 "event-logs"
+    And the response body should be an array of 3 "event-logs" with the following relationships:
       """
       {
         "environment": {
@@ -280,8 +280,8 @@ Feature: List event logs
       """
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "event-logs"
-    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+    And the response body should be an array with 6 "event-logs"
+    And the response body should be an array of 3 "event-logs" with the following relationships:
       """
       {
         "environment": {
@@ -290,7 +290,7 @@ Feature: List event logs
         }
       }
       """
-    And the JSON response should be an array of 3 "event-logs" with the following relationships:
+    And the response body should be an array of 3 "event-logs" with the following relationships:
       """
       {
         "environment": {
@@ -312,7 +312,7 @@ Feature: List event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: License attempts to retrieve all logs for their account
     Given the current account is "ent"
@@ -322,7 +322,7 @@ Feature: List event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all logs for their account
     Given the current account is "ent"
@@ -332,4 +332,4 @@ Feature: List event logs
     And the current account has 3 "event-logs"
     When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

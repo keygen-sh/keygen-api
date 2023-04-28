@@ -26,7 +26,7 @@ Feature: Show release platform
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   Scenario: Developer retrieves a platform for their account
     Given the current account is "test1"
@@ -110,7 +110,7 @@ Feature: Show release platform
       """
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   @ee
   Scenario: Environment retrieves a platform (shared)
@@ -125,7 +125,7 @@ Feature: Show release platform
       """
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   Scenario: Product retrieves a platform for their product
     Given the current account is "test1"
@@ -137,7 +137,7 @@ Feature: Show release platform
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "200"
-    And the JSON response should be a "platform"
+    And the response body should be a "platform"
 
   Scenario: Product retrieves a platform for another product
     Given the current account is "test1"
@@ -210,7 +210,7 @@ Feature: Show release platform
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to retrieves a platform for an account (LICENSED distribution strategy)
    Given the current account is "test1"

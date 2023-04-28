@@ -24,7 +24,7 @@ Feature: Machine product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -40,7 +40,7 @@ Feature: Machine product relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Shared environment retrieves the product for a shared machine
@@ -51,7 +51,7 @@ Feature: Machine product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/product?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Shared environment retrieves the product for a global machine
@@ -66,7 +66,7 @@ Feature: Machine product relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a machine
     Given the current account is "test1"
@@ -77,7 +77,7 @@ Feature: Machine product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a machine of another product
     Given the current account is "test1"

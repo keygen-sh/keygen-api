@@ -8,7 +8,7 @@ Feature: List plans
     Given there exists 3 "plans"
     When I send a GET request to "/plans"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "plans"
+    And the response body should be an array with 3 "plans"
 
   Scenario: Admin retrieves all plans
     Given there exists 1 "account"
@@ -17,7 +17,7 @@ Feature: List plans
     And I use an authentication token
     When I send a GET request to "/plans"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "plans"
+    And the response body should be an array with 6 "plans"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous should not be able to see private plans
@@ -28,13 +28,13 @@ Feature: List plans
       """
     When I send a GET request to "/plans"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "plans"
+    And the response body should be an array with 2 "plans"
 
   Scenario: Anonymous retrieves a paginated list of plans
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "plans"
+    And the response body should be an array with 5 "plans"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves a paginated list of plans with a page size that is too high
@@ -59,21 +59,21 @@ Feature: List plans
     Given there exists 20 "plans"
     When I send a GET request to "/plans"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "plans"
+    And the response body should be an array with 10 "plans"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves all plans with a low limit for their account
     Given there exists 10 "plans"
     When I send a GET request to "/plans?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "plans"
+    And the response body should be an array with 5 "plans"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves all plans with a high limit for their account
     Given there exists 20 "plans"
     When I send a GET request to "/plans?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "plans"
+    And the response body should be an array with 20 "plans"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous retrieves all plans with a limit that is too high

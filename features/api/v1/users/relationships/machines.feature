@@ -40,7 +40,7 @@ Feature: User machines relationship
     When I send a GET request to "/accounts/test1/users/$1/machines"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   @ee
   Scenario: Environment retrieves the machines for an isolated user
@@ -52,7 +52,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Product retrieves the machines for a user
     Given the current account is "test1"
@@ -77,7 +77,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin retrieves a machine for a user
     Given I am an admin of account "test1"
@@ -102,7 +102,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves a machine for a user
     Given the current account is "test1"
@@ -127,7 +127,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines/$0"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
 
   Scenario: Product retrieves the machines of a user from another product
     Given the current account is "test1"
@@ -152,7 +152,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines"
     Then the response status should be "200"
-    And the JSON response should be an empty array
+    And the response body should be an empty array
 
   Scenario: License attempts to retrieve the machines for another user
     Given the current account is "test1"
@@ -201,7 +201,7 @@ Feature: User machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "machines"
+    And the response body should be an array with 3 "machines"
 
   Scenario: Admin attempts to retrieve the machines for a user of another account
     Given I am an admin of account "test2"

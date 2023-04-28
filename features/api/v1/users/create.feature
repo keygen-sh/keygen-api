@@ -45,8 +45,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the firstName "Clark"
-    And the JSON response should be a "user" with the role "user"
+    And the response body should be a "user" with the firstName "Clark"
+    And the response body should be a "user" with the role "user"
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
@@ -76,7 +76,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -111,8 +111,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the firstName ""
-    And the JSON response should be a "user" with the lastName ""
+    And the response body should be a "user" with the firstName ""
+    And the response body should be a "user" with the lastName ""
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
@@ -137,8 +137,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with a nil firstName
-    And the JSON response should be a "user" with a nil lastName
+    And the response body should be a "user" with a nil firstName
+    And the response body should be a "user" with a nil lastName
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
@@ -249,7 +249,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "environment": {
@@ -298,7 +298,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -340,7 +340,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -383,7 +383,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "environment": {
@@ -432,7 +432,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -474,7 +474,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -506,7 +506,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the following relationships:
       """
       {
         "environment": {
@@ -550,7 +550,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -588,7 +588,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -625,7 +625,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -666,7 +666,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -707,7 +707,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -748,7 +748,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -790,7 +790,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -831,8 +831,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the email "group@keygen.example"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the email "group@keygen.example"
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -874,8 +874,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the email "group@keygen.example"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the email "group@keygen.example"
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -917,8 +917,8 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the email "group@keygen.example"
-    And the JSON response should be a "user" with the following relationships:
+    And the response body should be a "user" with the email "group@keygen.example"
+    And the response body should be a "user" with the following relationships:
       """
       {
         "group": {
@@ -1063,7 +1063,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       { "email": "invite@keygen.example" }
       """
@@ -1094,9 +1094,9 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with a nil firstName
-    And the JSON response should be a "user" with a nil lastName
-    And the JSON response should be a "user" with the role "user"
+    And the response body should be a "user" with a nil firstName
+    And the response body should be a "user" with a nil lastName
+    And the response body should be a "user" with the role "user"
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
@@ -1126,7 +1126,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -1147,7 +1147,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to create a user with invalid parameter types
     Given the current account is "test1"
@@ -1167,7 +1167,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to create a user with an invalid email
     Given the current account is "test1"
@@ -1187,7 +1187,7 @@ Feature: Create user
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1230,7 +1230,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "user"
+    And the response body should be a "user" with the role "user"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1359,7 +1359,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "admin"
+    And the response body should be a "user" with the role "admin"
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1392,7 +1392,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "admin"
+    And the response body should be a "user" with the role "admin"
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1425,7 +1425,7 @@ Feature: Create user
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1461,7 +1461,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "developer"
+    And the response body should be a "user" with the role "developer"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1493,7 +1493,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "sales-agent"
+    And the response body should be a "user" with the role "sales-agent"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1525,7 +1525,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "support-agent"
+    And the response body should be a "user" with the role "support-agent"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1555,7 +1555,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1643,7 +1643,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1681,7 +1681,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1719,7 +1719,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1757,7 +1757,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": ["policy.create", "product.create"]
@@ -1822,7 +1822,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the role "user"
+    And the response body should be a "user" with the role "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1914,7 +1914,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1952,7 +1952,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -1990,7 +1990,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2029,7 +2029,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And the current account should have 1 "user"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": [
@@ -2067,7 +2067,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2104,7 +2104,7 @@ Feature: Create user
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2148,7 +2148,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2185,7 +2185,7 @@ Feature: Create user
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2227,7 +2227,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 errors
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
@@ -2263,7 +2263,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And the current account should have 1 "user"
-    And the JSON response should be a "user" with the following attributes:
+    And the response body should be a "user" with the following attributes:
       """
       {
         "permissions": []
@@ -2347,7 +2347,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2381,7 +2381,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2415,7 +2415,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2449,7 +2449,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2483,7 +2483,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2517,7 +2517,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2551,7 +2551,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2585,7 +2585,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2619,7 +2619,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2653,7 +2653,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2684,7 +2684,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2714,7 +2714,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2746,7 +2746,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2778,7 +2778,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2808,7 +2808,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2839,7 +2839,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2870,9 +2870,9 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the firstName "foo"
-    And the JSON response should be a "user" with a nil lastName
-    And the JSON response should be a "user" with the role "user"
+    And the response body should be a "user" with the firstName "foo"
+    And the response body should be a "user" with a nil lastName
+    And the response body should be a "user" with the role "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
     And sidekiq should have 1 "request-log" jobs
@@ -2893,7 +2893,7 @@ Feature: Create user
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2923,7 +2923,7 @@ Feature: Create user
       }=
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {

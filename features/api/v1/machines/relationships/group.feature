@@ -29,7 +29,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves the group for a machine (by fingerprint)
@@ -47,7 +47,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/7bb42565fb4e555fe3bf902dd3f1e5c3/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -64,7 +64,7 @@ Feature: Machine group relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   @ee
   Scenario: Shared environment retrieves the group for a shared machine
@@ -76,7 +76,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   @ee
   Scenario: Shared environment retrieves the group for a global machine
@@ -92,7 +92,7 @@ Feature: Machine group relationship
       """
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a machine
     Given the current account is "test1"
@@ -120,7 +120,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Product retrieves the group for a machine of another product
     Given the current account is "test1"
@@ -170,7 +170,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User attempts to retrieve the group for a machine they own (in group)
     Given the current account is "test1"
@@ -184,7 +184,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: User attempts to retrieve the group for a machine they don't own
     Given the current account is "test1"
@@ -228,7 +228,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: License attempts to retrieve the group for their license (in group)
     Given the current account is "test1"
@@ -241,7 +241,7 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "group"
+    And the response body should be a "group"
 
   Scenario: Admin attempts to retrieve the group for a machine of another account
     Given the current account is "test1"
@@ -268,7 +268,7 @@ Feature: Machine group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -302,7 +302,7 @@ Feature: Machine group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -331,7 +331,7 @@ Feature: Machine group relationship
       { "data": null }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {
@@ -442,7 +442,7 @@ Feature: Machine group relationship
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine" with the following relationships:
+    And the response body should be a "machine" with the following relationships:
       """
       {
         "group": {

@@ -24,7 +24,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Developer retrieves an environment for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Sales retrieves an environment for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Support retrieves an environment for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Read-only retrieves an environment for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Admin retrieves an invalid environment for their account
     Given I am an admin of account "test1"
@@ -88,7 +88,7 @@ Feature: Show environment
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Environment retrieves an environment
     Given the current account is "test1"

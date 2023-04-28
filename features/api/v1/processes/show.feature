@@ -25,9 +25,9 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-10-16T14:52:48.000Z",
@@ -50,9 +50,9 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "lastHeartbeat": "2022-04-14T14:52:48.000Z",
@@ -122,7 +122,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   @ee
   Scenario: Environment retrieves a shared process
@@ -133,7 +133,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   @ee
   Scenario: Environment retrieves a global process
@@ -144,7 +144,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: Product retrieves a process for their product
     Given the current account is "test1"
@@ -157,7 +157,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: Product attempts to retrieve a process for another product
     Given the current account is "test1"
@@ -178,7 +178,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: User retrieves a process for a license they don't own
     Given the current account is "test1"
@@ -198,7 +198,7 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "200"
-    And the JSON response should be a "process"
+    And the response body should be a "process"
 
   Scenario: License retrieves a process for another license
     Given the current account is "test1"
@@ -216,4 +216,4 @@ Feature: Show machine process
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

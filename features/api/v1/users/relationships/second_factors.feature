@@ -25,7 +25,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factor"
+    And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -38,7 +38,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factor"
+    And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -51,7 +51,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "second-factors"
+    And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -65,7 +65,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factor"
+    And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -79,7 +79,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factor"
+    And the response body should be an array with 1 "second-factor"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -93,7 +93,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "second-factors"
+    And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -107,7 +107,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factors"
+    And the response body should be an array with 1 "second-factors"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -121,7 +121,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "second-factors"
+    And the response body should be an array with 1 "second-factors"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -135,7 +135,7 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "second-factors"
+    And the response body should be an array with 0 "second-factors"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -227,11 +227,11 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors/$0"
     Then the response status should be "200"
-    And the JSON response should be a "second-factor" with the following attributes:
+    And the response body should be a "second-factor" with the following attributes:
       """
       { "enabled": false }
       """
-    And the JSON response should be a "second-factor" with a uri
+    And the response body should be a "second-factor" with a uri
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -244,11 +244,11 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors/$0"
     Then the response status should be "200"
-    And the JSON response should be a "second-factor" with the following attributes:
+    And the response body should be a "second-factor" with the following attributes:
       """
       { "enabled": true }
       """
-    And the JSON response should be a "second-factor" without a "uri" attribute
+    And the response body should be a "second-factor" without a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -262,11 +262,11 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
     Then the response status should be "200"
-    And the JSON response should be a "second-factor" with the following attributes:
+    And the response body should be a "second-factor" with the following attributes:
       """
       { "enabled": false }
       """
-    And the JSON response should be a "second-factor" with a uri
+    And the response body should be a "second-factor" with a uri
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -280,11 +280,11 @@ Feature: Manage second factors for user
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
     Then the response status should be "200"
-    And the JSON response should be a "second-factor" with the following attributes:
+    And the response body should be a "second-factor" with the following attributes:
       """
       { "enabled": true }
       """
-    And the JSON response should be a "second-factor" without a "uri" attribute
+    And the response body should be a "second-factor" without a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

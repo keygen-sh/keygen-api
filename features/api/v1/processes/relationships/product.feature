@@ -24,7 +24,7 @@ Feature: Process product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
     And the response should contain a valid signature header for "test1"
 
   @ee
@@ -40,7 +40,7 @@ Feature: Process product relationship
       """
     When I send a GET request to "/accounts/test1/processes/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Shared environment retrieves the product for a shared process
@@ -51,7 +51,7 @@ Feature: Process product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   @ee
   Scenario: Shared environment retrieves the product for a global process
@@ -66,7 +66,7 @@ Feature: Process product relationship
       """
     When I send a GET request to "/accounts/test1/processes/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a process
     Given the current account is "test1"
@@ -80,7 +80,7 @@ Feature: Process product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: Product retrieves the product for a process of different product
     Given the current account is "test1"
@@ -117,7 +117,7 @@ Feature: Process product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: User attempts to retrieve the product for a process they own (no permission)
     Given the current account is "test1"
@@ -166,7 +166,7 @@ Feature: Process product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$1/product"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: License attempts to retrieves the product of a process (no permission)
     Given the current account is "test1"

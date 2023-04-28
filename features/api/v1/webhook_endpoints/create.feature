@@ -32,9 +32,9 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
       """
@@ -62,8 +62,8 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       [
         "license.created",
@@ -119,8 +119,8 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com/?token=xxx"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the url "https://example.com/?token=xxx"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account with an RSA-PKCS1-PSS signature algorithm
@@ -140,8 +140,8 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "rsa-pss-sha256"
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "rsa-pss-sha256"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account with an RSA-PKCS1 signature algorithm
@@ -161,8 +161,8 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com/"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "rsa-sha256"
+    And the response body should be a "webhook-endpoint" with the url "https://example.com/"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "rsa-sha256"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account with an invalid signature algorithm
@@ -328,8 +328,8 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
       """
@@ -518,9 +518,9 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://isolated.example"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://isolated.example"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
       """
@@ -553,9 +553,9 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://shared.example"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://shared.example"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
       """
@@ -578,9 +578,9 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhook-endpoint" with the url "https://app.example"
-    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
-    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+    And the response body should be a "webhook-endpoint" with the url "https://app.example"
+    And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
       """

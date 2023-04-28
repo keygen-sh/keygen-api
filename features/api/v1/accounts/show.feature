@@ -18,8 +18,8 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "account"
-    And the JSON response should be an "account" with the following meta:
+    And the response body should be an "account"
+    And the response body should be an "account" with the following meta:
       """
       {
         "publicKey": "$~accounts[0].public_key",
@@ -146,7 +146,7 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/test1"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: License attempts to retrieve an account (default permission)

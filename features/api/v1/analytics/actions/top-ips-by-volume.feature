@@ -48,7 +48,7 @@ Feature: Analytics of top IPs by volume
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
     Then the response status should be "200"
-    And the JSON response should contain meta with the following:
+    And the response body should contain meta with the following:
       """
       [
         {
@@ -79,7 +79,7 @@ Feature: Analytics of top IPs by volume
       """
     When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to retrieve analytic counts for their account
@@ -89,7 +89,7 @@ Feature: Analytics of top IPs by volume
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: User attempts to retrieve analytics for their account
@@ -99,5 +99,5 @@ Feature: Analytics of top IPs by volume
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/top-ips-by-volume"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And sidekiq should have 0 "request-log" jobs

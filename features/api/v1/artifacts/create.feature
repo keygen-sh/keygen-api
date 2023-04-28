@@ -47,7 +47,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "latest-mac.yml",
@@ -111,7 +111,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "dev.yml",
@@ -122,7 +122,7 @@ Feature: Create artifact
         "status": "WAITING"
       }
       """
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -179,7 +179,7 @@ Feature: Create artifact
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "latest-mac.yml",
@@ -234,7 +234,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -281,7 +281,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "Product-1.0.0.AppImage" }
       """
@@ -315,7 +315,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -361,7 +361,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filetype": "appimage" }
       """
@@ -397,7 +397,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filetype": null }
       """
@@ -433,7 +433,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filetype": null }
       """
@@ -470,7 +470,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filesize": null }
       """
@@ -506,7 +506,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -552,7 +552,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "platform": "macos" }
       """
@@ -589,7 +589,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "platform": null }
       """
@@ -626,7 +626,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "platform": null }
       """
@@ -664,7 +664,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "arch": "m1" }
       """
@@ -702,7 +702,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "arch": null }
       """
@@ -740,7 +740,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "arch": null }
       """
@@ -776,7 +776,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw" }
       """
@@ -812,7 +812,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": null }
       """
@@ -848,7 +848,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "signature": "" }
       """
@@ -884,7 +884,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA" }
       """
@@ -920,7 +920,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": null }
       """
@@ -956,7 +956,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "checksum": "" }
       """
@@ -992,7 +992,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": { "foo": "bar" } }
       """
@@ -1028,7 +1028,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": {} }
       """
@@ -1064,7 +1064,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "metadata": {} }
       """
@@ -1108,7 +1108,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1165,7 +1165,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "App-Setup-1-0-0.exe",
@@ -1176,7 +1176,7 @@ Feature: Create artifact
         "status": "WAITING"
       }
       """
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -1236,7 +1236,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1287,7 +1287,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1336,7 +1336,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "App-Setup-1-0-0.exe",
@@ -1347,7 +1347,7 @@ Feature: Create artifact
         "status": "WAITING"
       }
       """
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "environment": {
@@ -1407,7 +1407,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1458,7 +1458,7 @@ Feature: Create artifact
       }
       """
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -1541,7 +1541,7 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       {
         "filename": "App-Setup-1-0-0.exe",

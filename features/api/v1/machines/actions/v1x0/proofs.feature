@@ -25,8 +25,8 @@ Feature: Machine proof actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "account": {
@@ -74,8 +74,8 @@ Feature: Machine proof actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "fingerprint": "$machines[0].fingerprint",
@@ -100,8 +100,8 @@ Feature: Machine proof actions
       """
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "account": {
@@ -158,8 +158,8 @@ Feature: Machine proof actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "fingerprint": "$machines[0].fingerprint",
@@ -184,8 +184,8 @@ Feature: Machine proof actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "account": {
@@ -237,8 +237,8 @@ Feature: Machine proof actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "machine"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be a "machine"
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "fingerprint": "$machines[0].fingerprint",
@@ -297,9 +297,9 @@ Feature: Machine proof actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
     Then the response status should be "200"
-    And the JSON response should be a "machine"
+    And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be meta that contains a valid activation proof of the following dataset:
+    And the response body should be meta that contains a valid activation proof of the following dataset:
       """
       {
         "account": {

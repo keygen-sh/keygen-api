@@ -39,7 +39,7 @@ Feature: Update machine process
       """
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       {
         "metadata": {
@@ -183,7 +183,7 @@ Feature: Update machine process
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       { "metadata": { "name": "Isolated Process" } }
       """
@@ -220,7 +220,7 @@ Feature: Update machine process
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "process" with the following attributes:
+    And the response body should be a "process" with the following attributes:
       """
       { "metadata": { "name": "Shared Process" } }
       """

@@ -23,8 +23,8 @@ Feature: Display who the current API token bearer is
     And I use an authentication token
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
-    And the JSON response should be a "user"
-    And the JSON response should contain an included "token" with the following relationships:
+    And the response body should be a "user"
+    And the response body should contain an included "token" with the following relationships:
       """
       {
         "bearer": {
@@ -45,7 +45,7 @@ Feature: Display who the current API token bearer is
     And I use an authentication token
     When I send a GET request to "/accounts/test1/me?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "environment"
+    And the response body should be a "environment"
 
   Scenario: Product requests their profile
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: Display who the current API token bearer is
     And I use an authentication token
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
-    And the JSON response should be a "product"
+    And the response body should be a "product"
 
   Scenario: User requests their profile
     Given the current account is "test1"
@@ -63,7 +63,7 @@ Feature: Display who the current API token bearer is
     And I use an authentication token
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the response body should be a "user"
 
   Scenario: License requests their profile (token)
     Given the current account is "test1"
@@ -77,7 +77,7 @@ Feature: Display who the current API token bearer is
     And I use an authentication token
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: License requests their profile (key)
     Given the current account is "test1"
@@ -91,7 +91,7 @@ Feature: Display who the current API token bearer is
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
-    And the JSON response should be a "license"
+    And the response body should be a "license"
 
   Scenario: License requests their profile (invalid key)
     Given the current account is "test1"

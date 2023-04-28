@@ -43,11 +43,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "2.0.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -135,11 +135,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/c8b55f91-e66f-4093-ae4d-7f3d390eae8d/upgrade?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "4.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -189,11 +189,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -251,11 +251,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -342,7 +342,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -405,7 +405,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -498,7 +498,7 @@ Feature: Upgrade release
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -638,11 +638,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.2.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -702,11 +702,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1-alpha.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -808,7 +808,7 @@ Feature: Upgrade release
       """
     When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -856,11 +856,11 @@ Feature: Upgrade release
       """
     When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.1.0",
@@ -904,11 +904,11 @@ Feature: Upgrade release
       """
     When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.1.0",
@@ -952,11 +952,11 @@ Feature: Upgrade release
       """
     When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.1.0",
@@ -1003,11 +1003,11 @@ Feature: Upgrade release
       { "Keygen-Environment": "isolated" }
       """
     When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1043,11 +1043,11 @@ Feature: Upgrade release
       """
     When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.1.0",
@@ -1097,7 +1097,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0-alpha.1/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -1111,11 +1111,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -1158,7 +1158,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/app@1.0.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -1172,14 +1172,14 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       {
         "tag": "app@2.0.0",
         "version": "2.0.0"
       }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1209,11 +1209,11 @@ Feature: Upgrade release
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$1/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "2.0.0-beta.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1-beta.1",
@@ -1323,11 +1323,11 @@ Feature: Upgrade release
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.2.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1388,11 +1388,11 @@ Feature: Upgrade release
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-alpha.1",
@@ -1486,11 +1486,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1548,11 +1548,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$1/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.1",
@@ -1580,11 +1580,11 @@ Feature: Upgrade release
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -1606,11 +1606,11 @@ Feature: Upgrade release
       | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1689,11 +1689,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.2",
@@ -1724,11 +1724,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1787,11 +1787,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1834,11 +1834,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1877,11 +1877,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade?channel=beta"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.7.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -1919,11 +1919,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$3/upgrade?channel=rc"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.7.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.3",
@@ -1961,11 +1961,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$14/upgrade?channel=beta"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.8.0-beta.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.8.0-alpha.2",
@@ -2000,11 +2000,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/upgrade?channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "2.0.0-alpha.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -2070,11 +2070,11 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$10/upgrade?constraint=1.0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.7.0" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.5.0",
@@ -2110,7 +2110,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$10/upgrade?constraint=A"
     Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
@@ -2138,7 +2138,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -2152,11 +2152,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -2180,7 +2180,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -2194,11 +2194,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -2224,7 +2224,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -2238,11 +2238,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0",
@@ -2289,7 +2289,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0%2Bp1/upgrade?constraint=1%2Bp1"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -2303,11 +2303,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.1+p1" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0+p1",
@@ -2338,7 +2338,7 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0-beta.1/upgrade?constraint=1-beta"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the following relationships:
+    And the response body should be a "release" with the following relationships:
       """
       {
         "product": {
@@ -2352,11 +2352,11 @@ Feature: Upgrade release
         }
       }
       """
-    And the JSON response should be a "release" with the following attributes:
+    And the response body should be a "release" with the following attributes:
       """
       { "version": "1.0.0-beta.3" }
       """
-    And the JSON response should contain meta which includes the following:
+    And the response body should contain meta which includes the following:
       """
       {
         "current": "1.0.0-beta.1",

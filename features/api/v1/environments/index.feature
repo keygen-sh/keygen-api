@@ -24,7 +24,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "environments"
+    And the response body should be an array with 3 "environments"
 
   Scenario: Developer retrieves all environments for their account
     Given the current account is "test1"
@@ -34,7 +34,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "environments"
+    And the response body should be an array with 2 "environments"
 
   Scenario: Sales retrieves all environments for their account
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "environments"
+    And the response body should be an array with 2 "environments"
 
   Scenario: Support retrieves all environments for their account
     Given the current account is "test1"
@@ -54,7 +54,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "environments"
+    And the response body should be an array with 5 "environments"
 
   Scenario: Read-only retrieves all environments for their account
     Given the current account is "test1"
@@ -64,7 +64,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "environments"
+    And the response body should be an array with 5 "environments"
 
   Scenario: Admin retrieves a paginated list of environments
     Given I am an admin of account "test1"
@@ -73,8 +73,8 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments?page[number]=1&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "environments"
-    And the JSON response should contain the following links:
+    And the response body should be an array with 5 "environments"
+    And the response body should contain the following links:
       """
       {
         "self": "/v1/accounts/test1/environments?page[number]=1&page[size]=5",
@@ -118,7 +118,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "environments"
+    And the response body should be an array with 10 "environments"
 
   Scenario: Admin retrieves all environments with a low limit for their account
     Given I am an admin of account "test1"
@@ -127,7 +127,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "environments"
+    And the response body should be an array with 5 "environments"
 
   Scenario: Admin retrieves all environments with a high limit for their account
     Given I am an admin of account "test1"
@@ -136,7 +136,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments?limit=10"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "environments"
+    And the response body should be an array with 10 "environments"
 
   Scenario: Admin retrieves all environments with a limit that is too high
     Given I am an admin of account "test1"
@@ -160,7 +160,7 @@ Feature: List environments
     And I use an authentication token
     When I send a GET request to "/accounts/test1/environments"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Environment attempts to retrieve all environments
     Given the current account is "test1"

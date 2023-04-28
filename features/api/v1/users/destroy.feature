@@ -88,7 +88,7 @@ Feature: Delete user
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$3"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "users"
 
   @ee
@@ -129,7 +129,7 @@ Feature: Delete user
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -144,7 +144,7 @@ Feature: Delete user
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$2"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -158,7 +158,7 @@ Feature: Delete user
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -172,7 +172,7 @@ Feature: Delete user
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$3"
     Then the response status should be "404"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

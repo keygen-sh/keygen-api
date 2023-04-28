@@ -24,7 +24,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "webhook-endpoints"
+    And the response body should be an array with 3 "webhook-endpoints"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a paginated list of webhook endpoints
@@ -34,7 +34,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints?page[number]=2&page[size]=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "webhook-endpoints"
+    And the response body should be an array with 5 "webhook-endpoints"
 
   Scenario: Admin retrieves a paginated list of webhook endpoints with a page size that is too high
     Given I am an admin of account "test1"
@@ -67,7 +67,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "200"
-    And the JSON response should be an array with 10 "webhook-endpoints"
+    And the response body should be an array with 10 "webhook-endpoints"
 
   Scenario: Admin retrieves all webhook endpoints with a low limit for their account
     Given I am an admin of account "test1"
@@ -76,7 +76,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints?limit=5"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "webhook-endpoints"
+    And the response body should be an array with 5 "webhook-endpoints"
 
   Scenario: Admin retrieves all webhook endpoints with a high limit for their account
     Given I am an admin of account "test1"
@@ -85,7 +85,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints?limit=20"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "webhook-endpoints"
+    And the response body should be an array with 20 "webhook-endpoints"
 
   Scenario: Admin retrieves all webhook endpoints with a limit that is too high
     Given I am an admin of account "test1"
@@ -109,7 +109,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   @ee
   Scenario: Environment attempts to retrieve all isolated webhook endpoints for their account
@@ -122,7 +122,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints?environment=isolated"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "webhook-endpoints"
+    And the response body should be an array with 3 "webhook-endpoints"
 
   @ee
   Scenario: Environment attempts to retrieve all shared webhook endpoints for their account
@@ -135,7 +135,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints?environment=shared"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "webhook-endpoints"
+    And the response body should be an array with 6 "webhook-endpoints"
 
   Scenario: Product attempts to retrieve all webhook endpoints for their account
     Given the current account is "test1"
@@ -145,7 +145,7 @@ Feature: List webhook endpoints
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "webhook-endpoints"
+    And the response body should be an array with 0 "webhook-endpoints"
 
   Scenario: License attempts to retrieve all webhook endpoints for their account
     Given the current account is "test1"
@@ -155,7 +155,7 @@ Feature: List webhook endpoints
     And the current account has 3 "webhook-endpoints"
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all webhook endpoints for their account
     Given the current account is "test1"
@@ -165,11 +165,11 @@ Feature: List webhook endpoints
     And the current account has 3 "webhook-endpoints"
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   Scenario: Anonymous attempts to retrieve all webhook endpoints for an account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error

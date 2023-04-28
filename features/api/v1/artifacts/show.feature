@@ -27,7 +27,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -45,7 +45,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -63,7 +63,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -180,7 +180,7 @@ Feature: Show release artifact
       """
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   @ee
   Scenario: Environment retrieves an isolated artifact (via environment param)
@@ -191,7 +191,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0?environment=isolated"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   @ee
   Scenario: Environment retrieves a shared artifact (via environment header)
@@ -206,7 +206,7 @@ Feature: Show release artifact
       """
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   @ee
   Scenario: Environment retrieves a shared artifact (via environment param)
@@ -217,7 +217,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0?environment=shared"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves an artifact for their product
     Given the current account is "test1"
@@ -229,7 +229,7 @@ Feature: Show release artifact
     And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the response body should be an "artifact"
 
   Scenario: Product retrieves an artifact for another product
     Given the current account is "test1"
@@ -381,7 +381,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -395,7 +395,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -494,7 +494,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml?channel=stable"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -508,7 +508,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -607,7 +607,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml?channel=rc"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -621,7 +621,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -720,7 +720,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml?channel=beta"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -734,7 +734,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -833,7 +833,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml?channel=alpha"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -847,7 +847,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -945,7 +945,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/latest.yml?channel=dev"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -959,7 +959,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "latest.yml" }
       """
@@ -1098,7 +1098,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/stable.yml"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -1112,7 +1112,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "stable.yml" }
       """
@@ -1137,7 +1137,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/stable.yml?product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -1151,7 +1151,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "stable.yml" }
       """
@@ -1172,7 +1172,7 @@ Feature: Show release artifact
       | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
     When I send a GET request to "/accounts/test1/artifacts/stable.yml"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -1186,7 +1186,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "stable.yml" }
       """
@@ -1207,7 +1207,7 @@ Feature: Show release artifact
       | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
     When I send a GET request to "/accounts/test1/artifacts/stable.yml?product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact" with the following relationships:
+    And the response body should be an "artifact" with the following relationships:
       """
       {
         "release": {
@@ -1221,7 +1221,7 @@ Feature: Show release artifact
         }
       }
       """
-    And the JSON response should be an "artifact" with the following attributes:
+    And the response body should be an "artifact" with the following attributes:
       """
       { "filename": "stable.yml" }
       """
@@ -1754,7 +1754,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "401"
-    And the JSON response should be an array of 1 error
+    And the response body should be an array of 1 error
 
   # Draft releases
   Scenario: Anonymous retrieves an artifact for a draft release

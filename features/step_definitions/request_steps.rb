@@ -191,7 +191,7 @@ Then /^the response status should not (?:contain|be) "([^\"]*)"$/ do |status|
   expect(last_response.status).to_not eq status.to_i
 end
 
-Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
@@ -205,7 +205,7 @@ Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"
   end
 end
 
-Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following attributes:$/ do |count, resource, body|
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following attributes:$/ do |count, resource, body|
   body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json  = JSON.parse(last_response.body)
   attrs = JSON.parse(body)
@@ -217,7 +217,7 @@ Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"
   expect(matches.count).to eq count.to_i
 end
 
-Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following relationships:$/ do |count, resource, body|
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following relationships:$/ do |count, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse(last_response.body)
   rels = JSON.parse(body)
@@ -229,25 +229,25 @@ Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"
   expect(matches.count).to eq count.to_i
 end
 
-Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name|
+Then /^the response body should (?:contain|be) an array of "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
 end
 
-Then /^the JSON response should (?:contain|be) an empty array$/ do
+Then /^the response body should (?:contain|be) an empty array$/ do
   json = JSON.parse last_response.body
 
   expect(json["data"].empty?).to be true
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)"$/ do |name|
+Then /^the response body should (?:contain|be) an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
 end
 
-Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
+Then /^the response body should not (?:contain|be) an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   resource = json["data"]
@@ -258,7 +258,7 @@ Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
   end
 end
 
-Then /^the JSON response should contain an included "([^\"]*)"$/ do |name|
+Then /^the response body should contain an included "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
   inlc = json["included"]
   expect(incl).to be_an Array
@@ -267,7 +267,7 @@ Then /^the JSON response should contain an included "([^\"]*)"$/ do |name|
   expect(res).to be true
 end
 
-Then /^the JSON response should contain an included "([^\"]*)" with the following relationships:$/ do |name, body|
+Then /^the response body should contain an included "([^\"]*)" with the following relationships:$/ do |name, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
@@ -282,7 +282,7 @@ Then /^the JSON response should contain an included "([^\"]*)" with the followin
   expect(rels).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -294,7 +294,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+) that is not "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with an? (\w+) that is not "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -306,7 +306,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+) tha
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (?:encrypted|signed|JWT) key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (?:encrypted|signed|JWT) key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
   json = JSON.parse last_response.body
 
   # Double quotes vs single quotes
@@ -410,7 +410,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encoded (\w+) (?:of )?"([^\"]*)" using "([^\"]*)"$/ do |resource, attribute, value, scheme|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encoded (\w+) (?:of )?"([^\"]*)" using "([^\"]*)"$/ do |resource, attribute, value, scheme|
   json = JSON.parse last_response.body
 
   case scheme
@@ -424,7 +424,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
   value = parse_placeholders(value, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
@@ -437,49 +437,49 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+)
   expect(t1).to be_within(3.seconds).of t2
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+)$/ do |resource, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" without an? (\w+)$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with an? (\w+)(?: that is not nil)?$/ do |resource, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with an? (\w+)(?: that is not nil)?$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to_not eq nil
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does|has) (\w+)$/ do |name, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" that (?:is|does|has) (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
   expect(name.pluralize).to eq json["data"]["type"]
 
   expect(json["data"]["attributes"][attribute]).to be true
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does) not (\w+)$/ do |resource, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" that (?:is|does) not (\w+)$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to be false
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? "([^\"]*)" attribute$/ do |resource, attribute|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" without an? "([^\"]*)" attribute$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"].key?(attribute)).to be false
 end
 
-Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |body|
+Then /^the response body should be meta that contains a valid activation proof of the following dataset:/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
@@ -501,7 +501,7 @@ Then /^the JSON response should be meta that contains a valid activation proof o
   expect(ok).to be true
 end
 
-Then /^the JSON response should a "license" that contains a valid "([^\"]*)" key with the following dataset:$/ do |scheme, body|
+Then /^the response body should a "license" that contains a valid "([^\"]*)" key with the following dataset:$/ do |scheme, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
@@ -607,14 +607,14 @@ Then /^the JSON response should a "license" that contains a valid "([^\"]*)" key
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following data:$/ do |resource, body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with the following data:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
@@ -622,7 +622,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   expect(json["data"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following attributes:$/ do |resource, body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with the following attributes:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
@@ -630,7 +630,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   expect(json["data"]["attributes"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following relationships:$/ do |resource, body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with the following relationships:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
@@ -638,7 +638,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   expect(json["data"]["relationships"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
@@ -646,34 +646,34 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   expect(json["data"]["meta"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with no meta$/ do |resource|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with no meta$/ do |resource|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"].key?("meta")).to be false
 end
 
-Then /^the JSON response should (?:contain|be) meta with the following:$/ do |body|
+Then /^the response body should (?:contain|be) meta with the following:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to eq JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) meta which includes the following:$/ do |body|
+Then /^the response body should (?:contain|be) meta which includes the following:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an array of (\d+) errors?$/ do |count|
+Then /^the response body should (?:contain|be) an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
 
   expect(json["errors"].size).to eq count.to_i
 end
 
-Then /^the JSON response should (?:contain|be) an array of errors?$/ do
+Then /^the response body should (?:contain|be) an array of errors?$/ do
   json = JSON.parse last_response.body
 
   expect(json["errors"].size).to be >= 1
@@ -687,7 +687,7 @@ Given /^the (\w+) error should have the following properties:$/ do |named_idx, b
   expect(err).to include JSON.parse(body)
 end
 
-Then /^the JSON response should contain the following links:$/ do |body|
+Then /^the response body should contain the following links:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
@@ -931,7 +931,7 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
   end
 end
 
-Then /^the JSON response should be a "([^"]+)" with a certificate signed using "([^"]+)"$/ do |resource_type, expected_alg|
+Then /^the response body should be a "([^"]+)" with a certificate signed using "([^"]+)"$/ do |resource_type, expected_alg|
   account = @account
   req     = last_request
   res     = last_response
@@ -977,7 +977,7 @@ Then /^the JSON response should be a "([^"]+)" with a certificate signed using "
   expect(ok).to be true
 end
 
-Then /^the JSON response should be a "([^"]+)" with the following encoded certificate data:$/ do |resource_type, body|
+Then /^the response body should be a "([^"]+)" with the following encoded certificate data:$/ do |resource_type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   req  = last_request
@@ -1025,7 +1025,7 @@ Then /^the JSON response should be a "([^"]+)" with the following encoded certif
   end
 end
 
-Then /^the JSON response should be a "([^"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
+Then /^the response body should be a "([^"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = @account
