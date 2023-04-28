@@ -168,6 +168,10 @@ You can fork Keygen and go closed-source.
 
 If the ELv2 license doesn't work for your company, please [reach out][sales].
 
+## Is it any good?
+
+Yes.
+
 [keygen-cloud]: https://keygen.sh
 [self-hosting]: https://keygen.sh/docs/self-hosting/
 [sponsor]: https://github.com/sponsors/ezekg
