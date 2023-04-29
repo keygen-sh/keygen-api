@@ -35,11 +35,11 @@ and getting a great service!
 
 Keygen is a fully open source software licensing and distribution API, and
 we have a free (as in beer) [self-hosted solution][self-hosting]. Keygen Community
-Edition is exactly the same code base as our managed Cloud solution, but with
+Edition is exactly the same code base as our managed solution, Keygen Cloud, but with
 a less frequent release schedule (think of it as an LTS release).
 
-Bug fixes and new features are released to the Cloud version several times
-per week. Features are battle-tested in the Cloud which allows us to fix
+Bug fixes and new features are released to Keygen Cloud several times
+per week. Features are battle-tested in Keygen Cloud which allows us to fix
 any bugs before the general self-hosted release. Every 6 months, we
 combine all the changes into a new self-hosted release.
 
