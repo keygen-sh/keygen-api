@@ -158,7 +158,7 @@ Keygen is licensed under the [Elastic License 2.0 (ELv2)](https://github.com/key
 
 1. You may not alter, remove, or obscure any licensing, copyright, or other notices.
 
-Anything else is fair game. There's no clause that requires you to open source modifications.
+Anything else is fair game. There's no clause that requires you to open source modifications to Keygen or other derivative works.
 
 You can self-host Keygen EE to license your enterprise application.
 
