@@ -85,7 +85,7 @@ to the long-term sustainability of the project.
 
 Keygen CE is a community supported project and there are **no guarantees** that
 you will receive support from the creators of Keygen to troubleshoot your
-self-hosting issues. There is [a community-supported Discord server][discord]
+self-hosting issues. Keygen offers **best-effort** support for Keygen CE. There is [a community-supported Discord server][discord]
 and [a forum][forum] where you can ask for help with self-hosting.
 
 If you do need support guantantees, consider becoming a [Keygen Cloud][keygen-cloud]
