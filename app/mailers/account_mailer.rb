@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AccountMailer < ApplicationMailer
-  default from: "Keygen Support <support@keygen.sh>"
   layout "account_mailer"
 
   def request_limit_exceeded(account:, plan:, request_count:, request_limit:)
