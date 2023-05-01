@@ -62,11 +62,15 @@ namespace :keygen do
           gets
         }
 
-        print 'Choose a primary email: '
-        email = gets
+        email = ENV.fetch('KEYGEN_ADMIN_EMAIL') {
+          print 'Choose a primary email: '
+          gets
+        }
 
-        print 'Choose a password: '
-        password = getp
+        password = ENV.fetch('KEYGEN_ADMIN_PASSWORD') {
+          print 'Choose a password: '
+          getp
+        }
 
         account = Account.create!(
           users_attributes: [{ email:, password: }],
@@ -117,12 +121,20 @@ namespace :keygen do
 
           #{config.reduce(+'') { |s, (k, v)| s << "export #{k}=#{v}\n  " }.strip.chomp}
 
-        In addition, you may want to keep track of the following information:
+      MSG
 
-          Account ID: #{account.id}
-          Account slug: #{account.slug}
-          Admin email: #{account.email}
+      if mode == 'singleplayer'
+        puts <<~MSG
+          In addition, you may want to keep track of the following information:
 
+            Account ID: #{account.id}
+            Account slug: #{account.slug}
+            Admin email: #{account.email}
+
+        MSG
+      end
+
+      puts <<~MSG
         Then run the following to start the server:
 
           rails s
