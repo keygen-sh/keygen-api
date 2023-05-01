@@ -108,6 +108,12 @@ rails db:setup
 rails db:seed
 ```
 
+To seed the database with sample data, run:
+
+```bash
+rails db:seed:development
+```
+
 To setup Keygen, run:
 
 ```bash

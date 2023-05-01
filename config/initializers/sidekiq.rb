@@ -68,5 +68,4 @@ SidekiqUniqueJobs.configure do |config|
 end
 
 # Enable strict args for development/test
-Sidekiq.strict_args! unless
-  Rails.env.production?
+Sidekiq.strict_args! unless Rails.env.production?
