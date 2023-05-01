@@ -45,6 +45,9 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users, limit: 10
   tracks_nested_attributes_for :users
 
+  accepts_nested_attributes_for :billing
+  tracks_nested_attributes_for :billing
+
   accepts_nested_attributes_for :plan
   tracks_nested_attributes_for :plan
 
