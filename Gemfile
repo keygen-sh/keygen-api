@@ -102,6 +102,7 @@ group :development, :test do
   gem 'bullet', '~> 7.0.1'
   gem 'parallel_tests', '~> 4.2.0'
   gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
+  gem 'faker', '~> 2.20.0'
 end
 
 group :development do
@@ -116,6 +117,5 @@ group :test do
   gem 'rspec-expectations', '~> 3.12.1'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'
-  gem 'faker', '~> 2.20.0'
   gem 'webmock', '~> 3.14.0'
 end

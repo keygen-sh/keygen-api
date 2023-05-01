@@ -25,6 +25,9 @@ class ApplicationRecord < ActiveRecord::Base
     limit(nil)
   }
 
+  # sample returns a random record for the model.
+  def self.sample = find_by(id: ids.sample) unless Rails.env.production?
+
   # This is a preventative measure to assert we never accidentally serialize
   # a model outside of our JSONAPI serializers
   def serializable_hash(...)
