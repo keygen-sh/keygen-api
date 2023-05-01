@@ -48,12 +48,6 @@ Sidekiq.configure_server do |config|
     network_timeout: 5,
   }
 
-  schedule_file = Rails.root / 'config' / 'schedule.yml'
-
-  if File.exist?(schedule_file)
-    Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
-  end
-
   config.client_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Client
   end
