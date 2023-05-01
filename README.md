@@ -1,5 +1,5 @@
 [![Keygen CI](https://github.com/keygen-sh/keygen-api/actions/workflows/test.yml/badge.svg)](https://github.com/keygen-sh/keygen-api/actions)
-[![Better Uptime Badge](https://betteruptime.com/status-badges/v1/monitor/95ne.svg)](https://status.keygen.sh/?utm_source=status_badge)
+[![Discord Community](https://img.shields.io/badge/discord-community-blue)](https://discord.gg/yednR566)
 
 # Keygen
 
