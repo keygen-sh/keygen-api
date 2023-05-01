@@ -1,7 +1,7 @@
 class PruneEventLogsWorker < BaseWorker
-  BACKLOG_DAYS       = ENV.fetch('PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
-  BATCH_SIZE         = ENV.fetch('PRUNE_BATCH_SIZE')         { 1_000 }.to_i
-  SLEEP_DURATION     = ENV.fetch('PRUNE_SLEEP_DURATION')     { 1 }.to_f
+  BACKLOG_DAYS       = ENV.fetch('KEYGEN_PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
+  BATCH_SIZE         = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')         { 1_000 }.to_i
+  BATCH_WAIT         = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')         { 1 }.to_f
   HIGH_VOLUME_EVENTS = %w[
     license.validation.succeeded
     license.validation.failed
@@ -56,7 +56,7 @@ class PruneEventLogsWorker < BaseWorker
 
         Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
-        sleep SLEEP_DURATION
+        sleep BATCH_WAIT
 
         break if count < BATCH_SIZE
       end

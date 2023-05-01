@@ -1,6 +1,6 @@
 class PruneReleaseDownloadLinksWorker < BaseWorker
-  BATCH_SIZE     = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
-  SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
+  BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
+  BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
 
   sidekiq_options queue: :cron,
                   lock: :until_executed,
@@ -30,7 +30,7 @@ class PruneReleaseDownloadLinksWorker < BaseWorker
 
         Keygen.logger.info "[workers.prune-release-download-links] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
-        sleep SLEEP_DURATION
+        sleep BATCH_WAIT
 
         break if count < BATCH_SIZE
       end

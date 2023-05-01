@@ -7,13 +7,13 @@ namespace :keygen do
     namespace :admins do
       desc 'Add a new set of permissions to all admins with default permissions'
       task add: %i[environment] do |_, args|
-        sleep_duration = ENV.fetch('SLEEP_DURATION') { 0.1 }.to_f
-        batch_size     = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
-        permissions    = args.extras
-        admins         = User.includes(:account, role: { role_permissions: :permission })
-                            .where(role: {
-                              name: %i[admin read_only developer support_agent sales_agent],
-                            })
+        batch_size  = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        batch_wait  = ENV.fetch('BATCH_WAIT') { 0.1 }.to_f
+        permissions = args.extras
+        admins      = User.includes(:account, role: { role_permissions: :permission })
+                          .where(role: {
+                            name: %i[admin read_only developer support_agent sales_agent],
+                          })
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{admins.count} admins..." }
 
@@ -41,7 +41,7 @@ namespace :keygen do
             Keygen.logger.info { "[#{i}] Nothing to add to #{user.id}..." }
           end
 
-          sleep sleep_duration
+          sleep batch_wait
         end
       end
     end
