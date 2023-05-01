@@ -9,6 +9,7 @@ check_for_license_overdue_check_ins:
 report_account_request_limits:
   cron: "0 0 * * *" # Every day at midnight (6pm CST)
   class: "RequestLimitsReportWorker"
+  status: <%= ENV['KEYGEN_MODE'] == 'multiplayer' ? 'enabled' : 'disabled' %>
 
 prune_expired_tokens:
   cron: "0 2 * * *" # Every day at 2am (8pm CST)
