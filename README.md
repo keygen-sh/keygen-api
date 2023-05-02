@@ -108,7 +108,7 @@ bundle exec rake db:setup
 bundle exec rake db:seed
 ```
 
-To seed the database with sample data, run:
+To seed the database with sample data, run (takes about an hour):
 
 ```bash
 bundle exec rake db:seed:development
@@ -136,7 +136,7 @@ bundle exec sidekiq
 
 ### Testing
 
-To run the entire test suite, specs and features, run:
+To run the entire test suite, specs and features, run (takes about 20 mins on a 16-core CPU):
 
 ```bash
 bundle exec rake test
