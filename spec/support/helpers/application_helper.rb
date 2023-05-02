@@ -28,6 +28,22 @@ module ApplicationHelper
         instance_exec(&)
       end
     end
+
+    def within_task(task = 'test', &)
+      context 'when in a Rake task environment' do
+        before {
+          require 'rake'
+
+          app = Data.define(:top_level_tasks)
+
+          allow(Rake).to receive(:application).and_return(
+            app.new(top_level_tasks: [task]),
+          )
+        }
+
+        instance_exec(&)
+      end
+    end
   end
 
   def self.included(klass)

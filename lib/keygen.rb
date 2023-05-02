@@ -52,10 +52,9 @@ module Keygen
     def sidekiq? = Sidekiq.const_defined?(:CLI)
 
     def rake?(*tasks)
-      Rails.const_defined?(:Rake) && $0.ends_with?('rake') &&
-        tasks.all? { |task|
-          $*.any? { |arg| arg.starts_with?(task) }
-        }
+      Rake.respond_to?(:application) && Rake.application.top_level_tasks.any? { |task|
+        tasks.all? { task.starts_with?(_1) }
+      }
     end
   end
 end
