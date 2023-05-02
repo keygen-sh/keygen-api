@@ -4,7 +4,7 @@ require_dependency Rails.root / 'lib' / 'keygen'
 
 Rails.application.config.to_prepare do
   next if
-    Keygen.test? || Keygen.task?('keygen:setup') # Skip in test and during setup
+    Keygen.test? || Keygen.task? # Skip in test and during Rake tasks
 
   case
   when Keygen.ee?

@@ -104,20 +104,20 @@ bundle
 To initialize the database, run:
 
 ```bash
-rails db:setup
-rails db:seed
+bundle exec rake db:setup
+bundle exec rake db:seed
 ```
 
 To seed the database with sample data, run:
 
 ```bash
-rails db:seed:development
+bundle exec rake db:seed:development
 ```
 
 To setup Keygen, run:
 
 ```bash
-rake keygen:setup
+bundle exec rake keygen:setup
 ```
 
 ### Running
@@ -139,19 +139,19 @@ bundle exec sidekiq
 To run the entire test suite, specs and features, run:
 
 ```bash
-rake test
+bundle exec rake test
 ```
 
 To run Cucumber features, run:
 
 ```bash
-rake test:cucumber
+bundle exec rake test:cucumber
 ```
 
 To run Rspec specs, run:
 
 ```bash
-rake test:rspec
+bundle exec rake test:rspec
 ```
 
 ## License
