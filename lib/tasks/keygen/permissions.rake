@@ -45,6 +45,8 @@ namespace :keygen do
         rescue ActiveRecord::RecordInvalid => e
           Keygen.logger.info { "[#{i}] Failed #{user.id}: #{e.message}" }
         end
+
+        Keygen.logger.info { 'Done' }
       end
     end
   end
