@@ -15,15 +15,6 @@ namespace :keygen do
       mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
 
-      # General config
-      config['KEYGEN_HOST'] = host = ENV.fetch('KEYGEN_HOST') {
-        print 'Enter your domain: '
-        gets
-      }
-
-      # TODO(ezekg) Cloudflare R2 and AWS S3 config
-
-      # Variable config
       case edition
       when 'CE'
         puts 'Setting up CE edition...'

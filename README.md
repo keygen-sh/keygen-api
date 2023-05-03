@@ -93,6 +93,22 @@ customer, or [purchasing Keygen EE][sales].
 
 ## Developing
 
+### Secrets
+
+To generate a secret key for the application, run:
+
+```bash
+export SECRET_KEY_BASE="$(openssl rand -hex 64)"
+```
+
+To setup database encryption secrets, run:
+
+```bash
+export ENCRYPTION_DETERMINISTIC_KEY="$(openssl rand -base64 32)"
+export ENCRYPTION_PRIMARY_KEY="$(openssl rand -base64 32)"
+export ENCRYPTION_KEY_DERIVATION_SALT="$(openssl rand -base64 32)"
+```
+
 ### Setup
 
 To install dependencies, run:
