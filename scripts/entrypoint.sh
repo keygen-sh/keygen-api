@@ -8,6 +8,10 @@ fi
 
 case "$@"
 in
+setup)
+  echo "Running command: bundle exec rails keygen:setup"
+  bundle exec rails keygen:setup
+  ;;
 release)
   echo "Running command: bundle exec rails db:migrate"
   bundle exec rails db:migrate
