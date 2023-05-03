@@ -42,6 +42,8 @@ namespace :keygen do
           end
 
           sleep batch_wait
+        rescue ActiveRecord::RecordInvalid => e
+          Keygen.logger.info { "[#{i}] Failed #{user.id}: #{e.message}" }
         end
       end
     end
