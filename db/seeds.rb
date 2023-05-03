@@ -203,8 +203,6 @@ events = %w[
   license.expired
   license.expiring-soon
   license.group.updated
-  license.permissions.attached
-  license.permissions.detached
   license.policy.updated
   license.reinstated
   license.renewed
@@ -246,8 +244,6 @@ events = %w[
 
   product.created
   product.deleted
-  product.permissions.attached
-  product.permissions.detached
   product.updated
 
   release.constraints.attached
@@ -276,8 +272,6 @@ events = %w[
   user.deleted
   user.group.updated
   user.password-reset
-  user.permissions.attached
-  user.permissions.detached
   user.unbanned
   user.updated
 ]
