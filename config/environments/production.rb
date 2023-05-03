@@ -3,7 +3,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts.concat(
-    [ENV.fetch('KEYGEN_HOST'), *ENV['KEYGEN_HOSTS'].split(',')].then { |host|
+    [ENV.fetch('KEYGEN_HOST'), *ENV.fetch('KEYGEN_HOSTS', '').split(',')].then { |host|
       host.uniq.compact_blank.map { _1.downcase.strip }
     },
   )
