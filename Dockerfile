@@ -3,6 +3,11 @@
 # Base image
 FROM ruby:3.2.2-alpine as base
 
+ENV BUNDLE_WITHOUT="development:test" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_DEPLOYMENT="1" \
+    RAILS_ENV="production"
+
 # Build stage
 FROM base as build
 
@@ -21,10 +26,6 @@ RUN apk add --no-cache \
   postgresql-dev \
   libc6-compat
 
-ENV BUNDLE_WITHOUT="development:test" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_DEPLOYMENT="1"
-
 RUN bundle install --jobs 4 --retry 5
 
 # Final stage
@@ -42,7 +43,6 @@ RUN apk add --no-cache \
 
 ENV KEYGEN_EDITION="CE" \
     KEYGEN_MODE="singleplayer" \
-    RAILS_ENV="production" \
     PORT="3000" \
     BIND="0.0.0.0"
 
