@@ -101,7 +101,7 @@ To generate a secret key for the application, run:
 export SECRET_KEY_BASE="$(openssl rand -hex 64)"
 ```
 
-To setup database encryption secrets, run:
+To generate database encryption secrets, run:
 
 ```bash
 export ENCRYPTION_DETERMINISTIC_KEY="$(openssl rand -base64 32)"
@@ -117,23 +117,10 @@ To install dependencies, run:
 bundle
 ```
 
-To initialize the database, run:
-
-```bash
-bundle exec rake db:setup
-bundle exec rake db:seed
-```
-
-To seed the database with sample data, run (takes about an hour):
-
-```bash
-bundle exec rake db:seed:development
-```
-
 To setup Keygen, run:
 
 ```bash
-bundle exec rake keygen:setup
+bundle exec rails keygen:setup
 ```
 
 ### Running
