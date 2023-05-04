@@ -2,15 +2,17 @@
 
 namespace :keygen do
   desc 'Setup Keygen and the environment'
-  task setup: %i[environment] do |_, args|
+  task setup: %i[environment db:schema:load db:migrate db:seed] do |_, args|
     require 'io/console'
 
-    def getp(...) = STDIN.getpass(...).chomp
-    def gets(...) = STDIN.gets(...).chomp
+    def getp(...) = STDIN.getpass(...)&.chomp
+    def gets(...) = STDIN.gets(...)&.chomp
+
+    unless STDIN.tty?
+      abort "Setup requires stdin to be a TTY"
+    end
 
     ActiveRecord::Base.logger.silence do
-      Rake::Task['db:prepare'].invoke # Calling this after we silence the logger
-
       edition = (args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }).upcase
       mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
