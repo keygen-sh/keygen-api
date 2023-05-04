@@ -15,6 +15,13 @@ namespace :keygen do
       mode    = (args.extras[1] || ENV.fetch('KEYGEN_MODE')    { 'singleplayer' }).downcase
       config  = {}
 
+      unless ENV.key?('NO_SECRETS')
+        config['SECRET_KEY_BASE']                = ENV.fetch('SECRET_KEY_BASE')
+        config['ENCRYPTION_DETERMINISTIC_KEY']   = ENV.fetch('ENCRYPTION_DETERMINISTIC_KEY')
+        config['ENCRYPTION_PRIMARY_KEY']         = ENV.fetch('ENCRYPTION_PRIMARY_KEY')
+        config['ENCRYPTION_KEY_DERIVATION_SALT'] = ENV.fetch('ENCRYPTION_KEY_DERIVATION_SALT')
+      end
+
       case edition
       when 'CE'
         puts 'Setting up CE edition...'
