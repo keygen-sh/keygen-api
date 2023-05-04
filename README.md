@@ -123,6 +123,14 @@ To setup Keygen, run:
 bundle exec rails keygen:setup
 ```
 
+### Seeding
+
+To seed the database with sample data, run:
+
+```
+bundle exec rails db:seed:development
+```
+
 ### Running
 
 To start the server, run:
