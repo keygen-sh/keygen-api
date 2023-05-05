@@ -125,7 +125,7 @@ bundle exec rails keygen:setup
 
 ### Seeding
 
-To seed the database with sample data, run:
+To seed the database with sample data, run (optional, takes about an hour):
 
 ```
 bundle exec rails db:seed:development
