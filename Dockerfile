@@ -43,6 +43,7 @@ RUN apk add --no-cache \
 
 ENV KEYGEN_EDITION="CE" \
     KEYGEN_MODE="singleplayer" \
+    RAILS_LOG_TO_STDOUT="1" \
     PORT="3000" \
     BIND="0.0.0.0"
 
