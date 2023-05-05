@@ -95,13 +95,13 @@ customer, or [purchasing Keygen EE][sales].
 
 ### Secrets
 
-To generate a secret key for the application, run:
+To generate a [secret key](https://guides.rubyonrails.org/security.html) for the application, run:
 
 ```bash
 export SECRET_KEY_BASE="$(openssl rand -hex 64)"
 ```
 
-To generate database encryption secrets, run:
+To generate [at-work encryption](https://guides.rubyonrails.org/active_record_encryption.html) secrets, run:
 
 ```bash
 export ENCRYPTION_DETERMINISTIC_KEY="$(openssl rand -base64 32)"
