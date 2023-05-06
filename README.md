@@ -3,7 +3,7 @@
 
 # Keygen
 
-Keygen is an open source software licensing and distribution API, built
+Keygen is an open source-available software licensing and distribution API, built
 for developers, by developers. Use Keygen to add license key validation,
 entitlements, and device activation to your business's desktop apps,
 server applications, on-premise software, and other products.
@@ -33,7 +33,7 @@ and getting a great service!
 
 ## Self hosting with Keygen CE
 
-Keygen is a fully open source software licensing and distribution API, and
+Keygen is an open source-available software licensing and distribution API, and
 we have a free (as in beer) [self-hosted solution][self-hosting]. Keygen Community
 Edition is exactly the same code base as our managed solution, Keygen Cloud, but with
 a less frequent release schedule (think of it as an LTS release).
