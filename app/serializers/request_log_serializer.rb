@@ -95,10 +95,7 @@ class RequestLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        t = "#{@object.resource_type}Serializer".safe_constantize
-                                                .type_val
-
-        @url_helpers.send "v1_account_#{t}_path", @object.account_id, @object.resource_id
+        @url_helpers.send "v1_account_#{@object.resource_type.underscore}_path", @object.account_id, @object.resource_id
       end
     end
   end
