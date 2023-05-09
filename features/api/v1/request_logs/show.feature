@@ -25,6 +25,17 @@ Feature: Show request logs
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "200"
     And the response body should be a "request-log"
+    And the response body should be a "request-log" with the following relationships:
+      """
+      {
+        "resource": {
+          "data": { "type": "licenses", "id": "$licenses[0]" },
+          "links": {
+            "related": "/v1/accounts/$account/licenses/$licenses[0]"
+          }
+        }
+      }
+      """
 
   Scenario: Admin retrieves an invalid log for their account
     Given I am an admin of account "test1"
