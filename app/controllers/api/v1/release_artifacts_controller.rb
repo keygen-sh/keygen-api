@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1
-  class ArtifactsController < Api::V1::BaseController
+  class ReleaseArtifactsController < Api::V1::BaseController
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:release) { |c, s, v| s.for_release(v) }
@@ -37,7 +37,7 @@ module Api::V1
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download = artifact.download!(ttl: artifact_query[:ttl])
+      download = artifact.download!(ttl: release_artifact_query[:ttl])
 
       BroadcastEventService.call(
         # NOTE(ezekg) The `release.downloaded` event is for backwards compat
@@ -97,7 +97,7 @@ module Api::V1
       end
     }
     def create
-      artifact = current_account.release_artifacts.new(artifact_params)
+      artifact = current_account.release_artifacts.new(release_artifact_params)
       authorize! artifact
 
       artifact.save!
@@ -134,7 +134,7 @@ module Api::V1
     def update
       authorize! artifact
 
-      artifact.update!(artifact_params)
+      artifact.update!(release_artifact_params)
 
       BroadcastEventService.call(
         event: 'artifact.updated',

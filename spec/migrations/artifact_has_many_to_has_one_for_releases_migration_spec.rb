@@ -31,7 +31,7 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
           relationships: include(
             artifacts: {
               links: {
-                related: v1_account_release_artifacts_path(release_without_artifact.account_id, release_without_artifact.id),
+                related: v1_account_release_release_artifacts_path(release_without_artifact.account_id, release_without_artifact.id),
               },
             },
           ),
@@ -40,7 +40,7 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
           relationships: include(
             artifacts: {
               links: {
-                related: v1_account_release_artifacts_path(release_with_artifact.account_id, release_with_artifact.id),
+                related: v1_account_release_release_artifacts_path(release_with_artifact.account_id, release_with_artifact.id),
               },
             },
           ),
@@ -57,7 +57,7 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
             artifact: {
               data: nil,
               links: {
-                related: v1_account_release_v1_0_artifact_path(release_without_artifact.account_id, release_without_artifact.id),
+                related: v1_account_release_v1_0_release_artifact_path(release_without_artifact.account_id, release_without_artifact.id),
               },
             },
           ),
@@ -70,7 +70,7 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
                 id: release_with_artifact.artifacts.sole.id,
               },
               links: {
-                related: v1_account_release_v1_0_artifact_path(release_with_artifact.account_id, release_with_artifact.id),
+                related: v1_account_release_v1_0_release_artifact_path(release_with_artifact.account_id, release_with_artifact.id),
               },
             },
           ),

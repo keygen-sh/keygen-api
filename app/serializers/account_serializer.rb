@@ -52,17 +52,17 @@ class AccountSerializer < BaseSerializer
   end
   relationship :platforms do
     link :related do
-      @url_helpers.v1_account_platforms_path @object
+      @url_helpers.v1_account_release_platforms_path @object
     end
   end
   relationship :arches do
     link :related do
-      @url_helpers.v1_account_arches_path @object
+      @url_helpers.v1_account_release_arches_path @object
     end
   end
   relationship :channels do
     link :related do
-      @url_helpers.v1_account_channels_path @object
+      @url_helpers.v1_account_release_channels_path @object
     end
   end
   relationship :releases do
@@ -72,7 +72,7 @@ class AccountSerializer < BaseSerializer
   end
   relationship :artifacts do
     link :related do
-      @url_helpers.v1_account_artifacts_path @object
+      @url_helpers.v1_account_release_artifacts_path @object
     end
   end
   relationship :policies do
@@ -102,7 +102,7 @@ class AccountSerializer < BaseSerializer
   end
   relationship :processes do
     link :related do
-      @url_helpers.v1_account_processes_path @object
+      @url_helpers.v1_account_machine_processes_path @object
     end
   end
   relationship :tokens do

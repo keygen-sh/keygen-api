@@ -75,7 +75,7 @@ class RequestLogSerializer < BaseSerializer
 
     if @object.requestor_id.present? && @object.requestor_type.present?
       link :related do
-        @url_helpers.send "v1_account_#{@object.requestor_type.underscore}_path", @object.account_id, @object.requestor_id
+        @url_helpers.polymorphic_path [:v1, @object.account, @object.requestor]
       end
     end
   end
@@ -95,7 +95,7 @@ class RequestLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        @url_helpers.send "v1_account_#{@object.resource_type.underscore}_path", @object.account_id, @object.resource_id
+        @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
       end
     end
   end

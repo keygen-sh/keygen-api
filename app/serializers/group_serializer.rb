@@ -47,7 +47,7 @@ class GroupSerializer < BaseSerializer
 
   relationship :owners do
     link :related do
-      @url_helpers.v1_account_group_owners_path @object.account_id, @object.id
+      @url_helpers.v1_account_group_group_owners_path @object.account_id, @object.id
     end
   end
 

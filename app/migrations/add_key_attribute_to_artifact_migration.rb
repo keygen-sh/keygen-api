@@ -12,7 +12,7 @@ class AddKeyAttributeToArtifactMigration < BaseMigration
   end
 
   response if: -> res { res.status < 400 && res.status != 204 &&
-                        res.request.params in controller: 'api/v1/artifacts' | 'api/v1/products/relationships/artifacts' | 'api/v1/releases/relationships/artifacts' | 'api/v1/releases/relationships/v1x0/artifacts' | 'api/v1/releases/actions/v1x0/upgrades',
+                        res.request.params in controller: 'api/v1/release_artifacts' | 'api/v1/products/relationships/release_artifacts' | 'api/v1/releases/relationships/release_artifacts' | 'api/v1/releases/relationships/v1x0/release_artifacts' | 'api/v1/releases/actions/v1x0/upgrades',
                                               action: 'show' | 'create' | 'update' | 'check_for_upgrade_by_query' | 'check_for_upgrade_by_id' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 

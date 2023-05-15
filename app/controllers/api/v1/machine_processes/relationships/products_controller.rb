@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Api::V1::Processes::Relationships
-  class LicensesController < Api::V1::BaseController
+module Api::V1::MachineProcesses::Relationships
+  class ProductsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -10,11 +10,11 @@ module Api::V1::Processes::Relationships
     authorize :machine_process
 
     def show
-      license = machine_process.license
-      authorize! license,
-        with: MachineProcesses::LicensePolicy
+      product = machine_process.product
+      authorize! product,
+        with: MachineProcesses::ProductPolicy
 
-      render jsonapi: license
+      render jsonapi: product
     end
 
     private
@@ -24,7 +24,7 @@ module Api::V1::Processes::Relationships
     def set_machine_process
       scoped_machine_processes = authorized_scope(current_account.machine_processes)
 
-      @machine_process = scoped_machine_processes.find(params[:process_id])
+      @machine_process = scoped_machine_processes.find(params[:machine_process_id])
 
       Current.resource = machine_process
     end

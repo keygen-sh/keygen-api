@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Api::V1::Processes::Relationships
+module Api::V1::MachineProcesses::Relationships
   class MachinesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -24,7 +24,7 @@ module Api::V1::Processes::Relationships
     def set_machine_process
       scoped_machine_processes = authorized_scope(current_account.machine_processes)
 
-      @machine_process = scoped_machine_processes.find(params[:process_id])
+      @machine_process = scoped_machine_processes.find(params[:machine_process_id])
 
       Current.resource = machine_process
     end

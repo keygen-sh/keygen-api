@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Machines::Relationships
-  class ProcessesController < Api::V1::BaseController
+  class MachineProcessesController < Api::V1::BaseController
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!

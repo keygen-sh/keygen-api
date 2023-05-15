@@ -71,7 +71,7 @@ class EventLogSerializer < BaseSerializer
 
     if @object.whodunnit_id.present? && @object.whodunnit_type.present?
       link :related do
-        @url_helpers.send "v1_account_#{@object.whodunnit_type.underscore}_path", @object.account_id, @object.whodunnit_id
+        @url_helpers.polymorphic_path [:v1, @object.account, @object.whodunnit]
       end
     end
   end
@@ -91,10 +91,7 @@ class EventLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        t = "#{@object.resource_type}Serializer".safe_constantize
-                                                .type_val
-
-        @url_helpers.send "v1_account_#{t}_path", @object.account_id, @object.resource_id
+        @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
       end
     end
   end

@@ -68,6 +68,7 @@ After do |scenario|
 
     log JSON.pretty_generate(
       request: {
+        method: last_request.method,
         url: last_request.url,
         headers: req_headers,
         body: (JSON.parse(last_request.body.string) rescue nil)

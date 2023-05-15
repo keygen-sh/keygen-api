@@ -54,8 +54,7 @@ class TokenSerializer < BaseSerializer
   relationship :bearer do
     linkage always: true
     link :related do
-      @url_helpers.send "v1_account_#{@object.bearer_type.underscore}_path",
-                        @object.account_id, @object.bearer_id
+      @url_helpers.polymorphic_path [:v1, @object.account, @object.bearer]
     end
   end
 

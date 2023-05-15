@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Groups::Relationships
-  class OwnersController < Api::V1::BaseController
+  class GroupOwnersController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -99,7 +99,7 @@ module Api::V1::Groups::Relationships
 
     attr_reader :group
 
-    def user_ids = owner_params.pluck(:user_id)
+    def user_ids = group_owner_params.pluck(:user_id)
 
     def set_group
       scoped_groups = authorized_scope(current_account.groups)

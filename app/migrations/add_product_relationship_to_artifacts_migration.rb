@@ -32,7 +32,7 @@ class AddProductRelationshipToArtifactsMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.status < 400 && res.request.params in controller: 'api/v1/artifacts' | 'api/v1/products/relationships/artifacts' | 'api/v1/releases/relationships/artifacts',
+  response if: -> res { res.status < 400 && res.request.params in controller: 'api/v1/release_artifacts' | 'api/v1/products/relationships/release_artifacts' | 'api/v1/releases/relationships/release_artifacts',
                                                                   action: 'index' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 

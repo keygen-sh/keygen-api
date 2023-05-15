@@ -55,7 +55,7 @@ class MachineProcessSerializer < BaseSerializer
       { type: :products, id: @object.product&.id }
     end
     link :related do
-      @url_helpers.v1_account_process_product_path @object.account_id, @object
+      @url_helpers.v1_account_machine_process_product_path @object.account_id, @object
     end
   end
 
@@ -64,7 +64,7 @@ class MachineProcessSerializer < BaseSerializer
       { type: :licenses, id: @object.license&.id }
     end
     link :related do
-      @url_helpers.v1_account_process_license_path @object.account_id, @object
+      @url_helpers.v1_account_machine_process_license_path @object.account_id, @object
     end
   end
 
@@ -73,11 +73,11 @@ class MachineProcessSerializer < BaseSerializer
       { type: :machines, id: @object.machine_id }
     end
     link :related do
-      @url_helpers.v1_account_process_machine_path @object.account_id, @object
+      @url_helpers.v1_account_machine_process_machine_path @object.account_id, @object
     end
   end
 
   link :self do
-    @url_helpers.v1_account_process_path @object.account_id, @object
+    @url_helpers.v1_account_machine_process_path @object.account_id, @object
   end
 end

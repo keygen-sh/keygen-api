@@ -80,13 +80,13 @@ class ReleaseSerializer < BaseSerializer
 
   relationship :constraints do
     link :related do
-      @url_helpers.v1_account_release_constraints_path @object.account_id, @object
+      @url_helpers.v1_account_release_release_entitlement_constraints_path @object.account_id, @object
     end
   end
 
   relationship :artifacts do
     link :related do
-      @url_helpers.v1_account_release_artifacts_path @object.account_id, @object
+      @url_helpers.v1_account_release_release_artifacts_path @object.account_id, @object
     end
   end
 

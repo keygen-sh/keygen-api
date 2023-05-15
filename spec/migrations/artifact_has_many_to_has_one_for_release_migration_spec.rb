@@ -30,7 +30,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
           relationships: include(
             artifacts: {
               links: {
-                related: v1_account_release_artifacts_path(subject.account_id, subject.id),
+                related: v1_account_release_release_artifacts_path(subject.account_id, subject.id),
               },
             },
           )
@@ -45,7 +45,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
             artifact: {
               data: nil,
               links: {
-                related: v1_account_release_v1_0_artifact_path(subject.account_id, subject.id),
+                related: v1_account_release_v1_0_release_artifact_path(subject.account_id, subject.id),
               },
             },
           )
@@ -66,7 +66,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
           relationships: include(
             artifacts: {
               links: {
-                related: v1_account_release_artifacts_path(subject.account_id, subject.id),
+                related: v1_account_release_release_artifacts_path(subject.account_id, subject.id),
               },
             },
           ),
@@ -84,7 +84,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
                 id: subject.artifacts.sole.id,
               },
               links: {
-                related: v1_account_release_v1_0_artifact_path(subject.account_id, subject.id),
+                related: v1_account_release_v1_0_release_artifact_path(subject.account_id, subject.id),
               },
             },
           ),

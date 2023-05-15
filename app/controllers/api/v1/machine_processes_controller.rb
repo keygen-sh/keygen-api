@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1
-  class ProcessesController < Api::V1::BaseController
+  class MachineProcessesController < Api::V1::BaseController
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }
@@ -59,7 +59,7 @@ module Api::V1
       end
     }
     def create
-      machine_process = current_account.machine_processes.new(process_params)
+      machine_process = current_account.machine_processes.new(machine_process_params)
       authorize! machine_process
 
       if machine_process.save
@@ -74,7 +74,7 @@ module Api::V1
           resource: machine_process,
         )
 
-        render jsonapi: machine_process, status: :created, location: v1_account_process_url(machine_process.account, machine_process)
+        render jsonapi: machine_process, status: :created, location: v1_account_machine_process_url(machine_process.account, machine_process)
       else
         render_unprocessable_resource(machine_process)
       end
@@ -94,7 +94,7 @@ module Api::V1
     def update
       authorize! machine_process
 
-      if machine_process.update(process_params)
+      if machine_process.update(machine_process_params)
         BroadcastEventService.call(
           event: 'process.updated',
           account: current_account,
