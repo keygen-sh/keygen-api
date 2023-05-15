@@ -57,6 +57,6 @@ class GroupOwnerSerializer < BaseSerializer
   end
 
   link :self do
-    @url_helpers.v1_account_group_owner_path @object.account_id, @object.group_id, @object.id
+    @url_helpers.v1_account_group_group_owner_path @object.account_id, @object.group_id, @object.id
   end
 end

@@ -22,6 +22,6 @@ class ReleaseChannelSerializer < BaseSerializer
   end
 
   link :related do
-    @url_helpers.v1_account_channel_path @object.account_id, @object
+    @url_helpers.v1_account_release_channel_path @object.account_id, @object
   end
 end

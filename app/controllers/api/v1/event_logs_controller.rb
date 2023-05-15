@@ -19,7 +19,7 @@ module Api::V1
       authorize! with: EventLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs)).preload(:event_type))
+        event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs)).preload(:event_type, :account, :whodunnit, :resource))
         data = Keygen::JSONAPI::Renderer.new.render(event_logs)
 
         data.tap do |d|

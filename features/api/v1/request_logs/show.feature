@@ -29,9 +29,9 @@ Feature: Show request logs
       """
       {
         "resource": {
-          "data": { "type": "licenses", "id": "$licenses[0]" },
+          "data": { "type": "artifacts", "id": "$artifacts[0]" },
           "links": {
-            "related": "/v1/accounts/$account/licenses/$licenses[0]"
+            "related": "/v1/accounts/$account/artifacts/$artifacts[0]"
           }
         }
       }

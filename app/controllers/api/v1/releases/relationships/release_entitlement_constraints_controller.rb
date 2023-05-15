@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Releases::Relationships
-  class ConstraintsController < Api::V1::BaseController
+  class ReleaseEntitlementConstraintsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -106,8 +106,8 @@ module Api::V1::Releases::Relationships
 
     attr_reader :release
 
-    def entitlement_ids = constraint_params.pluck(:entitlement_id)
-    def constraint_ids  = constraint_params.pluck(:id)
+    def entitlement_ids = release_entitlement_constraint_params.pluck(:entitlement_id)
+    def constraint_ids  = release_entitlement_constraint_params.pluck(:id)
 
     def set_release
       scoped_releases = authorized_scope(current_account.releases)

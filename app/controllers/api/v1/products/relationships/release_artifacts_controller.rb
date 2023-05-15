@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-module Api::V1::Releases::Relationships
-  class ArtifactsController < Api::V1::BaseController
+module Api::V1::Products::Relationships
+  class ReleaseArtifactsController < Api::V1::BaseController
+    has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
@@ -9,17 +10,16 @@ module Api::V1::Releases::Relationships
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!, except: %i[index show]
-    before_action :authenticate_with_token, only: %i[index show]
-    before_action :set_release, only: %i[index show]
+    before_action :authenticate_with_token!
+    before_action :set_product, only: %i[index show]
     before_action :set_artifact, only: %i[show]
 
-    authorize :release
+    authorize :product
 
     def index
-      artifacts = apply_pagination(authorized_scope(apply_scopes(release.artifacts)).preload(:platform, :arch, :filetype))
+      artifacts = apply_pagination(authorized_scope(apply_scopes(product.release_artifacts)).preload(:platform, :arch, :filetype))
       authorize! artifacts,
-        with: Releases::ReleaseArtifactPolicy
+        with: Products::ReleaseArtifactPolicy
 
       render jsonapi: artifacts
     end
@@ -29,14 +29,14 @@ module Api::V1::Releases::Relationships
     }
     def show
       authorize! artifact,
-        with: Releases::ReleaseArtifactPolicy
+        with: Products::ReleaseArtifactPolicy
 
       # Respond early if the artifact has not been uploaded or if the
       # client prefers no-download
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download = artifact.download!(ttl: artifact_query[:ttl])
+      download = artifact.download!(ttl: release_artifact_query[:ttl])
 
       BroadcastEventService.call(
         event: %w[artifact.downloaded release.downloaded],
@@ -53,23 +53,19 @@ module Api::V1::Releases::Relationships
 
     private
 
-    attr_reader :release,
+    attr_reader :product,
                 :artifact
 
-    def set_release
-      scoped_releases = authorized_scope(current_account.releases)
+    def set_product
+      scoped_products = authorized_scope(current_account.products)
 
-      @release = FindByAliasService.call(
-        scoped_releases,
-        id: params[:release_id],
-        aliases: %i[version tag],
-      )
+      @product = scoped_products.find(params[:product_id])
 
-      Current.resource = release
+      Current.resource = product
     end
 
     def set_artifact
-      scoped_artifacts = authorized_scope(apply_scopes(release.artifacts))
+      scoped_artifacts = authorized_scope(apply_scopes(product.release_artifacts))
 
       @artifact = FindByAliasService.call(
         scoped_artifacts.order_by_version,

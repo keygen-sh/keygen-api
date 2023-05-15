@@ -24,7 +24,7 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
             rels[:artifact] = {
               data: artifact.present? ? { type: :artifacts, id: artifact.id } : nil,
               links: {
-                related: v1_account_release_v1_0_artifact_path(account_id, release_id),
+                related: v1_account_release_v1_0_release_artifact_path(account_id, release_id),
               },
             }
 

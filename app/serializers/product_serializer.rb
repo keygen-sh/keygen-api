@@ -80,13 +80,13 @@ class ProductSerializer < BaseSerializer
 
   relationship :platforms do
     link :related do
-      @url_helpers.v1_account_product_platforms_path @object.account_id, @object
+      @url_helpers.v1_account_product_release_platforms_path @object.account_id, @object
     end
   end
 
   relationship :channels do
     link :related do
-      @url_helpers.v1_account_product_channels_path @object.account_id, @object
+      @url_helpers.v1_account_product_release_channels_path @object.account_id, @object
     end
   end
 
@@ -98,7 +98,7 @@ class ProductSerializer < BaseSerializer
 
   relationship :artifacts do
     link :related do
-      @url_helpers.v1_account_product_artifacts_path @object.account_id, @object
+      @url_helpers.v1_account_product_release_artifacts_path @object.account_id, @object
     end
   end
 

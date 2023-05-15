@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Releases::Relationships::V1x0
-  class ArtifactsController < Api::V1::BaseController
+  class ReleaseArtifactsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[show]
@@ -19,7 +19,7 @@ module Api::V1::Releases::Relationships::V1x0
       download = ::V1x0::ReleaseDownloadService.call(
         account: current_account,
         release: release,
-        ttl: artifact_query[:ttl],
+        ttl: release_artifact_query[:ttl],
       )
 
       BroadcastEventService.call(

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Products::Relationships
-  class PlatformsController < Api::V1::BaseController
+  class ReleaseArchesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -10,19 +10,19 @@ module Api::V1::Products::Relationships
     authorize :product
 
     def index
-      platforms = apply_pagination(authorized_scope(apply_scopes(product.release_platforms)))
-      authorize! platforms,
-        with: Products::ReleasePlatformPolicy
+      arches = apply_pagination(authorized_scope(apply_scopes(product.release_arches)))
+      authorize! arches,
+        with: Products::ReleaseArchPolicy
 
-      render jsonapi: platforms
+      render jsonapi: arches
     end
 
     def show
-      platform = product.release_platforms.find(params[:id])
-      authorize! platform,
-        with: Products::ReleasePlatformPolicy
+      arch = product.release_arches.find(params[:id])
+      authorize! arch,
+        with: Products::ReleaseArchPolicy
 
-      render jsonapi: platform
+      render jsonapi: arch
     end
 
     private

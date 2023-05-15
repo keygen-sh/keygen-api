@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Api::V1::Processes::Actions
+module Api::V1::MachineProcesses::Actions
   class HeartbeatsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

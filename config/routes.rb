@@ -40,19 +40,19 @@ Rails.application.routes.draw do
     scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
       version_constraint '<=1.0' do
         scope module: :v1x0 do
-          get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'artifacts#index', as: 'bin_artifacts'
-          get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'artifacts#show',  as: 'bin_artifact'
+          get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'release_artifacts#index', as: :bin_artifacts
+          get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'release_artifacts#show',  as: :bin_artifact
         end
       end
 
       version_constraint '>=1.1' do
-        get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'artifacts#index'
-        get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'artifacts#show'
+        get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'release_artifacts#index'
+        get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'release_artifacts#show'
       end
     end
 
     scope module: :stdout, constraints: { subdomain: %w[stdout], **domain_constraints, format: :jsonapi } do
-      get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: 'stdout_unsubscribe'
+      get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
     end
   end
 
@@ -88,7 +88,7 @@ Rails.application.routes.draw do
     #             their fingerprint attr, which can be an arbitrary string.
     resources :machines, constraints: { id: /[^\/]*/ } do
       scope module: 'machines/relationships' do
-        resources :processes, only: %i[index show]
+        resources :machine_processes, only: %i[index show], path: 'processes'
 
         resource :product, only: %i[show]
         resource :group,   only: %i[show update]
@@ -112,15 +112,15 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :processes do
-      scope module: 'processes/relationships' do
+    resources :machine_processes, path: 'processes' do
+      scope module: 'machine_processes/relationships' do
         resource :product, only: %i[show]
         resource :license, only: %i[show]
         resource :machine, only: %i[show]
       end
 
       member do
-        scope :actions, module: 'processes/actions' do
+        scope :actions, module: 'machine_processes/actions' do
           post :ping, to: 'heartbeats#ping'
         end
       end
@@ -150,7 +150,7 @@ Rails.application.routes.draw do
 
     # NOTE(ezekg) Licenses are queryable by their key attr, which can be an
     #             arbitrary string.
-    resources 'licenses', constraints: { id: /[^\/]*/ } do
+    resources :licenses, constraints: { id: /[^\/]*/ } do
       scope module: 'licenses/relationships' do
         resources :machines, only: %i[index show]
         resources :tokens,   only: %i[index show create]
@@ -162,8 +162,8 @@ Rails.application.routes.draw do
 
         resources :entitlements, only: %i[index show] do
           collection do
-            post '/',   to: 'entitlements#attach', as: 'attach'
-            delete '/', to: 'entitlements#detach', as: 'detach'
+            post '/',   to: 'entitlements#attach', as: :attach
+            delete '/', to: 'entitlements#detach', as: :detach
           end
         end
       end
@@ -197,16 +197,16 @@ Rails.application.routes.draw do
         resources :licenses, only: %i[index show]
         resource :product,   only: %i[show]
 
-        resources :pool, only: %i[index show], as: 'keys' do
+        resources :pool, only: %i[index show], as: :keys do
           collection do
-            delete '/', to: 'pool#pop', as: 'pop'
+            delete '/', to: 'pool#pop', as: :pop
           end
         end
 
         resources :entitlements, only: %i[index show] do
           collection do
-            post '/',   to: 'entitlements#attach', as: 'attach'
-            delete '/', to: 'entitlements#detach', as: 'detach'
+            post '/',   to: 'entitlements#attach', as: :attach
+            delete '/', to: 'entitlements#detach', as: :detach
           end
         end
       end
@@ -214,16 +214,16 @@ Rails.application.routes.draw do
 
     resources :products do
       scope module: 'products/relationships' do
-        resources :policies,                                 only: %i[index show]
-        resources :licenses,                                 only: %i[index show]
-        resources :machines,                                 only: %i[index show]
-        resources :tokens,                                   only: %i[index show create]
-        resources :users,                                    only: %i[index show]
-        resources :artifacts, constraints: { id: /.*/ },     only: %i[index show]
-        resources :platforms,                                only: %i[index show]
-        resources :arches,                                   only: %i[index show]
-        resources :channels,                                 only: %i[index show]
-        resources :releases,  constraints: { id: /[^\/]*/ }, only: %i[index show]
+        resources :policies,          only: %i[index show]
+        resources :licenses,          only: %i[index show]
+        resources :machines,          only: %i[index show]
+        resources :tokens,            only: %i[index show create]
+        resources :users,             only: %i[index show]
+        resources :releases,          only: %i[index show],                    constraints: { id: /[^\/]*/ }
+        resources :release_artifacts, only: %i[index show], path: 'artifacts', constraints: { id: /.*/ }
+        resources :release_platforms, only: %i[index show], path: 'platforms'
+        resources :release_arches,    only: %i[index show], path: 'arches'
+        resources :release_channels,  only: %i[index show], path: 'channels'
       end
     end
 
@@ -238,7 +238,7 @@ Rails.application.routes.draw do
         end
 
         collection do
-          put '/', to: 'releases#create', as: 'upsert'
+          put '/', to: 'releases#create', as: :upsert
 
           scope :actions, module: 'releases/actions' do
             scope module: :v1x0 do
@@ -252,22 +252,22 @@ Rails.application.routes.draw do
       end
 
       scope module: 'releases/relationships' do
-        resources :constraints, only: %i[index show] do
+        resources :release_entitlement_constraints, only: %i[index show], path: 'constraints' do
           collection do
-            post '/',   to: 'constraints#attach', as: 'attach'
-            delete '/', to: 'constraints#detach', as: 'detach'
+            post '/',   to: 'release_entitlement_constraints#attach', as: :attach
+            delete '/', to: 'release_entitlement_constraints#detach', as: :detach
           end
         end
 
-        resources :entitlements, only: %i[index show]
-        resources :artifacts,    only: %i[index show]
+        resources :entitlements,      only: %i[index show]
+        resources :release_artifacts, only: %i[index show], path: 'artifacts'
 
         resource :upgrade, only: %i[show]
         resource :product, only: %i[show]
 
         version_constraint '<=1.0' do
           scope module: :v1x0 do
-            resource :artifact, only: %i[show destroy], as: :v1_0_artifact do
+            resource :release_artifact, only: %i[show destroy], path: 'artifact', as: :v1_0_release_artifact do
               put :create
             end
           end
@@ -282,13 +282,10 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :artifacts, constraints: { id: /.*/ }
-
-    resources :platforms, only: %i[index show]
-
-    resources :arches, only: %i[index show]
-
-    resources :channels, only: %i[index show]
+    resources :release_artifacts,                       path: 'artifacts', constraints: { id: /.*/ }
+    resources :release_platforms, only: %i[index show], path: 'platforms'
+    resources :release_arches,    only: %i[index show], path: 'arches'
+    resources :release_channels,  only: %i[index show], path: 'channels'
 
     resources :entitlements
 
@@ -298,10 +295,10 @@ Rails.application.routes.draw do
         resources :licenses, only: %i[index show]
         resources :machines, only: %i[index show]
 
-        resources :owners, only: %i[index show] do
+        resources :group_owners, only: %i[index show], path: 'owners' do
           collection do
-            post '/',   to: 'owners#attach', as: 'attach'
-            delete '/', to: 'owners#detach', as: 'detach'
+            post '/',   to: 'group_owners#attach', as: :attach
+            delete '/', to: 'group_owners#detach', as: :detach
           end
         end
       end

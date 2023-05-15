@@ -6,8 +6,8 @@ FactoryBot.define do
 
     account     { nil }
     environment { NIL_ENVIRONMENT }
-    requestor   { create(:admin, account:) }
-    resource    { create(:license, account:) }
+    requestor   { build(:admin, account:, environment:) }
+    resource    { build(:artifact, account:, environment:) }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
