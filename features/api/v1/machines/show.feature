@@ -174,7 +174,7 @@ Feature: Show machine
       }
       """
 
-  Scenario: Admin retrieves a machine for their account with a newline character in the ID (exists)
+  Scenario: Admin retrieves a machine for their account with a newline character in the ID (ID without newline exists)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "machine"
@@ -184,11 +184,17 @@ Feature: Show machine
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/95a4a5dc-fd79-4108-ba73-c3610ccfcab1%0A"
-    Then the response status should be "200"
-    And the response body should be a "machine"
-    And the response should contain a valid signature header for "test1"
+    Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested machine '95a4a5dc-fd79-4108-ba73-c3610ccfcab1\n' was not found",
+        "code": "NOT_FOUND"
+      }
+      """
 
-  Scenario: Admin retrieves a machine for their account with a newline character in the ID (not found)
+  Scenario: Admin retrieves a machine for their account with a newline character in the ID (ID does not exist)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -198,7 +204,7 @@ Feature: Show machine
       """
       {
         "title": "Not found",
-        "detail": "The requested machine '95a4a5dc-fd79-4108-ba73-c3610ccfcab1' was not found",
+        "detail": "The requested machine '95a4a5dc-fd79-4108-ba73-c3610ccfcab1\n' was not found",
         "code": "NOT_FOUND"
       }
       """
@@ -505,5 +511,32 @@ Feature: Show machine
       { "Keygen-Environment": "shared" }
       """
     When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+    And the response body should be a "machine"
+
+  Scenario: License retrieves a machine by fingerprint with a newline (no newline)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
+      """
+      { "fingerprint": "foo\n" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/foo"
+    Then the response status should be "404"
+
+  Scenario: License retrieves a machine by fingerprint with a newline (newline)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
+      """
+      { "fingerprint": "foo\n" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/foo%0A"
     Then the response status should be "200"
     And the response body should be a "machine"

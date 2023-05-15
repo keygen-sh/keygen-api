@@ -5,7 +5,7 @@ class FindByAliasService < BaseService
     @table   = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
     @model   = scope.model_name.name
     @scope   = scope
-    @id      = "#{id}".squish
+    @id      = id.to_s
     @aliases = aliases
     @reorder = reorder
   end
