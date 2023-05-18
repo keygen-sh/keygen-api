@@ -1,5 +1,5 @@
 [![Keygen CI](https://github.com/keygen-sh/keygen-api/actions/workflows/test.yml/badge.svg)](https://github.com/keygen-sh/keygen-api/actions)
-[![Discord Community](https://img.shields.io/badge/discord-community-blue)](https://discord.gg/yednR566)
+[![Discord Community](https://img.shields.io/badge/discord-community-blue)][discord]
 
 # Keygen
 
@@ -189,13 +189,13 @@ If the ELv2 license doesn't work for your company, please [reach out][sales].
 
 ## Is it any good?
 
-[Yes](https://news.ycombinator.com/item?id=3067434).
+[Yes.](https://news.ycombinator.com/item?id=3067434)
 
 [keygen-cloud]: https://keygen.sh
 [self-hosting]: https://keygen.sh/docs/self-hosting/
 [sponsor]: https://github.com/sponsors/ezekg
 [support]: mailto:support@keygen.sh
-[discord]: https://discord.gg/yednR566
+[discord]: https://discord.gg/TRrhSaWSsN
 [forum]: https://github.com/keygen-sh/community/discussions
 [contribute]: https://keygen.sh/contrib/
 [license]: https://keygen.sh/license/
