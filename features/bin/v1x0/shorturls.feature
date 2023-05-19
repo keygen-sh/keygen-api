@@ -33,3 +33,12 @@ Feature: Short bin URLs
     And I use API version "1.0"
     When I send a GET request to "//get.keygen.sh/keygen/cli/install.sh"
     Then the response status should be "303"
+
+  Scenario: Subdomain 'get' should support any accept header
+    And I use API version "1.0"
+    And I send the following headers:
+      """
+      { "Accept": "text/*" }
+      """
+    When I send a GET request to "//get.keygen.sh/keygen/cli/install.sh"
+    Then the response status should be "303"

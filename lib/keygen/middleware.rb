@@ -220,7 +220,7 @@ module Keygen
 
             # Default to JSON content-type header for non-artifact endpoints
             env['CONTENT_TYPE'] = 'application/json' unless
-              controller&.ends_with?('/artifacts') &&
+              controller&.ends_with?('/release_artifacts') &&
               action == 'create'
           rescue => e
             Keygen.logger.exception(e)
