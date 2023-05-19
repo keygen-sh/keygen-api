@@ -141,7 +141,7 @@ module DefaultHeaders
     controller = params[:controller]
     action     = params[:action]
 
-    controller.ends_with?('/artifacts') &&
+    controller.ends_with?('/release_artifacts') &&
       action == 'show'
   end
 
