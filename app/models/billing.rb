@@ -11,9 +11,6 @@ class Billing < ApplicationRecord
   has_many :receipts, dependent: :destroy
   has_one :plan, through: :account
 
-  validates :customer_id, presence: true,
-    if: -> { Keygen.multiplayer? }
-
   before_destroy :close_customer_account
 
   aasm column: :state, whiny_transitions: false do
