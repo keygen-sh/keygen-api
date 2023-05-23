@@ -42,15 +42,15 @@ class RequestLog < ApplicationRecord
     )
   }
 
-  scope :search_request_id, -> (term) {
-    request_id = term.to_s
+  scope :search_id, -> (term) {
+    id = term.to_s
     return none if
-      request_id.empty?
+      id.empty?
 
-    return where(request_id: request_id) if
-      UUID_RE.match?(request_id)
+    return where(id:) if
+      UUID_RE.match?(id)
 
-    where('request_logs.request_id::text ILIKE ?', "%#{request_id}%")
+    where('request_logs.id::text ILIKE ?', "%#{id}%")
   }
 
   scope :search_requestor, -> (type, id) {
