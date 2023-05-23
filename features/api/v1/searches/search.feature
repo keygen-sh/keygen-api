@@ -1543,6 +1543,76 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by request log type on ID (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-59c8-4a78-b2e3-4cf95232a904" }
+      """
+    And the second "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-49f6-42df-ad1a-ac2ba1b0ae1b" }
+      """
+    And the third "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-da36-4a92-863d-68880c4cfea1" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "id": "3307d9b3-59c8-4a78-b2e3-4cf95232a904"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "request-log"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-59c8-4a78-b2e3-4cf95232a904" }
+      """
+    And the second "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-49f6-42df-ad1a-ac2ba1b0ae1b" }
+      """
+    And the third "request-log" has the following attributes:
+      """
+      { "id": "3307d9b3-da36-4a92-863d-68880c4cfea1" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "id": "3307d9b3"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by request log type on the url attribute (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
