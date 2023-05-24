@@ -5,31 +5,28 @@ module Keygen
     extend self
 
     CONSOLE_WIDTH = 80
-    LOGOMARK_PAD  = 13
+    LOGOMARK_PAD  = 20
     LOGOMARK      = <<~TXT.freeze
-                        ...
-                      .oooo*°°.
-                     °oooooooooo**°..
-                    *oooo*.°**oooooooo*°°.
-                  .*oooo°      .°°*oooooooo*°°..
-                 .ooooo.            ..°**ooooooo**°..
-                °oooo*.                   .°°*ooooooo*.
-               *oooo°                          .°oooo*
-             .*oooo°                            .oooo°
-            .ooooo.                             °oooo°
-           °oooo*                               *oooo.
-          *oooo°                                *ooo*.
-        .ooooo°                                .oooo*
-       °oooo*.                                 .oooo°
-      °ooooo*°.                                °oooo°
-      ..**ooooo**°.                            *oooo.
-          .°*oooooo*°.                         *ooo*
-              .°*oooooo*°.                 ..°*oooo*
-                  .°*oooooo*°.          .°*oooooo*°.
-                     .°*oooooo*°.   .°*oooooo*°..
-                         .°*oooooo*oooooo*°.
-                             .°*ooooo*°.
-                                .°°..
+                                  -*%@@@#+:
+                                :%@@@@@@@@@#
+                                @@@@@@@@@@@@#
+                                :@@@@@@@@@@@@@
+                                #@@@@@@@@@@@+
+                                  +@@@@@@@@%=
+                        ::::        -+**+=:
+                    -#@@@@@@#=
+                    #@@@@@@@@@@#.
+                  +@@@@@@@@@@@@+
+                  +@@@@@@@@@@@@#
+                    #@@@@@@@@@@@@=
+                    =%@@@@@@@@@@@*:
+        :=+*+=-       .:--=+%@@@@@@@#**+=:
+      -%@@@@@@@@*            :#@@@@@@@@@@@%=
+      =@@@@@@@@@@@%             *@@@@@@@@@@@@+
+      @@@@@@@@@@@@@-            -@@@@@@@@@@@@@
+      #@@@@@@@@@@@@.             @@@@@@@@@@@@#
+      #@@@@@@@@@%-              :%@@@@@@@@@#.
+        :+#@@@%*-                  -*%@@@#+:
     TXT
 
     def about!
