@@ -14,8 +14,7 @@ module Api::V1::Metrics::Actions
       event_params = params[:metrics]
       event_type_ids = []
 
-      # This not only blocks counts for invalid event types but it is also our
-      # first defense from SQL injection below
+      # Filter out invalid event types
       if event_params.present?
         event_types = EventType.select(:id, :event)
         valid_events = event_types.map(&:event)
@@ -34,68 +33,69 @@ module Api::V1::Metrics::Actions
       end
 
       json = Rails.cache.fetch(cache_key, expires_in: 10.minutes, race_condition_ttl: 1.minute) do
-        conn       = ActiveRecord::Base.connection
         start_date = Date.current - 13.days
         end_date   = Date.current
 
-        # FIXME(ezekg) How do you use prepared statements with this type of query?
-        sql =
+        conn = ActiveRecord::Base.connection
+        rows =
           if event_type_ids.any?
-            <<~SQL
-              SELECT
-                sum(m.count) AS count,
-                series.date  AS period
-              FROM
-                generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS series (date)
-              LEFT JOIN LATERAL
-                (
-                  SELECT
-                    count(*)     AS count,
-                    created_date AS date,
-                    event_type_id,
-                    account_id
-                  FROM
-                    metrics
-                  WHERE
-                    account_id     = #{conn.quote current_account.id} AND
-                    created_date   = series.date                      AND
-                    event_type_id IN (
-                      #{event_type_ids.map { conn.quote(_1) }.join(', ')}
-                    )
-                  GROUP BY
-                    event_type_id,
-                    account_id,
-                    date
-                ) AS m USING (date)
-              GROUP BY
-                series.date;
-            SQL
+            conn.execute(
+              Metric.sanitize_sql([<<~SQL, account_id: current_account.id, event_type_ids:, start_date:, end_date:])
+                SELECT
+                  sum(m.count) AS count,
+                  series.date  AS period
+                FROM
+                  generate_series(date :start_date, date :end_date, interval '1 day') AS series (date)
+                LEFT JOIN LATERAL
+                  (
+                    SELECT
+                      count(*)     AS count,
+                      created_date AS date,
+                      event_type_id,
+                      account_id
+                    FROM
+                      metrics
+                    WHERE
+                      account_id     = :account_id AND
+                      created_date   = series.date AND
+                      event_type_id IN (
+                        :event_type_ids
+                      )
+                    GROUP BY
+                      event_type_id,
+                      account_id,
+                      date
+                  ) AS m USING (date)
+                GROUP BY
+                  series.date;
+              SQL
+            )
           else
-            <<~SQL
-              SELECT
-                coalesce(m.count, 0) AS count,
-                series.date          AS period
-              FROM
-                generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS series (date)
-              LEFT JOIN LATERAL
-                (
-                  SELECT
-                    count(*)     AS count,
-                    created_date AS date,
-                    account_id
-                  FROM
-                    metrics
-                  WHERE
-                    account_id   = #{conn.quote current_account.id} AND
-                    created_date = series.date
-                  GROUP BY
-                    account_id,
-                    date
-                ) AS m USING (date);
-            SQL
+            conn.execute(
+              Metric.sanitize_sql([<<~SQL, account_id: current_account.id, start_date:, end_date:])
+                SELECT
+                  coalesce(m.count, 0) AS count,
+                  series.date          AS period
+                FROM
+                  generate_series(date :start_date, date :end_date, interval '1 day') AS series (date)
+                LEFT JOIN LATERAL
+                  (
+                    SELECT
+                      count(*)     AS count,
+                      created_date AS date,
+                      account_id
+                    FROM
+                      metrics
+                    WHERE
+                      account_id   = :account_id AND
+                      created_date = series.date
+                    GROUP BY
+                      account_id,
+                      date
+                  ) AS m USING (date);
+              SQL
+            )
           end
-
-        rows = conn.execute(sql.squish)
 
         {
           meta: rows.map { [_1['period'].strftime('%Y-%m-%d'), _1['count'].to_i] }

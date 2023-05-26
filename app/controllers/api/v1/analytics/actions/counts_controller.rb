@@ -34,33 +34,33 @@ module Api::V1::Analytics::Actions
       authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_licenses_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
-        conn = ActiveRecord::Base.connection
-
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current
-        sql = <<~SQL
-          SELECT
-            "request_logs"."resource_id" AS license_id,
-            COUNT(*) AS count
-          FROM
-            "request_logs"
-          WHERE
-            "request_logs"."account_id" = #{conn.quote current_account.id} AND
-            "request_logs"."resource_type" = 'License' AND
-            "request_logs"."resource_id" IS NOT NULL AND
-            (
-              "request_logs"."created_at" >= #{conn.quote start_date} AND
-              "request_logs"."created_at" <= #{conn.quote end_date}
-            )
-          GROUP BY
-            "request_logs"."resource_id"
-          ORDER BY
-            count DESC
-          LIMIT
-            10
-        SQL
+        end_date   = Time.current
 
-        rows = conn.execute sql.squish
+        conn = ActiveRecord::Base.connection
+        rows = conn.execute(
+          RequestLog.sanitize_sql([<<~SQL, account_id: current_account.id, start_date:, end_date:])
+            SELECT
+              "request_logs"."resource_id" AS license_id,
+              COUNT(*) AS count
+            FROM
+              "request_logs"
+            WHERE
+              "request_logs"."account_id" = :account_id AND
+              "request_logs"."resource_type" = 'License' AND
+              "request_logs"."resource_id" IS NOT NULL AND
+              (
+                "request_logs"."created_at" >= :start_date AND
+                "request_logs"."created_at" <= :end_date
+              )
+            GROUP BY
+              "request_logs"."resource_id"
+            ORDER BY
+              count DESC
+            LIMIT
+              10
+          SQL
+        )
 
         {
           meta: rows.map { |r| r.slice('license_id', 'count').transform_keys { |k| k.camelize(:lower) } },
@@ -74,35 +74,35 @@ module Api::V1::Analytics::Actions
       authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_urls_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
-        conn = ActiveRecord::Base.connection
-
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current
-        sql = <<~SQL
-          SELECT
-            "request_logs"."method" AS method,
-            "request_logs"."url" AS url,
-            COUNT(*) AS count
-          FROM
-            "request_logs"
-          WHERE
-            "request_logs"."account_id" = #{conn.quote current_account.id} AND
-            "request_logs"."method" IS NOT NULL AND
-            "request_logs"."url" IS NOT NULL AND
-            (
-              "request_logs"."created_at" >= #{conn.quote start_date} AND
-              "request_logs"."created_at" <= #{conn.quote end_date}
-            )
-          GROUP BY
-            "request_logs"."method",
-            "request_logs"."url"
-          ORDER BY
-            count DESC
-          LIMIT
-            10
-        SQL
+        end_date   = Time.current
 
-        rows = conn.execute sql.squish
+        conn = ActiveRecord::Base.connection
+        rows = conn.execute(
+          RequestLog.sanitize_sql([<<~SQL, account_id: current_account.id, start_date:, end_date:])
+            SELECT
+              "request_logs"."method" AS method,
+              "request_logs"."url" AS url,
+              COUNT(*) AS count
+            FROM
+              "request_logs"
+            WHERE
+              "request_logs"."account_id" = :account_id AND
+              "request_logs"."method" IS NOT NULL AND
+              "request_logs"."url" IS NOT NULL AND
+              (
+                "request_logs"."created_at" >= :start_date AND
+                "request_logs"."created_at" <= :end_date
+              )
+            GROUP BY
+              "request_logs"."method",
+              "request_logs"."url"
+            ORDER BY
+              count DESC
+            LIMIT
+              10
+          SQL
+        )
 
         {
           meta: rows.map { |r| r.slice('method', 'url', 'count') },
@@ -116,32 +116,32 @@ module Api::V1::Analytics::Actions
       authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_ips_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
-        conn = ActiveRecord::Base.connection
-
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current
-        sql = <<~SQL
-          SELECT
-            "request_logs"."ip" AS ip,
-            COUNT(*) AS count
-          FROM
-            "request_logs"
-          WHERE
-            "request_logs"."account_id" = #{conn.quote current_account.id} AND
-            "request_logs"."ip" IS NOT NULL AND
-            (
-              "request_logs"."created_at" >= #{conn.quote start_date} AND
-              "request_logs"."created_at" <= #{conn.quote end_date}
-            )
-          GROUP BY
-            "request_logs"."ip"
-          ORDER BY
-            count DESC
-          LIMIT
-            10
-        SQL
+        end_date   = Time.current
 
-        rows = conn.execute sql.squish
+        conn = ActiveRecord::Base.connection
+        rows = conn.execute(
+          RequestLog.sanitize_sql([<<~SQL, account_id: current_account.id, start_date:, end_date:])
+            SELECT
+              "request_logs"."ip" AS ip,
+              COUNT(*) AS count
+            FROM
+              "request_logs"
+            WHERE
+              "request_logs"."account_id" = :account_id AND
+              "request_logs"."ip" IS NOT NULL AND
+              (
+                "request_logs"."created_at" >= :start_date AND
+                "request_logs"."created_at" <= :end_date
+              )
+            GROUP BY
+              "request_logs"."ip"
+            ORDER BY
+              count DESC
+            LIMIT
+              10
+          SQL
+        )
 
         {
           meta: rows.map { |r| r.slice('ip', 'count') },
