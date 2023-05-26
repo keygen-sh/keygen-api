@@ -220,12 +220,12 @@ class License < ApplicationRecord
     return where(id: identifier) if
       UUID_RE.match?(identifier)
 
-    where('licenses.id::text ILIKE ?', "%#{identifier}%")
+    where('licenses.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
   }
 
   scope :search_key,  -> key  { where(key:) }
   scope :search_name, -> term {
-    where('licenses.name ILIKE ?', "%#{term}%")
+    where('licenses.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_metadata, -> (terms) {
@@ -272,7 +272,7 @@ class License < ApplicationRecord
     return where(user_id: user_identifier) if
       UUID_RE.match?(user_identifier)
 
-    scope = joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
+    scope = joins(:user).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(user_identifier)
 
@@ -299,7 +299,7 @@ class License < ApplicationRecord
     return joins(:policy).where(policy: { product_id: product_identifier }) if
       UUID_RE.match?(product_identifier)
 
-    scope = joins(policy: :product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    scope = joins(policy: :product).where('products.name ILIKE ?', "%#{sanitize_sql_like(product_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(product_identifier)
 
@@ -326,7 +326,7 @@ class License < ApplicationRecord
     return where(policy_id: policy_identifier) if
       UUID_RE.match?(policy_identifier)
 
-    scope = joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
+    scope = joins(:policy).where('policies.name ILIKE ?', "%#{sanitize_sql_like(policy_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(policy_identifier)
 

@@ -42,15 +42,15 @@ class Entitlement < ApplicationRecord
     return where(id: identifier) if
       UUID_RE.match?(identifier)
 
-    where('entitlements.id::text ILIKE ?', "%#{identifier}%")
+    where('entitlements.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
   }
 
   scope :search_code, -> (term) {
-    where('entitlements.code ILIKE ?', "%#{term}%")
+    where('entitlements.code ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_name, -> (term) {
-    where('entitlements.name ILIKE ?', "%#{term}%")
+    where('entitlements.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   ##

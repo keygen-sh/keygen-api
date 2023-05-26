@@ -147,15 +147,15 @@ class Release < ApplicationRecord
     return where(id: identifier) if
       UUID_RE.match?(identifier)
 
-    where('releases.id::text ILIKE ?', "%#{identifier}%")
+    where('releases.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
   }
 
   scope :search_version, -> (term) {
-    where('releases.version ILIKE ?', "%#{term}%")
+    where('releases.version ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_tag, -> (term) {
-    where('releases.tag ILIKE ?', "%#{term}%")
+    where('releases.tag ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_metadata, -> (terms) {
@@ -201,7 +201,7 @@ class Release < ApplicationRecord
     return where(product_id: product_identifier) if
       UUID_RE.match?(product_identifier)
 
-    scope = joins(:product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    scope = joins(:product).where('products.name ILIKE ?', "%#{sanitize_sql_like(product_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(product_identifier)
 

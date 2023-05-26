@@ -50,7 +50,7 @@ class RequestLog < ApplicationRecord
     return where(id:) if
       UUID_RE.match?(id)
 
-    where('request_logs.id::text ILIKE ?', "%#{id}%")
+    where('request_logs.id::text ILIKE ?', "%#{sanitize_sql_like(id)}%")
   }
 
   scope :search_requestor, -> (type, id) {
@@ -73,7 +73,7 @@ class RequestLog < ApplicationRecord
     return where(requestor_id: requestor_id) if
       UUID_RE.match?(requestor_id)
 
-    where('request_logs.requestor_id::text ILIKE ?', "%#{requestor_id}%")
+    where('request_logs.requestor_id::text ILIKE ?', "%#{sanitize_sql_like(requestor_id)}%")
   }
 
   scope :search_resource, -> (type, id) {
@@ -96,7 +96,7 @@ class RequestLog < ApplicationRecord
     return where(resource_id: resource_id) if
       UUID_RE.match?(resource_id)
 
-    where('request_logs.resource_id::text ILIKE ?', "%#{resource_id}%")
+    where('request_logs.resource_id::text ILIKE ?', "%#{sanitize_sql_like(resource_id)}%")
   }
 
   scope :search_method, -> (term) {
@@ -108,7 +108,7 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_url, -> (term) {
-    where('request_logs.url LIKE ?', "%#{term}%")
+    where('request_logs.url LIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_ip, -> (term) {
