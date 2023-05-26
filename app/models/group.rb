@@ -42,6 +42,6 @@ class Group < ApplicationRecord
   }
 
   scope :search_name, -> term {
-    where('groups.name ILIKE ?', "%#{term}%")
+    where('groups.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 end

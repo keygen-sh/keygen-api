@@ -124,15 +124,15 @@ class User < ApplicationRecord
   }
 
   scope :search_email, -> (term) {
-    where('users.email ILIKE ?', "%#{term}%")
+    where('users.email ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_first_name, -> (term) {
-    where('users.first_name ILIKE ?', "%#{term}%")
+    where('users.first_name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_last_name, -> (term) {
-    where('users.last_name ILIKE ?', "%#{term}%")
+    where('users.last_name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_full_name, -> (term) {
@@ -189,7 +189,7 @@ class User < ApplicationRecord
     return joins(:role).where(role: { id: role_identifier }) if
       UUID_RE.match?(role_identifier)
 
-    scope = joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
+    scope = joins(:role).where('roles.name ILIKE ?', "%#{sanitize_sql_like(role_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(role_identifier)
 

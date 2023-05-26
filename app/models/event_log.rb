@@ -33,7 +33,7 @@ class EventLog < ApplicationRecord
     return where(request_log_id:) if
       UUID_RE.match?(request_log_id)
 
-    where('event_logs.request_log_id::text ILIKE ?', "%#{request_log_id}%")
+    where('event_logs.request_log_id::text ILIKE ?', "%#{sanitize_sql_like(request_log_id)}%")
   }
 
   scope :search_whodunnit, -> (type, id) {
@@ -56,7 +56,7 @@ class EventLog < ApplicationRecord
     return where(whodunnit_id:) if
       UUID_RE.match?(whodunnit_id)
 
-    where('event_logs.whodunnit_id::text ILIKE ?', "%#{whodunnit_id}%")
+    where('event_logs.whodunnit_id::text ILIKE ?', "%#{sanitize_sql_like(whodunnit_id)}%")
   }
 
   scope :search_resource, -> (type, id) {
@@ -79,6 +79,6 @@ class EventLog < ApplicationRecord
     return where(resource_id:) if
       UUID_RE.match?(resource_id)
 
-    where('event_logs.resource_id::text ILIKE ?', "%#{resource_id}%")
+    where('event_logs.resource_id::text ILIKE ?', "%#{sanitize_sql_like(resource_id)}%")
   }
 end

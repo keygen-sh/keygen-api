@@ -230,11 +230,11 @@ class Policy < ApplicationRecord
     return where(id: identifier) if
       UUID_RE.match?(identifier)
 
-    where('policies.id::text ILIKE ?', "%#{identifier}%")
+    where('policies.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
   }
 
   scope :search_name, -> (term) {
-    where('policies.name ILIKE ?', "%#{term}%")
+    where('policies.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_metadata, -> (terms) {
@@ -281,7 +281,7 @@ class Policy < ApplicationRecord
     return where(product_id: product_identifier) if
       UUID_RE.match?(product_identifier)
 
-    scope = joins(:product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    scope = joins(:product).where('products.name ILIKE ?', "%#{sanitize_sql_like(product_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(product_identifier)
 

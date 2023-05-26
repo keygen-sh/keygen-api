@@ -48,11 +48,11 @@ class Product < ApplicationRecord
     return where(id: identifier) if
       UUID_RE.match?(identifier)
 
-    where('products.id::text ILIKE ?', "%#{identifier}%")
+    where('products.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
   }
 
   scope :search_name, -> (term) {
-    where('products.name ILIKE ?', "%#{term}%")
+    where('products.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_metadata, -> (terms) {
