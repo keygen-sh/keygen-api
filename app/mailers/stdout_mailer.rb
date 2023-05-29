@@ -492,6 +492,70 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_four(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: 'Keygen goes open source!',
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Zeke here with a pretty big update -- Keygen is now open source!
+
+        As some of you may already know, this has been in the works for nearly a year. I'm incredibly excited for this change, and I hope you will be too.
+
+        So, what does this mean for you and for Keygen?
+
+        ## What's changing
+
+        If you're a current Keygen Cloud customer (what we're calling our SaaS moving forward), nothing changes. Starting today, in addition to Keygen Cloud, Keygen is now available in two self-hosted editions: Keygen CE and Keygen EE.
+
+        Each edition offers unique features and benefits, and you can choose the edition that best suits your specific needs:
+
+        - Keygen CE: the Community Edition (CE) of Keygen. This is a self-hosted single-tenant version of Keygen's API. To start using Keygen CE, you can visit our GitHub or follow our self-hosting instructions. Keygen CE is free (as in beer) to self-host.
+
+        - Keygen EE: the Enterprise Edition (EE) of Keygen. Also a self-hosted version of Keygen's API, Keygen EE can be single- or multi-tenant depending on configuration and license. Keygen EE comes with features that are more enterprise-centric such as environments, request logs, event (audit) logs, and advanced permissions. Keygen EE will require a valid license key to self-host.
+
+        - Keygen Cloud: the SaaS version of Keygen. Keygen Cloud is a fully-managed cloud service that provides all the benefits of Keygen EE without the need to manage infrastructure. This is the Keygen you already know and love.
+
+        ## Why open source?
+
+        Well, a lot of reasons. So many that I wrote a blog post about the why:
+
+          https://keygen.sh/blog/all-your-licensing-are-belong-to-you/
+
+        Please give it a read. Links to code and docs are there too.
+
+        --
+
+        Have questions or comments? I'm all ears. You can reply back this email directly.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+      TXT
+    )
+  end
+
   private
 
   def encrypt(plaintext)
