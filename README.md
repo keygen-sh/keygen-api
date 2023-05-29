@@ -187,6 +187,12 @@ You can fork Keygen and go closed-source.
 
 If the ELv2 license doesn't work for your company, please [reach out][sales].
 
+## Security
+
+We take security at Keygen very seriously. We perform annual pen-tests on our code base and infrastructure. In addition, we regularly perform code audits. Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/), an OSCP-certified security researcher in the Ruby and Rails community.
+
+If you believe you've found a vulnerability, please see our [`SECURITY.md`](https://github.com/keygen-sh/keygen-api/blob/master/SECURITY.md) file.
+
 ## Is it any good?
 
 [Yes.](https://news.ycombinator.com/item?id=3067434)

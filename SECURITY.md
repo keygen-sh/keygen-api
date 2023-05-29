@@ -2,9 +2,9 @@ Thanks for helping make Keygen safe for everyone.
 
 # Security
 
-We take the security of Keygen seriously.
+We take the security of Keygen seriously. We perform annual penetration tests of Keygen's code base and infrastructure. In addition, we perform regular code audits.
 
-We will ensure that your finding gets passed along to the appropriate maintainers for remediation.
+Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/), an OSCP-certified security researcher in the Ruby and Rails community.
 
 ## Reporting Security Issues
 
@@ -24,7 +24,7 @@ Please include as much of the information listed below as you can to help us bet
 - Proof-of-concept or exploit code (if possible)
 - Impact of the issue, including how an attacker might exploit the issue
 
-This information will help us triage your report more quickly.
+This information will help us triage your report, ensuring that your findings get passed along to the appropriate maintainers for remediation.
 
 We can only accept vulnerability reports at the above email address.
 
