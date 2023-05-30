@@ -52,6 +52,9 @@ class Product < ApplicationRecord
   }
 
   scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
     where('products.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

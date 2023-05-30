@@ -124,14 +124,23 @@ class User < ApplicationRecord
   }
 
   scope :search_email, -> (term) {
+    return none if
+      term.blank?
+
     where('users.email ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_first_name, -> (term) {
+    return none if
+      term.blank?
+
     where('users.first_name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_last_name, -> (term) {
+    return none if
+      term.blank?
+
     where('users.last_name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

@@ -108,10 +108,16 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_url, -> (term) {
+    return none if
+      term.blank?
+
     where('request_logs.url LIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_ip, -> (term) {
-    where('request_logs.ip ILIKE ?', "#{term}%")
+    return none if
+      term.blank?
+
+    where('request_logs.ip ILIKE ?', "#{sanitize_sql_like(term)}%")
   }
 end
