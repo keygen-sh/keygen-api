@@ -225,6 +225,9 @@ class License < ApplicationRecord
 
   scope :search_key,  -> key  { where(key:) }
   scope :search_name, -> term {
+    return none if
+      term.blank?
+
     where('licenses.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

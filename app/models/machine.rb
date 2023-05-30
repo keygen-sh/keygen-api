@@ -172,10 +172,16 @@ class Machine < ApplicationRecord
   }
 
   scope :search_fingerprint, -> (term) {
+    return none if
+      term.blank?
+
     where('machines.fingerprint ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
     where('machines.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

@@ -151,10 +151,16 @@ class Release < ApplicationRecord
   }
 
   scope :search_version, -> (term) {
+    return none if
+      term.blank?
+
     where('releases.version ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_tag, -> (term) {
+    return none if
+      term.blank?
+
     where('releases.tag ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

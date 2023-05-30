@@ -2028,6 +2028,68 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search with a empty value
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the first 2 "users" have the following attributes:
+      """
+      { "lastName": "Doe" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "lastName": ""
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the response body should be an array of errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "search query for 'lastName' is too small (minimum 3 characters)",
+        "source": {
+          "pointer": "/meta/query/lastName"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search with a nil value
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the first 2 "users" have the following attributes:
+      """
+      { "lastName": "Doe" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "lastName": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   @ee
   Scenario: Environment performs a search
     Given the current account is "test1"

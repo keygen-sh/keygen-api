@@ -46,10 +46,16 @@ class Entitlement < ApplicationRecord
   }
 
   scope :search_code, -> (term) {
+    return none if
+      term.blank?
+
     where('entitlements.code ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
   scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
     where('entitlements.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 

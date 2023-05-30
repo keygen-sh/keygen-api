@@ -234,6 +234,9 @@ class Policy < ApplicationRecord
   }
 
   scope :search_name, -> (term) {
+    return none if
+      term.blank?
+
     where('policies.name ILIKE ?', "%#{sanitize_sql_like(term)}%")
   }
 
