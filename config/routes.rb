@@ -9,15 +9,33 @@ Rails.application.routes.draw do
       {
         domain: ENV.fetch('KEYGEN_DOMAIN') {
           # Get host without subdomains if domain is not explicitly set
-          host = ENV.fetch('KEYGEN_HOST')
-          next unless
-            domains = host.downcase.strip.split('.')[-2, 2]
+          host    = ENV.fetch('KEYGEN_HOST')
+          domains = host.downcase.strip.split('.')[-2..-1]
+          next if
+            domains.blank?
 
           domains.join('.')
         },
       }
     else
       {}
+    end
+
+  subdomain_constraints =
+    if !Rails.env.development?
+      {
+        subdomain: ENV.fetch('KEYGEN_SUBDOMAIN') {
+          # Get subdomain when subdomain is not explicitly set
+          host       = ENV.fetch('KEYGEN_HOST')
+          subdomains = host.downcase.strip.split('.')[0..-3]
+          next if
+            subdomains.blank?
+
+          subdomains.join('.')
+        },
+      }
+    else
+      { subdomain: 'api' }
     end
 
   mount Sidekiq::Web, at: '/-/sidekiq'
@@ -356,7 +374,7 @@ Rails.application.routes.draw do
 
   scope module: :api, constraints: { format: :jsonapi } do
     namespace :v1 do
-      constraints subdomain: %w[api], **domain_constraints do
+      constraints **domain_constraints, **subdomain_constraints do
         if Keygen.multiplayer?
           post :stripe, to: 'stripe#receive_webhook'
 
