@@ -187,6 +187,14 @@ You can fork Keygen and go closed-source.
 
 If the ELv2 license doesn't work for your company, please [reach out][sales].
 
+The license is available [here](https://keygen.sh/license/).
+
+## Contributing
+
+If you discover an issue, or are interested in a new feature, please open an issue. If you want to contribute code, feel free to open a pull request. If the PR is substantial, it may be beneficial to open an issue beforehand to discuss.
+
+The CLA is available [here](https://keygen.sh/cla/).
+
 ## Security
 
 We take security at Keygen very seriously. We perform annual pen-tests on our code base and infrastructure. In addition, we regularly perform code audits. Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/), an OSCP-certified security researcher in the Ruby and Rails community.
