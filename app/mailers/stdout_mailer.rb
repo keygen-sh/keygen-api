@@ -544,11 +544,13 @@ class StdoutMailer < ApplicationMailer
 
         Please give it a read. Links to code and docs are there too.
 
-        ## Interested in EE?
+        ## What next?
 
-        Reply to this email directly, or reach out to sales@keygen.sh anytime.
+        If you're interested in Keygen EE, reply to this email directly or reach out to sales@keygen.sh anytime to start the discussion.
 
-        --
+        For self-hosting Keygen, check out the new self-hosting docs:
+
+          https://keygen.sh/docs/self-hosting/
 
         Have questions or comments? I'm all ears. You can reply back this email directly.
 
