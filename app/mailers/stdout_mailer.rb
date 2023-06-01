@@ -552,7 +552,7 @@ class StdoutMailer < ApplicationMailer
 
           https://keygen.sh/docs/self-hosting/
 
-        Have questions or comments? I'm all ears. You can reply back this email directly.
+        Have questions or comments? I'm all ears. You can reply back to this email directly.
 
         Until next time.
 
