@@ -544,6 +544,10 @@ class StdoutMailer < ApplicationMailer
 
         Please give it a read. Links to code and docs are there too.
 
+        ## Interested in EE?
+
+        Reply to this email directly, or reach out to sales@keygen.sh anytime.
+
         --
 
         Have questions or comments? I'm all ears. You can reply back this email directly.
