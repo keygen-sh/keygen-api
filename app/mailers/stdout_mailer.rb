@@ -546,7 +546,7 @@ class StdoutMailer < ApplicationMailer
 
         ## What next?
 
-        If you're interested in Keygen EE, reply to this email directly or reach out to sales@keygen.sh anytime to start the discussion.
+        If you're interested in Keygen EE, reply to this email directly or reach out to sales@keygen.sh anytime to start a conversation.
 
         For self-hosting Keygen, check out the new self-hosting docs:
 
