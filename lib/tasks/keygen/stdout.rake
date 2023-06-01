@@ -34,7 +34,7 @@ namespace :keygen do
 
           Keygen.logger.info "Sending issue #4 to #{subscriber.email}"
 
-          StdoutMailer.issue_three(subscriber: subscriber)
+          StdoutMailer.issue_four(subscriber:)
                       .deliver_later(
                         # Fan out deliveries
                         in: rand(1.minute..3.hours),
