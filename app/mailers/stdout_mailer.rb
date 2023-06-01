@@ -552,7 +552,6 @@ class StdoutMailer < ApplicationMailer
 
           https://keygen.sh/docs/self-hosting/
 
-
         Star us on GitHub:
 
           https://github.com/keygen-sh/keygen-api
