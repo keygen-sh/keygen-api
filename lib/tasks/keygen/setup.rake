@@ -68,6 +68,7 @@ namespace :keygen do
           billing_attributes: { state: 'subscribed' },
           users_attributes: [{ email:, password: }],
           plan_attributes: { name: 'Ent 0', price: 1 },
+          protected: true,
           id:,
         )
 
@@ -94,6 +95,7 @@ namespace :keygen do
             billing_attributes: { state: 'subscribed' },
             users_attributes: [{ email:, password: }],
             plan_attributes: { name: 'Ent 0', price: 1 },
+            protected: true,
             id:,
           )
 
