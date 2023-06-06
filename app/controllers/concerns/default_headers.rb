@@ -75,7 +75,7 @@ module DefaultHeaders
         "group": "csp-reports",
         "max_age": 10886400,
         "endpoints": [{
-          "url": "https://api.keygen.sh/-/csp-reports"
+          "url": "https://#{ENV.fetch('KEYGEN_HOST')}/-/csp-reports"
         }]
       }
     JSON
