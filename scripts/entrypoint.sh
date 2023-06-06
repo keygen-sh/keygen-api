@@ -17,7 +17,7 @@ release)
   exec bundle exec rails db:migrate
   ;;
 web)
-  echo "Running command: exec rails server -b $BIND -p $PORT"
+  echo "Running command: bundle exec rails server -b $BIND -p $PORT"
   exec bundle exec rails server -b "$BIND" -p "$PORT"
   ;;
 worker)
