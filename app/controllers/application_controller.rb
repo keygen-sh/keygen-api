@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
-  include TypedParameters::Controller
+  include TypedParams::Controller
   include ActionPolicy::Controller
 
   # NOTE(ezekg) Including these at the end so that they're run last
@@ -334,8 +334,8 @@ class ApplicationController < ActionController::API
 
   def rescue_from_exceptions
     yield
-  rescue TypedParameters::UnpermittedParameterError,
-         TypedParameters::InvalidParameterError => e
+  rescue TypedParams::UnpermittedParameterError,
+         TypedParams::InvalidParameterError => e
     source = e.source == :query ? :parameter : :pointer
     path   = e.source == :query ? e.path.to_s : e.path.to_json_pointer
 
