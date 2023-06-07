@@ -18,6 +18,9 @@ gem 'redis', '~> 4.7.1'
 # API migrations
 gem 'request_migrations', '~> 1.1'
 
+# API params
+gem 'typed_params', '~> 0.2'
+
 # JSON API serializers
 gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'

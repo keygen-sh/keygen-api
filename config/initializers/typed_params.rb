@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-require_dependency Rails.root / 'lib' / 'typed_parameters'
-
-TypedParameters.configure do |config|
+TypedParams.configure do |config|
   config.path_transform       = :lower_camel
   config.ignore_nil_optionals = true
 end
 
-TypedParameters.types.register(:metadata,
+TypedParams.types.register(:metadata,
   archetype: :hash,
   match: -> value {
     return false unless

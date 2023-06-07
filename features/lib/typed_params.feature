@@ -1,4 +1,4 @@
-@lib/typed_parameters
+@lib/typed_params
 Feature: Typed parameters
   Background:
     Given I send and accept JSON
