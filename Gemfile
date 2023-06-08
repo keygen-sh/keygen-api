@@ -19,7 +19,7 @@ gem 'redis', '~> 4.7.1'
 gem 'request_migrations', '~> 1.1'
 
 # API params
-gem 'typed_params', '~> 1.0.0'
+gem 'typed_params', '~> 1.0.3'
 
 # JSON API serializers
 gem 'json', '~> 2.3.0'
