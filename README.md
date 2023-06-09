@@ -1,3 +1,10 @@
+<a href="https://keygen.sh?ref=keygen-api">
+  <div>
+    <img src="https://keygen.sh/images/logo-pill.png" width="200" alt="Keygen">
+  </div>
+</a>
+<br>
+
 [![Keygen CI](https://github.com/keygen-sh/keygen-api/actions/workflows/test.yml/badge.svg)](https://github.com/keygen-sh/keygen-api/actions)
 [![Discord Community](https://img.shields.io/badge/discord-community-blue)][discord]
 
