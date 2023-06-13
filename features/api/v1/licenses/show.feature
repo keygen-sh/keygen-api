@@ -205,6 +205,44 @@ Feature: Show license
     Then the response status should be "200"
     And the response body should be a "license"
 
+  Scenario: Admin retrieves a license for their account that does not have a current version
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "lastValidatedVersion": null }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response body should be a "license"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "version": null }
+      """
+
+  Scenario: Admin retrieves a license for their account that has a current version
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "lastValidatedVersion": "1.2.0" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response body should be a "license"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following attributes:
+      """
+      { "version": "1.2.0" }
+      """
+
   Scenario: Admin retrieves a license for their account by UUID key that matches another account license by ID
     Given I am an admin of account "test1"
     And the current account is "test1"

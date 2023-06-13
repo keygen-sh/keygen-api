@@ -28,6 +28,9 @@ class LicenseSerializer < BaseSerializer
   attribute :protected do
     @object.protected?
   end
+  attribute :version do
+    @object.last_validated_version
+  end
   attribute :max_machines
   attribute :max_processes
   attribute :max_cores

@@ -28,6 +28,8 @@ class PolicySerializer < BaseSerializer
   attribute :require_machine_scope
   attribute :require_fingerprint_scope
   attribute :require_user_scope
+  attribute :require_checksum_scope
+  attribute :require_version_scope
   attribute :require_check_in
   attribute :check_in_interval
   attribute :check_in_interval_count
