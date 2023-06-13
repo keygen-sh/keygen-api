@@ -176,6 +176,8 @@ Feature: Update policy
       """
       {
         "requireUserScope": true,
+        "requireChecksumScope": false,
+        "requireVersionScope": false,
         "requireCheckIn": true,
         "checkInInterval": "day",
         "checkInIntervalCount": 1,
@@ -191,6 +193,8 @@ Feature: Update policy
           "id": "$policies[0].id",
           "attributes": {
             "requireUserScope": false,
+            "requireChecksumScope": true,
+            "requireVersionScope": true,
             "requireCheckIn": false,
             "checkInInterval": null,
             "checkInIntervalCount": null,
@@ -200,11 +204,18 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the response body should be a "policy" that does not requireUserScope
-    And the response body should be a "policy" that does not requireCheckIn
-    And the response body should be a "policy" with a nil checkInInterval
-    And the response body should be a "policy" with a nil checkInIntervalCount
-    And the response body should be a "policy" with a nil duration
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "requireUserScope": false,
+        "requireChecksumScope": true,
+        "requireVersionScope": true,
+        "requireCheckIn": false,
+        "checkInInterval": null,
+        "checkInIntervalCount": null,
+        "duration": null
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

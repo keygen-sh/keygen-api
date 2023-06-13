@@ -47,6 +47,8 @@ module Api::V1::Licenses::Actions
           param :entitlements, type: :array, optional: true do
             items type: :string
           end
+          param :checksum, type: :string, optional: true
+          param :version, type: :string, optional: true
 
           Keygen.ee do |license|
             next unless
@@ -113,6 +115,8 @@ module Api::V1::Licenses::Actions
           param :entitlements, type: :array, optional: true do
             items type: :string
           end
+          param :checksum, type: :string, optional: true
+          param :version, type: :string, optional: true
 
           Keygen.ee do |license|
             next unless

@@ -54,6 +54,8 @@ module Api::V1
           param :require_machine_scope, type: :boolean, optional: true
           param :require_fingerprint_scope, type: :boolean, optional: true
           param :require_user_scope, type: :boolean, optional: true
+          param :require_checksum_scope, type: :boolean, optional: true
+          param :require_version_scope, type: :boolean, optional: true
           param :require_check_in, type: :boolean, optional: true
           param :check_in_interval, type: :string, allow_nil: true, optional: true
           param :check_in_interval_count, type: :integer, allow_nil: true, optional: true
@@ -133,6 +135,8 @@ module Api::V1
           param :require_machine_scope, type: :boolean, optional: true
           param :require_fingerprint_scope, type: :boolean, optional: true
           param :require_user_scope, type: :boolean, optional: true
+          param :require_checksum_scope, type: :boolean, optional: true
+          param :require_version_scope, type: :boolean, optional: true
           param :require_check_in, type: :boolean, optional: true
           param :check_in_interval, type: :string, allow_nil: true, optional: true
           param :check_in_interval_count, type: :integer, allow_nil: true, optional: true
