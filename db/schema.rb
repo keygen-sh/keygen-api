@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_02_171227) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_13_164122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -220,6 +220,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_02_171227) do
     t.integer "max_processes_override"
     t.datetime "last_check_out_at", precision: nil
     t.uuid "environment_id"
+    t.string "last_validated_checksum"
+    t.string "last_validated_version"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -371,6 +373,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_02_171227) do
     t.uuid "environment_id"
     t.string "heartbeat_basis"
     t.boolean "require_environment_scope", default: false, null: false
+    t.boolean "require_checksum_scope", default: false, null: false
+    t.boolean "require_version_scope", default: false, null: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

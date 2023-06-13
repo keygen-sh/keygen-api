@@ -3,16 +3,34 @@
 class LicenseValidationService < BaseService
 
   def initialize(license:, scope: nil, skip_touch: false)
+    @account    = license&.account
+    @product    = license&.product
     @license    = license
     @scope      = scope
     @skip_touch = skip_touch
+    @touches    = {
+      last_validated_at: Time.current,
+    }
   end
 
   def call
-    return [false, "does not exist", :NOT_FOUND] if license.nil?
+    res = validate!
+    touch! unless skip_touch?
+    res
+  end
 
-    touch_last_validated_at unless
-      skip_touch?
+  private
+
+  attr_reader :account,
+              :product,
+              :license,
+              :scope,
+              :touches
+
+  def skip_touch? = !!@skip_touch
+
+  def validate!
+    return [false, "does not exist", :NOT_FOUND] if license.nil?
 
     # Check if license's user has been banned
     return [false, "is banned", :BANNED] if
@@ -28,6 +46,7 @@ class LicenseValidationService < BaseService
 
     # Check if license is overdue for check in
     return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
+
     # Scope validations (quick validation skips this by setting explicitly to false)
     if scope != false
       # Check against environment scope requirements
@@ -138,6 +157,39 @@ class LicenseValidationService < BaseService
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
       end
+
+      # Check against checksum scope
+      if scope.present? && scope.key?(:checksum)
+        checksum = scope[:checksum]
+        artifact = product.release_artifacts.with_checksum(checksum)
+                                            .for_license(license)
+                                            .take
+
+        if artifact.nil?
+          return [false, "checksum scope is not valid (does not match any accessible artifacts)", :CHECKSUM_SCOPE_MISMATCH]
+        end
+
+        touches[:last_validated_checksum] = checksum
+        touches[:last_validated_version]  = artifact.version
+      else
+        return [false, "checksum scope is required", :CHECKSUM_SCOPE_REQUIRED] if license.policy.require_checksum_scope?
+      end
+
+      # Check against version scope
+      if scope.present? && scope.key?(:version)
+        version = scope[:version]
+        release = product.releases.with_version(version)
+                                  .for_license(license)
+                                  .take
+
+        if release.nil?
+          return [false, "version scope is not valid (does not match any accessible releases)", :VERSION_SCOPE_MISMATCH]
+        end
+
+        touches[:last_validated_version] = release.version
+      else
+        return [false, "version scope is required", :VERSION_SCOPE_REQUIRED] if license.policy.require_version_scope?
+      end
     end
 
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).
@@ -227,28 +279,24 @@ class LicenseValidationService < BaseService
     return [true, "is valid", :VALID]
   end
 
-  private
-
-  attr_reader :license, :scope
-
-  def skip_touch?
-    @skip_touch
-  end
-
-  def touch_last_validated_at
+  # TODO(ezekg) Move to a background job so we can read from replicas for validations.
+  def touch!
     return if
-      skip_touch?
+      skip_touch? || touches.empty?
 
-    # We're going to attempt to update the license's last validated timestamp,
-    # but if there's a concurrent update then we'll skip.
-    license.with_lock 'FOR UPDATE SKIP LOCKED' do
-      license.last_validated_at = Time.current
-      license.save!
+    # We're going to attempt to update the license's last validated timestamp and
+    # other metadata, but if there's a concurrent update then we'll skip. This
+    # sheds load when a license is validated too often, e.g. in an infinite
+    # loop or via a high number of concurrent processes.
+    license&.with_lock 'FOR UPDATE SKIP LOCKED' do
+      license.update!(**touches)
     end
   rescue ActiveRecord::LockWaitTimeout, # For NOWAIT lock wait timeout error
          ActiveRecord::RecordNotFound   # SKIP LOCKED raises not found
     # noop
   rescue => e
     Keygen.logger.exception(e)
+
+    raise e
   end
 end

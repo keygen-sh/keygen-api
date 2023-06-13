@@ -1,6 +1,5 @@
 @api/v1
 Feature: Create policy
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -2691,6 +2690,8 @@ Feature: Create policy
             "requirePolicyScope": true,
             "requireMachineScope": true,
             "requireUserScope": true,
+            "requireChecksumScope": true,
+            "requireVersionScope": true,
             "duration": null
           },
           "relationships": {
@@ -2705,8 +2706,20 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the response body should be a "policy" that is requireFingerprintScope
-    And the response body should be a "policy" that is requireProductScope
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Premium Add-On",
+        "requireFingerprintScope": true,
+        "requireProductScope": true,
+        "requirePolicyScope": true,
+        "requireMachineScope": true,
+        "requireUserScope": true,
+        "requireChecksumScope": true,
+        "requireVersionScope": true,
+        "duration": null
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
