@@ -43,9 +43,9 @@ Before do |scenario|
   StripeHelper.start
   Rails.cache.clear
 
-  stub_account_keygens
-  stub_cache
-  stub_s3
+  stub_account_keygens!
+  stub_cache!
+  stub_s3!
 
   @crypt = []
 end
