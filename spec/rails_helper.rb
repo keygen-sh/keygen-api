@@ -77,6 +77,9 @@ RSpec.configure do |config|
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
 
+  # Stub keygens
+  config.before { stub_account_keygens! }
+
   # Setup Sidekiq, Stripe, etc.
   config.before :each do
     DatabaseCleaner.start
