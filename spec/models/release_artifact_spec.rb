@@ -209,6 +209,13 @@ describe ReleaseArtifact, type: :model do
         1.0.0-alpha
       ]
     end
+
+    it 'should take latest' do
+      artifact = described_class.order_by_version
+                                .take
+
+      expect(artifact.version).to eq '101.0.0'
+    end
   end
 
   describe 'filesize=' do

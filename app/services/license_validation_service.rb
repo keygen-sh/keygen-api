@@ -117,6 +117,7 @@ class LicenseValidationService < BaseService
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
       end
+
       # Check against fingerprint scope requirements
       if scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
         fingerprints = Array(scope[:fingerprint] || scope[:fingerprints])
@@ -163,6 +164,7 @@ class LicenseValidationService < BaseService
         checksum = scope[:checksum]
         artifact = product.release_artifacts.with_checksum(checksum)
                                             .for_license(license)
+                                            .order_by_version
                                             .take
 
         if artifact.nil?
