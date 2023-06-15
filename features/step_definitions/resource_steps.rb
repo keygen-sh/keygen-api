@@ -408,6 +408,8 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
     case resource.underscore.pluralize
     when 'processes'
       @account.machine_processes
+    when 'artifacts'
+      @account.release_artifacts
     else
       @account.send(resource.pluralize.underscore)
     end
