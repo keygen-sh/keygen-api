@@ -24,15 +24,15 @@ class ReleaseEntitlementConstraint < ApplicationRecord
 
   scope :accessible_by, -> accessor {
     case accessor
-    in role: { name: 'admin' }
+    in role: Role(:admin)
       self.all
-    in role: { name: 'environment' }
+    in role: Role(:environment)
       self.for_environment(accessor.id)
-    in role: { name: 'product' }
+    in role: Role(:product)
       self.for_product(accessor.id)
-    in role: { name: 'license' }
+    in role: Role(:license)
       self.for_license(accessor.id)
-    in role: { name: 'user' }
+    in role: Role(:user)
       self.for_user(accessor.id)
     else
       self.none

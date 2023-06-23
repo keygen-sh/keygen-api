@@ -8,7 +8,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :product | :environment)
       allow!
     else
       deny!
@@ -22,7 +22,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :product | :environment)
       allow!
     else
       deny!
@@ -34,7 +34,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :product | :environment)
       allow!
     else
       deny!
@@ -46,7 +46,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :product | :environment)
       allow!
     else
       deny!
@@ -58,7 +58,7 @@ class WebhookEndpointPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :product | :environment)
       allow!
     else
       deny!

@@ -29,7 +29,7 @@ class AccountPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: Role(:admin | :developer)
       record == bearer.account
     else
       deny!

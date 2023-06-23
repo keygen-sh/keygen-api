@@ -11,11 +11,11 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :product | :environment)
         allow!
-      in role: { name: 'user' } if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
+      in role: Role(:user) if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
         allow!
-      in role: { name: 'license' } if group.id == bearer.group_id
+      in role: Role(:license) if group.id == bearer.group_id
         allow!
       else
         deny!
@@ -29,11 +29,11 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :product | :environment)
         allow!
-      in role: { name: 'user' } if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
+      in role: Role(:user) if group.id == bearer.group_id || group.id.in?(bearer.group_ids)
         allow!
-      in role: { name: 'license' } if group.id == bearer.group_id
+      in role: Role(:license) if group.id == bearer.group_id
         allow!
       else
         deny!
@@ -50,7 +50,7 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
+      in role: Role(:admin | :developer | :product | :environment)
         allow!
       else
         deny!
@@ -65,7 +65,7 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'product' | 'environment' }
+      in role: Role(:admin | :developer | :product | :environment)
         allow!
       else
         deny!

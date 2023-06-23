@@ -8,9 +8,9 @@ class KeyPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
     else
       deny!
@@ -24,9 +24,9 @@ class KeyPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -38,9 +38,9 @@ class KeyPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -52,9 +52,9 @@ class KeyPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -66,9 +66,9 @@ class KeyPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!

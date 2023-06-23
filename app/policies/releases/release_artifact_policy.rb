@@ -13,13 +13,13 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow? :index, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
-      in role: { name: 'license' } if release.product == bearer.product
+      in role: Role(:license) if release.product == bearer.product
         allow? :index, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
       else
         release.open_distribution? && release.constraints.none?
@@ -33,13 +33,13 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow? :show, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
-      in role: { name: 'license' } if release.product == bearer.product
+      in role: Role(:license) if release.product == bearer.product
         allow? :show, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
       else
         release.open_distribution? && release.constraints.none?

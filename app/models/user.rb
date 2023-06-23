@@ -41,9 +41,9 @@ class User < ApplicationRecord
              end
 
       case role
-      in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
+      in Role(:admin | :developer | :support_agent | :sales_agent)
         Permission::ADMIN_PERMISSIONS
-      in name: 'read_only'
+      in Role(:read_only)
         Permission::READ_ONLY_PERMISSIONS
       else
         Permission::USER_PERMISSIONS
@@ -61,9 +61,9 @@ class User < ApplicationRecord
       #              deprecated, but still may be a good idea for correctness.
       #              When the admin is in an environment, we should also remove
       #              permissions such as account.billing.update, etc.
-      in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
+      in Role(:admin | :developer | :support_agent | :sales_agent)
         Permission::ADMIN_PERMISSIONS
-      in name: 'read_only'
+      in Role(:read_only)
         Permission::READ_ONLY_PERMISSIONS
       else
         # NOTE(ezekg) Removing these from defaults for backwards compatibility
@@ -236,13 +236,13 @@ class User < ApplicationRecord
   # Give products the ability to read all groups
   scope :accessible_by, -> accessor {
     case accessor
-    in role: { name: 'admin' | 'product' }
+    in role: Role(:admin | :product)
       self.all
-    in role: { name: 'environment' }
+    in role: Role(:environment)
       self.for_environment(accessor.id)
-    in role: { name: 'user' }
+    in role: Role(:user)
       self.for_user(accessor.id)
-    in role: { name: 'license' }
+    in role: Role(:license)
       self.for_license(accessor.id)
     else
       self.none

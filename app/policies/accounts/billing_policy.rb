@@ -9,7 +9,7 @@ module Accounts
       )
 
       case bearer
-      in role: { name: 'admin' }
+      in role: Role(:admin)
         allow!
       else
         deny!
@@ -21,7 +21,7 @@ module Accounts
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' }
+      in role: Role(:admin)
         allow!
       else
         deny!

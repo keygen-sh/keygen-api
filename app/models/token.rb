@@ -95,14 +95,14 @@ class Token < ApplicationRecord
 
   scope :accessible_by, -> accessor {
     case accessor
-    in role: { name: 'admin' }
+    in role: Role(:admin)
       self.all
-    in role: { name: 'environment' }
+    in role: Role(:environment)
       self.for_environment(accessor)
           .or(
             where(bearer: accessor)
           )
-    in role: { name: 'product' }
+    in role: Role(:product)
       self.for_product(accessor.id)
           .or(
             where(bearer: accessor.licenses.reorder(nil)),
@@ -110,9 +110,9 @@ class Token < ApplicationRecord
           .or(
             where(bearer: accessor.users.reorder(nil)),
           )
-    in role: { name: 'user' }
+    in role: Role(:user)
       self.for_user(accessor.id)
-    in role: { name: 'license' }
+    in role: Role(:license)
       self.for_license(accessor.id)
     else
       self.none
@@ -393,7 +393,7 @@ class Token < ApplicationRecord
 
   def set_default_expiry
     # NOTE(ezekg) Non-user tokens do not expire by default (admin, env, product, license, etc.)
-    self.expiry = if bearer in role: { name: 'user' }
+    self.expiry = if bearer in role: Role(:user)
                     Time.current + TOKEN_DURATION
                   else
                     nil

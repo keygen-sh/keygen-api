@@ -8,13 +8,13 @@ class LicenseFilePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
-    in role: { name: 'license' } if record.license == bearer
+    in role: Role(:license) if record.license == bearer
       allow!
     else
       deny!
