@@ -11,13 +11,13 @@ module MachineProcesses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'environment' }
+      in role: Role(:admin | :developer | :environment)
         allow!
-      in role: { name: 'product' } if machine_process.product == bearer
+      in role: Role(:product) if machine_process.product == bearer
         allow!
-      in role: { name: 'user' } if machine_process.user == bearer
+      in role: Role(:user) if machine_process.user == bearer
         !machine_process.license.protected?
-      in role: { name: 'license' } if machine_process.license == bearer
+      in role: Role(:license) if machine_process.license == bearer
         allow!
       else
         deny!

@@ -7,7 +7,7 @@ class SearchPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+    in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent)
       allow!
     else
       deny!

@@ -11,11 +11,11 @@ module Users
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if user.user?
+      in role: Role(:product) if user.user?
         allow!
-      in role: { name: 'user' } if user == bearer
+      in role: Role(:user) if user == bearer
         allow!
       else
         deny!
@@ -27,9 +27,9 @@ module Users
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :environment)
         allow!
-      in role: { name: 'product' } if user.user?
+      in role: Role(:product) if user.user?
         allow!
       else
         deny!

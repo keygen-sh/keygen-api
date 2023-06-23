@@ -8,16 +8,16 @@ class ReleasePolicy < ApplicationPolicy
       relation.respond_to?(:for_environment)
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+    in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent)
       relation.all
-    in role: { name: 'environment' } if relation.respond_to?(:for_environment)
+    in role: Role(:environment) if relation.respond_to?(:for_environment)
       relation.for_environment(bearer.id)
-    in role: { name: 'product' } if relation.respond_to?(:for_product)
+    in role: Role(:product) if relation.respond_to?(:for_product)
       relation.for_product(bearer.id)
-    in role: { name: 'user' } if relation.respond_to?(:for_user)
+    in role: Role(:user) if relation.respond_to?(:for_user)
       relation.for_user(bearer.id)
               .published
-    in role: { name: 'license' } if relation.respond_to?(:for_license)
+    in role: Role(:license) if relation.respond_to?(:for_license)
       relation.for_license(bearer.id)
               .published
     else
@@ -39,12 +39,12 @@ class ReleasePolicy < ApplicationPolicy
       bearer.nil?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: { name: 'user' } if record.all? { _1.open_distribution? && _1.constraints.none? ||
-                                               _1.product_id.in?(bearer.product_ids) }
+    in role: Role(:user) if record.all? { _1.open_distribution? && _1.constraints.none? ||
+                                          _1.product_id.in?(bearer.product_ids) }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed_distribution?)
 
@@ -64,8 +64,8 @@ class ReleasePolicy < ApplicationPolicy
       end
 
       allow!
-    in role: { name: 'license' } if record.all? { _1.open_distribution? && _1.constraints.none? ||
-                                                  _1.product == bearer.product }
+    in role: Role(:license) if record.all? { _1.open_distribution? && _1.constraints.none? ||
+                                             _1.product == bearer.product }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed_distribution?)
 
@@ -99,11 +99,11 @@ class ReleasePolicy < ApplicationPolicy
       bearer.nil?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if bearer.licenses.for_product(record.product).any?
+    in role: Role(:user) if bearer.licenses.for_product(record.product).any?
       deny! 'release distribution strategy is closed' if
         record.closed_distribution?
 
@@ -116,7 +116,7 @@ class ReleasePolicy < ApplicationPolicy
       )
 
       allow!
-    in role: { name: 'license' } if record.product == bearer.product
+    in role: Role(:license) if record.product == bearer.product
       deny! 'release distribution strategy is closed' if
         record.closed_distribution?
 
@@ -136,9 +136,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -150,9 +150,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -164,9 +164,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -184,9 +184,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -198,9 +198,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -212,9 +212,9 @@ class ReleasePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!

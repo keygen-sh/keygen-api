@@ -8,11 +8,11 @@ class ProductPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'user' } if record_ids & bearer.product_ids == record_ids
+    in role: Role(:user) if record_ids & bearer.product_ids == record_ids
       allow!
-    in role: { name: 'license' } if record == [bearer.product]
+    in role: Role(:license) if record == [bearer.product]
       allow!
     else
       deny!
@@ -26,13 +26,13 @@ class ProductPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record == bearer
+    in role: Role(:product) if record == bearer
       allow!
-    in role: { name: 'user' } if bearer.products.exists?(record.id)
+    in role: Role(:user) if bearer.products.exists?(record.id)
       allow!
-    in role: { name: 'license' } if record == bearer.product
+    in role: Role(:license) if record == bearer.product
       allow!
     else
       deny!
@@ -44,7 +44,7 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
     else
       deny!
@@ -56,9 +56,9 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record == bearer
+    in role: Role(:product) if record == bearer
       allow!
     else
       deny!
@@ -70,7 +70,7 @@ class ProductPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
     else
       deny!
@@ -84,7 +84,7 @@ class ProductPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'product' } if record == bearer
+    in role: Role(:product) if record == bearer
       allow!
     else
       deny!

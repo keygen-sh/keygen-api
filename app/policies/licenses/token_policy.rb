@@ -11,9 +11,9 @@ module Licenses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if license.product == bearer
+      in role: Role(:product) if license.product == bearer
         allow!
       else
         deny!
@@ -27,9 +27,9 @@ module Licenses
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if license.product == bearer
+      in role: Role(:product) if license.product == bearer
         allow!
       else
         deny!
@@ -41,9 +41,9 @@ module Licenses
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :environment)
         allow!
-      in role: { name: 'product' } if license.product == bearer
+      in role: Role(:product) if license.product == bearer
         allow!
       else
         deny!

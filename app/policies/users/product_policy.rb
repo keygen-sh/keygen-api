@@ -11,11 +11,11 @@ module Users
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product'} if record.all? { _1 == bearer }
+      in role: Role(:product) if record.all? { _1 == bearer }
         allow!
-      in role: { name: 'user' } if user == bearer
+      in role: Role(:user) if user == bearer
         allow!
       else
         deny!
@@ -29,11 +29,11 @@ module Users
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if record == bearer
+      in role: Role(:product) if record == bearer
         allow!
-      in role: { name: 'user' } if user == bearer
+      in role: Role(:user) if user == bearer
         allow!
       else
         deny!

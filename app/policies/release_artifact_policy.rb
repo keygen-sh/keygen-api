@@ -8,17 +8,17 @@ class ReleaseArtifactPolicy < ApplicationPolicy
       relation.respond_to?(:for_environment)
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+    in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent)
       relation.all
-    in role: { name: 'environment' } if relation.respond_to?(:for_environment)
+    in role: Role(:environment) if relation.respond_to?(:for_environment)
       relation.for_environment(bearer.id)
-    in role: { name: 'product' } if relation.respond_to?(:for_product)
+    in role: Role(:product) if relation.respond_to?(:for_product)
       relation.for_product(bearer.id)
-    in role: { name: 'user' } if relation.respond_to?(:for_user)
+    in role: Role(:user) if relation.respond_to?(:for_user)
       relation.for_user(bearer.id)
               .published
               .uploaded
-    in role: { name: 'license' } if relation.respond_to?(:for_license)
+    in role: Role(:license) if relation.respond_to?(:for_license)
       relation.for_license(bearer.id)
               .published
               .uploaded
@@ -52,9 +52,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -66,9 +66,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -80,9 +80,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!

@@ -13,13 +13,13 @@ module Releases::V1x0
       deny! if record.nil?
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if record.product == bearer
+      in role: Role(:product) if record.product == bearer
         allow!
-      in role: { name: 'user' }
+      in role: Role(:user)
         allow? :show, record, skip_verify_permissions: true, with: ::ReleasePolicy
-      in role: { name: 'license' }
+      in role: Role(:license)
         allow? :show, record, skip_verify_permissions: true, with: ::ReleasePolicy
       else
         record.open_distribution? && record.constraints.none?
@@ -36,13 +36,13 @@ module Releases::V1x0
       allow! if record.nil?
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if record.product == bearer
+      in role: Role(:product) if record.product == bearer
         allow!
-      in role: { name: 'user' }
+      in role: Role(:user)
         allow? :upgrade, record, skip_verify_permissions: true, with: ::ReleasePolicy
-      in role: { name: 'license' }
+      in role: Role(:license)
         allow? :upgrade, record, skip_verify_permissions: true, with: ::ReleasePolicy
       else
         record.open_distribution? && record.constraints.none?

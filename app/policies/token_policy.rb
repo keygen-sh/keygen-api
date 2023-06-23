@@ -8,14 +8,14 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' }
+    in role: Role(:product)
       record.all? { _1 in { bearer_type: ^(Product.name), bearer_id: ^(bearer.id) } |
                           { bearer_type: ^(License.name) | ^(User.name) } }
-    in role: { name: 'license' }
+    in role: Role(:license)
       record.all? { _1 in { bearer_type: ^(License.name), bearer_id: ^(bearer.id) } }
-    in role: { name: 'user' }
+    in role: Role(:user)
       record.all? { _1 in { bearer_type: ^(User.name), bearer_id: ^(bearer.id) } }
     else
       deny!
@@ -29,7 +29,7 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
     else
       record.bearer == bearer
@@ -45,11 +45,11 @@ class TokenPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' } if record.bearer == bearer
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment) if record.bearer == bearer
       allow!
-    in role: { name: 'admin' | 'developer'  | 'environment' } if record.bearer.user?
+    in role: Role(:admin | :developer | :environment) if record.bearer.user?
       allow!
-    in role: { name: 'user' } if record.bearer == bearer
+    in role: Role(:user) if record.bearer == bearer
       deny! 'user is banned' if
         bearer.banned?
 
@@ -64,9 +64,9 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' } if record.bearer == bearer || record.bearer.environment? || record.bearer.product? || record.bearer.license? || record.bearer.user?
+    in role: Role(:admin | :developer) if record.bearer == bearer || record.bearer.environment? || record.bearer.product? || record.bearer.license? || record.bearer.user?
       allow!
-    in role: { name: 'environment' } if record.bearer == bearer || record.bearer.product? || record.bearer.license? || record.bearer.user?
+    in role: Role(:environment) if record.bearer == bearer || record.bearer.product? || record.bearer.license? || record.bearer.user?
       allow!
     else
       record.bearer == bearer
@@ -78,7 +78,7 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'environment' }
+    in role: Role(:admin | :developer | :environment)
       allow!
     else
       record.bearer == bearer

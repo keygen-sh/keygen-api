@@ -11,13 +11,13 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow!
-      in role: { name: 'license' } if release.product == bearer.product
+      in role: Role(:license) if release.product == bearer.product
         allow!
       else
         deny!
@@ -31,13 +31,13 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow!
-      in role: { name: 'license' } if release.product == bearer.product
+      in role: Role(:license) if release.product == bearer.product
         allow!
       else
         deny!
@@ -54,9 +54,9 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'environment' }
+      in role: Role(:admin | :developer | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
       else
         deny!
@@ -71,9 +71,9 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'environment' }
+      in role: Role(:admin | :developer | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
       else
         deny!

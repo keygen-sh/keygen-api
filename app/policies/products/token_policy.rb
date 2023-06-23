@@ -11,9 +11,9 @@ module Products
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if product == bearer
+      in role: Role(:product) if product == bearer
         record.all? { _1 in bearer_type: ^(Product.name), bearer_id: ^(bearer.id) }
       else
         deny!
@@ -27,9 +27,9 @@ module Products
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if product == bearer && record.bearer == bearer
+      in role: Role(:product) if product == bearer && record.bearer == bearer
         allow!
       else
         deny!
@@ -41,7 +41,7 @@ module Products
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'environment' }
+      in role: Role(:admin | :developer | :environment)
         allow!
       else
         deny!
