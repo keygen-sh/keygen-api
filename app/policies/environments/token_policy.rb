@@ -9,9 +9,9 @@ module Environments
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
         allow!
-      in role: { name: 'environment' } if environment == bearer
+      in role: Role(:environment) if environment == bearer
         record.all? { _1 in bearer_type: ^(Environment.name), bearer_id: ^(bearer.id) }
       else
         deny!
@@ -25,9 +25,9 @@ module Environments
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
         allow!
-      in role: { name: 'environment' } if environment == bearer && record.bearer == bearer
+      in role: Role(:environment) if environment == bearer && record.bearer == bearer
         allow!
       else
         deny!
@@ -39,7 +39,7 @@ module Environments
       verify_environment!
 
       case bearer
-      in role: { name: 'admin' | 'developer' }
+      in role: Role(:admin | :developer)
         allow!
       else
         deny!

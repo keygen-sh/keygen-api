@@ -11,13 +11,13 @@ module Releases
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if release.product == bearer
+      in role: Role(:product) if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(record.id)
+      in role: Role(:user) if bearer.products.exists?(record.id)
         allow!
-      in role: { name: 'license' } if record == bearer.product
+      in role: Role(:license) if record == bearer.product
         allow!
       else
         deny!

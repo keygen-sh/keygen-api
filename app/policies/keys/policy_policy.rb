@@ -11,9 +11,9 @@ module Keys
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if key.product == bearer
+      in role: Role(:product) if key.product == bearer
         allow!
       else
         deny!

@@ -164,6 +164,13 @@ class Role < ApplicationRecord
     end
   end
 
+  ##
+  # deconstruct allows pattern pattern matching like:
+  #
+  #   role in Role(:admin | :user)
+  #
+  def deconstruct = [name.to_sym]
+
   def rank
     ROLE_RANK.fetch(name) { -1 }
   end

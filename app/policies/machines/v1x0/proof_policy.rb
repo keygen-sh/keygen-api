@@ -11,13 +11,13 @@ module Machines::V1x0
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :environment)
         allow!
-      in role: { name: 'product' } if machine.product == bearer
+      in role: Role(:product) if machine.product == bearer
         allow!
-      in role: { name: 'user' } if machine.user == bearer
+      in role: Role(:user) if machine.user == bearer
         !machine.license.protected?
-      in role: { name: 'license' } if machine.license == bearer
+      in role: Role(:license) if machine.license == bearer
         allow!
       else
         deny!

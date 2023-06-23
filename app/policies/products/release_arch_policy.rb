@@ -13,13 +13,13 @@ module Products
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if product == bearer
+      in role: Role(:product) if product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(product.id)
+      in role: Role(:user) if bearer.products.exists?(product.id)
         allow!
-      in role: { name: 'license' } if product == bearer.product
+      in role: Role(:license) if product == bearer.product
         allow!
       else
         product.open_distribution?
@@ -33,13 +33,13 @@ module Products
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' } if product == bearer
+      in role: Role(:product) if product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(product.id)
+      in role: Role(:user) if bearer.products.exists?(product.id)
         allow!
-      in role: { name: 'license' } if product == bearer.product
+      in role: Role(:license) if product == bearer.product
         allow!
       else
         product.open_distribution?

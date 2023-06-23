@@ -9,13 +9,13 @@ module Groups
         relation.respond_to?(:for_environment)
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      in role: Role(:admin | :developer | :read_only | :sales_agent | :support_agent)
         relation.all
-      in role: { name: 'environment' } if relation.respond_to?(:for_environment)
+      in role: Role(:environment) if relation.respond_to?(:for_environment)
         relation.for_environment(bearer.id)
-      in role: { name: 'product' } if relation.respond_to?(:for_product)
+      in role: Role(:product) if relation.respond_to?(:for_product)
         relation.for_product(bearer.id)
-      in role: { name: 'user' } if relation.respond_to?(:for_owner)
+      in role: Role(:user) if relation.respond_to?(:for_owner)
         relation.for_owner(bearer.id)
       else
         relation.none
@@ -29,11 +29,11 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' }
+      in role: Role(:product)
         allow!
-      in role: { name: 'user' } if bearer.group_ids? && record.all? { _1.group_id? && _1.group_id.in?(bearer.group_ids) }
+      in role: Role(:user) if bearer.group_ids? && record.all? { _1.group_id? && _1.group_id.in?(bearer.group_ids) }
         allow!
       else
         deny!
@@ -47,11 +47,11 @@ module Groups
       )
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+      in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: { name: 'product' }
+      in role: Role(:product)
         allow!
-      in role: { name: 'user' } if bearer.group_ids? && record.group_id? && record.group_id.in?(bearer.group_ids)
+      in role: Role(:user) if bearer.group_ids? && record.group_id? && record.group_id.in?(bearer.group_ids)
         allow!
       else
         deny!

@@ -10,11 +10,11 @@ class LicensePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: { name: 'user' } if record.all? { _1.user == bearer }
+    in role: Role(:user) if record.all? { _1.user == bearer }
       allow!
     else
       deny!
@@ -28,13 +28,13 @@ class LicensePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
-    in role: { name: 'license' } if record == bearer
+    in role: Role(:license) if record == bearer
       allow!
     else
       deny!
@@ -46,11 +46,11 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy&.protected?
     else
       deny!
@@ -62,9 +62,9 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -76,11 +76,11 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!
@@ -92,13 +92,13 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
-    in role: { name: 'license' } if record == bearer
+    in role: Role(:license) if record == bearer
       allow!
     else
       deny!
@@ -110,13 +110,13 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
-    in role: { name: 'license' } if record == bearer
+    in role: Role(:license) if record == bearer
       allow!
     else
       deny!
@@ -130,13 +130,13 @@ class LicensePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
-    in role: { name: 'license' } if record == bearer
+    in role: Role(:license) if record == bearer
       allow!
     else
       deny!
@@ -158,11 +158,11 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!
@@ -174,11 +174,11 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
-    in role: { name: 'user' } if record.user == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!
@@ -190,9 +190,9 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -204,9 +204,9 @@ class LicensePolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :environment)
       allow!
-    in role: { name: 'product' } if record.product == bearer
+    in role: Role(:product) if record.product == bearer
       allow!
     else
       deny!
@@ -220,7 +220,7 @@ class LicensePolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'license' } if record == bearer
+    in role: Role(:license) if record == bearer
       allow!
     else
       deny!

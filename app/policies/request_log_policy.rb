@@ -8,7 +8,7 @@ class RequestLogPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :environment)
       allow!
     else
       deny!
@@ -22,7 +22,7 @@ class RequestLogPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'read_only' | 'environment' }
+    in role: Role(:admin | :developer | :read_only | :environment)
       allow!
     else
       deny!

@@ -10,9 +10,9 @@ class UserPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
       allow!
-    in role: { name: 'product' | 'environment' } if record.all?(&:user?)
+    in role: Role(:product | :environment) if record.all?(&:user?)
       allow!
     else
       deny!
@@ -26,13 +26,13 @@ class UserPolicy < ApplicationPolicy
     )
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
       allow!
-    in role: { name: 'product' | 'environment' } if record.user?
+    in role: Role(:product | :environment) if record.user?
       allow!
-    in role: { name: 'user' } if record == bearer
+    in role: Role(:user) if record == bearer
       allow!
-    in role: { name: 'license' } if record == bearer.user
+    in role: Role(:license) if record == bearer.user
       allow!
     else
       deny!
@@ -45,9 +45,9 @@ class UserPolicy < ApplicationPolicy
     verify_privileges!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: Role(:admin | :developer)
       allow!
-    in role: { name: 'product' | 'environment' } if record.user?
+    in role: Role(:product | :environment) if record.user?
       allow!
     in nil
       !account.protected?
@@ -62,11 +62,11 @@ class UserPolicy < ApplicationPolicy
     verify_privileges!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+    in role: Role(:admin | :developer | :sales_agent)
       allow!
-    in role: { name: 'product' | 'environment' } if record.user?
+    in role: Role(:product | :environment) if record.user?
       allow!
-    in role: { name: 'user' } if record == bearer
+    in role: Role(:user) if record == bearer
       allow!
     else
       deny!
@@ -79,9 +79,9 @@ class UserPolicy < ApplicationPolicy
     verify_privileges!
 
     case bearer
-    in role: { name: 'admin' | 'developer' }
+    in role: Role(:admin | :developer)
       allow!
-    in role: { name: 'environment' } if record.user?
+    in role: Role(:environment) if record.user?
       allow!
     else
       deny!
@@ -93,9 +93,9 @@ class UserPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent)
       allow!
-    in role: { name: 'environment' } if record.user?
+    in role: Role(:environment) if record.user?
       allow!
     else
       deny!
@@ -110,7 +110,7 @@ class UserPolicy < ApplicationPolicy
       record.user?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :product | :environment)
       allow!
     else
       deny!
@@ -125,7 +125,7 @@ class UserPolicy < ApplicationPolicy
       record.user?
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'product' | 'environment' }
+    in role: Role(:admin | :developer | :sales_agent | :support_agent | :product | :environment)
       allow!
     else
       deny!
