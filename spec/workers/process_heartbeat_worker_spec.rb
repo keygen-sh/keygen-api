@@ -9,11 +9,11 @@ describe ProcessHeartbeatWorker do
 
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
-    SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
+    SidekiqUniqueJobs.configure { _1.enabled = true }
   end
 
   after do
-    SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
+    SidekiqUniqueJobs.configure { _1.enabled = false }
   end
 
   it 'should enqueue and run the worker' do

@@ -31,9 +31,13 @@ module Api::V1::MachineProcesses::Actions
       end
 
       # Queue up heartbeat worker which will handle deactivating dead processes
-      ProcessHeartbeatWorker.perform_in(
+      jid = ProcessHeartbeatWorker.perform_in(
         machine_process.interval + MachineProcess::HEARTBEAT_DRIFT,
         machine_process.id,
+      )
+
+      machine_process.update(
+        heartbeat_jid: jid,
       )
 
       render jsonapi: machine_process

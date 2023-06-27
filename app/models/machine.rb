@@ -429,6 +429,9 @@ class Machine < ApplicationRecord
     policy&.heartbeat_duration || HEARTBEAT_TTL.to_i
   end
 
+  def heartbeat_monitored? = heartbeat_jid.present?
+  alias_method :monitored?, :heartbeat_monitored?
+
   def heartbeat_not_started?
     heartbeat_status == 'NOT_STARTED'
   end

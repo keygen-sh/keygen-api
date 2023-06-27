@@ -63,9 +63,13 @@ module Api::V1
       authorize! machine_process
 
       if machine_process.save
-        ProcessHeartbeatWorker.perform_in(
+        jid = ProcessHeartbeatWorker.perform_in(
           machine_process.interval + MachineProcess::HEARTBEAT_DRIFT,
           machine_process.id,
+        )
+
+        machine_process.update(
+          heartbeat_jid: jid,
         )
 
         BroadcastEventService.call(
