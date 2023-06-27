@@ -279,6 +279,7 @@ Feature: User tokens relationship
       {
         "title": "Bad request",
         "detail": "is unsupported",
+        "code": "ENVIRONMENT_NOT_SUPPORTED",
         "source": {
           "header": "Keygen-Environment"
         }

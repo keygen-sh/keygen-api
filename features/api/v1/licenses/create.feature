@@ -365,6 +365,7 @@ Feature: Create license
       {
         "title": "Bad request",
         "detail": "is unsupported",
+        "code": "ENVIRONMENT_NOT_SUPPORTED",
         "source": {
           "header": "Keygen-Environment"
         }
@@ -992,6 +993,7 @@ Feature: Create license
       {
         "title": "Bad request",
         "detail": "is unsupported",
+        "code": "ENVIRONMENT_NOT_SUPPORTED",
         "source": {
           "header": "Keygen-Environment"
         }

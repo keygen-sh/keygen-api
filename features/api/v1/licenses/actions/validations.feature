@@ -10017,6 +10017,76 @@ Feature: License validation actions
       """
     Then the response status should be "403"
 
+  @ce
+  Scenario: Admin validates a license key in an environment
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "invalid" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is unsupported",
+        "code": "ENVIRONMENT_NOT_SUPPORTED",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: Admin validates a license key in an invalid environment
+    Given the current account is "ent1"
+    And the current account has 1 "license"
+    And I am an admin of account "ent1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "invalid" }
+      """
+    When I send a POST request to "/accounts/ent1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "environment is invalid",
+        "code": "ENVIRONMENT_INVALID",
+        "source": {
+          "header": "Keygen-Environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "ent1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Admin validates an isolated license key in an isolated environment
     Given the current account is "ent1"
