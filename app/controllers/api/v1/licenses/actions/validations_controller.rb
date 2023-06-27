@@ -54,7 +54,7 @@ module Api::V1::Licenses::Actions
             next unless
               license.entitled?(:environments)
 
-            param :environment, type: :string, optional: true
+            param :environment, type: :string, allow_nil: true, optional: true
           end
         end
       end
@@ -122,7 +122,7 @@ module Api::V1::Licenses::Actions
             next unless
               license.entitled?(:environments)
 
-            param :environment, type: :string, optional: true
+            param :environment, type: :string, allow_nil: true, optional: true
           end
         end
       end
