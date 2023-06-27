@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_13_164122) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_27_203655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -247,6 +247,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_13_164122) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.string "heartbeat_jid"
     t.index "machine_id, md5((pid)::text)", name: "index_machine_processes_on_machine_id_md5_pid", unique: true
     t.index ["account_id"], name: "index_machine_processes_on_account_id"
     t.index ["environment_id"], name: "index_machine_processes_on_environment_id"
@@ -272,6 +273,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_13_164122) do
     t.integer "max_processes_override"
     t.datetime "last_check_out_at", precision: nil
     t.uuid "environment_id"
+    t.string "heartbeat_jid"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist

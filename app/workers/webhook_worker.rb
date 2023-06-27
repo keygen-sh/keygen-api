@@ -200,9 +200,7 @@ class WebhookWorker < BaseWorker
 
   class FailedRequestError < StandardError
     # Silence backtrace for failed webhooks (not needed, too noisy)
-    def backtrace
-      nil
-    end
+    def backtrace = nil
   end
 
   class Request

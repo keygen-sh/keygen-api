@@ -51,6 +51,11 @@ class ProcessHeartbeatWorker < BaseWorker
       account: process.account,
       resource: process,
     )
+
+    # The process no longer has a heartbeat monitor (until next ping)
+    process.update(
+      heartbeat_jid: nil,
+    )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
   end
@@ -58,8 +63,6 @@ class ProcessHeartbeatWorker < BaseWorker
   private
 
   class ResurrectionPeriodNotPassedError < StandardError
-    def backtrace
-      nil
-    end
+    def backtrace = nil
   end
 end
