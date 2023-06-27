@@ -17,11 +17,11 @@ module Keygen
     end
 
     class UnauthorizedError < JSONAPIError
-      def initialize(message = 'is unauthorized', code:, **) = super(message, **)
+      def initialize(message = 'is unauthorized', code:, **) = super(message, code:, **)
     end
 
     class ForbiddenError < JSONAPIError
-      def initialize(message = 'is forbidden', code:, **) = super(message, **)
+      def initialize(message = 'is forbidden', code:, **) = super(message, code:, **)
     end
 
     class InvalidParameterError < JSONAPIError

@@ -146,6 +146,7 @@ Feature: Generate authentication token for product
       {
         "title": "Bad request",
         "detail": "is unsupported",
+        "code": "ENVIRONMENT_NOT_SUPPORTED",
         "source": {
           "header": "Keygen-Environment"
         }

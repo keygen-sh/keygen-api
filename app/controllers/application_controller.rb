@@ -345,13 +345,15 @@ class ApplicationController < ActionController::API
          ActionController::ParameterMissing => e
     render_bad_request detail: e.message
   rescue Keygen::Error::UnsupportedParameterError,
-         Keygen::Error::InvalidParameterError => e
-    render_bad_request detail: e.message, source: e.source
-  rescue Keygen::Error::UnsupportedHeaderError,
+         Keygen::Error::InvalidParameterError,
+         Keygen::Error::UnsupportedHeaderError,
          Keygen::Error::InvalidHeaderError => e
-    render_bad_request detail: e.message, source: e.source
-  rescue Keygen::Error::InvalidParameterError => e
-    render_bad_request detail: e.message, source: e.source
+    kwargs = { detail: e.message, source: e.source }
+
+    kwargs[:code] = e.code if
+      e.code.present?
+
+    render_bad_request(**kwargs)
   rescue Keygen::Error::UnauthorizedError => e
     kwargs = { code: e.code }
 
@@ -399,7 +401,7 @@ class ApplicationController < ActionController::API
          Keygen::Error::InvalidAccountIdError => e
     render_not_found detail: e.message
   rescue Keygen::Error::InvalidEnvironmentError => e
-    render_bad_request detail: e.message, code: 'INVALID_ENVIRONMENT', source: { header: 'Keygen-Environment' }
+    render_bad_request detail: e.message, code: 'ENVIRONMENT_INVALID', source: { header: 'Keygen-Environment' }
   rescue ActiveModel::RangeError
     render_bad_request detail: "integer is too large"
   rescue ActiveRecord::StatementInvalid => e
