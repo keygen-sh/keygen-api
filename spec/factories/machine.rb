@@ -34,5 +34,17 @@ FactoryBot.define do
     trait :global do
       in_nil_environment
     end
+
+    trait :alive do
+      last_heartbeat_at { Time.current }
+    end
+
+    trait :idle do
+      last_heartbeat_at { nil }
+    end
+
+    trait :dead do
+      last_heartbeat_at { 1.day.ago }
+    end
   end
 end

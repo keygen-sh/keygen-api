@@ -146,6 +146,8 @@ class MachineProcess < ApplicationRecord
     last_heartbeat_at + interval
   end
 
+  def monitored? = heartbeat_jid.present?
+
   def alive?
     status == 'ALIVE' || status == 'RESURRECTED'
   end

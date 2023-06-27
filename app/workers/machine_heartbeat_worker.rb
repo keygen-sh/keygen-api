@@ -53,6 +53,11 @@ class MachineHeartbeatWorker < BaseWorker
       account: machine.account,
       resource: machine,
     )
+
+    # The machine no longer has a heartbeat monitor (until next ping)
+    machine.update(
+      heartbeat_jid: nil,
+    )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
   end
@@ -60,8 +65,6 @@ class MachineHeartbeatWorker < BaseWorker
   private
 
   class ResurrectionPeriodNotPassedError < StandardError
-    def backtrace
-      nil
-    end
+    def backtrace = nil
   end
 end

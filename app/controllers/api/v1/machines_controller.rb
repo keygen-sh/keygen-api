@@ -107,9 +107,13 @@ module Api::V1
 
       if machine.save
         if machine.requires_heartbeat?
-          MachineHeartbeatWorker.perform_in(
+          jid = MachineHeartbeatWorker.perform_in(
             machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
             machine.id,
+          )
+
+          machine.update(
+            heartbeat_jid: jid,
           )
         end
 
