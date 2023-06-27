@@ -2,12 +2,12 @@
 
 module Keygen
   module Error
-    class UnauthorizedError < StandardError
+    class JSONAPIError < StandardError
       attr_reader :code,
                   :detail,
                   :source
 
-      def initialize(message = 'is unauthorized', code:, detail: nil, parameter: nil, pointer: nil, header: nil)
+      def initialize(message, code: nil, detail: nil, parameter: nil, pointer: nil, header: nil)
         @code   = code
         @detail = detail
         @source = { parameter:, pointer:, header: }.compact
@@ -16,27 +16,17 @@ module Keygen
       end
     end
 
-    class ForbiddenError < StandardError
-      attr_reader :code,
-                  :detail,
-                  :source
-
-      def initialize(message = 'is forbidden', code:, detail: nil, parameter: nil, pointer: nil, header: nil)
-        @code   = code
-        @detail = detail
-        @source = { parameter:, pointer:, header: }.compact
-
-        super(message)
-      end
+    class UnauthorizedError < JSONAPIError
+      def initialize(message = 'is unauthorized', code:, **) = super(message, **)
     end
 
-    class InvalidParameterError < StandardError
-      attr_reader :source
+    class ForbiddenError < JSONAPIError
+      def initialize(message = 'is forbidden', code:, **) = super(message, **)
+    end
 
-      def initialize(message = 'is invalid', parameter:)
-        @source = { parameter: }
-
-        super(message)
+    class InvalidParameterError < JSONAPIError
+      def initialize(message = 'is invalid', parameter:, code: nil)
+        super(message, parameter:, code:)
       end
     end
 
@@ -44,13 +34,9 @@ module Keygen
       def initialize(message = 'is unsupported', **) = super(message, **)
     end
 
-    class InvalidHeaderError < StandardError
-      attr_reader :source
-
-      def initialize(message = 'is invalid', header:)
-        @source = { header: }
-
-        super(message)
+    class InvalidHeaderError < JSONAPIError
+      def initialize(message = 'is invalid', header:, code: nil)
+        super(message, header:, code:)
       end
     end
 
