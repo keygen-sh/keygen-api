@@ -45,7 +45,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
-    And the response body should be an "artifact"
+    And the response body should be an "artifact" without a "redirect" link
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -63,7 +63,7 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
-    And the response body should be an "artifact"
+    And the response body should be an "artifact" with a "redirect" link
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -1824,7 +1824,7 @@ Feature: Show release artifact
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "200"
+    Then the response status should be "303"
 
   Scenario: Product retrieves an artifact for a draft release of another product
     Given the current account is "test1"
@@ -1844,7 +1844,7 @@ Feature: Show release artifact
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "200"
+    Then the response status should be "303"
 
   # Yanked releases
   Scenario: Anonymous retrieves an artifact for a yanked release

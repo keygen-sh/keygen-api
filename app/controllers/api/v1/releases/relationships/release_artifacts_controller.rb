@@ -31,8 +31,8 @@ module Api::V1::Releases::Relationships
       authorize! artifact,
         with: Releases::ReleaseArtifactPolicy
 
-      # Respond early if the artifact has not been uploaded or if the
-      # client prefers no-download
+      # Respond early if the artifact has not been uploaded (or is yanked) or
+      # if the client prefers no download
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
@@ -45,7 +45,7 @@ module Api::V1::Releases::Relationships
       )
 
       # Respond without a redirect if that's what the client prefers
-      render jsonapi: artifact, location: download.url if
+      return render jsonapi: artifact, location: download.url if
         prefers?('no-redirect')
 
       render jsonapi: artifact, status: :see_other, location: download.url

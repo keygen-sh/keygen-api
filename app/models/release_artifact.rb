@@ -390,7 +390,7 @@ class ReleaseArtifact < ApplicationRecord
   end
 
   def downloadable?
-    uploaded? && release.published?
+    uploaded? && !release.yanked?
   end
 
   private
