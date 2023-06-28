@@ -695,6 +695,24 @@ Then /^the response body should contain the following links:$/ do |body|
   expect(json["links"]&.transform_values { |l| l.is_a?(String) ? URI.decode_www_form_component(l) : l }).to include JSON.parse(body)
 end
 
+Then /^the response body should (?:contain|be) an? "([^\"]*)" without(?: an?)? "([^\"]*)" link$/ do |resource, link|
+  json  = JSON.parse(last_response.body)
+  links = json["data"]["links"] || {}
+  type  = json["data"]["type"]
+
+  expect(type).to eq resource.pluralize
+  expect(links.key?(link)).to be false
+end
+
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with(?: an?)? "([^\"]*)" link$/ do |resource, link|
+  json  = JSON.parse(last_response.body)
+  links = json["data"]["links"] || {}
+  type  = json["data"]["type"]
+
+  expect(type).to eq resource.pluralize
+  expect(links.key?(link)).to be true
+end
+
 Then /^the response should contain the following headers:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
