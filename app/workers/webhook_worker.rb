@@ -11,8 +11,7 @@ class WebhookWorker < BaseWorker
   sidekiq_options queue: :webhooks,
                   retry: 15,
                   lock: :until_executed,
-                  dead: false,
-                  cronitor_disabled: false
+                  dead: false
 
   sidekiq_retry_in do |count|
     jitter = 10.minutes.to_i * rand(1..10)
