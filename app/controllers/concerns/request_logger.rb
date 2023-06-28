@@ -71,6 +71,7 @@ module RequestLogger
         request_log_signature,
         request_log_response_body,
         request_log_status,
+        Current.environment&.id,
       )
     rescue => e
       Keygen.logger.exception(e)

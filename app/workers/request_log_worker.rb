@@ -18,7 +18,8 @@ class RequestLogWorker < BaseWorker
     request_ip,
     response_signature,
     response_body,
-    response_status
+    response_status,
+    environment_id = nil
   )
     return unless
       Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
@@ -46,6 +47,7 @@ class RequestLogWorker < BaseWorker
       response_signature: response_signature,
       response_body: response_body,
       status: response_status,
+      environment_id:,
     })
   rescue PG::UniqueViolation
     # NOTE(ezekg) Don't log duplicates
