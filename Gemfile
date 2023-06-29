@@ -11,6 +11,7 @@ gem 'rack', '~> 2.2.6.2'
 gem 'rack-timeout', require: 'rack/timeout/base'
 gem 'rack-attack', '~> 6.6'
 gem 'rack-cors'
+gem 'uri', '>= 0.12.2'
 
 # Redis for caching and background jobs
 gem 'redis', '~> 4.7.1'
