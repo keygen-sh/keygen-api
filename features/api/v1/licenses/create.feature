@@ -5298,6 +5298,50 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User creates a license using an unprotected policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "name": "Trial Policy",
+        "duration": "$time.30.days",
+        "protected": false
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User creates a license using a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -5305,6 +5349,8 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
+        "name": "Pro Policy",
+        "duration": "$time.1.year",
         "protected": true
       }
       """
