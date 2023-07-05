@@ -31,7 +31,7 @@ module Api::V1::Policies::Relationships
       param :data, type: :array, length: { minimum: 1 } do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
-          param :id, type: :string, as: :entitlement_id
+          param :id, type: :uuid, as: :entitlement_id
         end
       end
     }
@@ -59,7 +59,7 @@ module Api::V1::Policies::Relationships
       param :data, type: :array, length: { minimum: 1 } do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
-          param :id, type: :string, as: :entitlement_id
+          param :id, type: :uuid, as: :entitlement_id
         end
       end
     }

@@ -51,7 +51,7 @@ module Api::V1::Products::Relationships
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end

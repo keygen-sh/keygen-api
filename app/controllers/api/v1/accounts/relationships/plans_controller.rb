@@ -18,7 +18,7 @@ module Api::V1::Accounts::Relationships
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[plan plans] }
-        param :id, type: :string
+        param :id, type: :uuid
       end
     }
     def update

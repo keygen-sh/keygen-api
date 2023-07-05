@@ -31,7 +31,7 @@ module Api::V1::Groups::Relationships
       param :data, type: :array do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[user users] }
-          param :id, type: :string, as: :user_id
+          param :id, type: :uuid, as: :user_id
         end
       end
     }
@@ -59,7 +59,7 @@ module Api::V1::Groups::Relationships
       param :data, type: :array do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[user users] }
-          param :id, type: :string, as: :user_id
+          param :id, type: :uuid, as: :user_id
         end
       end
     }

@@ -31,7 +31,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[process processes] }
-        param :id, type: :string, optional: true
+        param :id, type: :uuid, optional: true
         param :attributes, type: :hash do
           param :pid, type: :string
           param :metadata, type: :metadata, allow_blank: true, optional: true
@@ -40,7 +40,7 @@ module Api::V1
           param :machine, type: :hash do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[machine machines] }
-              param :id, type: :string
+              param :id, type: :uuid
             end
           end
 
@@ -51,7 +51,7 @@ module Api::V1
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end
@@ -89,7 +89,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[process processes] }
-        param :id, type: :string, optional: true, noop: true
+        param :id, type: :uuid, optional: true, noop: true
         param :attributes, type: :hash do
           param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) }
         end
