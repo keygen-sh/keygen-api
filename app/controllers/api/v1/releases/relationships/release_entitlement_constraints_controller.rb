@@ -35,7 +35,7 @@ module Api::V1::Releases::Relationships
             param :entitlement, type: :hash do
               param :data, type: :hash do
                 param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end
@@ -66,7 +66,7 @@ module Api::V1::Releases::Relationships
       param :data, type: :array do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[constraint constraints] }
-          param :id, type: :string
+          param :id, type: :uuid
         end
       end
     }

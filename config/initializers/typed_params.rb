@@ -24,3 +24,11 @@ TypedParams.types.register(:metadata,
     }
   },
 )
+
+TypedParams.types.register(:uuid,
+  archetype: :string,
+  name: 'UUID',
+  match: -> value {
+    value.is_a?(String) && UUID_RE.match?(value)
+  },
+)

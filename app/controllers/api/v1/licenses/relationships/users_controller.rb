@@ -22,7 +22,7 @@ module Api::V1::Licenses::Relationships
 
       param :data, type: :hash, allow_nil: true do
         param :type, type: :string, inclusion: { in: %w[user users] }
-        param :id, type: :string
+        param :id, type: :uuid
       end
     }
     def update

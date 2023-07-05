@@ -40,7 +40,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[license licenses] }
-        param :id, type: :string, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
+        param :id, type: :uuid, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
         param :attributes, type: :hash, optional: true do
           param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :key, type: :string, optional: true
@@ -68,19 +68,19 @@ module Api::V1
           param :policy, type: :hash do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[policy policies] }
-              param :id, type: :string
+              param :id, type: :uuid
             end
           end
           param :user, type: :hash, optional: true do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[user users] }
-              param :id, type: :string
+              param :id, type: :uuid
             end
           end
           param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[group groups] }
-              param :id, type: :string
+              param :id, type: :uuid
             end
           end
 
@@ -91,7 +91,7 @@ module Api::V1
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end
@@ -120,7 +120,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[license licenses] }
-        param :id, type: :string, optional: true, noop: true
+        param :id, type: :uuid, optional: true, noop: true
         param :attributes, type: :hash do
           param :name, type: :string, allow_blank: true, allow_nil: true, optional: true
           with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do

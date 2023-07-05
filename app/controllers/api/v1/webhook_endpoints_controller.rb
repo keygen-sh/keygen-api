@@ -32,7 +32,7 @@ module Api::V1
           end
           param :signature_algorithm, type: :string, optional: true
         end
-        params :relationships, type: :hash, optional: true do
+        param :relationships, type: :hash, optional: true do
           Keygen.ee do |license|
             next unless
               license.entitled?(:environments)
@@ -40,7 +40,7 @@ module Api::V1
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end
@@ -63,7 +63,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints] }
-        param :id, type: :string, optional: true, noop: true
+        param :id, type: :uuid, optional: true, noop: true
         param :attributes, type: :hash do
           param :url, type: :string, optional: true
           param :subscriptions, type: :array, optional: true do

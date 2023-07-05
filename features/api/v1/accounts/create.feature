@@ -1177,8 +1177,18 @@ Feature: Create account
         }
       }
       """
-    Then the response status should be "422"
-    And the response body should be an array of 2 errors
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected UUID string)",
+        "source": {
+          "pointer": "/data/relationships/plan/data/id"
+        }
+      }
+      """
 
   Scenario: Anonymous attempts to create an account with invalid JSON (syntax)
     When I send a POST request to "/accounts" with the following:
