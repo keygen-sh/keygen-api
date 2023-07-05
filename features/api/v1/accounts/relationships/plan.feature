@@ -258,13 +258,15 @@ Feature: Account plan relationship
         }
       }
       """
-    Then the response status should be "404"
+    Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
-        "title": "Not found",
-        "detail": "The requested plan 'invalid' was not found",
-        "code": "NOT_FOUND"
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected UUID string)",
+        "source": {
+          "pointer": "/data/id"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs

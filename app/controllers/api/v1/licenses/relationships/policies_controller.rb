@@ -22,7 +22,7 @@ module Api::V1::Licenses::Relationships
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[policy policies] }
-        param :id, type: :string
+        param :id, type: :uuid
       end
     }
     def update

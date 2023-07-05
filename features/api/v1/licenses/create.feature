@@ -3513,18 +3513,17 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the current account should have 0 "licenses"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be a valid UUID",
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected UUID string)",
         "source": {
           "pointer": "/data/id"
-        },
-        "code": "ID_INVALID"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs

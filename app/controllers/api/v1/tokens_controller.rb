@@ -47,7 +47,7 @@ module Api::V1
           param :bearer, type: :hash, optional: true do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[environment environments product products user users license licenses] }
-              param :id, type: :string
+              param :id, type: :uuid
             end
           end
           Keygen.ee do |license|
@@ -57,7 +57,7 @@ module Api::V1
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end

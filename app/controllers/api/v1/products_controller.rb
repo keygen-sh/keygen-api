@@ -51,7 +51,7 @@ module Api::V1
             param :environment, type: :hash, optional: true do
               param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: { in: %w[environment environments] }
-                param :id, type: :string
+                param :id, type: :uuid
               end
             end
           end
@@ -80,7 +80,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[product products] }
-        param :id, type: :string, optional: true, noop: true
+        param :id, type: :uuid, optional: true, noop: true
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :distribution_strategy, type: :string, allow_nil: true, optional: true
