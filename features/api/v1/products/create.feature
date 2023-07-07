@@ -32,6 +32,7 @@ Feature: Create product
           "type": "products",
           "attributes": {
             "name": "Cool App",
+            "code": "cool",
             "url": "http://example.com",
             "platforms": ["iOS", "Android"]
           }

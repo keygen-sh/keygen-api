@@ -4,6 +4,7 @@ class ProductSerializer < BaseSerializer
   type 'products'
 
   attribute :name
+  attribute :code
   attribute :distribution_strategy
   attribute :url
   attribute :platforms
