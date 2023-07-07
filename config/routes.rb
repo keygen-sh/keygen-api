@@ -305,6 +305,12 @@ Rails.application.routes.draw do
     resources :release_arches,    only: %i[index show], path: 'arches'
     resources :release_channels,  only: %i[index show], path: 'channels'
 
+    namespace :release_packages, path: 'packages' do
+      scope :pypi, module: :pypi do
+        get 'simple/:id', to: 'simple#index', as: :pypi_packages
+      end
+    end
+
     resources :entitlements
 
     resources :groups do

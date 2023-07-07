@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RequestLogger
   extend ActiveSupport::Concern
 
@@ -126,7 +128,7 @@ module RequestLogger
         response.content_type.include?('json')
 
       params   = JSON.parse(body)
-      filterer = ActiveSupport::ParameterFilter.new(%i[password digest token redirect])
+      filterer = ActiveSupport::ParameterFilter.new(%i[password digest token secret otp redirect])
       filtered = filterer.filter(params)
 
       filtered.to_json

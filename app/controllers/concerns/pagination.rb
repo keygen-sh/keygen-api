@@ -7,15 +7,15 @@ module Pagination
   extend ActiveSupport::Concern
 
   included do
-    # Overload render method to append pagination links to response
-    def render(args)
-      resource = args[:jsonapi]
+    # Overload render method to append pagination links to JSONAPI responses
+    def render(args, ...)
+      return super(args, ...) unless args in Hash(jsonapi:)
 
-      super args.merge(links: pagination_links(resource)) unless performed?
+      super(args.merge(links: pagination_links(jsonapi)), ...) unless performed?
     rescue => e # TODO: Let's not catch everything here
-      Keygen.logger.exception e
+      Keygen.logger.exception(e)
 
-      super args unless performed? # Avoid double render
+      super(args, ...) unless performed? # Avoid double render
     end
 
     private
@@ -27,7 +27,7 @@ module Pagination
         scope.model < Orderable
 
       if query.key?(:page)
-        raise Keygen::Error::InvalidParameterError.new(parameter: "page"), "page must be an object" unless
+        raise Keygen::Error::InvalidParameterError.new(parameter: 'page'), 'page must be an object' unless
           query[:page].is_a?(Hash)
 
         scope = scope.with_pagination(query.dig(:page, :number), query.dig(:page, :size)) if

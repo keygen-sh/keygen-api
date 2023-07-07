@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DefaultHeaders
   extend ActiveSupport::Concern
 
