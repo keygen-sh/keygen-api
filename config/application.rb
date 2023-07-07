@@ -86,6 +86,15 @@ module Keygen
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
 
+    # Include all helpers
+    config.action_controller.include_all_helpers = true
+
+    # Default URL options (namely host)
+    Rails.application.default_url_options = {
+      host: ENV.fetch('KEYGEN_HOST'),
+      protocol: 'https',
+    }
+
     # Force UTF-8 encoding
     config.encoding = 'utf-8'
 
