@@ -8,8 +8,6 @@ module DefaultHeaders
   include RateLimiting
 
   included do
-    before_action :validate_accept_and_add_content_type_headers!
-
     # NOTE(ezekg Run signature header validations after current account has been set, but
     #            before the controller action is processed.
     after_current_account :validate_accept_signature_header!
@@ -20,35 +18,6 @@ module DefaultHeaders
   end
 
   private
-
-  def validate_accept_and_add_content_type_headers!
-    accepted_content_types = HashWithIndifferentAccess.new(
-      jsonapi: Mime::Type.lookup_by_extension(:jsonapi).to_s,
-      json: Mime::Type.lookup_by_extension(:json).to_s,
-    )
-
-    content_type = request.headers['Accept']&.strip
-    if content_type.nil? || content_type.include?('*/*')
-      response.headers['Content-Type'] = accepted_content_types[:jsonapi]
-
-      return
-    end
-
-    selected_content_types = accepted_content_types.values &
-                             content_type.split(/,\s*/)
-    if selected_content_types.empty?
-      response.headers['Content-Type'] = accepted_content_types[:jsonapi]
-
-      # Skip accept header enforcement for artifacts#show so that we play
-      # nicely with package managers such as pip
-      render_bad_request(detail: "The content type of the request is not supported (check accept header)", code: 'ACCEPT_INVALID') unless
-        artifact_route? || checkout_route?
-
-      return
-    end
-
-    response.headers['Content-Type'] = selected_content_types.first.strip
-  end
 
   def add_default_headers
     yield
@@ -61,6 +30,7 @@ module DefaultHeaders
     add_content_security_policy_headers
     add_rate_limiting_headers
     add_cache_control_headers
+    add_content_type_header
     add_signature_headers
     add_whoami_headers
     add_environment_header
@@ -102,7 +72,26 @@ module DefaultHeaders
     response.headers['X-RateLimit-Remaining'] = data[:remaining]
     response.headers['X-RateLimit-Reset']     = data[:reset]
   rescue => e
-    Keygen.logger.exception e
+    Keygen.logger.exception(e)
+  end
+
+  def add_content_type_header
+    return if
+      request.format != :jsonapi
+
+    # We consider both application/vnd.api+json and application/json as
+    # synonyms of the :jsonapi format, but we still want to respond
+    # with application/json if asked to do so, for compatibility
+    # with various HTTP clients, e.g. cpp-rest-sdk.
+    jsonapi = Mime::Type.lookup_by_extension(:jsonapi).to_s
+    json    = Mime::Type.lookup_by_extension(:json).to_s
+    accept  = request.headers['Accept']
+
+    if json.in?(accept)
+      response.headers['Content-Type'] = json
+    else
+      response.headers['Content-Type'] = jsonapi
+    end
   end
 
   def add_whoami_headers
@@ -110,7 +99,7 @@ module DefaultHeaders
     response.headers['Keygen-Bearer-Id']  = current_bearer&.id
     response.headers['Keygen-Token-Id']   = current_token&.id
   rescue => e
-    Keygen.logger.exception e
+    Keygen.logger.exception(e)
   end
 
   def add_environment_header
@@ -137,21 +126,5 @@ module DefaultHeaders
 
   def add_powered_by_header
     response.headers['X-Powered-By'] = 'Ruby, Rails, and a lot of coffee. (And the occasional Islay.)'
-  end
-
-  def artifact_route?
-    controller = params[:controller]
-    action     = params[:action]
-
-    controller.ends_with?('/release_artifacts') &&
-      action == 'show'
-  end
-
-  def checkout_route?
-    controller = params[:controller]
-    action     = params[:action]
-
-    controller.ends_with?('/actions/checkouts') &&
-      action == 'show'
   end
 end
