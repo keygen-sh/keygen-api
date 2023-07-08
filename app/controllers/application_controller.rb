@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include ActionController::MimeResponds
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
@@ -68,121 +69,184 @@ class ApplicationController < ActionController::API
   def render_forbidden(**kwargs)
     skip_verify_authorized!
 
-    render status: :forbidden, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Access denied",
-        detail: "You do not have permission to complete the request",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :forbidden, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Access denied',
+            detail: 'You do not have permission to complete the request',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Forbidden', status: :forbidden
+      }
+    end
   end
 
   def render_unauthorized(**kwargs)
     skip_verify_authorized!
 
-    self.headers["WWW-Authenticate"] = %(Bearer realm="keygen")
+    self.headers['WWW-Authenticate'] = %(Bearer realm="keygen")
 
-    render status: :unauthorized, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Unauthorized",
-        detail: "You must be authenticated to complete the request",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :unauthorized, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Unauthorized',
+            detail: 'You must be authenticated to complete the request',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Unauthorized', status: :unauthorized
+      }
+    end
   end
 
   def render_unprocessable_entity(**kwargs)
     skip_verify_authorized!
 
-    render status: :unprocessable_entity, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Unprocessable entity",
-        detail: "The request could not be completed",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :unprocessable_entity, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Unprocessable entity',
+            detail: 'The request could not be completed',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Unprocessable Entity', status: :unprocessable_entity
+      }
+    end
   end
 
   def render_not_found(**kwargs)
     skip_verify_authorized!
 
-    render status: :not_found, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Not found",
-        detail: "The requested endpoint was not found (check your HTTP method and resource path)",
-        code: "NOT_FOUND",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :not_found, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Not found',
+            detail: 'The requested endpoint was not found (check your HTTP method, Accept header, and URL path)',
+            code: 'NOT_FOUND',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Not Found', status: :not_found
+      }
+    end
   end
 
   def render_bad_request(**kwargs)
     skip_verify_authorized!
 
-    render status: :bad_request, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Bad request",
-        detail: "The request could not be completed",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :bad_request, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Bad request',
+            detail: 'The request could not be completed',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Bad Request', status: :bad_request
+      }
+    end
   end
 
   def render_conflict(**kwargs)
     skip_verify_authorized!
 
-    render status: :conflict, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Conflict",
-        detail: "The request could not be completed because of a conflict",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :conflict, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Conflict',
+            detail: 'The request could not be completed because of a conflict',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Conflict', status: :conflict
+      }
+    end
   end
 
   def render_payment_required(**kwargs)
     skip_verify_authorized!
 
-    render status: :payment_required, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Payment required",
-        detail: "The request could not be completed",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :payment_required, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Payment required',
+            detail: 'The request could not be completed',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Payment Required', status: :payment_required
+      }
+    end
   end
 
   def render_internal_server_error(**kwargs)
     skip_verify_authorized!
 
-    render status: :internal_server_error, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Internal server error",
-        detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :internal_server_error, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Internal server error',
+            detail: 'Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Internal Server Error', status: :internal_server_error
+      }
+    end
   end
 
   def render_service_unavailable(**kwargs)
     skip_verify_authorized!
 
-    render status: :service_unavailable, json: {
-      meta: { id: request.request_id },
-      errors: [{
-        title: "Service unavailable",
-        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions.",
-        **kwargs,
-      }],
-    }
+    respond_to do |format|
+      format.jsonapi {
+        render status: :service_unavailable, json: {
+          meta: { id: request.request_id },
+          errors: [{
+            title: 'Service unavailable',
+            detail: 'Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions.',
+            **kwargs,
+          }],
+        }
+      }
+      format.html {
+        render html: 'Service Unavailable', status: :service_unavailable
+      }
+    end
   end
 
   def render_unprocessable_resource(resource)
