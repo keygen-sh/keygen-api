@@ -239,7 +239,7 @@ Feature: Show account
     Then the response status should be "200"
     Then the response should contain the following headers:
       """
-      { "Content-Type": "application/vnd.api+json" }
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
       """
 
   Scenario: Admin retrieves their account, accepting any content-type
@@ -253,7 +253,7 @@ Feature: Show account
     Then the response status should be "200"
     Then the response should contain the following headers:
       """
-      { "Content-Type": "application/vnd.api+json" }
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
       """
 
   Scenario: Admin retrieves their account, accepting any content-type with metadata
@@ -268,7 +268,7 @@ Feature: Show account
     Then the response status should be "200"
     Then the response should contain the following headers:
       """
-      { "Content-Type": "application/vnd.api+json" }
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
       """
 
   Scenario: Admin retrieves their account, accepting JSONAPI content-type
@@ -282,7 +282,7 @@ Feature: Show account
     Then the response status should be "200"
     Then the response should contain the following headers:
       """
-      { "Content-Type": "application/vnd.api+json" }
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
       """
 
   Scenario: Admin retrieves their account, accepting JSON content-type

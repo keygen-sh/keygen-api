@@ -83,7 +83,7 @@ Given /^I send the following headers:$/ do |body|
   end
 
   headers.each do |name, value|
-    header name, value
+    header name, value&.strip
   end
 end
 
@@ -99,7 +99,7 @@ Given /^I send the following badly encoded headers:$/ do |body|
   end
 
   headers.each do |name, value|
-    header name, value
+    header name, value&.strip
   end
 end
 
@@ -108,9 +108,9 @@ Given /^I send the following raw headers:$/ do |body|
   headers = body.split /\n/
 
   headers.each do |raw|
-    key, value = raw.split ":"
+    key, value = raw.split(':')
 
-    header key, value
+    header key, value&.strip
   end
 end
 
