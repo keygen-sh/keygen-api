@@ -70,7 +70,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Forbidden', status: :forbidden
+      }
+      format.any {
         render status: :forbidden, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -79,9 +82,6 @@ class ApplicationController < ActionController::API
             **kwargs,
           }],
         }
-      }
-      format.html {
-        render html: 'Forbidden', status: :forbidden
       }
     end
   end
@@ -92,7 +92,10 @@ class ApplicationController < ActionController::API
     self.headers['WWW-Authenticate'] = %(Bearer realm="keygen")
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Unauthorized', status: :unauthorized
+      }
+      format.any {
         render status: :unauthorized, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -102,9 +105,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Unauthorized', status: :unauthorized
-      }
     end
   end
 
@@ -112,7 +112,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Unprocessable Entity', status: :unprocessable_entity
+      }
+      format.any {
         render status: :unprocessable_entity, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -122,9 +125,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Unprocessable Entity', status: :unprocessable_entity
-      }
     end
   end
 
@@ -132,7 +132,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Not Found', status: :not_found
+      }
+      format.any {
         render status: :not_found, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -143,9 +146,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Not Found', status: :not_found
-      }
     end
   end
 
@@ -153,7 +153,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Bad Request', status: :bad_request
+      }
+      format.any {
         render status: :bad_request, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -163,9 +166,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Bad Request', status: :bad_request
-      }
     end
   end
 
@@ -173,7 +173,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Conflict', status: :conflict
+      }
+      format.any {
         render status: :conflict, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -183,9 +186,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Conflict', status: :conflict
-      }
     end
   end
 
@@ -193,7 +193,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Payment Required', status: :payment_required
+      }
+      format.any {
         render status: :payment_required, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -203,9 +206,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Payment Required', status: :payment_required
-      }
     end
   end
 
@@ -213,7 +213,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Internal Server Error', status: :internal_server_error
+      }
+      format.any {
         render status: :internal_server_error, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -223,9 +226,6 @@ class ApplicationController < ActionController::API
           }],
         }
       }
-      format.html {
-        render html: 'Internal Server Error', status: :internal_server_error
-      }
     end
   end
 
@@ -233,7 +233,10 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.jsonapi {
+      format.html {
+        render html: 'Service Unavailable', status: :service_unavailable
+      }
+      format.any {
         render status: :service_unavailable, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -242,9 +245,6 @@ class ApplicationController < ActionController::API
             **kwargs,
           }],
         }
-      }
-      format.html {
-        render html: 'Service Unavailable', status: :service_unavailable
       }
     end
   end
