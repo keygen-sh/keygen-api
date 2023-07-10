@@ -76,9 +76,6 @@ module DefaultHeaders
   end
 
   def add_content_type_header
-    return unless
-      request.format == :jsonapi || request.format == :json # skip for non-JSON routes
-
     # We consider both application/vnd.api+json and application/json as
     # synonyms of the :jsonapi format, but we still want to respond
     # with application/json if asked to do so, for compatibility
