@@ -213,8 +213,8 @@ module Keygen
         # off the bat. In theory, this would slightly improve onboarding DX.
         if content_type.empty? || content_type.include?('text/plain') || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
           begin
-            req        = ActionDispatch::Request.new(env)
-            route      = Rails.application.routes.recognize_path(req.url, method: req.method) rescue {}
+            request    = ActionDispatch::Request.new(env)
+            route      = Rails.application.routes.recognize_path(request.url, request:) rescue {}
             controller = route[:controller]
             action     = route[:action]
 
@@ -227,7 +227,7 @@ module Keygen
           end
         end
 
-        @app.call env
+        @app.call(env)
       end
     end
 
