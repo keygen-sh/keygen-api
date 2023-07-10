@@ -16,7 +16,7 @@ module Api::V1::ReleasePackages
       authorize! artifacts,
         with: Products::ReleaseArtifactPolicy
 
-      render 'api/v1/packages/pypi/simple/index',
+      render 'api/v1/release_packages/pypi/simple/index',
         locals: {
           account: current_account,
           product:,

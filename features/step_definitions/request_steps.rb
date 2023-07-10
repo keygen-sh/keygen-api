@@ -713,22 +713,23 @@ Then /^the response body should (?:contain|be) an? "([^\"]*)" with(?: an?)? "([^
 end
 
 Then /^the response should contain the following headers:$/ do |body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  body    = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  headers = JSON.parse(body)
 
-  expect(last_response.headers).to include JSON.parse(body)
+  headers.each do |key, value|
+    expect(last_response.headers[key]).to eq value&.strip
+  end
 end
 
 Then /^the response should contain the following raw headers:$/ do |body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
-  headers = body.split /\n/
+  body    = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  headers = body.split(/\n/)
 
   headers.each do |raw|
-    key, value = raw.split ":"
+    key, value = raw.split(':')
 
-    expect(last_response.headers).to include key => value.strip
+    expect(last_response.headers[key]).to eq value&.strip
   end
-
 end
 
 Then /^the response should contain a valid(?: "([^"]+)")? signature header for "([^"]+)"$/ do |expected_algorithm, account_id|

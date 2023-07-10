@@ -57,7 +57,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the response body should be a "machine-file" with a certificate signed using "ed25519"
     And the response body should be a "machine-file" with the following encoded certificate data:
@@ -1020,7 +1020,7 @@ Feature: Machine checkout actions
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the first error should have the following properties:
       """
@@ -1047,7 +1047,7 @@ Feature: Machine checkout actions
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the first error should have the following properties:
       """

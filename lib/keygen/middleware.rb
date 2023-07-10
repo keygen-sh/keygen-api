@@ -30,7 +30,7 @@ module Keygen
           [
             400,
             {
-              "Content-Type" => "application/vnd.api+json",
+              "Content-Type" => "application/vnd.api+json; charset=utf-8",
             },
             [{
               errors: [{
@@ -44,7 +44,7 @@ module Keygen
           [
             400,
             {
-              "Content-Type" => "application/vnd.api+json",
+              "Content-Type" => "application/vnd.api+json; charset=utf-8",
             },
             [{
               errors: [{
@@ -58,7 +58,7 @@ module Keygen
           [
             400,
             {
-              "Content-Type" => "application/vnd.api+json",
+              "Content-Type" => "application/vnd.api+json; charset=utf-8",
             },
             [{
               errors: [{
@@ -76,7 +76,7 @@ module Keygen
             [
               500,
               {
-                "Content-Type" => "application/vnd.api+json",
+                "Content-Type" => "application/vnd.api+json; charset=utf-8",
               },
               [{
                 errors: [{
@@ -89,7 +89,7 @@ module Keygen
             [
               400,
               {
-                "Content-Type" => "application/vnd.api+json",
+                "Content-Type" => "application/vnd.api+json; charset=utf-8",
               },
               [{
                 errors: [{
@@ -109,7 +109,7 @@ module Keygen
           [
             400,
             {
-              "Content-Type" => "application/vnd.api+json",
+              "Content-Type" => "application/vnd.api+json; charset=utf-8",
             },
             [{
               errors: [{
@@ -123,7 +123,7 @@ module Keygen
           [
             404,
             {
-              "Content-Type" => "application/vnd.api+json",
+              "Content-Type" => "application/vnd.api+json; charset=utf-8",
             },
             [{
               errors: [{
@@ -142,7 +142,7 @@ module Keygen
         [
           503,
           {
-            "Content-Type" => "application/vnd.api+json",
+            "Content-Type" => "application/vnd.api+json; charset=utf-8",
           },
           [{
             errors: [{
@@ -155,7 +155,7 @@ module Keygen
         [
           400,
           {
-            "Content-Type" => "application/vnd.api+json",
+            "Content-Type" => "application/vnd.api+json; charset=utf-8",
           },
           [{
             errors: [{
@@ -169,7 +169,7 @@ module Keygen
         [
           400,
           {
-            "Content-Type" => "application/vnd.api+json",
+            "Content-Type" => "application/vnd.api+json; charset=utf-8",
           },
           [{
             errors: [{
@@ -183,7 +183,7 @@ module Keygen
         [
           400,
           {
-            "Content-Type" => "application/vnd.api+json",
+            "Content-Type" => "application/vnd.api+json; charset=utf-8",
           },
           [{
             errors: [{

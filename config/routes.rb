@@ -77,7 +77,7 @@ Rails.application.routes.draw do
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
-    scope defaults: { format: :jsonapi }, constraints: FormatConstraint.new(:jsonapi) do
+    scope defaults: { format: :jsonapi }, constraints: FormatConstraint.new(format: %i[jsonapi json]) do
       post :passwords, to: 'passwords#reset'
       get  :profile,   to: 'profiles#show'
       get  :me,        to: 'profiles#me'
@@ -375,7 +375,7 @@ Rails.application.routes.draw do
     end
 
     namespace :release_packages, path: 'packages' do
-      scope :pypi, module: :pypi, defaults: { format: :html }, constraints: FormatConstraint.new(:html) do
+      scope :pypi, module: :pypi, defaults: { format: :html }, constraints: FormatConstraint.new(format: :html) do
         get 'simple/:id', to: 'simple#index', as: :pypi_packages
       end
     end

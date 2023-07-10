@@ -57,7 +57,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the response body should be a "license-file" with a certificate signed using "ed25519"
     And the response body should be a "license-file" with the following encoded certificate data:
@@ -954,7 +954,7 @@ Feature: License checkout actions
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the first error should have the following properties:
       """
@@ -981,7 +981,7 @@ Feature: License checkout actions
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json
+      Content-Type: application/vnd.api+json; charset=utf-8
       """
     And the first error should have the following properties:
       """

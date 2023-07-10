@@ -299,7 +299,7 @@ Rack::Attack.throttled_responder = -> req {
   [
     429,
     {
-      "Content-Type" => "application/vnd.api+json",
+      "Content-Type" => "application/vnd.api+json; charset=utf-8",
       "X-RateLimit-Window" => window.to_s,
       "X-RateLimit-Count" => count.to_s,
       "X-RateLimit-Limit" => limit.to_s,
@@ -321,7 +321,7 @@ Rack::Attack.blocklisted_responder = -> req {
   [
     403,
     {
-      "Content-Type" => "application/vnd.api+json",
+      "Content-Type" => "application/vnd.api+json; charset=utf-8",
       "X-RateLimit-Window" => "blacklist",
       "X-RateLimit-Count" => "0",
       "X-RateLimit-Limit" => "0",

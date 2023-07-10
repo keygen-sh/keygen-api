@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class FormatConstraint
-  def initialize(format) = @format = format
+  def initialize(format:) = @formats = Array(format)
 
   # Assert that both the Accept header and requested :format matches
   # our allowed format. For example, if a route requires the :jsonapi
@@ -12,7 +12,9 @@ class FormatConstraint
   # where it will not look at the request headers if there is a
   # default :format supplied on the route.
   def matches?(request)
-    request.accepts.any? { _1 == Mime::ALL || _1 == @format } &&
-      request.format == @format
+    @formats.any? { request.format == _1 } &&
+      @formats.any? { |format|
+        request.accepts.any? { _1 == '*/*' || _1 == format }
+      }
   end
 end

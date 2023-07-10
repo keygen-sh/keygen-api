@@ -61,7 +61,7 @@ lowlevel_error_handler do |e|
   [
     500,
     {
-      "Content-Type" => "application/vnd.api+json"
+      "Content-Type" => "application/vnd.api+json; charset=utf-8"
     },
     [{
       errors: [{

@@ -83,15 +83,23 @@ module DefaultHeaders
     # synonyms of the :jsonapi format, but we still want to respond
     # with application/json if asked to do so, for compatibility
     # with various HTTP clients, e.g. cpp-rest-sdk.
-    jsonapi = Mime::Type.lookup_by_extension(:jsonapi).to_s
-    json    = Mime::Type.lookup_by_extension(:json).to_s
-    accept  = request.headers['Accept']
+    jsonapi = Mime::Type.lookup_by_extension(:jsonapi)
+    json    = Mime::Type.lookup_by_extension(:json)
+    accepts = Mime::Type.parse(
+      request.headers['Accept'].to_s,
+    )
 
-    if json.in?(accept)
-      response.headers['Content-Type'] = json
-    else
-      response.headers['Content-Type'] = jsonapi
-    end
+    # NOTE(ezekg) Using content_type instead of headers['Content-Type']
+    #             allows us to retain the current charset.
+    response.content_type =
+      case
+      when accepts.any? { _1 == '*/*' || _1 == jsonapi }
+        jsonapi.to_s
+      when accepts.any? { _1 == json }
+        json.to_s
+      else
+        jsonapi.to_s
+      end
   end
 
   def add_whoami_headers
