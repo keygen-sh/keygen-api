@@ -76,13 +76,17 @@ module DefaultHeaders
   end
 
   def add_content_type_header
-    return if
-      request.format != :jsonapi
+    return unless
+      request.format == :jsonapi || request.format == :json # skip for non-JSON routes
 
     # We consider both application/vnd.api+json and application/json as
     # synonyms of the :jsonapi format, but we still want to respond
     # with application/json if asked to do so, for compatibility
     # with various HTTP clients, e.g. cpp-rest-sdk.
+    content_type, * = Mime::Type.parse(response.content_type.to_s)
+    return unless
+      content_type == :jsonapi || content_type == :json # skip for non-JSON responses
+
     jsonapi = Mime::Type.lookup_by_extension(:jsonapi)
     json    = Mime::Type.lookup_by_extension(:json)
     accepts = Mime::Type.parse(
@@ -91,15 +95,14 @@ module DefaultHeaders
 
     # NOTE(ezekg) Using content_type instead of headers['Content-Type']
     #             allows us to retain the current charset.
-    response.content_type =
-      case
-      when accepts.any? { _1 == '*/*' || _1 == jsonapi }
-        jsonapi.to_s
-      when accepts.any? { _1 == json }
-        json.to_s
-      else
-        jsonapi.to_s
-      end
+    case
+    when accepts.any? { _1 == '*/*' || _1 == jsonapi }
+      response.content_type = jsonapi.to_s
+    when accepts.any? { _1 == json }
+      response.content_type = json.to_s
+    else
+      # leave as-is
+    end
   end
 
   def add_whoami_headers

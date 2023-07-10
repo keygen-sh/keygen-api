@@ -14,7 +14,7 @@ class FormatConstraint
   def matches?(request)
     @formats.any? { request.format == _1 } &&
       @formats.any? { |format|
-        request.accepts.any? { _1 == '*/*' || _1 == format }
+        request.accepts.none? || request.accepts.any? { _1 == '*/*' || _1 == format }
       }
   end
 end

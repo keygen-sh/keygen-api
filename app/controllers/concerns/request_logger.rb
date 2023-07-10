@@ -40,12 +40,8 @@ module RequestLogger
       return false if
         REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
 
-      route = Rails.application.routes.recognize_path(request.url, method: request.method) rescue {}
-      return false unless
-        route.key?(:controller)
-
       return false if
-        REQUEST_LOG_IGNORED_RESOURCES.any? { |r| r.in?(route[:controller]) }
+        REQUEST_LOG_IGNORED_RESOURCES.any? { _1.in? request.params[:controller] }
 
       Current.account.present?
     end
