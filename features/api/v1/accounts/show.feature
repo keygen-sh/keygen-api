@@ -296,7 +296,7 @@ Feature: Show account
     Then the response status should be "200"
     Then the response should contain the following headers:
       """
-      { "Content-Type": "application/json" }
+      { "Content-Type": "application/json; charset=utf-8" }
       """
 
   Scenario: Admin retrieves their account, accepting XML content-type
