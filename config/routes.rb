@@ -123,7 +123,7 @@ Rails.application.routes.draw do
             post :reset,                                    to: 'heartbeats#reset'
             post :ping,                                     to: 'heartbeats#ping'
             post :check_out,       path: 'check-out',       to: 'checkouts#create'
-            get :check_out,        path: 'check-out',       to: 'checkouts#show'
+            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :octet_stream }
 
             scope module: :v1x0 do
               post :generate_offline_proof, path: 'generate-offline-proof', to: 'proofs#create'
@@ -201,7 +201,7 @@ Rails.application.routes.draw do
             post :decrement_usage, path: 'decrement-usage', to: 'uses#decrement'
             post :reset_usage,     path: 'reset-usage',     to: 'uses#reset'
             post :check_out,       path: 'check-out',       to: 'checkouts#create'
-            get :check_out,        path: 'check-out',       to: 'checkouts#show'
+            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :octet_stream }
           end
         end
 
