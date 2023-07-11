@@ -307,7 +307,7 @@ Feature: Show account
       { "Accept": "application/xml" }
       """
     When I send a GET request to "/accounts/test1"
-    Then the response status should be "404"
+    Then the response status should be "400"
 
   Scenario: Admin retrieves their account, accepting HTML content-type
     Given I am an admin of account "test1"
@@ -317,7 +317,7 @@ Feature: Show account
       { "Accept": "text/html" }
       """
     When I send a GET request to "/accounts/test1"
-    Then the response status should be "404"
+    Then the response status should be "400"
 
   Scenario: Admin retrieves their account, accepting plain-text content-type
     Given I am an admin of account "test1"
@@ -327,7 +327,7 @@ Feature: Show account
       { "Accept": "text/plain" }
       """
     When I send a GET request to "/accounts/test1"
-    Then the response status should be "404"
+    Then the response status should be "400"
 
   Scenario: Admin retrieves their account, accepting an ed25519 signature algorithm
     Given I am an admin of account "test1"
