@@ -121,7 +121,7 @@ module RequestLogger
         body.present?
 
       return body unless
-        response.content_type.include?('json')
+        response.content_type&.include?('json')
 
       params   = JSON.parse(body)
       filterer = ActiveSupport::ParameterFilter.new(%i[password digest token secret otp redirect])
