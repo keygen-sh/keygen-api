@@ -40,9 +40,12 @@ module Api::V1::ReleasePackages
     rescue Keygen::Error::NotFoundError
       # Redirect to PyPI when not found to play nicely with PyPI not supporting a per-package index
       # TODO(ezekg) Make this configurable?
-      redirect_to "https://pypi.org/simple/#{params[:id]}",
-        status: :temporary_redirect,
-        allow_other_host: true
+      url = URI.parse("https://pypi.org/simple")
+      pkg = CGI.escape(params[:id])
+
+      url.path += "/#{pkg}"
+
+      redirect_to url.to_s, status: :temporary_redirect, allow_other_host: true
     end
   end
 end
