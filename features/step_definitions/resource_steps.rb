@@ -228,6 +228,25 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\
   end
 end
 
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)" with the following:$/ do |count, traits, resource, index, association, body|
+  body   = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
+  traits = traits&.split('+')&.map(&:to_sym)
+
+  count.to_i.times do
+    associated_record = @account.send(association.pluralize.underscore).send(index)
+    association_name  =
+      case resource.singularize
+      when "token"
+        :bearer
+      else
+        association.singularize.underscore.to_sym
+      end
+
+    create resource.singularize.underscore, *traits, **attrs, account: @account, association_name => associated_record
+  end
+end
+
 Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, resource|
   count.to_i.times do
     @crypt << create(resource.singularize.underscore, :legacy_encrypt, account: @account)
@@ -834,7 +853,7 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license
   expect(license.expiry).to be nil
 end
 
-Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words, model_name, attribute_name, expected|
+Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^\"]+)"$/ do |index_in_words, model_name, attribute_name, expected|
   model =
     case model_name.pluralize
     when 'processes'
@@ -855,7 +874,7 @@ Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words
   expect(actual).to eq expected
 end
 
-Then /^the (?!account)(\w+) "([^\"]*)" should have (\w+) "([^"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
+Then /^the (?!account)(\w+) "([^\"]*)" should have (\w+) "([^\"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
   model =
     case model_name.pluralize
     when 'processes'

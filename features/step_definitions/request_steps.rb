@@ -2,6 +2,14 @@
 
 World Rack::Test::Methods
 
+Before do
+  algorithms = %w[ed25519 rsa-pss-sha256 rsa-sha256]
+
+  # Random accept signature
+  header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}") if
+    rand(0...6) == 0 # dice roll to test for no header
+end
+
 Given 'I use API version {string}' do |version|
   header 'Keygen-Version', version
 end
@@ -9,12 +17,16 @@ end
 Given /^I send and accept JSON$/ do
   header "Content-Type", "application/vnd.api+json"
   header "Accept", "application/vnd.api+json"
+end
 
-  # Random accept signature
-  algorithms = %w[ed25519 rsa-pss-sha256 rsa-sha256]
+Given /^I send and accept HTML$/ do
+  header "Content-Type", "text/html"
+  header "Accept", "text/html"
+end
 
-  header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}") if
-    rand(0...6) == 0 # Dice roll to test for no header
+Given /^I send and accept XML$/ do
+  header "Content-Type", "application/xml"
+  header "Accept", "application/xml"
 end
 
 Given /^time is frozen (\d+) (\w+) into the future$/ do |duration_number, duration_word|
