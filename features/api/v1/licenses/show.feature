@@ -153,7 +153,7 @@ Feature: Show license
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
-    Then the response status should be "404"
+    Then the response status should be "400"
 
   Scenario: Admin retrieves a license for their account that has a user
     Given I am an admin of account "test1"
