@@ -60,9 +60,9 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/297dd28f-6043-456b-a737-714b72e1a852"
     Then the response status should be "200"
 
-  Scenario: License requests an index for their product
+  Scenario: License requests an index for a licensed product
     Given the current account is "test1"
-    And the current account has 1 "product" with the following:
+    And the current account has 1 licensed "product" with the following:
       """
       { "code": "package1" }
       """
@@ -76,9 +76,45 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
 
-  Scenario: License requests an index for another product
+  Scenario: License requests an index for a closed product
     Given the current account is "test1"
-    And the current account has 1 "product" with the following:
+    And the current account has 1 closed "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://pypi.org/simple/package1" }
+      """
+
+  Scenario: License requests an index for an open product
+    Given the current account is "test1"
+    And the current account has 1 open "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+
+  Scenario: License requests an index for another licensed product
+    Given the current account is "test1"
+    And the current account has 1 licensed "product" with the following:
       """
       { "code": "package1" }
       """
@@ -96,9 +132,45 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: Anonymous requests an index
+  Scenario: License requests an index for another closed product
     Given the current account is "test1"
-    And the current account has 1 "product" with the following:
+    And the current account has 1 closed "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://pypi.org/simple/package1" }
+      """
+
+  Scenario: License requests an index for another open product
+    Given the current account is "test1"
+    And the current account has 1 open "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+
+  Scenario: Anonymous requests an index for a licensed product
+    Given the current account is "test1"
+    And the current account has 1 licensed "product" with the following:
       """
       { "code": "package1" }
       """
@@ -108,3 +180,25 @@ Feature: PyPI simple index
       """
       { "Location": "https://pypi.org/simple/package1" }
       """
+
+  Scenario: Anonymous requests an index for a closed product
+    Given the current account is "test1"
+    And the current account has 1 closed "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://pypi.org/simple/package1" }
+      """
+
+  Scenario: Anonymous requests an index for an open product
+    Given the current account is "test1"
+    And the current account has 1 open "product" with the following:
+      """
+      { "code": "package1" }
+      """
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
