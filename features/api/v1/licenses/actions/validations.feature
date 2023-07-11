@@ -9314,8 +9314,8 @@ Feature: License validation actions
       """
       {
         "title": "Bad request",
-        "detail": "The content type of the request is not acceptable (check content-type header)",
-        "code": "CONTENT_TYPE_INVALID"
+        "detail": "The mime type of the request is not acceptable (check content-type and accept headers)",
+        "code": "MIME_TYPE_INVALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs

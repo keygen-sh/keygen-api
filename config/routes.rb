@@ -77,7 +77,7 @@ Rails.application.routes.draw do
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
-    scope constraints: FormatConstraint.new(format: %i[jsonapi json octet_stream]), defaults: { format: :jsonapi } do
+    scope constraints: FormatConstraint.new(format: %i[jsonapi json octet_stream], raise_on_no_match: true), defaults: { format: :jsonapi } do
       post :passwords, to: 'passwords#reset'
       get  :profile,   to: 'profiles#show'
       get  :me,        to: 'profiles#me'
@@ -375,7 +375,7 @@ Rails.application.routes.draw do
     end
 
     namespace :release_packages, path: 'packages' do
-      scope :pypi, module: :pypi, constraints: FormatConstraint.new(format: :html), defaults: { format: :html } do
+      scope :pypi, module: :pypi, constraints: FormatConstraint.new(format: :html, raise_on_no_match: true), defaults: { format: :html } do
         get 'simple/:id', to: 'simple#index', as: :pypi_packages
       end
     end
@@ -388,7 +388,7 @@ Rails.application.routes.draw do
           post :stripe, to: 'stripe#receive_webhook'
 
           # Pricing
-          scope constraints: FormatConstraint.new(format: %i[jsonapi json]), defaults: { format: :jsonapi } do
+          scope constraints: FormatConstraint.new(format: %i[jsonapi json], raise_on_no_match: true), defaults: { format: :jsonapi } do
             resources :plans, only: %i[index show]
           end
         end
@@ -400,7 +400,7 @@ Rails.application.routes.draw do
         end
 
         # Recover
-        scope constraints: FormatConstraint.new(format: %i[jsonapi json]), defaults: { format: :jsonapi } do
+        scope constraints: FormatConstraint.new(format: %i[jsonapi json], raise_on_no_match: true), defaults: { format: :jsonapi } do
           post :recover, to: 'recoveries#recover'
 
           # Account
@@ -416,7 +416,7 @@ Rails.application.routes.draw do
         # routes are also available in singleplayer mode for compatiblity.
         scope 'accounts/:account_id', as: :account do
           if Keygen.multiplayer?
-            scope constraints: FormatConstraint.new(format: %i[jsonapi json]), defaults: { format: :jsonapi } do
+            scope constraints: FormatConstraint.new(format: %i[jsonapi json], raise_on_no_match: true), defaults: { format: :jsonapi } do
               scope module: 'accounts/relationships' do
                 resource :billing, only: %i[show update]
                 resource :plan,    only: %i[show update]
