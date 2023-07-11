@@ -101,12 +101,20 @@ class Product < ApplicationRecord
 
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: })
+                    .licensed
                     .distinct
+                    .union(
+                      self.open,
+                    )
   }
 
   scope :for_user, -> id {
     joins(:users).where(users: { id: })
+                 .licensed
                  .distinct
+                 .union(
+                   self.open,
+                 )
   }
 
   scope :open,     -> { where(distribution_strategy: 'OPEN') }
