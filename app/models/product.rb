@@ -14,6 +14,10 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
+  DISTRIBUTION_ENGINES = %w[
+    PYPI
+  ]
+
   belongs_to :account
   has_many :policies, dependent: :destroy_async
   has_many :keys, through: :policies, source: :pool
@@ -40,6 +44,7 @@ class Product < ApplicationRecord
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :distribution_strategy, inclusion: { in: DISTRIBUTION_STRATEGIES, message: "unsupported distribution strategy" }, allow_nil: true
+  validates :distribution_engine, inclusion: { in: DISTRIBUTION_ENGINES, message: "unsupported distribution engine" }, allow_nil: true
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -120,6 +125,8 @@ class Product < ApplicationRecord
   scope :open,     -> { where(distribution_strategy: 'OPEN') }
   scope :licensed, -> { where(distribution_strategy: 'LICENSED') }
   scope :closed,   -> { where(distribution_strategy: 'CLOSED') }
+
+  scope :pypi, -> { where(distribution_engine: 'PYPI') }
 
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat

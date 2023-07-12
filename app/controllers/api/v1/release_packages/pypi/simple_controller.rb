@@ -12,7 +12,7 @@ module Api::V1::ReleasePackages
     authorize :product
 
     def index
-      artifacts = authorized_scope(apply_scopes(product.release_artifacts)).limit(1_000)
+      artifacts = authorized_scope(apply_scopes(product.release_artifacts.pypi)).limit(1_000)
       authorize! artifacts,
         with: Products::ReleaseArtifactPolicy
 
@@ -33,7 +33,7 @@ module Api::V1::ReleasePackages
 
       # TODO(ezekg) Add a distribution_engine attribute to product?
       @product = FindByAliasService.call(
-        scoped_products,
+        scoped_products.pypi,
         id: params[:id],
         aliases: :code,
       )
