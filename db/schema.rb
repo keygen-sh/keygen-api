@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_06_203905) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -411,12 +411,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_203905) do
     t.string "distribution_strategy"
     t.uuid "environment_id"
     t.string "code"
+    t.string "distribution_engine"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
     t.index ["account_id", "code"], name: "index_products_on_account_id_and_code", unique: true
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_products_on_created_at", order: :desc
+    t.index ["distribution_engine"], name: "index_products_on_distribution_engine"
     t.index ["distribution_strategy"], name: "index_products_on_distribution_strategy"
     t.index ["environment_id"], name: "index_products_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true

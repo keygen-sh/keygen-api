@@ -27,7 +27,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And I am an admin of account "test1"
     And I use an authentication token
@@ -38,22 +41,46 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package2" }
       """
 
-  Scenario: Endpoint should return an index when package exists
+  Scenario: Endpoint should return an index when package exists (PyPI engine)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
 
+  Scenario: Endpoint should return an index when package exists (no engine)
+    Given the current account is "test1"
+    And the current account has 1 "product" with the following:
+      """
+      {
+        "distributionEngine": null,
+        "code": "package1"
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://pypi.org/simple/package1" }
+      """
+
   Scenario: Endpoint should return an index using product ID
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
-      { "id": "297dd28f-6043-456b-a737-714b72e1a852", "code": "package1" }
+      {
+        "id": "297dd28f-6043-456b-a737-714b72e1a852",
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And I am an admin of account "test1"
     And I use an authentication token
@@ -64,7 +91,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 licensed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" for the last "product" with the following:
       """
@@ -80,7 +110,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 closed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" for the last "product" with the following:
       """
@@ -100,7 +133,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 open "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" for the last "product" with the following:
       """
@@ -116,7 +152,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 licensed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" with the following:
       """
@@ -136,7 +175,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 closed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" with the following:
       """
@@ -156,7 +198,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 open "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     And the current account has 1 "policy" with the following:
       """
@@ -172,7 +217,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 licensed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "307"
@@ -185,7 +233,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 closed "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "307"
@@ -198,7 +249,10 @@ Feature: PyPI simple index
     Given the current account is "test1"
     And the current account has 1 open "product" with the following:
       """
-      { "code": "package1" }
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
       """
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
