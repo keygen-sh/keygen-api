@@ -361,6 +361,8 @@ class Release < ApplicationRecord
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
+  scope :pypi, -> { joins(:product).where(product: { distribution_engine: 'PYPI' }) }
+
   scope :with_artifacts, -> { where.associated(:artifacts) }
   scope :without_artifacts, -> { where.missing(:artifacts) }
 

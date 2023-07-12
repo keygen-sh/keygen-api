@@ -235,6 +235,8 @@ class ReleaseArtifact < ApplicationRecord
   scope :open,     -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed,   -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
+  scope :pypi, -> { joins(:product).where(product: { distribution_engine: 'PYPI' }) }
+
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
   scope :with_checksum, -> checksum { where(checksum:) }
