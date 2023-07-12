@@ -178,7 +178,6 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 
   # Wait for all async deletion workers to finish
-  DestroyModelWorker.drain
   YankArtifactWorker.drain
 rescue Timeout::Error
 end
