@@ -52,7 +52,7 @@ module Api::V1::Licenses::Actions
         resource: license,
       )
 
-      license.destroy_async
+      license.destroy
     end
 
     def suspend

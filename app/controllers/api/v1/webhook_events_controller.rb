@@ -25,7 +25,7 @@ module Api::V1
     def destroy
       authorize! event
 
-      event.destroy_async
+      event.destroy
     end
 
     private

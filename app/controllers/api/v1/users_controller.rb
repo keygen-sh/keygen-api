@@ -154,8 +154,8 @@ module Api::V1
       authorize! user
 
       # NOTE(ezekg) Using a condition here because destroy async may return
-      #             false if the user an admin and a minimum has been hit.
-      if user.destroy_async
+      #             false if user is an admin and a minimum has been hit.
+      if user.destroy
         BroadcastEventService.call(
           event: 'user.deleted',
           account: current_account,

@@ -8,7 +8,7 @@ class Billing < ApplicationRecord
   include AASM
 
   belongs_to :account, touch: true
-  has_many :receipts, dependent: :destroy
+  has_many :receipts, dependent: :destroy_async
   has_one :plan, through: :account
 
   before_destroy :close_customer_account

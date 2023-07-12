@@ -104,7 +104,7 @@ module Api::V1
         resource: environment,
       )
 
-      environment.destroy_async
+      environment.destroy
     end
 
     private

@@ -106,7 +106,7 @@ module Api::V1
         resource: key,
       )
 
-      key.destroy_async
+      key.destroy
     end
 
     private

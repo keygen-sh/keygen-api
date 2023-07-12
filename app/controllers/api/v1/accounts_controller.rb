@@ -94,7 +94,7 @@ module Api::V1
     def destroy
       authorize! account
 
-      account.destroy_async
+      account.destroy
     end
 
     private

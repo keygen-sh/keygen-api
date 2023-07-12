@@ -67,6 +67,10 @@ module Keygen
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
+    # Update async destroy batch size
+    # TODO(ezekg) Will be introduced in Rails 7.1
+    # config.active_record.destroy_association_async_batch_size = 100
+
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
 

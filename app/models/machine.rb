@@ -570,7 +570,9 @@ class Machine < ApplicationRecord
     return if policy.nil? || license.nil?
 
     # Skip if license is being destroyed
-    return if license.destroyed?
+    return if
+      license.marked_for_destruction? ||
+      license.destroyed?
 
     core_count = license.machines.where.not(id: id).sum(:cores) || 0
     return if license.machines_core_count == core_count

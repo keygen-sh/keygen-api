@@ -139,7 +139,7 @@ module Api::V1
         resource: token,
       )
 
-      token.destroy_async
+      token.destroy
     end
 
     private
