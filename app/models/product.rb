@@ -15,13 +15,13 @@ class Product < ApplicationRecord
   ]
 
   belongs_to :account
-  has_many :policies, dependent: :destroy
+  has_many :policies, dependent: :destroy_async
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
   has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :tokens, as: :bearer, dependent: :destroy
-  has_many :releases, inverse_of: :product, dependent: :destroy
+  has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :releases, inverse_of: :product, dependent: :destroy_async
   has_many :release_channels, through: :releases, source: :channel
   has_many :release_artifacts, through: :releases, source: :artifacts
   has_many :release_platforms, through: :release_artifacts, source: :platform

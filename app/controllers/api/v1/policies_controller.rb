@@ -174,7 +174,7 @@ module Api::V1
         resource: policy,
       )
 
-      policy.destroy_async
+      policy.destroy
     end
 
     private

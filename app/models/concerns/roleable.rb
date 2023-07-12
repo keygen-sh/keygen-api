@@ -87,7 +87,7 @@ module Roleable
 
       has_one :role,
         inverse_of: :resource,
-        dependent: :destroy,
+        dependent: :destroy_async,
         autosave: true,
         as: :resource
 

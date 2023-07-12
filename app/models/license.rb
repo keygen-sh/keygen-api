@@ -19,8 +19,8 @@ class License < ApplicationRecord
   has_one :product, through: :policy
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
-  has_many :tokens, as: :bearer, dependent: :destroy
-  has_many :machines, dependent: :destroy
+  has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :machines, dependent: :destroy_async
   has_many :processes, through: :machines
   has_many :releases, -> l { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :product
@@ -602,7 +602,7 @@ class License < ApplicationRecord
   end
 
   def banned?
-    return false if user_id.nil?
+    return false if user_id.nil? || user.nil?
 
     user.banned?
   end

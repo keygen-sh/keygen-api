@@ -170,7 +170,7 @@ module Api::V1
         resource: license,
       )
 
-      license.destroy_async
+      license.destroy
     end
 
     private

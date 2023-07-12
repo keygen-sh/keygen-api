@@ -160,7 +160,7 @@ module Api::V1
         resource: release,
       )
 
-      release.destroy_async
+      release.destroy
     end
 
     private

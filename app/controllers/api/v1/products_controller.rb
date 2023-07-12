@@ -126,7 +126,7 @@ module Api::V1
         resource: product
       )
 
-      product.destroy_async
+      product.destroy
     end
 
     private

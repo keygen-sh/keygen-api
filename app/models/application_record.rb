@@ -13,6 +13,11 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
+  # FIXME(ezekg) Not sure why this isn't already happening by Rails?
+  #              We could also do def destroying? = _destroy.
+  before_destroy :mark_for_destruction,
+    prepend: true
+
   default_scope -> {
     order(created_at: DEFAULT_SORT_ORDER)
   }
@@ -32,9 +37,5 @@ class ApplicationRecord < ActiveRecord::Base
   # a model outside of our JSONAPI serializers
   def serializable_hash(...)
     raise NotImplementedError
-  end
-
-  def destroy_async
-    DestroyModelWorker.perform_async self.class.name, self.id
   end
 end

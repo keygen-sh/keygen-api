@@ -14,8 +14,8 @@ class User < ApplicationRecord
   belongs_to :account, inverse_of: :users
   belongs_to :group,
     optional: true
-  has_many :second_factors, dependent: :destroy
-  has_many :licenses, dependent: :destroy
+  has_many :second_factors, dependent: :destroy_async
+  has_many :licenses, dependent: :destroy_async
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
@@ -417,24 +417,15 @@ class User < ApplicationRecord
     nil
   end
 
-  # Our async destroy logic needs to be a bit different to prevent accounts
-  # from going under the minimum admin threshold
-  def destroy_async
-    if has_role?(:admin) && account.admins.count <= MINIMUM_ADMIN_COUNT
-      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
-
-      return false
-    end
-
-    super
-  end
-
   def enforce_admin_minimums_on_account!
     return if
       !has_role?(:admin) && !was_role?(:admin)
 
     other_admins = account.admins.preload(role: %i[role_permissions]).where.not(id:)
-    admin_count  = other_admins.size + 1
+    admin_count  = other_admins.size
+    unless marked_for_destruction?
+      admin_count += 1 # current admin
+    end
 
     # Real count is not including any of the current role changes,
     # so we'll adjust the number based on the current change.
