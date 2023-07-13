@@ -50,10 +50,18 @@ Feature: PyPI simple index
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]"]
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[1]"]
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[2]"]
+      """
 
   Scenario: Endpoint should return an index when package exists (no engine)
     Given the current account is "test1"
@@ -86,6 +94,102 @@ Feature: PyPI simple index
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/pypi/simple/297dd28f-6043-456b-a737-714b72e1a852"
     Then the response status should be "200"
+
+  Scenario: Endpoint should return an index with artifact metadata
+    Given the current account is "test1"
+    And the current account has 1 "product" with the following:
+      """
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release" with the following:
+      """
+      {
+        "metadata": {
+          "requiresPython": ">=3.0.0"
+        }
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]" and @data-requires-python=">=3.0.0"]
+      """
+
+  Scenario: Endpoint should return an index with artifact checksum (SHA256)
+    Given the current account is "test1"
+    And the current account has 1 "product" with the following:
+      """
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release" with the following:
+      """
+      { "checksum": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]#sha256=2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]
+      """
+
+  Scenario: Endpoint should return an index with artifact checksum (SHA512)
+    Given the current account is "test1"
+    And the current account has 1 "product" with the following:
+      """
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release" with the following:
+      """
+      { "checksum": "f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]#sha512=f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7"]
+      """
+
+  Scenario: Endpoint should return an index with artifact checksum (MD5)
+    Given the current account is "test1"
+    And the current account has 1 "product" with the following:
+      """
+      {
+        "distributionEngine": "PYPI",
+        "code": "package1"
+      }
+      """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release" with the following:
+      """
+      { "checksum": "acbd18db4cc2f85cedef654fccc4a4d8" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]"]
+      """
 
   Scenario: License requests an index for a licensed product
     Given the current account is "test1"
