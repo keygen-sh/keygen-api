@@ -7,6 +7,6 @@
     %h1 Links for #{product.name} by #{account.name}
 
     - artifacts.each do |artifact|
-      - url = url_for([:v1, account, artifact, anchor: checksum_for(artifact, delimiter: '='), protocol: 'https'])
+      - url = url_for([:v1, account, artifact, anchor: checksum_for(artifact, delimiter: '=')])
 
       = link_to(artifact.filename, url, data: artifact.metadata)
