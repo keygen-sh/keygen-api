@@ -89,12 +89,6 @@ module Keygen
     # Include all helpers
     config.action_controller.include_all_helpers = true
 
-    # Default URL options (namely host)
-    Rails.application.default_url_options = {
-      host: ENV.fetch('KEYGEN_HOST'),
-      protocol: 'https',
-    }
-
     # Force UTF-8 encoding
     config.encoding = 'utf-8'
 
@@ -106,6 +100,13 @@ module Keygen
     ]
 
     # Print env info when server boots
-    config.after_initialize { Keygen::Console.welcome! }
+    config.after_initialize do |app|
+      app.default_url_options = {
+        host: ENV.fetch('KEYGEN_HOST'),
+        protocol: 'https',
+      }
+
+      Keygen::Console.welcome!
+    end
   end
 end
