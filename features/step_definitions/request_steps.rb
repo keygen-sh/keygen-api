@@ -744,7 +744,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
   end
 end
 
-Then /^the response should contain a valid(?: "([^"]+)")? signature header for "([^"]+)"$/ do |expected_algorithm, account_id|
+Then /^the response should contain a valid(?: "([^\"]+)")? signature header for "([^\"]+)"$/ do |expected_algorithm, account_id|
   account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
   req     = last_request
   res     = last_response
@@ -803,7 +803,7 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
   end
 end
 
-Then /^the response should be a "([^"]+)" certificate$/ do |type|
+Then /^the response should be a "([^\"]+)" certificate$/ do |type|
   account = @account
   req     = last_request
   res     = last_response
@@ -813,7 +813,7 @@ Then /^the response should be a "([^"]+)" certificate$/ do |type|
   expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
 end
 
-Then /^the response should be a "([^"]+)" certificate signed using "([^"]+)"$/ do |type, expected_alg|
+Then /^the response should be a "([^\"]+)" certificate signed using "([^\"]+)"$/ do |type, expected_alg|
   account = @account
   req     = last_request
   res     = last_response
@@ -852,7 +852,7 @@ Then /^the response should be a "([^"]+)" certificate signed using "([^"]+)"$/ d
   expect(ok).to be true
 end
 
-Then /^the response should be a "([^"]+)" certificate with the following encoded data:$/ do |type, body|
+Then /^the response should be a "([^\"]+)" certificate with the following encoded data:$/ do |type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   req  = last_request
@@ -893,7 +893,7 @@ Then /^the response should be a "([^"]+)" certificate with the following encoded
   end
 end
 
-Then /^the response should be a "([^"]+)" certificate with the following encrypted data:$/ do |type, body|
+Then /^the response should be a "([^\"]+)" certificate with the following encrypted data:$/ do |type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = @account
@@ -961,7 +961,7 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
   end
 end
 
-Then /^the response body should be a "([^"]+)" with a certificate signed using "([^"]+)"$/ do |resource_type, expected_alg|
+Then /^the response body should be a "([^\"]+)" with a certificate signed using "([^\"]+)"$/ do |resource_type, expected_alg|
   account = @account
   req     = last_request
   res     = last_response
@@ -1007,7 +1007,7 @@ Then /^the response body should be a "([^"]+)" with a certificate signed using "
   expect(ok).to be true
 end
 
-Then /^the response body should be a "([^"]+)" with the following encoded certificate data:$/ do |resource_type, body|
+Then /^the response body should be a "([^\"]+)" with the following encoded certificate data:$/ do |resource_type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   req  = last_request
@@ -1055,7 +1055,7 @@ Then /^the response body should be a "([^"]+)" with the following encoded certif
   end
 end
 
-Then /^the response body should be a "([^"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
+Then /^the response body should be a "([^\"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = @account
@@ -1134,7 +1134,24 @@ Then /^the response body should be a "([^"]+)" with the following encrypted cert
   end
 end
 
-Given /^the JSON data should be sorted by "([^"]+)"$/ do |key|
+Then /^the response body should be an HTML document with the following xpaths:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  doc    = Nokogiri::HTML.parse(last_response.body)
+  xpaths = body.split("\n")
+
+  xpaths.each do |xpath|
+    res = doc.search(xpath)
+
+    expect(res).to_not be_empty, <<~MSG
+      expected XPath #{xpath} to exist in document:
+
+      #{doc.to_s.indent(2)}
+    MSG
+  end
+end
+
+Given /^the JSON data should be sorted by "([^\"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')
 
