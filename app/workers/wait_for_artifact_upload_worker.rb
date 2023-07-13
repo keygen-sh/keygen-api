@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class WaitForArtifactUploadWorker < BaseWorker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :critical,
+                  dead: false
 
   def perform(artifact_id, enqueued_at = Time.current.iso8601)
     artifact = ReleaseArtifact.find(artifact_id)
