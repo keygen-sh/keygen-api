@@ -31,7 +31,6 @@ module Api::V1::ReleasePackages
     def set_product
       scoped_products = authorized_scope(current_account.products)
 
-      # TODO(ezekg) Add a distribution_engine attribute to product?
       @product = FindByAliasService.call(
         scoped_products.pypi,
         id: params[:id],
