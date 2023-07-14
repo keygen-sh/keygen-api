@@ -193,9 +193,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for a licensed product
     Given the current account is "test1"
-    And the current account has 1 licensed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "LICENSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -212,9 +213,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for a closed product
     Given the current account is "test1"
-    And the current account has 1 closed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "CLOSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -235,9 +237,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for an open product
     Given the current account is "test1"
-    And the current account has 1 open "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "OPEN",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -254,9 +257,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for another licensed product
     Given the current account is "test1"
-    And the current account has 1 licensed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "LICENSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -277,9 +281,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for another closed product
     Given the current account is "test1"
-    And the current account has 1 closed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "CLOSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -300,9 +305,10 @@ Feature: PyPI simple index
 
   Scenario: License requests an index for another open product
     Given the current account is "test1"
-    And the current account has 1 open "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "OPEN",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -319,9 +325,10 @@ Feature: PyPI simple index
 
   Scenario: Anonymous requests an index for a licensed product
     Given the current account is "test1"
-    And the current account has 1 licensed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "LICENSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -335,9 +342,10 @@ Feature: PyPI simple index
 
   Scenario: Anonymous requests an index for a closed product
     Given the current account is "test1"
-    And the current account has 1 closed "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "CLOSED",
         "distributionEngine": "PYPI",
         "code": "package1"
       }
@@ -351,9 +359,10 @@ Feature: PyPI simple index
 
   Scenario: Anonymous requests an index for an open product
     Given the current account is "test1"
-    And the current account has 1 open "product" with the following:
+    And the current account has 1 "product" with the following:
       """
       {
+        "distributionStrategy": "OPEN",
         "distributionEngine": "PYPI",
         "code": "package1"
       }

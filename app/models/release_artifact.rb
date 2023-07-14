@@ -95,6 +95,7 @@ class ReleaseArtifact < ApplicationRecord
     }
 
   delegate :version, :semver, :channel,
+    :licensed?, :open?, :closed?,
     to: :release
 
   scope :order_by_version, -> {

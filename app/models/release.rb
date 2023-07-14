@@ -429,7 +429,7 @@ class Release < ApplicationRecord
   scope :yanked,    -> { with_status(:YANKED) }
   scope :unyanked,  -> { with_statuses(:DRAFT, :PUBLISHED) }
 
-  delegate :licensed_distribution?, :open_distribution?, :closed_distribution?,
+  delegate :licensed?, :open?, :closed?,
     to: :product
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
