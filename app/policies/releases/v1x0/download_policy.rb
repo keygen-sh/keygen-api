@@ -22,7 +22,7 @@ module Releases::V1x0
       in role: Role(:license)
         allow? :show, record, skip_verify_permissions: true, with: ::ReleasePolicy
       else
-        record.open_distribution? && record.constraints.none?
+        record.open? && record.constraints.none?
       end
     end
 
@@ -45,7 +45,7 @@ module Releases::V1x0
       in role: Role(:license)
         allow? :upgrade, record, skip_verify_permissions: true, with: ::ReleasePolicy
       else
-        record.open_distribution? && record.constraints.none?
+        record.open? && record.constraints.none?
       end
     end
   end

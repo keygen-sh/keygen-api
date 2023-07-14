@@ -128,19 +128,7 @@ class Product < ApplicationRecord
 
   scope :pypi, -> { where(distribution_engine: 'PYPI') }
 
-  def licensed_distribution?
-    # NOTE(ezekg) Backwards compat
-    return true if
-      distribution_strategy.nil?
-
-    distribution_strategy == 'LICENSED'
-  end
-
-  def open_distribution?
-    distribution_strategy == 'OPEN'
-  end
-
-  def closed_distribution?
-    distribution_strategy == 'CLOSED'
-  end
+  def licensed? = distribution_strategy.nil? || distribution_strategy == 'LICENSED'
+  def closed?   = distribution_strategy == 'CLOSED'
+  def open?     = distribution_strategy == 'OPEN'
 end
