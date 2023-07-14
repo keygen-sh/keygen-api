@@ -1030,6 +1030,64 @@ module AuthorizationHelper
       let(:record) { artifact }
     end
 
+    def accessing_packages(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:products) { [create(:product, *product_traits, account: other_account)] }
+      else
+        let(:products) { [create(:product, *product_traits, account:)] }
+      end
+
+      let(:record) { ReleasePackage.for(products) }
+    end
+
+    def accessing_package(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:product)   { create(:product, *product_traits, account: other_account) }
+        let(:release)   { create(:release, *release_traits, product:, account: other_account) }
+        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account: other_account) }
+      else
+        let(:product)   { create(:product, *product_traits, account:) }
+        let(:release)   { create(:release, *release_traits, product:, account:) }
+        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+      end
+
+      let(:record) { ReleasePackage.new(product, artifacts:) }
+    end
+
+    def accessing_its_packages(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:products) { [bearer] }
+      in [:as_license, *]
+        let(:products) { [bearer.product] }
+      in [:as_user, *]
+        let(:products) { bearer.licenses.collect(&:product) }
+      end
+
+      let(:record) { ReleasePackage.for(products) }
+    end
+
+    def accessing_its_package(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:product)   { bearer }
+        let(:release)   { create(:release, *release_traits, product:, account:) }
+        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+      in [:as_license, *]
+        let(:product)   { bearer.product }
+        let(:release)   { create(:release, *release_traits, product:, account:) }
+        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+      in [:as_user, *]
+        let(:product)   { bearer.licenses.first.product }
+        let(:release)   { create(:release, *release_traits, product:, account:) }
+        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+      end
+
+      let(:record) { ReleasePackage.new(product, artifacts:) }
+    end
+
     def accessing_its_constraints(scenarios)
       case scenarios
       in [*, :accessing_its_release | :accessing_a_release, *]
