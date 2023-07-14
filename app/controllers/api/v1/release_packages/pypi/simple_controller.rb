@@ -17,6 +17,7 @@ module Api::V1::ReleasePackages
         with: Products::ReleaseArtifactPolicy
 
       render 'api/v1/release_packages/pypi/simple/index',
+        layout: 'layouts/plain',
         locals: {
           account: current_account,
           product:,
