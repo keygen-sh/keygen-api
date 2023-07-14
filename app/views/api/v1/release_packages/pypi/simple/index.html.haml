@@ -4,7 +4,7 @@
 
 %h1= title
 
-- products.each do |product|
-  - url = url_for([:v1, account, :release_packages, :pypi_simple_package, package: product.id, format: nil, trailing_slash: true])
+- packages.each do |package|
+  - url = url_for([:v1, account, :release_packages, :pypi_simple_package, id: package.id, format: nil, trailing_slash: true])
 
-  = link_to(product.code, url, data: product.metadata)
+  = link_to(package.code, url, data: package.metadata)
