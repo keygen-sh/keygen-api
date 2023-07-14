@@ -55,6 +55,18 @@ FactoryBot.define do
       status { 'YANKED' }
     end
 
+    trait :licensed do
+      release { build(:release, :licensed, account:, environment:) }
+    end
+
+    trait :open do
+      release { build(:release, :open, account:, environment:) }
+    end
+
+    trait :closed do
+      release { build(:release, :closed, account:, environment:) }
+    end
+
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end

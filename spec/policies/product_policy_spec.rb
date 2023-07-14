@@ -473,6 +473,28 @@ describe ProductPolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_products] do
+      with_product_traits %i[open] do
+        with_license_authentication do
+          with_permissions %w[product.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+
+        with_token_authentication do
+          with_permissions %w[product.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
       with_license_authentication do
         with_permissions %w[product.read] do
           denies :index
@@ -495,6 +517,46 @@ describe ProductPolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_a_product] do
+      with_product_traits %i[open] do
+        with_license_authentication do
+          with_permissions %w[product.read] do
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :show, :create, :update, :destroy
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
+        end
+
+        with_token_authentication do
+          with_permissions %w[product.read] do
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            denies :create, :update, :destroy
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :show, :create, :update, :destroy
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy
+          end
+        end
+      end
+
       with_license_authentication do
         with_permissions %w[product.read] do
           denies :show
@@ -569,6 +631,18 @@ describe ProductPolicy, type: :policy do
       end
 
       with_scenarios %i[accessing_products] do
+        with_product_traits %i[open] do
+          with_token_authentication do
+            with_permissions %w[product.read] do
+              allows :index
+            end
+
+            with_wildcard_permissions { allows :index }
+            with_default_permissions  { denies :index }
+            without_permissions       { denies :index }
+          end
+        end
+
         with_token_authentication do
           with_permissions %w[product.read] do
             denies :index
@@ -581,6 +655,27 @@ describe ProductPolicy, type: :policy do
       end
 
       with_scenarios %i[accessing_a_product] do
+        with_product_traits %i[open] do
+          with_token_authentication do
+            with_permissions %w[product.read] do
+              allows :show
+            end
+
+            with_wildcard_permissions do
+              denies :create, :update, :destroy
+              allows :show
+            end
+
+            with_default_permissions do
+              denies :show, :create, :update, :destroy
+            end
+
+            without_permissions do
+              denies :show, :create, :update, :destroy
+            end
+          end
+        end
+
         with_token_authentication do
           with_permissions %w[product.read] do
             denies :show

@@ -22,7 +22,7 @@ module Releases
       in role: Role(:license) if release.product == bearer.product
         allow? :index, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
       else
-        release.open_distribution? && release.constraints.none?
+        release.open? && release.constraints.none?
       end
     end
 
@@ -42,7 +42,7 @@ module Releases
       in role: Role(:license) if release.product == bearer.product
         allow? :show, record, skip_verify_permissions: true, with: ::ReleaseArtifactPolicy
       else
-        release.open_distribution? && release.constraints.none?
+        release.open? && release.constraints.none?
       end
     end
   end

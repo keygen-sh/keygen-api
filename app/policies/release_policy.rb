@@ -33,7 +33,7 @@ class ReleasePolicy < ApplicationPolicy
     )
 
     allow! if
-      record.all? { _1.open_distribution? && _1.constraints.none? }
+      record.all? { _1.open? && _1.constraints.none? }
 
     deny! 'authentication is required' if
       bearer.nil?
@@ -43,10 +43,10 @@ class ReleasePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.open_distribution? && _1.constraints.none? ||
+    in role: Role(:user) if record.all? { _1.open? && _1.constraints.none? ||
                                           _1.product_id.in?(bearer.product_ids) }
       deny! 'release distribution strategy is closed' if
-        record.any?(&:closed_distribution?)
+        record.any?(&:closed?)
 
       licenses = bearer.licenses.preload(:product, :policy, :user)
                                 .for_product(
@@ -54,7 +54,7 @@ class ReleasePolicy < ApplicationPolicy
                                 )
 
       record.each do |release|
-        next if release.open_distribution? &&
+        next if release.open? &&
                 release.constraints.none?
 
         verify_licenses_for_release!(
@@ -64,13 +64,13 @@ class ReleasePolicy < ApplicationPolicy
       end
 
       allow!
-    in role: Role(:license) if record.all? { _1.open_distribution? && _1.constraints.none? ||
+    in role: Role(:license) if record.all? { _1.open? && _1.constraints.none? ||
                                              _1.product == bearer.product }
       deny! 'release distribution strategy is closed' if
-        record.any?(&:closed_distribution?)
+        record.any?(&:closed?)
 
       record.each do |release|
-        next if release.open_distribution? &&
+        next if release.open? &&
                 release.constraints.none?
 
         verify_license_for_release!(
@@ -92,7 +92,7 @@ class ReleasePolicy < ApplicationPolicy
     )
 
     allow! if
-      record.open_distribution? &&
+      record.open? &&
       record.constraints.none?
 
     deny! 'authentication is required' if
@@ -105,7 +105,7 @@ class ReleasePolicy < ApplicationPolicy
       allow!
     in role: Role(:user) if bearer.licenses.for_product(record.product).any?
       deny! 'release distribution strategy is closed' if
-        record.closed_distribution?
+        record.closed?
 
       licenses = bearer.licenses.preload(:product, :policy, :user)
                                 .for_product(record.product)
@@ -118,7 +118,7 @@ class ReleasePolicy < ApplicationPolicy
       allow!
     in role: Role(:license) if record.product == bearer.product
       deny! 'release distribution strategy is closed' if
-        record.closed_distribution?
+        record.closed?
 
       verify_license_for_release!(
         license: bearer,
