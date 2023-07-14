@@ -2201,3 +2201,57 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
+
+  Scenario: Admin retrieves an artifact with an application/octet-stream accept header
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "application/octet-stream" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
+
+  Scenario: Admin retrieves an artifact with a text/html accept header
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "text/html" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
+
+  Scenario: Admin retrieves an artifact with a text/plain accept header
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "text/plain" }
+      """
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """

@@ -77,7 +77,15 @@ Rails.application.routes.draw do
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
-    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :octet_stream, raise_on_no_match: true), defaults: { format: :jsonapi } do
+    constraint = MimeTypeConstraint.new(:jsonapi, :json, :octet_stream,
+      raise_on_no_match: true,
+      except: [
+        # Artifact :show action needs to be a bit loose with the Accept header.
+        { controller: 'api/v1/release_artifacts', action: 'show' },
+      ],
+    )
+
+    scope constraints: constraint, defaults: { format: :jsonapi } do
       post :passwords, to: 'passwords#reset'
       get  :profile,   to: 'profiles#show'
       get  :me,        to: 'profiles#me'
@@ -374,6 +382,8 @@ Rails.application.routes.draw do
       post :search, to: 'searches#search'
     end
 
+    # Release packages can support and respond with a variety of mime types, so
+    # we're defining those routes here with their own unique constraints.
     namespace :release_packages, path: 'packages' do
       scope :pypi, module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
         get 'simple/:id', to: 'simple#index', as: :pypi_packages
