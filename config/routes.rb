@@ -77,15 +77,7 @@ Rails.application.routes.draw do
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
-    constraint = MimeTypeConstraint.new(:jsonapi, :json, :octet_stream,
-      raise_on_no_match: true,
-      except: [
-        # Artifact :show action needs to be a bit loose with the Accept header.
-        { controller: 'api/v1/release_artifacts', action: 'show' },
-      ],
-    )
-
-    scope constraints: constraint, defaults: { format: :jsonapi } do
+    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :octet_stream, raise_on_no_match: true), defaults: { format: :jsonapi } do
       post :passwords, to: 'passwords#reset'
       get  :profile,   to: 'profiles#show'
       get  :me,        to: 'profiles#me'
@@ -310,7 +302,9 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :release_artifacts,                       path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
+      # NOTE(ezekg) The artifact :show route is defined below, with a less
+      #             restrictive mime type constraint.
+      resources :release_artifacts, except: %i[show],     path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
       resources :release_platforms, only: %i[index show], path: 'platforms'
       resources :release_arches,    only: %i[index show], path: 'arches'
       resources :release_channels,  only: %i[index show], path: 'channels'
@@ -380,6 +374,12 @@ Rails.application.routes.draw do
       end
 
       post :search, to: 'searches#search'
+    end
+
+    # Artifact :show action needs to be a bit loose with the Accept header, so we're
+    # defining the route outside of the restrictive mime type constraint above.
+    scope defaults: { format: :jsonapi } do
+      resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
     end
 
     # Release packages can support and respond with a variety of mime types, so

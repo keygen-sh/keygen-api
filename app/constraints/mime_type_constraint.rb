@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class MimeTypeConstraint
-  def initialize(*mimes, raise_on_no_match: false, except: [])
+  def initialize(*mimes, raise_on_no_match: false)
     @mimes             = Array(mimes.flatten)
     @raise_on_no_match = raise_on_no_match
-    @except            = except
   end
 
   # Assert that both the Accept header and requested path :format matches
@@ -16,12 +15,6 @@ class MimeTypeConstraint
   # where it will not look at the request headers if there is a
   # default :format supplied on the route.
   def matches?(request)
-    return true if
-      except.any? { |params|
-        params <= request.params.slice(:format, :controller, :action)
-                                .symbolize_keys
-      }
-
     unless ok = path_format_matches?(request) && accept_header_matches?(request)
       raise Mime::Type::InvalidMimeType if
         raise_on_no_match?
@@ -32,8 +25,7 @@ class MimeTypeConstraint
 
   private
 
-  attr_reader :mimes,
-              :except
+  attr_reader :mimes
 
   def raise_on_no_match? = !!@raise_on_no_match
 
