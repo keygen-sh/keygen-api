@@ -99,6 +99,8 @@ class Permission < ApplicationRecord
 
     metric.read
 
+    package.read
+
     platform.read
 
     policy.create
@@ -237,6 +239,8 @@ class Permission < ApplicationRecord
     machine.read
     machine.update
 
+    package.read
+
     platform.read
 
     policy.create
@@ -347,6 +351,8 @@ class Permission < ApplicationRecord
 
     metric.read
 
+    package.read
+
     platform.read
 
     policy.read
@@ -436,6 +442,8 @@ class Permission < ApplicationRecord
     machine.proofs.generate
     machine.read
     machine.update
+
+    package.read
 
     platform.read
 
@@ -527,6 +535,8 @@ class Permission < ApplicationRecord
     machine.read
     machine.update
 
+    package.read
+
     platform.read
 
     policy.read
@@ -588,6 +598,8 @@ class Permission < ApplicationRecord
     machine.proofs.generate
     machine.read
     machine.update
+
+    package.read
 
     platform.read
 

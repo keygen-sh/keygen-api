@@ -7,52 +7,45 @@ module Api::V1::ReleasePackages
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_product, only: %i[show]
 
     def index
       products = authorized_scope(apply_scopes(current_account.products.pypi)).limit(1_000)
-      authorize! products,
-        with: ReleasePackages::Pypi::SimplePolicy
+      packages = ReleasePackage.for(products)
+      authorize! packages,
+        with: ReleasePackagePolicy # can't be inferred when empty
 
       render 'api/v1/release_packages/pypi/simple/index',
         layout: 'layouts/plain',
         locals: {
           account: current_account,
-          products:,
+          packages:,
         }
     end
 
     def show
+      product = FindByAliasService.call(
+        authorized_scope(current_account.products.pypi),
+        id: params[:id],
+        aliases: :code,
+      )
+
       artifacts = authorized_scope(apply_scopes(product.release_artifacts.pypi)).limit(1_000)
-      authorize! artifacts,
-        with: ReleasePackages::Pypi::SimplePolicy
+      package   = ReleasePackage.new(product, artifacts:)
+      authorize! package
 
       render 'api/v1/release_packages/pypi/simple/show',
         layout: 'layouts/plain',
         locals: {
           account: current_account,
-          product:,
-          artifacts:,
+          package:,
         }
-    end
-
-    private
-
-    attr_reader :product
-
-    def set_product
-      scoped_products = authorized_scope(current_account.products)
-
-      @product = FindByAliasService.call(
-        scoped_products.pypi,
-        id: params[:package],
-        aliases: :code,
-      )
     rescue Keygen::Error::NotFoundError
+      skip_verify_authorized!
+
       # Redirect to PyPI when not found to play nicely with PyPI not supporting a per-package index
       # TODO(ezekg) Make this configurable?
       url = URI.parse("https://pypi.org/simple")
-      pkg = CGI.escape(params[:package])
+      pkg = CGI.escape(params[:id])
 
       url.path += "/#{pkg}"
 

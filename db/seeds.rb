@@ -92,6 +92,8 @@ permissions = %w[
 
   metric.read
 
+  package.read
+
   platform.read
 
   policy.create

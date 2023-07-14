@@ -7,5 +7,15 @@ Rails.application.config.action_policy.tap do |config|
   config.auto_inject_into_channel          = false
 end
 
+# Lookup chain should support arrays of like-activemodels.
+ActionPolicy::LookupChain.chain << -> records, **options {
+  case records
+  in Array(_ => first, *) if records.all? { _1.class == first.class }
+    ActionPolicy.lookup(first, **options)
+  else
+    nil
+  end
+}
+
 # Lookup chain should fallback to nil policy.
 ActionPolicy::LookupChain.chain << -> * { NilClassPolicy }

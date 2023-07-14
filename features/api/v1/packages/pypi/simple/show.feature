@@ -72,6 +72,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
@@ -90,6 +92,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/pypi/simple/297dd28f-6043-456b-a737-714b72e1a852"
@@ -201,6 +205,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" for the last "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -221,6 +227,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" for the last "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -245,6 +253,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" for the last "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -265,6 +275,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -289,6 +301,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -313,6 +327,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     And the current account has 1 "policy" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -333,6 +349,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "307"
     And the response should contain the following headers:
@@ -350,6 +368,8 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "307"
     And the response should contain the following headers:
@@ -367,5 +387,7 @@ Feature: PyPI simple package show
         "code": "package1"
       }
       """
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "artifacts" for the last "release"
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
