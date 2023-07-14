@@ -327,6 +327,8 @@ module AuthorizationHelper
 
           licenses.collect(&:product)
         }
+      in [:as_product, *]
+        let(:products) { [bearer] }
       in [:as_license, *]
         let(:products) { [bearer.product] }
       in [:as_user, *]

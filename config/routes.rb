@@ -386,7 +386,8 @@ Rails.application.routes.draw do
     # we're defining those routes here with their own unique constraints.
     namespace :release_packages, path: 'packages' do
       scope :pypi, module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
-        get 'simple/:id', to: 'simple#index', as: :pypi_packages
+        get 'simple/',          to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
+        get 'simple/:package/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
       end
     end
   end

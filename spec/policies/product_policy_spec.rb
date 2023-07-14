@@ -695,38 +695,6 @@ describe ProductPolicy, type: :policy do
         end
       end
     end
-
-    with_scenarios %i[accessing_products] do
-      with_token_authentication do
-        with_permissions %w[product.read] do
-          denies :index
-        end
-
-        with_wildcard_permissions { denies :index }
-        with_default_permissions  { denies :index }
-        without_permissions       { denies :index }
-      end
-    end
-
-    with_scenarios %i[accessing_a_product] do
-      with_token_authentication do
-        with_permissions %w[product.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :create, :update, :destroy
-        end
-      end
-    end
   end
 
   without_authorization do

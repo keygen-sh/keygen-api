@@ -1,0 +1,10 @@
+-# frozen_string_literal: true
+- title = "Versions for #{product.name} by #{account.name}"
+- content_for(:title) { title }
+
+%h1= title
+
+- artifacts.each do |artifact|
+  - url = url_for([:v1, account, artifact, anchor: checksum_for(artifact, delimiter: '=')])
+
+  = link_to(artifact.filename, url, data: artifact.metadata)

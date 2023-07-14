@@ -1,5 +1,5 @@
 @api/v1
-Feature: PyPI simple index
+Feature: PyPI simple package show
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -41,7 +41,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package2" }
       """
 
-  Scenario: Endpoint should return an index when package exists (PyPI engine)
+  Scenario: Endpoint should return versions when package exists (PyPI engine)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -63,7 +63,7 @@ Feature: PyPI simple index
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[2]"]
       """
 
-  Scenario: Endpoint should return an index when package exists (no engine)
+  Scenario: Endpoint should return versions when package exists (no engine)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -80,7 +80,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: Endpoint should return an index using product ID
+  Scenario: Endpoint should return versions using product ID
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -95,7 +95,7 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/297dd28f-6043-456b-a737-714b72e1a852"
     Then the response status should be "200"
 
-  Scenario: Endpoint should return an index with artifact metadata
+  Scenario: Endpoint should return versions with artifact metadata
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -122,7 +122,7 @@ Feature: PyPI simple index
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]" and @data-requires-python=">=3.0.0"]
       """
 
-  Scenario: Endpoint should return an index with artifact checksum (SHA256)
+  Scenario: Endpoint should return versions with artifact checksum (SHA256)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -145,7 +145,7 @@ Feature: PyPI simple index
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]#sha256=2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]
       """
 
-  Scenario: Endpoint should return an index with artifact checksum (SHA512)
+  Scenario: Endpoint should return versions with artifact checksum (SHA512)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -168,7 +168,7 @@ Feature: PyPI simple index
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]#sha512=f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7"]
       """
 
-  Scenario: Endpoint should return an index with artifact checksum (MD5)
+  Scenario: Endpoint should return versions with artifact checksum (MD5)
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -191,7 +191,7 @@ Feature: PyPI simple index
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/$artifacts[0]"]
       """
 
-  Scenario: License requests an index for a licensed product
+  Scenario: License requests versions for a licensed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -211,7 +211,7 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
 
-  Scenario: License requests an index for a closed product
+  Scenario: License requests versions for a closed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -235,7 +235,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: License requests an index for an open product
+  Scenario: License requests versions for an open product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -255,7 +255,7 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
 
-  Scenario: License requests an index for another licensed product
+  Scenario: License requests versions for another licensed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -279,7 +279,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: License requests an index for another closed product
+  Scenario: License requests versions for another closed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -303,7 +303,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: License requests an index for another open product
+  Scenario: License requests versions for another open product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -323,7 +323,7 @@ Feature: PyPI simple index
     When I send a GET request to "/accounts/test1/packages/pypi/simple/package1"
     Then the response status should be "200"
 
-  Scenario: Anonymous requests an index for a licensed product
+  Scenario: Anonymous requests versions for a licensed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -340,7 +340,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: Anonymous requests an index for a closed product
+  Scenario: Anonymous requests versions for a closed product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
@@ -357,7 +357,7 @@ Feature: PyPI simple index
       { "Location": "https://pypi.org/simple/package1" }
       """
 
-  Scenario: Anonymous requests an index for an open product
+  Scenario: Anonymous requests versions for an open product
     Given the current account is "test1"
     And the current account has 1 "product" with the following:
       """
