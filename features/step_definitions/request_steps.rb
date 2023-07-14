@@ -1134,6 +1134,23 @@ Then /^the response body should be a "([^\"]+)" with the following encrypted cer
   end
 end
 
+Then /^the response body should be an HTML document without the following xpaths:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  doc    = Nokogiri::HTML.parse(last_response.body)
+  xpaths = body.split("\n")
+
+  xpaths.each do |xpath|
+    res = doc.search(xpath)
+
+    expect(res).to be_empty, <<~MSG
+      expected XPath #{xpath} to not exist in document:
+
+      #{doc.to_s.indent(2)}
+    MSG
+  end
+end
+
 Then /^the response body should be an HTML document with the following xpaths:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
