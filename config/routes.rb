@@ -54,23 +54,10 @@ Rails.application.routes.draw do
     }
   end
 
-  if Keygen.multiplayer?
-    scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
-      version_constraint '<=1.0' do
-        scope module: :v1x0 do
-          get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'release_artifacts#index', as: :bin_artifacts
-          get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'release_artifacts#show',  as: :bin_artifact
-        end
-      end
-
-      version_constraint '>=1.1' do
-        get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'release_artifacts#index'
-        get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'release_artifacts#show'
-      end
-    end
-
-    scope module: :stdout, constraints: { subdomain: %w[stdout], **domain_constraints, format: :jsonapi } do
-      get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
+  concern :pypi do
+    scope module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
+      get 'simple/',     to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
+      get 'simple/:id/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
     end
   end
 
@@ -385,10 +372,39 @@ Rails.application.routes.draw do
     # Release packages can support and respond with a variety of mime types, so
     # we're defining those routes here with their own unique constraints.
     namespace :release_packages, path: 'packages' do
-      scope :pypi, module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
-        get 'simple/',     to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
-        get 'simple/:id/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
+      scope :pypi do
+        concerns :pypi
       end
+    end
+  end
+
+  if Keygen.multiplayer?
+    scope module: :bin, constraints: { subdomain: 'get', **domain_constraints, format: :jsonapi } do
+      version_constraint '<=1.0' do
+        scope module: :v1x0 do
+          get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'release_artifacts#index', as: :bin_artifacts
+          get ':account_id/:id', constraints: { account_id: /[^\/]*/, id: /.*/ }, to: 'release_artifacts#show',  as: :bin_artifact
+        end
+      end
+
+      version_constraint '>=1.1' do
+        get ':account_id/:release_id',     constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/ },           to: 'release_artifacts#index'
+        get ':account_id/:release_id/:id', constraints: { account_id: /[^\/]+/, release_id: /[^\/]+/, id: /.*/ }, to: 'release_artifacts#show'
+      end
+    end
+
+    scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :jsonapi } do
+      get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
+    end
+  end
+
+  scope constraints: { subdomain: /\.pkg$/, **domain_constraints } do
+    scope module: 'api/v1/release_packages', constraints: { subdomain: 'pypi.pkg' } do
+      scope ':account_id', as: :account do
+        concerns :pypi
+      end
+
+      concerns :pypi
     end
   end
 
