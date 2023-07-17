@@ -12,6 +12,7 @@ FactoryBot.define do
     environment { NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
     channel     { build(:channel, key: 'stable', account:) }
+    package     { nil }
     artifacts   { [] }
 
     after :build do |release, evaluator|
@@ -45,6 +46,14 @@ FactoryBot.define do
     trait :yanked do
       yanked_at { Time.current }
       status    { 'YANKED' }
+    end
+
+    trait :packaged do
+      package { build(:package, account:, product:, environment:) }
+    end
+
+    trait :pypi do
+      package { build(:package, :pypi, account:, product:, environment:) }
     end
 
     trait :licensed do

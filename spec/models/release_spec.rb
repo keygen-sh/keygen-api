@@ -32,6 +32,25 @@ describe Release, type: :model do
 
         expect { create(:release, account:, environment:, product:) }.to raise_error ActiveRecord::RecordInvalid
       end
+
+      it 'should not raise when environment matches package' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+        package     = create(:package, account:, product:, environment:)
+
+        expect { create(:release, account:, environment:, product:, package:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match package' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+        package     = create(:package, account:, product:)
+
+        # We can't really get here with all of the package's validations
+        package.environment = nil
+
+        expect { create(:release, account:, environment:, package:, product:) }.to raise_error ActiveRecord::RecordInvalid
+      end
     end
 
     context 'on update' do
@@ -47,6 +66,61 @@ describe Release, type: :model do
         release     = create(:release, account:, environment:)
 
         expect { release.update!(product: create(:product, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it 'should not raise when environment matches package' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+        release     = create(:release, account:, product:, environment:)
+        package     = create(:package, account:, product:, environment:)
+
+        expect { release.update!(package:) }.to_not raise_error
+      end
+
+      it 'should raise when environment does not match package' do
+        environment = create(:environment, account:)
+        product     = create(:product, account:, environment:)
+        release     = create(:release, account:, product:, environment:)
+        package     = create(:package, account:, product:)
+
+        # We can't really get here with all of the package's validations
+        package.environment = nil
+
+        expect { release.update!(package:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
+  describe '#package=' do
+    context 'on create' do
+      it 'should not raise when package product matches product' do
+        product = create(:product, account:)
+        package = create(:package, account:, product:)
+
+        expect { create(:release, account:, product:, package:) }.to_not raise_error
+      end
+
+      it 'should raise when package product does not match product' do
+        package = create(:package, account:)
+
+        expect { create(:release, account:, package:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'on update' do
+      it 'should not raise when package product matches product' do
+        product = create(:product, account:)
+        release = create(:release, :packaged, account:, product:)
+        package = create(:package, account:, product:)
+
+        expect { release.update!(package:) }.to_not raise_error
+      end
+
+      it 'should raise when package product does not match product' do
+        release = create(:release, :packaged, account:)
+        package = create(:package, account:)
+
+        expect { release.update!(package:) }.to raise_error ActiveRecord::RecordInvalid
       end
     end
   end

@@ -4,6 +4,7 @@ module Api::V1
   class ReleaseArtifactsController < Api::V1::BaseController
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:package) { |c, s, v| s.for_package(v) }
     has_scope(:release) { |c, s, v| s.for_release(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }

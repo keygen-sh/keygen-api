@@ -412,7 +412,7 @@ describe Products::ReleaseChannelPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_product accessing_its_channels] do
+      with_scenarios %i[accessing_its_product accessing_its_channel] do
         with_token_authentication do
           with_permissions %w[channel.read] do
             without_token_permissions { denies :show }

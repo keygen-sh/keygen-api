@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_17_204249) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -410,15 +410,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
     t.string "url"
     t.string "distribution_strategy"
     t.uuid "environment_id"
-    t.string "code"
-    t.string "distribution_engine"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
-    t.index ["account_id", "code"], name: "index_products_on_account_id_and_code", unique: true
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_products_on_created_at", order: :desc
-    t.index ["distribution_engine"], name: "index_products_on_distribution_engine"
     t.index ["distribution_strategy"], name: "index_products_on_distribution_strategy"
     t.index ["environment_id"], name: "index_products_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true
@@ -498,6 +494,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
     t.index ["release_id"], name: "index_release_download_links_on_release_id"
   end
 
+  create_table "release_engines", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_release_engines_on_key", unique: true
+  end
+
   create_table "release_entitlement_constraints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "release_id", null: false
@@ -520,6 +524,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
+  end
+
+  create_table "release_packages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "product_id", null: false
+    t.uuid "release_engine_id"
+    t.uuid "environment_id"
+    t.string "name", null: false
+    t.string "key", null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_release_packages_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_packages_on_account_id_and_key", unique: true
+    t.index ["environment_id"], name: "index_release_packages_on_environment_id"
+    t.index ["product_id"], name: "index_release_packages_on_product_id"
+    t.index ["release_engine_id"], name: "index_release_packages_on_release_engine_id"
   end
 
   create_table "release_platforms", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -589,17 +610,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_12_192044) do
     t.bigint "semver_build_num"
     t.string "tag"
     t.uuid "environment_id"
+    t.uuid "release_package_id"
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
     t.index ["environment_id"], name: "index_releases_on_environment_id"
     t.index ["product_id"], name: "index_releases_on_product_id"
     t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
     t.index ["release_filetype_id"], name: "index_releases_on_release_filetype_id"
+    t.index ["release_package_id"], name: "index_releases_on_release_package_id"
     t.index ["release_platform_id"], name: "index_releases_on_release_platform_id"
     t.index ["semver_major", "semver_minor", "semver_patch", "semver_pre_word", "semver_pre_num", "semver_build_word", "semver_build_num"], name: "releases_sort_semver_components_idx", order: { semver_major: :desc, semver_minor: "DESC NULLS LAST", semver_patch: "DESC NULLS LAST", semver_pre_word: :desc, semver_pre_num: "DESC NULLS LAST", semver_build_word: "DESC NULLS LAST", semver_build_num: "DESC NULLS LAST" }
     t.index ["status"], name: "index_releases_on_status"
     t.index ["tag", "account_id"], name: "index_releases_on_tag_and_account_id", unique: true, where: "(tag IS NOT NULL)"
-    t.index ["version", "product_id", "account_id"], name: "index_releases_on_version_and_product_id_and_account_id", unique: true, where: "((api_version)::text <> '1.0'::text)"
+    t.index ["version", "product_id", "account_id"], name: "releases_version_no_package_uniq_idx", unique: true, where: "((release_package_id IS NULL) AND ((api_version)::text <> '1.0'::text))"
+    t.index ["version", "release_package_id", "product_id", "account_id"], name: "releases_version_package_uniq_idx", unique: true, where: "((release_package_id IS NOT NULL) AND ((api_version)::text <> '1.0'::text))"
   end
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

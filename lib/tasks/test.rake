@@ -32,7 +32,7 @@ begin
       ENV['TEST_ENV_NUMBER'] ||= '1'
 
       # Ensure we're always in the test environment.
-      Rails.env = 'test'
+      ENV['RAILS_ENV'] = Rails.env = 'test'
     end
 
     desc 'setup test suite'

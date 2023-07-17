@@ -4,9 +4,7 @@ class ProductSerializer < BaseSerializer
   type 'products'
 
   attribute :name
-  attribute :code
   attribute :distribution_strategy
-  attribute :distribution_engine
   attribute :url
   attribute :platforms
   attribute :permissions, if: -> { @account.ent? } do
