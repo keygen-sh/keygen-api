@@ -91,6 +91,7 @@ RSpec.configure do |config|
   # Teardown Stripe, clean database, etc.
   config.after :each do
     RequestMigrations::Testing.teardown!
+    Faker::UniqueGenerator.clear
     StripeHelper.stop
     DatabaseCleaner.clean
   end

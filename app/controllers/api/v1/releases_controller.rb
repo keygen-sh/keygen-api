@@ -7,6 +7,7 @@ module Api::V1
     has_scope(:constraints) { |c, s, v| s.within_constraints(v) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:package) { |c, s, v| s.for_package(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     # FIXME(ezekg) Eventually remove these once we can confirm they're
@@ -66,6 +67,12 @@ module Api::V1
           param :product, type: :hash do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[product products] }
+              param :id, type: :uuid
+            end
+          end
+          param :package, type: :hash, optional: true do
+            param :data, type: :hash do
+              param :type, type: :string, inclusion: { in: %w[package packages] }
               param :id, type: :uuid
             end
           end

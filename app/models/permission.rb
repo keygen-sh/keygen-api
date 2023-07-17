@@ -37,6 +37,8 @@ class Permission < ApplicationRecord
 
     constraint.read
 
+    engine.read
+
     entitlement.create
     entitlement.delete
     entitlement.read
@@ -99,7 +101,10 @@ class Permission < ApplicationRecord
 
     metric.read
 
+    package.create
+    package.delete
     package.read
+    package.update
 
     platform.read
 
@@ -128,6 +133,7 @@ class Permission < ApplicationRecord
     release.create
     release.delete
     release.download
+    release.package.update
     release.publish
     release.read
     release.update
@@ -182,6 +188,8 @@ class Permission < ApplicationRecord
     channel.read
 
     constraint.read
+
+    engine.read
 
     entitlement.create
     entitlement.delete
@@ -239,7 +247,10 @@ class Permission < ApplicationRecord
     machine.read
     machine.update
 
+    package.create
+    package.delete
     package.read
+    package.update
 
     platform.read
 
@@ -268,6 +279,7 @@ class Permission < ApplicationRecord
     release.create
     release.delete
     release.download
+    release.package.update
     release.publish
     release.read
     release.update
@@ -329,6 +341,8 @@ class Permission < ApplicationRecord
     channel.read
 
     constraint.read
+
+    engine.read
 
     entitlement.read
 
@@ -394,6 +408,8 @@ class Permission < ApplicationRecord
 
     constraint.read
 
+    engine.read
+
     entitlement.read
 
     group.create
@@ -443,7 +459,10 @@ class Permission < ApplicationRecord
     machine.read
     machine.update
 
+    package.create
+    package.delete
     package.read
+    package.update
 
     platform.read
 
@@ -469,6 +488,7 @@ class Permission < ApplicationRecord
     release.create
     release.delete
     release.download
+    release.package.update
     release.publish
     release.read
     release.update
@@ -507,6 +527,8 @@ class Permission < ApplicationRecord
     channel.read
 
     constraint.read
+
+    engine.read
 
     entitlement.read
 
@@ -579,6 +601,8 @@ class Permission < ApplicationRecord
     channel.read
 
     constraint.read
+
+    engine.read
 
     entitlement.read
 

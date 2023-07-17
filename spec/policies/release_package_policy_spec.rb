@@ -23,15 +23,41 @@ describe ReleasePackagePolicy, type: :policy do
 
     with_scenarios %i[accessing_package] do
       with_token_authentication do
+        with_permissions %w[package.create] do
+          without_token_permissions { denies :create }
+
+          allows :create
+        end
+
+        with_permissions %w[package.delete] do
+          without_token_permissions { denies :destroy }
+
+          allows :destroy
+        end
+
         with_permissions %w[package.read] do
           without_token_permissions { denies :show }
 
           allows :show
         end
 
-        with_wildcard_permissions { allows :show }
-        with_default_permissions  { allows :show }
-        without_permissions       { denies :show }
+        with_permissions %w[package.update] do
+          without_token_permissions { denies :update }
+
+          allows :update
+        end
+
+        with_wildcard_permissions do
+          allows :create, :destroy, :show, :update
+        end
+
+        with_default_permissions do
+          allows :create, :destroy, :show, :update
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
     end
   end
@@ -54,15 +80,41 @@ describe ReleasePackagePolicy, type: :policy do
 
       with_scenarios %i[accessing_package] do
         with_token_authentication do
+          with_permissions %w[package.create] do
+            without_token_permissions { denies :create }
+
+            allows :create
+          end
+
+          with_permissions %w[package.delete] do
+            without_token_permissions { denies :destroy }
+
+            allows :destroy
+          end
+
           with_permissions %w[package.read] do
             without_token_permissions { denies :show }
 
             allows :show
           end
 
-          with_wildcard_permissions { allows :show }
-          with_default_permissions  { allows :show }
-          without_permissions       { denies :show }
+          with_permissions %w[package.update] do
+            without_token_permissions { denies :update }
+
+            allows :update
+          end
+
+          with_wildcard_permissions do
+            allows :create, :destroy, :show, :update
+          end
+
+          with_default_permissions do
+            allows :create, :destroy, :show, :update
+          end
+
+          without_permissions do
+            denies :create, :destroy, :show, :update
+          end
         end
       end
     end
@@ -83,13 +135,41 @@ describe ReleasePackagePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_package] do
       with_token_authentication do
+        with_permissions %w[package.create] do
+          without_token_permissions { denies :create }
+
+          allows :create
+        end
+
+        with_permissions %w[package.delete] do
+          without_token_permissions { denies :destroy }
+
+          allows :destroy
+        end
+
         with_permissions %w[package.read] do
+          without_token_permissions { denies :show }
+
           allows :show
         end
 
-        with_wildcard_permissions { allows :show }
-        with_default_permissions  { allows :show }
-        without_permissions       { denies :show }
+        with_permissions %w[package.update] do
+          without_token_permissions { denies :update }
+
+          allows :update
+        end
+
+        with_wildcard_permissions do
+          allows :create, :destroy, :show, :update
+        end
+
+        with_default_permissions do
+          allows :create, :destroy, :show, :update
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
     end
 
@@ -107,13 +187,33 @@ describe ReleasePackagePolicy, type: :policy do
 
     with_scenarios %i[accessing_package] do
       with_token_authentication do
+        with_permissions %w[package.create] do
+          denies :create
+        end
+
+        with_permissions %w[package.delete] do
+          denies :destroy
+        end
+
         with_permissions %w[package.read] do
           denies :show
         end
 
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_permissions %w[package.update] do
+          denies :update
+        end
+
+        with_wildcard_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        with_default_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
     end
   end
@@ -147,24 +247,46 @@ describe ReleasePackagePolicy, type: :policy do
           allows :show
         end
 
-        with_wildcard_permissions { allows :show }
-        with_default_permissions  { allows :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions do
+          denies :create, :destroy, :update
+          allows :show
+        end
+
+        with_default_permissions do
+          denies :create, :destroy, :update
+          allows :show
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
 
       with_token_authentication do
         with_permissions %w[package.read] do
+          without_token_permissions { denies :show }
+
           allows :show
         end
 
-        with_wildcard_permissions { allows :show }
-        with_default_permissions  { allows :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions do
+          denies :create, :destroy, :update
+          allows :show
+        end
+
+        with_default_permissions do
+          denies :create, :destroy, :update
+          allows :show
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
     end
 
     with_scenarios %i[accessing_packages] do
-      with_product_traits %i[open] do
+      with_package_traits %i[open] do
         with_license_authentication do
           with_permissions %w[package.read] do
             allows :index
@@ -177,6 +299,8 @@ describe ReleasePackagePolicy, type: :policy do
 
         with_token_authentication do
           with_permissions %w[package.read] do
+            without_token_permissions { denies :show }
+
             allows :index
           end
 
@@ -208,25 +332,47 @@ describe ReleasePackagePolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_package] do
-      with_product_traits %i[open] do
+      with_package_traits %i[open] do
         with_license_authentication do
           with_permissions %w[package.read] do
             allows :show
           end
 
-          with_wildcard_permissions { allows :show }
-          with_default_permissions  { allows :show }
-          without_permissions       { denies :show }
+          with_wildcard_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          without_permissions do
+            denies :create, :destroy, :show, :update
+          end
         end
 
         with_token_authentication do
           with_permissions %w[package.read] do
+            without_token_permissions { denies :show }
+
             allows :show
           end
 
-          with_wildcard_permissions { allows :show }
-          with_default_permissions  { allows :show }
-          without_permissions       { denies :show }
+          with_wildcard_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          without_permissions do
+            denies :create, :destroy, :show, :update
+          end
         end
       end
 
@@ -235,9 +381,17 @@ describe ReleasePackagePolicy, type: :policy do
           denies :show
         end
 
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        with_default_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
 
       with_token_authentication do
@@ -245,9 +399,17 @@ describe ReleasePackagePolicy, type: :policy do
           denies :show
         end
 
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        with_default_permissions do
+          denies :create, :destroy, :show, :update
+        end
+
+        without_permissions do
+          denies :create, :destroy, :show, :update
+        end
       end
     end
   end
@@ -269,17 +431,29 @@ describe ReleasePackagePolicy, type: :policy do
       with_scenarios %i[accessing_its_package] do
         with_token_authentication do
           with_permissions %w[package.read] do
+            without_token_permissions { denies :show }
+
             allows :show
           end
 
-          with_wildcard_permissions { allows :show }
-          with_default_permissions  { allows :show }
-          without_permissions       { denies :show }
+          with_wildcard_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :create, :destroy, :update
+            allows :show
+          end
+
+          without_permissions do
+            denies :create, :destroy, :show, :update
+          end
         end
       end
 
       with_scenarios %i[accessing_packages] do
-        with_product_traits %i[open] do
+        with_package_traits %i[open] do
           with_token_authentication do
             with_permissions %w[package.read] do
               allows :index
@@ -303,15 +477,27 @@ describe ReleasePackagePolicy, type: :policy do
       end
 
       with_scenarios %i[accessing_package] do
-        with_product_traits %i[open] do
+        with_package_traits %i[open] do
           with_token_authentication do
             with_permissions %w[package.read] do
+              without_token_permissions { denies :show }
+
               allows :show
             end
 
-            with_wildcard_permissions { allows :show }
-            with_default_permissions  { allows :show }
-            without_permissions       { denies :show }
+            with_wildcard_permissions do
+              denies :create, :destroy, :update
+              allows :show
+            end
+
+            with_default_permissions do
+              denies :create, :destroy, :update
+              allows :show
+            end
+
+            without_permissions do
+              denies :create, :destroy, :show, :update
+            end
           end
         end
 
@@ -320,9 +506,17 @@ describe ReleasePackagePolicy, type: :policy do
             denies :show
           end
 
-          with_wildcard_permissions { denies :show }
-          with_default_permissions  { denies :show }
-          without_permissions       { denies :show }
+          with_wildcard_permissions do
+            denies :create, :destroy, :show, :update
+          end
+
+          with_default_permissions do
+            denies :create, :destroy, :show, :update
+          end
+
+          without_permissions do
+            denies :create, :destroy, :show, :update
+          end
         end
       end
     end
@@ -331,7 +525,7 @@ describe ReleasePackagePolicy, type: :policy do
   without_authorization do
     with_scenarios %i[accessing_packages] do
       without_authentication do
-        with_product_traits %i[open] do
+        with_package_traits %i[open] do
           allows :index
         end
 
@@ -341,11 +535,12 @@ describe ReleasePackagePolicy, type: :policy do
 
     with_scenarios %i[accessing_package] do
       without_authentication do
-        with_product_traits %i[open] do
+        with_package_traits %i[open] do
+          denies :create, :destroy, :update
           allows :show
         end
 
-        denies :show
+        denies :create, :destroy, :show, :update
       end
     end
   end

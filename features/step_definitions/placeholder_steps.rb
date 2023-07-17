@@ -42,6 +42,10 @@ PLACEHOLDERS = %w[
   release_upload_link
   release_artifact
   artifact
+  release_package
+  package
+  release_engine
+  engine
   constraint
   current
   crypt
@@ -132,6 +136,14 @@ def parse_placeholders(str, account:, bearer:, crypt:)
               account.machine_processes.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             when 'artifact'
               account.release_artifacts.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            when 'package'
+              account.release_packages.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            when 'engine' # not tied to accounts
+              if index.present?
+                ReleaseEngine.all[index.to_i]
+              else
+                ReleaseEngine
+              end
             else
               account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             end
@@ -153,6 +165,7 @@ def parse_placeholders(str, account:, bearer:, crypt:)
 
         # FIXME(ezekg) Format timestamps to ISO 8601
         res = res.iso8601 3 if res.is_a?(ActiveSupport::TimeWithZone)
+        res = res.id        if res.is_a?(ActiveRecord::Base)
 
         res
       end
@@ -202,6 +215,10 @@ def parse_path_placeholders(str, account:, bearer:, crypt:)
             account.release_filetypes.send(:[], index.to_i).id
           when "artifacts"
             account.release_artifacts.send(:[], index.to_i).id
+          when "packages"
+            account.release_packages.send(:[], index.to_i).id
+          when "engines"
+            ReleaseEngine.all[index.to_i].id # not tied to accounts
           when "request-logs"
             account.request_logs.send(:[], index.to_i).id
           when "processes"

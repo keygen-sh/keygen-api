@@ -1,0 +1,10 @@
+-# frozen_string_literal: true
+- title = "Packages for #{account.name}"
+- content_for(:title) { title }
+
+%h1= title
+
+- packages.each do |package|
+  - url = url_for([:v1, account, :release_engines, :pypi_simple_package, package: package.id, format: nil, trailing_slash: true])
+
+  = link_to(package.key, url, data: package.metadata)

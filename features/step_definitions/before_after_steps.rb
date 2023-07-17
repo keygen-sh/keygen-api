@@ -54,6 +54,7 @@ After do |scenario|
   Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
   Bullet.end_request if Bullet.enable?
 
+  Faker::UniqueGenerator.clear
   StripeHelper.stop
 
   # Tell Cucumber to quit if a scenario fails

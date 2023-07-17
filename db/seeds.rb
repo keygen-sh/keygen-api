@@ -30,6 +30,8 @@ permissions = %w[
 
   constraint.read
 
+  engine.read
+
   entitlement.create
   entitlement.delete
   entitlement.read
@@ -92,7 +94,10 @@ permissions = %w[
 
   metric.read
 
+  package.create
+  package.delete
   package.read
+  package.update
 
   platform.read
 
@@ -121,6 +126,7 @@ permissions = %w[
   release.create
   release.delete
   release.download
+  release.package.update
   release.publish
   release.read
   release.update
@@ -231,6 +237,10 @@ events = %w[
   machine.proofs.generated
   machine.updated
 
+  package.created
+  package.deleted
+  package.updated
+
   policy.created
   policy.deleted
   policy.entitlements.attached
@@ -253,6 +263,7 @@ events = %w[
   release.created
   release.deleted
   release.downloaded
+  release.package.updated
   release.published
   release.replaced
   release.updated
@@ -278,14 +289,24 @@ events = %w[
   user.updated
 ]
 
+engines = {
+  pypi: 'PyPI',
+}
+
 Permission.upsert_all(
-  permissions.map { |action| { action: } },
+  permissions.map {{ action: _1 }},
   record_timestamps: true,
   on_duplicate: :skip,
 )
 
 EventType.upsert_all(
-  events.map { |event| { event: } },
+  events.map {{ event: _1 }},
+  record_timestamps: true,
+  on_duplicate: :skip,
+)
+
+ReleaseEngine.upsert_all(
+  engines.map {{ key: _1, name: _2 }},
   record_timestamps: true,
   on_duplicate: :skip,
 )

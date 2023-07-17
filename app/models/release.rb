@@ -37,6 +37,11 @@ class Release < ApplicationRecord
     inverse_of: :releases
   belongs_to :product,
     inverse_of: :releases
+  belongs_to :package,
+    class_name: 'ReleasePackage',
+    foreign_key: :release_package_id,
+    inverse_of: :releases,
+    optional: true
   has_many :users,
     through: :product
   has_many :licenses,
@@ -79,6 +84,8 @@ class Release < ApplicationRecord
     through: :artifacts
   has_many :event_logs,
     as: :resource
+  has_one :engine,
+    through: :package
 
   # FIXME(ezekg) For v1.0 backwards compatibility
   has_one :artifact,
@@ -104,6 +111,11 @@ class Release < ApplicationRecord
   validates :product,
     scope: { by: :account_id }
 
+  validates :package,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    if: :package_id?
+
   validates :channel,
     scope: { by: :account_id }
 
@@ -118,7 +130,7 @@ class Release < ApplicationRecord
     presence: true,
     semver: true,
     uniqueness: {
-      scope: %i[version product_id account_id],
+      scope: %i[version release_package_id product_id account_id],
       message: 'version already exists',
       # We only want to enforce uniqueness for >= v1.1
       if: -> { api_version != '1.0' },
@@ -138,6 +150,16 @@ class Release < ApplicationRecord
       message: 'tag already exists',
       if: :tag?,
     }
+
+  # Assert that package matches the release's product.
+  validate on: %i[create update] do
+    next unless
+      release_package_id_changed?
+
+    unless package.nil? || package.product_id == product_id
+      errors.add :package, :not_allowed, message: 'package product must match release product'
+    end
+  end
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -288,6 +310,16 @@ class Release < ApplicationRecord
         )
   }
 
+  scope :for_package, -> package {
+    case package
+    when ReleasePackage,
+         UUID_RE
+      joins(:package).where(package: { id: package })
+    else
+      joins(:package).where(package: { key: package.to_s })
+    end
+  }
+
   scope :for_platform, -> platform {
     case platform
     when ReleasePlatform,
@@ -361,8 +393,6 @@ class Release < ApplicationRecord
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  scope :pypi, -> { joins(:product).where(product: { distribution_engine: 'PYPI' }) }
-
   scope :with_artifacts, -> { where.associated(:artifacts) }
   scope :without_artifacts, -> { where.missing(:artifacts) }
 
@@ -434,6 +464,12 @@ class Release < ApplicationRecord
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
+
+  def package_id? = release_package_id?
+  def package_id  = release_package_id
+  def package_id=(id)
+    self.release_package_id = id
+  end
 
   # FIXME(ezekg) Setters for v1.0 backwards compatibility
   def platform=(key)

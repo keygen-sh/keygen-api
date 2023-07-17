@@ -10,7 +10,7 @@ module Api::V1::Users::Relationships
     authorize :user
 
     def index
-      products = apply_pagination(authorized_scope(apply_scopes(@user.products)))
+      products = apply_pagination(authorized_scope(apply_scopes(user.products)).preload(:role))
       authorize! products,
         with: Users::ProductPolicy
 

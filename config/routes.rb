@@ -56,15 +56,15 @@ Rails.application.routes.draw do
 
   concern :pypi do
     scope module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
-      get 'simple/',     to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
-      get 'simple/:id/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
+      get 'simple/',          to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
+      get 'simple/:package/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
     end
   end
 
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
-    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :octet_stream, raise_on_no_match: true), defaults: { format: :jsonapi } do
+    scope constraints: MimeTypeConstraint.new(:jsonapi, :json, :binary, raise_on_no_match: true), defaults: { format: :jsonapi } do
       post :passwords, to: 'passwords#reset'
       get  :profile,   to: 'profiles#show'
       get  :me,        to: 'profiles#me'
@@ -110,7 +110,7 @@ Rails.application.routes.draw do
             post :reset,                                    to: 'heartbeats#reset'
             post :ping,                                     to: 'heartbeats#ping'
             post :check_out,       path: 'check-out',       to: 'checkouts#create'
-            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :octet_stream }
+            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :binary }
 
             scope module: :v1x0 do
               post :generate_offline_proof, path: 'generate-offline-proof', to: 'proofs#create'
@@ -188,7 +188,7 @@ Rails.application.routes.draw do
             post :decrement_usage, path: 'decrement-usage', to: 'uses#decrement'
             post :reset_usage,     path: 'reset-usage',     to: 'uses#reset'
             post :check_out,       path: 'check-out',       to: 'checkouts#create'
-            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :octet_stream }
+            get :check_out,        path: 'check-out',       to: 'checkouts#show', defaults: { format: :binary }
           end
         end
 
@@ -227,6 +227,7 @@ Rails.application.routes.draw do
           resources :tokens,            only: %i[index show create]
           resources :users,             only: %i[index show]
           resources :releases,          only: %i[index show],                    constraints: { id: /[^\/]*/ }
+          resources :release_packages,  only: %i[index show], path: 'packages'
           resources :release_artifacts, only: %i[index show], path: 'artifacts', constraints: { id: /.*/ }
           resources :release_platforms, only: %i[index show], path: 'platforms'
           resources :release_arches,    only: %i[index show], path: 'arches'
@@ -267,10 +268,11 @@ Rails.application.routes.draw do
           end
 
           resources :entitlements,      only: %i[index show]
-          resources :release_artifacts, only: %i[index show], path: 'artifacts'
-
-          resource :upgrade, only: %i[show]
-          resource :product, only: %i[show]
+          resources :release_artifacts, only: %i[index show],  path: 'artifacts'
+          resource  :release_package,   only: %i[show update], path: 'package'
+          resource  :release_engine,    only: %i[show],        path: 'engine'
+          resource  :product,           only: %i[show]
+          resource  :upgrade,           only: %i[show]
 
           version_constraint '<=1.0' do
             scope module: :v1x0 do
@@ -291,7 +293,9 @@ Rails.application.routes.draw do
 
       # NOTE(ezekg) The artifact :show route is defined below, with a less
       #             restrictive mime type constraint.
-      resources :release_artifacts, except: %i[show],     path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
+      resources :release_artifacts, except: %i[show],     path: 'artifacts', constraints: { id: /.*/ }
+      resources :release_packages,                        path: 'packages',  constraints: { id: /[^\/]*/ }
+      resources :release_engines,   only: %i[index show], path: 'engines',   constraints: { id: /[^\/]*/ }
       resources :release_platforms, only: %i[index show], path: 'platforms'
       resources :release_arches,    only: %i[index show], path: 'arches'
       resources :release_channels,  only: %i[index show], path: 'channels'
@@ -369,9 +373,9 @@ Rails.application.routes.draw do
       resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
     end
 
-    # Release packages can support and respond with a variety of mime types, so
+    # Release engines can support and respond with a variety of mime types, so
     # we're defining those routes here with their own unique constraints.
-    namespace :release_packages, path: 'packages' do
+    namespace :release_engines, path: 'engines' do
       scope :pypi do
         concerns :pypi
       end
@@ -379,7 +383,8 @@ Rails.application.routes.draw do
   end
 
   if Keygen.multiplayer?
-    scope module: :bin, constraints: { subdomain: 'get', **domain_constraints, format: :jsonapi } do
+    # Simplified short URLs for artifact distribution
+    scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
       version_constraint '<=1.0' do
         scope module: :v1x0 do
           get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'release_artifacts#index', as: :bin_artifacts
@@ -393,18 +398,24 @@ Rails.application.routes.draw do
       end
     end
 
+    # Routes for Stdout (e.g. unsubscribe)
     scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :jsonapi } do
       get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
     end
   end
 
+  # Subdomains for our supported distribution engines (i.e. package managers)
   scope constraints: { subdomain: /\.pkg$/, **domain_constraints } do
+    # PyPI
     scope module: 'api/v1/release_packages', constraints: { subdomain: 'pypi.pkg' } do
-      scope ':account_id', as: :account do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :pypi
+        end
+      when Keygen.singleplayer?
         concerns :pypi
       end
-
-      concerns :pypi
     end
   end
 
@@ -432,10 +443,10 @@ Rails.application.routes.draw do
 
           # Account
           case
-          when Keygen.singleplayer?
-            resources :accounts, param: :account_id, only: %i[show update destroy]
           when Keygen.multiplayer?
             resources :accounts, param: :account_id, only: %i[show create update destroy]
+          when Keygen.singleplayer?
+            resources :accounts, param: :account_id, only: %i[show update destroy]
           end
         end
 
