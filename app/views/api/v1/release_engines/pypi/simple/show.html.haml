@@ -4,7 +4,7 @@
 
 %h1= title
 
-- package.artifacts.each do |artifact|
+- artifacts.each do |artifact|
   - url = url_for([:v1, account, artifact, anchor: checksum_for(artifact, delimiter: '=')])
 
   = link_to(artifact.filename, url, data: artifact.metadata)

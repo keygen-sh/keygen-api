@@ -412,7 +412,7 @@ describe Products::ReleasePlatformPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_product accessing_its_platforms] do
+      with_scenarios %i[accessing_its_product accessing_its_platform] do
         with_token_authentication do
           with_permissions %w[platform.read] do
             without_token_permissions { denies :show }

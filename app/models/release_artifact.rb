@@ -40,6 +40,10 @@ class ReleaseArtifact < ApplicationRecord
     through: :release
   has_one :product,
     through: :release
+  has_one :package,
+    through: :release
+  has_one :engine,
+    through: :package
   has_many :users,
     through: :product
   has_many :licenses,
@@ -202,6 +206,16 @@ class ReleaseArtifact < ApplicationRecord
         )
   }
 
+  scope :for_package, -> package {
+    case package
+    when ReleasePackage,
+         UUID_RE
+      joins(:package).where(package: { id: package })
+    else
+      joins(:package).where(package: { key: package.to_s })
+    end
+  }
+
   scope :for_platform, -> platform {
     case platform
     when ReleasePlatform,
@@ -235,8 +249,6 @@ class ReleaseArtifact < ApplicationRecord
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
   scope :open,     -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed,   -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
-
-  scope :pypi, -> { joins(:product).where(product: { distribution_engine: 'PYPI' }) }
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }

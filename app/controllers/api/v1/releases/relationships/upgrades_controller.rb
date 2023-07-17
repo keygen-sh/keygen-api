@@ -3,6 +3,7 @@
 module Api::V1::Releases::Relationships
   class UpgradesController < Api::V1::BaseController
     has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:package) { |c, s, v| s.for_package(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

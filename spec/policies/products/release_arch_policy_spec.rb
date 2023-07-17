@@ -451,7 +451,7 @@ describe Products::ReleaseArchPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_arches] do
+    with_scenarios %i[accessing_a_product accessing_its_arch] do
       with_token_authentication do
         with_permissions %w[arch.read] do
           denies :show

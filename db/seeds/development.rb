@@ -32,6 +32,10 @@ loop do
     )
 
     [nil, *account.environments].each do |environment|
+      if rand(0..1).zero? && environment.present?
+        Token.create!(bearer: environment, account:, environment:)
+      end
+
       rand(0..10).times do
         buzzword = Faker::Company.unique.buzzword
 
@@ -52,30 +56,54 @@ loop do
       end
     end
 
-    # Distribution
     account.products.find_each do |product|
       environment = product.environment
 
-      rand(0..20).times do
-        release = Release.create!(
-          channel_attributes: { key: 'stable' },
-          version: Faker::App.unique.semantic_version,
-          name: Faker::App.name,
-          product:,
-          account:,
-        )
+      if rand(0..1).zero?
+        Token.create!(bearer: product, account:, environment:)
+      end
 
-        rand(1..10).times do
-          ext = %w[exe tar.gz zip dmg].sample
-          artifact = ReleaseArtifact.create!(
-            platform_attributes: { key: Faker::Computer.platform.downcase },
-            arch_attributes: { key: %w[x86 386 amd64 arm arm64].sample },
-            filetype_attributes: { key: ext },
-            filename: Faker::File.unique.file_name(ext:),
-            filesize: rand(1.gigabyte),
-            release:,
+      # Distribution
+      rand(0..3).times do
+        name    = "#{product.name} #{Faker::Hacker.unique.noun.capitalize}"
+        engines = [ReleaseEngine.pypi, nil]
+
+        package = if rand(0..1).zero?
+                    ReleasePackage.create!(
+                      engine: engines.sample,
+                      key: name.parameterize,
+                      name: name,
+                      environment:,
+                      product:,
+                      account:,
+                    )
+                  end
+
+        rand(0..20).times do
+          version = Faker::App.unique.semantic_version
+          release = Release.create!(
+            channel_attributes: { key: 'stable' },
+            name: "#{name} v#{version}",
+            version:,
+            environment:,
+            package:,
+            product:,
             account:,
           )
+
+          rand(1..10).times do
+            ext = %w[exe tar.gz zip dmg].sample
+            artifact = ReleaseArtifact.create!(
+              platform_attributes: { key: Faker::Computer.platform.downcase },
+              arch_attributes: { key: %w[x86 386 amd64 arm arm64].sample },
+              filetype_attributes: { key: ext },
+              filename: Faker::File.unique.file_name(ext:),
+              filesize: rand(1.gigabyte),
+              environment:,
+              release:,
+              account:,
+            )
+          end
         end
       end
 
@@ -87,6 +115,7 @@ loop do
           duration: [nil, 1.year, 1.month, 2.weeks].sample,
           max_machines: 5,
           floating: true,
+          environment:,
           product:,
           account:,
         )
@@ -100,16 +129,26 @@ loop do
                    )
                  end
 
+          if rand(0..1).zero? && user.present?
+            Token.create!(bearer: user, account:, environment:)
+          end
+
           license = License.create!(
             name: 'Floating License',
+            environment:,
             policy:,
             user:,
             account:,
           )
 
           rand(0..5).times do
+            if rand(0..10).zero?
+              Token.create!(bearer: license, account:, environment:)
+            end
+
             Machine.create!(
               fingerprint: SecureRandom.hex,
+              environment:,
               license:,
               account:,
             )
@@ -123,7 +162,11 @@ loop do
       request_time = rand(1.year).seconds.ago
       request_id   = SecureRandom.uuid
 
-      resource    = account.licenses.sample
+      # Attempt to select a random resource
+      resource = account.licenses.sample || account.releases.sample || account.products.sample
+      next if
+        resource.nil?
+
       environment = resource.environment
       requestor   = account.admins.for_environment(environment).sample || resource
 
@@ -139,7 +182,7 @@ loop do
         ip: Faker::Internet.ip_v4_address,
         response_signature: SecureRandom.base64,
         response_body: '{"data":null,"errors":[],"meta":{"sample":true}}',
-        status: %w[200 201 204 303 400 401 403 404 422],
+        status: %w[200 201 204 303 302 307 400 401 403 404 422],
         environment:,
         resource:,
         requestor:,

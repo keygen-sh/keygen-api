@@ -32,7 +32,6 @@ Feature: Create product
           "type": "products",
           "attributes": {
             "name": "Cool App",
-            "code": "cool",
             "url": "http://example.com",
             "platforms": ["iOS", "Android"]
           }
@@ -140,60 +139,6 @@ Feature: Create product
         "code": "DISTRIBUTION_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/distributionStrategy"
-        }
-      }
-      """
-
-  Scenario: Admin creates a product with a PYPI distribution engine
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
-    And the current account has 1 "webhook-endpoint"
-    When I send a POST request to "/accounts/test1/products" with the following:
-      """
-      {
-        "data": {
-          "type": "products",
-          "attributes": {
-            "name": "PyPI Package",
-            "distributionEngine": "PYPI"
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the response body should be a "product" with the distributionEngine "PYPI"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a product with an invalid distribution engine
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
-    And the current account has 1 "webhook-endpoint"
-    When I send a POST request to "/accounts/test1/products" with the following:
-      """
-      {
-        "data": {
-          "type": "products",
-          "attributes": {
-            "name": "Docker Image",
-            "distributionEngine": "OSI"
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the response body should be an array of 1 errors
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "unsupported distribution engine",
-        "code": "DISTRIBUTION_ENGINE_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/attributes/distributionEngine"
         }
       }
       """

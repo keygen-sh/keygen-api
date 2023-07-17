@@ -947,6 +947,10 @@ Feature: License checkout actions
     And the current account has 1 "license"
     And I am an admin of account "test1"
     And I use an authentication token
+    And I send the following raw headers:
+      """
+      Accept: application/json
+      """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out" with the following:
       """
       { "meta": { "include": ["account"] } }
@@ -954,7 +958,7 @@ Feature: License checkout actions
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json; charset=utf-8
+      Content-Type: application/json; charset=utf-8
       """
     And the first error should have the following properties:
       """
@@ -977,11 +981,15 @@ Feature: License checkout actions
     And the current account has 1 "license"
     And I am an admin of account "test1"
     And I use an authentication token
+    And I send the following raw headers:
+      """
+      Accept: application/json
+      """
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=account"
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json; charset=utf-8
+      Content-Type: application/json; charset=utf-8
       """
     And the first error should have the following properties:
       """

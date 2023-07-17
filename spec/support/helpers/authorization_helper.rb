@@ -1030,62 +1030,80 @@ module AuthorizationHelper
       let(:record) { artifact }
     end
 
+    def accessing_engines(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:engines) { create_list(:engine, 3, *engine_traits) }
+      else
+        let(:engines) { create_list(:engine, 3, *engine_traits) }
+      end
+
+      let(:record) { engines }
+    end
+
+    def accessing_engine(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:engine) { create(:engine, *engine_traits) }
+      else
+        let(:engine) { create(:engine, *engine_traits) }
+      end
+
+      let(:record) { engine }
+    end
+
     def accessing_packages(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:products) { [create(:product, *product_traits, account: other_account)] }
+        let(:packages) { create_list(:package, 3, *package_traits, account: other_account) }
       else
-        let(:products) { [create(:product, *product_traits, account:)] }
+        let(:packages) { create_list(:package, 3, *package_traits, account:) }
       end
 
-      let(:record) { ReleasePackage.for(products) }
+      let(:record) { packages }
     end
 
     def accessing_package(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:product)   { create(:product, *product_traits, account: other_account) }
-        let(:release)   { create(:release, *release_traits, product:, account: other_account) }
-        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account: other_account) }
+        let(:package) { create(:package, *package_traits, account: other_account) }
       else
-        let(:product)   { create(:product, *product_traits, account:) }
-        let(:release)   { create(:release, *release_traits, product:, account:) }
-        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+        let(:package) { create(:package, *package_traits, account:) }
       end
 
-      let(:record) { ReleasePackage.new(product, artifacts:) }
+      let(:record) { package }
     end
 
     def accessing_its_packages(scenarios)
       case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:packages) { create_list(:package, 3, *package_traits, account:, product:) }
       in [:as_product, *]
-        let(:products) { [bearer] }
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer, account:) }
       in [:as_license, *]
-        let(:products) { [bearer.product] }
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer.product, account:) }
       in [:as_user, *]
-        let(:products) { bearer.licenses.collect(&:product) }
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer.licenses.take.product, account:) }
       end
 
-      let(:record) { ReleasePackage.for(products) }
+      let(:record) { packages }
     end
 
     def accessing_its_package(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:package) { release.package }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:package) { create(:package, *package_traits, account:, product:) }
       in [:as_product, *]
-        let(:product)   { bearer }
-        let(:release)   { create(:release, *release_traits, product:, account:) }
-        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+        let(:package) { create(:package, *package_traits, product: bearer, account:) }
       in [:as_license, *]
-        let(:product)   { bearer.product }
-        let(:release)   { create(:release, *release_traits, product:, account:) }
-        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+        let(:package) { create(:package, *package_traits, product: bearer.product, account:) }
       in [:as_user, *]
-        let(:product)   { bearer.licenses.first.product }
-        let(:release)   { create(:release, *release_traits, product:, account:) }
-        let(:artifacts) { create_list(:artifact, 3, *artifact_traits, release:, account:) }
+        let(:package) { create(:package, *package_traits, product: bearer.licenses.take.product, account:) }
       end
 
-      let(:record) { ReleasePackage.new(product, artifacts:) }
+      let(:record) { package }
     end
 
     def accessing_its_constraints(scenarios)
@@ -1489,6 +1507,8 @@ module AuthorizationHelper
         let(:token_traits)       { [] }
         let(:release_traits)     { [] }
         let(:artifact_traits)    { [] }
+        let(:package_traits)     { [] }
+        let(:engine_traits)      { [] }
         let(:product_traits)     { [] }
         let(:policy_traits)      { [] }
         let(:license_traits)     { [] }
@@ -1510,6 +1530,8 @@ module AuthorizationHelper
         let(:token_traits)    { [] }
         let(:release_traits)  { [] }
         let(:artifact_traits) { [] }
+        let(:package_traits)  { [] }
+        let(:engine_traits)   { [] }
         let(:product_traits)  { [] }
         let(:policy_traits)   { [] }
         let(:license_traits)  { [] }
@@ -1773,6 +1795,34 @@ module AuthorizationHelper
     ##
     # with_artifact_trait defines a trait on the artifact context.
     def with_artifact_trait(trait, &) = with_artifact_traits(*trait, &)
+
+    ##
+    # with_package_traits defines traits on the package context.
+    def with_package_traits(traits, &)
+      context "with package #{traits} traits" do
+        let(:package_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_package_trait defines a trait on the package context.
+    def with_package_trait(trait, &) = with_package_traits(*trait, &)
+
+    ##
+    # with_engine_traits defines traits on the engine context.
+    def with_engine_traits(traits, &)
+      context "with engine #{traits} traits" do
+        let(:engine_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_engine_trait defines a trait on the engine context.
+    def with_engine_trait(trait, &) = with_engine_traits(*trait, &)
 
     ##
     # with_product_traits defines traits on the product context.
