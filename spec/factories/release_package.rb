@@ -10,10 +10,10 @@ FactoryBot.define do
     account     { nil }
     environment { NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
-    engine      { build(:engine) }
+    engine      { nil }
 
     trait :pypi do
-      engine { ReleaseEngine.pypi }
+      engine { build(:engine, :pypi, account:) }
     end
 
     trait :licensed do

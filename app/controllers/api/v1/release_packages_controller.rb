@@ -12,7 +12,7 @@ module Api::V1
     has_scope(:engine)  { |c, s, v| s.for_engine(v) }
 
     def index
-      packages = apply_pagination(authorized_scope(apply_scopes(current_account.release_packages)))
+      packages = apply_pagination(authorized_scope(apply_scopes(current_account.release_packages)).preload(:engine))
       authorize! packages
 
       render jsonapi: packages
@@ -32,18 +32,16 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string
           param :key, type: :string
+          param :engine, type: :string, inclusion: { in: %w[pypi] }, optional: true, allow_nil: true,
+            transform: -> (_, key) {
+              [:engine_attributes, { key: }]
+            }
           param :metadata, type: :metadata, allow_blank: true, optional: true
         end
         param :relationships, type: :hash do
           param :product, type: :hash do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[product products] }
-              param :id, type: :uuid
-            end
-          end
-          param :engine, type: :hash, optional: true do
-            param :data, type: :hash do
-              param :type, type: :string, inclusion: { in: %w[engine engines] }
               param :id, type: :uuid
             end
           end
@@ -88,6 +86,10 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :key, type: :string, optional: true
+          param :engine, type: :string, inclusion: { in: %w[pypi] }, optional: true, allow_nil: true,
+            transform: -> (_, key) {
+              [:engine_attributes, { key: }]
+            }
           param :metadata, type: :metadata, allow_blank: true, optional: true
         end
       end

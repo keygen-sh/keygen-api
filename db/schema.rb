@@ -495,11 +495,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_17_204249) do
   end
 
   create_table "release_engines", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name", null: false
+    t.uuid "account_id", null: false
+    t.string "name"
     t.string "key", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["key"], name: "index_release_engines_on_key", unique: true
+    t.index ["account_id", "created_at"], name: "index_release_engines_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_engines_on_account_id_and_key", unique: true
   end
 
   create_table "release_entitlement_constraints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

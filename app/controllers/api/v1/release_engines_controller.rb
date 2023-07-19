@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_engine, only: %i[show]
 
     def index
-      engines = apply_pagination(authorized_scope(apply_scopes(ReleaseEngine.all)))
+      engines = apply_pagination(authorized_scope(apply_scopes(current_account.release_engines.with_packages)))
       authorize! engines
 
       render jsonapi: engines
@@ -25,7 +25,7 @@ module Api::V1
     attr_reader :engine
 
     def set_engine
-      scoped_engines = authorized_scope(ReleaseEngine.all)
+      scoped_engines = authorized_scope(current_account.release_engines)
 
       Current.resource = @engine = FindByAliasService.call(
         scoped_engines,

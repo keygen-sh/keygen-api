@@ -138,12 +138,8 @@ def parse_placeholders(str, account:, bearer:, crypt:)
               account.release_artifacts.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             when 'package'
               account.release_packages.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-            when 'engine' # not tied to accounts
-              if index.present?
-                ReleaseEngine.all[index.to_i]
-              else
-                ReleaseEngine
-              end
+            when 'engine'
+              account.release_engines.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             else
               account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             end
@@ -218,7 +214,7 @@ def parse_path_placeholders(str, account:, bearer:, crypt:)
           when "packages"
             account.release_packages.send(:[], index.to_i).id
           when "engines"
-            ReleaseEngine.all[index.to_i].id # not tied to accounts
+            account.release_engines.send(:[], index.to_i).id
           when "request-logs"
             account.request_logs.send(:[], index.to_i).id
           when "processes"

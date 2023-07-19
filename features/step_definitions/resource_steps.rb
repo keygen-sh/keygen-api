@@ -157,9 +157,7 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
         **hash,
       )
     when :package
-      key = hash.delete(:engine)
-
-      hash[:engine] = ReleaseEngine.find_by(key:) || create(:engine, key:)
+      hash[:engine_attributes] = { key: hash.delete(:engine) }
 
       create(:package,
         account: @account,
@@ -174,7 +172,7 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in)(?: an)? existing "([^\"]*)"$/ do |count, traits, resource, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in)(?: an)? existing "([^\"]*)"$/ do |count, traits, resource, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).all.sample
     association_name  = association.singularize.underscore.to_sym
@@ -184,9 +182,22 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in)(?: an)
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
-  associated_records = @account.send(association.pluralize.underscore)
-  traits             = traits&.split('+')&.map(&:to_sym)
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
+  associated_records =
+      case association.underscore.pluralize
+      when 'processes'
+        @account.machine_processes
+      when 'artifacts'
+        @account.release_artifacts
+      when 'packages'
+        @account.release_packages
+      when 'engines'
+        @account.release_engines
+      else
+        @account.send(association.pluralize.underscore)
+      end
+
+  traits = traits&.split('+')&.map(&:to_sym)
 
   if associated_records.respond_to?(:for_environment)
     associated_records = case traits
@@ -220,11 +231,24 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) (?:all
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
   traits = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
-    associated_record = @account.send(association.pluralize.underscore).send(index)
+    associated_records =
+      case association.underscore.pluralize
+      when 'processes'
+        @account.machine_processes
+      when 'artifacts'
+        @account.release_artifacts
+      when 'packages'
+        @account.release_packages
+      when 'engines'
+        @account.release_engines
+      else
+        @account.send(association.pluralize.underscore)
+      end
+
     association_name  =
       case resource.singularize
       when "token"
@@ -233,11 +257,11 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\
         association.singularize.underscore.to_sym
       end
 
-    create resource.singularize.underscore, *traits, account: @account, association_name => associated_record
+    create resource.singularize.underscore, *traits, account: @account, association_name => associated_records.send(index)
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)" with the following:$/ do |count, traits, resource, index, association, body|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)" with the following:$/ do |count, traits, resource, index, association, body|
   body   = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
   traits = traits&.split('+')&.map(&:to_sym)
@@ -438,6 +462,8 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
       @account.machine_processes
     when 'artifacts'
       @account.release_artifacts
+    when 'engines'
+      @account.release_engines
     else
       @account.send(resource.pluralize.underscore)
     end
@@ -595,6 +621,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
       @account.release_artifacts.send(model_idx)
     when 'package'
       @account.release_packages.send(model_idx)
+    when 'engine'
+      @account.release_engine.send(model_idx)
     else
       @account.send(model_name.pluralize.underscore).send(model_idx)
     end
@@ -607,6 +635,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
       @account.release_artifacts.send(assoc_idx)
     when 'package'
       @account.release_packages.send(assoc_idx)
+    when 'engine'
+      @account.release_engines.send(model_idx)
     else
       @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
     end
@@ -626,6 +656,8 @@ Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*
       @account.release_artifacts
     when 'package'
       @account.release_packages
+    when 'engine'
+      @account.release_engines
     else
       @account.send(model_name.pluralize.underscore)
     end
@@ -641,6 +673,8 @@ Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*
       @account.release_artifacts.send(assoc_idx)
     when 'package'
       @account.release_packages.send(assoc_idx)
+    when 'engine'
+      @account.release_engines.send(assoc_idx)
     else
       @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
     end
@@ -801,6 +835,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.release_arches.count).to eq count.to_i
   when /^packages?$/
     expect(@account.release_packages.count).to eq count.to_i
+  when /^engines?$/
+    expect(@account.release_engines.count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
@@ -951,6 +987,10 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the fol
       @account.machine_processes.send(index_in_words)
     when 'artifacts'
       @account.release_artifacts.send(index_in_words)
+    when 'packages'
+      @account.release_packages.send(index_in_words)
+    when 'engines'
+      @account.release_engines.send(index_in_words)
     else
       @account.send(model_name.pluralize).send(index_in_words)
     end
