@@ -66,16 +66,19 @@ loop do
       # Distribution
       rand(0..3).times do
         name    = "#{product.name} #{Faker::Hacker.unique.noun.capitalize}"
-        engines = [ReleaseEngine.pypi, nil]
 
         package = if rand(0..1).zero?
+                    engine = if rand(0..1).zero?
+                               { engine_attributes: { key: 'pypi' } }
+                             end
+
                     ReleasePackage.create!(
-                      engine: engines.sample,
                       key: name.parameterize,
                       name: name,
                       environment:,
                       product:,
                       account:,
+                      **engine,
                     )
                   end
 

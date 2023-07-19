@@ -14,10 +14,10 @@ class ReleaseEngineSerializer < BaseSerializer
 
   relationship :account do
     linkage always: true do
-      { type: :accounts, id: @account.id }
+      { type: :accounts, id: @object.account_id }
     end
     link :related do
-      @url_helpers.v1_account_path @account.id
+      @url_helpers.v1_account_path @object.account_id
     end
   end
 

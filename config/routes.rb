@@ -232,6 +232,7 @@ Rails.application.routes.draw do
           resources :release_platforms, only: %i[index show], path: 'platforms'
           resources :release_arches,    only: %i[index show], path: 'arches'
           resources :release_channels,  only: %i[index show], path: 'channels'
+          resources :release_engines,   only: %i[index show], path: 'engines'
         end
       end
 
@@ -270,7 +271,6 @@ Rails.application.routes.draw do
           resources :entitlements,      only: %i[index show]
           resources :release_artifacts, only: %i[index show],  path: 'artifacts'
           resource  :release_package,   only: %i[show update], path: 'package'
-          resource  :release_engine,    only: %i[show],        path: 'engine'
           resource  :product,           only: %i[show]
           resource  :upgrade,           only: %i[show]
 

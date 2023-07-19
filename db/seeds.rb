@@ -289,10 +289,6 @@ events = %w[
   user.updated
 ]
 
-engines = {
-  pypi: 'PyPI',
-}
-
 Permission.upsert_all(
   permissions.map {{ action: _1 }},
   record_timestamps: true,
@@ -301,12 +297,6 @@ Permission.upsert_all(
 
 EventType.upsert_all(
   events.map {{ event: _1 }},
-  record_timestamps: true,
-  on_duplicate: :skip,
-)
-
-ReleaseEngine.upsert_all(
-  engines.map {{ key: _1, name: _2 }},
   record_timestamps: true,
   on_duplicate: :skip,
 )
