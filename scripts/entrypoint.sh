@@ -20,6 +20,10 @@ web)
   echo "Running command: bundle exec rails server -b $BIND -p $PORT"
   exec bundle exec rails server -b "$BIND" -p "$PORT"
   ;;
+console)
+  echo "Running command: bundle exec rails console"
+  exec bundle exec rails console
+  ;;
 worker)
   echo "Running command: bundle exec sidekiq"
   exec bundle exec sidekiq
