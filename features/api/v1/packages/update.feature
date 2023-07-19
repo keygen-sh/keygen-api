@@ -16,6 +16,58 @@ Feature: Update package
     When I send a PATCH request to "/accounts/test1/packages/$0"
     Then the response status should be "403"
 
+  Scenario: Admin updates the engine of a package
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "package"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/packages/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "packages",
+          "attributes": {
+            "engine": "pypi"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "package" with the following attributes:
+      """
+      { "engine": "pypi" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes the engine of a package
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 pypi "package"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/packages/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "packages",
+          "attributes": {
+            "engine": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "package" with the following attributes:
+      """
+      { "engine": null }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin updates the name of a package
     Given I am an admin of account "test1"
     And the current account is "test1"

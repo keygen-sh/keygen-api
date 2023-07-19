@@ -5,6 +5,9 @@ class ReleasePackageSerializer < BaseSerializer
 
   attribute :name
   attribute :key
+  attribute :engine do
+    @object.engine&.key
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
@@ -39,23 +42,6 @@ class ReleasePackageSerializer < BaseSerializer
         else
           nil
         end
-      end
-    end
-  end
-
-  relationship :engine do
-    linkage always: true do
-      if @object.release_engine_id.present?
-        { type: :engines, id: @object.release_engine_id }
-      else
-        nil
-      end
-    end
-    link :related do
-      if @object.release_engine_id.present?
-        @url_helpers.v1_account_release_engine_path @object.account_id, @object.release_engine_id
-      else
-        nil
       end
     end
   end

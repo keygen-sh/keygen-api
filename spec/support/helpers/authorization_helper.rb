@@ -1033,9 +1033,9 @@ module AuthorizationHelper
     def accessing_engines(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:engines) { create_list(:engine, 3, *engine_traits) }
+        let(:engines) { create_list(:engine, 1, *engine_traits, account:) }
       else
-        let(:engines) { create_list(:engine, 3, *engine_traits) }
+        let(:engines) { create_list(:engine, 1, *engine_traits, account:) }
       end
 
       let(:record) { engines }
@@ -1044,9 +1044,50 @@ module AuthorizationHelper
     def accessing_engine(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:engine) { create(:engine, *engine_traits) }
+        let(:engine) { create(:engine, *engine_traits, account:) }
       else
-        let(:engine) { create(:engine, *engine_traits) }
+        let(:engine) { create(:engine, *engine_traits, account:) }
+      end
+
+      let(:record) { engine }
+    end
+
+    def accessing_its_engines(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:packages) { create_list(:package, 3, *package_traits, account:, product:) }
+        let(:engines)  { packages.collect(&:engine) }
+      in [:as_product, *]
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer, account:) }
+        let(:engines)  { packages.collect(&:engine) }
+      in [:as_license, *]
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer.product, account:) }
+        let(:engines)  { packages.collect(&:engine) }
+      in [:as_user, *]
+        let(:packages) { create_list(:package, 3, *package_traits, product: bearer.licenses.take.product, account:) }
+        let(:engines)  { packages.collect(&:engine) }
+      end
+
+      let(:record) { engines }
+    end
+
+    def accessing_its_engine(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:package) { release.package }
+        let(:engine)  { package.engine }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:package) { create(:package, *package_traits, account:, product:) }
+        let(:engine)  { package.engine }
+      in [:as_product, *]
+        let(:package) { create(:package, *package_traits, product: bearer, account:) }
+        let(:engine)  { package.engine }
+      in [:as_license, *]
+        let(:package) { create(:package, *package_traits, product: bearer.product, account:) }
+        let(:engine)  { package.engine }
+      in [:as_user, *]
+        let(:package) { create(:package, *package_traits, product: bearer.licenses.take.product, account:) }
+        let(:engine)  { package.engine }
       end
 
       let(:record) { engine }

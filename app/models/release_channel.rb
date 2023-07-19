@@ -5,6 +5,14 @@ class ReleaseChannel < ApplicationRecord
   include Orderable
   include Pageable
 
+  CHANNELS = %w[
+    stable
+    rc
+    beta
+    alpha
+    dev
+  ]
+
   belongs_to :account,
     inverse_of: :release_channels
   has_many :releases,
@@ -19,7 +27,7 @@ class ReleaseChannel < ApplicationRecord
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id },
-    inclusion: { in: %w[stable rc beta alpha dev] }
+    inclusion: { in: CHANNELS }
 
   before_create -> { self.key = key&.downcase&.strip }
 

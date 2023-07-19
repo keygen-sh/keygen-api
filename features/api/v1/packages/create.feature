@@ -53,10 +53,6 @@ Feature: Create package
         "product": {
           "links": { "related": "/v1/accounts/$account/products/$products[0]" },
           "data": { "type": "products", "id": "$products[0]" }
-        },
-        "engine": {
-          "links": { "related": null },
-          "data": null
         }
       }
       """
@@ -64,7 +60,8 @@ Feature: Create package
       """
       {
         "name": "Cool Package",
-        "key": "cool"
+        "key": "cool",
+        "engine": null
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -85,19 +82,14 @@ Feature: Create package
           "type": "packages",
           "attributes": {
             "name": "PyPI Package",
-            "key": "pypi"
+            "key": "pypi",
+            "engine": "pypi"
           },
           "relationships": {
             "product": {
               "data": {
                 "type": "products",
                 "id": "$products[0]"
-              }
-            },
-            "engine": {
-              "data": {
-                "type": "engines",
-                "id": "$engines.pypi"
               }
             }
           }
@@ -111,10 +103,6 @@ Feature: Create package
         "product": {
           "links": { "related": "/v1/accounts/$account/products/$products[0]" },
           "data": { "type": "products", "id": "$products[0]" }
-        },
-        "engine": {
-          "links": { "related": "/v1/accounts/$account/engines/$engines[0]" },
-          "data": { "type": "engines", "id": "$engines.pypi" }
         }
       }
       """
@@ -122,7 +110,8 @@ Feature: Create package
       """
       {
         "name": "PyPI Package",
-        "key": "pypi"
+        "key": "pypi",
+        "engine": "pypi"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -143,15 +132,10 @@ Feature: Create package
           "type": "packages",
           "attributes": {
             "name": "Invalid Package",
-            "key": "invalid"
+            "key": "invalid",
+            "engine": "invalid"
           },
           "relationships": {
-            "engine": {
-              "data": {
-                "type": "engines",
-                "id": "425b669f-2690-4b22-b995-2779df000b96"
-              }
-            },
             "product": {
               "data": {
                 "type": "products",
@@ -162,16 +146,15 @@ Feature: Create package
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "ENGINE_NOT_FOUND",
+        "title": "Bad request",
+        "detail": "is invalid",
         "source": {
-          "pointer": "/data/relationships/engine"
+          "pointer": "/data/attributes/engine"
         }
       }
       """
