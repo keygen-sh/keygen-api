@@ -14,7 +14,7 @@ module Api::V1::ReleaseEngines
       authorize! packages
 
       render 'api/v1/release_engines/pypi/simple/index',
-        layout: 'layouts/plain',
+        layout: 'layouts/simple',
         locals: {
           account: current_account,
           packages:,
@@ -29,7 +29,7 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       render 'api/v1/release_engines/pypi/simple/show',
-        layout: 'layouts/plain',
+        layout: 'layouts/simple',
         locals: {
           account: current_account,
           package:,
