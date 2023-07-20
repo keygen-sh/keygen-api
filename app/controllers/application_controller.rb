@@ -4,8 +4,9 @@ class ApplicationController < ActionController::API
   # FIXME(ezekg) Why is this needed?
   self.default_url_options = Rails.application.default_url_options
 
-  include ActionController::MimeResponds
   include Rendering::JSON
+  using Rendering::Refinements
+
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
@@ -74,7 +75,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :forbidden, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -96,7 +97,7 @@ class ApplicationController < ActionController::API
     self.headers['WWW-Authenticate'] = %(Bearer realm="keygen")
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :unauthorized, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -116,7 +117,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :unprocessable_entity, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -136,7 +137,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :not_found, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -157,7 +158,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :bad_request, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -177,7 +178,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :conflict, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -197,7 +198,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :payment_required, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -217,7 +218,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :internal_server_error, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -237,7 +238,7 @@ class ApplicationController < ActionController::API
     skip_verify_authorized!
 
     respond_to do |format|
-      format.any(:jsonapi, :json, :binary) {
+      format.any(except: :html) {
         render status: :service_unavailable, json: {
           meta: { id: request.request_id },
           errors: [{
