@@ -2,13 +2,12 @@
 
 module Api::V1::Products::Relationships
   class ReleasePackagesController < Api::V1::BaseController
+    has_scope(:engine) { |c, s, v| s.for_engine(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product
-
-    has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope(:engine)  { |c, s, v| s.for_engine(v) }
 
     authorize :product
 

@@ -2,6 +2,8 @@
 
 module Api::V1::Releases::Relationships
   class ReleasePackagesController < Api::V1::BaseController
+    has_scope(:engine) { |c, s, v| s.for_engine(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[show]

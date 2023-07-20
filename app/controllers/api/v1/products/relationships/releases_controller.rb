@@ -5,6 +5,8 @@ module Api::V1::Products::Relationships
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
+    has_scope(:package) { |c, s, v| s.for_package(v) }
+    has_scope(:engine) { |c, s, v| s.for_engine(v) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:version) { |c, s, v| s.with_version(v) }
 
