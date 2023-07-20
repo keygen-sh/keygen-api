@@ -1546,29 +1546,19 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "firstName": "Pam",
-            "lastName": "Beesly",
-            "email": "beesly@keygen.sh",
-            "password": "jimjimjimjim",
+            "firstName": "Toby",
+            "lastName": "Flenderson",
+            "email": "toby@keygen.sh",
+            "password": "ScrantonStrangler",
             "role": "read-only"
           }
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "is invalid",
-        "source": {
-          "pointer": "/data/attributes/role"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "201"
+    And the response body should be a "user" with the role "read-only"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer attempts to create an admin for their account

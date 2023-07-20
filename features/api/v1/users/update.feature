@@ -177,7 +177,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the response body should be a "user"
+    And the response body should be a "user" with the role "admin"
     And the account "test1" should have 2 "admins"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -199,7 +199,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the response body should be a "user"
+    And the response body should be a "user" with the role "developer"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -220,7 +220,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the response body should be a "user"
+    And the response body should be a "user" with the role "sales-agent"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -241,7 +241,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the response body should be a "user"
+    And the response body should be a "user" with the role "support-agent"
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -261,19 +261,9 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "is invalid",
-        "source": {
-          "pointer": "/data/attributes/role"
-        }
-      }
-      """
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "200"
+    And the response body should be a "user" with the role "read-only"
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin promotes a user with an invalid role name for their account
@@ -294,7 +284,17 @@ Feature: Update user
       }
       """
     Then the response status should be "400"
-    And sidekiq should have 0 "webhook" jobs
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is invalid",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
+      }
+      """
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 

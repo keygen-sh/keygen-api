@@ -45,7 +45,7 @@ module Api::V1
           param :email, type: :string
           param :password, type: :string, allow_nil: true, optional: true
           param :metadata, type: :metadata, allow_blank: true, optional: true
-          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
+          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent read-only] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
               [:role_attributes, { name: v.underscore }]
@@ -111,7 +111,7 @@ module Api::V1
           param :email, type: :string, optional: true
           param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :product, :environment) }
           param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
-          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent] }, optional: true,
+          param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent read-only] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
               [:role_attributes, { name: v.underscore }]
