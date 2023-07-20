@@ -24,7 +24,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      artifacts = package.artifacts
+      artifacts = package.artifacts.order_by_version
       authorize! artifacts,
         to: :index?
 
