@@ -2,14 +2,14 @@
 
 module Api::V1
   class ReleasePackagesController < Api::V1::BaseController
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:engine)  { |c, s, v| s.for_engine(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[index show]
     before_action :authenticate_with_token, only: %i[index show]
     before_action :set_package, only: %i[show update destroy]
-
-    has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope(:engine)  { |c, s, v| s.for_engine(v) }
 
     def index
       packages = apply_pagination(authorized_scope(apply_scopes(current_account.release_packages)).preload(:engine))

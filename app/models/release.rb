@@ -310,6 +310,16 @@ class Release < ApplicationRecord
         )
   }
 
+  scope :for_engine, -> engine {
+    case engine
+    when ReleaseEngine,
+         UUID_RE
+      joins(:engine).where(engine: { id: engine })
+    else
+      joins(:engine).where(engine: { key: engine.to_s })
+    end
+  }
+
   scope :for_package, -> package {
     case package
     when ReleasePackage,
@@ -357,8 +367,8 @@ class Release < ApplicationRecord
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show releases for stable, rc and beta channels.
         joins(:channel).select('release_channels.key')
-                       .where(channel: channel)
-                       .first
+                       .where(channel:)
+                       .take
                        .try(:key)
       when ReleaseChannel
         channel.key

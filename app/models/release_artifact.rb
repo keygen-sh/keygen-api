@@ -206,6 +206,16 @@ class ReleaseArtifact < ApplicationRecord
         )
   }
 
+  scope :for_engine, -> engine {
+    case engine
+    when ReleaseEngine,
+         UUID_RE
+      joins(:engine).where(engine: { id: engine })
+    else
+      joins(:engine).where(engine: { key: engine.to_s })
+    end
+  }
+
   scope :for_package, -> package {
     case package
     when ReleasePackage,
