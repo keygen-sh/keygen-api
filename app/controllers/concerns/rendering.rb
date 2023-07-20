@@ -1,10 +1,33 @@
 # frozen_string_literal: true
 
 module Rendering
+  module Refinements
+    # Refine #responds_to's format.any to accept an :except keyword, for
+    # defining a responder for any format except the provided, which
+    # should be handled explicitly (otherwise will be rejected).
+    refine ActionController::MimeResponds::Collector do
+      def any(*mimes, except: nil, &block)
+        case
+        when except.present?
+          excluded = Array(except).map { Mime[_1] }
+          rest     = Mime::SET.excluding(excluded)
+
+          rest.each { send(_1.to_sym, &block) }
+        when mimes.any?
+          mimes.each { send(_1, &block) }
+        else
+          custom(Mime::ALL, &block)
+        end
+      end
+    end
+  end
+
   module Base
     extend ActiveSupport::Concern
 
     included do
+      include ActionController::MimeResponds
+
       # Overload render method to automatically set content type
       def render(args, ...)
         case args
