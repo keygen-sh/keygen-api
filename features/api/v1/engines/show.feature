@@ -16,6 +16,10 @@ Feature: Show engine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/$0"
     Then the response status should be "403"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
 
   Scenario: Admin retrieves an engine for their account
     Given the current account is "test1"
