@@ -49,6 +49,10 @@ Feature: PyPI simple package files
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
     Then the response status should be "403"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "text/html; charset=utf-8" }
+      """
 
   Scenario: Endpoint should redirect to PyPI when package does not exist
     Given I am an admin of account "test1"
