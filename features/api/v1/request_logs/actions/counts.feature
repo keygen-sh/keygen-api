@@ -15,6 +15,10 @@ Feature: Request log counts
     And the current account has 2 "request-logs"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/actions/count"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
     Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 

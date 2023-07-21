@@ -18,6 +18,10 @@ Feature: List plans
     When I send a GET request to "/plans"
     Then the response status should be "200"
     And the response body should be an array with 6 "plans"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous should not be able to see private plans
