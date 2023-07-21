@@ -49,6 +49,10 @@ Feature: PyPI simple package index
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/pypi/simple"
     Then the response status should be "403"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "text/html; charset=utf-8" }
+      """
 
   Scenario: Endpoint should return an index of packages
     Given I am an admin of account "test1"

@@ -20,6 +20,10 @@ Feature: List release engines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines"
     Then the response status should be "403"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      """
 
   Scenario: Admin retrieves their release engines (all have associated packages)
     Given the current account is "test1"
