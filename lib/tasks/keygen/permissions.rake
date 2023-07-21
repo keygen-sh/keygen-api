@@ -3,47 +3,124 @@
 namespace :keygen do
   desc 'Tasks for managing permissions'
   namespace :permissions do
+    task :add, %i[type] => %i[environment] do |_, args|
+      batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+      batch_wait = ENV.fetch('BATCH_WAIT') { 0.1 }.to_f
+
+      model = args[:type].to_s.classify.safe_constantize
+
+      # Split args up into ID and permission buckets
+      ids,
+      permissions,
+      * = args.extras.chunk   { Permission::ALL_PERMISSIONS.include?(_1) }
+                     .collect { _2 }
+
+      records = model.includes(:account, role: { role_permissions: :permission })
+                     .where(id: ids)
+
+      records.find_each(batch_size:) do |record, i|
+        # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
+        prev_permissions = record.role_permissions.map { _1.permission.action }
+
+        unless record.default_permissions?(except: permissions, with: prev_permissions)
+          Keygen.logger.info { "Skipping #{record.id}..." }
+
+          next
+        end
+
+        next_permissions = prev_permissions + (permissions & record.allowed_permissions)
+
+        if next_permissions.any?
+          new_permissions = next_permissions - prev_permissions
+
+          Keygen.logger.info { "Adding #{new_permissions.join(',')} permissions to #{record.id}..." }
+
+          record.update!(
+            permissions: next_permissions,
+          )
+        else
+          Keygen.logger.info { "Nothing to add to #{record.id}..." }
+        end
+
+        sleep batch_wait
+      rescue ActiveRecord::RecordInvalid => e
+        Keygen.logger.info { "Failed #{record.id}: #{e.message}" }
+      end
+    end
+
     desc 'Tasks for managing admin permissions'
     namespace :admins do
       desc 'Add a new set of permissions to all admins with default permissions'
       task add: %i[environment] do |_, args|
-        batch_size  = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
-        batch_wait  = ENV.fetch('BATCH_WAIT') { 0.1 }.to_f
+        batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+
         permissions = args.extras
-        admins      = User.includes(:account, role: { role_permissions: :permission })
+        admins      = User.joins(:role)
                           .where(role: {
                             name: %i[admin read_only developer support_agent sales_agent],
                           })
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{admins.count} admins..." }
 
-        admins.find_each(batch_size:).with_index do |user, i|
-          # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
-          prev_permissions = user.role_permissions.map { _1.permission.action }
+        admins.in_batches(of: batch_size) do |batch|
+          Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
+        end
 
-          unless user.default_permissions?(except: permissions, with: prev_permissions)
-            Keygen.logger.info { "[#{i}] Skipping #{user.id}..." }
+        Keygen.logger.info { 'Done' }
+      end
+    end
 
-            next
-          end
+    desc 'Tasks for managing environment permissions'
+    namespace :environments do
+      desc 'Add a new set of permissions to all environments with default permissions'
+      task add: %i[environment] do |_, args|
+        batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 
-          next_permissions = prev_permissions + (permissions & user.allowed_permissions)
+        permissions  = args.extras
+        environments = Environment.all
 
-          if next_permissions.any?
-            new_permissions = next_permissions - prev_permissions
+        Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{environments.count} environments..." }
 
-            Keygen.logger.info { "[#{i}] Adding #{new_permissions.join(',')} permissions to #{user.id}..." }
+        environments.in_batches(of: batch_size) do |batch|
+          Rake::Task['keygen:permissions:add'].invoke(Environment.name, *batch.ids, *permissions)
+        end
 
-            user.update!(
-              permissions: next_permissions,
-            )
-          else
-            Keygen.logger.info { "[#{i}] Nothing to add to #{user.id}..." }
-          end
+        Keygen.logger.info { 'Done' }
+      end
+    end
 
-          sleep batch_wait
-        rescue ActiveRecord::RecordInvalid => e
-          Keygen.logger.info { "[#{i}] Failed #{user.id}: #{e.message}" }
+    desc 'Tasks for managing product permissions'
+    namespace :products do
+      desc 'Add a new set of permissions to all products with default permissions'
+      task add: %i[environment] do |_, args|
+        batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+
+        permissions = args.extras
+        products    = Product.all
+
+        Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{products.count} products..." }
+
+        products.in_batches(of: batch_size) do |batch|
+          Rake::Task['keygen:permissions:add'].invoke(Product.name, *batch.ids, *permissions)
+        end
+
+        Keygen.logger.info { 'Done' }
+      end
+    end
+
+    desc 'Tasks for managing license permissions'
+    namespace :licenses do
+      desc 'Add a new set of permissions to all licenses with default permissions'
+      task add: %i[environment] do |_, args|
+        batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+
+        permissions = args.extras
+        licenses    = License.all
+
+        Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{licenses.count} licenses..." }
+
+        licenses.in_batches(of: batch_size) do |batch|
+          Rake::Task['keygen:permissions:add'].invoke(License.name, *batch.ids, *permissions)
         end
 
         Keygen.logger.info { 'Done' }
