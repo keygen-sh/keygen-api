@@ -14,6 +14,7 @@ class ReleasePackage < ApplicationRecord
   belongs_to :engine,
     foreign_key: :release_engine_id,
     class_name: 'ReleaseEngine',
+    autosave: true,
     optional: true
   has_many :releases,
     inverse_of: :package,
