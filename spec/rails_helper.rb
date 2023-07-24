@@ -50,6 +50,7 @@ RSpec.configure do |config|
   config.include TimeHelper
   config.include EnvHelper
   config.include KeygenHelper
+  config.include TaskHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -111,5 +112,12 @@ RSpec.configure do |config|
   config.after type: :ee do
     Keygen::EE::LicenseFile.reset!
     Keygen::EE::License.reset!
+  end
+
+  # Load rake tasks
+  config.before type: :task do
+    require 'rake'
+
+    Rails.application.load_tasks
   end
 end
