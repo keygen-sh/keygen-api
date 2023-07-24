@@ -9,31 +9,32 @@ namespace :keygen do
 
       model = args[:type].to_s.classify.safe_constantize
 
-      # Split args up into ID and permission buckets
-      ids,
-      permissions,
-      * = args.extras.chunk   { Permission::ALL_PERMISSIONS.include?(_1) }
-                     .collect { _2 }
+      # Split args up into ID and permission buckets.
+      new_permissions,
+      record_ids =
+        args.extras.flatten.partition { Permission::ALL_PERMISSIONS.include?(_1) }
 
       records = model.includes(:account, role: { role_permissions: :permission })
-                     .where(id: ids)
+                     .where(id: record_ids)
 
-      records.find_each(batch_size:) do |record, i|
-        # NOTE(ezekg) Use preloaded permissions to save on superfluous queries.
+      records.find_each(batch_size:) do |record|
+        # Use preloaded permissions to save on superfluous queries.
         prev_permissions = record.role_permissions.map { _1.permission.action }
 
-        unless record.default_permissions?(except: permissions, with: prev_permissions)
+        # We only want to add new permissions to records that have the default
+        # permission set, i.e. not to records with a custom permission set.
+        unless record.default_permissions?(except: new_permissions, with: prev_permissions)
           Keygen.logger.info { "Skipping #{record.id}..." }
 
           next
         end
 
-        next_permissions = prev_permissions + (permissions & record.allowed_permissions)
+        next_permissions = prev_permissions + (new_permissions & record.allowed_permissions)
 
         if next_permissions.any?
-          new_permissions = next_permissions - prev_permissions
+          diff_permissions = next_permissions - prev_permissions
 
-          Keygen.logger.info { "Adding #{new_permissions.join(',')} permissions to #{record.id}..." }
+          Keygen.logger.info { "Adding #{diff_permissions.join(',')} permissions to #{record.id}..." }
 
           record.update!(
             permissions: next_permissions,
