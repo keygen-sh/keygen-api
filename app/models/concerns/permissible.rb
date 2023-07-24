@@ -68,7 +68,8 @@ module Permissible
         actual.size == expected.size
       end
     end
-    alias_method :permissions?, :can?
+    alias_method :permissions?,     :can?
+    alias_method :has_permissions?, :can?
 
     ##
     # cannot? returns true if the user does not have all provided permissions.
