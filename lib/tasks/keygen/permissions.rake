@@ -127,5 +127,24 @@ namespace :keygen do
         Keygen.logger.info { 'Done' }
       end
     end
+
+    desc 'Tasks for managing user permissions'
+    namespace :users do
+      desc 'Add a new set of permissions to all users with default permissions'
+      task add: %i[environment] do |_, args|
+        batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+
+        permissions = args.extras
+        users       = User.joins(:role).where(role: { name: %i[user] })
+
+        Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{users.count} users..." }
+
+        users.in_batches(of: batch_size) do |batch|
+          Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
+        end
+
+        Keygen.logger.info { 'Done' }
+      end
+    end
   end
 end
