@@ -54,6 +54,7 @@ namespace :keygen do
       desc 'Add a new set of permissions to all admins with default permissions'
       task add: %i[environment] do |_, args|
         batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        task       = Rake::Task['keygen:permissions:add']
 
         permissions = args.extras
         admins      = User.joins(:role)
@@ -64,7 +65,13 @@ namespace :keygen do
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{admins.count} admins..." }
 
         admins.in_batches(of: batch_size).each do |batch|
-          Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
+          task.invoke(User.name, *batch.ids, *permissions)
+
+          # FIXME(ezekg) By default, tasks can only be invoked once. So we
+          #              need to reenable to be able to invoke in a loop.
+          #              Using execute() is an alternative, but I failed
+          #              to figure out how to pass args correctly.
+          task.reenable
         end
 
         Keygen.logger.info { 'Done' }
@@ -76,6 +83,7 @@ namespace :keygen do
       desc 'Add a new set of permissions to all environments with default permissions'
       task add: %i[environment] do |_, args|
         batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        task       = Rake::Task['keygen:permissions:add']
 
         permissions  = args.extras
         environments = Environment.all
@@ -83,7 +91,8 @@ namespace :keygen do
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{environments.count} environments..." }
 
         environments.in_batches(of: batch_size).each do |batch|
-          Rake::Task['keygen:permissions:add'].invoke(Environment.name, *batch.ids, *permissions)
+          task.invoke(Environment.name, *batch.ids, *permissions)
+          task.reenable
         end
 
         Keygen.logger.info { 'Done' }
@@ -95,6 +104,7 @@ namespace :keygen do
       desc 'Add a new set of permissions to all products with default permissions'
       task add: %i[environment] do |_, args|
         batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        task       = Rake::Task['keygen:permissions:add']
 
         permissions = args.extras
         products    = Product.all
@@ -102,7 +112,8 @@ namespace :keygen do
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{products.count} products..." }
 
         products.in_batches(of: batch_size).each do |batch|
-          Rake::Task['keygen:permissions:add'].invoke(Product.name, *batch.ids, *permissions)
+          task.invoke(Product.name, *batch.ids, *permissions)
+          task.reenable
         end
 
         Keygen.logger.info { 'Done' }
@@ -114,6 +125,7 @@ namespace :keygen do
       desc 'Add a new set of permissions to all licenses with default permissions'
       task add: %i[environment] do |_, args|
         batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        task       = Rake::Task['keygen:permissions:add']
 
         permissions = args.extras
         licenses    = License.all
@@ -121,7 +133,8 @@ namespace :keygen do
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{licenses.count} licenses..." }
 
         licenses.in_batches(of: batch_size).each do |batch|
-          Rake::Task['keygen:permissions:add'].invoke(License.name, *batch.ids, *permissions)
+          task.invoke(License.name, *batch.ids, *permissions)
+          task.reenable
         end
 
         Keygen.logger.info { 'Done' }
@@ -133,6 +146,7 @@ namespace :keygen do
       desc 'Add a new set of permissions to all users with default permissions'
       task add: %i[environment] do |_, args|
         batch_size = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+        task       = Rake::Task['keygen:permissions:add']
 
         permissions = args.extras
         users       = User.joins(:role).where(role: { name: %i[user] })
@@ -140,7 +154,8 @@ namespace :keygen do
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{users.count} users..." }
 
         users.in_batches(of: batch_size).each do |batch|
-          Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
+          task.invoke(User.name, *batch.ids, *permissions)
+          task.reenable
         end
 
         Keygen.logger.info { 'Done' }
