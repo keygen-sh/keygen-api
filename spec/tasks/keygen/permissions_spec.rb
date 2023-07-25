@@ -6,7 +6,7 @@ require 'spec_helper'
 describe 'keygen:permissions:add', type: :task do
   let(:account) { create(:account) }
 
-  it 'should add permissions to licenses' do
+  it 'should add permissions to provided licenses' do
     licenses = create_list(:license, 5,
       permissions: License.default_permissions - %w[package.read],
       account:,
@@ -21,7 +21,7 @@ describe 'keygen:permissions:add', type: :task do
     end
   end
 
-  it 'should add permissions to licenses with default permissions' do
+  it 'should append permissions to licenses with default permissions' do
     licenses = create_list(:license, 5,
       permissions: License.default_permissions - %w[package.read],
       account:,
@@ -29,7 +29,7 @@ describe 'keygen:permissions:add', type: :task do
 
     run_task described_task, :license, *licenses.collect(&:id), 'package.read' do
       licenses.each do |license|
-        expect(license).to have_permissions 'package.read'
+        expect(license).to have_permissions 'package.read', *License.default_permissions
       end
     end
   end
