@@ -63,7 +63,7 @@ namespace :keygen do
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{admins.count} admins..." }
 
-        admins.in_batches(of: batch_size) do |batch|
+        admins.in_batches(of: batch_size).each do |batch|
           Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
         end
 
@@ -82,7 +82,7 @@ namespace :keygen do
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{environments.count} environments..." }
 
-        environments.in_batches(of: batch_size) do |batch|
+        environments.in_batches(of: batch_size).each do |batch|
           Rake::Task['keygen:permissions:add'].invoke(Environment.name, *batch.ids, *permissions)
         end
 
@@ -101,7 +101,7 @@ namespace :keygen do
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{products.count} products..." }
 
-        products.in_batches(of: batch_size) do |batch|
+        products.in_batches(of: batch_size).each do |batch|
           Rake::Task['keygen:permissions:add'].invoke(Product.name, *batch.ids, *permissions)
         end
 
@@ -120,7 +120,7 @@ namespace :keygen do
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{licenses.count} licenses..." }
 
-        licenses.in_batches(of: batch_size) do |batch|
+        licenses.in_batches(of: batch_size).each do |batch|
           Rake::Task['keygen:permissions:add'].invoke(License.name, *batch.ids, *permissions)
         end
 
@@ -139,7 +139,7 @@ namespace :keygen do
 
         Keygen.logger.info { "Adding #{permissions.join(',')} permissions to #{users.count} users..." }
 
-        users.in_batches(of: batch_size) do |batch|
+        users.in_batches(of: batch_size).each do |batch|
           Rake::Task['keygen:permissions:add'].invoke(User.name, *batch.ids, *permissions)
         end
 
