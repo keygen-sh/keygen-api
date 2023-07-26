@@ -66,7 +66,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[account accounts] }
-        param :id, type: :uuid, optional: true, noop: true
+        param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :slug, type: :string, optional: true
