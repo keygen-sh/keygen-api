@@ -4,11 +4,11 @@ module Api::V1::Products::Relationships
   class ReleaseArtifactsController < Api::V1::BaseController
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
-    has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
-    has_scope(:platform) { |c, s, v| s.for_platform(v) }
-    has_scope(:package) { |c, s, v| s.for_package(v) }
-    has_scope(:engine) { |c, s, v| s.for_engine(v) }
-    has_scope(:arch) { |c, s, v| s.for_arch(v) }
+    has_scope(:filetype, allow_blank: true) { |c, s, v| s.for_filetype(v.presence) }
+    has_scope(:platform, allow_blank: true) { |c, s, v| s.for_platform(v.presence) }
+    has_scope(:package, allow_blank: true) { |c, s, v| s.for_package(v.presence) }
+    has_scope(:engine, allow_blank: true) { |c, s, v| s.for_engine(v.presence) }
+    has_scope(:arch, allow_blank: true) { |c, s, v| s.for_arch(v.presence) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

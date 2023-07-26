@@ -2364,3 +2364,144 @@ Feature: Upgrade release
         "next": "1.0.0-beta.3"
       }
       """
+
+  Scenario: Admin retrieves an upgrade for a release conflicting with another package (with scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+    And the current account has the following "package" rows:
+      | id                                   | product_id                           | name      | key      |
+      | 615f641a-2825-40d7-9689-8c82e3cadd58 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 1 | package1 |
+      | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 2 | package2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | package_id | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.0   | stable  |
+      | 2033c3ef-7093-4554-95e2-20572f27663f | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.1   | stable  |
+      | 25a7ee6b-b660-4e27-a2cd-bf541f6c17f5 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.1   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?package=8fec17e8-17f1-4869-aeb1-19e050cf4dea"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/ff04d1c4-cc04-4d19-985a-cb113827b821/product"
+          }
+        }
+      }
+      """
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a release conflicting with another package (nil scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+    And the current account has the following "package" rows:
+      | id                                   | product_id                           | name      | key      |
+      | 615f641a-2825-40d7-9689-8c82e3cadd58 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 1 | package1 |
+      | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 2 | package2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | package_id | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.0   | stable  |
+      | 2033c3ef-7093-4554-95e2-20572f27663f | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.1   | stable  |
+      | 25a7ee6b-b660-4e27-a2cd-bf541f6c17f5 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.1   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?package="
+    Then the response status should be "200"
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/2033c3ef-7093-4554-95e2-20572f27663f/product"
+          }
+        }
+      }
+      """
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a release conflicting with another package (no scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+    And the current account has the following "package" rows:
+      | id                                   | product_id                           | name      | key      |
+      | 615f641a-2825-40d7-9689-8c82e3cadd58 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 1 | package1 |
+      | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Package 2 | package2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | package_id | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 615f641a-2825-40d7-9689-8c82e3cadd58 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.0   | stable  |
+      | 2033c3ef-7093-4554-95e2-20572f27663f | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 |                                      | 1.0.1   | stable  |
+      | 25a7ee6b-b660-4e27-a2cd-bf541f6c17f5 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 8fec17e8-17f1-4869-aeb1-19e050cf4dea | 1.0.1   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/25a7ee6b-b660-4e27-a2cd-bf541f6c17f5/upgrade"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/ff04d1c4-cc04-4d19-985a-cb113827b821/product"
+          }
+        }
+      }
+      """
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """

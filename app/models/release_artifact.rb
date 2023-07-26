@@ -207,52 +207,72 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_engine, -> engine {
-    case engine
+    case engine.presence
     when ReleaseEngine,
          UUID_RE
       joins(:engine).where(engine: { id: engine })
+    when nil
+      where.missing(:engine)
     else
-      joins(:engine).where(engine: { key: engine.to_s })
+      joins(:engine).where(
+        engine: { key: engine.to_s },
+      )
     end
   }
 
   scope :for_package, -> package {
-    case package
+    case package.presence
     when ReleasePackage,
          UUID_RE
       joins(:package).where(package: { id: package })
+    when nil
+      where.missing(:package)
     else
-      joins(:package).where(package: { key: package.to_s })
+      joins(:package).where(
+        package: { key: package.to_s },
+      )
     end
   }
 
   scope :for_platform, -> platform {
-    case platform
+    case platform.presence
     when ReleasePlatform,
          UUID_RE
       joins(:platform).where(platform: { id: platform })
+    when nil
+      where.missing(:platform)
     else
-      joins(:platform).where(platform: { key: platform.to_s })
+      joins(:platform).where(
+        platform: { key: platform.to_s },
+      )
     end
   }
 
   scope :for_arch, -> arch {
-    case arch
+    case arch.presence
     when ReleaseArch,
          UUID_RE
       joins(:arch).where(arch: { id: arch })
+    when nil
+      where.missing(:arch)
     else
-      joins(:arch).where(arch: { key: arch.to_s })
+      joins(:arch).where(
+        arch: { key: arch.to_s },
+      )
     end
   }
 
   scope :for_filetype, -> filetype {
-    case filetype
+    case filetype.presence
     when ReleaseFiletype,
          UUID_RE
       joins(:filetype).where(filetype: { id: filetype })
+    when nil
+      where.missing(:filetype)
     else
-      joins(:filetype).where(filetype: { key: filetype.to_s })
+      joins(:filetype).where(
+        filetype: { key: filetype.to_s },
+      )
     end
   }
 

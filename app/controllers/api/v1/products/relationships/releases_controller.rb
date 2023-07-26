@@ -3,12 +3,16 @@
 module Api::V1::Products::Relationships
   class ReleasesController < Api::V1::BaseController
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
-    has_scope(:platform) { |c, s, v| s.for_platform(v) }
-    has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
-    has_scope(:package) { |c, s, v| s.for_package(v) }
-    has_scope(:engine) { |c, s, v| s.for_engine(v) }
+    has_scope(:package, allow_blank: true) { |c, s, v| s.for_package(v.presence) }
+    has_scope(:engine, allow_blank: true) { |c, s, v| s.for_engine(v.presence) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
-    has_scope(:version) { |c, s, v| s.with_version(v) }
+
+    # FIXME(ezekg) Eventually remove these once we can confirm they're
+    #              no longer being used
+    has_scope(:filetype, if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_filetype(v) }
+    has_scope(:platform, if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_platform(v) }
+    has_scope(:arch,     if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_arch(v) }
+    has_scope(:version,  if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.with_version(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

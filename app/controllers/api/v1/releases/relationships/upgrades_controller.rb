@@ -3,7 +3,7 @@
 module Api::V1::Releases::Relationships
   class UpgradesController < Api::V1::BaseController
     has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope(:package) { |c, s, v| s.for_package(v) }
+    has_scope(:package, allow_blank: true) { |c, s, v| s.for_package(v.presence) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -12,13 +12,14 @@ module Api::V1::Releases::Relationships
 
     typed_query {
       param :constraint, type: :string, optional: true
+      param :package, type: :string, optional: true, allow_blank: true
       param :channel, type: :string, optional: true
     }
     def show
       authorize! release,
         to: :upgrade?
 
-      kwargs  = upgrade_query.slice(:constraint, :channel)
+      kwargs  = upgrade_query.slice(:constraint, :package, :channel)
       upgrade = release.upgrade!(**kwargs)
       authorize! upgrade
 
