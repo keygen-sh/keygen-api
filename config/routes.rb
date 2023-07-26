@@ -407,7 +407,7 @@ Rails.application.routes.draw do
   # Subdomains for our supported distribution engines (i.e. package managers)
   scope constraints: { subdomain: /\.pkg$/, **domain_constraints } do
     # PyPI
-    scope module: 'api/v1/release_packages', constraints: { subdomain: 'pypi.pkg' } do
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'pypi.pkg' } do
       case
       when Keygen.multiplayer?
         scope ':account_id', as: :account do
