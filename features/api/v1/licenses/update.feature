@@ -94,6 +94,42 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin updates a license by key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license" with the following:
+      """
+      { "key": "163E70-7F0AC7-E72D3D-8A977E-4A7AFA-V3" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/163E70-7F0AC7-E72D3D-8A977E-4A7AFA-V3" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "163E70-7F0AC7-E72D3D-8A977E-4A7AFA-V3",
+          "attributes": {
+            "expiry": "2016-09-05T22:53:37.000Z",
+            "name": "Some Name"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following attributes:
+      """
+      {
+        "key": "163E70-7F0AC7-E72D3D-8A977E-4A7AFA-V3",
+        "expiry": "2016-09-05T22:53:37.000Z",
+        "name": "Some Name"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin overrides a floating license's max machines
     Given I am an admin of account "test1"
     And the current account is "test1"
