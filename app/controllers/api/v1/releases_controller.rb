@@ -7,8 +7,8 @@ module Api::V1
     has_scope(:constraints) { |c, s, v| s.within_constraints(v) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope(:package) { |c, s, v| s.for_package(v) }
-    has_scope(:engine) { |c, s, v| s.for_engine(v) }
+    has_scope(:package, allow_blank: true) { |c, s, v| s.for_package(v.presence) }
+    has_scope(:engine, allow_blank: true) { |c, s, v| s.for_engine(v.presence) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     # FIXME(ezekg) Eventually remove these once we can confirm they're

@@ -311,58 +311,78 @@ class Release < ApplicationRecord
   }
 
   scope :for_engine, -> engine {
-    case engine
+    case engine.presence
     when ReleaseEngine,
          UUID_RE
       joins(:engine).where(engine: { id: engine })
+    when nil
+      where.missing(:engine)
     else
-      joins(:engine).where(engine: { key: engine.to_s })
+      joins(:engine).where(
+        engine: { key: engine.to_s },
+      )
     end
   }
 
   scope :for_package, -> package {
-    case package
+    case package.presence
     when ReleasePackage,
          UUID_RE
       joins(:package).where(package: { id: package })
+    when nil
+      where.missing(:package)
     else
-      joins(:package).where(package: { key: package.to_s })
+      joins(:package).where(
+        package: { key: package.to_s },
+      )
     end
   }
 
   scope :for_platform, -> platform {
-    case platform
+    case platform.presence
     when ReleasePlatform,
          UUID_RE
       joins(:platforms).where(platforms: { id: platform })
+    when nil
+      where.missing(:platform)
     else
-      joins(:platforms).where(platforms: { key: platform.to_s })
+      joins(:platforms).where(
+        platforms: { key: platform.to_s },
+      )
     end
   }
 
   scope :for_arch, -> arch {
-    case arch
+    case arch.presence
     when ReleaseArch,
          UUID_RE
       joins(:arches).where(arches: { id: arch })
+    when nil
+      where.missing(:arch)
     else
-      joins(:arches).where(arches: { key: arch.to_s })
+      joins(:arches).where(
+        arches: { key: arch.to_s },
+      )
     end
   }
 
   scope :for_filetype, -> filetype {
-    case filetype
+    case filetype.presence
     when ReleaseFiletype,
          UUID_RE
       joins(:filetypes).where(filetypes: { id: filetype })
+    when nil
+      where.missing(:filetype)
     else
-      joins(:filetypes).where(filetypes: { key: filetype.to_s })
+      joins(:filetypes).where(
+        filetypes: { key: filetype.to_s },
+      )
     end
   }
 
   scope :for_channel, -> channel {
     key =
-      case channel
+      case channel.presence
       when UUID_RE
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show releases for stable, rc and beta channels.
@@ -506,8 +526,9 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { checksum: })
   end
 
-  def upgrade!(channel: nil, constraint: nil)
+  def upgrade!(package: nil, channel: nil, constraint: nil)
     release = product.releases
+      .for_package(package.presence || self.package)
       .for_channel(channel.presence || self.channel)
       .order_by_version
       .published
