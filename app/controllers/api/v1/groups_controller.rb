@@ -69,7 +69,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[group groups] }
-        param :id, type: :uuid, optional: true, noop: true
+        param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :max_users, type: :integer, allow_nil: true, optional: true

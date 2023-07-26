@@ -69,7 +69,7 @@ module Api::V1::Users::Relationships
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors] }
-        param :id, type: :uuid, optional: true, noop: true
+        param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
           param :enabled, type: :boolean
         end

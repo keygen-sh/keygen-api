@@ -63,7 +63,7 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints] }
-        param :id, type: :uuid, optional: true, noop: true
+        param :id, type: :string, optional: true, noop: true
         param :attributes, type: :hash do
           param :url, type: :string, optional: true
           param :subscriptions, type: :array, optional: true do
