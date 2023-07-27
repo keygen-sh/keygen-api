@@ -195,6 +195,26 @@ Feature: Release package relationship
       { "id": "$packages[1]" }
       """
 
+  Scenario: Admin clears the package for a release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "packages" for the last "product"
+    And the current account has 2 "releases" for the last "product"
+    And the first "release" belongs to the first "package"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/package" with the following:
+      """
+      {
+        "data": null
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be the following:
+      """
+      { "data": null }
+      """
+
   @ee
   Scenario: Environment updates the package for a release
     Given the current account is "test1"

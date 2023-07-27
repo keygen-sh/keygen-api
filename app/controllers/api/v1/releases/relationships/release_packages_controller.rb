@@ -21,7 +21,7 @@ module Api::V1::Releases::Relationships
     typed_params {
       format :jsonapi
 
-      param :data, type: :hash do
+      param :data, type: :hash, allow_nil: true do
         param :type, type: :string, inclusion: { in: %w[package packages] }
         param :id, type: :uuid
       end
