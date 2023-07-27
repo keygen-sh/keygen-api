@@ -26,17 +26,17 @@ Feature: PyPI simple package index
     And the current account has the following "artifact" rows:
       | release_id                           | filename                    | filetype |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tar.gz            | tar.gz   |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0-py3-none-any.wh   | wh       |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0-py3-none-any.whl  | whl      |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tar.gz            | tar.gz   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1-py3-none-any.wh   | wh       |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1-py3-none-any.whl  | whl      |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tar.gz            | tar.gz   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-py3-none-any.wh   | wh       |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-py3-none-any.whl  | whl      |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1.tar.gz          | tar.gz   |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1-py3-none-any.wh | wh       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1-py3-none-any.whl| whl      |
       | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tar.gz            | tar.gz   |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0-py3-none-any.wh   | wh       |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0-py3-none-any.whl  | whl      |
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0.tar.gz            | tar.gz   |
-      | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0-py3-none-any.wh   | wh       |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0-py3-none-any.whl  | whl      |
     And I send the following raw headers:
       """
       User-Agent: pip/23.1.2 {"ci":null,"cpu":"x86_64","distro":{"id":"focal","libc":{"lib":"glibc","version":"2.31"},"name":"Ubuntu","version":"20.04"},"implementation":{"name":"CPython","version":"3.8.10"},"installer":{"name":"pip","version":"23.1.2"},"openssl_version":"OpenSSL 1.1.1f  31 Mar 2020","python":"3.8.10","setuptools_version":"45.2.0","system":{"name":"Linux","release":"5.15.90.1-microsoft-standard-WSL2"}}
