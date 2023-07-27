@@ -74,7 +74,11 @@ class ReleaseSerializer < BaseSerializer
 
   relationship :package do
     linkage always: true do
-      { type: :packages, id: @object.package_id }
+      if @object.package_id.present?
+        { type: :packages, id: @object.package_id }
+      else
+        nil
+      end
     end
     link :related do
       @url_helpers.v1_account_release_release_package_path @object.account_id, @object
