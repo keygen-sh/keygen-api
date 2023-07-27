@@ -202,6 +202,20 @@ Then /^the response status should not (?:contain|be) "([^\"]*)"$/ do |status|
   expect(last_response.status).to_not eq status.to_i
 end
 
+Then /^the response body should include the following:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+
+  expect(json).to include JSON.parse(body)
+end
+
+Then /^the response body should be the following:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+
+  expect(json).to eq JSON.parse(body)
+end
+
 Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
 
