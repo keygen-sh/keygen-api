@@ -1,6 +1,9 @@
 -# frozen_string_literal: true
 - title = "Packages for #{account.name}"
+
 - content_for(:title) { title }
+- content_for(:head) do
+  %meta(name="pypi:repository-version" content="1.1")
 
 %h1= title
 
@@ -8,3 +11,4 @@
   - url = url_for([:v1, account, :release_engines, :pypi_simple_package, package: package.id, format: nil, trailing_slash: true])
 
   = link_to(package.key, url, data: package.metadata)
+  %br
