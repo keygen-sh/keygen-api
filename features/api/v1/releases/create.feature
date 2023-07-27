@@ -101,7 +101,7 @@ Feature: Create release
         "data": {
           "type": "releases",
           "attributes": {
-            "name": "Package Release",
+            "name": "Packaged Release",
             "channel": "stable",
             "tag": "pkg@v1.0.0",
             "version": "1.0.0",
@@ -132,7 +132,7 @@ Feature: Create release
     And the response body should be a "release" with the following attributes:
       """
       {
-        "name": "Package Release",
+        "name": "Packaged Release",
         "channel": "stable",
         "status": "DRAFT",
         "tag": "pkg@v1.0.0",
@@ -157,6 +157,77 @@ Feature: Create release
         "package": {
           "links": { "related": "/v1/accounts/$account/releases/$releases[14]/package" },
           "data": { "type": "packages", "id": "$packages[0]" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a new unpackaged release for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "package" for the last "product"
+    And the current account has 14 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Unpackaged Release",
+            "channel": "stable",
+            "tag": "pkg@v1.0.0",
+            "version": "1.0.0",
+            "metadata": {
+              "shasums": [
+                "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              ]
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "release" with the following attributes:
+      """
+      {
+        "name": "Unpackaged Release",
+        "channel": "stable",
+        "status": "DRAFT",
+        "tag": "pkg@v1.0.0",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "shasums": [
+            "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+          ]
+        }
+      }
+      """
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "package": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[14]/package" },
+          "data": null
         }
       }
       """

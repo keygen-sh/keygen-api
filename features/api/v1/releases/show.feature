@@ -112,6 +112,42 @@ Feature: Show release
       }
       """
 
+  Scenario: Admin retrieves a release without a package
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "package": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/package" },
+          "data": null
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a release with a package
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 packaged "releases"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following relationships:
+      """
+      {
+        "package": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/package" },
+          "data": { "type": "packages", "id": "$packages[0]" }
+        }
+      }
+      """
+
   Scenario: Admin retrieves a draft release for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
