@@ -375,7 +375,7 @@ Rails.application.routes.draw do
 
     # Release engines can support and respond with a variety of mime types, so
     # we're defining those routes here with their own unique constraints.
-    namespace :release_engines, path: 'engines' do
+    namespace :release_engine, module: :release_engines, path: 'engines' do
       scope :pypi do
         concerns :pypi
       end
