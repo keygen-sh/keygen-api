@@ -1,14 +1,16 @@
 -# frozen_string_literal: true
-- title = "Versions for #{package.name} by #{account.name}"
+- title = "Files for #{package.name} by #{account.name}"
 
 - content_for(:title) { title }
 - content_for(:head) do
-  %meta(name="pypi:repository-version" content="1.1")
+  %meta(name='pypi:repository-version' content='1.1')
 
 %h1= title
 
 - artifacts.each do |artifact|
-  - url = url_for([:v1, account, :release_artifact, id: artifact.filename, package:, anchor: checksum_for(artifact, delimiter: '=')])
+  -# NOTE(ezekg) Even though it's not covered in PEP 503, pip expects the URL path to be a
+  -#             filename, not a UUID. Paths without an extension are ignored.
+  - url = v1_account_release_artifact_url(account, artifact.filename, package:, anchor: checksum_for(artifact, delimiter: '='))
 
   = link_to(artifact.filename, url, data: artifact.metadata)
   %br

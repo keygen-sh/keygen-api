@@ -3,12 +3,14 @@
 
 - content_for(:title) { title }
 - content_for(:head) do
-  %meta(name="pypi:repository-version" content="1.1")
+  %meta(name='pypi:repository-version' content='1.1')
 
 %h1= title
 
 - packages.each do |package|
-  - url = url_for([:v1, account, :release_engines, :pypi_simple_package, package: package.id, format: nil, trailing_slash: true])
+  -# NOTE(ezekg) The nil format is required for trailing slash because
+  -#             the route has a default format.
+  - url = v1_account_release_engine_pypi_simple_package_url(account, package, format: nil, trailing_slash: true)
 
   = link_to(package.key, url, data: package.metadata)
   %br
