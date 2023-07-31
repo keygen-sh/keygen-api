@@ -24,7 +24,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      artifacts = package.artifacts.order_by_version
+      artifacts = package.artifacts.order_by_version.preload(release: %i[product entitlements constraints])
       authorize! artifacts,
         to: :index?
 
