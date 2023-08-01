@@ -108,7 +108,7 @@ class MachineSerializer < BaseSerializer
 
   relationship :processes do
     link :related do
-      @url_helpers.v1_account_machine_processes_path @object.account_id, @object
+      @url_helpers.v1_account_machine_machine_processes_path @object.account_id, @object
     end
   end
 
