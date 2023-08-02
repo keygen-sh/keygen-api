@@ -584,7 +584,7 @@ class StdoutMailer < ApplicationMailer
     mail(
       content_type: 'text/plain',
       to: subscriber.email,
-      subject: 'Keygen goes open source!',
+      subject: 'Environments and packages and engines, oh my!',
       body: <<~TXT
         (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
 
