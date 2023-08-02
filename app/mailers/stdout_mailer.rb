@@ -566,6 +566,114 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_five(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: 'Keygen goes open source!',
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        This has been a big couple months, with July being our biggest month yet. Since going open source, we've seen a ton of new faces ... err, read a ton of new texts ... err, okay -- you know what I mean. Lots of new people using Keygen to license their applications, big and small.
+
+        It's been crazy to see so many people interested in self-hosting Keygen, both CE and EE. The first sale for Keygen EE was exilterating, moving from being a SaaS business into multi-prem. That feeling brought me back to my first sale of Keygen, 7 years ago.
+
+        If you're interested in exploring self-hosting Keygen EE for your organization, reply back to this email and I can get you set up with a 30-day trial. No strings attached.
+
+        But with that said, some big features were released over the last couple months.
+
+        ## Environments
+
+        It only took 7 years, but environments are now available. You can use the new environment resource to segregate data within your Keygen account.
+
+        Most companies will utilize this for an isolated "sandbox" environment, but the system is flexible enough for other applications as well.
+
+        For example, you can create a "shared" environment for QA, where read-only production data augments the environment-specific resources. It's a powerful system, and like always, we're excited to see what people build with it.
+
+        Currently, environments are available via the API only. We'll be adding them to the new Portal app in the works (more on that soon).
+
+        Docs: https://keygen.sh/docs/api/environments/
+
+        ## Packages
+
+        Another huge feature is release packages. Historically, releases were managed one-application-per-product. But this rather was inflexible, because it meant that licenses couldn't be shared across multiple applications, even if some of the applications were plugins or add-ons for the same product. This meant that those plugins would either require a separate license, or they wouldn't be able to be versioned like a normal release.
+
+        But packages allow you to separately manage releases for multiple applications under a single product umbrella.
+
+        This could mean a flagship product with various add-ons, all licensed together, but versioned and distributed separately.
+
+        Or it could mean offering a series of "packages" across various languages, e.g. npm, Rubygems, PyPI, etc.
+
+        Docs: https://keygen.sh/docs/api/packages/
+
+        ## Engines
+
+        Which brings us into our next bit...
+
+        As part of our packages launch, we're introducing release engines. These will offer compatibility with popular package managers, such as npm and PyPI.
+
+        With the introduction of engines, we've added support for our first package manager: PyPI.
+
+        You can now upload private PyPI packages and let licensed users install the packages using pip:
+
+          pip install example --index-url https://license:<key>@pypi.pkg.keygen.sh/demo/simple
+
+        We'll be adding others, such as npm, Electron, Tauri, and OCI very soon.
+
+        Docs: https://keygen.sh/docs/api/engines/
+
+        ## Second factors
+
+        Last but not least, we've made our second factor API endpoints public (i.e. we documented them). This means that you can now offer TOTP second factors (a.k.a. 2FA/MFA) to the users of your applications. Think: Authy, Google Authenticator, etc.
+
+        We've been using these endpoints for our own dashboard for years to offer MFA to our users (i.e. you), and we figured documenting the API for others to use would increase security for all.
+
+        Let us know what you think. We'll be interating on this over the next few weeks.
+
+        Docs: https://keygen.sh/docs/api/users/#second-factors
+
+        ## Community
+
+        Our Discord community is growing, so if you have questions or just want to talk licensing or business, drop in and say hi.
+
+        Link: https://discord.gg/TRrhSaWSsN
+
+        --
+
+        That's it for now. Lots of new stuff coming up, including more information on the soon-to-be-open-source Portal.
+
+        Have questions or comments? I'm all ears. You can reply back to this email directly.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. we're creeping up on 300 stars on GitHub, so if you haven't already, give us a star. :)
+
+        Link: https://github.com/keygen-sh/keygen-api
+      TXT
+    )
+  end
+
   private
 
   def encrypt(plaintext)
