@@ -3,8 +3,13 @@
 class SecondFactorSerializer < BaseSerializer
   type 'second-factors'
 
-  attribute :uri, if: -> { @object.uri.present? && @context != :webhook } do
+  # Don't render secrets for second factors that are already enabled, or if
+  # we're in a webhook context (so we don't leak user secrets).
+  attribute :uri, unless: -> { @object.enabled? || @context == :webhook } do
     @object.uri
+  end
+  attribute :secret, unless: -> { @object.enabled? || @context == :webhook } do
+    @object.secret
   end
   attribute :enabled
   attribute :created do
