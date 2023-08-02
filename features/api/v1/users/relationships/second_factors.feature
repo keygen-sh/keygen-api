@@ -231,7 +231,8 @@ Feature: Manage second factors for user
       """
       { "enabled": false }
       """
-    And the response body should be a "second-factor" with a uri
+    And the response body should be a "second-factor" with a "secret" attribute
+    And the response body should be a "second-factor" with a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -248,6 +249,7 @@ Feature: Manage second factors for user
       """
       { "enabled": true }
       """
+    And the response body should be a "second-factor" without a "secret" attribute
     And the response body should be a "second-factor" without a "uri" attribute
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

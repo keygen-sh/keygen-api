@@ -504,7 +504,14 @@ Then /^the response body should (?:contain|be) an? "([^\"]*)" without an? "([^\"
   expect(json["data"]["attributes"].key?(attribute)).to be false
 end
 
-Then /^the response body should be meta that contains a valid activation proof of the following dataset:/ do |body|
+Then /^the response body should (?:contain|be) an? "([^\"]*)" with an? "([^\"]*)" attribute$/ do |resource, attribute|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  expect(json["data"]["attributes"].key?(attribute)).to be true
+end
+
+Then /^the response body should be meta that contains a valid activation proof of the following dataset:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
