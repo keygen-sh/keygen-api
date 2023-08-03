@@ -1389,6 +1389,35 @@ Feature: Release artifact relationship
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
+  Scenario: Admin uploads an artifact with a binary request body
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 draft "releases"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "App.dmg" }
+      """
+    And I use an authentication token
+    And I send and accept binary
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases/$0/artifact" with the following:
+      """
+      \x68\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64
+      """
+    Then the response status should be "307"
+    And the response body should be an "artifact" with the following attributes:
+      """
+      {
+        "status": "WAITING",
+        "key": "App.dmg"
+      }
+      """
+    And the first "release" should have the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+
   # Artifact yank
   Scenario: Admin yanks an artifact for a release (no artifact)
     Given I am an admin of account "test1"

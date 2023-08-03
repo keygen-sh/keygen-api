@@ -276,9 +276,7 @@ Rails.application.routes.draw do
 
           version_constraint '<=1.0' do
             scope module: :v1x0 do
-              resource :release_artifact, only: %i[show destroy], path: 'artifact', as: :v1_0_release_artifact do
-                put :create
-              end
+              resource :release_artifact, only: %i[show destroy], path: 'artifact', as: :v1_0_release_artifact
             end
           end
         end
@@ -371,6 +369,20 @@ Rails.application.routes.draw do
     # defining the route outside of the restrictive mime type constraint above.
     scope defaults: { format: :jsonapi } do
       resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
+    end
+
+    # Likewise, we have a legacy endpoint that needs to accept a variety of content
+    # types without failing due to legacy integrations e.g. old electron-builder
+    # versions send binary even though they shouldn't. To resolve this, we'll
+    # default to the binary content type, instead of failing with a JSON parse
+    # error (because Rails tries to parse the binary as JSON).
+    #
+    # In reality, this should never have been allowed in the first place. But
+    # since it was, electron-builder < v26.6.3 relies on the behavior.
+    version_constraint '<=1.0' do
+      scope 'releases/:release_id', as: :release, module: 'releases/relationships/v1x0', constraints: { release_id: /[^\/]*/, format: /.*/ } do
+        put 'artifact', to: 'release_artifacts#create', defaults: { format: :binary }
+      end
     end
 
     # Release engines can support and respond with a variety of mime types, so
