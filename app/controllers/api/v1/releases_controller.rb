@@ -72,7 +72,7 @@ module Api::V1
             end
           end
           param :package, type: :hash, optional: true do
-            param :data, type: :hash do
+            param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[package packages] }
               param :id, type: :uuid
             end
