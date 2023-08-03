@@ -29,6 +29,11 @@ Given /^I send and accept XML$/ do
   header "Accept", "application/xml"
 end
 
+Given /^I send and accept binary$/ do
+  header "Content-Type", "application/octet-stream"
+  header "Accept", "*/*"
+end
+
 Given /^time is frozen (\d+) (\w+) into the future$/ do |duration_number, duration_word|
   travel_to(duration_number.to_i.send(duration_word).from_now)
 end
