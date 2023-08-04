@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.configure do
-  # Settings specified here will take precedence over those in config/application.rb.
+  config.host_authorization = { exclude: -> req { req.path =~ %r(^/v\d+/health) } }
   config.hosts.concat(
     [ENV.fetch('KEYGEN_HOST'), *ENV.fetch('KEYGEN_HOSTS', '').split(',')].then { |host|
       host.uniq.compact_blank.map { _1.downcase.strip }

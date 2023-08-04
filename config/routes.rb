@@ -433,6 +433,12 @@ Rails.application.routes.draw do
 
   scope module: :api do
     namespace :v1 do
+      # Health checks
+      scope :health do
+        get '/',       to: 'health#general_health'
+        get :webhooks, to: 'health#webhook_health'
+      end
+
       constraints **domain_constraints, **subdomain_constraints do
         if Keygen.multiplayer?
           post :stripe, to: 'stripe#receive_webhook'
@@ -441,12 +447,6 @@ Rails.application.routes.draw do
           scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
             resources :plans, only: %i[index show]
           end
-        end
-
-        # Health checks
-        scope :health do
-          get '/',       to: 'health#general_health'
-          get :webhooks, to: 'health#webhook_health'
         end
 
         # Recover
