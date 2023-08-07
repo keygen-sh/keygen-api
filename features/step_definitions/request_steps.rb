@@ -14,6 +14,10 @@ Given 'I use API version {string}' do |version|
   header 'Keygen-Version', version
 end
 
+Given 'I use user agent {string}' do |ua|
+  header "User-Agent", ua
+end
+
 Given /^I send and accept JSON$/ do
   header "Content-Type", "application/vnd.api+json"
   header "Accept", "application/vnd.api+json"

@@ -200,31 +200,49 @@ module Keygen
     end
 
     class DefaultContentType
-      def initialize app
+      def initialize(app)
         @app = app
       end
 
       def call(env)
-        content_type = env['CONTENT_TYPE'] || ''
+        begin
+          request      = ActionDispatch::Request.new(env)
+          content_type = request.content_type
+          user_agent   = request.user_agent
+          method       = request.method
+          path         = request.path
 
-        # Whenever an API request is sent without a content-type header, some clients,
-        # such as `fetch()` or curl, use these headers by default. We're going to try
-        # to parse the request as JSON and error later, instead of rejecting the request
-        # off the bat. In theory, this would slightly improve onboarding DX.
-        if content_type.empty? || content_type.include?('text/plain') || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
-          begin
-            request    = ActionDispatch::Request.new(env)
-            route      = Rails.application.routes.recognize_path(request.url, request:) rescue {}
-            controller = route[:controller]
-            action     = route[:action]
-
-            # Default to JSON content-type header for non-artifact endpoints
-            env['CONTENT_TYPE'] = 'application/json' unless
-              controller&.ends_with?('/release_artifacts') &&
-              action == 'create'
-          rescue => e
-            Keygen.logger.exception(e)
+          case { method:, path: }
+          in method: 'PUT', path: %r(/artifact$)
+            # electron-builder < v24.6.3 sets a JSON content-type, but it actually sends
+            # binary data. This ends up exploding on our end because Rails attempts to
+            # parse the request as JSON, and rightfully so, but it's actually an app
+            # binary. Rather than wait on a patch and backport for electron-builder,
+            # and for everybody to upgrade, we'll assume binary.
+            #
+            # FIXME(ezekg) Only applies to the legacy v1.0 endpoint. Let's eventually
+            #              deprecate this as integrations upgrade electron-builder.
+            if user_agent.starts_with?('electron-builder')
+              env['CONTENT_TYPE'] = 'application/octet-stream'
+            end
+          in method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+            # Whenever an API request is sent without a content-type header, some clients,
+            # such as `fetch()` or curl, use these headers by default. We're going to try
+            # to parse the request as JSON and error later, instead of rejecting the request
+            # off the bat. In theory, this would slightly improve onboarding DX.
+            #
+            # FIXME(ezekg) This was a terrible idea and I'd like to deprecate it.
+            if content_type.nil? ||
+               content_type == Mime::Type.lookup_by_extension(:url_encoded_form) ||
+               content_type == Mime::Type.lookup_by_extension(:multipart_form) ||
+               content_type == Mime::Type.lookup_by_extension(:text)
+              env['CONTENT_TYPE'] = 'application/json'
+            end
+          else
+            # Leave as-is
           end
+        rescue => e
+          Keygen.logger.exception(e)
         end
 
         @app.call(env)
