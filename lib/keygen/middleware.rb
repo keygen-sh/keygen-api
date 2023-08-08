@@ -226,6 +226,8 @@ module Keygen
               env['CONTENT_TYPE'] = 'application/octet-stream'
             end
           in method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+            mime, * = Mime::Type.parse(content_type || '')
+
             # Whenever an API request is sent without a content-type header, some clients,
             # such as `fetch()` or curl, use these headers by default. We're going to try
             # to parse the request as JSON and error later, instead of rejecting the request
@@ -233,9 +235,9 @@ module Keygen
             #
             # FIXME(ezekg) This was a terrible idea and I'd like to deprecate it.
             if content_type.blank? ||
-               content_type == Mime::Type.lookup_by_extension(:url_encoded_form) ||
-               content_type == Mime::Type.lookup_by_extension(:multipart_form) ||
-               content_type == Mime::Type.lookup_by_extension(:text)
+               mime == Mime::Type.lookup_by_extension(:url_encoded_form) ||
+               mime == Mime::Type.lookup_by_extension(:multipart_form) ||
+               mime == Mime::Type.lookup_by_extension(:text)
               env['CONTENT_TYPE'] = 'application/json'
             end
           else
