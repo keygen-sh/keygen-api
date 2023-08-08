@@ -232,7 +232,7 @@ module Keygen
             # off the bat. In theory, this would slightly improve onboarding DX.
             #
             # FIXME(ezekg) This was a terrible idea and I'd like to deprecate it.
-            if content_type.nil? ||
+            if content_type.blank? ||
                content_type == Mime::Type.lookup_by_extension(:url_encoded_form) ||
                content_type == Mime::Type.lookup_by_extension(:multipart_form) ||
                content_type == Mime::Type.lookup_by_extension(:text)
