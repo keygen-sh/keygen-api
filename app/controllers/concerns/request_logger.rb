@@ -40,8 +40,9 @@ module RequestLogger
       return false if
         REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
 
+      controller = request.path_parameters[:controller]
       return false if
-        REQUEST_LOG_IGNORED_RESOURCES.any? { _1.in? request.params[:controller] }
+        REQUEST_LOG_IGNORED_RESOURCES.any? { controller&.include?(_1) }
 
       Current.account.present?
     end
