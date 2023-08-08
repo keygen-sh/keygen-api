@@ -1133,6 +1133,42 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin performs a machine checkout with a bad content-type header (POST)
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "content-type": "text/plain;charset=UTF-8" }
+      """
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "encrypt": true } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine-file" with a certificate signed using "ed25519"
+    And the response body should be a "machine-file" with the following encrypted certificate data:
+      """
+      {
+        "meta": {
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2022-11-16T14:52:48.000Z",
+          "ttl": 2629746
+        },
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   @ee
   Scenario: Environment performs an isolated machine checkout (GET)
     Given the current account is "test1"
