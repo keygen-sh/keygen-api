@@ -80,9 +80,9 @@ module DefaultHeaders
     # synonyms of the :jsonapi format, but we still want to respond
     # with application/json if asked to do so, for compatibility
     # with various HTTP clients, e.g. cpp-rest-sdk.
-    content_type, * = Mime::Type.parse(response.content_type.to_s)
+    mime_type, * = Mime::Type.parse(response.content_type.to_s)
     return unless
-      content_type == :jsonapi || content_type == :json # skip for non-JSON responses
+      mime_type == :jsonapi || mime_type == :json # skip for non-JSON responses
 
     jsonapi = Mime::Type.lookup_by_extension(:jsonapi)
     json    = Mime::Type.lookup_by_extension(:json)
