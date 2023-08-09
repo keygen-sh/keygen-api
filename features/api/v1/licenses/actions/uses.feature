@@ -446,21 +446,15 @@ Feature: License usage actions
   Scenario: User increments the usage count for an unprotected license that is at its usage limit
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 unprotected "policy"
+    And the last "policy" has the following attributes:
       """
-      {
-        "protected": false,
-        "maxUses": 5
-      }
+      { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 5
-      }
+      { "uses": 5 }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -486,21 +480,15 @@ Feature: License usage actions
   Scenario: User increments the usage count for a protected license that is at its usage limit
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 protected "policy"
+    And the last "policy" has the following attributes:
       """
-      {
-        "protected": true,
-        "maxUses": 5
-      }
+      { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 5
-      }
+      { "uses": 5 }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
