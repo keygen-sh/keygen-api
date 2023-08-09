@@ -97,7 +97,7 @@ class LicensePolicy < ApplicationPolicy
     in role: Role(:product) if record.product == bearer
       allow!
     in role: Role(:user) if record.user == bearer
-      !record.policy.protected?
+      !record.protected?
     in role: Role(:license) if record == bearer
       allow!
     else
@@ -115,7 +115,7 @@ class LicensePolicy < ApplicationPolicy
     in role: Role(:product) if record.product == bearer
       allow!
     in role: Role(:user) if record.user == bearer
-      !record.policy.protected?
+      !record.protected?
     in role: Role(:license) if record == bearer
       allow!
     else
