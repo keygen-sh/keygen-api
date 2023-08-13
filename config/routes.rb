@@ -38,7 +38,9 @@ Rails.application.routes.draw do
       { subdomain: 'api' }
     end
 
-  mount Sidekiq::Web, at: '/-/sidekiq'
+  if ENV.key?('SIDEKIQ_WEB_USER') && ENV.key?('SIDEKIQ_WEB_PASSWORD')
+    mount Sidekiq::Web, at: '/-/sidekiq'
+  end
 
   namespace '-' do
     post 'csp-reports', to: proc { |env|
