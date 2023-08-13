@@ -11,11 +11,13 @@ SIDEKIQ_MAX_QUEUE_LATENCY =
 # Configure Sidekiq's web interface to use basic authentication
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
   compare = -> (a, b) { Rack::Utils.secure_compare(a, b) }
-  hash = -> (v) { Digest::SHA256.hexdigest(v) }
-  env = -> (k) { ENV.fetch(k.to_s, '') }
+  hash    = -> (v)    { Digest::SHA256.hexdigest(v) }
 
-  compare[hash[user], hash[env[:SIDEKIQ_WEB_USER]]] &
-    compare[hash[password], hash[env[:SIDEKIQ_WEB_PASSWORD]]]
+  next false unless
+    ENV['SIDEKIQ_WEB_USER'] && ENV['SIDEKIQ_WEB_PASSWORD']
+
+  compare[hash[user], hash[ENV['SIDEKIQ_WEB_USER']]] &
+    compare[hash[password], hash[ENV['SIDEKIQ_WEB_PASSWORD']]]
 end
 
 # Configure Sidekiq session middleware
