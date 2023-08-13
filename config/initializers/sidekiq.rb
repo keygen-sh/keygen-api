@@ -13,11 +13,12 @@ Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
   compare = -> (a, b) { Rack::Utils.secure_compare(a, b) }
   hash    = -> (v)    { Digest::SHA256.hexdigest(v) }
 
+  u = ENV['SIDEKIQ_WEB_USER']
+  p = ENV['SIDEKIQ_WEB_PASSWORD']
   next false unless
-    ENV['SIDEKIQ_WEB_USER'] && ENV['SIDEKIQ_WEB_PASSWORD']
+    u.present? && p.present?
 
-  compare[hash[user], hash[ENV['SIDEKIQ_WEB_USER']]] &
-    compare[hash[password], hash[ENV['SIDEKIQ_WEB_PASSWORD']]]
+  compare[hash[user], hash[u]] & compare[hash[password], hash[p]]
 end
 
 # Configure Sidekiq session middleware
