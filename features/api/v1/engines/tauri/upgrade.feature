@@ -71,12 +71,12 @@ Feature: Tauri upgrade package
       | 23b0c365-1941-4036-b60b-c3f669f1da35 | c77ba874-de62-4a17-8368-fc10db1e1c80 | myapp.msi.zip             | zip      | windows  | i686   | rIZq0l+CqaSuv52Z2VjiXXnbpURrIXoZuZKvTr9TlCb9cikY2egwBWCLBekurbFiNfwzzeWrjZlefb/t14pAnQ== |
       | ecdb59f6-00c1-4fec-80bd-7fc176f9d1a0 | c77ba874-de62-4a17-8368-fc10db1e1c80 | myapp.msi.zip.sig         | sig      | windows  | i686   | qJ6ij921jgD6yJ3UknE5IFAiSfFPTcUZPkqGj+WwfedTKPz7d7NmiUZRxPoajz/GKLimBoXdEm0a57L+yFEejw== |
       # 2.0.0-beta.1
-      | 61987e0a-1848-4a04-9b2a-86ff6a7f464b | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi                 | msi      | windows  | i686   | 3vw5nDxg8qAZ4yPtPvBb0BJf5I+Df7zveGPDWEhOFAfeSfPhUuxbwePy/inD16AQM/K2ovHPpBMsZ9nmpI/r9A== |
-      | 0220fd5b-e35f-452f-980f-6a7447c71163 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi.zip             | zip      | windows  | i686   | DM6TUNOgzD11U2bgEEuNfxKOssq5ElscX/AIgd5Oczl4ufIoYViVdT0U/hin5jx7pySy3WW7J5tlS/lt5U5xPg== |
-      | dd61752e-187e-4346-a7df-fda80adb7131 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi.zip.sig         | sig      | windows  | i686   | /oBea3DwxhueGOhoKQ9JxTBHamr9cp85WyJI5p50FeRqq9zELjroza7h5/c33CgZGnx1klSo4omAqWgdupx+8g== |
       | 16b9a3fa-6b12-4d86-b81e-be2757392bae | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp-setup.exe           | exe      | windows  | i686   | 1/ZheqnqL3OJbQcUa+zmFCENiXqhW1oqrUP2sREyExryaDRcy14lC6nSHg4gt/TfbHkE1ANnsEFizRdno+uZZg== |
       | 8dbd9795-2b57-436a-863e-26a3e6689f38 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp-setup.nsis.zip      | zip      | windows  | i686   | 6vfPB8J8IW1AlSkc7e4XOiLFIPelzQYQyN+nrXMNsBr+Tb7IWjNKRZxDH/rlOhXjAqkY24SxD56suQGY+ELkYA== |
       | e1a9d063-cd8d-4655-95e5-647c961852eb | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp-setup.nsis.zip.sig  | sig      | windows  | i686   | Rpvx4kMZlfBr1lM7GwA1tJA7qeRGfNACOIYXwyxqTH6RkqIvcNcB8dl3ZcdEqdF46l1oFDiWYcI5xYE35/NSlA== |
+      | 61987e0a-1848-4a04-9b2a-86ff6a7f464b | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi                 | msi      | windows  | i686   | 3vw5nDxg8qAZ4yPtPvBb0BJf5I+Df7zveGPDWEhOFAfeSfPhUuxbwePy/inD16AQM/K2ovHPpBMsZ9nmpI/r9A== |
+      | 0220fd5b-e35f-452f-980f-6a7447c71163 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi.zip             | zip      | windows  | i686   | DM6TUNOgzD11U2bgEEuNfxKOssq5ElscX/AIgd5Oczl4ufIoYViVdT0U/hin5jx7pySy3WW7J5tlS/lt5U5xPg== |
+      | dd61752e-187e-4346-a7df-fda80adb7131 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp.msi.zip.sig         | sig      | windows  | i686   | /oBea3DwxhueGOhoKQ9JxTBHamr9cp85WyJI5p50FeRqq9zELjroza7h5/c33CgZGnx1klSo4omAqWgdupx+8g== |
     And I send the following raw headers:
       """
       User-Agent: tauri-updater
@@ -159,3 +159,158 @@ Feature: Tauri upgrade package
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/pkg1/darwin/x86_64/1.0.0"
     Then the response status should be "404"
+
+  Scenario: Product retrieves an upgrade when an upgrade is available
+    Given I am the first product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/windows/x86_64/1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/8700e88b-17b9-45af-91a7-6f7d1de7038e/myapp-setup.nsis.zip",
+        "signature": "1lbG9323YV/MyW9t+MbouA1mvWaJQG+Skd3hCFpU44AfTS+jmQGiAyOqbdGa9zyDkEzeeoJeoqR+j3cq06uqBw==",
+        "version": "1.1.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade when an upgrade is available
+    Given the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/77aaaf13-cfc3-4339-8350-163efcaf8814/myapp.app.tar.gz",
+        "signature": "qjuxG7/3e44SUMRWSc8h3mOMk11L8lMSpKmEujgYmSjc+PnRY/Jedbw74a0+AMWkGSBCXvOISWK3bfylbNkaxw==",
+        "version": "1.1.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release that has entitlement constraints (no entitlements)
+    Given the current account has 3 "entitlements"
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "204"
+
+  Scenario: License retrieves an upgrade that has entitlement constraints (no entitlements)
+    Given the current account has 3 "entitlements"
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade that has entitlement constraints (has entitlements)
+    Given the current account has 3 "entitlements"
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/77aaaf13-cfc3-4339-8350-163efcaf8814/myapp.app.tar.gz",
+        "signature": "qjuxG7/3e44SUMRWSc8h3mOMk11L8lMSpKmEujgYmSjc+PnRY/Jedbw74a0+AMWkGSBCXvOISWK3bfylbNkaxw==",
+        "version": "1.1.0"
+      }
+      """
+
+  Scenario: User retrieves an upgrade when an upgrade is available
+    Given the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/77aaaf13-cfc3-4339-8350-163efcaf8814/myapp.app.tar.gz",
+        "signature": "qjuxG7/3e44SUMRWSc8h3mOMk11L8lMSpKmEujgYmSjc+PnRY/Jedbw74a0+AMWkGSBCXvOISWK3bfylbNkaxw==",
+        "version": "1.1.0"
+      }
+      """
+
+  Scenario: Anonymous retrieves an upgrade for a licensed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "404"
+
+  Scenario: Anonymous retrieves an upgrade for a closed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "404"
+
+  Scenario: Anonymous retrieves an upgrade for an open product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/77aaaf13-cfc3-4339-8350-163efcaf8814/myapp.app.tar.gz",
+        "signature": "qjuxG7/3e44SUMRWSc8h3mOMk11L8lMSpKmEujgYmSjc+PnRY/Jedbw74a0+AMWkGSBCXvOISWK3bfylbNkaxw==",
+        "version": "1.1.0"
+      }
+      """
