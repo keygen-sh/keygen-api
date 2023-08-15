@@ -16,8 +16,7 @@ module Api::V1::ReleaseEngines
 
       releases = authorized_scope(package.releases)
       release  = releases.find_by!(version: params[:current_version])
-      authorize! release,
-        to: :upgrade?
+      authorize! release, to: :upgrade?
 
       kwargs  = upgrade_query.slice(:constraint, :channel)
       upgrade = release.upgrade!(**kwargs)
