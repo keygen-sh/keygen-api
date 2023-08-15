@@ -23,13 +23,14 @@ module Api::V1::ReleaseEngines
       upgrade = release.upgrade!(**kwargs)
       authorize! upgrade
 
-      artifact = upgrade.artifacts.joins(:platform, :arch, :filetype)
-                                  .reorder(filename: :desc) # so that NSIS takes precedence over MSI on conflict
-                                  .find_by!(
-                                    platform: { key: params[:target] },
-                                    arch: { key: params[:arch] },
-                                    filetype: { key: %w[gz zip] },
-                                  )
+      artifacts = authorized_scope(upgrade.artifacts)
+      artifact  = artifacts.joins(:platform, :arch, :filetype)
+                           .reorder(filename: :desc) # so that NSIS takes precedence over MSI on conflict
+                           .find_by!(
+                             platform: { key: params[:target] },
+                             arch: { key: params[:arch] },
+                             filetype: { key: %w[gz zip] },
+                           )
       authorize! artifact
 
       # See: https://tauri.app/v1/guides/distribution/updater
