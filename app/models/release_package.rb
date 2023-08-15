@@ -93,6 +93,7 @@ class ReleasePackage < ApplicationRecord
 
   scope :for_engine_key, -> key { joins(:engine).where(release_engines: { key: }) }
   scope :pypi,           ->     { for_engine_key('pypi') }
+  scope :tauri,          ->     { for_engine_key('tauri') }
 
   def engine_id? = release_engine_id?
   def engine_id  = release_engine_id
