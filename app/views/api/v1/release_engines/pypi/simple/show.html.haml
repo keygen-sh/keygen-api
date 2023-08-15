@@ -10,7 +10,7 @@
 - artifacts.each do |artifact|
   -# NOTE(ezekg) Even though it's not covered in PEP 503, pip expects the URL path to be a
   -#             filename, not a UUID. Paths without an extension are ignored.
-  - url = v1_account_release_artifact_url(account, artifact.filename, package:, anchor: checksum_for(artifact, delimiter: '='))
+  - url = vanity_v1_account_release_artifact_url(account, artifact, filename: artifact.filename, anchor: checksum_for(artifact, delimiter: '='))
 
   = link_to(artifact.filename, url, data: artifact.metadata)
   %br
