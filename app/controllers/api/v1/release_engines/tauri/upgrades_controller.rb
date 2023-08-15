@@ -34,10 +34,10 @@ module Api::V1::ReleaseEngines
 
       # See: https://tauri.app/v1/guides/distribution/updater
       render json: {
-        version: upgrade.version,
-        pub_date: upgrade.created_at,
         url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
         signature: artifact.signature,
+        version: upgrade.version,
+        pub_date: upgrade.created_at.iso8601(3),
         notes: upgrade.description,
       }
     rescue ActiveRecord::RecordNotFound
