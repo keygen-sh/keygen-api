@@ -7,6 +7,7 @@ class ReleaseEngine < ApplicationRecord
 
   ENGINES = %w[
     pypi
+    tauri
   ]
 
   belongs_to :account,
@@ -99,6 +100,4 @@ class ReleaseEngine < ApplicationRecord
   scope :with_releases, -> {
     where_assoc_exists(:releases)
   }
-
-  def self.pypi = find_by(key: 'pypi')
 end

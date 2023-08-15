@@ -63,6 +63,14 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :tauri do
+    scope module: :tauri, constraints: MimeTypeConstraint.new(:json, raise_on_no_match: true), defaults: { format: :json } do
+      get ':package/:target/:arch/:current_version', to: 'upgrades#show', as: :tauri_upgrade_package, constraints: {
+        current_version: /[^\/]*/, # allow dots in version
+      }
+    end
+  end
+
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
@@ -370,7 +378,16 @@ Rails.application.routes.draw do
     # Artifact :show action needs to be a bit loose with the Accept header, so we're
     # defining the route outside of the restrictive mime type constraint above.
     scope defaults: { format: :jsonapi } do
-      resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ }
+      resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ } do
+        member do
+          # Vanity URLs where we route by ID but also supply a filename for compatibility
+          # with the various package managers that expect a URL with an extension.
+          get ':filename', to: 'release_artifacts#show', as: :vanity, constraints: {
+            id: UUID_URL_RE,
+            filename: /.*/,
+          }
+        end
+      end
     end
 
     # Likewise, we have a legacy endpoint that needs to accept a variety of content
@@ -392,6 +409,9 @@ Rails.application.routes.draw do
     namespace :release_engine, module: :release_engines, path: 'engines' do
       scope :pypi do
         concerns :pypi
+      end
+      scope :tauri do
+        concerns :tauri
       end
     end
   end
@@ -429,6 +449,18 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :pypi
+      end
+    end
+
+    # Tauri
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'tauri.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :tauri
+        end
+      when Keygen.singleplayer?
+        concerns :tauri
       end
     end
   end
