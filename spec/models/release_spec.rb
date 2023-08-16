@@ -125,6 +125,22 @@ describe Release, type: :model do
     end
   end
 
+  describe '#channel=' do
+    context 'channel does not exist' do
+      it 'should create channel' do
+        expect { create(:release, :beta, account:) }.to change { account.release_channels.count }
+      end
+    end
+
+    context 'channel does exist' do
+      before { create(:channel, :beta, account:) }
+
+      it 'should not create channel' do
+        expect { create(:release, :beta, account:) }.to_not change { account.release_channels.count }
+      end
+    end
+  end
+
   describe '.without_constraints' do
     let(:releases) { described_class.where(account:) }
 
