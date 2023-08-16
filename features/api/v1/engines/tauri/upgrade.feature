@@ -87,7 +87,7 @@ Feature: Tauri upgrade package
     Given the account "test1" is canceled
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/linux/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.0.0"
     Then the response status should be "403"
     And the response should contain the following headers:
       """
@@ -97,19 +97,19 @@ Feature: Tauri upgrade package
   Scenario: Endpoint should not return an upgrade when an upgrade is not available
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/linux/x86_64/1.1.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.1.0"
     Then the response status should be "204"
 
   Scenario: Endpoint should not return an upgrade when a version does not exist
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/linux/x86_64/3.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=3.0.0"
     Then the response status should be "204"
 
   Scenario: Endpoint should return an upgrade when an upgrade is available
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/linux/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -123,7 +123,7 @@ Feature: Tauri upgrade package
   Scenario: Endpoint should prefer NSIS over MSI for windows
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app2/windows/i686/1.0.0-beta.1"
+    When I send a GET request to "/accounts/test1/engines/tauri/app2?platform=windows&arch=i686&version=1.0.0-beta.1"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -137,7 +137,7 @@ Feature: Tauri upgrade package
   Scenario: Endpoint should include release notes when available
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -151,7 +151,7 @@ Feature: Tauri upgrade package
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -161,13 +161,13 @@ Feature: Tauri upgrade package
   Scenario: Endpoint should return error for non-Tauri packages
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/pkg1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/pkg1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "404"
 
   Scenario: Product retrieves an upgrade when an upgrade is available
     Given I am the first product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/windows/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=windows&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -186,7 +186,7 @@ Feature: Tauri upgrade package
     And the current account has 1 "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -213,7 +213,7 @@ Feature: Tauri upgrade package
     And the current account has 1 "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "204"
 
   Scenario: License retrieves an upgrade that has entitlement constraints (no entitlements)
@@ -232,7 +232,7 @@ Feature: Tauri upgrade package
     And the current account has 1 "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade that has entitlement constraints (has entitlements)
@@ -258,7 +258,7 @@ Feature: Tauri upgrade package
       """
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -276,7 +276,7 @@ Feature: Tauri upgrade package
     And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
@@ -292,7 +292,7 @@ Feature: Tauri upgrade package
       """
       { "distributionStrategy": "LICENSED" }
       """
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "404"
 
   Scenario: Anonymous retrieves an upgrade for a closed product
@@ -300,7 +300,7 @@ Feature: Tauri upgrade package
       """
       { "distributionStrategy": "CLOSED" }
       """
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "404"
 
   Scenario: Anonymous retrieves an upgrade for an open product
@@ -308,7 +308,7 @@ Feature: Tauri upgrade package
       """
       { "distributionStrategy": "OPEN" }
       """
-    When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """

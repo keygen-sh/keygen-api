@@ -65,9 +65,7 @@ Rails.application.routes.draw do
 
   concern :tauri do
     scope module: :tauri, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
-      get ':package/:target/:arch/:current_version', to: 'upgrades#show', as: :tauri_upgrade_package, constraints: {
-        current_version: /[^\/]*/, # allow dots in version
-      }
+      get ':package', to: 'upgrades#show'
     end
   end
 
