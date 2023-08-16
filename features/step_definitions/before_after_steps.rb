@@ -81,6 +81,15 @@ After do |scenario|
       },
       debug: {
         env_number: ENV['TEST_ENV_NUMBER'].to_i,
+        query_log: File.open(Rails.root / 'log' / 'test.log') do |log|
+          line_count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
+
+          log.readlines.select { _1 =~ /application:Keygen,pid:#{Process.pid}/ }
+                       .last(line_count)
+                       .map(&:squish)
+        rescue
+          []
+        end
       },
     )
   end
