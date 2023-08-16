@@ -16,12 +16,12 @@ Feature: Tauri upgrade package
       | 7b113ac2-ae81-406a-b44e-f356126e2faa | 6198261a-48b5-4445-a045-9fed4afc7735 | pypi   | pkg1 |
       | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 |        | pkg2 |
     And the current account has the following "release" rows:
-      | id                                   | product_id                           | release_package_id                   | version      | channel  | description | created_at               |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | foo         | 2023-08-15T16:10:09.000Z |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   | bar         | 2023-08-15T16:10:09.000Z |
-      | 2bbb14ae-bb6b-4c57-b6ab-26f7982c967d | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.2.0-beta-1 | beta     |             | 2023-08-15T16:10:09.000Z |
-      | c77ba874-de62-4a17-8368-fc10db1e1c80 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     | baz         | 2023-08-15T16:10:09.000Z |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 2.0.0-beta.1 | beta     | qux         | 2023-08-15T16:10:09.000Z |
+      | id                                   | product_id                           | release_package_id                   | version      | channel  | description |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | foo         |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   | bar         |
+      | 2bbb14ae-bb6b-4c57-b6ab-26f7982c967d | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.2.0-beta-1 | beta     |             |
+      | c77ba874-de62-4a17-8368-fc10db1e1c80 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     | baz         |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 2.0.0-beta.1 | beta     | qux         |
     And the current account has the following "artifact" rows:
       | id                                   | release_id                           | filename                  | filetype | platform | arch   | signature                                                                                |
       # 1.0.0
@@ -145,13 +145,17 @@ Feature: Tauri upgrade package
       """
 
   Scenario: Endpoint should include publish date when available
-    Given I am an admin of account "test1"
+    Given the second "release" has the following attributes:
+      """
+      { "createdAt": "2023-08-15T00:00:00.000Z" }
+      """
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/app1/darwin/x86_64/1.0.0"
     Then the response status should be "200"
     And the response body should include the following:
       """
-      { "pub_date": "2023-08-15T16:10:09.000Z" }
+      { "pub_date": "2023-08-15T00:00:00.000Z" }
       """
 
   Scenario: Endpoint should return error for non-Tauri packages

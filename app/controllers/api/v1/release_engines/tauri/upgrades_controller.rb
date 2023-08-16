@@ -25,13 +25,13 @@ module Api::V1::ReleaseEngines
       artifacts = authorized_scope(upgrade.artifacts)
       artifact  = artifacts.joins(:platform, :arch, :filetype)
                            .reorder(
-                              # NOTE(ezekg) Order so that NSIS always takes precedence
-                              #             over deprecated MSI on conflict.
-                              Arel.sql(<<~SQL.squish)
-                                release_artifacts.filename ILIKE '%.nsis.zip' DESC,
-                                release_artifacts.created_at DESC
-                              SQL
-                            )
+                             # NOTE(ezekg) Order so that NSIS always takes precedence
+                             #             over deprecated MSI on conflict.
+                             Arel.sql(<<~SQL.squish)
+                               release_artifacts.filename ILIKE '%.nsis.zip' DESC,
+                               release_artifacts.created_at DESC
+                             SQL
+                           )
                            .find_by!(
                              platform: { key: params[:target] },
                              arch: { key: params[:arch] },
