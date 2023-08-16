@@ -122,4 +122,5 @@ group :test do
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'
   gem 'webmock', '~> 3.14.0'
+  gem 'simplecov', require: false
 end
