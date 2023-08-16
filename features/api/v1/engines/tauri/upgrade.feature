@@ -19,8 +19,9 @@ Feature: Tauri upgrade package
       | id                                   | product_id                           | release_package_id                   | version      | channel  | description |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | foo         |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   | bar         |
-      | 2bbb14ae-bb6b-4c57-b6ab-26f7982c967d | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.2.0-beta-1 | beta     |             |
+      | 2bbb14ae-bb6b-4c57-b6ab-26f7982c967d | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.2.0-beta.1 | beta     |             |
       | c77ba874-de62-4a17-8368-fc10db1e1c80 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     | baz         |
+      | 29f74047-265f-452c-9d64-779621682857 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.1-beta.1 | beta     | baz         |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 2.0.0-beta.1 | beta     | qux         |
     And the current account has the following "artifact" rows:
       | id                                   | release_id                           | filename                  | filetype | platform | arch   | signature                                                                                |
@@ -70,6 +71,13 @@ Feature: Tauri upgrade package
       | 375d8a5a-e839-4bc1-a168-e376baf27c78 | c77ba874-de62-4a17-8368-fc10db1e1c80 | myapp.msi                 | msi      | windows  | i686   | foTILz/82kERvo9wdYprCKw/zCq4tA409RSnFAhMbSXbn6Co9MBmSIVjVFaVIP/cy74oXDUAuRHscQVwEUH1rA== |
       | 23b0c365-1941-4036-b60b-c3f669f1da35 | c77ba874-de62-4a17-8368-fc10db1e1c80 | myapp.msi.zip             | zip      | windows  | i686   | rIZq0l+CqaSuv52Z2VjiXXnbpURrIXoZuZKvTr9TlCb9cikY2egwBWCLBekurbFiNfwzzeWrjZlefb/t14pAnQ== |
       | ecdb59f6-00c1-4fec-80bd-7fc176f9d1a0 | c77ba874-de62-4a17-8368-fc10db1e1c80 | myapp.msi.zip.sig         | sig      | windows  | i686   | qJ6ij921jgD6yJ3UknE5IFAiSfFPTcUZPkqGj+WwfedTKPz7d7NmiUZRxPoajz/GKLimBoXdEm0a57L+yFEejw== |
+      # 1.0.1-beta.1
+      | 05b82ab6-ad64-46d4-9885-97a23347eb1c | 29f74047-265f-452c-9d64-779621682857 | myapp-setup.exe           | exe      | windows  | i686   | w3tDl0PCRIBM8t07D8fWpl102zpxiKKYJ8E6oCLBxiXYBB3Zvb52osFgrw6H8nPrqNu3Ax0NV8VKtBmmxxUN3A== |
+      | 2d719642-aec6-4e76-86af-5de76b9c2491 | 29f74047-265f-452c-9d64-779621682857 | myapp-setup.nsis.zip      | zip      | windows  | i686   | JMPKKgalgzGHfQ7TBCRTR4NU6rqWZeQpLDWrkjswTc/mztdShLLPMG0I9tdNFi0qlCtMXAHXYPUR/YQSQFLEOA== |
+      | cefb4032-6e1b-4411-8e85-f5d7d8a269a2 | 29f74047-265f-452c-9d64-779621682857 | myapp-setup.nsis.zip.sig  | sig      | windows  | i686   | dA4En1FgSfi+6O8O+DY5bCchQkVxRGR8w+4pKfGjpug6+/4wwrZgmlhOfs364eKVtf7UcWsZ9vopF0E6HV28UA== |
+      | 1adda3a2-021d-4d76-b715-6907ce7d78c2 | 29f74047-265f-452c-9d64-779621682857 | myapp.msi                 | msi      | windows  | i686   | G0ocYvc2INVNpBcaoDEaAwQhAxX9/xxNv1g44NICAnMU+Z8V6ohUGtoX2Q8adDOo7JE8/picj+i1gwWb5Em1Fw== |
+      | 7cd42443-f93e-4a28-8f7f-57a0aa8b8ac2 | 29f74047-265f-452c-9d64-779621682857 | myapp.msi.zip             | zip      | windows  | i686   | HdjLw2BS/1lBKUtoamPrTQWhdHAMsKhz96Z6OHoQPh8h/9CfFH+JtA+RbPNVSpEidBD9tmYM0SOaHmVHmr/Bwg== |
+      | 2986a294-fc70-4a99-805e-e91b90b4ec2b | 29f74047-265f-452c-9d64-779621682857 | myapp.msi.zip.sig         | sig      | windows  | i686   | CW5imayiWMU50dYJIW1CMDxMW0qr01YUGd97r4IOs2WZlpcl1OIyeYvKgDNAJXkBBSbi9QPG21I3OxJxecsoBw== |
       # 2.0.0-beta.1
       | 16b9a3fa-6b12-4d86-b81e-be2757392bae | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp-setup.exe           | exe      | windows  | i686   | 1/ZheqnqL3OJbQcUa+zmFCENiXqhW1oqrUP2sREyExryaDRcy14lC6nSHg4gt/TfbHkE1ANnsEFizRdno+uZZg== |
       | 8dbd9795-2b57-436a-863e-26a3e6689f38 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | myapp-setup.nsis.zip      | zip      | windows  | i686   | 6vfPB8J8IW1AlSkc7e4XOiLFIPelzQYQyN+nrXMNsBr+Tb7IWjNKRZxDH/rlOhXjAqkY24SxD56suQGY+ELkYA== |
@@ -158,11 +166,95 @@ Feature: Tauri upgrade package
       { "pub_date": "2023-08-15T00:00:00.000Z" }
       """
 
+  Scenario: Endpoint should constrain to a semver constraint
+    Given the second "release" has the following attributes:
+      """
+      { "createdAt": "2023-08-15T00:00:00.000Z" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app2?platform=windows&arch=i686&version=1.0.0-beta.1&constraint=1.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/2d719642-aec6-4e76-86af-5de76b9c2491/myapp-setup.nsis.zip",
+        "signature": "JMPKKgalgzGHfQ7TBCRTR4NU6rqWZeQpLDWrkjswTc/mztdShLLPMG0I9tdNFi0qlCtMXAHXYPUR/YQSQFLEOA==",
+        "version": "1.0.1-beta.1"
+      }
+      """
+
+  Scenario: Endpoint should upgrade from stable to beta
+    Given the second "release" has the following attributes:
+      """
+      { "createdAt": "2023-08-15T00:00:00.000Z" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.1.0&channel=beta"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/62577251-fbc4-4bb5-bcd8-cf4bac39faaf/myapp.AppImage.tar.gz",
+        "signature": "yfz/TKguPCzKru2jnYHqTk40g7sVBlPD00bHQK60iQ2ICG0tsfKq7j0Nc6gouyrtbwoiCUmZQE+xyEmKcyf/Vg==",
+        "version": "1.2.0-beta.1"
+      }
+      """
+
   Scenario: Endpoint should return error for non-Tauri packages
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/pkg1?platform=darwin&arch=x86_64&version=1.0.0"
     Then the response status should be "404"
+
+  Scenario: Endpoint should return error for missing platform
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?arch=x86_64&version=1.0.0"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "platform"
+        }
+      }
+      """
+
+  Scenario: Endpoint should return error for missing arch
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&version=1.0.0"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "arch"
+        }
+      }
+      """
+
+  Scenario: Endpoint should return error for missing version
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "version"
+        }
+      }
+      """
 
   Scenario: Product retrieves an upgrade when an upgrade is available
     Given I am the first product of account "test1"
