@@ -10,12 +10,19 @@ module Api::V1::ReleaseEngines
     typed_query {
       param :constraint, type: :string, optional: true
       param :channel, type: :string, optional: true
+      param :platform, type: :string
+      param :arch, type: :string
+      param :version, type: :string
     }
     def show
       authorize! package
 
+      platform = upgrade_query[:platform]
+      arch     = upgrade_query[:arch]
+      version  = upgrade_query[:version]
+
       releases = authorized_scope(package.releases)
-      release  = releases.find_by!(version: params[:current_version])
+      release  = releases.find_by!(version:)
       authorize! release, to: :upgrade?
 
       kwargs  = upgrade_query.slice(:constraint, :channel)
@@ -33,9 +40,9 @@ module Api::V1::ReleaseEngines
                              SQL
                            )
                            .find_by!(
-                             platform: { key: params[:target] },
-                             arch: { key: params[:arch] },
                              filetype: { key: %w[gz zip] },
+                             platform: { key: platform },
+                             arch: { key: arch },
                            )
       authorize! artifact
 
