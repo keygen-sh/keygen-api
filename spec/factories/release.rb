@@ -26,7 +26,7 @@ FactoryBot.define do
 
       # Make sure channel matches semver prerelease channel
       if (semver = Semverse::Version.coerce(release.version)).pre_release?
-        key = semver.pre_release[/([^\.]+)/, 1]
+        key = semver.pre_release[/([^-\.]+)/, 1]
 
         release.channel.assign_attributes(
           name: key.capitalize,
@@ -54,6 +54,30 @@ FactoryBot.define do
 
     trait :pypi do
       package { build(:package, :pypi, account:, product:, environment:) }
+    end
+
+    trait :tauri do
+      package { build(:package, :tauri, account:, product:, environment:) }
+    end
+
+    trait :stable do
+      channel { build(:channel, :beta, account:) }
+    end
+
+    trait :rc do
+      channel { build(:channel, :rc, account:) }
+    end
+
+    trait :beta do
+      channel { build(:channel, :beta, account:) }
+    end
+
+    trait :alpha do
+      channel { build(:channel, :alpha, account:) }
+    end
+
+    trait :dev do
+      channel { build(:channel, :dev, account:) }
     end
 
     trait :licensed do
