@@ -69,7 +69,7 @@ loop do
 
         package = if rand(0..1).zero?
                     engine = if rand(0..1).zero?
-                               { engine_attributes: { key: 'pypi' } }
+                               { engine_attributes: { key: %w[pypi tauri].sample } }
                              end
 
                     ReleasePackage.create!(
