@@ -17,9 +17,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      platform = upgrade_query[:platform]
-      arch     = upgrade_query[:arch]
-      version  = upgrade_query[:version]
+      upgrade_query => platform:, arch:, version:
 
       releases = authorized_scope(package.releases)
       release  = releases.find_by!(version:)
