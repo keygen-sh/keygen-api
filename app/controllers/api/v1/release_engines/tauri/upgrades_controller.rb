@@ -46,6 +46,16 @@ module Api::V1::ReleaseEngines
                            )
       authorize! artifact
 
+      BroadcastEventService.call(
+        event: 'release.upgraded',
+        account: current_account,
+        resource: upgrade,
+        meta: {
+          current: release.version,
+          next: upgrade.version,
+        },
+      )
+
       # See: https://tauri.app/v1/guides/distribution/updater
       render json: {
         url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
