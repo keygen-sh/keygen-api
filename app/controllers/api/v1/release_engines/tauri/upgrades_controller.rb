@@ -61,7 +61,7 @@ module Api::V1::ReleaseEngines
         url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
         signature: artifact.signature,
         version: upgrade.version,
-        pub_date: upgrade.created_at.iso8601(3),
+        pub_date: upgrade.created_at.rfc3339(3),
         notes: upgrade.description,
       }
     rescue ActiveRecord::RecordNotFound
