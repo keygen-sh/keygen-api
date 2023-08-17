@@ -85,6 +85,7 @@ After do |scenario|
           count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
           lines = []
 
+          # Read the last n SQL lines from the log file (useful when debugging CI)
           log.each do |line|
             break if lines.count >= count
 
