@@ -103,19 +103,28 @@ Feature: Tauri upgrade package
       """
 
   Scenario: Endpoint should not return an upgrade when an upgrade is not available
-    Given I am an admin of account "test1"
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.1.0"
     Then the response status should be "204"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should not return an upgrade when a version does not exist
-    Given I am an admin of account "test1"
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=3.0.0"
     Then the response status should be "204"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return an upgrade when an upgrade is available
-    Given I am an admin of account "test1"
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=linux&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
@@ -127,6 +136,9 @@ Feature: Tauri upgrade package
         "version": "1.1.0"
       }
       """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should prefer NSIS over MSI for windows
     Given I am an admin of account "test1"
