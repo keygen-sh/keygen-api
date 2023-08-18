@@ -32,7 +32,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string
           param :key, type: :string
-          param :engine, type: :string, inclusion: { in: %w[pypi] }, optional: true, allow_nil: true,
+          param :engine, type: :string, inclusion: { in: %w[pypi tauri] }, optional: true, allow_nil: true,
             transform: -> (_, key) {
               [:engine_attributes, { key: }]
             }
