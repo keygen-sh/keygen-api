@@ -140,12 +140,18 @@ class LicenseValidationService < BaseService
                                      .alive
 
           case
-          when license.policy.fingerprint_match_most?
-            return [false, "fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+          when fingerprints.size > 1 && license.policy.fingerprint_match_most?
+            return [false, "one or more fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.count < (fingerprints.size / 2.0).ceil
-          when license.policy.fingerprint_match_all?
-            return [false, "fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+          when fingerprints.size > 1 && license.policy.fingerprint_match_two?
+            return [false, "one or more fingerprint is not activated (does not match 2 associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+              machines.count < 2
+          when fingerprints.size > 1 && license.policy.fingerprint_match_all?
+            return [false, "one or more fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.count < fingerprints.size
+          when fingerprints.size > 1 && license.policy.fingerprint_match_any?
+            return [false, "one or more fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+              machines.empty?
           else
             return [false, "fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.empty?
@@ -157,6 +163,43 @@ class LicenseValidationService < BaseService
         end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
+      end
+
+      # Check against component scope requirements
+      if scope.present? && scope.key?(:components)
+        unless scope.key?(:fingerprint)
+          # Matching on components is done per-machine so a singular
+          # fingerprint is required
+          return [false, "fingerprint scope is required when using the components scope", :FINGERPRINT_SCOPE_REQUIRED]
+        end
+
+        fingerprints = scope[:components].compact
+                                         .uniq
+
+        return [false, "components scope is empty", :COMPONENTS_SCOPE_EMPTY] if
+          fingerprints.empty?
+
+        # We can expect the machine to exist since the :fingerprint scope
+        # will have been validated beforehand
+        machine    = license.machines.find_by(fingerprint: scope[:fingerprint])
+        components = machine.components.with_fingerprint(fingerprints)
+
+        case
+        when license.policy.fingerprint_match_most?
+          return [false, "one or more component is not activated (does not match enough associated components)", :COMPONENTS_SCOPE_MISMATCH] if
+            components.count < (fingerprints.size / 2.0).ceil
+        when license.policy.fingerprint_match_two?
+          return [false, "one or more component is not activated (does not match 2 associated components)", :COMPONENTS_SCOPE_MISMATCH] if
+            components.count < 2
+        when license.policy.fingerprint_match_all?
+          return [false, "one or more component is not activated (does not match all associated components)", :COMPONENTS_SCOPE_MISMATCH] if
+            components.count < fingerprints.size
+        else
+          return [false, "one or more component is not activated (does not match any associated components)", :COMPONENTS_SCOPE_MISMATCH] if
+            components.empty?
+        end
+      else
+        return [false, "components scope is required", :COMPONENTS_SCOPE_REQUIRED] if license.policy.require_components_scope?
       end
 
       # Check against checksum scope
