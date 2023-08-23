@@ -34,7 +34,7 @@ class Policy < ApplicationRecord
     UNIQUE_PER_PRODUCT: 3,
     UNIQUE_PER_POLICY:  2,
     UNIQUE_PER_LICENSE: 1,
-    UNIQUE_PER_LICENSE: 0,
+    UNIQUE_PER_MACHINE: 0,
   }.with_indifferent_access
    .freeze
 

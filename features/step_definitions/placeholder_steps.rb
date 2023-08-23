@@ -10,6 +10,8 @@ PLACEHOLDERS = %w[
   key
   license
   machine
+  machine_component
+  component
   machine_process
   process
   metric
@@ -132,6 +134,8 @@ def parse_placeholders(str, account:, bearer:, crypt:)
             case resource.singularize
             when 'constraint'
               account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            when 'component'
+              account.machine_components.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             when 'process'
               account.machine_processes.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             when 'artifact'
@@ -217,6 +221,8 @@ def parse_path_placeholders(str, account:, bearer:, crypt:)
             account.release_engines.send(:[], index.to_i).id
           when "request-logs"
             account.request_logs.send(:[], index.to_i).id
+          when "components"
+            account.machine_components.send(:[], index.to_i).id
           when "processes"
             account.machine_processes.send(:[], index.to_i).id
           when "owners"
