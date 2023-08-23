@@ -7356,6 +7356,243 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous validates a valid license key scoped to an array of valid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "$machines[0].fingerprint",
+              "$machines[1].fingerprint"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of majority valid and some invalid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "$machines[0].fingerprint",
+              "$machines[1].fingerprint",
+              "foo:bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of equal valid and invalid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "$machines[0].fingerprint",
+              "$machines[1].fingerprint",
+              "foo:bar",
+              "baz:qux"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of some valid and majority invalid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "$machines[0].fingerprint",
+              "foo:bar",
+              "baz:qux"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "one or more fingerprint is not activated (does not match at least 2 associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of enough valid and majority invalid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "$machines[0].fingerprint",
+              "$machines[1].fingerprint",
+              "foo:bar",
+              "baz:qux",
+              "quxx:corge",
+              "grault:garply",
+              "waldo:fred"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of invalid fingerprints (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "some-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              "foo:bar",
+              "baz:qux"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "one or more fingerprint is not activated (does not match at least 2 associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a valid license key scoped to an array of a valid fingerprint (matching strategy: MATCH_MOST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -10716,6 +10953,211 @@ Feature: License validation actions
     And the response body should contain meta which includes the following:
       """
       { "valid": false, "detail": "one or more component is not activated (does not match any associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of valid components (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "component-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "components" for each "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "component-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "components": [
+              "$components[0].fingerprint",
+              "$components[1].fingerprint",
+              "$components[2].fingerprint"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of majority valid components (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "component-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "components" for each "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "component-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "components": [
+              "$components[0].fingerprint",
+              "$components[1].fingerprint",
+              "bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of invalid components (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "component-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "components" for each "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "component-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "components": [
+              "foo",
+              "bar",
+              "baz"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of majority invalid components (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "component-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "components" for each "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "component-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "components": [
+              "$components[0].fingerprint",
+              "foo",
+              "bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a valid license key scoped to an array of misassociated components (matching strategy: MATCH_TWO)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "component-key" }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "components" for each "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "component-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "components": [
+              "$components[3].fingerprint",
+              "$components[4].fingerprint",
+              "$components[5].fingerprint"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "one or more component is not activated (does not match at least 2 associated components)", "code": "COMPONENTS_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
