@@ -283,6 +283,8 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_release | :accessing_a_release, *]
         let(:product) { release.product }
+      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
+        let(:product) { machine_component.product }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:product) { machine_process.product }
       in [*, :accessing_its_pooled_key | :accessing_a_pooled_key, *]
@@ -565,6 +567,8 @@ module AuthorizationHelper
 
           license.user
         }
+      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
+        let(:user) { machine_component.user }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:user) { machine_process.user }
       in [*, :accessing_its_machine | :accessing_a_machine, *]
@@ -789,6 +793,8 @@ module AuthorizationHelper
 
           create(:machine, account: license.account, license:)
         }
+      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
+        let(:machine) { machine_component.machine }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:machine) { machine_process.machine }
       in [*, :accessing_its_license | :accessing_a_license, *]
@@ -1292,6 +1298,8 @@ module AuthorizationHelper
 
           create(:license, *license_traits, account: policy.account, policy:)
         }
+      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
+        let(:license) { machine_component.license }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:license) { machine_process.license }
       in [*, :accessing_its_policy | :accessing_a_policy, *]

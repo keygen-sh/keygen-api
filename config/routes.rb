@@ -103,7 +103,8 @@ Rails.application.routes.draw do
       #             their fingerprint attr, which can be an arbitrary string.
       resources :machines, constraints: { id: /[^\/]*/ } do
         scope module: 'machines/relationships' do
-          resources :machine_processes, only: %i[index show], path: 'processes'
+          resources :machine_components, only: %i[index show], path: 'components'
+          resources :machine_processes,  only: %i[index show], path: 'processes'
 
           resource :product, only: %i[show]
           resource :group,   only: %i[show update]
@@ -124,6 +125,12 @@ Rails.application.routes.draw do
               post :generate_offline_proof, path: 'generate-offline-proof', to: 'proofs#create'
             end
           end
+        end
+      end
+
+      resources :machine_components, path: 'components' do
+        scope module: 'machine_components/relationships' do
+          resource :machine, only: %i[show]
         end
       end
 
