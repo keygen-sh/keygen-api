@@ -33,6 +33,11 @@ class Permission < ApplicationRecord
     artifact.read
     artifact.update
 
+    component.create
+    component.delete
+    component.read
+    component.update
+
     channel.read
 
     constraint.read
@@ -184,6 +189,11 @@ class Permission < ApplicationRecord
     artifact.delete
     artifact.read
     artifact.update
+
+    component.create
+    component.delete
+    component.read
+    component.update
 
     channel.read
 
@@ -338,6 +348,8 @@ class Permission < ApplicationRecord
 
     artifact.read
 
+    component.read
+
     channel.read
 
     constraint.read
@@ -403,6 +415,11 @@ class Permission < ApplicationRecord
     artifact.delete
     artifact.read
     artifact.update
+
+    component.create
+    component.delete
+    component.read
+    component.update
 
     channel.read
 
@@ -524,6 +541,11 @@ class Permission < ApplicationRecord
 
     artifact.read
 
+    component.create
+    component.delete
+    component.read
+    component.update
+
     channel.read
 
     constraint.read
@@ -597,6 +619,11 @@ class Permission < ApplicationRecord
     arch.read
 
     artifact.read
+
+    component.create
+    component.delete
+    component.read
+    component.update
 
     channel.read
 
