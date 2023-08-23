@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_17_204249) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_23_164814) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -237,6 +237,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_17_204249) do
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at"
   end
 
+  create_table "machine_components", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "machine_id", null: false
+    t.uuid "environment_id"
+    t.string "fingerprint", null: false
+    t.string "name", null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_machine_components_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_machine_components_on_environment_id"
+    t.index ["fingerprint"], name: "index_machine_components_on_fingerprint"
+    t.index ["machine_id", "fingerprint"], name: "index_machine_components_on_machine_id_and_fingerprint", unique: true
+  end
+
   create_table "machine_processes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "machine_id", null: false
@@ -377,6 +392,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_17_204249) do
     t.boolean "require_environment_scope", default: false, null: false
     t.boolean "require_checksum_scope", default: false, null: false
     t.boolean "require_version_scope", default: false, null: false
+    t.boolean "require_components_scope", default: false, null: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

@@ -7298,7 +7298,7 @@ Feature: License validation actions
     And the response body should contain a "license"
     And the response body should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "one or more fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -7350,7 +7350,7 @@ Feature: License validation actions
     And the response body should contain a "license"
     And the response body should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -7457,7 +7457,7 @@ Feature: License validation actions
     And the response body should contain a "license"
     And the response body should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match all associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "one or more fingerprint is not activated (does not match all associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -7725,7 +7725,7 @@ Feature: License validation actions
     And the response body should contain a "license"
     And the response body should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "one or more fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job

@@ -26,18 +26,21 @@ class Policy < ApplicationRecord
     UNIQUE_PER_PRODUCT
     UNIQUE_PER_POLICY
     UNIQUE_PER_LICENSE
+    UNIQUE_PER_MACHINE
   ].freeze
 
   FINGERPRINT_UNIQUENESS_RANKS = {
-    UNIQUE_PER_ACCOUNT: 3,
-    UNIQUE_PER_PRODUCT: 2,
-    UNIQUE_PER_POLICY:  1,
+    UNIQUE_PER_ACCOUNT: 4,
+    UNIQUE_PER_PRODUCT: 3,
+    UNIQUE_PER_POLICY:  2,
+    UNIQUE_PER_LICENSE: 1,
     UNIQUE_PER_LICENSE: 0,
   }.with_indifferent_access
    .freeze
 
   FINGERPRINT_MATCHING_STRATEGIES = %w[
     MATCH_ANY
+    MATCH_TWO
     MATCH_MOST
     MATCH_ALL
   ].freeze
@@ -427,6 +430,10 @@ class Policy < ApplicationRecord
     fingerprint_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
   end
 
+  def fingerprint_uniq_per_machine?
+    fingerprint_uniqueness_strategy == 'UNIQUE_PER_MACHINE'
+  end
+
   def fingerprint_uniq_rank
     FINGERPRINT_UNIQUENESS_RANKS.fetch(fingerprint_uniqueness_strategy) { -1 }
   end
@@ -435,6 +442,10 @@ class Policy < ApplicationRecord
     return true if fingerprint_matching_strategy.nil? # NOTE(ezekg) Backwards compat
 
     fingerprint_matching_strategy == 'MATCH_ANY'
+  end
+
+  def fingerprint_match_two?
+    fingerprint_matching_strategy == 'MATCH_TWO'
   end
 
   def fingerprint_match_most?

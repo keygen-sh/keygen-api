@@ -25,6 +25,10 @@ class Machine < ApplicationRecord
     class_name: 'MachineProcess',
     inverse_of: :machine,
     dependent: :delete_all
+  has_many :components,
+    class_name: 'MachineComponent',
+    inverse_of: :machine,
+    dependent: :delete_all
   has_many :event_logs,
     as: :resource
 
@@ -134,13 +138,14 @@ class Machine < ApplicationRecord
   validate on: :create do |machine|
     case
     when uniq_per_account?
-      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists?(fingerprint: fingerprint)
+      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists?(fingerprint:)
     when uniq_per_product?
-      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists?(fingerprint: fingerprint, products: { id: product.id })
+      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists?(fingerprint:, products: { id: product.id })
     when uniq_per_policy?
-      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists?(fingerprint: fingerprint, policies: { id: policy.id })
-    when uniq_per_license?
-      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists?(fingerprint: fingerprint)
+      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists?(fingerprint:, policies: { id: policy.id })
+    when uniq_per_license?,
+         uniq_per_machine?
+      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists?(fingerprint:)
     end
   end
 
@@ -492,29 +497,6 @@ class Machine < ApplicationRecord
                    lazarus_ttl
   end
 
-  private
-
-  attr_accessor :heartbeat_status_override
-
-  def default_proof_dataset
-    {
-      account: { id: account.id },
-      product: { id: product.id },
-      policy: { id: policy.id, duration: policy.duration },
-      license: {
-        id: license.id,
-        key: license.key,
-        expiry: license.expiry&.iso8601(3),
-      },
-      machine: {
-        id: id,
-        fingerprint: fingerprint,
-        created: created_at.iso8601(3),
-      },
-      ts: Time.current,
-    }
-  end
-
   def uniq_per_account?
     return false if policy.nil?
 
@@ -537,6 +519,35 @@ class Machine < ApplicationRecord
     return false if policy.nil?
 
     license.policy.fingerprint_uniq_per_license?
+  end
+
+  def uniq_per_machine?
+    return false if policy.nil?
+
+    license.policy.fingerprint_uniq_per_machine?
+  end
+
+  private
+
+  attr_accessor :heartbeat_status_override
+
+  def default_proof_dataset
+    {
+      account: { id: account.id },
+      product: { id: product.id },
+      policy: { id: policy.id, duration: policy.duration },
+      license: {
+        id: license.id,
+        key: license.key,
+        expiry: license.expiry&.iso8601(3),
+      },
+      machine: {
+        id: id,
+        fingerprint: fingerprint,
+        created: created_at.iso8601(3),
+      },
+      ts: Time.current,
+    }
   end
 
   # FIXME(ezekg) Maybe there's a better way to do this?
