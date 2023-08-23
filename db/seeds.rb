@@ -26,6 +26,11 @@ permissions = %w[
   artifact.read
   artifact.update
 
+  component.create
+  component.delete
+  component.read
+  component.update
+
   channel.read
 
   constraint.read
@@ -183,6 +188,10 @@ events = %w[
   artifact.downloaded
   artifact.updated
   artifact.uploaded
+
+  component.created
+  component.deleted
+  component.updated
 
   entitlement.created
   entitlement.deleted
