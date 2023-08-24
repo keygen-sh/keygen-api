@@ -558,6 +558,147 @@ Feature: Create machine component
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a component with a fingerprint matching another component (UNIQUE_PER_ACCOUNT)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for each "product" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      """
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "machine" for each "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a component with a fingerprint matching another component for a different product (UNIQUE_PER_ACCOUNT)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for each "product" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      """
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "machine" for each "license"
+    And the current account has 1 "component" for the third "machine" with the following:
+      """
+      { "fingerprint": "5f28e8a43bcd402082190b48d0048100" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this account",
+        "code": "FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/fingerprint"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a component with a fingerprint matching another component for the same product (UNIQUE_PER_ACCOUNT)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for each "product" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      """
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "machine" for each "license"
+    And the current account has 1 "component" for the second "machine" with the following:
+      """
+      { "fingerprint": "5f28e8a43bcd402082190b48d0048100" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this account",
+        "code": "FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/fingerprint"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a component for their account with a fingerprint matching a reserved word
     Given I am an admin of account "test1"
     And the current account is "test1"
