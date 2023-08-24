@@ -2686,6 +2686,7 @@ Feature: Create policy
           "attributes": {
             "name": "Premium Add-On",
             "requireFingerprintScope": true,
+            "requireComponentsScope": true,
             "requireProductScope": true,
             "requirePolicyScope": true,
             "requireMachineScope": true,
@@ -2711,6 +2712,7 @@ Feature: Create policy
       {
         "name": "Premium Add-On",
         "requireFingerprintScope": true,
+        "requireComponentsScope": true,
         "requireProductScope": true,
         "requirePolicyScope": true,
         "requireMachineScope": true,

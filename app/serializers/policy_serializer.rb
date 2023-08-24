@@ -27,6 +27,7 @@ class PolicySerializer < BaseSerializer
   attribute :require_policy_scope
   attribute :require_machine_scope
   attribute :require_fingerprint_scope
+  attribute :require_components_scope
   attribute :require_user_scope
   attribute :require_checksum_scope
   attribute :require_version_scope
