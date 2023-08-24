@@ -12,6 +12,7 @@ class MachineCheckoutService < AbstractCheckoutService
     license.policy
     license.user
     license
+    components
     environment
     group
   ].freeze
