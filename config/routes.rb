@@ -130,6 +130,8 @@ Rails.application.routes.draw do
 
       resources :machine_components, path: 'components' do
         scope module: 'machine_components/relationships' do
+          resource :product, only: %i[show]
+          resource :license, only: %i[show]
           resource :machine, only: %i[show]
         end
       end

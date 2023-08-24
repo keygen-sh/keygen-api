@@ -106,6 +106,12 @@ class MachineSerializer < BaseSerializer
     end
   end
 
+  relationship :components do
+    link :related do
+      @url_helpers.v1_account_machine_machine_components_path @object.account_id, @object
+    end
+  end
+
   relationship :processes do
     link :related do
       @url_helpers.v1_account_machine_machine_processes_path @object.account_id, @object
