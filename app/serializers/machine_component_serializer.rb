@@ -43,6 +43,24 @@ class MachineComponentSerializer < BaseSerializer
     end
   end
 
+  relationship :product do
+    linkage always: true do
+      { type: :products, id: @object.product&.id }
+    end
+    link :related do
+      @url_helpers.v1_account_machine_component_product_path @object.account_id, @object
+    end
+  end
+
+  relationship :license do
+    linkage always: true do
+      { type: :licenses, id: @object.license&.id }
+    end
+    link :related do
+      @url_helpers.v1_account_machine_component_license_path @object.account_id, @object
+    end
+  end
+
   relationship :machine do
     linkage always: true do
       { type: :machines, id: @object.machine_id }

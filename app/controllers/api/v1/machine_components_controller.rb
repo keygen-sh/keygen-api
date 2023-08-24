@@ -31,7 +31,6 @@ module Api::V1
 
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[component components] }
-        param :id, type: :uuid, optional: true
         param :attributes, type: :hash do
           param :fingerprint, type: :string
           param :name, type: :string
@@ -72,7 +71,7 @@ module Api::V1
 
         render jsonapi: machine_component, status: :created, location: v1_account_machine_component_url(machine_component.account, machine_component)
       else
-        render_uncomponentable_resource(machine_component)
+        render_unprocessable_resource(machine_component)
       end
     end
 
@@ -100,7 +99,7 @@ module Api::V1
 
         render jsonapi: machine_component
       else
-        render_uncomponentable_resource(machine_component)
+        render_unprocessable_resource(machine_component)
       end
     end
 

@@ -8,6 +8,8 @@ class MachineComponent < ApplicationRecord
 
   belongs_to :account
   belongs_to :machine
+  has_one :group,
+    through: :machine
   has_one :license,
     through: :machine
   has_one :product,
