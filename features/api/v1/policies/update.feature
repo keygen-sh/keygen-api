@@ -40,6 +40,7 @@ Feature: Update policy
           "id": "$policies[0].id",
           "attributes": {
             "requireFingerprintScope": true,
+            "requireComponentsScope": true,
             "name": "Trial",
             "maxCores": 32,
             "maxUses": 3
@@ -50,6 +51,7 @@ Feature: Update policy
     Then the response status should be "200"
     And the response body should be a "policy" with a duration that is not nil
     And the response body should be a "policy" with a requireFingerprintScope
+    And the response body should be a "policy" with a requireComponentsScope
     And the response body should be a "policy" with the name "Trial"
     And the response body should be a "policy" with the maxCores "32"
     And the response body should be a "policy" with the maxUses "3"

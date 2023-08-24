@@ -53,6 +53,7 @@ module Api::V1
           param :require_policy_scope, type: :boolean, optional: true
           param :require_machine_scope, type: :boolean, optional: true
           param :require_fingerprint_scope, type: :boolean, optional: true
+          param :require_components_scope, type: :boolean, optional: true
           param :require_user_scope, type: :boolean, optional: true
           param :require_checksum_scope, type: :boolean, optional: true
           param :require_version_scope, type: :boolean, optional: true
@@ -134,6 +135,7 @@ module Api::V1
           param :require_policy_scope, type: :boolean, optional: true
           param :require_machine_scope, type: :boolean, optional: true
           param :require_fingerprint_scope, type: :boolean, optional: true
+          param :require_components_scope, type: :boolean, optional: true
           param :require_user_scope, type: :boolean, optional: true
           param :require_checksum_scope, type: :boolean, optional: true
           param :require_version_scope, type: :boolean, optional: true
