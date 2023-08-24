@@ -20,8 +20,7 @@ Feature: Create machine component
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component for their account
-    Given time is frozen at "2022-10-16T14:52:48.000Z"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "machine"
     And I am an admin of account "test1"
@@ -72,7 +71,6 @@ Feature: Create machine component
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: Developer creates a component for their account
     Given the current account is "test1"
@@ -971,8 +969,7 @@ Feature: Create machine component
 
   @ee
   Scenario: Environment creates an isolated component for their account
-    Given time is frozen at "2022-10-16T14:52:48.000Z"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 2 isolated "webhook-endpoints"
     And the current account has 1 isolated "machine"
@@ -1014,7 +1011,6 @@ Feature: Create machine component
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: User creates a component for their machine
     Given the current account is "test1"
