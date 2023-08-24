@@ -6,7 +6,6 @@ module Api::V1
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
-    has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
