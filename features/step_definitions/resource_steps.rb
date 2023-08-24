@@ -185,6 +185,8 @@ end
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
   associated_records =
       case association.underscore.pluralize
+      when 'components'
+        @account.machine_components
       when 'processes'
         @account.machine_processes
       when 'artifacts'
@@ -231,12 +233,67 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
   end
 end
 
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)" with the following:$/ do |count, traits, resource, association, body|
+  body   = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
+  traits = traits&.split('+')&.map(&:to_sym)
+
+  associated_records =
+      case association.underscore.pluralize
+      when 'components'
+        @account.machine_components
+      when 'processes'
+        @account.machine_processes
+      when 'artifacts'
+        @account.release_artifacts
+      when 'packages'
+        @account.release_packages
+      when 'engines'
+        @account.release_engines
+      else
+        @account.send(association.pluralize.underscore)
+      end
+
+  if associated_records.respond_to?(:for_environment)
+    associated_records = case traits
+                         in [*, :isolated, *]
+                           environment = @account.environments.find_by_code!(:isolated)
+
+                           associated_records.for_environment(environment)
+                         in [*, :shared, *]
+                           environment = @account.environments.find_by_code!(:shared)
+
+                           associated_records.for_environment(environment)
+                         in [*, :global, *]
+                           associated_records.for_environment(nil)
+                         else
+                           associated_records
+                         end
+  end
+
+  association_name =
+    case resource.singularize
+    when 'token'
+      :bearer
+    else
+      association.singularize.underscore.to_sym
+    end
+
+  associated_records.each do |record|
+    count.to_i.times do
+      create resource.singularize.underscore, *traits, **attrs, account: @account, association_name => record
+    end
+  end
+end
+
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
   traits = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
     associated_records =
       case association.underscore.pluralize
+      when 'components'
+        @account.machine_components
       when 'processes'
         @account.machine_processes
       when 'artifacts'
@@ -458,6 +515,8 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources =
     case resource.underscore.pluralize
+    when 'components'
+      @account.machine_components
     when 'processes'
       @account.machine_processes
     when 'artifacts'
@@ -553,6 +612,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
     case resource.singularize
     when "plan"
       Plan.send(named_idx)
+    when "component"
+      @account.machine_components.send(named_idx)
     when "process"
       @account.machine_processes.send(named_idx)
     when "artifact"
@@ -576,6 +637,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]
     case resource.singularize
     when "plan"
       Plan.send(named_idx)
+    when "component"
+      @account.machine_components.send(named_idx)
     when "process"
       @account.machine_processes.send(named_idx)
     when "artifact"
@@ -599,6 +662,8 @@ Given /^the (first|second|third|fourth|fifth|last) "([^\"]*)" has the following 
     case resource.singularize
     when "plan"
       Plan.send(named_idx)
+    when "component"
+      @account.machine_component.send(named_idx)
     when "process"
       @account.machine_processes.send(named_idx)
     when "artifact"
@@ -615,6 +680,8 @@ end
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:belongs to|is in) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
   model =
     case model_name.singularize
+    when 'component'
+      @account.machine_components.send(model_idx)
     when 'process'
       @account.machine_processes.send(model_idx)
     when 'artifact'
@@ -629,6 +696,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
 
   associated_record =
     case assoc_name.singularize
+    when 'component'
+      @account.machine_components.send(assoc_idx)
     when 'process'
       @account.machine_processes.send(assoc_idx)
     when 'artifact'
@@ -650,6 +719,8 @@ end
 Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*)"$/ do |direction, count, model_name, assoc_idx, assoc_name|
   models =
     case model_name.singularize
+    when 'component'
+      @account.machine_components
     when 'process'
       @account.machine_processes
     when 'artifact'
@@ -667,6 +738,8 @@ Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*
 
   associated_record =
     case assoc_name.singularize
+    when 'component'
+      @account.machine_components.send(assoc_idx)
     when 'process'
       @account.machine_processes.send(assoc_idx)
     when 'artifact'
@@ -690,6 +763,8 @@ end
 Given /^all "([^\"]*)" belong to the (\w+) "([^\"]*)"$/ do |model_name, assoc_idx, assoc_name|
   models =
     case model_name.singularize
+    when 'component'
+      @account.machine_components
     when 'process'
       @account.machine_processes
     when 'artifact'
@@ -821,6 +896,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.users.with_role(:read_only).count).to eq count.to_i
   when /^users?$/
     expect(@account.users.with_role(:user).count).to eq count.to_i
+  when /^components?$/
+    expect(@account.machine_components.count).to eq count.to_i
   when /^process(es)?$/
     expect(@account.machine_processes.count).to eq count.to_i
   when /^artifacts?$/
@@ -937,6 +1014,8 @@ end
 Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^\"]+)"$/ do |index_in_words, model_name, attribute_name, expected|
   model =
     case model_name.pluralize
+    when 'components'
+      @account.machine_components.send(index_in_words)
     when 'processes'
       @account.machine_processes.send(index_in_words)
     else
@@ -958,6 +1037,8 @@ end
 Then /^the (?!account)(\w+) "([^\"]*)" should have (\w+) "([^\"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
   model =
     case model_name.pluralize
+    when 'components'
+      @account.machine_components.send(index_in_words)
     when 'processes'
       @account.machine_processes.send(index_in_words)
     else
@@ -983,6 +1064,8 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the fol
   body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   model =
     case model_name.pluralize
+    when 'components'
+      @account.machine_components.send(index_in_words)
     when 'processes'
       @account.machine_processes.send(index_in_words)
     when 'artifacts'
