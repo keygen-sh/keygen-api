@@ -1000,6 +1000,20 @@ Feature: Create machine component
       }
       """
     Then the response status should be "201"
+    And the response body should be a "component" with the following relationships:
+      """
+      {
+        "environment": {
+          "data": {
+            "type": "environments",
+            "id": "$environments[0]"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/environments/$environments[0]"
+          }
+        }
+      }
+      """
     And the response body should be a "component" with the following attributes:
       """
       {
