@@ -9,6 +9,7 @@ class Release < ApplicationRecord
   include Orderable
   include Pageable
   include Diffable
+  include Dirtyable
 
   SEMVER_TAG_RE =
     %r{
@@ -96,8 +97,12 @@ class Release < ApplicationRecord
   has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
-  accepts_nested_attributes_for :artifact, update_only: true
+  tracks_nested_attributes_for :constraints
+
   accepts_nested_attributes_for :channel
+
+  # FIXME(ezekg) For v1.0 backwards compatibility
+  accepts_nested_attributes_for :artifact, update_only: true
 
   before_validation -> { self.status ||= 'DRAFT' }
 
