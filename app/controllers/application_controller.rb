@@ -264,17 +264,16 @@ class ApplicationController < ActionController::API
         klass   = resource.class
         pointer = nil
 
-        if klass.respond_to?(:reflect_on_association) &&
-           klass.reflect_on_association(path.first) &&
-           path.first != "role"
-          # FIXME(ezekg) Matching on error message is dirty
-          case
-          when err == "must exist" && src.size > 1
-            src.insert 1, :data
-            src.insert -2, :relationships
-          when err != "must exist" && src.size > 1
-            src.insert 1, :data
-            src.insert -2, :attributes
+        if path.first != "role" && klass.respond_to?(:reflect_on_association) &&
+           (assoc = klass.reflect_on_association(path.first))
+          if src.size > 1
+            if assoc.klass&.reflect_on_association(path.last)
+              src.insert 1, :data
+              src.insert -2, :relationships
+            else
+              src.insert 1, :data
+              src.insert -2, :attributes
+            end
           end
 
           # On account creation, the users association is actually called admins

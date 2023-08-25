@@ -1295,6 +1295,84 @@ Feature: Create release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a release with duplicate constraints
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "entitlements"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Product Version 2 (Beta)",
+            "version": "2.0.0-alpha1",
+            "channel": "alpha"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            },
+            "constraints": {
+              "data": [
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "$entitlements[0]" }
+                    }
+                  }
+                },
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "$entitlements[0]" }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "is duplicated",
+        "code": "CONSTRAINTS_ENTITLEMENT_CONFLICT",
+        "source": {
+          "pointer": "/data/relationships/constraints/data/0/relationships/entitlement"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "is duplicated",
+        "code": "CONSTRAINTS_ENTITLEMENT_CONFLICT",
+        "source": {
+          "pointer": "/data/relationships/constraints/data/1/relationships/entitlement"
+        }
+      }
+      """
+    And the current account should have 0 "release-entitlement-constraints"
+    And the current account should have 3 "entitlements"
+    And the current account should have 0 "releases"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a release with invalid constraints
     Given I am an admin of account "test1"
     And the current account is "test1"
