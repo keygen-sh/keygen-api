@@ -91,6 +91,56 @@ describe Release, type: :model do
     end
   end
 
+  describe '#constraints_attributes=' do
+    it 'should not raise when constraint is valid' do
+      release = build(:release, account:, constraints_attributes: [
+        attributes_for(:constraint, account:),
+      ])
+
+      expect { release.save! }.to_not raise_error
+    end
+
+    it 'should raise when constraint is duplicated' do
+      entitlement = create(:entitlement, account:)
+      release     = build(:release, account:, constraints_attributes: [
+        attributes_for(:constraint, account:, entitlement:),
+        attributes_for(:constraint, account:, entitlement:),
+      ])
+
+      expect { release.save! }.to raise_error ActiveRecord::RecordNotUnique
+    end
+
+    it 'should raise when constraint is invalid' do
+      release = build(:release, account:, constraints_attributes: [
+        attributes_for(:constraint, account:, entitlement: nil),
+        attributes_for(:constraint, account:),
+      ])
+
+      expect { release.save! }.to raise_error ActiveRecord::RecordInvalid
+    end
+  end
+
+  describe '#constraints=' do
+    it 'should not raise when constraint is valid' do
+      release = build(:release, account:, constraints: build_list(:constraint, 3, account:))
+
+      expect { release.save! }.to_not raise_error
+    end
+
+    it 'should raise when constraint is duplicated' do
+      entitlement = create(:entitlement, account:)
+      release     = build(:release, account:, constraints: build_list(:constraint, 3, account:, entitlement:))
+
+      expect { release.save! }.to raise_error ActiveRecord::RecordNotUnique
+    end
+
+    it 'should raise when constraint is invalid' do
+      release = build(:release, account:, constraints: build_list(:constraint, 3, account:, entitlement: nil))
+
+      expect { release.save! }.to raise_error ActiveRecord::RecordInvalid
+    end
+  end
+
   describe '#package=' do
     context 'on create' do
       it 'should not raise when package product matches product' do
