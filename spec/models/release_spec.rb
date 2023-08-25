@@ -107,7 +107,7 @@ describe Release, type: :model do
         attributes_for(:constraint, account:, entitlement:),
       ])
 
-      expect { release.save! }.to raise_error ActiveRecord::RecordNotUnique
+      expect { release.save! }.to raise_error ActiveRecord::RecordInvalid
     end
 
     it 'should raise when constraint is invalid' do
