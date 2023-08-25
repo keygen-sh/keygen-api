@@ -10,6 +10,7 @@ class Machine < ApplicationRecord
   include Orderable
   include Pageable
   include Diffable
+  include Dirtyable
 
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes
@@ -33,6 +34,9 @@ class Machine < ApplicationRecord
     as: :resource
 
   has_environment default: -> { license&.environment_id }
+
+  accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
+  tracks_nested_attributes_for :components
 
   # Machines automatically inherit their license's group ID
   before_validation -> { self.group_id = license.group_id },
@@ -591,5 +595,32 @@ class Machine < ApplicationRecord
     license.update!(machines_core_count: core_count)
   rescue => e
     Keygen.logger.exception e
+  end
+
+  def validate_associated_records_for_components
+    return if
+      components.nil? || components.empty?
+
+    components.each_with_index do |component, i|
+      component.account = account if
+        component.account.nil?
+
+      next if
+        component.valid?
+
+      component.errors.each do |err|
+        errors.import(err, attribute: "components[#{i}].#{err.attribute}")
+      end
+    end
+  end
+
+  def reject_associated_records_for_components(attrs)
+    return if
+      new_record?
+
+    components.exists?(
+      # Make sure we only select real columns, not e.g. _destroy.
+      attrs.slice(attributes.keys),
+    )
   end
 end

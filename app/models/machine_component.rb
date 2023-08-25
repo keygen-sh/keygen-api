@@ -34,15 +34,32 @@ class MachineComponent < ApplicationRecord
 
   # Fingerprint uniqueness on create
   validate on: :create do |component|
+    # Special case where fingerprints could be duplicated in the actual nested
+    # association params, so this adds better error messaging vs a plain
+    # 409 Conflict error via the unique index violation.
+    if !machine.persisted? && machine.components_attributes_assigned?
+      components = machine.components
+
+      component.errors.add(:fingerprint, :conflict, message: 'is duplicated') if
+        components.reject { _1 == component }
+                  .find { _1.fingerprint == component.fingerprint }
+                  .present?
+    end
+
+    # FIXME(ezekg) We're accessing machine.#{assoc} here because the machine may
+    #              not be persisted yet and has_one :through associations are
+    #              not available on unpersisted records.
+    #
+    #              See: https://github.com/rails/rails/issues/33155
     case
     when uniq_per_account?
       errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machine_components.exists?(fingerprint:)
     when uniq_per_product?
-      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machine_components.joins(:product).exists?(fingerprint:, products: { id: product.id })
+      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machine_components.joins(:product).exists?(fingerprint:, products: { id: machine.product })
     when uniq_per_policy?
-      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machine_components.joins(:policy).exists?(fingerprint:, policies: { id: policy.id })
+      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machine_components.joins(:policy).exists?(fingerprint:, policies: { id: machine.policy })
     when uniq_per_license?
-      errors.add :fingerprint, :taken, message: "has already been taken for this license" if license.components.exists?(fingerprint:)
+      errors.add :fingerprint, :taken, message: "has already been taken for this license" if account.machine_components.joins(:license).exists?(fingerprint:, licenses: { id: machine.license })
     when uniq_per_machine?
       errors.add :fingerprint, :taken, message: "has already been taken" if machine.components.exists?(fingerprint:)
     end

@@ -42,7 +42,7 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
-    verify_permissions!('machine.create')
+    verify_permissions!('machine.create', *permissions_for_create)
     verify_environment!
 
     case bearer
@@ -111,5 +111,16 @@ class MachinePolicy < ApplicationPolicy
     else
       deny!
     end
+  end
+
+  private
+
+  def permissions_for_create
+    perms = []
+
+    perms << 'component.create' if record.components_attributes_assigned? ||
+                                   record.components.any?
+
+    perms
   end
 end
