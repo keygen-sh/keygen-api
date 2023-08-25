@@ -34,6 +34,9 @@ class MachineComponent < ApplicationRecord
 
   # Fingerprint uniqueness on create
   validate on: :create do |component|
+    next if
+      machine.nil?
+
     # Special case where fingerprints could be duplicated in the actual nested
     # association params, so this adds better error messaging vs a plain
     # 409 Conflict error via the unique index violation.

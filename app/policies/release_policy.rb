@@ -132,7 +132,7 @@ class ReleasePolicy < ApplicationPolicy
   end
 
   def create?
-    verify_permissions!('release.create')
+    verify_permissions!('release.create', *permissions_for_create)
     verify_environment!
 
     case bearer
@@ -219,5 +219,16 @@ class ReleasePolicy < ApplicationPolicy
     else
       deny!
     end
+  end
+
+  private
+
+  def permissions_for_create
+    perms = []
+
+    perms << 'release.constraints.attach' if record.constraints_attributes_assigned? ||
+                                             record.constraints.any?
+
+    perms
   end
 end
