@@ -41,12 +41,10 @@ class MachineComponent < ApplicationRecord
     # association params, so this adds better error messaging vs a plain
     # 409 Conflict error via the unique index violation.
     if !machine.persisted? && machine.components_attributes_assigned?
-      components = machine.components
+      count = machine.components.count { _1.fingerprint == component.fingerprint }
 
       component.errors.add(:fingerprint, :conflict, message: 'is duplicated') if
-        components.reject { _1 == component }
-                  .find { _1.fingerprint == component.fingerprint }
-                  .present?
+        count > 1
     end
 
     # FIXME(ezekg) We're accessing machine.#{assoc} here because the machine may
