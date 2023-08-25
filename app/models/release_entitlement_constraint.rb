@@ -18,9 +18,25 @@ class ReleaseEntitlementConstraint < ApplicationRecord
 
   validates :release,
     scope: { by: :account_id }
+
   validates :entitlement,
     uniqueness: { message: 'already exists', scope: %i[account_id release_id entitlement_id] },
     scope: { by: :account_id }
+
+  validate on: :create do |constraint|
+    next if
+      release.nil? || release.persisted? # detect if constraint is from nested params
+
+    # Special case where entitlements could be duplicated in the actual nested
+    # association params, so this adds better error messaging vs a plain
+    # 409 Conflict error via the unique index violation.
+    if release.constraints_attributes_assigned?
+      count = release.constraints.count { _1.entitlement_id == constraint.entitlement_id }
+
+      constraint.errors.add(:entitlement, :conflict, message: 'is duplicated') if
+        count > 1
+    end
+  end
 
   scope :accessible_by, -> accessor {
     case accessor
