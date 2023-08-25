@@ -61,6 +61,19 @@ module Api::V1
             end
           end
 
+          param :components, type: :hash, optional: true do
+            param :data, type: :array do
+              items type: :hash do
+                param :type, type: :string, inclusion: { in: %w[component components] }
+                param :attributes, type: :hash do
+                  param :fingerprint, type: :string
+                  param :name, type: :string
+                  param :metadata, type: :metadata, allow_blank: true, optional: true
+                end
+              end
+            end
+          end
+
           Keygen.ee do |license|
             next unless
               license.entitled?(:environments)

@@ -786,6 +786,603 @@ Feature: Create machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a machine with nested hardware components
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "E31EE496D46E4C33A3D27BD3745F3B00",
+                    "name": "MOBO",
+                    "metadata": {
+                      "make": "ASUS",
+                      "model": "ROG Strix B550-XE"
+                    }
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "3EE6404F473A455F91B418029388A3BF",
+                    "name": "CPU"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "1D595FD063C7477C8969C16D120BD95D",
+                    "name": "GPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "machine" with the following attributes:
+      """
+      {
+        "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+        "name": "Windows Desktop"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 3 "components"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with duplicate hardware components
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "E31EE496D46E4C33A3D27BD3745F3B00",
+                    "name": "MOBO"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "E31EE496D46E4C33A3D27BD3745F3B00",
+                    "name": "MOBO"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "is duplicated",
+        "code": "COMPONENTS_FINGERPRINT_CONFLICT",
+        "source": {
+          "pointer": "/data/relationships/components/data/0/attributes/fingerprint"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "is duplicated",
+        "code": "COMPONENTS_FINGERPRINT_CONFLICT",
+        "source": {
+          "pointer": "/data/relationships/components/data/1/attributes/fingerprint"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "machines"
+    And the current account should have 0 "components"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_ACCOUNT)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for each "product" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      """
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "$components[0].fingerprint",
+                    "name": "CPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this account",
+        "code": "COMPONENTS_FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/relationships/components/data/0/attributes/fingerprint"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 1 "component"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_PRODUCT)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 2 "policies" for the last "product" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      """
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "$components[0].fingerprint",
+                    "name": "CPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this product",
+        "code": "COMPONENTS_FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/relationships/components/data/0/attributes/fingerprint"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 1 "component"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_POLICY)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      """
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "$components[0].fingerprint",
+                    "name": "CPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this policy",
+        "code": "COMPONENTS_FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/relationships/components/data/0/attributes/fingerprint"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 1 "component"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_LICENSE)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "$components[0].fingerprint",
+                    "name": "CPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this license",
+        "code": "COMPONENTS_FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/relationships/components/data/0/attributes/fingerprint"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 1 "component"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with conflicting hardware components (UNIQUE_PER_MACHINE)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_MACHINE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "$components[0].fingerprint",
+                    "name": "CPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "machine" with the following attributes:
+      """
+      {
+        "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+        "name": "Windows Desktop"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "machines"
+    And the current account should have 2 "components"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License creates a machine with nested hardware components (has permission)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "permissions": ["machine.create", "component.create"] }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "E31EE496D46E4C33A3D27BD3745F3B00",
+                    "name": "MOBO"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "3EE6404F473A455F91B418029388A3BF",
+                    "name": "CPU"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "1D595FD063C7477C8969C16D120BD95D",
+                    "name": "GPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "machine" with the following attributes:
+      """
+      {
+        "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+        "name": "Windows Desktop"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "machine"
+    And the current account should have 3 "components"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License creates a machine with nested hardware components (no permission)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "permissions": ["machine.create"] }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "B841C9C6E06C4F6B9FED0ED551B71D16",
+            "name": "Windows Desktop"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "E31EE496D46E4C33A3D27BD3745F3B00",
+                    "name": "MOBO"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "3EE6404F473A455F91B418029388A3BF",
+                    "name": "CPU"
+                  }
+                },
+                {
+                  "type": "components",
+                  "attributes": {
+                    "fingerprint": "1D595FD063C7477C8969C16D120BD95D",
+                    "name": "GPU"
+                  }
+                }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (license lacks permission to perform action)"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "machines"
+    And the current account should have 0 "components"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a grouped machine for their account
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
