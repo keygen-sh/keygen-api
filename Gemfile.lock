@@ -126,7 +126,7 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     concurrent-ruby (1.2.2)
-    connection_pool (2.4.0)
+    connection_pool (2.4.1)
     crack (0.4.5)
       rexml
     crass (1.0.6)
@@ -359,7 +359,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.7.1)
-    redis-client (0.14.1)
+    redis-client (0.16.0)
       connection_pool
     regexp_parser (2.2.1)
     request_migrations (1.1.1)
@@ -418,7 +418,7 @@ GEM
     sidekiq-cronitor (3.6.0)
       cronitor (~> 5.0)
       sidekiq (< 8)
-    sidekiq-unique-jobs (8.0.0)
+    sidekiq-unique-jobs (8.0.3)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 7.0.0, < 8.0.0)
@@ -518,7 +518,7 @@ DEPENDENCIES
   sidekiq (~> 7.0.8)
   sidekiq-cron (~> 1.9.1)
   sidekiq-cronitor (~> 3.6.0)
-  sidekiq-unique-jobs (~> 8.0.0)
+  sidekiq-unique-jobs (~> 8.0.3)
   sprockets (~> 3.0)
   stripe (~> 5.43)
   stripe-ruby-mock!
