@@ -54,10 +54,12 @@ class MachineHeartbeatWorker < BaseWorker
       resource: machine,
     )
 
-    # The machine no longer has a heartbeat monitor (until next ping)
-    machine.update(
-      heartbeat_jid: nil,
-    )
+    # Clear heartbeat monitor (but only if we're still in possession)
+    Machine.where(id: machine.id, heartbeat_jid: jid)
+           .limit(1)
+           .update(
+             heartbeat_jid: nil,
+           )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
   end

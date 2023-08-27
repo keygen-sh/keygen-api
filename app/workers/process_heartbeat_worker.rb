@@ -52,10 +52,12 @@ class ProcessHeartbeatWorker < BaseWorker
       resource: process,
     )
 
-    # The process no longer has a heartbeat monitor (until next ping)
-    process.update(
-      heartbeat_jid: nil,
-    )
+    # Clear heartbeat monitor (but only if we're still in possession)
+    MachineProcess.where(id: process.id, heartbeat_jid: jid)
+                  .limit(1)
+                  .update(
+                    heartbeat_jid: nil,
+                  )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
   end
