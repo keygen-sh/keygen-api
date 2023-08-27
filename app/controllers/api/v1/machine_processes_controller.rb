@@ -68,6 +68,12 @@ module Api::V1
           machine_process.id,
         )
 
+        Keygen.logger.info {
+          "[process.heartbeat.start] account_id=#{current_account.id} process_id=#{machine_process.id}" \
+            " process_status=#{machine_process.status} process_interval=#{machine_process.interval}" \
+            " process_jid=#{jid}"
+        }
+
         machine_process.update(
           heartbeat_jid: jid,
         )

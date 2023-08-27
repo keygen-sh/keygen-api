@@ -112,6 +112,12 @@ module Api::V1
             machine.id,
           )
 
+          Keygen.logger.info {
+            "[machine.heartbeat.start] account_id=#{current_account.id} machine_id=#{machine.id}" \
+              " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
+              " machine_jid=#{jid}"
+          }
+
           machine.update(
             heartbeat_jid: jid,
           )

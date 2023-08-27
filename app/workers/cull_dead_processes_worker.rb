@@ -23,6 +23,12 @@ class CullDeadProcessesWorker < BaseWorker
         process.id,
       )
 
+      Keygen.logger.info {
+        "[process.heartbeat.cull] account_id=#{process.account.id} process_id=#{process.id}" \
+          " process_status=#{process.status} process_interval=#{process.interval}" \
+          " process_jid=#{jid} process_jid_was=#{process.heartbeat_jid}"
+      }
+
       process.update(heartbeat_jid: jid)
     end
   end

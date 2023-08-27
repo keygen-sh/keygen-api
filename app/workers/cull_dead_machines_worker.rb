@@ -23,6 +23,12 @@ class CullDeadMachinesWorker < BaseWorker
         machine.id,
       )
 
+      Keygen.logger.info {
+        "[machine.heartbeat.cull] account_id=#{machine.account_id} machine_id=#{machine.id}" \
+          " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
+          " machine_jid=#{jid} machine_jid_was=#{machine.heartbeat_jid}"
+      }
+
       machine.update(heartbeat_jid: jid)
     end
   end

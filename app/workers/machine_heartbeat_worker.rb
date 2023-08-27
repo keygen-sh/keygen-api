@@ -22,6 +22,12 @@ class MachineHeartbeatWorker < BaseWorker
     return unless
       machine.requires_heartbeat?
 
+    Keygen.logger.info {
+      "[machine.heartbeat.monitor] account_id=#{machine.account.id} machine_id=#{machine.id}" \
+        " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
+        " machine_jid=#{machine.heartbeat_jid} jid=#{jid}"
+    }
+
     if machine.not_started? || machine.dead?
       if machine.last_death_event_sent_at.nil?
         machine.touch(:last_death_event_sent_at)
