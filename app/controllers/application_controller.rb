@@ -253,149 +253,24 @@ class ApplicationController < ActionController::API
   end
 
   def render_unprocessable_resource(resource)
-    errors = resource.errors.to_hash.map { |attr, errs|
-      details = resource.errors.details[attr]
+    errors = resource.errors.as_jsonapi
+    meta   = { id: request.request_id }
 
-      errs.each_with_index.map do |err, i|
-        # Transform users[0].email into [users, 0, email] so that we can put it
-        # back together as a proper pointer: /users/data/0/attributes/email
-        path    = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
-        src     = path.map { |p| p.to_s.camelize :lower }
-        klass   = resource.class
-        pointer = nil
-
-        if path.first != "role" && klass.respond_to?(:reflect_on_association) &&
-           (assoc = klass.reflect_on_association(path.first))
-          if src.size > 1
-            if assoc.klass&.reflect_on_association(path.last)
-              src.insert 1, :data
-              src.insert -2, :relationships
-            else
-              src.insert 1, :data
-              src.insert -2, :attributes
-            end
-          end
-
-          # On account creation, the users association is actually called admins
-          # and is used to define the founding admins of the account
-          src[0] = "admins" if
-            resource.is_a?(Account) &&
-            action_name == "create" &&
-            path.first == "users"
-
-          pointer = "/data/relationships/#{src.join '/'}"
-        elsif path.first == "base"
-          pointer = "/data"
-        elsif path.first == "entitlements"
-          pointer = "/data/relationships/entitlements"
-        elsif path.first == "permission_ids" ||
-              path.first == "role"
-          pointer = if path.any? { _1 =~ /permissions?/ }
-                      "/data/attributes/permissions"
-                    else
-                      "/data/attributes/role"
-                    end
-        elsif path.first == "id" &&
-              path.size == 1
-          pointer = "/data/id"
-        else
-          pointer = "/data/attributes/#{src.join '/'}"
-        end
-
-        res = {
-          title: "Unprocessable resource",
-          detail: err,
-          source: {
-            pointer: pointer,
-          },
-        }
-
-        # Provide more detailed error codes for resources other than account
-        # resources (which are not needed and leaks our validations)
-        begin
-          detail = details[i][:error] rescue nil
-
-          if detail.present? && !resource.is_a?(Account)
-            subject =
-              case attr
-              when :'role.permission_ids',
-                   :'permission_ids'
-                :permissions
-              when :base
-                resource.class.name.underscore
-              else
-                attr.to_s.gsub(/\[\d+\]/, '') # Remove indexes
-              end
-            code =
-              case detail
-              when :greater_than_or_equal_to,
-                   :less_than_or_equal_to,
-                   :greater_than,
-                   :less_than,
-                   :equal_to,
-                   :other_than
-                "invalid"
-              when :inclusion,
-                   :exclusion
-                "not_allowed"
-              when :blank
-                if pointer.starts_with?("/data/relationships")
-                  "not_found"
-                else
-                  "missing"
-                end
-              else
-                detail.to_s
-              end
-
-            res.merge! code: "#{subject}_#{code}".parameterize.underscore.upcase
-          end
-        rescue => e
-          Keygen.logger.exception(e)
-        end
-
-        # Provide a docs link when possible
-        begin
-          if pointer.present?
-            (_, docs_type, docs_attr, *) = pointer.delete_prefix('/').split('/')
-            docs_object = klass.name.underscore.pluralize
-
-            # FIXME(ezekg) Special case (need to update docs)
-            docs_type = 'attrs' if
-              docs_type == 'attributes'
-
-            if docs_object.present? && docs_type.present? && docs_attr.present?
-              links = {
-                about: "https://keygen.sh/docs/api/#{docs_object}/##{docs_object}-object-#{docs_type}-#{docs_attr}"
-              }
-
-              res.merge!(links:)
-            end
-          end
-        rescue => e
-          Keygen.logger.exception(e)
-        end
-
-        # Update sort order for my OCD
-        res.slice(
-          :title,
-          :detail,
-          :code,
-          :source,
-          :links,
-        )
-      end
-    }.flatten
+    # FIXME(ezekg) Move all 'custom' logic out of .to_jsonapi and handle
+    #              each individual error code explicitly, rewriting by
+    #              pointer if needed. Also add links explicitly.
 
     # Special cases where a certain limit has been met on the free tier
-    status =
-      if errors&.any? { |e| e[:code] == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
-        :payment_required
-      else
-        :unprocessable_entity
-      end
+    status = if errors.any? { _1.code == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
+               :payment_required
+             else
+               :unprocessable_entity
+             end
 
-    render status:, json: { meta: { id: request.request_id }, errors: }
+    render status:, json: {
+      errors:,
+      meta:,
+    }
   end
 
   def rescue_from_exceptions
