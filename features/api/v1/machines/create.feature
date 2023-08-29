@@ -856,6 +856,72 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a machine with too many hardware components
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "A527640DCF194DFA837E1B81ECCE24FA",
+            "name": "Test"
+          },
+          "relationships": {
+            "components": {
+              "data": [
+                { "type": "components", "attributes": { "name": "00", "fingerprint": "00" } },
+                { "type": "components", "attributes": { "name": "01", "fingerprint": "01" } },
+                { "type": "components", "attributes": { "name": "02", "fingerprint": "02" } },
+                { "type": "components", "attributes": { "name": "03", "fingerprint": "03" } },
+                { "type": "components", "attributes": { "name": "04", "fingerprint": "04" } },
+                { "type": "components", "attributes": { "name": "05", "fingerprint": "05" } },
+                { "type": "components", "attributes": { "name": "06", "fingerprint": "06" } },
+                { "type": "components", "attributes": { "name": "07", "fingerprint": "07" } },
+                { "type": "components", "attributes": { "name": "08", "fingerprint": "08" } },
+                { "type": "components", "attributes": { "name": "09", "fingerprint": "09" } },
+                { "type": "components", "attributes": { "name": "10", "fingerprint": "10" } },
+                { "type": "components", "attributes": { "name": "11", "fingerprint": "11" } },
+                { "type": "components", "attributes": { "name": "12", "fingerprint": "12" } },
+                { "type": "components", "attributes": { "name": "13", "fingerprint": "13" } },
+                { "type": "components", "attributes": { "name": "14", "fingerprint": "14" } },
+                { "type": "components", "attributes": { "name": "15", "fingerprint": "15" } },
+                { "type": "components", "attributes": { "name": "16", "fingerprint": "16" } },
+                { "type": "components", "attributes": { "name": "17", "fingerprint": "17" } },
+                { "type": "components", "attributes": { "name": "18", "fingerprint": "18" } },
+                { "type": "components", "attributes": { "name": "19", "fingerprint": "19" } },
+                { "type": "components", "attributes": { "name": "20", "fingerprint": "20" } }
+              ]
+            },
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "too many records"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "machines"
+    And the current account should have 0 "components"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a machine with duplicate hardware components
     Given I am an admin of account "test1"
     And the current account is "test1"

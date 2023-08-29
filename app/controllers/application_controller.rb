@@ -498,6 +498,8 @@ class ApplicationController < ActionController::API
     render_unprocessable_resource e.record
   rescue ActiveRecord::RecordNotUnique
     render_conflict # Race condition on unique index
+  rescue ActiveRecord::NestedAttributes::TooManyRecords
+    render_unprocessable_entity detail: 'too many records'
   rescue ActiveModel::ValidationError => e
     render_unprocessable_resource e.model
   rescue Encoding::CompatibilityError,
