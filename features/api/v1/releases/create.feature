@@ -1251,7 +1251,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
@@ -1308,7 +1308,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
@@ -1386,7 +1386,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
@@ -1456,7 +1456,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
@@ -1516,7 +1516,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
@@ -1630,7 +1630,7 @@ Feature: Create release
         "data": {
           "type": "release",
           "attributes": {
-            "name": "Product Version 2 (Beta)",
+            "name": "Product Version 2 (Alpha)",
             "version": "2.0.0-alpha1",
             "channel": "alpha"
           },
