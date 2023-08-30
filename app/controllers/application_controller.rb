@@ -256,9 +256,51 @@ class ApplicationController < ActionController::API
     errors = resource.errors.as_jsonapi
     meta   = { id: request.request_id }
 
-    # FIXME(ezekg) Move all 'custom' logic out of .to_jsonapi and handle
-    #              each individual error code explicitly, rewriting by
-    #              pointer if needed. Also add links explicitly.
+    errors.each do |error|
+      # Fixup various error codes and pointers to match our objects, e.g.
+      # some relationships are invisible, exposed as attributes.
+      case error
+      in source: { pointer: %r{^/data/relationships/users/(.*+)} } if resource in Account
+        error.pointer = "/data/relationships/admins/#{$1}"
+      in source: { pointer: %r{^/data/attributes/permission_?ids$}i },
+         code: /^PERMISSION_IDS_(.+)/
+        error.pointer = '/data/attributes/permissions'
+        error.code    = "PERMISSIONS_#{$1}"
+      in source: { pointer: %r{^/data/relationships/role/data/attributes/permission_?ids}i },
+         code: /^ROLE_PERMISSION_IDS_(.+)/
+        error.pointer = '/data/attributes/permissions'
+        error.code    = "PERMISSIONS_#{$1}"
+      in source: { pointer: %r{^/data/relationships/role} }
+        error.pointer = '/data/attributes/role'
+      in source: { pointer: %r{^/data/relationships/filetype} }
+        error.pointer = '/data/attributes/filetype'
+      in source: { pointer: %r{^/data/relationships/channel} }
+        error.pointer = '/data/attributes/channel'
+      in source: { pointer: %r{^/data/relationships/platform} }
+        error.pointer = '/data/attributes/platform'
+      in source: { pointer: %r{^/data/relationships/engine} }
+        error.pointer = '/data/attributes/engine'
+      in source: { pointer: %r{^/data/relationships/arch} }
+        error.pointer = '/data/attributes/arch'
+      else
+      end
+
+      # Add a helpful link to the docs when possible
+      topic = resource.class.name.parameterize.pluralize
+      hash = "#{topic}-object".then { |s|
+        case error
+        in source: { pointer: %r{/relationships/([^/]+)} }
+          s << '-relationships-' << $1
+        in source: { pointer: %r{/attributes/([^/]+)} }
+          s << '-attrs-' << $1
+        else
+        end
+      }
+
+      error.links = {
+        about: "https://keygen.sh/docs/api/#{topic}/##{hash}",
+      }
+    end
 
     # Special cases where a certain limit has been met on the free tier
     status = if errors.any? { _1.code == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
