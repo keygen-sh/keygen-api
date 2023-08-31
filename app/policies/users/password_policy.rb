@@ -10,10 +10,6 @@ module Users
       verify_permissions!('user.password.update')
       verify_environment!
 
-      # TODO(ezekg) Remove this and use permissions
-      deny! if
-        user.has_role?(:read_only)
-
       user == bearer
     end
 
@@ -24,10 +20,6 @@ module Users
       # User's without a password set cannot reset their password if account is protected
       deny! if
         user.has_role?(:user) && account.protected? && !user.password?
-
-      # TODO(ezekg) Remove this and use permissions
-      deny! if
-        user.has_role?(:read_only)
 
       bearer.nil? || user == bearer
     end
