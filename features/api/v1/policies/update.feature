@@ -72,8 +72,10 @@ Feature: Update policy
           "type": "policies",
           "id": "$policies[0].id",
           "attributes": {
-            "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
-            "fingerprintMatchingStrategy": "MATCH_MOST",
+            "machineUniquenessStrategy": "UNIQUE_PER_LICENSE",
+            "machineMatchingStrategy": "MATCH_ALL",
+            "componentUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+            "componentMatchingStrategy": "MATCH_MOST",
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_ACTIVATION",
             "transferStrategy": "RESET_EXPIRY",
@@ -93,8 +95,10 @@ Feature: Update policy
     And the response body should be a "policy" with the following attributes:
       """
       {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineUniquenessStrategy": "UNIQUE_PER_LICENSE",
+        "machineMatchingStrategy": "MATCH_ALL",
+        "componentUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+        "componentMatchingStrategy": "MATCH_MOST",
         "expirationStrategy": "REVOKE_ACCESS",
         "expirationBasis": "FROM_FIRST_ACTIVATION",
         "transferStrategy": "RESET_EXPIRY",
@@ -563,3 +567,60 @@ Feature: Update policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a policy's fingerprint strategies (v1.4)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.4"
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
+            "fingerprintMatchingStrategy": "MATCH_MOST"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/fingerprintUniquenessStrategy"
+        }
+      }
+      """
+
+  Scenario: Admin updates a policy's fingerprint strategies (v1.0)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
+            "fingerprintMatchingStrategy": "MATCH_MOST"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
+        "fingerprintMatchingStrategy": "MATCH_MOST"
+      }
+      """

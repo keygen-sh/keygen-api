@@ -140,16 +140,16 @@ class LicenseValidationService < BaseService
                                      .alive
 
           case
-          when fingerprints.size > 1 && license.policy.fingerprint_match_most?
+          when fingerprints.size > 1 && license.policy.machine_match_most?
             return [false, "one or more fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.count < (fingerprints.size / 2.0).ceil
-          when fingerprints.size > 1 && license.policy.fingerprint_match_two?
+          when fingerprints.size > 1 && license.policy.machine_match_two?
             return [false, "one or more fingerprint is not activated (does not match at least 2 associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.count < 2
-          when fingerprints.size > 1 && license.policy.fingerprint_match_all?
+          when fingerprints.size > 1 && license.policy.machine_match_all?
             return [false, "one or more fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.count < fingerprints.size
-          when fingerprints.size > 1 && license.policy.fingerprint_match_any?
+          when fingerprints.size > 1 && license.policy.machine_match_any?
             return [false, "one or more fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
               machines.empty?
           else
@@ -185,13 +185,13 @@ class LicenseValidationService < BaseService
         components = machine.components.with_fingerprint(fingerprints)
 
         case
-        when license.policy.fingerprint_match_most?
+        when license.policy.component_match_most?
           return [false, "one or more component is not activated (does not match enough associated components)", :COMPONENTS_SCOPE_MISMATCH] if
             components.count < (fingerprints.size / 2.0).ceil
-        when license.policy.fingerprint_match_two?
+        when license.policy.component_match_two?
           return [false, "one or more component is not activated (does not match at least 2 associated components)", :COMPONENTS_SCOPE_MISMATCH] if
             components.count < 2
-        when license.policy.fingerprint_match_all?
+        when license.policy.component_match_all?
           return [false, "one or more component is not activated (does not match all associated components)", :COMPONENTS_SCOPE_MISMATCH] if
             components.count < fingerprints.size
         else

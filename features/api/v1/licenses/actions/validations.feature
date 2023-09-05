@@ -7093,7 +7093,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_ANY",
+        "machineMatchingStrategy": "MATCH_ANY",
         "productId": "$products[0]"
       }
       """
@@ -7147,7 +7147,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineMatchingStrategy": "MATCH_MOST",
         "productId": "$products[0]"
       }
       """
@@ -7203,7 +7203,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineMatchingStrategy": "MATCH_MOST",
         "productId": "$products[0]"
       }
       """
@@ -7258,7 +7258,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineMatchingStrategy": "MATCH_MOST",
         "productId": "$products[0]"
       }
       """
@@ -7312,7 +7312,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineMatchingStrategy": "MATCH_MOST",
         "productId": "$products[0]"
       }
       """
@@ -7362,7 +7362,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7400,7 +7400,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7439,7 +7439,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7479,7 +7479,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7518,7 +7518,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7561,7 +7561,7 @@ Feature: License validation actions
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "machineMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -7601,7 +7601,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "machineMatchingStrategy": "MATCH_MOST",
         "productId": "$products[0]"
       }
       """
@@ -7653,7 +7653,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "machineMatchingStrategy": "MATCH_ALL",
         "productId": "$products[0]"
       }
       """
@@ -7708,7 +7708,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "machineMatchingStrategy": "MATCH_ALL",
         "productId": "$products[0]"
       }
       """
@@ -7762,7 +7762,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "machineMatchingStrategy": "MATCH_ALL",
         "productId": "$products[0]"
       }
       """
@@ -10759,7 +10759,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ANY" }
+      { "componentMatchingStrategy": "MATCH_ANY" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -10800,7 +10800,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ANY" }
+      { "componentMatchingStrategy": "MATCH_ANY" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -10841,7 +10841,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ANY" }
+      { "componentMatchingStrategy": "MATCH_ANY" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -10882,7 +10882,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ANY" }
+      { "componentMatchingStrategy": "MATCH_ANY" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -10923,7 +10923,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ANY" }
+      { "componentMatchingStrategy": "MATCH_ANY" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -10964,7 +10964,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "componentMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11005,7 +11005,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "componentMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11046,7 +11046,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "componentMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11087,7 +11087,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "componentMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11128,7 +11128,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_TWO" }
+      { "componentMatchingStrategy": "MATCH_TWO" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11169,7 +11169,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_MOST" }
+      { "componentMatchingStrategy": "MATCH_MOST" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11210,7 +11210,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_MOST" }
+      { "componentMatchingStrategy": "MATCH_MOST" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11251,7 +11251,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_MOST" }
+      { "componentMatchingStrategy": "MATCH_MOST" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11292,7 +11292,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_MOST" }
+      { "componentMatchingStrategy": "MATCH_MOST" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11333,7 +11333,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_MOST" }
+      { "componentMatchingStrategy": "MATCH_MOST" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11374,7 +11374,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ALL" }
+      { "componentMatchingStrategy": "MATCH_ALL" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11415,7 +11415,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ALL" }
+      { "componentMatchingStrategy": "MATCH_ALL" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11456,7 +11456,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ALL" }
+      { "componentMatchingStrategy": "MATCH_ALL" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11497,7 +11497,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ALL" }
+      { "componentMatchingStrategy": "MATCH_ALL" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
@@ -11538,7 +11538,7 @@ Feature: License validation actions
     And the current account has 2 "products"
     And the current account has 1 "policy" for the last "product" with the following:
       """
-      { "fingerprintMatchingStrategy": "MATCH_ALL" }
+      { "componentMatchingStrategy": "MATCH_ALL" }
       """
     And the current account has 1 "license" for the last "policy" with the following:
       """
