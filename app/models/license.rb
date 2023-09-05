@@ -147,9 +147,12 @@ class License < ApplicationRecord
       license.errors.add :policy, :not_compatible, message: "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
     when next_policy.scheme != prev_policy.scheme
       license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a different scheme"
-    when next_policy.fingerprint_uniqueness_strategy != prev_policy.fingerprint_uniqueness_strategy
-      license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a more strict fingerprint uniqueness strategy" if
-        next_policy.fingerprint_uniq_rank > prev_policy.fingerprint_uniq_rank
+    when next_policy.machine_uniqueness_strategy != prev_policy.machine_uniqueness_strategy
+      license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a more strict machine uniqueness strategy" if
+        next_policy.machine_uniqueness_strategy_rank > prev_policy.machine_uniqueness_strategy_rank
+    when next_policy.component_uniqueness_strategy != prev_policy.component_uniqueness_strategy
+      license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a more strict component uniqueness strategy" if
+        next_policy.component_uniqueness_strategy_rank > prev_policy.component_uniqueness_strategy_rank
     end
   end
 

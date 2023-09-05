@@ -12,8 +12,10 @@ class PolicySerializer < BaseSerializer
   attribute :max_processes
   attribute :max_cores
   attribute :max_uses
-  attribute :fingerprint_uniqueness_strategy
-  attribute :fingerprint_matching_strategy
+  attribute :machine_uniqueness_strategy
+  attribute :machine_matching_strategy
+  attribute :component_uniqueness_strategy
+  attribute :component_matching_strategy
   attribute :expiration_strategy
   attribute :expiration_basis
   attribute :transfer_strategy

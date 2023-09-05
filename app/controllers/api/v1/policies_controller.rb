@@ -41,8 +41,12 @@ module Api::V1
           param :max_processes, type: :integer, allow_nil: true, optional: true
           param :max_cores, type: :integer, allow_nil: true, optional: true
           param :max_uses, type: :integer, allow_nil: true, optional: true
-          param :fingerprint_uniqueness_strategy, type: :string, optional: true
-          param :fingerprint_matching_strategy, type: :string, optional: true
+          param :fingerprint_uniqueness_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_uniqueness_strategy
+          param :fingerprint_matching_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_matching_strategy
+          param :machine_uniqueness_strategy, type: :string, optional: true
+          param :machine_matching_strategy, type: :string, optional: true
+          param :component_uniqueness_strategy, type: :string, optional: true
+          param :component_matching_strategy, type: :string, optional: true
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
@@ -123,8 +127,12 @@ module Api::V1
           param :max_processes, type: :integer, allow_nil: true, optional: true
           param :max_cores, type: :integer, allow_nil: true, optional: true
           param :max_uses, type: :integer, allow_nil: true, optional: true
-          param :fingerprint_uniqueness_strategy, type: :string, optional: true
-          param :fingerprint_matching_strategy, type: :string, optional: true
+          param :fingerprint_uniqueness_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_uniqueness_strategy
+          param :fingerprint_matching_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_matching_strategy
+          param :machine_uniqueness_strategy, type: :string, optional: true
+          param :machine_matching_strategy, type: :string, optional: true
+          param :component_uniqueness_strategy, type: :string, optional: true
+          param :component_matching_strategy, type: :string, optional: true
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true

@@ -21,7 +21,14 @@ class Policy < ApplicationRecord
     ED25519_SIGN
   ].freeze
 
-  FINGERPRINT_UNIQUENESS_STRATEGIES = %w[
+  MACHINE_UNIQUENESS_STRATEGIES = %w[
+    UNIQUE_PER_ACCOUNT
+    UNIQUE_PER_PRODUCT
+    UNIQUE_PER_POLICY
+    UNIQUE_PER_LICENSE
+  ].freeze
+
+  COMPONENT_UNIQUENESS_STRATEGIES = %w[
     UNIQUE_PER_ACCOUNT
     UNIQUE_PER_PRODUCT
     UNIQUE_PER_POLICY
@@ -29,7 +36,7 @@ class Policy < ApplicationRecord
     UNIQUE_PER_MACHINE
   ].freeze
 
-  FINGERPRINT_UNIQUENESS_RANKS = {
+  UNIQUENESS_STRATEGY_RANKS = {
     UNIQUE_PER_ACCOUNT: 4,
     UNIQUE_PER_PRODUCT: 3,
     UNIQUE_PER_POLICY:  2,
@@ -38,7 +45,14 @@ class Policy < ApplicationRecord
   }.with_indifferent_access
    .freeze
 
-  FINGERPRINT_MATCHING_STRATEGIES = %w[
+  MACHINE_MATCHING_STRATEGIES = %w[
+    MATCH_ANY
+    MATCH_TWO
+    MATCH_MOST
+    MATCH_ALL
+  ].freeze
+
+  COMPONENT_MATCHING_STRATEGIES = %w[
     MATCH_ANY
     MATCH_TWO
     MATCH_MOST
@@ -124,8 +138,10 @@ class Policy < ApplicationRecord
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
 
-  before_create -> { self.fingerprint_uniqueness_strategy = 'UNIQUE_PER_LICENSE' }, if: -> { fingerprint_uniqueness_strategy.nil? }
-  before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
+  before_create -> { self.machine_uniqueness_strategy = 'UNIQUE_PER_LICENSE' }, if: -> { machine_uniqueness_strategy.nil? }
+  before_create -> { self.machine_matching_strategy = 'MATCH_ANY' }, if: -> { machine_matching_strategy.nil? }
+  before_create -> { self.component_uniqueness_strategy = 'UNIQUE_PER_MACHINE' }, if: -> { component_uniqueness_strategy.nil? }
+  before_create -> { self.component_matching_strategy = 'MATCH_ANY' }, if: -> { component_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
   before_create -> { self.transfer_strategy = 'KEEP_EXPIRY' }, if: -> { heartbeat_resurrection_strategy.nil? }
@@ -156,8 +172,10 @@ class Policy < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
   validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
-  validates :fingerprint_uniqueness_strategy, inclusion: { in: FINGERPRINT_UNIQUENESS_STRATEGIES, message: "unsupported fingerprint uniqueness strategy" }, allow_nil: true
-  validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
+  validates :machine_uniqueness_strategy, inclusion: { in: MACHINE_UNIQUENESS_STRATEGIES, message: "unsupported machine uniqueness strategy" }, allow_nil: true
+  validates :machine_matching_strategy, inclusion: { in: MACHINE_MATCHING_STRATEGIES, message: "unsupported machine matching strategy" }, allow_nil: true
+  validates :component_uniqueness_strategy, inclusion: { in: COMPONENT_UNIQUENESS_STRATEGIES, message: "unsupported component uniqueness strategy" }, allow_nil: true
+  validates :component_matching_strategy, inclusion: { in: COMPONENT_MATCHING_STRATEGIES, message: "unsupported component matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
   validates :authentication_strategy,
@@ -412,48 +430,52 @@ class Policy < ApplicationRecord
     heartbeat_basis == 'FROM_FIRST_PING'
   end
 
-  def fingerprint_uniq_per_account?
-    fingerprint_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
+  # FIXME(ezekg) Temporary until we fully migrate to renamed column
+  def machine_uniqueness_strategy = attributes['machine_uniqueness_strategy'] || attributes['fingerprint_uniqueness_strategy']
+
+  def machine_unique_per_account? = machine_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
+  def machine_unique_per_product? = machine_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
+  def machine_unique_per_policy?  = machine_uniqueness_strategy == 'UNIQUE_PER_POLICY'
+  def machine_unique_per_license?
+    return true if machine_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
+
+    machine_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
   end
 
-  def fingerprint_uniq_per_product?
-    fingerprint_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
+  def machine_uniqueness_strategy_rank
+    UNIQUENESS_STRATEGY_RANKS.fetch(machine_uniqueness_strategy) { -1 }
   end
 
-  def fingerprint_uniq_per_policy?
-    fingerprint_uniqueness_strategy == 'UNIQUE_PER_POLICY'
+  def component_unique_per_account? = component_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
+  def component_unique_per_product? = component_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
+  def component_unique_per_policy?  = component_uniqueness_strategy == 'UNIQUE_PER_POLICY'
+  def component_unique_per_license? = component_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
+  def component_unique_per_machine?
+    return true if component_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
+
+    component_uniqueness_strategy == 'UNIQUE_PER_MACHINE'
   end
 
-  def fingerprint_uniq_per_license?
-    return true if fingerprint_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
-
-    fingerprint_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
+  def component_uniqueness_strategy_rank
+    UNIQUENESS_STRATEGY_RANKS.fetch(component_uniqueness_strategy) { -1 }
   end
 
-  def fingerprint_uniq_per_machine?
-    fingerprint_uniqueness_strategy == 'UNIQUE_PER_MACHINE'
+  def machine_match_two?  = machine_matching_strategy == 'MATCH_TWO'
+  def machine_match_most? = machine_matching_strategy == 'MATCH_MOST'
+  def machine_match_all?  = machine_matching_strategy == 'MATCH_ALL'
+  def machine_match_any?
+    return true if machine_matching_strategy.nil? # NOTE(ezekg) Backwards compat
+
+    machine_matching_strategy == 'MATCH_ANY'
   end
 
-  def fingerprint_uniq_rank
-    FINGERPRINT_UNIQUENESS_RANKS.fetch(fingerprint_uniqueness_strategy) { -1 }
-  end
+  def component_match_two?  = component_matching_strategy == 'MATCH_TWO'
+  def component_match_most? = component_matching_strategy == 'MATCH_MOST'
+  def component_match_all?  = component_matching_strategy == 'MATCH_ALL'
+  def component_match_any?
+    return true if component_matching_strategy.nil? # NOTE(ezekg) Backwards compat
 
-  def fingerprint_match_any?
-    return true if fingerprint_matching_strategy.nil? # NOTE(ezekg) Backwards compat
-
-    fingerprint_matching_strategy == 'MATCH_ANY'
-  end
-
-  def fingerprint_match_two?
-    fingerprint_matching_strategy == 'MATCH_TWO'
-  end
-
-  def fingerprint_match_most?
-    fingerprint_matching_strategy == 'MATCH_MOST'
-  end
-
-  def fingerprint_match_all?
-    fingerprint_matching_strategy == 'MATCH_ALL'
+    component_matching_strategy == 'MATCH_ANY'
   end
 
   def restrict_access?

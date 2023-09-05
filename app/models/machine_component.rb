@@ -7,7 +7,8 @@ class MachineComponent < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :machine
+  belongs_to :machine,
+    inverse_of: :components
   has_one :group,
     through: :machine
   has_one :license,
@@ -53,15 +54,15 @@ class MachineComponent < ApplicationRecord
     #
     #              See: https://github.com/rails/rails/issues/33155
     case
-    when uniq_per_account?
+    when unique_per_account?
       errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machine_components.exists?(fingerprint:)
-    when uniq_per_product?
+    when unique_per_product?
       errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machine_components.joins(:product).exists?(fingerprint:, products: { id: machine.product })
-    when uniq_per_policy?
+    when unique_per_policy?
       errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machine_components.joins(:policy).exists?(fingerprint:, policies: { id: machine.policy })
-    when uniq_per_license?
+    when unique_per_license?
       errors.add :fingerprint, :taken, message: "has already been taken for this license" if account.machine_components.joins(:license).exists?(fingerprint:, licenses: { id: machine.license })
-    when uniq_per_machine?
+    when unique_per_machine?
       errors.add :fingerprint, :taken, message: "has already been taken" if machine.components.exists?(fingerprint:)
     end
   end
@@ -73,7 +74,34 @@ class MachineComponent < ApplicationRecord
 
   scope :with_fingerprint, -> fingerprint { where(fingerprint:) }
 
-  delegate :uniq_per_account?, :uniq_per_product?, :uniq_per_policy?, :uniq_per_license?, :uniq_per_machine?,
-    allow_nil: true,
-    to: :machine
+  # FIXME(ezekg) https://github.com/rails/rails/issues/33155
+  def unique_per_account?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_account?
+  end
+
+  def unique_per_product?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_product?
+  end
+
+  def unique_per_policy?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_policy?
+  end
+
+  def unique_per_license?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_license?
+  end
+
+  def unique_per_machine?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_license?
+  end
 end

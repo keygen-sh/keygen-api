@@ -407,18 +407,18 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a policy with a more strict fingerprint uniqueness strategy
+  Scenario: Admin changes a license's policy relationship to a policy with a more strict machine uniqueness strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
     And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the second "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "licenses" for the first "policy"
@@ -452,7 +452,7 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot change to a policy with a more strict fingerprint uniqueness strategy",
+        "detail": "cannot change to a policy with a more strict machine uniqueness strategy",
         "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
@@ -463,18 +463,128 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a policy with a less strict fingerprint uniqueness strategy
+  Scenario: Admin changes a license's policy relationship to a policy with a less strict machine uniqueness strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
     And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the second "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "licenses" for the first "policy"
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "policy": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/policy" },
+          "data": { "type": "policies", "id": "$policies[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin changes a license's policy relationship to a policy with a more strict component uniqueness strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_MACHINE" }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "licenses" for the first "policy"
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot change to a policy with a more strict component uniqueness strategy",
+        "code": "POLICY_NOT_COMPATIBLE",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin changes a license's policy relationship to a policy with a less strict component uniqueness strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_MACHINE" }
       """
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "licenses" for the first "policy"
