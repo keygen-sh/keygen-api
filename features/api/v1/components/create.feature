@@ -191,7 +191,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_MACHINE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_MACHINE" }
       """
     And the current account has 1 "license" for each "policy"
     And the current account has 2 "machines" for each "license"
@@ -232,7 +232,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_MACHINE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_MACHINE" }
       """
     And the current account has 1 "license" for each "policy"
     And the current account has 2 "machines" for each "license"
@@ -284,7 +284,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"
@@ -325,7 +325,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 2 "machines" for each "license"
@@ -377,7 +377,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 2 "policies" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 2 "machines" for each "license"
@@ -418,7 +418,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 2 "policies" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 2 "machines" for each "license"
@@ -470,7 +470,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"
@@ -511,7 +511,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"
@@ -563,7 +563,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"
@@ -600,7 +600,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"
@@ -652,7 +652,7 @@ Feature: Create machine component
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for each "license"

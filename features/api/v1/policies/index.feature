@@ -296,3 +296,56 @@ Feature: List policies
     Then the response status should be "403"
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin retrieves policies with machine strategies (v1.4)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies" with the following:
+      """
+      {
+        "machineUniquenessStrategy": "UNIQUE_PER_POLICY",
+        "machineMatchingStrategy": "MATCH_TWO"
+      }
+      """
+    And I use an authentication token
+    And I use API version "1.4"
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "policies"
+    And the response body should be an array of 2 "policies" with the following attributes:
+      """
+      {
+        "machineUniquenessStrategy": "UNIQUE_PER_POLICY",
+        "machineMatchingStrategy": "MATCH_TWO"
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.4" }
+      """
+
+  Scenario: Admin retrieves policies with machine strategies (v1.3)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies" with the following:
+      """
+      {
+        "machineUniquenessStrategy": "UNIQUE_PER_POLICY",
+        "machineMatchingStrategy": "MATCH_TWO"
+      }
+      """
+    And I use an authentication token
+    And I use API version "1.3"
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "policies"
+    And the response body should be an array of 2 "policies" with the following attributes:
+      """
+      {
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY",
+        "fingerprintMatchingStrategy": "MATCH_TWO"
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.3" }
+      """

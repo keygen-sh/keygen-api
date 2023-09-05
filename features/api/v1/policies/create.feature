@@ -87,8 +87,8 @@ Feature: Create policy
       """
       {
         "name": "Premium Add-On",
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE",
-        "fingerprintMatchingStrategy": "MATCH_ANY",
+        "machineUniquenessStrategy": "UNIQUE_PER_LICENSE",
+        "machineMatchingStrategy": "MATCH_ANY",
         "expirationStrategy": "RESTRICT_ACCESS",
         "expirationBasis": "FROM_CREATION",
         "transferStrategy": "KEEP_EXPIRY",
@@ -124,7 +124,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Premium Add-On",
-            "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+            "machineUniquenessStrategy": "UNIQUE_PER_PRODUCT",
             "overageStrategy": "NO_OVERAGE",
             "maxMachines": 3,
             "floating": true,
@@ -144,7 +144,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the response body should be a "policy" with the maxMachines "3"
-    And the response body should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_PRODUCT"
+    And the response body should be a "policy" with the machineUniquenessStrategy "UNIQUE_PER_PRODUCT"
     And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And the response body should be a "policy" with a nil maxUses
     And the response body should be a "policy" that is not strict
@@ -172,7 +172,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Actionsack Map Pack",
-            "fingerprintMatchingStrategy": "MATCH_ALL",
+            "machineMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
             "transferStrategy": "RESET_EXPIRY",
             "authenticationStrategy": "LICENSE",
@@ -197,7 +197,7 @@ Feature: Create policy
       """
       {
         "name": "Actionsack Map Pack",
-        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "machineMatchingStrategy": "MATCH_ALL",
         "expirationStrategy": "REVOKE_ACCESS",
         "transferStrategy": "RESET_EXPIRY",
         "authenticationStrategy": "LICENSE",
@@ -334,7 +334,85 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a policy that has an invalid fingerprint uniqueness strategy
+  Scenario: Admin creates a policy that has a fingerprint uniqueness strategy (v1.3)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.3"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+            "name": "Fingerprint Uniqueness Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+        "name": "Fingerprint Uniqueness Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a fingerprint matching strategy (v1.3)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.3"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "fingerprintMatchingStrategy": "MATCH_ALL",
+            "name": "Fingerprint Matching Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "name": "Fingerprint Matching Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid machine uniqueness strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -347,7 +425,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Bad Uniqueness Strategy",
-            "fingerprintUniquenessStrategy": "MATCH_NONE"
+            "machineUniquenessStrategy": "UNIQUE_PER_MACHINE"
           },
           "relationships": {
             "product": {
@@ -366,10 +444,10 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "unsupported fingerprint uniqueness strategy",
-        "code": "FINGERPRINT_UNIQUENESS_STRATEGY_NOT_ALLOWED",
+        "detail": "unsupported machine uniqueness strategy",
+        "code": "MACHINE_UNIQUENESS_STRATEGY_NOT_ALLOWED",
         "source": {
-          "pointer": "/data/attributes/fingerprintUniquenessStrategy"
+          "pointer": "/data/attributes/machineUniquenessStrategy"
         }
       }
       """
@@ -377,7 +455,7 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a policy that has an invalid fingerprint matching strategy
+  Scenario: Admin creates a policy that has an invalid machine matching strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -390,7 +468,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Bad Matching Strategy",
-            "fingerprintMatchingStrategy": "MATCH_NONE"
+            "machineMatchingStrategy": "MATCH_NONE"
           },
           "relationships": {
             "product": {
@@ -409,15 +487,91 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "unsupported fingerprint matching strategy",
-        "code": "FINGERPRINT_MATCHING_STRATEGY_NOT_ALLOWED",
+        "detail": "unsupported machine matching strategy",
+        "code": "MACHINE_MATCHING_STRATEGY_NOT_ALLOWED",
         "source": {
-          "pointer": "/data/attributes/fingerprintMatchingStrategy"
+          "pointer": "/data/attributes/machineMatchingStrategy"
         }
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a component uniqueness strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "componentUniquenessStrategy": "UNIQUE_PER_MACHINE",
+            "name": "Component Uniqueness Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "componentUniquenessStrategy": "UNIQUE_PER_MACHINE",
+        "name": "Component Uniqueness Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a component matching strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "componentMatchingStrategy": "MATCH_ALL",
+            "name": "Component Matching Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "componentMatchingStrategy": "MATCH_ALL",
+        "name": "Component Matching Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a maintain access expiration strategy

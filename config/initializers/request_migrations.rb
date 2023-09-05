@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-CURRENT_API_VERSION = '1.3'
+CURRENT_API_VERSION = '1.4'
 DEFAULT_API_VERSION = CURRENT_API_VERSION
 
 RequestMigrations.configure do |config|
@@ -14,6 +14,12 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.3' => %i[
+      rename_machine_uniqueness_strategy_to_fingerprint_uniqueness_strategy_for_policies_migration
+      rename_machine_uniqueness_strategy_to_fingerprint_uniqueness_strategy_for_policy_migration
+      rename_machine_matching_strategy_to_fingerprint_matching_strategy_for_policies_migration
+      rename_machine_matching_strategy_to_fingerprint_matching_strategy_for_policy_migration
+    ],
     '1.2' => %i[
       change_alive_status_to_not_started_for_machine_migration
     ],

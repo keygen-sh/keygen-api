@@ -1002,7 +1002,7 @@ Feature: Create machine
     And the current account has 2 "products"
     And the current account has 1 "policy" for each "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for the last "license"
@@ -1065,7 +1065,7 @@ Feature: Create machine
     And the current account has 1 "product"
     And the current account has 2 "policies" for the last "product" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "machine" for the last "license"
@@ -1127,7 +1127,7 @@ Feature: Create machine
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the current account has 2 "licenses" for the last "policy"
     And the current account has 1 "machine" for the last "license"
@@ -1189,7 +1189,7 @@ Feature: Create machine
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "machine" for the last "license"
@@ -1251,7 +1251,7 @@ Feature: Create machine
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy" with the following:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_MACHINE" }
+      { "componentUniquenessStrategy": "UNIQUE_PER_MACHINE" }
       """
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "machine" for the last "license"
@@ -3557,13 +3557,13 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a license-scoped fingerprint uniqueness strategy
+  Scenario: License creates a machine with a fingerprint from another license's machine for a license-scoped machine uniqueness strategy
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the current account has 2 "licenses"
     And all "licenses" have the following attributes:
@@ -3621,13 +3621,13 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint matching another license's machine for a policy-scoped fingerprint uniqueness strategy (same policy)
+  Scenario: License creates a machine with a fingerprint matching another license's machine for a policy-scoped machine uniqueness strategy (same policy)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"
@@ -3689,13 +3689,13 @@ Feature: Create machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a policy-scoped fingerprint uniqueness strategy (different policy)
+  Scenario: License creates a machine with a fingerprint from another license's machine for a policy-scoped machine uniqueness strategy (different policy)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And all "policies" have the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "license" for the second "policy"
@@ -3747,14 +3747,14 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped fingerprint uniqueness strategy (same product)
+  Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped machine uniqueness strategy (same product)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the first "product"
     And all "policies" have the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"
@@ -3816,19 +3816,19 @@ Feature: Create machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped fingerprint uniqueness strategy (different product)
+  Scenario: License creates a machine with a fingerprint from another license's machine for a product-scoped machine uniqueness strategy (different product)
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 2 "products"
     And the current account has 1 "policy" for the first "product"
     And the first "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 1 "policy" for the second "product"
     And the second "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 1 "license" for the first "product"
     And the current account has 1 "license" for the second "product"
@@ -3880,13 +3880,13 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a account-scoped fingerprint uniqueness strategy (same account)
+  Scenario: License creates a machine with a fingerprint from another license's machine for a account-scoped machine uniqueness strategy (same account)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
-      { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
+      { "machineUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
     And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"

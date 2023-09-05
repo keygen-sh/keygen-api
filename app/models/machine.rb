@@ -29,7 +29,9 @@ class Machine < ApplicationRecord
   has_many :components,
     class_name: 'MachineComponent',
     inverse_of: :machine,
-    dependent: :delete_all
+    dependent: :delete_all,
+    index_errors: true,
+    autosave: true
   has_many :event_logs,
     as: :resource
 
@@ -59,6 +61,7 @@ class Machine < ApplicationRecord
 
   validates :license,
     scope: { by: :account_id }
+
   validates :group,
     presence: { message: 'must exist' },
     scope: { by: :account_id },
@@ -66,12 +69,23 @@ class Machine < ApplicationRecord
       group_id_before_type_cast.nil?
     }
 
-  validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
+  validates :fingerprint,
+    uniqueness: { message: 'has already been taken', scope: %i[license_id] },
+    exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    allow_blank: false,
+    presence: true
+
+  validates :metadata,
+    length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+
+  validates :cores,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true
 
   validates :max_processes,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
-    allow_nil: true,
-    if: -> { max_processes_override? }
+    if: :max_processes_override?,
+    allow_nil: true
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
@@ -141,14 +155,13 @@ class Machine < ApplicationRecord
   # Fingerprint uniqueness on create
   validate on: :create do |machine|
     case
-    when uniq_per_account?
+    when unique_per_account?
       errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists?(fingerprint:)
-    when uniq_per_product?
+    when unique_per_product?
       errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists?(fingerprint:, products: { id: product.id })
-    when uniq_per_policy?
+    when unique_per_policy?
       errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists?(fingerprint:, policies: { id: policy.id })
-    when uniq_per_license?,
-         uniq_per_machine?
+    when unique_per_license?
       errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists?(fingerprint:)
     end
   end
@@ -165,9 +178,6 @@ class Machine < ApplicationRecord
 
     errors.add :group, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
   end
-
-  validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }
-  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -501,34 +511,28 @@ class Machine < ApplicationRecord
                    lazarus_ttl
   end
 
-  def uniq_per_account?
+  def unique_per_account?
     return false if policy.nil?
 
-    license.policy.fingerprint_uniq_per_account?
+    policy.machine_unique_per_account?
   end
 
-  def uniq_per_product?
+  def unique_per_product?
     return false if policy.nil?
 
-    license.policy.fingerprint_uniq_per_product?
+    policy.machine_unique_per_product?
   end
 
-  def uniq_per_policy?
+  def unique_per_policy?
     return false if policy.nil?
 
-    license.policy.fingerprint_uniq_per_policy?
+    policy.machine_unique_per_policy?
   end
 
-  def uniq_per_license?
+  def unique_per_license?
     return false if policy.nil?
 
-    license.policy.fingerprint_uniq_per_license?
-  end
-
-  def uniq_per_machine?
-    return false if policy.nil?
-
-    license.policy.fingerprint_uniq_per_machine?
+    policy.machine_unique_per_license?
   end
 
   private
