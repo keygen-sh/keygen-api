@@ -99,6 +99,6 @@ class EventLogSerializer < BaseSerializer
   end
 
   link :self do
-    @url_helpers.v1_account_request_log_path @object.account_id, @object
+    @url_helpers.v1_account_event_log_path @object.account_id, @object
   end
 end
