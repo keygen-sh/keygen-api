@@ -6,7 +6,9 @@ class EventLogSerializer < BaseSerializer
   attribute :event do
     @object.event_type.event
   end
-  attribute :metadata
+  attribute :metadata do
+    @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
+  end
   attribute :created do
     @object.created_at
   end
