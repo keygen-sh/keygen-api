@@ -21,7 +21,8 @@ class RequestLogWorker < BaseWorker
     response_status,
     environment_id,
     request_headers = nil,
-    response_headers = nil
+    response_headers = nil,
+    request_runtime = nil
   )
     return unless
       Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
@@ -52,6 +53,7 @@ class RequestLogWorker < BaseWorker
       response_body: response_body,
       status: response_status,
       environment_id:,
+      runtime: request_runtime,
     })
   rescue PG::UniqueViolation
     # NOTE(ezekg) Don't log duplicates
