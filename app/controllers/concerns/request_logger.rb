@@ -154,9 +154,13 @@ module RequestLogger
     end
 
     def request_log_response_headers
-      headers = response.headers.to_h
+      headers = REQUEST_LOG_RESPONSE_HEADERS.reduce({}) do |hash, header|
+        value = response.headers[header]
 
-      headers.slice(*REQUEST_LOG_RESPONSE_HEADERS)
+        hash.merge(header => value)
+      end
+
+      headers
     end
 
     def request_log_response_body
