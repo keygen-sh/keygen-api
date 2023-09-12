@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_05_125612) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_12_191630) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -666,6 +666,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_05_125612) do
     t.uuid "resource_id"
     t.date "created_date", null: false
     t.uuid "environment_id"
+    t.jsonb "request_headers"
+    t.jsonb "response_headers"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["account_id", "created_date"], name: "index_request_logs_on_account_id_and_created_date", order: { created_date: :desc }
     t.index ["environment_id"], name: "index_request_logs_on_environment_id"

@@ -8,6 +8,13 @@ class RequestLogSerializer < BaseSerializer
   attribute :status
   attribute :user_agent
   attribute :ip
+  attribute :request_headers do
+    if @object.respond_to?(:request_headers)
+      @object.request_headers || {}
+    else
+      '[REDACTED]'
+    end
+  end
   attribute :request_body do
     if @object.respond_to?(:request_body)
       @object.request_body
@@ -18,6 +25,13 @@ class RequestLogSerializer < BaseSerializer
   attribute :response_signature do
     if @object.respond_to?(:response_signature)
       @object.response_signature
+    else
+      '[REDACTED]'
+    end
+  end
+  attribute :response_headers do
+    if @object.respond_to?(:response_headers)
+      @object.response_headers || {}
     else
       '[REDACTED]'
     end

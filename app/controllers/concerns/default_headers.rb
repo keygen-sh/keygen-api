@@ -103,9 +103,9 @@ module DefaultHeaders
   end
 
   def add_whoami_headers
-    response.headers['Keygen-Account-Id'] = current_account&.id
-    response.headers['Keygen-Bearer-Id']  = current_bearer&.id
-    response.headers['Keygen-Token-Id']   = current_token&.id
+    response.headers['Keygen-Account'] = current_account&.id
+    response.headers['Keygen-Bearer']  = current_bearer&.id
+    response.headers['Keygen-Token']   = current_token&.id
   rescue => e
     Keygen.logger.exception(e)
   end
