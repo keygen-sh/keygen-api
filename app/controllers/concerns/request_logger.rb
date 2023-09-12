@@ -138,7 +138,7 @@ module RequestLogger
         hash.merge(header => value)
       end
 
-      headers
+      headers.compact
     end
 
     def request_log_request_body
@@ -160,7 +160,7 @@ module RequestLogger
         hash.merge(header => value)
       end
 
-      headers
+      headers.compact
     end
 
     def request_log_response_body
