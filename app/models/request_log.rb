@@ -23,7 +23,7 @@ class RequestLog < ApplicationRecord
   # NOTE(ezekg) A lot of the time, we don't need to load the request
   #             or response body, e.g. when listing logs.
   scope :without_blobs, -> {
-    select(self.attribute_names - %w[request_body response_body response_signature])
+    select(self.attribute_names - %w[request_headers request_body response_headers response_body response_signature])
   }
 
   scope :yesterday, -> { where(created_at: Date.yesterday.all_day) }
