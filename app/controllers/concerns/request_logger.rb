@@ -19,6 +19,31 @@ module RequestLogger
     plans
   ].freeze
 
+  REQUEST_LOG_REQUEST_HEADERS = %w[
+    Accept
+    Content-Length
+    Content-Type
+    Host
+  ]
+
+  REQUEST_LOG_RESPONSE_HEADERS = %w[
+    Content-Length
+    Content-Type
+    Date
+    Digest
+    Keygen-Account
+    Keygen-Bearer
+    Keygen-Date
+    Keygen-Digest
+    Keygen-Edition
+    Keygen-Environment
+    Keygen-License
+    Keygen-Mode
+    Keygen-Signature
+    Keygen-Token
+    Keygen-Version
+  ]
+
   included do
     prepend_around_action :log_request!
 
@@ -71,6 +96,8 @@ module RequestLogger
         request_log_response_body,
         request_log_status,
         Current.environment&.id,
+        request_log_request_headers,
+        request_log_response_headers,
       )
     rescue => e
       Keygen.logger.exception(e)
@@ -104,6 +131,16 @@ module RequestLogger
       end
     end
 
+    def request_log_request_headers
+      headers = REQUEST_LOG_REQUEST_HEADERS.reduce({}) do |hash, header|
+        value = request.headers[header]
+
+        hash.merge(header => value)
+      end
+
+      headers
+    end
+
     def request_log_request_body
       params = request.filtered_parameters.slice(:meta, :data)
       if params.present?
@@ -114,6 +151,12 @@ module RequestLogger
       end
     rescue => e
       Keygen.logger.exception(e)
+    end
+
+    def request_log_response_headers
+      headers = response.headers.to_h
+
+      headers.slice(*REQUEST_LOG_RESPONSE_HEADERS)
     end
 
     def request_log_response_body

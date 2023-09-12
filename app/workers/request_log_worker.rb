@@ -19,7 +19,9 @@ class RequestLogWorker < BaseWorker
     response_signature,
     response_body,
     response_status,
-    environment_id = nil
+    environment_id,
+    request_headers = nil,
+    response_headers = nil
   )
     return unless
       Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
@@ -42,9 +44,11 @@ class RequestLogWorker < BaseWorker
       user_agent: request_user_agent,
       method: request_method,
       url: request_url,
+      request_headers:,
       request_body: request_body,
       ip: request_ip,
       response_signature: response_signature,
+      response_headers:,
       response_body: response_body,
       status: response_status,
       environment_id:,
