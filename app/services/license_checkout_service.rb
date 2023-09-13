@@ -14,7 +14,7 @@ class LicenseCheckoutService < AbstractCheckoutService
     user
   ].freeze
 
-  def initialize(account:, license:, environment: nil, encrypt: false, ttl: 1.month, include: [])
+  def initialize(account:, license:, environment: nil, encrypt: false, ttl: 1.month, include: [], api_version: nil)
     raise InvalidAccountError, 'account must be present' unless
       account.present?
 
@@ -27,6 +27,7 @@ class LicenseCheckoutService < AbstractCheckoutService
     @account     = account
     @license     = license
     @environment = environment
+    @api_version = api_version
 
     super(account:, encrypt:, ttl:, include:)
   end
@@ -42,15 +43,30 @@ class LicenseCheckoutService < AbstractCheckoutService
     meta = { issued: issued_at, expiry: expires_at, ttl: ttl }
     incl = includes & ALLOWED_INCLUDES
     data = renderer.render(license, meta: meta, include: incl)
-                   .to_json
+
+    # Migrate dataset to target version
+    migrator = RequestMigrations::Migrator.new(
+      from: CURRENT_API_VERSION,
+      to: api_version || account.api_version,
+    )
+
+    # Migrate the license
+    migrator.migrate!(data:)
+
+    # FIXME(ezekg) Migration expects a data top-level key, so we're adding
+    #              that here. It still mutates the includes.
+    #
+    # Migrate includes
+    migrator.migrate!(data: {
+      data: data[:included],
+    })
 
     enc = if encrypted?
-            encrypt(data, secret: license.key)
+            encrypt(data.to_json, secret: license.key)
           else
-            encode(data, strict: true)
+            encode(data.to_json, strict: true)
           end
     sig = sign(enc, key: private_key, algorithm: algorithm, prefix: 'license')
-
     alg = if encrypted?
             "#{ENCRYPT_ALGORITHM}+#{algorithm}"
           else
@@ -81,7 +97,8 @@ class LicenseCheckoutService < AbstractCheckoutService
 
   attr_reader :environment,
               :account,
-              :license
+              :license,
+              :api_version
 
   def private_key
     case license.scheme

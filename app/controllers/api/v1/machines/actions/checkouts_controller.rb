@@ -55,7 +55,7 @@ module Api::V1::Machines::Actions
                                :include,
                                :encrypt,
                                :ttl,
-                              )
+                             )
 
       machine_file = checkout_machine_file(**kwargs)
 
@@ -87,6 +87,7 @@ module Api::V1::Machines::Actions
         to: :check_out?
 
       machine_file = MachineCheckoutService.call(
+        api_version: current_api_version,
         environment: current_environment,
         account: current_account,
         machine:,
