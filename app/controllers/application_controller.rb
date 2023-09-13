@@ -10,20 +10,32 @@ class ApplicationController < ActionController::API
   include TypedParams::Controller
   include ActionPolicy::Controller
 
-  # NOTE(ezekg) Including these at the end so that they're run last
+  # NOTE(ezekg) The remaining concerns use around_action, so the order
+  #             here is very explicit.
+
+  # 1. Requests are counted at the very end of the around_action chain,
+  #    so the concern is added first.
   include RequestCounter
+
+  # 2. Requests are logged after all migrations and errors. Again, this
+  #    is run near the end of the around_action chain.
   include RequestLogger
+
+  # 3. Responses are signed after migrations and errors.
+  include SignatureHeaders
 
   # NOTE(ezekg) We're using an around_action here so that our request
   #             logger concern can log the resulting response body.
   #             Otherwise, the logged response may be incorrect.
+  #
+  # 4. Errors are caught and handled after migrations.
   around_action :rescue_from_exceptions
 
-  # NOTE(ezekg) This is after the rescues have been hooked so that we
-  #             can rescue from invalid version errors.
+  # 5. Migrations are run after errors have been caught.
   include RequestMigrations::Controller::Migrations
 
-  # NOTE(ezekg) After migrations are hooked so we can migrate headers.
+  # 6. Headers are added before migrations, so they can be migrated
+  #    if needed, with the exception of the signature headers.
   include DefaultHeaders
 
   attr_accessor :current_http_scheme

@@ -3,58 +3,39 @@
 module SignatureHeaders
   extend ActiveSupport::Concern
 
-  SUPPORTED_SIGNATURE_ALGORITHMS = %w[ed25519 rsa-pss-sha256 rsa-sha256].freeze
-  DEFAULT_SIGNATURE_ALGORITHM    = 'ed25519'.freeze
-  DEFAULT_ACCEPT_SIGNATURE       = %(algorithm="#{DEFAULT_SIGNATURE_ALGORITHM}").freeze
-  ACCEPT_SIGNATURE_RE            =
-    %r{
-      \A
-      (keyid="(?<keyid>[^"]+)")?
-      (\s*,\s*)?
-      (algorithm="(?<algorithm>[^"]+)")
-      (\s*;\s*)?
-      \z
-    }xi.freeze
+  include CurrentAccountScope
+  include SignatureMethods
 
-  LEGACY_SIGNATURE_UNTIL =
+  DEFAULT_ACCEPT_SIGNATURE = %(algorithm="#{SignatureMethods::DEFAULT_SIGNATURE_ALGORITHM}").freeze
+  LEGACY_SIGNATURE_UNTIL   =
     if Rails.env.production?
       Time.parse('2021-06-11T00:00:00.000Z').freeze
     else
       Time.parse('2552-01-01T00:00:00.000Z').freeze
     end
 
-  def generate_digest_header(body:)
-    sha256 = OpenSSL::Digest::SHA256.new
-    digest = sha256.digest(body.presence || '')
-    enc    = Base64.strict_encode64(digest)
+  included do
+    # NOTE(ezekg Run signature header validations after current account has been set, but
+    #            before the controller action is processed.
+    after_current_account :validate_accept_signature_header!
 
-    "sha-256=#{enc}"
+    # NOTE(ezekg) We're using an *around* action here to ensure these headers are always
+    #             sent, even when an error has halted the action chain.
+    around_action :add_signature_headers
   end
 
-  # See: https://tools.ietf.org/id/draft-cavage-http-signatures-08.html#rfc.section.4
-  def generate_signature_header(account:, algorithm:, keyid:, date:, method:, host:, uri:, digest:)
-    return nil if
-      account.nil?
-
-    return nil if
-      keyid.present? && account.id != keyid
-
-    signing_data = generate_signing_data(
-      date: date,
-      method: method,
-      host: host,
-      uri: uri,
-      digest: digest,
-    )
-
-    signature = sign_response_data(
-      algorithm: algorithm,
-      account: account,
-      data: signing_data,
-    )
-
-    %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) host date digest")
+  def add_signature_headers
+    yield
+  rescue => e
+    # Ensure all exceptions are properly dealt with before we process our
+    # signature headers. E.g. rescuing not found errors and rendering
+    # a 404. Otherwise, the response body may be blank.
+    rescue_with_handler(e) || raise
+  ensure
+    generate_signature_headers
   end
+
+  private
 
   def validate_accept_signature_header!
     return if
@@ -73,7 +54,7 @@ module SignatureHeaders
       data[:keyid].present? && data[:keyid] != current_account.id
   end
 
-  def add_signature_headers
+  def generate_signature_headers
     return if
       current_account.nil?
 
@@ -117,72 +98,7 @@ module SignatureHeaders
     response.headers['Keygen-Date']   = httpdate
     response.headers['Keygen-Digest'] = digest
   rescue => e
+    puts e
     Keygen.logger.exception(e)
-  end
-
-  def sign_response_data(algorithm:, account:, data:)
-    return nil if algorithm.nil? || account.nil?
-
-    case algorithm.to_s.downcase
-    when 'ed25519'
-      sign_with_ed25519(key: account.ed25519_private_key, data: data.to_s)
-    when 'rsa-pss-sha256'
-      sign_with_rsa_pkcs1_pss(key: account.private_key, data: data.to_s)
-    when 'rsa-sha256',
-         'legacy'
-      sign_with_rsa_pkcs1(key: account.private_key, data: data.to_s)
-    end
-  rescue => e
-    Keygen.logger.exception e
-
-    nil
-  end
-
-  private
-
-  # NOTE(ezekg) We're using strict_encode64 because encode64 adds a newline
-  #             every 60 chars, which results in an invalid HTTP header.
-
-  def generate_signing_data(date:, method:, host:, uri:, digest:)
-    data = [
-      "(request-target): #{method.downcase} #{uri.presence || '/'}",
-      "host: #{host}",
-      "date: #{date}",
-      "digest: #{digest}",
-    ]
-
-    data.join("\n")
-  end
-
-  def parse_accept_signature_header(accept_signature)
-    ACCEPT_SIGNATURE_RE.match(accept_signature)
-  end
-
-  def supports_signature_algorithm?(algorithm)
-    SUPPORTED_SIGNATURE_ALGORITHMS.include?(algorithm.to_s.downcase)
-  end
-
-  def sign_with_ed25519(key:, data:)
-    key_bytes = [key].pack('H*')
-    priv      = Ed25519::SigningKey.new(key_bytes)
-    sig       = priv.sign(data)
-
-    Base64.strict_encode64(sig)
-  end
-
-  def sign_with_rsa_pkcs1_pss(key:, data:)
-    digest = OpenSSL::Digest::SHA256.new
-    priv   = OpenSSL::PKey::RSA.new(key)
-    sig    = priv.sign_pss(digest, data, salt_length: :max, mgf1_hash: 'SHA256')
-
-    Base64.strict_encode64(sig)
-  end
-
-  def sign_with_rsa_pkcs1(key:, data:)
-    digest = OpenSSL::Digest::SHA256.new
-    priv   = OpenSSL::PKey::RSA.new(key)
-    sig    = priv.sign(digest, data)
-
-    Base64.strict_encode64(sig)
   end
 end

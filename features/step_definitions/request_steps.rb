@@ -781,6 +781,8 @@ Then /^the response should contain a valid(?: "([^\"]+)")? signature header for 
 
   # Legacy signature header
   begin
+    expect(res.headers).to have_key 'X-Signature'
+
     pub     = OpenSSL::PKey::RSA.new(account.public_key)
     digest  = OpenSSL::Digest::SHA256.new
     enc_sig = res.headers['X-Signature']
@@ -793,6 +795,8 @@ Then /^the response should contain a valid(?: "([^\"]+)")? signature header for 
 
   # Signature header
   begin
+    expect(res.headers).to have_key 'Keygen-Signature'
+
     attrs = SignatureHelper.parse(res.headers['Keygen-Signature'])
     expect(attrs).to_not eq nil
 
