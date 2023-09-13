@@ -16,7 +16,7 @@ module Api::V1
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
         metrics = apply_pagination(authorized_scope(apply_scopes(current_account.metrics)).preload(:event_type))
-        data    = Keygen::JSONAPI::Renderer.new.render(metrics)
+        data    = Keygen::JSONAPI.render(metrics)
 
         data.tap { _1[:links] = pagination_links(metrics) }
       end

@@ -1,24 +1,21 @@
 # frozen_string_literal: true
 
 class AbstractCheckoutService < BaseService
+  class InvalidAccountError < StandardError; end
   class InvalidAlgorithmError < StandardError; end
-  class InvalidPrivateKeyError < StandardError; end
   class InvalidTTLError < StandardError; end
 
-  ENCRYPT_ALGORITHM  = 'aes-256-gcm'
-  ENCODE_ALGORITHM   = 'base64'
+  ENCRYPT_ALGORITHM  = 'aes-256-gcm'.freeze
+  ENCODE_ALGORITHM   = 'base64'.freeze
   ALLOWED_ALGORITHMS = %w[
     ed25519
     rsa-pss-sha256
     rsa-sha256
-  ]
+  ].freeze
 
-  def initialize(account:, encrypt:, ttl:, include:)
-    raise InvalidPrivateKeyError, 'private key is missing' unless
-      private_key.present?
-
-    raise InvalidAlgorithmError, 'algorithm is missing' unless
-      algorithm.present?
+  def initialize(account:, scheme: nil, encrypt: false, ttl: 1.month, include: [], api_version: nil)
+    raise InvalidAccountError, 'license must be present' unless
+      account.present?
 
     raise InvalidTTLError, 'must be less than or equal to 31556952 (1 year)' if
       ttl.present? && ttl > 1.year
@@ -26,10 +23,35 @@ class AbstractCheckoutService < BaseService
     raise InvalidTTLError, 'must be greater than or equal to 3600 (1 hour)' if
       ttl.present? && ttl < 1.hour
 
-    @renderer    = Keygen::JSONAPI::Renderer.new(account:, context: :checkout)
+    @renderer    = Keygen::JSONAPI::Renderer.new(account:, api_version:, context: :checkout)
+    @account     = account
     @encrypted   = encrypt
     @ttl         = ttl
     @includes    = include
+    @private_key = case scheme
+                   when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+                        'RSA_2048_PKCS1_SIGN_V2',
+                        'RSA_2048_PKCS1_PSS_SIGN',
+                        'RSA_2048_PKCS1_SIGN',
+                        'RSA_2048_PKCS1_ENCRYPT',
+                        'RSA_2048_JWT_RS256'
+                     account.private_key
+                   else
+                     account.ed25519_private_key
+                   end
+
+    @algorithm = case scheme
+                 when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+                      'RSA_2048_PKCS1_PSS_SIGN'
+                   'rsa-pss-sha256'
+                 when 'RSA_2048_PKCS1_SIGN_V2',
+                      'RSA_2048_PKCS1_SIGN',
+                      'RSA_2048_PKCS1_ENCRYPT',
+                      'RSA_2048_JWT_RS256'
+                   'rsa-sha256'
+                 else
+                   'ed25519'
+                 end
   end
 
   def call
@@ -39,9 +61,12 @@ class AbstractCheckoutService < BaseService
   private
 
   attr_reader :renderer,
+              :private_key,
+              :algorithm,
               :encrypted,
               :ttl,
-              :includes
+              :includes,
+              :account
 
   def encrypted?
     !!encrypted

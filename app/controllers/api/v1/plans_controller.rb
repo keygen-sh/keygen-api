@@ -9,7 +9,7 @@ module Api::V1
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.hour, race_condition_ttl: 1.minute) do
         plans = apply_pagination(apply_scopes(Plan.visible).reorder('price ASC NULLS FIRST'))
-        data = Keygen::JSONAPI::Renderer.new.render(plans)
+        data = Keygen::JSONAPI.render(plans)
 
         data
       end
