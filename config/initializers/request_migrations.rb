@@ -19,6 +19,7 @@ RequestMigrations.configure do |config|
       rename_machine_uniqueness_strategy_to_fingerprint_uniqueness_strategy_for_policy_migration
       rename_machine_matching_strategy_to_fingerprint_matching_strategy_for_policies_migration
       rename_machine_matching_strategy_to_fingerprint_matching_strategy_for_policy_migration
+      rename_keygen_id_headers_for_responses_migration
     ],
     '1.2' => %i[
       change_alive_status_to_not_started_for_machine_migration

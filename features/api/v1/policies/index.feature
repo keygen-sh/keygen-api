@@ -320,7 +320,10 @@ Feature: List policies
       """
     Then the response should contain the following headers:
       """
-      { "Keygen-Version": "1.4" }
+      {
+        "Keygen-Account": "$account",
+        "Keygen-Version": "1.4"
+      }
       """
 
   Scenario: Admin retrieves policies with machine strategies (v1.3)
@@ -347,5 +350,8 @@ Feature: List policies
       """
     Then the response should contain the following headers:
       """
-      { "Keygen-Version": "1.3" }
+      {
+        "Keygen-Account-Id": "$account",
+        "Keygen-Version": "1.3"
+      }
       """
