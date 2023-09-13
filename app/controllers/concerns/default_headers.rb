@@ -3,15 +3,9 @@
 module DefaultHeaders
   extend ActiveSupport::Concern
 
-  include CurrentAccountScope
-  include SignatureHeaders
   include RateLimiting
 
   included do
-    # NOTE(ezekg Run signature header validations after current account has been set, but
-    #            before the controller action is processed.
-    after_current_account :validate_accept_signature_header!
-
     # NOTE(ezekg) We're using an *around* action here to ensure these headers are always
     #             sent, even when an error has halted the action chain.
     around_action :add_default_headers
@@ -22,16 +16,12 @@ module DefaultHeaders
   def add_default_headers
     yield
   rescue => e
-    # Ensure all exceptions are properly dealt with before we process our
-    # signature headers. E.g. rescuing not found errors and rendering
-    # a 404. Otherwise, the response body may be blank.
     rescue_with_handler(e) || raise
   ensure
     add_content_security_policy_headers
     add_rate_limiting_headers
     add_cache_control_headers
     add_content_type_header
-    add_signature_headers
     add_whoami_headers
     add_environment_header
     add_license_header

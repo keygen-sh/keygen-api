@@ -814,6 +814,7 @@ Feature: Create release
       }
       """
     Then the response status should be "422"
+    And the response should contain a valid signature header for "test1"
     And the response body should be an array of 1 error
     And the first error should have the following properties:
       """

@@ -318,7 +318,8 @@ Feature: List policies
         "machineMatchingStrategy": "MATCH_TWO"
       }
       """
-    Then the response should contain the following headers:
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
       """
       {
         "Keygen-Account": "$account",
@@ -348,7 +349,8 @@ Feature: List policies
         "fingerprintMatchingStrategy": "MATCH_TWO"
       }
       """
-    Then the response should contain the following headers:
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
       """
       {
         "Keygen-Account-Id": "$account",

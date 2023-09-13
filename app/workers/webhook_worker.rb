@@ -3,7 +3,7 @@
 require "httparty"
 
 class WebhookWorker < BaseWorker
-  include SignatureHeaders
+  include SignatureMethods
 
   MAX_RESPONSE_BODY_BYTE_SIZE = 2048
   ACCEPTABLE_CODES = (200..299).freeze
