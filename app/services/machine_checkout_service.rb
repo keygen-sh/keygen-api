@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class MachineCheckoutService < AbstractCheckoutService
-  class InvalidAccountError < StandardError; end
+  class InvalidIncludeError < StandardError; end
   class InvalidMachineError < StandardError; end
   class InvalidLicenseError < StandardError; end
-  class InvalidIncludeError < StandardError; end
 
   ALLOWED_INCLUDES = %w[
     license.entitlements
@@ -17,10 +16,7 @@ class MachineCheckoutService < AbstractCheckoutService
     group
   ].freeze
 
-  def initialize(account:, machine:, environment: nil, encrypt: false, ttl: 1.month, include: [], api_version: nil)
-    raise InvalidAccountError, 'account must be present' unless
-      account.present?
-
+  def initialize(machine:, environment: nil, include: [], **kwargs)
     raise InvalidMachineError, 'machine must be present' unless
       machine.present?
 
@@ -30,13 +26,11 @@ class MachineCheckoutService < AbstractCheckoutService
     raise InvalidIncludeError, 'invalid includes' if
       (include - ALLOWED_INCLUDES).any?
 
-    @account     = account
     @machine     = machine
     @license     = machine.license
     @environment = environment
-    @api_version = api_version
 
-    super(account:, encrypt:, ttl:, include:)
+    super(scheme: machine.license.scheme, include:, **kwargs)
   end
 
   def call
@@ -50,28 +44,12 @@ class MachineCheckoutService < AbstractCheckoutService
     meta = { issued: issued_at, expiry: expires_at, ttl: ttl }
     incl = includes & ALLOWED_INCLUDES
     data = renderer.render(machine, meta: meta, include: incl)
-
-    # Migrate dataset to target version
-    migrator = RequestMigrations::Migrator.new(
-      from: CURRENT_API_VERSION,
-      to: api_version || account.api_version,
-    )
-
-    # Migrate the license
-    migrator.migrate!(data:)
-
-    # FIXME(ezekg) Migration expects a data top-level key, so we're adding
-    #              that here. It still mutates the includes.
-    #
-    # Migrate includes
-    migrator.migrate!(data: {
-      data: data[:included],
-    })
+                   .to_json
 
     enc = if encrypted?
-            encrypt(data.to_json, secret: license.key + machine.fingerprint)
+            encrypt(data, secret: license.key + machine.fingerprint)
           else
-            encode(data.to_json, strict: true)
+            encode(data, strict: true)
           end
     sig = sign(enc, key: private_key, algorithm: algorithm, prefix: 'machine')
 
@@ -105,10 +83,8 @@ class MachineCheckoutService < AbstractCheckoutService
   private
 
   attr_reader :environment,
-              :account,
               :machine,
-              :license,
-              :api_version
+              :license
 
   def private_key
     case license.scheme
