@@ -6,7 +6,6 @@ class ApplicationController < ActionController::API
 
   include Rendering::JSON
   include CurrentRequestAttributes
-  include DefaultHeaders
   include RateLimiting
   include TypedParams::Controller
   include ActionPolicy::Controller
@@ -23,6 +22,9 @@ class ApplicationController < ActionController::API
   # NOTE(ezekg) This is after the rescues have been hooked so that we
   #             can rescue from invalid version errors.
   include RequestMigrations::Controller::Migrations
+
+  # NOTE(ezekg) After migrations are hooked so we can migrate headers.
+  include DefaultHeaders
 
   attr_accessor :current_http_scheme
   attr_accessor :current_http_token
