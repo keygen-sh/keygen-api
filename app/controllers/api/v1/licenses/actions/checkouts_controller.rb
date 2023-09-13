@@ -55,7 +55,7 @@ module Api::V1::Licenses::Actions
                                :include,
                                :encrypt,
                                :ttl,
-                              )
+                             )
 
       license_file = checkout_license_file(**kwargs)
 
@@ -85,6 +85,7 @@ module Api::V1::Licenses::Actions
         to: :check_out?
 
       license_file = LicenseCheckoutService.call(
+        api_version: current_api_version,
         environment: current_environment,
         account: current_account,
         license:,

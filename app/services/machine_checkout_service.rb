@@ -17,7 +17,7 @@ class MachineCheckoutService < AbstractCheckoutService
     group
   ].freeze
 
-  def initialize(account:, machine:, environment: nil, encrypt: false, ttl: 1.month, include: [])
+  def initialize(account:, machine:, environment: nil, encrypt: false, ttl: 1.month, include: [], api_version: nil)
     raise InvalidAccountError, 'account must be present' unless
       account.present?
 
@@ -34,6 +34,7 @@ class MachineCheckoutService < AbstractCheckoutService
     @machine     = machine
     @license     = machine.license
     @environment = environment
+    @api_version = api_version
 
     super(account:, encrypt:, ttl:, include:)
   end
@@ -49,12 +50,28 @@ class MachineCheckoutService < AbstractCheckoutService
     meta = { issued: issued_at, expiry: expires_at, ttl: ttl }
     incl = includes & ALLOWED_INCLUDES
     data = renderer.render(machine, meta: meta, include: incl)
-                   .to_json
+
+    # Migrate dataset to target version
+    migrator = RequestMigrations::Migrator.new(
+      from: CURRENT_API_VERSION,
+      to: api_version || account.api_version,
+    )
+
+    # Migrate the license
+    migrator.migrate!(data:)
+
+    # FIXME(ezekg) Migration expects a data top-level key, so we're adding
+    #              that here. It still mutates the includes.
+    #
+    # Migrate includes
+    migrator.migrate!(data: {
+      data: data[:included],
+    })
 
     enc = if encrypted?
-            encrypt(data, secret: license.key + machine.fingerprint)
+            encrypt(data.to_json, secret: license.key + machine.fingerprint)
           else
-            encode(data, strict: true)
+            encode(data.to_json, strict: true)
           end
     sig = sign(enc, key: private_key, algorithm: algorithm, prefix: 'machine')
 
@@ -90,7 +107,8 @@ class MachineCheckoutService < AbstractCheckoutService
   attr_reader :environment,
               :account,
               :machine,
-              :license
+              :license,
+              :api_version
 
   def private_key
     case license.scheme
