@@ -3,15 +3,25 @@
 class RenameMachineMatchingStrategyToFingerprintMatchingStrategyForPoliciesMigration < BaseMigration
   description %(renames machine matching strategy to fingerprint matching strategy for Policies)
 
+  migrate if: -> body { body in included: [*] } do |body|
+    case body
+    in included: [*, { type: /\Apolicies\z/, attributes: { ** } }, *] => includes
+      includes.each do |record|
+        case record
+        in type: /\Apolicies\z/, attributes: { machineMatchingStrategy: String } => attrs
+          attrs[:fingerprintMatchingStrategy] = attrs.delete(:machineMatchingStrategy)
+        else
+        end
+      end
+    else
+    end
+  end
+
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [
-      *,
-      { type: /\Apolicies\z/, attributes: { machineMatchingStrategy: String } },
-      *
-    ] => data
-      data.each do |policy|
-        case policy
+    in data: [*, { type: /\Apolicies\z/, attributes: { ** } }, *] => data
+      data.each do |record|
+        case record
         in type: /\Apolicies\z/, attributes: { machineMatchingStrategy: String } => attrs
           attrs[:fingerprintMatchingStrategy] = attrs.delete(:machineMatchingStrategy)
         else

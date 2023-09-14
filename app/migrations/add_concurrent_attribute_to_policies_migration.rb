@@ -3,13 +3,27 @@
 class AddConcurrentAttributeToPoliciesMigration < BaseMigration
   description %(adds concurrent attributes to a collection of Policies)
 
+  migrate if: -> body { body in included: [*] } do |body|
+    case body
+    in included: [*, { type: /\Apolicies\z/, attributes: { ** } }, *] => includes
+      includes.each do |record|
+        case record
+        in type: /\Apolicies\z/, attributes: { overageStrategy: overage_strategy } => attrs
+          attrs[:concurrent] = overage_strategy != 'NO_OVERAGE'
+        else
+        end
+      end
+    else
+    end
+  end
+
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [*, { type: /\Apolicies\z/, attributes: { ** } }, *]
-      body[:data].each do |policy|
+    in data: [*, { type: /\Apolicies\z/, attributes: { ** } }, *] => data
+      data.each do |policy|
         case policy
-        in type: /\Apolicies\z/, attributes: { overageStrategy: overage_strategy }
-          policy[:attributes][:concurrent] = overage_strategy != 'NO_OVERAGE'
+        in type: /\Apolicies\z/, attributes: { overageStrategy: overage_strategy } => attrs
+          attrs[:concurrent] = overage_strategy != 'NO_OVERAGE'
         else
         end
       end

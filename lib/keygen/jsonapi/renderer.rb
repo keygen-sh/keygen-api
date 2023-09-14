@@ -46,14 +46,6 @@ module Keygen::JSONAPI
         to: target_version,
       )
 
-      # FIXME(ezekg) Migrations expect a top-level data key, so we're adding
-      #              that here. It still mutates the includes.
-      if data.key?(:included)
-        migrator.migrate!(data: {
-          data: data[:included],
-        })
-      end
-
       migrator.migrate!(data:)
     end
   end
