@@ -3,13 +3,27 @@
 class RenameMachineUniquenessStrategyToFingerprintUniquenessStrategyForPoliciesMigration < BaseMigration
   description %(renames machine uniqueness strategy to fingerprint uniqueness strategy for Policies)
 
+  migrate if: -> body { body in included: [*] } do |body|
+    case body
+    in included: [
+      *,
+      { type: /\Apolicies\z/, attributes: { ** } },
+      *
+    ] => includes
+      includes.each do |record|
+        case record
+        in type: /\Apolicies\z/, attributes: { machineUniquenessStrategy: String } => attrs
+          attrs[:fingerprintUniquenessStrategy] = attrs.delete(:machineUniquenessStrategy)
+        else
+        end
+      end
+    else
+    end
+  end
+
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [
-      *,
-      { type: /\Apolicies\z/, attributes: { machineUniquenessStrategy: String } },
-      *
-    ] => data
+    in data: [*, { type: /\Apolicies\z/, attributes: { ** } }, *] => data
       data.each do |policy|
         case policy
         in type: /\Apolicies\z/, attributes: { machineUniquenessStrategy: String } => attrs
