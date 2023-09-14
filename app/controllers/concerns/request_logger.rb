@@ -103,13 +103,15 @@ module RequestLogger
         Current.environment&.id,
         request_log_request_headers,
         request_log_response_headers,
-        request_log_request_runtime,
+        request_log_request_run_time,
+        request_log_request_queue_time,
       )
     rescue => e
       Keygen.logger.exception(e)
     end
 
-    def request_log_request_runtime = (@request_log_end_clock - @request_log_start_clock) * 1_000
+    def request_log_request_queue_time = @request_log_start_time.to_f - request_log_request_time.to_f
+    def request_log_request_run_time   = (@request_log_end_clock - @request_log_start_clock) * 1_000
     def request_log_request_time
       value = request.env['HTTP_X_REQUEST_START'] || request.env['HTTP_X_QUEUE_START'] # use these when available
       return @request_log_start_time if
