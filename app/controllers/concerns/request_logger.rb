@@ -57,9 +57,9 @@ module RequestLogger
       @request_log_start_time  = Time.current
 
       yield
-
-      @request_log_end_clock = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     ensure
+      @request_log_end_clock = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
       queue_request_log_worker
     end
 
