@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-CURRENT_API_VERSION = '1.4'
+CURRENT_API_VERSION = Keygen.version.segments[0..1].join('.') # major/minor
 DEFAULT_API_VERSION = CURRENT_API_VERSION
 
 RequestMigrations.configure do |config|

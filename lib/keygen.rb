@@ -9,7 +9,7 @@ require_relative 'keygen/middleware'
 
 module Keygen
   PUBLIC_KEY = %(\xB8\xF3\xEBL\xD2`\x13_g\xA5\tn\x8D\xC1\xC9\xB9\xDC\xB8\x1E\xE9\xFEP\xD1,\xDC\xD9A\xF6`z\x901).freeze
-  VERSION    = '1.3.0'.freeze
+  VERSION    = '1.4.0'.freeze
 
   class << self
     def logger = Logger
@@ -28,7 +28,7 @@ module Keygen
 
     def mode    = multiplayer? ? 'multiplayer' : 'singleplayer'
     def edition = ee? ? 'EE' : 'CE'
-    def version = VERSION
+    def version = Gem::Version.new(VERSION)
 
     def ee(&block)
       return unless
