@@ -43,6 +43,7 @@ Rack::Attack.blocklist("req/block/bots") do |rack_req|
     CGI.unescape(req.query_string) =~ %r{/etc/(passwd|profile)} ||
       req.path.include?("/etc/profile") ||
       req.path.include?("/etc/passwd") ||
+      req.path.include?("/wp-content") ||
       req.path.include?("/wp-admin") ||
       req.path.include?("/wp-login") ||
       req.path.include?("/cgi-bin") ||
