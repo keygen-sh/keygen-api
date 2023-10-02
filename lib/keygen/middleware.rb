@@ -225,8 +225,8 @@ module Keygen
             if user_agent.starts_with?('electron-builder')
               env['CONTENT_TYPE'] = 'application/octet-stream'
             end
-          in method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-            mime_type, * = Mime::Type.parse(content_type.to_s)
+          in method: 'POST' | 'PUT' | 'PATCH' | 'DELETE' if content_type.to_s =~ /^([^,;]*)/
+            mime_type, * = Mime::Type.parse($1.strip.downcase)
 
             # Whenever an API request is sent without a content-type header, some clients,
             # such as `fetch()` or curl, use these headers by default. We're going to try
