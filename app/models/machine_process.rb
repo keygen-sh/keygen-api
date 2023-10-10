@@ -96,7 +96,7 @@ class MachineProcess < ApplicationRecord
   scope :for_user,    -> id { joins(:license).where(licenses: { user_id: id }) }
 
   scope :alive, -> {
-    joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+    joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
       machine_processes.last_heartbeat_at >= ?::timestamp - (
         COALESCE(policies.heartbeat_duration, ?) || ' seconds'
       )::interval
@@ -104,7 +104,7 @@ class MachineProcess < ApplicationRecord
   }
 
   scope :dead, -> {
-    joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+    joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
       machine_processes.last_heartbeat_at < ?::timestamp - (
         COALESCE(policies.heartbeat_duration, ?) || ' seconds'
       )::interval
