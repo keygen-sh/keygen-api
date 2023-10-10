@@ -98,7 +98,6 @@ module SignatureHeaders
     response.headers['Keygen-Date']   = httpdate
     response.headers['Keygen-Digest'] = digest
   rescue => e
-    puts e
     Keygen.logger.exception(e)
   end
 end

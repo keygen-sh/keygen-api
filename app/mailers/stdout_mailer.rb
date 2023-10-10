@@ -676,6 +676,8 @@ class StdoutMailer < ApplicationMailer
 
   private
 
+  def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
+
   def encrypt(plaintext)
     crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
     enc   = crypt.encrypt_and_sign(plaintext)
@@ -688,9 +690,5 @@ class StdoutMailer < ApplicationMailer
     Keygen.logger.error "[stdout.encrypt] Encrypt failed: err=#{e.message}"
 
     nil
-  end
-
-  def secret_key
-    Rails.application.secrets.stdout_secret_key
   end
 end
