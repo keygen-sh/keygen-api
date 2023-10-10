@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 ruby '3.2.3'
 
-gem 'rails', '~> 7.0.7.1'
+gem 'rails', '~> 7.1'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.4.0'
 gem 'bcrypt', '~> 3.1.7'
@@ -29,8 +29,6 @@ gem 'oj'
 
 # XML/HTML
 gem 'nokogiri', '~> 1.15.4'
-gem 'rails-html-sanitizer', '~> 1.4.4'
-gem 'loofah', '~> 2.19.1'
 
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
@@ -52,8 +50,8 @@ gem 'kaminari', '~> 1.2.0'
 
 # Postgres/DB extensions
 gem 'active_record_union'
-gem 'active_record_distinct_on'
-gem 'activerecord_where_assoc'
+gem 'active_record_distinct_on', github: 'ezekg/active_record_distinct_on', branch: 'feature/support-rails-7-1'
+gem 'activerecord_where_assoc', github: 'ezekg/activerecord_where_assoc'
 
 # Pattern matching
 gem 'rails-pattern_matching'
@@ -103,7 +101,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
-  gem 'bullet', '~> 7.0.1'
+  gem 'bullet', '~> 7.1.1'
   gem 'parallel_tests', '~> 4.2.1'
   gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
   gem 'faker', '~> 2.20.0'
@@ -117,7 +115,7 @@ end
 group :test do
   gem 'stripe-ruby-mock', github: 'stripe-ruby-mock/stripe-ruby-mock', ref: '6ceea9679bb573cb8bc6830f1bdf670b220a9859', require: 'stripe_mock'
   gem 'cucumber-rails', '~> 2.5', require: false
-  gem 'rspec-rails', '~> 6.0.1'
+  gem 'rspec-rails', '~> 6.0.3'
   gem 'rspec-expectations', '~> 3.12.1'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'

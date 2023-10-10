@@ -363,13 +363,13 @@ class Machine < ApplicationRecord
   scope :alive, -> {
     idle_machines  = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: false })
     new_machines   = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
-                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
                                               machines.created_at >= ?::timestamp - (
                                                 COALESCE(policies.heartbeat_duration, ?) || ' seconds'
                                               )::interval
                                             SQL
     alive_machines = joins(license: :policy).where.not(last_heartbeat_at: nil)
-                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
                                               machines.last_heartbeat_at >= ?::timestamp - (
                                                 COALESCE(policies.heartbeat_duration, ?) || ' seconds'
                                               )::interval
@@ -381,13 +381,13 @@ class Machine < ApplicationRecord
 
   scope :dead, -> {
     expired_machines = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
-                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
                                                 machines.created_at < ?::timestamp - (
                                                   COALESCE(policies.heartbeat_duration, ?) || ' seconds'
                                                 )::interval
                                               SQL
     dead_machines    = joins(license: :policy).where.not(last_heartbeat_at: nil)
-                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
                                                 machines.last_heartbeat_at < ?::timestamp - (
                                                   COALESCE(policies.heartbeat_duration, ?) || ' seconds'
                                                 )::interval
