@@ -24,6 +24,8 @@ module Stdout
 
     private
 
+    def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
+
     def decrypt(ciphertext)
       crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
       enc   = ciphertext.split('.')
@@ -35,10 +37,6 @@ module Stdout
       Keygen.logger.warn "[stdout.decrypt] Decrypt failed: err=#{e.message}"
 
       nil
-    end
-
-    def secret_key
-      Rails.application.secrets.stdout_secret_key
     end
   end
 end

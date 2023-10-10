@@ -63,13 +63,15 @@ module Keygen
     config.active_record.encryption.deterministic_key   = ENV.fetch('ENCRYPTION_DETERMINISTIC_KEY')
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ENCRYPTION_KEY_DERIVATION_SALT')
 
-    # TODO(ezekg) Remove these once our data is migrated
+    config.active_record.encryption.hash_digest_class                             = OpenSSL::Digest::SHA256
+    config.active_record.encryption.support_sha1_for_non_deterministic_encryption = true
+
+    config.active_record.encryption.store_key_references     = true
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
     # Update async destroy batch size
-    # TODO(ezekg) Will be introduced in Rails 7.1
-    # config.active_record.destroy_association_async_batch_size = 100
+    config.active_record.destroy_association_async_batch_size = 100
 
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
@@ -92,7 +94,8 @@ module Keygen
     # Force UTF-8 encoding
     config.encoding = 'utf-8'
 
-    # Add services/validators to autoload path
+    # Add lib, services, validators, etc. to autoload path
+    config.autoload_lib(ignore: %w[tasks])
     config.autoload_paths += %W[
       #{config.root}/app/serializers
       #{config.root}/app/validators
