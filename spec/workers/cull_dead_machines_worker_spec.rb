@@ -171,6 +171,46 @@ describe CullDeadMachinesWorker do
     let(:policy)  { create(:policy, require_heartbeat: true, heartbeat_duration: 10.minutes, account:) }
     let(:license) { create(:license, policy:, account:) }
 
+    it 'should cull a machine that is idle' do
+      machine = create(:machine, :idle, license:, account:)
+
+      policy.update!(
+        heartbeat_duration: 1.hour,
+      )
+
+      travel_to 11.minutes.from_now do
+        expect { worker.perform_async }.to_not(
+          change { account.machines.count },
+        )
+      end
+
+      travel_to 61.minutes.from_now do
+        expect { worker.perform_async }.to(
+          change { account.machines.count },
+        )
+      end
+    end
+
+    it 'should not cull a machine that is alive' do
+      machine = create(:machine, :alive, license:, account:)
+
+      policy.update!(
+        heartbeat_duration: 1.hour,
+      )
+
+      travel_to 11.minutes.from_now do
+        expect { worker.perform_async }.to_not(
+          change { account.machines.count },
+        )
+      end
+
+      travel_to 61.minutes.from_now do
+        expect { worker.perform_async }.to(
+          change { account.machines.count },
+        )
+      end
+    end
+
     it 'should cull a machine that is dead' do
       machine = create(:machine, license:, account:)
 
@@ -186,6 +226,68 @@ describe CullDeadMachinesWorker do
 
       travel_to 61.minutes.from_now do
         expect { worker.perform_async }.to(
+          change { account.machines.count },
+        )
+      end
+    end
+  end
+
+  context 'when policy heartbeat requirement changes' do
+    let(:policy)  { create(:policy, require_heartbeat: false, heartbeat_duration: nil, account:) }
+    let(:license) { create(:license, policy:, account:) }
+
+    it 'should not cull a machine that is idle' do
+      machine = create(:machine, :idle, license:, account:)
+
+      policy.update!(
+        heartbeat_duration: 10.minutes,
+        require_heartbeat: true,
+      )
+
+      expect { worker.perform_async }.to_not(
+        change { account.machines.count },
+      )
+
+      travel_to 11.minutes.from_now do
+        expect { worker.perform_async }.to(
+          change { account.machines.count },
+        )
+      end
+    end
+
+    it 'should not cull a machine that is alive' do
+      machine = create(:machine, :alive, license:, account:)
+
+      policy.update!(
+        heartbeat_duration: 10.minutes,
+        require_heartbeat: true,
+      )
+
+      expect { worker.perform_async }.to_not(
+        change { account.machines.count },
+      )
+
+      travel_to 11.minutes.from_now do
+        expect { worker.perform_async }.to(
+          change { account.machines.count },
+        )
+      end
+    end
+
+    it 'should cull a machine that is dead' do
+      machine = create(:machine, :dead, license:, account:)
+
+      policy.update!(
+        heartbeat_duration: 10.minutes,
+        require_heartbeat: true,
+      )
+
+      expect { worker.perform_async }.to(
+        change { account.machines.count },
+      )
+
+      travel_to 11.minutes.from_now do
+        expect { worker.perform_async }.to_not(
           change { account.machines.count },
         )
       end
