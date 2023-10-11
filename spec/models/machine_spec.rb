@@ -98,4 +98,118 @@ describe Machine, type: :model do
       expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid
     end
   end
+
+  describe '#status' do
+    context 'when policy does not require heartbeats' do
+      let(:policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+
+      it 'should provide status when idle' do
+        machine = create(:machine, :idle, account:, policy:)
+
+        expect(machine.status).to eq 'NOT_STARTED'
+      end
+
+      it 'should provide status when idle but expired' do
+        machine = create(:machine, :idle, account:, policy:, created_at: 11.minutes.ago)
+
+        expect(machine.status).to eq 'NOT_STARTED'
+      end
+
+      it 'should provide status when alive' do
+        machine = create(:machine, :alive, account:, policy:)
+
+        expect(machine.status).to eq 'ALIVE'
+      end
+
+      it 'should provide status when dead' do
+        machine = create(:machine, :dead, account:, policy:)
+
+        expect(machine.status).to eq 'DEAD'
+      end
+
+      it 'should provide status when resurrected' do
+        machine = create(:machine, :dead, account:, policy:)
+        machine.resurrect!
+
+        expect(machine.status).to eq 'RESURRECTED'
+      end
+    end
+
+    context 'when policy does require heartbeats' do
+      let(:policy) { create(:policy, account:, require_heartbeat: true, heartbeat_duration: 10.minutes, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+
+      it 'should provide status when idle' do
+        machine = create(:machine, :idle, account:, policy:)
+
+        expect(machine.status).to eq 'NOT_STARTED'
+      end
+
+      it 'should provide status when idle but expired' do
+        machine = create(:machine, :idle, account:, policy:, created_at: 11.minutes.ago)
+
+        expect(machine.status).to eq 'DEAD'
+      end
+
+      it 'should provide status when alive' do
+        machine = create(:machine, :alive, account:, policy:)
+
+        expect(machine.status).to eq 'ALIVE'
+      end
+
+      it 'should provide status when dead' do
+        machine = create(:machine, :dead, account:, policy:)
+
+        expect(machine.status).to eq 'DEAD'
+      end
+
+      it 'should provide status when resurrected' do
+        machine = create(:machine, :dead, account:, policy:)
+        machine.resurrect!
+
+        expect(machine.status).to eq 'RESURRECTED'
+      end
+    end
+  end
+
+  describe '.alive' do
+    let(:no_heartbeat_policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil) }
+    let(:heartbeat_policy)    { create(:policy, account:, require_heartbeat: true,  heartbeat_duration: 10.minutes, heartbeat_basis: 'FROM_FIRST_PING') }
+    let(:machines) {
+      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy, created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :alive, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :dead, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy, created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :alive, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :dead, account:, policy: heartbeat_policy)
+
+      account.machines
+    }
+
+    it 'should return alive machines' do
+      expect(machines.alive.count).to eq 25
+    end
+  end
+
+  describe '.dead' do
+    let(:no_heartbeat_policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil) }
+    let(:heartbeat_policy)    { create(:policy, account:, require_heartbeat: true,  heartbeat_duration: 10.minutes, heartbeat_basis: 'FROM_FIRST_PING') }
+    let(:machines) {
+      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy, created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :alive, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :dead, account:, policy: no_heartbeat_policy)
+      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy, created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :alive, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :dead, account:, policy: heartbeat_policy)
+
+      account.machines
+    }
+
+    it 'should return dead machines' do
+      expect(machines.dead.count).to eq 15
+    end
+  end
 end
