@@ -11,6 +11,11 @@ class CullDeadMachinesWorker < BaseWorker
   # 86000, this will cause all in-progress heartbeat monitors to
   # become out of sync if no further pings are sent. After death,
   # this results in a zombie machine that needs to be culled.
+  #
+  # Another scenario is where a policy is created that does not require
+  # heartbeats, but is later updated to require heartbeats. Without
+  # this worker, previously created machines in an idle state would
+  # stick around even though they're required to have a heartbeat.
   def perform
     machines = Machine.joins(:policy)
                       .where.not(policies: { heartbeat_cull_strategy: 'ALWAYS_REVIVE' })
