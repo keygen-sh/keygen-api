@@ -1,0 +1,88 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+require 'spec_helper'
+
+describe PruneEventLogsWorker do
+  let(:worker)  { PruneEventLogsWorker }
+  let(:account) { create(:account) }
+
+  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
+  before do
+    Sidekiq::Testing.inline!
+  end
+
+  after do
+    Sidekiq::Worker.clear_all
+  end
+
+  it 'should prune backlog of high-volume event logs' do
+    license = create(:license, account:)
+    machine = create(:machine, account:)
+    process = create(:process, account:)
+
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license)
+    create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine)
+    create_list(:event_log, 50, :process_heartbeat_ping, account:, resource: process, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 50, :process_heartbeat_ping, account:, resource: process)
+    create_list(:event_log, 5, :license_created, account:, resource: license, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 5, :license_created, account:, resource: license)
+    create_list(:event_log, 5, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 5, :machine_created, account:, resource: machine)
+    create_list(:event_log, 5, :machine_deleted, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + rand(1..5)).days.ago)
+    create_list(:event_log, 5, :machine_deleted, account:, resource: machine)
+
+    expect { worker.perform_async }.to(
+      change { account.event_logs.count }.from(430).to(234),
+    )
+  end
+
+  it 'should prune duplicate event logs from backlog' do
+    licenses = create_list(:license, 5, account:)
+
+    licenses.each do |license|
+      (worker::BACKLOG_DAYS - 4..worker::BACKLOG_DAYS + 5).each do |i|
+        create_list(:event_log, 10, :license_validation_succeeded, account:, resource: license, created_at: i.days.ago)
+      end
+    end
+
+    expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
+      satisfy { |counts|
+        counts.all? { |_, count| count == 10 }
+      },
+    )
+
+    expect { worker.perform_async }.to(
+      change { account.event_logs.count }.from(500).to(275),
+    )
+
+    expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
+      satisfy { |counts|
+        counts.all? { |(id, type, event, date), count|
+          if date >= worker::BACKLOG_DAYS.days.ago.beginning_of_day
+            count == 10
+          else
+            count == 1
+          end
+        }
+      },
+    )
+  end
+
+  it 'should not prune high-volume event logs before backlog' do
+    license = create(:license, account:)
+
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: worker::BACKLOG_DAYS / 2)
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: worker::BACKLOG_DAYS)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license)
+
+    expect { worker.perform_async }.to_not(
+      change { account.event_logs.count },
+    )
+  end
+end

@@ -10,6 +10,34 @@ FactoryBot.define do
     whodunnit   { build(:user, account:, environment:) }
     event_type
 
+    trait :license_validation_succeeded do
+      event_type { build(:event_type, event: 'license.validation.succeeded') }
+    end
+
+    trait :license_validation_failed do
+      event_type { build(:event_type, event: 'license.validation.failed') }
+    end
+
+    trait :machine_heartbeat_ping do
+      event_type { build(:event_type, event: 'machine.heartbeat.ping') }
+    end
+
+    trait :process_heartbeat_ping do
+      event_type { build(:event_type, event: 'process.heartbeat.ping') }
+    end
+
+    trait :license_created do
+      event_type { build(:event_type, event: 'license.created') }
+    end
+
+    trait :machine_created do
+      event_type { build(:event_type, event: 'machine.created') }
+    end
+
+    trait :machine_deleted do
+      event_type { build(:event_type, event: 'machine.deleted') }
+    end
+
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end

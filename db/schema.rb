@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_14_184536) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_13_164654) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -109,7 +109,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_14_184536) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.date "created_date"
     t.index ["account_id", "created_at"], name: "index_event_logs_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "created_date"], name: "index_event_logs_on_account_id_and_created_date", order: { created_date: :desc }
     t.index ["environment_id"], name: "index_event_logs_on_environment_id"
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
