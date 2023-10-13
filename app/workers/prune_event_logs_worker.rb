@@ -50,9 +50,18 @@ class PruneEventLogsWorker < BaseWorker
                             .where('created_at < ?', BACKLOG_DAYS.days.ago.beginning_of_day)
                             .where(event_type_id: event_type_ids)
 
+        # Keep the latest log per-resource for each day and event type (i.e. discard duplicates)
+        kept_logs = event_logs.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
+                              .reorder(:resource_id, :resource_type, :event_type_id,
+                                created_date: :desc,
+                              )
+                              .select(:id)
+
         batch += 1
         count = event_logs.limit(BATCH_SIZE)
-                          .delete_all
+                          .delete_by(
+                            "id NOT IN (#{kept_logs.to_sql})",
+                          )
 
         Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 

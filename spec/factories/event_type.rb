@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :event_type do
-    initialize_with { new(**attributes) }
+    initialize_with { EventType.find_by(event:) || new(**attributes) }
 
     event { "test.event.#{SecureRandom.hex}" }
   end
