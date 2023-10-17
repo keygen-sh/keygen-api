@@ -100,3 +100,8 @@ Rails.application.configure do
     Bullet.unused_eager_loading_enable = false
   end
 end
+
+# Speed up tests by disabling the WAL.
+ActiveSupport.on_load :active_record_postgresqladapter do
+  self.create_unlogged_tables = true
+end
