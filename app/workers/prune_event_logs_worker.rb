@@ -1,7 +1,26 @@
 class PruneEventLogsWorker < BaseWorker
-  BACKLOG_DAYS       = ENV.fetch('KEYGEN_PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
-  BATCH_SIZE         = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')         { 1_000 }.to_i
-  BATCH_WAIT         = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')         { 1 }.to_f
+  # Number of days to keep event logs in backlog. Set to 0 to keep
+  # all event logs into perpetuity, i.e. to disable pruning.
+  BACKLOG_DAYS = ENV.fetch('KEYGEN_PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
+
+  # Number of days from backlog to target for pruning. The lower the
+  # number, the better the performance. Use a higher number for e.g.
+  # catching up going from a backlog of 90 days to 30. For normal
+  # non-catch up workloads, this should be set to 1.
+  TARGET_DAYS = ENV.fetch('KEYGEN_PRUNE_EVENT_TARGET_DAYS') { 1 }.to_i
+
+  # Number of event logs to delete per batch. The larger the number,
+  # the higher the impact on the database.
+  BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
+
+  # Number of seconds to wait in between batches.
+  BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
+
+  # High volume events elligible for pruning. Essentially, this
+  # reduces the storage burden for noisy events. For example,
+  # a license could be validated hundreds of times a day, or
+  # a machine could send thousands of heartbeat pings every
+  # day. This job prunes those superfluous event logs.
   HIGH_VOLUME_EVENTS = %w[
     license.validation.succeeded
     license.validation.failed
@@ -20,7 +39,7 @@ class PruneEventLogsWorker < BaseWorker
       BACKLOG_DAYS <= 0
 
     end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
-    start_date = (end_date - 1.day).beginning_of_day
+    start_date = (end_date - TARGET_DAYS.day).beginning_of_day
 
     # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
     accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
