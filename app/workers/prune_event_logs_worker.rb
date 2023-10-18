@@ -19,15 +19,20 @@ class PruneEventLogsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0
 
-    accounts = Account.where(<<~SQL.squish, BACKLOG_DAYS.days.ago.beginning_of_day)
+    end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
+    start_date = (end_date - 1.day).beginning_of_day
+
+    # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
+    accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
       EXISTS (
         SELECT
           1
         FROM
           "event_logs"
         WHERE
-          "event_logs"."account_id" = "accounts"."id" AND
-          "event_logs"."created_at" < ?
+          "event_logs"."account_id"  = "accounts"."id" AND
+          "event_logs"."created_at" >= :start_date     AND
+          "event_logs"."created_at" <  :end_date
         LIMIT
           1
       )
@@ -46,9 +51,10 @@ class PruneEventLogsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-event-logs] Pruning rows: account_id=#{account_id}"
 
       loop do
-        event_logs = account.event_logs
-                            .where('created_at < ?', BACKLOG_DAYS.days.ago.beginning_of_day)
-                            .where(event_type_id: event_type_ids)
+        # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
+        event_logs = account.event_logs.where(event_type_id: event_type_ids)
+                                       .where('created_at >= ?', start_date)
+                                       .where('created_at < ?', end_date)
 
         # Keep the latest log per-resource for each day and event type (i.e. discard duplicates)
         kept_logs = event_logs.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
