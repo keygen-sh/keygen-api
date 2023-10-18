@@ -73,10 +73,10 @@ describe PruneEventLogsWorker do
     )
   end
 
-  it 'should not prune high-volume event logs before backlog' do
+  it 'should not prune high-volume event logs before/after backlog' do
     license = create(:license, account:)
 
-    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: worker::BACKLOG_DAYS / 2)
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: worker::BACKLOG_DAYS + 2)
     create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license)
     create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: worker::BACKLOG_DAYS)
     create_list(:event_log, 50, :license_validation_failed, account:, resource: license)
