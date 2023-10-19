@@ -1,5 +1,6 @@
 class PruneMetricsWorker < BaseWorker
   BACKLOG_DAYS = ENV.fetch('KEYGEN_PRUNE_METRIC_BACKLOG_DAYS') { 30 }.to_i
+  TARGET_DAYS  = ENV.fetch('KEYGEN_PRUNE_METRIC_TARGET_DAYS')  { 1 }.to_i
   BATCH_SIZE   = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')          { 1_000 }.to_i
   BATCH_WAIT   = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')          { 1 }.to_f
 
@@ -11,15 +12,19 @@ class PruneMetricsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0
 
-    accounts = Account.where(<<~SQL.squish, BACKLOG_DAYS.days.ago.beginning_of_day)
+    end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
+    start_date = (end_date - TARGET_DAYS.day).beginning_of_day
+
+    accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
       EXISTS (
         SELECT
           1
         FROM
           "metrics"
         WHERE
-          "metrics"."account_id" = "accounts"."id" AND
-          "metrics"."created_at" < ?
+          "metrics"."account_id"  = "accounts"."id" AND
+          "metrics"."created_at" >= :start_date     AND
+          "metrics"."created_at" <  :end_date
         LIMIT
           1
       )
@@ -34,8 +39,8 @@ class PruneMetricsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-metrics] Pruning rows: account_id=#{account_id}"
 
       loop do
-        metrics = account.metrics
-                         .where('created_at < ?', BACKLOG_DAYS.days.ago.beginning_of_day)
+        metrics = account.metrics.where('created_at >= ?', start_date)
+                                 .where('created_at < ?', end_date)
 
         batch += 1
         count = metrics.limit(BATCH_SIZE)
