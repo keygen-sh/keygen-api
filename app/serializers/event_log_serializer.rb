@@ -7,7 +7,7 @@ class EventLogSerializer < BaseSerializer
     @object.event_type.event
   end
   attribute :metadata do
-    @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
+    @object.metadata&.deep_transform_keys { |k| k.to_s.camelize :lower } or {}
   end
   attribute :created do
     @object.created_at
@@ -48,8 +48,6 @@ class EventLogSerializer < BaseSerializer
     linkage always: true do
       next if
         @object.request_log_id.nil?
-
-      t = @object.whodunnit_type.underscore.pluralize.parameterize
 
       { type: 'request-logs', id: @object.request_log_id }
     end
