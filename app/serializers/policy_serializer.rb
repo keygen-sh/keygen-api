@@ -42,7 +42,7 @@ class PolicySerializer < BaseSerializer
   attribute :heartbeat_basis
   attribute :require_heartbeat
   attribute :metadata do
-    @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
+    @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}
   end
   attribute :created do
     @object.created_at
