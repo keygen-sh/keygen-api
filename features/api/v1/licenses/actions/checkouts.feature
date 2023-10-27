@@ -583,10 +583,63 @@ Feature: License checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin performs a license checkout with a policy include (POST, v1.5)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "metadata": {
+          "parent_key": {
+            "child_key": "value"
+          }
+        }
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license-file" with the following encoded certificate data:
+      """
+      {
+        "included": [
+          {
+            "type": "policies",
+            "id": "$policies[0]",
+            "attributes": {
+              "machineUniquenessStrategy": "UNIQUE_PER_LICENSE",
+              "machineMatchingStrategy": "MATCH_ANY",
+              "metadata": {
+                "parentKey": {
+                  "childKey": "value"
+                }
+              }
+            }
+          }
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin performs a license checkout with a policy include (POST, v1.4)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "metadata": {
+          "parent_key": {
+            "child_key": "value"
+          }
+        }
+      }
+      """
     And the current account has 1 "license" for the last "policy"
     And I am an admin of account "test1"
     And I use an authentication token
@@ -603,7 +656,12 @@ Feature: License checkout actions
             "id": "$policies[0]",
             "attributes": {
               "machineUniquenessStrategy": "UNIQUE_PER_LICENSE",
-              "machineMatchingStrategy": "MATCH_ANY"
+              "machineMatchingStrategy": "MATCH_ANY",
+              "metadata": {
+                "parentKey": {
+                  "child_key": "value"
+                }
+              }
             }
           }
         ]
@@ -686,6 +744,90 @@ Feature: License checkout actions
       {
         "included": [
           { "type": "policies", "id": "$policies[0]" }
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a license checkout with a policy include (GET, v1.5)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "metadata": {
+          "parent_key": {
+            "child_key": "value"
+          }
+        }
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response should be a "LICENSE" certificate with the following encoded data:
+      """
+      {
+        "included": [
+          {
+            "type": "policies",
+            "id": "$policies[0]",
+            "attributes": {
+              "metadata": {
+                "parentKey": {
+                  "childKey": "value"
+                }
+              }
+            }
+          }
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a license checkout with a policy include (GET, v1.4)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "metadata": {
+          "parent_key": {
+            "child_key": "value"
+          }
+        }
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.4"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response should be a "LICENSE" certificate with the following encoded data:
+      """
+      {
+        "included": [
+          {
+            "type": "policies",
+            "id": "$policies[0]",
+            "attributes": {
+              "metadata": {
+                "parentKey": {
+                  "child_key": "value"
+                }
+              }
+            }
+          }
         ]
       }
       """

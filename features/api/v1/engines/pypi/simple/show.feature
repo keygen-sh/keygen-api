@@ -288,3 +288,12 @@ Feature: PyPI simple package files
       """
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
     Then the response status should be "200"
+
+  Scenario: Anonymous requests versions using a previous API version
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And I use API version "1.3"
+    When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
+    Then the response status should be "200"
