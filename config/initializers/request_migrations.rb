@@ -18,6 +18,9 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.4' => %i[
+      update_nested_key_casing_to_snakecase_for_metadata_migration
+    ],
     '1.3' => %i[
       rename_machine_uniqueness_strategy_to_fingerprint_uniqueness_strategy_for_policies_migration
       rename_machine_uniqueness_strategy_to_fingerprint_uniqueness_strategy_for_policy_migration
