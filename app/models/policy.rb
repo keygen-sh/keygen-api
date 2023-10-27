@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Policy < ApplicationRecord
+  self.lock_optimistically = false
+
   class UnsupportedPoolError < StandardError; end
   class EmptyPoolError < StandardError; end
 
