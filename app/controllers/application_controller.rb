@@ -76,7 +76,7 @@ class ApplicationController < ActionController::API
   def authorization_context = build_authorization_context
 
   def render_meta(meta)
-    render json: { meta: meta.transform_keys! { _1.to_s.camelize :lower } }
+    render json: { meta: meta.deep_transform_keys { _1.to_s.camelize :lower } }
   end
 
   def render_no_content(**kwargs)
