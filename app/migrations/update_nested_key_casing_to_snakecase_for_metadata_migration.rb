@@ -89,5 +89,7 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
     migrate!(body)
 
     res.body = JSON.generate(body)
+  rescue JSON::ParserError => e
+    Keygen.logger.exception(e)
   end
 end
