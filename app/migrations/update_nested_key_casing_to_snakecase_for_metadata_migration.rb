@@ -75,7 +75,15 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.status < 400 && res.status != 204 && json?(res.request) } do |res|
+  response if: -> res { res.status < 400 && res.status != 204 } do |res|
+    req    = res.request
+    format = req.format
+    next unless
+      format.jsonapi? || format.json?
+
+    next if
+      res.body.blank?
+
     body = JSON.parse(res.body, symbolize_names: true)
 
     migrate!(body)
