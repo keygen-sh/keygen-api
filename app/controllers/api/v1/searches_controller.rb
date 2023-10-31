@@ -67,7 +67,7 @@ module Api::V1
         res = res.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date: start_date, end_date: end_date)
       end
 
-      Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_query=#{query}"
+      Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_type=#{type} search_query=#{query} search_op=#{op}"
 
       query.each do |key, value|
         attribute = key.to_s.underscore.parameterize(separator: '_')
