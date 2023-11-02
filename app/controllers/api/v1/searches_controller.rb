@@ -128,6 +128,8 @@ module Api::V1
       authorize! search_results,
         to: :index?
 
+      Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_results=#{search_results.count}"
+
       render jsonapi: search_results
     rescue UnsupportedSearchTypeError
       render_bad_request(detail: "search type '#{type.camelize(:lower)}' is not supported", source: { pointer: "/meta/type" })
