@@ -123,6 +123,17 @@ class User < ApplicationRecord
         .reorder(:email, :created_at)
   }
 
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('users.id::text ILIKE ?', "%#{sanitize_sql_like(identifier)}%")
+  }
+
   scope :search_email, -> (term) {
     return none if
       term.blank?
