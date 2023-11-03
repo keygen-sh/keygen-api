@@ -190,7 +190,7 @@ You can embed Keygen CE in your on-premise application.
 
 You can run Keygen CE on a private network.
 
-You can fork Keygen and go closed-source.
+You can fork Keygen into a private repo.
 
 If the ELv2 license doesn't work for your company, please [reach out][sales].
 
