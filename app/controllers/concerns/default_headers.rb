@@ -90,6 +90,8 @@ module DefaultHeaders
     else
       # leave as-is
     end
+  rescue => e
+    Keygen.logger.exception(e)
   end
 
   def add_whoami_headers
