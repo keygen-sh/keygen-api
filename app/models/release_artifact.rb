@@ -44,10 +44,6 @@ class ReleaseArtifact < ApplicationRecord
     through: :release
   has_one :engine,
     through: :package
-  has_many :users,
-    through: :product
-  has_many :licenses,
-    through: :product
   has_many :constraints,
     through: :release
 

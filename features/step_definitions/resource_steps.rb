@@ -380,6 +380,7 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
   resource = @account.send(a.pluralize.underscore).limit(numbers[i]).last
   association = @account.send(b.pluralize.underscore).limit(numbers[j]).last
 
+  # FIXME(ezekg) We should use reflection here.
   begin
     association.send(a.singularize.underscore) << resource
   rescue
