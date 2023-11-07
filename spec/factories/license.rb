@@ -97,10 +97,15 @@ FactoryBot.define do
 
     trait :with_user do
       user { build(:user, account:, environment:) }
+
+      after :create do |license|
+        create(:license_user, account: license.account, environment: license.environment, user: license.user, license:)
+      end
     end
 
     trait :userless do
-      user { nil }
+      license_users { nil }
+      user          { nil }
     end
 
     trait :user do
