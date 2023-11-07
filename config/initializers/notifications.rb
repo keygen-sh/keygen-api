@@ -15,7 +15,7 @@ ActiveSupport::Notifications.subscribe 'process_action.action_controller' do |ev
   request = event.payload[:request]
   status  = event.payload[:status]
   next unless
-    status >= 500
+    status.present? && status >= 500
 
   err = event.payload[:exception_object] || $!
   next if
