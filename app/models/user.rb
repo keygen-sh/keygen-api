@@ -15,6 +15,11 @@ class User < ApplicationRecord
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
+  has_many :license_users, index_errors: true, dependent: :delete_all
+  # TODO(ezekg) Swap this over to through: :license_users once migrated
+  #             to license_users.
+  #
+  # NOTE(ezekg) Be sure to mirror destroy callback for <= v1.5!
   has_many :licenses, dependent: :destroy_async
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -338,6 +343,7 @@ class User < ApplicationRecord
   def entitlement_ids   = entitlements.reorder(nil).ids
   def product_ids       = products.reorder(nil).ids
   def policy_ids        = policies.reorder(nil).ids
+  def license_ids       = licenses.reorder(nil).ids
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
