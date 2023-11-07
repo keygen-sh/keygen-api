@@ -19,7 +19,7 @@ class Product < ApplicationRecord
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
   has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses, source: :user
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, inverse_of: :product, dependent: :destroy_async
   has_many :release_packages, inverse_of: :product, dependent: :destroy_async
