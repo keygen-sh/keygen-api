@@ -81,6 +81,7 @@ After do |scenario|
       },
       debug: {
         env_number: ENV['TEST_ENV_NUMBER'].to_i,
+        error_log: $!&.backtrace || [],
         query_log: Elif.open(Rails.root / 'log' / 'test.log') do |log|
           count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
           lines = []
