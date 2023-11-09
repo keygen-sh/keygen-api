@@ -5,9 +5,10 @@ module CurrentRequestAttributes
 
   included do
     before_action do
-      Current.request_id = request.request_id = SecureRandom.uuid
-      Current.host       = request.host
-      Current.ip         = request.remote_ip
+      Current.api_version = RequestMigrations.config.request_version_resolver.call(request)
+      Current.request_id  = request.request_id = SecureRandom.uuid
+      Current.host        = request.host
+      Current.ip          = request.remote_ip
     end
   end
 end

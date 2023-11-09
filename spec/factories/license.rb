@@ -99,17 +99,24 @@ FactoryBot.define do
       end
     end
 
-    trait :with_user do
-      user { build(:user, account:, environment:) }
+    trait :with_users do
+      users { build_list(:user, 3, account:, environment:) }
+    end
 
+    trait :with_user do
+      users { build_list(:user, 1, account:, environment:) }
+
+      # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
       after :create do |license|
-        create(:license_user, account: license.account, environment: license.environment, user: license.user, license:)
+        license.update!(user: license.users.first)
       end
     end
 
     trait :userless do
-      license_users { nil }
-      user          { nil }
+      users { [] }
+
+      # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
+      user { nil }
     end
 
     trait :user do
