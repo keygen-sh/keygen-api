@@ -183,6 +183,8 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   end
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+
+  drain_async_destroy_jobs
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
@@ -198,8 +200,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 
-  # Wait for all async deletion workers to finish
-  YankArtifactWorker.drain
+  drain_async_destroy_jobs
 rescue Timeout::Error
 end
 
