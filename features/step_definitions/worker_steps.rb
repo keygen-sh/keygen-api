@@ -2,6 +2,22 @@
 
 World Rack::Test::Methods
 
+def drain_async_destroy_jobs
+  require 'sidekiq/testing'
+
+  # FIXME(ezekg) We only want to process the destroy async jobs so we
+  #              can't just drain the entire job wrapper class.
+  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
+  active_job.jobs.each do |job|
+    case job['wrapped']
+    when ActiveRecord::DestroyAssociationAsyncJob.name
+      active_job.process_job(job)
+    end
+  end
+
+  YankArtifactWorker.drain
+end
+
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name
