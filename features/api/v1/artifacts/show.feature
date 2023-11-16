@@ -32,7 +32,7 @@ Feature: Show release artifact
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves an artifact for their account (prefers no-download)
+  Scenario: Admin retrieves an artifact for their account (prefers no-download via header)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -50,7 +50,21 @@ Feature: Show release artifact
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves an artifact for their account (prefers no-redirect)
+  Scenario: Admin retrieves an artifact for their account (prefers no-download via query parameter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?prefer=no-download"
+    Then the response status should be "200"
+    And the response body should be an "artifact" without a "redirect" link
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact for their account (prefers no-redirect via header)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -64,6 +78,34 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
     And the response body should be an "artifact" with a "redirect" link
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact for their account (prefers no-redirect via query parameter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?prefer=no-redirect"
+    Then the response status should be "200"
+    And the response body should be an "artifact" with a "redirect" link
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact for their account (prefers via unsupported query parameter)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0?prefer[]=no-redirect&prefer[]=no-download"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
