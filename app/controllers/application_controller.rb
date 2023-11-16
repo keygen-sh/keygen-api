@@ -497,7 +497,7 @@ class ApplicationController < ActionController::API
   end
 
   def prefers?(preference)
-    preferences = request.headers.fetch('Prefer', '')
+    preferences = request.headers.fetch('Prefer') { request.query_parameters.fetch(:prefer, '').to_s }
                                  .split(',')
                                  .map(&:strip)
 
