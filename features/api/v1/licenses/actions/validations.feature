@@ -8942,6 +8942,209 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous validates a license key that requires a checksum scope (match published and uploaded artifact)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 published "release" for the last "product"
+    And the current account has 1 uploaded "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireChecksumScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "checksum-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" },
+          "key": "checksum-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license" with the following attributes:
+      """
+      { "version": "$releases[0].version" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a checksum scope (match published and waiting artifact)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 published "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireChecksumScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "checksum-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" },
+          "key": "checksum-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a checksum scope (match published and failed artifact)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 published "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireChecksumScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "checksum-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" },
+          "key": "checksum-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a checksum scope (match draft and uploaded artifact)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 uploaded "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireChecksumScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "checksum-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" },
+          "key": "checksum-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a checksum scope (match yanked artifact)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireChecksumScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "checksum-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "checksum": "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30" },
+          "key": "checksum-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "checksum scope is not valid (does not match any accessible artifacts)", "code": "CHECKSUM_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a license key that requires a version scope (missing)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -9130,6 +9333,126 @@ Feature: License validation actions
       {
         "meta": {
           "scope": { "version": "2.0.0" },
+          "key": "version-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a version scope (match published release)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 published "release" for the last "product"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.2.3" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireVersionScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "version-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "version": "1.2.3" },
+          "key": "version-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license" with the following attributes:
+      """
+      { "version": "1.2.3" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a version scope (match draft release)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.2.3" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireVersionScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "version-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "version": "1.2.3" },
+          "key": "version-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a version scope (match yanked release)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.2.3" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "requireVersionScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "version-key" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "version": "1.2.3" },
           "key": "version-key"
         }
       }

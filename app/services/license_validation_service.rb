@@ -208,6 +208,8 @@ class LicenseValidationService < BaseService
         artifact = product.release_artifacts.with_checksum(checksum)
                                             .for_license(license)
                                             .order_by_version
+                                            .published
+                                            .uploaded
                                             .take
 
         if artifact.nil?
@@ -225,6 +227,7 @@ class LicenseValidationService < BaseService
         version = scope[:version]
         release = product.releases.with_version(version)
                                   .for_license(license)
+                                  .published
                                   .take
 
         if release.nil?
