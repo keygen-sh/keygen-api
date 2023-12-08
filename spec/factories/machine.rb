@@ -7,8 +7,8 @@ FactoryBot.define do
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name        { Faker::Company.buzzword }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     license     { build(:license, account:, environment:) }
 
     trait :in_isolated_environment do

@@ -7,8 +7,8 @@ FactoryBot.define do
     sequence :name, %w[HWID HDDID SSD CPU MOBO IP MAC].cycle
     fingerprint { SecureRandom.hex(16) }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     machine     { build(:machine, account:, environment:) }
 
     trait :in_isolated_environment do

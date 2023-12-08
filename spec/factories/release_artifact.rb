@@ -8,8 +8,8 @@ FactoryBot.define do
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
     status   { 'UPLOADED' }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     release     { build(:release, account:, environment:) }
     platform    { build(:platform, key: 'darwin', account:) }
     arch        { build(:arch, key: 'amd64', account:) }
