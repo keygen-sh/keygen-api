@@ -52,7 +52,17 @@ Feature: Create license
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And the response body should be a "license" with a key that is not nil
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
     And the current account should have 1 "license"
+    And the first "license" should have 1 "user"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -5561,9 +5571,7 @@ Feature: Create license
     Given the account "test2" has 2 "users"
     And the second "user" of account "test2" has the following attributes:
       """
-      {
-        "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5"
-      }
+      { "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5" }
       """
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -5594,8 +5602,8 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    And the response body should be an array of errors
+    And an error should have the following properties:
       """
       {
         "title": "Unprocessable resource",

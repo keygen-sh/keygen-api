@@ -6,8 +6,8 @@ FactoryBot.define do
 
     url { "https://#{SecureRandom.hex}.example" }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

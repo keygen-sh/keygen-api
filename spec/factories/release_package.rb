@@ -7,8 +7,8 @@ FactoryBot.define do
     name { Faker::App.unique.name }
     key  { name.underscore }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
     engine      { nil }
 

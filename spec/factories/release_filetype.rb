@@ -6,6 +6,6 @@ FactoryBot.define do
 
     sequence :key, %w[dmg exe zip tar.gz appimage].cycle
 
-    account { nil }
+    account { Current.account }
   end
 end
