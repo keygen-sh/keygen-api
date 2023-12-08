@@ -8,8 +8,8 @@ FactoryBot.define do
     version { nil }
     status  { 'PUBLISHED' }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
     channel     { build(:channel, key: 'stable', account:) }
     package     { nil }
