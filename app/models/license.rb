@@ -3,6 +3,7 @@
 class License < ApplicationRecord
   include Envented::Callbacks
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Tokenable
@@ -10,7 +11,6 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  belongs_to :account
   belongs_to :policy
   belongs_to :group,
     optional: true
@@ -31,6 +31,7 @@ class License < ApplicationRecord
   belongs_to :user,
     optional: true
 
+  has_account default: -> { policy&.account_id }, inverse_of: :licenses
   has_environment default: -> { policy&.environment_id }
   has_role :license
   has_permissions Permission::LICENSE_PERMISSIONS,
@@ -512,12 +513,12 @@ class License < ApplicationRecord
 
   # NOTE(ezekg) For backwards compatibility. Dual writing until we migrate
   #             data from licenses.user_id column to HABTM.
-  def user=(record)
-    case record
-    in String => user_id
-      self.users = User.where(id: user_id)
+  def user=(value)
+    case value
     in User => user
       self.users = [user]
+    in String => id
+      self.users = account.users.where(id:)
     in nil
       self.users = []
     end
@@ -525,8 +526,15 @@ class License < ApplicationRecord
     super
   end
 
-  def user_id=(id)
-    self.users = User.where(id:)
+  def user_id=(value)
+    case value
+    in User => user
+      self.users = [user]
+    in String => id
+      self.users = account.users.where(id:)
+    in nil
+      self.users = []
+    end
 
     super
   end

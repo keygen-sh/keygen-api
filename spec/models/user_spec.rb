@@ -7,6 +7,7 @@ describe User, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#role_attributes=' do
     context 'on role assignment' do
@@ -204,6 +205,19 @@ describe User, type: :model do
       user = create(:user, account:)
 
       expect(user.permissions.ids).to match_array User.default_permission_ids
+    end
+  end
+
+  describe '#licenses' do
+    let(:policy) { build(:policy, account:) }
+    let(:user)   { create(:user, account:) }
+
+    # FIXME(ezekg) Remove dual-writing after we fully migrate to HABTM.
+    it 'should should dual-write to #_licenses and #licenses associations' do
+      license = user.licenses.create!(account:, policy:)
+
+      expect(user._licenses).to eq [license]
+      expect(user.licenses).to eq [license]
     end
   end
 end

@@ -99,7 +99,8 @@ module Api::V1
       end
     }
     def create
-      license = current_account.licenses.new(license_params)
+      # FIXME(ezekg) The superfluous account: keyword is a workaround for https://github.com/rails/rails/pull/50014
+      license = current_account.licenses.new(account: current_account, **license_params)
       authorize! license
 
       if license.save

@@ -4,8 +4,8 @@ FactoryBot.define do
   factory :second_factor do
     initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
-    account     { nil }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     user        { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do

@@ -7,6 +7,7 @@ describe License, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
   it_behaves_like :dirtyable
 
   describe '#environment=' do
@@ -181,6 +182,61 @@ describe License, type: :model do
         actions = license.permissions.actions
 
         expect(actions).to match_array %w[license.validate license.read machine.read machine.create machine.delete]
+      end
+    end
+  end
+
+  # FIXME(ezekg) Remove dual-writing after we fully migrate to HABTM.
+  describe '#user_id=' do
+    let(:user) { create(:user, account:) }
+
+    context 'on create' do
+      it 'should should dual-write to #user and #users associations' do
+        license = create(:license, account:, user_id: user.id)
+
+        expect(license.users).to eq [user]
+        expect(license.user).to eq user
+      end
+    end
+
+    context 'on update' do
+      it 'should should dual-write to #user and #users associations' do
+        license    = create(:license, account:, user_id: user.id)
+        other_user = create(:user, account:)
+
+        license.update!(
+          user_id: other_user.id,
+        )
+
+        expect(license.users).to eq [other_user]
+        expect(license.user).to eq other_user
+      end
+    end
+  end
+
+  describe '#user=' do
+    let(:user) { create(:user, account:) }
+
+    context 'on create' do
+      it 'should should dual-write to #user and #users associations' do
+        license = create(:license, account:, user:)
+
+        expect(license.users).to eq [user]
+        expect(license.user).to eq user
+      end
+    end
+
+    context 'on update' do
+      it 'should should dual-write to #user and #users associations' do
+        license    = create(:license, account:, user:)
+        other_user = create(:user, account:)
+
+        license.update!(
+          user: other_user,
+        )
+
+        expect(license.users).to eq [other_user]
+        expect(license.user).to eq other_user
       end
     end
   end
