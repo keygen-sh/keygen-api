@@ -9,18 +9,19 @@ class User < ApplicationRecord
 
   include PasswordResettable
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Roleable
   include Diffable
 
-  belongs_to :account, inverse_of: :users
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
   # TODO(ezekg) Rename to :licenses once data is migrated to HABTM.
-  has_and_belongs_to_many :_licenses, class_name: 'License', index_errors: true, dependent: :delete_all
+  # TODO(ezekg) Uncomment destroy callback.
+  has_and_belongs_to_many :_licenses, class_name: 'License', index_errors: true, dependent: :destroy_async
   # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
   has_many :licenses, dependent: :destroy_async
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -47,34 +48,8 @@ class User < ApplicationRecord
   has_one :any_active_license, -> { active.reorder(nil).distinct_on(:user_id) },
     class_name: License.name
 
-  # NOTE(ezekg) This mirrors behavior for <= v1.5 where a user's licenses
-  #             were destroyed when the user was destroyed. With the
-  #             advent of multi-user licenses, this is no longer the
-  #             case. Instead, the license is simply disassociated
-  #             from the user.
-  #
-  # TODO(ezekg) Uncomment once we migrate licenses to HABTM.
-  # after_destroy {
-  #   next unless
-  #     Current.api_version.present? # skip outside of web context
-
-  #   next unless
-  #     Semverse::Constraint.new('<= 1.5')
-  #                         .satisfies?(
-  #                           Semverse::Version.new(Current.api_version),
-  #                         )
-
-  #   destroy_association_async_job.perform_later(
-  #     owner_model_name: self.class.to_s,
-  #     owner_id: id,
-  #     association_class: _licenses.klass.to_s,
-  #     association_ids: _licenses.ids,
-  #     association_primary_key_column: _licenses.klass.primary_key.to_s,
-  #     ensuring_owner_was_method: nil,
-  #   )
-  # }
-
   has_secure_password :password, validations: false
+  has_account inverse_of: :users
   has_environment
   has_default_role :user
   has_permissions -> user {
@@ -120,6 +95,35 @@ class User < ApplicationRecord
     }
 
   normalizes :email, with: -> email { email.downcase.strip }
+
+  # NOTE(ezekg) This mirrors behavior for <= v1.5 where a user's licenses
+  #             were destroyed when the user was destroyed. With the
+  #             advent of multi-user licenses, this is no longer the
+  #             case. Instead, the license is simply disassociated
+  #             from the user.
+  #
+  # TODO(ezekg) Uncomment once we migrate licenses to HABTM.
+  # TODO(ezekg) Should we batch this?
+  #
+  # after_destroy {
+  #   next unless
+  #     Current.api_version.present? # skip outside of web context
+
+  #   next unless
+  #     Semverse::Constraint.new('<= 1.5')
+  #                         .satisfies?(
+  #                           Semverse::Version.new(Current.api_version),
+  #                         )
+
+  #   destroy_association_async_job.perform_later(
+  #     owner_model_name: self.class.to_s,
+  #     owner_id: id,
+  #     association_class: _licenses.klass.to_s,
+  #     association_ids: _licenses.ids,
+  #     association_primary_key_column: _licenses.klass.primary_key.to_s,
+  #     ensuring_owner_was_method: nil,
+  #   )
+  # }
 
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
