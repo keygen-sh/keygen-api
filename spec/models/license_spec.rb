@@ -244,7 +244,19 @@ describe License, type: :model do
     end
   end
 
-  # FIXME(ezekg) Remove dual-writing after we fully migrate to HABTM.
+  describe '#users' do
+    let(:license) { create(:license, account:) }
+
+    it 'should raise on user account mismatch' do
+      other_account = create(:account)
+
+      expect { license.users << create(:user, account: other_account) }.to(
+        raise_error ActiveRecord::RecordInvalid
+      )
+    end
+  end
+
+  # FIXME(ezekg) Remove dual-writing after we fully migrate to multi-user licenses.
   describe '#user_id=' do
     let(:user) { create(:user, account:) }
 

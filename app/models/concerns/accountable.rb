@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Accountable
   extend ActiveSupport::Concern
 
@@ -24,11 +23,11 @@ module Accountable
       # is applied to new records (given no :account was provided).
       after_initialize -> { self.account_id ||= Current.account&.id },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-        if: -> { new_record? && !account_id? }
+        if: -> { new_record? && account_id.nil? }
 
       before_validation -> { self.account_id ||= Current.account&.id },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-        if: -> { new_record? && !account_id? },
+        if: -> { new_record? && account_id.nil? },
         on: %i[create]
 
       validates :account,
