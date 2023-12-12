@@ -53,7 +53,7 @@ describe Machine, type: :model do
   describe '#components_attributes=' do
     it 'should not raise when component is valid' do
       machine = build(:machine, account:, components_attributes: [
-        attributes_for(:component),
+        attributes_for(:component, account:),
       ])
 
       expect { machine.save! }.to_not raise_error
@@ -62,8 +62,8 @@ describe Machine, type: :model do
     it 'should raise when component is duplicated' do
       fingerprint = SecureRandom.hex
       machine     = build(:machine, account:, components_attributes: [
-        attributes_for(:component, fingerprint:),
-        attributes_for(:component, fingerprint:),
+        attributes_for(:component, fingerprint:, account:),
+        attributes_for(:component, fingerprint:, account:),
       ])
 
       expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid
@@ -71,8 +71,8 @@ describe Machine, type: :model do
 
     it 'should raise when component is invalid' do
       machine = build(:machine, account:, components_attributes: [
-        attributes_for(:component, fingerprint: nil),
-        attributes_for(:component),
+        attributes_for(:component, fingerprint: nil, account:),
+        attributes_for(:component, account:),
       ])
 
       expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid

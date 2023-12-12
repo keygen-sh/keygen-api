@@ -6,9 +6,9 @@ require 'spec_helper'
 describe Account, type: :model do
   it 'should promote nested users to admins on create' do
     users_attributes = [
-      attributes_for(:user),
-      attributes_for(:user),
-      attributes_for(:user),
+      attributes_for(:user, account: nil),
+      attributes_for(:user, account: nil),
+      attributes_for(:user, account: nil),
     ]
 
     account = build(:account,

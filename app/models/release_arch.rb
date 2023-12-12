@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 class ReleaseArch < ApplicationRecord
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account,
-    inverse_of: :release_arches
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :arch
@@ -14,6 +13,8 @@ class ReleaseArch < ApplicationRecord
     through: :artifacts
   has_many :products,
     through: :releases
+
+  has_account inverse_of: :release_arches
 
   validates :key,
     presence: true,

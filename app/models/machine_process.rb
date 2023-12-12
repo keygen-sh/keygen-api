@@ -5,6 +5,7 @@ class MachineProcess < ApplicationRecord
   class ResurrectionExpiredError < StandardError; end
 
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -12,7 +13,6 @@ class MachineProcess < ApplicationRecord
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL   = 10.minutes
 
-  belongs_to :account
   belongs_to :machine
   has_one :group,      through: :machine
   has_one :license,    through: :machine
@@ -20,6 +20,7 @@ class MachineProcess < ApplicationRecord
   has_one :policy,     through: :machine
   has_one :product,    through: :machine
 
+  has_account default: -> { machine&.account_id }
   has_environment default: -> { machine&.environment_id }
 
   before_validation -> { self.last_heartbeat_at ||= Time.current },

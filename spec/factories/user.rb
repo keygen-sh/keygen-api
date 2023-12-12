@@ -2,15 +2,15 @@
 
 FactoryBot.define do
   factory :user do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     first_name { Faker::Name.first_name }
     last_name  { Faker::Name.last_name }
     email      { SecureRandom.hex(4) + Faker::Internet.safe_email }
     password   { 'password' }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { NIL_ACCOUNT }
+    environment { NIL_ENVIRONMENT }
 
     factory :admin do
       role { build(:role, :admin) }

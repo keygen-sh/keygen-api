@@ -1,13 +1,14 @@
 class GroupOwner < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :group
   belongs_to :user
 
+  has_account default: -> { group&.account_id }
   has_environment default: -> { group&.environment_id }
 
   validates :group,
