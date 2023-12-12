@@ -26,7 +26,8 @@ RUN apk add --no-cache \
   postgresql-dev \
   libc6-compat
 
-RUN bundle install --jobs 4 --retry 5
+RUN bundle install --jobs 4 --retry 5 && \
+  chmod -R a+r /usr/local/bundle
 
 # Final stage
 FROM base
@@ -47,11 +48,12 @@ ENV KEYGEN_EDITION="CE" \
     PORT="3000" \
     BIND="0.0.0.0"
 
-COPY --from=build /usr/local/bundle/ /usr/local/bundle
-
 RUN chmod +x /app/scripts/entrypoint.sh && \
-  adduser -h /app -u 1000 -s /bin/bash -D keygen && \
+  adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen && \
   chown -R keygen:keygen /app
+
+COPY --from=build --chown=keygen:keygen \
+  /usr/local/bundle/ /usr/local/bundle
 
 USER keygen
 
