@@ -5,11 +5,11 @@ FactoryBot.define do
     # Prevent duplicates due to cyclic entitlement codes.
     initialize_with do
       PolicyEntitlement.find_by(entitlement_id: entitlement&.id, policy_id: policy&.id) ||
-        new(**attributes.reject { NIL_ENVIRONMENT == _2 })
+        new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT })
     end
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { NIL_ACCOUNT }
+    environment { NIL_ENVIRONMENT }
     entitlement { build(:entitlement, account:, environment:) }
     policy      { build(:policy, account:, environment:) }
 

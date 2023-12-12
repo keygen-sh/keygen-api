@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseEngine < ApplicationRecord
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -10,8 +11,6 @@ class ReleaseEngine < ApplicationRecord
     tauri
   ]
 
-  belongs_to :account,
-    inverse_of: :release_engines
   has_many :packages,
     class_name: 'ReleasePackage',
     inverse_of: :engine
@@ -23,6 +22,8 @@ class ReleaseEngine < ApplicationRecord
     through: :products
   has_many :users,
     through: :products
+
+  has_account inverse_of: :release_engines
 
   validates :key,
     presence: true,

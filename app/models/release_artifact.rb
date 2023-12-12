@@ -2,6 +2,7 @@
 
 class ReleaseArtifact < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -15,7 +16,6 @@ class ReleaseArtifact < ApplicationRecord
 
   attr_accessor :redirect_url
 
-  belongs_to :account
   belongs_to :release,
     inverse_of: :artifacts
   belongs_to :platform,
@@ -47,6 +47,7 @@ class ReleaseArtifact < ApplicationRecord
   has_many :constraints,
     through: :release
 
+  has_account default: -> { release&.account_id }
   has_environment default: -> { release&.environment_id }
 
   accepts_nested_attributes_for :filetype

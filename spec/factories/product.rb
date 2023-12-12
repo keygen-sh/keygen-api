@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :product do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     name { Faker::App.name }
     platforms {
@@ -13,8 +13,8 @@ FactoryBot.define do
       ]
     }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { NIL_ACCOUNT }
+    environment { NIL_ENVIRONMENT }
 
     trait :licensed do
       distribution_strategy { 'LICENSED' }

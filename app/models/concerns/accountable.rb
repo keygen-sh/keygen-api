@@ -65,11 +65,11 @@ module Accountable
 
         # Again, we want to make absolutely sure our default is applied.
         after_initialize unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-          if: -> { new_record? && !account_id? },
+          if: -> { new_record? && account_id.nil? },
           &fn
 
         before_validation unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-          if: -> { new_record? && !account_id? },
+          if: -> { new_record? && account_id.nil? },
           on: %i[create],
           &fn
       end
