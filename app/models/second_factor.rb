@@ -6,15 +6,16 @@ class SecondFactor < ApplicationRecord
   SECOND_FACTOR_DRIFT  = 10
 
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
   encrypts :secret
 
-  belongs_to :account
   belongs_to :user
 
+  has_account default: -> { user&.account_id }
   has_environment default: -> { user&.environment_id }
 
   before_create :generate_secret!

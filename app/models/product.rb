@@ -2,6 +2,7 @@
 
 class Product < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -14,7 +15,6 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
-  belongs_to :account
   has_many :policies, dependent: :destroy_async
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
@@ -31,6 +31,7 @@ class Product < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  has_account
   has_environment
   has_role :product
   has_permissions Permission::PRODUCT_PERMISSIONS

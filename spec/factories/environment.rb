@@ -4,7 +4,9 @@ FactoryBot.define do
   factory :environment do
     # Prevent duplicates due to recurring environment codes. Attempting
     # to insert duplicate codes would fail, and this prevents that.
-    initialize_with { Environment.find_by(code:) || new(**attributes) }
+    initialize_with { Environment.find_by(code:) || new(**attributes.reject { NIL_ACCOUNT == _2 }) }
+
+    account { NIL_ACCOUNT }
 
     isolation_strategy { 'ISOLATED' }
     code               { SecureRandom.hex(4) }
