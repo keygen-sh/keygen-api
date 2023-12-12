@@ -8,6 +8,7 @@ class Policy < ApplicationRecord
 
   include Denormalizable
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -130,7 +131,6 @@ class Policy < ApplicationRecord
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
 
-  belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy_async
   has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses, source: :user
@@ -141,6 +141,7 @@ class Policy < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  has_account default: -> { product&.account_id }
   has_environment default: -> { product&.environment_id }
 
   denormalizes :product_id,

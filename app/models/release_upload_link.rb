@@ -2,14 +2,15 @@
 
 class ReleaseUploadLink < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :release,
     inverse_of: :upload_links
 
+  has_account default: -> { release&.account_id }
   has_environment default: -> { release&.environment_id }
 
   encrypts :url

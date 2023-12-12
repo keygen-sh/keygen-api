@@ -1,12 +1,10 @@
 class Group < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  has_environment
-
-  belongs_to :account
   has_many :group_permissions
   has_many :permissions,
     through: :group_permissions
@@ -20,6 +18,9 @@ class Group < ApplicationRecord
   has_many :owners,
     class_name: 'GroupOwner',
     dependent: :delete_all
+
+  has_account
+  has_environment
 
   # Give products the ability to read all groups
   scope :for_product, -> id { self }
