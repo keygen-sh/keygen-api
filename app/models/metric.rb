@@ -2,6 +2,7 @@
 
 class Metric < ApplicationRecord
   include DateRangeable
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -76,8 +77,9 @@ class Metric < ApplicationRecord
     release.constraints.detached
   ].freeze
 
-  belongs_to :account
   belongs_to :event_type
+
+  has_account
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.

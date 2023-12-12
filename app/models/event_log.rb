@@ -3,12 +3,12 @@
 class EventLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[event_logs]]
   include Environmental
+  include Accountable
   include DateRangeable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :event_type
   belongs_to :resource,
     polymorphic: true,
@@ -19,6 +19,7 @@ class EventLog < ApplicationRecord
   belongs_to :request_log,
     optional: true
 
+  has_account
   has_environment
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,

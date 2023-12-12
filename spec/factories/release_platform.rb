@@ -6,6 +6,6 @@ FactoryBot.define do
 
     sequence :key, %w[darwin linux windows].cycle
 
-    account { Current.account }
+    account { NIL_ACCOUNT }
   end
 end
