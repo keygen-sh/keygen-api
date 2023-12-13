@@ -18,10 +18,6 @@ class ReleaseEngine < ApplicationRecord
     through: :packages
   has_many :products,
     through: :packages
-  has_many :licenses,
-    through: :products
-  has_many :users,
-    through: :products
 
   has_account inverse_of: :release_engines
 
