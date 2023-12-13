@@ -7,6 +7,7 @@ describe SecondFactor, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#environment=' do
     context 'on create' do

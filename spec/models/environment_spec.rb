@@ -6,6 +6,8 @@ require 'spec_helper'
 describe Environment, type: :model do
   let(:account) { create(:account) }
 
+  it_behaves_like :accountable
+
   %i[isolated shared].each do |isolation|
     it "should promote nested #{isolation} users to admins on create" do
       users_attributes = [
