@@ -270,7 +270,10 @@ class ApplicationController < ActionController::API
     errors = resource.errors.as_jsonapi
     meta   = { id: request.request_id }
 
-    errors.each do |error|
+    # NOTE(ezekg) We're using #reverse_each here so that we can delete errors
+    #             in-place, e.g. in the case of a non-public error, without
+    #             botching the iterator's indexes.
+    errors.reverse_each do |error|
       # Fixup various error codes and pointers to match our objects, e.g.
       # some relationships are invisible, exposed as attributes.
       case error
@@ -296,6 +299,8 @@ class ApplicationController < ActionController::API
         error.pointer = '/data/attributes/engine'
       in source: { pointer: %r{^/data/relationships/arch} }
         error.pointer = '/data/attributes/arch'
+      in code: /ACCOUNT_NOT_ALLOWED$/ # private error
+        errors.delete(error)
       else
       end
 
