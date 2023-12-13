@@ -18,10 +18,6 @@ class ReleaseChannel < ApplicationRecord
     inverse_of: :channel
   has_many :products,
     through: :releases
-  has_many :licenses,
-    through: :products
-  has_many :users,
-    through: :products
 
   has_account inverse_of: :release_channels
 
