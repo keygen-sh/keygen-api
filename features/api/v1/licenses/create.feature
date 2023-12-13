@@ -5602,8 +5602,8 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
-    And the response body should be an array of errors
-    And an error should have the following properties:
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
       """
       {
         "title": "Unprocessable resource",
