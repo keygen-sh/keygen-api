@@ -142,8 +142,8 @@ class Policy < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_account default: -> { product&.account_id }
   has_environment default: -> { product&.environment_id }
+  has_account default: -> { product&.account_id }
 
   denormalizes :product_id,
     to: :licenses

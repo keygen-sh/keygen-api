@@ -20,8 +20,8 @@ class MachineProcess < ApplicationRecord
   has_one :policy,     through: :machine
   has_one :product,    through: :machine
 
-  has_account default: -> { machine&.account_id }
   has_environment default: -> { machine&.environment_id }
+  has_account default: -> { machine&.account_id }
 
   before_validation -> { self.last_heartbeat_at ||= Time.current },
     on: :create
