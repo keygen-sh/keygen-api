@@ -10,8 +10,8 @@ class WebhookEvent < ApplicationRecord
 
   belongs_to :event_type
 
-  has_account
   has_environment
+  has_account
 
   validates :endpoint, url: true, presence: true
 

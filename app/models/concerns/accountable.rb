@@ -117,6 +117,20 @@ module Accountable
           end
         end
       end
+
+      module_eval do
+        define_singleton_method :belongs_to do |name, *args, **kwargs, &block|
+          Keygen.logger.warn <<~MSG.strip
+            A .belongs_to(#{name.inspect}) association was defined after .has_account() was called.
+            This may result in incorrect and potentially insecure validation behavior, where the
+            #{name.inspect} association's account is not validated against the owner's account.
+
+            #{caller.join("\n")}
+          MSG
+
+          super(name, *args, **kwargs, &block)
+        end
+      end
     end
   end
 end
