@@ -30,8 +30,17 @@ module Accountable
         if: -> { new_record? && account_id.nil? },
         on: %i[create]
 
-      validates :account,
-        presence: { message: 'must exist' }
+      # This is essentially Rails' default presence: validator but with an explicit
+      # abort to stop the validation chain, since a lot of validations require an
+      # account. If the account is missing, it's safe to fail early.
+      validate on: %i[create update] do
+        next if
+          account.present?
+
+        errors.add(:account, :blank, message: 'must exist')
+
+        throw :abort
+      end
 
       # TODO(ezekg) Extract this into a concern or an attr_immutable lib?
       validate on: %i[update] do
