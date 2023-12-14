@@ -32,8 +32,8 @@ class Product < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_account
   has_environment
+  has_account
   has_role :product
   has_permissions Permission::PRODUCT_PERMISSIONS
 

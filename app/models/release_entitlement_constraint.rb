@@ -14,8 +14,8 @@ class ReleaseEntitlementConstraint < ApplicationRecord
   has_one :product,
     through: :release
 
-  has_account default: -> { release&.account_id }
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   validates :release,
     scope: { by: :account_id }
