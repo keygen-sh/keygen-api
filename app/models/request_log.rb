@@ -14,8 +14,8 @@ class RequestLog < ApplicationRecord
   has_one :event_log,
     inverse_of: :request_log
 
-  has_account
   has_environment
+  has_account
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.
