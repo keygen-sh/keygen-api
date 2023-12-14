@@ -40,8 +40,8 @@ class User < ApplicationRecord
     through: :group_owners
 
   has_secure_password :password, validations: false
-  has_account inverse_of: :users
   has_environment
+  has_account inverse_of: :users
   has_default_role :user
   has_permissions -> user {
       role = if user.respond_to?(:role)

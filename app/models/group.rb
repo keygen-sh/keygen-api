@@ -19,8 +19,8 @@ class Group < ApplicationRecord
     class_name: 'GroupOwner',
     dependent: :delete_all
 
-  has_account
   has_environment
+  has_account
 
   # Give products the ability to read all groups
   scope :for_product, -> id { self }

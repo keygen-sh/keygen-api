@@ -136,8 +136,8 @@ class Policy < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_account default: -> { product&.account_id }
   has_environment default: -> { product&.environment_id }
+  has_account default: -> { product&.account_id }
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }

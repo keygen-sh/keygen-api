@@ -15,8 +15,8 @@ class SecondFactor < ApplicationRecord
 
   belongs_to :user
 
-  has_account default: -> { user&.account_id }
   has_environment default: -> { user&.environment_id }
+  has_account default: -> { user&.account_id }
 
   before_create :generate_secret!
 
