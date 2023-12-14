@@ -10,8 +10,8 @@ class ReleaseUploadLink < ApplicationRecord
   belongs_to :release,
     inverse_of: :upload_links
 
-  has_account default: -> { release&.account_id }
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   encrypts :url
 

@@ -21,7 +21,6 @@ class Token < ApplicationRecord
     dependent: :delete_all,
     autosave: true
 
-  has_account default: -> { bearer&.account_id }
   has_environment default: -> {
     case bearer
     in Environment(id: environment_id)
@@ -32,6 +31,7 @@ class Token < ApplicationRecord
       nil
     end
   }
+  has_account default: -> { bearer&.account_id }
   has_permissions Permission::ALL_PERMISSIONS,
     # Default to wildcard permission but allow all
     default: %w[*]
