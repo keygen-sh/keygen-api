@@ -95,7 +95,7 @@ describe Release, type: :model do
   describe '#constraints_attributes=' do
     it 'should not raise when constraint is valid' do
       release = build(:release, account:, constraints_attributes: [
-        attributes_for(:constraint, account:),
+        attributes_for(:constraint, account:, environment: nil),
       ])
 
       expect { release.save! }.to_not raise_error
@@ -104,8 +104,8 @@ describe Release, type: :model do
     it 'should raise when constraint is duplicated' do
       entitlement = create(:entitlement, account:)
       release     = build(:release, account:, constraints_attributes: [
-        attributes_for(:constraint, account:, entitlement:),
-        attributes_for(:constraint, account:, entitlement:),
+        attributes_for(:constraint, account:, entitlement:, environment: nil),
+        attributes_for(:constraint, account:, entitlement:, environment: nil),
       ])
 
       expect { release.save! }.to raise_error ActiveRecord::RecordInvalid
@@ -113,8 +113,8 @@ describe Release, type: :model do
 
     it 'should raise when constraint is invalid' do
       release = build(:release, account:, constraints_attributes: [
-        attributes_for(:constraint, account:, entitlement: nil),
-        attributes_for(:constraint, account:),
+        attributes_for(:constraint, account:, entitlement: nil, environment: nil),
+        attributes_for(:constraint, account:, environment: nil),
       ])
 
       expect { release.save! }.to raise_error ActiveRecord::RecordInvalid
