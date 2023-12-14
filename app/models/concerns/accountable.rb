@@ -37,7 +37,7 @@ module Accountable
         next if
           account.present?
 
-        errors.add(:account, :blank, message: 'must exist')
+        errors.add :account, :blank, message: 'must exist'
 
         throw :abort
       end
@@ -47,7 +47,9 @@ module Accountable
         next unless
           account_changed? && account_id != account_id_was
 
-        errors.add(:account, :not_allowed, message: 'is immutable')
+        errors.add :account, :not_allowed, message: 'is immutable'
+
+        throw :abort
       end
 
       unless default.nil?

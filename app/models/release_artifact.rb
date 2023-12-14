@@ -54,7 +54,6 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :arch
 
-  before_validation -> { self.account_id ||= release&.account_id }
   before_validation -> { self.status ||= 'WAITING' }
 
   before_create -> { self.backend ||= account.backend }
@@ -439,7 +438,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_filetype
     return unless
-      filetype.present?
+      filetype.present? && account.present?
 
     # Clear filetype if the key is empty e.g. "" or nil
     return self.filetype = nil unless
@@ -497,7 +496,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_platform
     return unless
-      platform.present?
+      platform.present? && account.present?
 
     # Clear platform if the key is empty e.g. "" or nil
     return self.platform = nil unless
@@ -547,7 +546,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_arch
     return unless
-      arch.present?
+      arch.present? && account.present?
 
     # Clear arch if the key is empty e.g. "" or nil
     return self.arch = nil unless
