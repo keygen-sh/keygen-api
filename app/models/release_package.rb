@@ -101,7 +101,7 @@ class ReleasePackage < ApplicationRecord
 
   def validate_associated_records_for_engine
     return unless
-      engine.present?
+      engine.present? && account.present?
 
     # Clear engine if the key is empty e.g. "" or nil
     return self.engine = nil unless
