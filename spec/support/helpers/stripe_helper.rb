@@ -19,11 +19,11 @@ class StripeHelper
       StripeMock.stop
     end
 
-    def method_missing(method, *args, **kwargs)
+    def method_missing(method, ...)
       if instance.respond_to?(method)
-        instance.send(method, *args, **kwargs)
+        instance.send(method, ...)
       else
-        instance.helper.send(method, *args, **kwargs)
+        instance.helper.send(method, ...)
       end
     end
 
