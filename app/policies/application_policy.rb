@@ -62,12 +62,12 @@ class ApplicationPolicy
 
   # Short and easier to remember/use alias. Also makes record arg required,
   # ensures we always use :inline_reasons.
-  def allow?(rule, record, *args, **kwargs) = allowed_to?(:"#{rule}?", record, *args, inline_reasons: true, **kwargs)
+  def allow?(rule, record, *, **) = allowed_to?(:"#{rule}?", record, *, inline_reasons: true, **)
 
   # Overriding policy_for() to add custom options/keywords, such as the option to skip
   # permissions checks for nested policy checks via :skip_verify_permissions.
-  def policy_for(skip_verify_permissions: false, **kwargs)
-    policy = super(**kwargs)
+  def policy_for(skip_verify_permissions: false, **)
+    policy = super(**)
 
     policy&.skip_verify_permissions! if
       skip_verify_permissions
