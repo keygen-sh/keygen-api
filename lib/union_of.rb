@@ -6,10 +6,10 @@ module UnionOf
   class ReadonlyAssociation < ActiveRecord::Associations::CollectionAssociation
     # TODO(ezekg) Implement a readonly association. Raise proper errors.
 
-    def writer(...) = raise NotImplementedError
-    def ids_writer = raise NotImplementedError
+    def writer(...)      = raise NotImplementedError
+    def ids_writer       = raise NotImplementedError
     def destroy_all(...) = raise NotImplementedError
-    def delete_all(...) = raise NotImplementedError
+    def delete_all(...)  = raise NotImplementedError
 
     def insert_record(...)  = raise NotImplementedError
     def delete_records(...) = raise NotImplementedError
@@ -43,8 +43,12 @@ module UnionOf
 
       sources = reflection.union_sources.map do |source|
         association = owner.association(source)
+        reflection  = association.reflection
+        primary_key = reflection.active_record_primary_key
 
+        # FIXME(ezekg) Should we use Arel here instead?
         association.send(:association_scope)
+                   .select(primary_key)
                    .unscope(:order)
                    .arel
       end
@@ -61,7 +65,7 @@ module UnionOf
         foreign_table[foreign_key].in(
           foreign_table.project(foreign_table[foreign_key])
                        .from(
-                         Arel::Nodes::TableAlias.new(unions, foreign_table.name)
+                         Arel::Nodes::TableAlias.new(unions, foreign_table.name),
                        ),
         ),
       )
@@ -82,12 +86,12 @@ module UnionOf
       primary_key = reflection.join_primary_key
       foreign_key = reflection.join_foreign_key
 
-      scopes = reflection.union_sources.map do |association_name|
-        association_reflection  = foreign_klass.reflect_on_association(association_name)
-        association_foreign_key = association_reflection.foreign_key
+      scopes = reflection.union_sources.map do |union_source|
+        union_source_reflection  = foreign_klass.reflect_on_association(union_source)
+        union_source_foreign_key = union_source_reflection.foreign_key
 
-        if association_reflection.through_reflection?
-          through_reflection  = association_reflection.through_reflection
+        if union_source_reflection.through_reflection?
+          through_reflection  = union_source_reflection.through_reflection
           through_foreign_key = through_reflection.foreign_key
           through_klass       = through_reflection.klass
           through_table       = through_klass.arel_table
@@ -96,14 +100,14 @@ module UnionOf
                        .from(foreign_table)
                        .join(through_table, Arel::Nodes::InnerJoin)
                        .on(
-                         table[foreign_key].eq(through_table[association_foreign_key]),
+                         table[foreign_key].eq(through_table[union_source_foreign_key]),
                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                        )
         else
           foreign_table.project(foreign_table[foreign_key])
                        .from(foreign_table)
                        .where(
-                         table[foreign_key].eq(foreign_table[association_foreign_key]),
+                         table[foreign_key].eq(foreign_table[union_source_foreign_key]),
                        )
         end
       end
@@ -120,7 +124,7 @@ module UnionOf
         join(
           foreign_table,
           foreign_table[foreign_key].in(
-            unions
+            unions,
           ),
         ),
       )
@@ -170,8 +174,8 @@ module UnionOf
       klass_scope       = klass_join_scope(table, predicate_builder)
 
       klass_scope.where!(
-        join_foreign_key => union_sources.reduce(nil) do |chain, association_name|
-          reflection = foreign_klass.reflect_on_association(association_name)
+        join_foreign_key => union_sources.reduce(nil) do |chain, union_source|
+          reflection = foreign_klass.reflect_on_association(union_source)
           relation   = reflection.klass.scope_for_association.except(:order)
                                                              .select(:id)
 
