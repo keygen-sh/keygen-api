@@ -2,6 +2,7 @@
 
 class License < ApplicationRecord
   include Envented::Callbacks
+  include UnionOf::Macro
   include Environmental
   include Accountable
   include Limitable
@@ -14,9 +15,12 @@ class License < ApplicationRecord
   belongs_to :policy
   belongs_to :group,
     optional: true
+  belongs_to :user,
+    optional: true
   has_one :product, through: :policy
   has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
-  has_many :users, index_errors: true, through: :license_users
+  has_many :licensees, index_errors: true, through: :license_users, source: :user
+  union_of :users, sources: %i[licensees user], class_name: User.name
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
@@ -27,10 +31,6 @@ class License < ApplicationRecord
     through: :product
   has_many :event_logs,
     as: :resource
-
-  # TODO(ezekg) Deprecated. Remove once migrated to multi-user licenses.
-  belongs_to :user,
-    optional: true
 
   has_environment default: -> { policy&.environment_id }
   has_account default: -> { policy&.account_id }, inverse_of: :licenses
@@ -373,8 +373,8 @@ class License < ApplicationRecord
 
   scope :inactive, -> (start_date = 90.days.ago) {
     # exclude licenses of banned users (if any)
-    left_outer_joins(:user)
-      .where(user: { banned_at: nil })
+    left_outer_joins(:users)
+      .where(users: { banned_at: nil })
       # include licenses older than :t without any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at < :start_date AND
@@ -550,36 +550,6 @@ class License < ApplicationRecord
 
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids
-  def user_ids          = users.reorder(nil).ids
-
-  # NOTE(ezekg) For backwards compatibility. Dual writing until we migrate
-  #             data from licenses.user_id column to multi-user licenses.
-  def user=(value)
-    case value
-    in User => user
-      self.users = [user]
-    in String => id
-      self.users = account.users.where(id:)
-    in nil
-      self.users = []
-    end
-
-    super
-  end
-
-  def user_id=(value)
-    case value
-    in User => user
-      self.users = [user]
-    in String => id
-      self.users = account.users.where(id:)
-    in nil
-      self.users = []
-    end
-
-    super
-  end
-
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 

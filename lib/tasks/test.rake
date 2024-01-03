@@ -44,18 +44,34 @@ begin
     ]
 
     desc 'run rspec test suite'
-    task rspec: %i[
-      test:environment
-      log:clear
-      parallel:spec
-    ]
+    task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
+      pattern = args[:pattern]
+
+      if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers in patterns
+        rspec = Rake::Task['spec']
+
+        ENV['SPEC'] = pattern
+
+        rspec.invoke
+      else
+        Rake::Task['parallel:spec'].invoke(nil, pattern)
+      end
+    end
 
     desc 'run cucumber test suite'
-    task cucumber: %i[
-      test:environment
-      log:clear
-      parallel:features
-    ]
+    task :cucumber, %i[pattern] => %i[test:environment log:clear] do |_, args|
+      pattern = args[:pattern]
+
+      if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers in patterns
+        cucumber = Rake::Task['cucumber']
+
+        ENV['FEATURE'] = pattern
+
+        cucumber.invoke
+      else
+        Rake::Task['parallel:features'].invoke(nil, pattern)
+      end
+    end
   end
 rescue LoadError
   # NOTE(ezekg) Wrapping this in a rescue clause so that we can use our

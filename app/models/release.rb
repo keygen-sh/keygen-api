@@ -277,14 +277,18 @@ class Release < ApplicationRecord
     # intersecting their entitlements, or no constraints at all.
     entl = within_constraints(user.entitlement_codes, strict: true)
 
-    # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(product: %i[users])
+    entl.joins(product: %i[licenses])
       .where(
-        product: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
+        product: {
+          distribution_strategy: ['LICENSED', nil],
+          licenses: License.for_user(user),
+        },
       )
       .union(
         self.open
+      )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
       )
   }
 
@@ -308,6 +312,9 @@ class Release < ApplicationRecord
         )
         .union(
           self.open
+        )
+        .reorder(
+          created_at: DEFAULT_SORT_ORDER,
         )
   }
 
@@ -481,8 +488,11 @@ class Release < ApplicationRecord
 
     # Union with releases without constraints as well.
     scp.union(
-      without_constraints,
-    )
+         without_constraints,
+       )
+       .reorder(
+         created_at: DEFAULT_SORT_ORDER,
+       )
   }
 
   scope :published, -> { with_status(:PUBLISHED) }
