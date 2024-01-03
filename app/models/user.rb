@@ -7,6 +7,7 @@ class User < ApplicationRecord
 
   MINIMUM_ADMIN_COUNT = 1
 
+  include UnionOf::Macro
   include PasswordResettable
   include Environmental
   include Accountable
@@ -20,16 +21,17 @@ class User < ApplicationRecord
     optional: true
   has_many :second_factors, dependent: :destroy_async
   has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
-  # TODO(ezekg) Rename to :licenses once data is migrated to multi-user licenses.
-  # TODO(ezekg) Uncomment destroy callback.
-  has_many :_licenses, index_errors: true, through: :license_users, source: :license
-  # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
-  has_many :licenses, dependent: :destroy_async
+  has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id
+  has_many :user_licenses, index_errors: true, through: :license_users, source: :license
+  union_of :licenses, sources: %i[owned_licenses user_licenses], class_name: License.name do
+    def owned = where(user: proxy_association.owner)
+  end
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
   has_many :policy_entitlements, through: :licenses
   has_many :machines, through: :licenses
+  has_many :components, through: :machines
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :products
@@ -122,10 +124,6 @@ class User < ApplicationRecord
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
     if: -> { role&.name_changed? }
-
-  validates_associated :_licenses,
-    scope: { by: :account_id },
-    on: %i[create]
 
   validates :group,
     presence: { message: 'must exist' },

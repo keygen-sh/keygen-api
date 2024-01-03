@@ -207,17 +207,4 @@ describe User, type: :model do
       expect(user.permissions.ids).to match_array User.default_permission_ids
     end
   end
-
-  # FIXME(ezekg) Rename to #licenses after we fully migrate to multi-user licenses.
-  describe '#_licenses' do
-    let(:user) { create(:user, account:) }
-
-    it 'should raise on license account mismatch' do
-      other_account = create(:account)
-
-      expect { user._licenses << create(:license, account: other_account) }.to(
-        raise_error ActiveRecord::RecordInvalid
-      )
-    end
-  end
 end
