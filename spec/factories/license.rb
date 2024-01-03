@@ -100,22 +100,16 @@ FactoryBot.define do
     end
 
     trait :with_users do
-      users { build_list(:user, 3, account:, environment:) }
-    end
-
-    trait :with_user do
-      users { build_list(:user, 1, account:, environment:) }
-
-      # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
       after :create do |license|
-        license.update!(user: license.users.first)
+        build_list(:license_user, 3, account:, environment:, license:)
       end
     end
 
-    trait :userless do
-      users { [] }
+    trait :with_user do
+      user { build(:user, account:, environment:) }
+    end
 
-      # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
+    trait :userless do
       user { nil }
     end
 
