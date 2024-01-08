@@ -234,7 +234,7 @@ Feature: Delete machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "machine"
+    And the current user has 1 "machine" as "owner"
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "204"
     And the current account should have 0 "machines"
@@ -258,7 +258,7 @@ Feature: Delete machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "machine"
+    And the current user has 1 "machine" as "owner"
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "403"
     And the current account should have 1 "machine"

@@ -1,14 +1,11 @@
 @api/v1
 Feature: Product releases relationship
-
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
-    # TODO(ezekg) Remove after we switch new accounts to v1.1
-    And I use API version "1.1"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
@@ -299,7 +296,7 @@ Feature: Product releases relationship
     And the current account has 1 "policy" for the last "product"
     And the current account has 3 "licenses" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/releases"

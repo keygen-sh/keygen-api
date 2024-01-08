@@ -171,7 +171,7 @@ Feature: Show package
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/$0"
@@ -184,7 +184,7 @@ Feature: Show package
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "packages"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages/$1"

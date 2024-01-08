@@ -1,6 +1,5 @@
 @api/v1
 Feature: Policy pool relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -396,7 +395,7 @@ Feature: Policy pool relationship
     And the current account has 3 "keys"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"

@@ -652,7 +652,7 @@ Feature: Update artifact
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
       """

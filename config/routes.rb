@@ -109,7 +109,8 @@ Rails.application.routes.draw do
           resource :product, only: %i[show]
           resource :group,   only: %i[show update]
           resource :license, only: %i[show]
-          resource :user,    only: %i[show]
+          resource :owner,   only: %i[show]
+          resource :user,    only: %i[show], controller: :owners
         end
 
         member do
@@ -182,7 +183,8 @@ Rails.application.routes.draw do
           resource :product, only: %i[show]
           resource :policy,  only: %i[show update]
           resource :group,   only: %i[show update]
-          resource :user,    only: %i[show update]
+          resource :owner,   only: %i[show update]
+          resource :user,    only: %i[show update], controller: :owners
 
           resources :entitlements, only: %i[index show] do
             collection do

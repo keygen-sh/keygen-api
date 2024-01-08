@@ -287,8 +287,8 @@ Feature: List products
     And the current account has 1 "policy" for each "product"
     And the current account has 1 "license" for each "policy"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user"
-    And the second "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
+    And the second "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
@@ -307,8 +307,8 @@ Feature: List products
       """
       { "permissions": ["product.read"] }
       """
-    And the first "license" belongs to the last "user"
-    And the second "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
+    And the second "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"
@@ -328,8 +328,8 @@ Feature: List products
       """
       { "permissions": ["license.validate"] }
       """
-    And the first "license" belongs to the last "user"
-    And the second "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
+    And the second "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products"

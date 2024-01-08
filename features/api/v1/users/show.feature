@@ -1,6 +1,5 @@
 @api/v1
 Feature: Show user
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -146,7 +145,7 @@ Feature: Show user
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
@@ -166,7 +165,7 @@ Feature: Show user
   Scenario: License retrieves their user (with permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the last "license" has the following attributes:
       """
       { "permissions": ["user.read"] }
@@ -180,7 +179,7 @@ Feature: Show user
    Scenario: License retrieves their user (without permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the last "license" has the following attributes:
       """
       { "permissions": ["license.validate"] }
@@ -193,7 +192,7 @@ Feature: Show user
   Scenario: License retrieves their user (default permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"

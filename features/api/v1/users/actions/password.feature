@@ -192,7 +192,7 @@ Feature: User password actions
   Scenario: License attempts to updates their user's password
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/actions/update-password" with the following:
