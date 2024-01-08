@@ -46,19 +46,19 @@ FactoryBot.define do
 
     trait :with_licenses do
       after :create do |user|
-        create_list(:license, 3, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
       end
     end
 
     trait :with_expired_licenses do
       after :create do |user|
-        create_list(:license, 3, :expired, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, :expired, account: user.account, environment: user.environment, owner: user)
       end
     end
 
     trait :with_entitled_licenses do
       after :create do |user|
-        licenses = create_list(:license, 3, account: user.account, environment: user.environment, user:)
+        licenses = create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
 
         licenses.each do |license|
           create_list(:license_entitlement, 10, account: license.account, environment: license.environment, license:)
@@ -68,7 +68,7 @@ FactoryBot.define do
 
     trait :with_grouped_licenses do
       after :create do |user|
-        create_list(:license, 3, :with_group, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, :with_group, account: user.account, environment: user.environment, owner: user)
       end
     end
 

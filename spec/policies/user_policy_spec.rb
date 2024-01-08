@@ -1039,8 +1039,8 @@ describe UserPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_bearer_trait :with_user do
-      with_scenarios %i[accessing_its_user] do
+    with_bearer_trait :with_owner do
+      with_scenarios %i[accessing_its_owner] do
         with_license_authentication do
           with_permissions %w[user.read] do
             allows :show

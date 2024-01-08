@@ -16,7 +16,8 @@ class MachineProcess < ApplicationRecord
   belongs_to :machine
   has_one :group,      through: :machine
   has_one :license,    through: :machine
-  has_one :user,       through: :machine
+  has_one :owner,      through: :machine
+  has_many :users,     through: :machine
   has_one :policy,     through: :machine
   has_one :product,    through: :machine
 
@@ -91,10 +92,11 @@ class MachineProcess < ApplicationRecord
     end
   end
 
-  scope :for_product, -> product { joins(license: :product).where(products: product) }
-  scope :for_license, -> license { joins(:license).where(licenses: license) }
-  scope :for_machine, -> machine { where(machine: machine) }
-  scope :for_user,    -> id { joins(:license).where(licenses: { user_id: id }) }
+  scope :for_product, -> id      { joins(license: :product).where(products: { id: }) }
+  scope :for_license, -> id      { joins(:license).where(licenses: { id: }) }
+  scope :for_machine, -> machine { joins(:machine).where(machine:) }
+  scope :for_user,    -> id      { joins(:users).where(users: { id: }) }
+  scope :for_owner,   -> owner   { joins(:owner).where(owner:) }
 
   scope :alive, -> {
     joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)

@@ -116,7 +116,7 @@ Feature: License entitlements relationship
   Scenario: User attempts to retrieve the entitlements for their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user"
+    And the current account has 3 "licenses" for the last "user" as "owner"
     And the current account has 2 "license-entitlements" for the first "license"
     And the current account has 4 "license-entitlements" for the second "license"
     And the current account has 6 "license-entitlements" for the third "license"

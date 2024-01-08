@@ -1714,7 +1714,7 @@ Feature: Machine checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token
@@ -1729,7 +1729,7 @@ Feature: Machine checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token

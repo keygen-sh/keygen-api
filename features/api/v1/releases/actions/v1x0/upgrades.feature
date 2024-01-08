@@ -903,7 +903,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade?channel=beta"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -940,7 +940,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
@@ -967,7 +967,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
@@ -989,7 +989,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "404"
 
@@ -1036,7 +1036,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -1103,7 +1103,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -1163,7 +1163,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
@@ -1188,7 +1188,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "404"
 
@@ -2139,7 +2139,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2310,7 +2310,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2429,7 +2429,7 @@ Feature: Release upgrade actions
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
 
@@ -2488,7 +2488,7 @@ Feature: Release upgrade actions
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2523,7 +2523,7 @@ Feature: Release upgrade actions
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
 

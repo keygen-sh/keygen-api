@@ -206,7 +206,7 @@ Feature: Delete artifact
     And the current account has 1 "license" for the last "policy"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a DELETE request to "/accounts/test1/artifacts/$1"
     Then the response status should be "403"
 

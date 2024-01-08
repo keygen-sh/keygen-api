@@ -172,19 +172,19 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in)(?: an)? existing "([^\"]*)"$/ do |count, traits, resource, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in)(?: an)? existing "([^\"]*)"(?: through "([^\"]*)")?$/ do |count, traits, model_name, assoc_name, through_name|
   count.to_i.times do
-    associated_record = @account.send(association.pluralize.underscore).all.sample
-    association_name  = association.singularize.underscore.to_sym
+    associated_record = @account.send(assoc_name.pluralize.underscore).all.sample
+    association_name  = through_name || assoc_name.singularize.underscore.to_sym
     traits            = traits&.split('+')&.map(&:to_sym)
 
-    create resource.singularize.underscore, *traits, account: @account, association_name => associated_record
+    create model_name.singularize.underscore, *traits, account: @account, association_name => associated_record
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)"$/ do |count, traits, resource, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)"(?: through "([^\"]*)")?$/ do |count, traits, model_name, assoc_name, through_name|
   associated_records =
-      case association.underscore.pluralize
+      case assoc_name.underscore.pluralize
       when 'components'
         @account.machine_components
       when 'processes'
@@ -196,7 +196,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
       when 'engines'
         @account.release_engines
       else
-        @account.send(association.pluralize.underscore)
+        @account.send(assoc_name.pluralize.underscore)
       end
 
   traits = traits&.split('+')&.map(&:to_sym)
@@ -219,16 +219,16 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
   end
 
   association_name =
-    case resource.singularize
+    case model_name.singularize
     when 'token'
       :bearer
     else
-      association.singularize.underscore.to_sym
+      through_name || assoc_name.singularize.underscore.to_sym
     end
 
   associated_records.each do |record|
     count.to_i.times do
-      create resource.singularize.underscore, *traits, account: @account, association_name => record
+      create model_name.singularize.underscore, *traits, account: @account, association_name => record
     end
   end
 end
@@ -286,7 +286,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"$/ do |count, traits, resource, index, association|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"(?: as "([^\"]*)")?$/ do |count, traits, resource, index, association, association_name|
   traits = traits&.split('+')&.map(&:to_sym)
 
   count.to_i.times do
@@ -306,7 +306,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) t
         @account.send(association.pluralize.underscore)
       end
 
-    association_name  =
+    association_name ||=
       case resource.singularize
       when "token"
         :bearer
@@ -479,14 +479,14 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) product
   end
 end
 
-Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
-  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
-    r.user = @bearer
-    r.save!
+Given /^the current user has (\d+) "([^\"]*)"(?: as "([^\"]*)")?$/ do |count, model_name, assoc_name|
+  assoc_name ||= :user
+  @account.send(model_name.pluralize.underscore).limit(count.to_i).all.each do |record|
+    record.update!(assoc_name => @bearer)
   end
 end
 
-Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
+Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"(?: as "([^\"]*)")?$/ do |model_idx, model_name, other_idx, other_name, assoc_name|
   numbers = {
     "first"   => 1,
     "second"  => 2,
@@ -500,9 +500,9 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
   }
 
   resource   = @account.send(model_name.pluralize.underscore).limit(numbers[model_idx]).last
-  associated = @account.send(assoc_name.pluralize.underscore).limit(numbers[assoc_idx]).last
+  associated = @account.send(other_name.pluralize.underscore).limit(numbers[other_idx]).last
 
-  association = resource.association(assoc_name)
+  association = resource.association(assoc_name || other_name)
   reflection  = association.reflection
 
   case
@@ -521,7 +521,7 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
   end
 end
 
-Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
+Given /^(?:all|the) "([^\"]*)" have the following attributes:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
@@ -689,8 +689,8 @@ Given /^the (first|second|third|fourth|fifth|last) "([^\"]*)" has the following 
   model.update!(permissions:)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:belongs to|is in) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
-  model =
+Given /^the (\w+) "([^\"]*)" (?:belongs to|is in) the (\w+) "([^\"]*)"(?: through "([^\"]*)")?$/ do |model_idx, model_name, assoc_idx, assoc_name, through_name|
+  record =
     case model_name.singularize
     when 'component'
       @account.machine_components.send(model_idx)
@@ -706,7 +706,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
       @account.send(model_name.pluralize.underscore).send(model_idx)
     end
 
-  associated_record =
+  associated =
     case assoc_name.singularize
     when 'component'
       @account.machine_components.send(assoc_idx)
@@ -717,18 +717,18 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
     when 'package'
       @account.release_packages.send(assoc_idx)
     when 'engine'
-      @account.release_engines.send(model_idx)
+      @account.release_engines.send(assoc_idx)
     else
       @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
     end
 
-  association_name = assoc_name.singularize.underscore.to_sym
+  through = (through_name || assoc_name).singularize.underscore.to_sym
 
-  model.assign_attributes(association_name => associated_record)
-  model.save!(validate: false)
+  record.assign_attributes(through => associated)
+  record.save!(validate: false)
 end
 
-Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*)"$/ do |direction, count, model_name, assoc_idx, assoc_name|
+Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*)"(?: through "([^\"]*)")?$/ do |direction, count, model_name, assoc_idx, assoc_name, through_name|
   models =
     case model_name.singularize
     when 'component'
@@ -764,7 +764,7 @@ Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*
       @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
     end
 
-  association_name  = assoc_name.singularize.underscore.to_sym
+  association_name = through_name || assoc_name.singularize.underscore.to_sym
 
   models.each do |model|
     model.assign_attributes(association_name => associated_record)
@@ -772,7 +772,7 @@ Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*
   end
 end
 
-Given /^all "([^\"]*)" belong to the (\w+) "([^\"]*)"$/ do |model_name, assoc_idx, assoc_name|
+Given /^(?:all|the) "([^\"]*)" belong to the (\w+) "([^\"]*)"(?: through "([^\"]*)")?$/ do |model_name, assoc_idx, assoc_name, through_name|
   models =
     case model_name.singularize
     when 'component'
@@ -788,7 +788,7 @@ Given /^all "([^\"]*)" belong to the (\w+) "([^\"]*)"$/ do |model_name, assoc_id
     end
 
   associated_record = @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
-  association_name  = assoc_name.singularize.underscore.to_sym
+  association_name  = through_name || assoc_name.singularize.underscore.to_sym
 
   models.each do |model|
     model.assign_attributes(association_name => associated_record)

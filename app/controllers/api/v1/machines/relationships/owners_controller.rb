@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Machines::Relationships
-  class UsersController < Api::V1::BaseController
+  class OwnersController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -10,11 +10,11 @@ module Api::V1::Machines::Relationships
     authorize :machine
 
     def show
-      user = machine.user
-      authorize! user,
-        with: Machines::UserPolicy
+      owner = machine.owner
+      authorize! owner,
+        with: Machines::OwnerPolicy
 
-      render jsonapi: user
+      render jsonapi: owner
     end
 
     private

@@ -1703,7 +1703,7 @@ Feature: License checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 unprotected "license" for the last "user"
+    And the current account has 1 unprotected "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
@@ -1717,7 +1717,7 @@ Feature: License checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 unprotected "license" for the last "user"
+    And the current account has 1 unprotected "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"
@@ -1731,7 +1731,7 @@ Feature: License checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 protected "license" for the last "user"
+    And the current account has 1 protected "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out"
@@ -1744,7 +1744,7 @@ Feature: License checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 protected "license" for the last "user"
+    And the current account has 1 protected "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out"

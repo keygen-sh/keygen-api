@@ -1,6 +1,5 @@
 @api/v1
 Feature: Update product
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -515,7 +514,7 @@ Feature: Update product
     And the current account has 1 "user"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/products/$0" with the following:

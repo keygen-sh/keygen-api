@@ -10,9 +10,15 @@ module Api::V1::Machines::Actions
     authorize :machine
 
     typed_query {
-      param :include, type: :array, coerce: true, allow_blank: true, optional: true
       param :encrypt, type: :boolean, coerce: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+      param :include, type: :array, coerce: true, allow_blank: true, optional: true, transform: -> key, includes {
+        # FIXME(ezekg) For backwards compatibility. Replace license.user include with
+        #              license.owner when present.
+        includes.push('license.owner') if includes.delete('license.user')
+
+        [key, includes]
+      }
     }
     def show
       kwargs = checkout_query.slice(
@@ -39,15 +45,23 @@ module Api::V1::Machines::Actions
       format :jsonapi
 
       param :meta, type: :hash, optional: true do
-        param :include, type: :array, allow_blank: true, optional: true
         param :encrypt, type: :boolean, optional: true
         param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+        param :include, type: :array, allow_blank: true, optional: true, transform: -> key, includes {
+          includes.push('license.owner') if includes.delete('license.user')
+
+          [key, includes]
+        }
       end
     }
     typed_query {
-      param :include, type: :array, coerce: true, allow_blank: true, optional: true
       param :encrypt, type: :boolean, coerce: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
+      param :include, type: :array, coerce: true, allow_blank: true, optional: true, transform: -> key, includes {
+        includes.push('license.owner') if includes.delete('license.user')
+
+        [key, includes]
+      }
     }
     def create
       kwargs = checkout_query.merge(checkout_meta)

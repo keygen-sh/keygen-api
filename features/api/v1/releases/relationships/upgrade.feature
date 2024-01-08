@@ -1207,7 +1207,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$1/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1241,7 +1241,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1263,7 +1263,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1280,7 +1280,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
@@ -1321,7 +1321,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1386,7 +1386,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1444,7 +1444,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1464,7 +1464,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
@@ -1578,7 +1578,7 @@ Feature: Upgrade release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
