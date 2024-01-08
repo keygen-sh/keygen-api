@@ -497,12 +497,12 @@ Feature: Machine heartbeat actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the last "license" has the following attributes:
       """
       { "protected": false }
       """
-    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
     And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": null }
@@ -524,12 +524,12 @@ Feature: Machine heartbeat actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the last "license" has the following attributes:
       """
       { "protected": true }
       """
-    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
     And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": null }
@@ -705,8 +705,8 @@ Feature: Machine heartbeat actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
-    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
     And the first "machine" has the following attributes:
       """
       { "lastHeartbeatAt": "$time.1.hour.ago" }

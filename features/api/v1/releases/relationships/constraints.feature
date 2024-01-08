@@ -1160,7 +1160,6 @@ Feature: Release constraints relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And I am a user of account "test1"
     When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
       """
       {

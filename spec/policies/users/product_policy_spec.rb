@@ -299,8 +299,8 @@ describe Users::ProductPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_bearer_trait :with_user do
-      with_scenarios %i[accessing_its_user accessing_its_products] do
+    with_bearer_trait :with_owner do
+      with_scenarios %i[accessing_its_owner accessing_its_products] do
         with_license_authentication do
           with_wildcard_permissions { denies :index }
           with_default_permissions  { denies :index }
@@ -314,7 +314,7 @@ describe Users::ProductPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_user accessing_its_product] do
+      with_scenarios %i[accessing_its_owner accessing_its_product] do
         with_license_authentication do
           with_wildcard_permissions { denies :show }
           with_default_permissions  { denies :show }

@@ -1,6 +1,5 @@
 @api/v1
 Feature: Update policy
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -526,7 +525,7 @@ Feature: Update policy
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
@@ -550,7 +549,7 @@ Feature: Update policy
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$1" with the following:

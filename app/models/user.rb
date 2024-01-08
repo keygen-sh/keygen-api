@@ -313,7 +313,7 @@ class User < ApplicationRecord
 
   scope :for_product, -> (id) { joins(licenses: :policy).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:licenses).where licenses: { id: id } }
-  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> id { where(id:) }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }

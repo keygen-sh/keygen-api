@@ -15,8 +15,8 @@ module Groups
         relation.for_environment(bearer.id)
       in role: Role(:product) if relation.respond_to?(:for_product)
         relation.for_product(bearer.id)
-      in role: Role(:user) if relation.respond_to?(:for_owner)
-        relation.for_owner(bearer.id)
+      in role: Role(:user) if relation.respond_to?(:for_group_owner)
+        relation.for_group_owner(bearer.id)
       else
         relation.none
       end

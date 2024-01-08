@@ -173,7 +173,7 @@ Feature: Machine components relationship
   Scenario: User retrieves the components for a machine
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "components" for the last "machine"
     And I am a user of account "test1"
@@ -279,7 +279,7 @@ Feature: Machine components relationship
   Scenario: User retrieves a machine's component
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the second "user"
+    And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "component" for the last "machine"
     And I am a user of account "test1"
@@ -290,7 +290,7 @@ Feature: Machine components relationship
   Scenario: User retireves a machine's component for a different user
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the third "user"
+    And the current account has 1 "license" for the third "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "component" for the last "machine"
     And I am a user of account "test1"

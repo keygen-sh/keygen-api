@@ -1,6 +1,5 @@
 @api/v1
 Feature: Machine processes relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -174,7 +173,7 @@ Feature: Machine processes relationship
   Scenario: User retrieves the processes for a machine
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
     And I am a user of account "test1"
@@ -280,7 +279,7 @@ Feature: Machine processes relationship
   Scenario: User retrieves a machine's process
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the second "user"
+    And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "process" for the last "machine"
     And I am a user of account "test1"
@@ -291,7 +290,7 @@ Feature: Machine processes relationship
   Scenario: User retireves a machine's process for a different user
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the third "user"
+    And the current account has 1 "license" for the third "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "process" for the last "machine"
     And I am a user of account "test1"

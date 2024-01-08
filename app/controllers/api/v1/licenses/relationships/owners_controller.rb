@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Licenses::Relationships
-  class UsersController < Api::V1::BaseController
+  class OwnersController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -10,11 +10,11 @@ module Api::V1::Licenses::Relationships
     authorize :license
 
     def show
-      user = license.user
-      authorize! user,
-        with: Licenses::UserPolicy
+      owner = license.owner
+      authorize! owner,
+        with: Licenses::OwnerPolicy
 
-      render jsonapi: user
+      render jsonapi: owner
     end
 
     typed_params {
@@ -26,11 +26,11 @@ module Api::V1::Licenses::Relationships
       end
     }
     def update
-      user = license.user
-      authorize! user,
-        with: Licenses::UserPolicy
+      owner = license.owner
+      authorize! owner,
+        with: Licenses::OwnerPolicy
 
-      license.update!(user_id: user_params[:id])
+      license.update!(user_id: owner_params[:id])
 
       BroadcastEventService.call(
         event: 'license.user.updated',

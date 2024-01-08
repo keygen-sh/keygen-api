@@ -79,7 +79,7 @@ Feature: License policy relationship
   Scenario: User attempts to retrieve the policy for a license they own
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
