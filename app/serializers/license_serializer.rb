@@ -127,8 +127,8 @@ class LicenseSerializer < BaseSerializer
 
   relationship :user do
     linkage always: true do
-      if @object.user_id.present?
-        { type: :users, id: @object.user_id }
+      if @object.owner_id?
+        { type: :users, id: @object.owner_id }
       else
         nil
       end

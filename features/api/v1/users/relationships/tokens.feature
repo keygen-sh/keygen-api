@@ -1467,7 +1467,7 @@ Feature: User tokens relationship
     And the current account has 1 "token" for each "product"
     And the current account has 6 "users"
     And the current account has 1 "token" for each "user"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/tokens"

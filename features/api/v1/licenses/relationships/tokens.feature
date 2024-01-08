@@ -1441,9 +1441,7 @@ Feature: Generate authentication token for license
    Scenario: User attempts to generate a token for their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
-    And the current account has 1 "license"
-    And I am a user of account "test1"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
@@ -1531,7 +1529,7 @@ Feature: Generate authentication token for license
   Scenario: User requests all tokens for their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user"
+    And the current account has 3 "licenses" for the last "user" as "owner"
     And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
@@ -1541,7 +1539,7 @@ Feature: Generate authentication token for license
   Scenario: User requests all tokens for another user's license
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token

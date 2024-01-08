@@ -94,7 +94,7 @@ Feature: Component license relationship
   Scenario: User attempts to retrieve the license for a component they own
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "components" for the last "machine"
     And I am a user of account "test1"

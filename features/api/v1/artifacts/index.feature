@@ -1,6 +1,5 @@
 @api/v1
 Feature: List release artifacts
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -683,8 +682,8 @@ Feature: List release artifacts
     And the current account has 2 "releases" for each "product"
     And the current account has 2 "artifacts" for each "release"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user"
-    And the second "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
+    And the second "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
