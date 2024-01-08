@@ -194,7 +194,7 @@ Feature: Show engine
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/$0"

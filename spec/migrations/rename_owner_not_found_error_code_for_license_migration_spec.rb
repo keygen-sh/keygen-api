@@ -3,38 +3,38 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe RenameFilenameExtErrorCodeForReleaseMigration do
+describe RenameOwnerNotFoundErrorCodeForLicenseMigration do
   before do
     RequestMigrations.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
-        '1.0' => [RenameFilenameExtErrorCodeForReleaseMigration],
+        '1.0' => [RenameOwnerNotFoundErrorCodeForLicenseMigration],
       }
     end
   end
 
-  context 'the errors contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
+  context 'the errors contain an OWNER_NOT_FOUND error code' do
     it 'should migrate the error' do
       migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data    = {
         errors: [
           {
             title: 'Unprocessable resource',
-            detail: 'filename extension does not match filetype (expected exe)',
-            code: 'ARTIFACT_FILENAME_EXTENSION_INVALID',
+            detail: 'must exist',
+            code: 'OWNER_NOT_FOUND',
             source: {
-              pointer: '/data/relationships/artifact/data/attributes/filename',
+              pointer: '/data/relationships/owner',
             },
             links: {
-              about: 'https://keygen.sh/docs/api/releases/#releases-object-relationships-artifact',
+              about: 'https://keygen.sh/docs/api/licenses/#licenses-object-relationships-owner',
             },
           },
           {
             title: 'Unprocessable resource',
-            detail: 'must be a valid version',
-            code: 'VERSION_INVALID',
+            detail: 'is invalid',
+            code: 'KEY_INVALID',
             source: {
-              pointer: '/data/attributes/version',
+              pointer: '/data/attributes/key',
             },
           },
         ],
@@ -45,15 +45,15 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
       expect(data).to include(
         errors: [
           include(
-            code: 'FILENAME_EXTENSION_INVALID',
+            code: 'USER_NOT_FOUND',
             source: {
-              pointer: '/data/attributes/filename',
+              pointer: '/data/relationships/user',
             },
           ),
           include(
-            code: 'VERSION_INVALID',
+            code: 'KEY_INVALID',
             source: {
-              pointer: '/data/attributes/version',
+              pointer: '/data/attributes/key',
             },
           ),
         ],
@@ -61,17 +61,17 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
     end
   end
 
-  context 'the errors do not contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
+  context 'the errors do not contain an OWNER_NOT_FOUND error code' do
     it 'should not migrate the error' do
       migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data    = {
         errors: [
           {
             title: 'Unprocessable resource',
-            detail: 'must be a valid version',
-            code: 'VERSION_INVALID',
+            detail: 'is invalid',
+            code: 'KEY_INVALID',
             source: {
-              pointer: '/data/attributes/version',
+              pointer: '/data/attributes/key',
             },
           },
         ],
@@ -82,9 +82,9 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
       expect(data).to include(
         errors: [
           include(
-            code: 'VERSION_INVALID',
+            code: 'KEY_INVALID',
             source: {
-              pointer: '/data/attributes/version',
+              pointer: '/data/attributes/key',
             },
           ),
         ],

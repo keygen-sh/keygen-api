@@ -13,7 +13,7 @@ module Api::V1
     before_action :set_machine_component, only: %i[show update destroy]
 
     def index
-      machine_components = apply_pagination(authorized_scope(apply_scopes(current_account.machine_components)).preload(:machine, :license, :policy, :product, :group, :user))
+      machine_components = apply_pagination(authorized_scope(apply_scopes(current_account.machine_components)).preload(:machine, :license, :policy, :product, :group, :owner))
       authorize! machine_components
 
       render jsonapi: machine_components

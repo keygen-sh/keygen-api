@@ -24,15 +24,15 @@ class ApplicationController < ActionController::API
   # 3. Responses are signed after migrations and errors.
   include SignatureHeaders
 
+  # 4. Migrations are run after errors have been caught.
+  include RequestMigrations::Controller::Migrations
+
   # NOTE(ezekg) We're using an around_action here so that our request
   #             logger concern can log the resulting response body.
   #             Otherwise, the logged response may be incorrect.
   #
-  # 4. Errors are caught and handled after migrations.
+  # 5. Errors are caught and handled before migrations.
   around_action :rescue_from_exceptions
-
-  # 5. Migrations are run after errors have been caught.
-  include RequestMigrations::Controller::Migrations
 
   # 6. Headers are added before migrations, so they can be migrated
   #    if needed, with the exception of the signature headers.

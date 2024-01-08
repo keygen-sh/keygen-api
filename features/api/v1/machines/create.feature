@@ -2153,7 +2153,7 @@ Feature: Create machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current account has 1 "license"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
@@ -2201,7 +2201,7 @@ Feature: Create machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current account has 1 "license"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     And all "licenses" have the following attributes:
       """
       { "protected": true }
@@ -2237,7 +2237,7 @@ Feature: Create machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current account has 1 "license"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     And all "licenses" have the following attributes:
       """
       { "protected": false }

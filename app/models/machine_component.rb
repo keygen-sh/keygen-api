@@ -17,7 +17,9 @@ class MachineComponent < ApplicationRecord
     through: :license
   has_one :policy,
     through: :license
-  has_one :user,
+  has_one :owner,
+    through: :license
+  has_many :users,
     through: :license
 
   has_environment default: -> { machine&.environment_id }
@@ -71,7 +73,8 @@ class MachineComponent < ApplicationRecord
   scope :for_product, -> id { joins(:product).where(product: { id: }) }
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
-  scope :for_user,    -> id { joins(:user).where(user: { id: }) }
+  scope :for_user,    -> id { joins(:users).where(users: { id: }) }
+  scope :for_owner,   -> id { joins(:owner).where(owner: { id: }) }
 
   scope :with_fingerprint, -> fingerprint { where(fingerprint:) }
 

@@ -18,6 +18,9 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.5' => %i[
+      rename_owner_not_found_error_code_for_license_migration
+    ],
     '1.4' => %i[
       update_nested_key_casing_to_snakecase_for_metadata_migration
     ],

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Machines
-  class UserPolicy < ApplicationPolicy
+  class OwnerPolicy < ApplicationPolicy
     authorize :machine
 
     def show?
@@ -15,7 +15,7 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.user == bearer
+      in role: Role(:user) if machine.owner == bearer
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!

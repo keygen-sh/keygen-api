@@ -1,6 +1,5 @@
 @api/v1
 Feature: User licenses relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -42,7 +41,7 @@ Feature: User licenses relationship
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "user"
-    And the current account has 3 isolated "licenses" for the last "user"
+    And the current account has 3 isolated "licenses" for the last "user" as "owner"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses?environment=isolated"
@@ -146,7 +145,7 @@ Feature: User licenses relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "users"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$2/licenses"
@@ -157,7 +156,7 @@ Feature: User licenses relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses"
@@ -168,7 +167,7 @@ Feature: User licenses relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "users"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$2/licenses"
@@ -179,7 +178,7 @@ Feature: User licenses relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "user"
-    And the current account has 2 "license" for the last "user"
+    And the current account has 2 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/licenses"
