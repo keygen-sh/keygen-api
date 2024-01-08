@@ -1,14 +1,11 @@
 @api/v1
 Feature: Update release
-
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
-    # TODO(ezekg) Remove after we switch new accounts to v1.1
-    And I use API version "1.1"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled

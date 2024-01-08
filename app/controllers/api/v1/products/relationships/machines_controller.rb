@@ -14,7 +14,7 @@ module Api::V1::Products::Relationships
     authorize :product
 
     def index
-      machines = apply_pagination(authorized_scope(apply_scopes(product.machines)).preload(:product, :policy))
+      machines = apply_pagination(authorized_scope(apply_scopes(product.machines)).preload(:product, :policy, :license, :owner))
       authorize! machines,
         with: Products::MachinePolicy
 

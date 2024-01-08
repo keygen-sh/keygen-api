@@ -1259,7 +1259,7 @@ Feature: Generate authentication token for product
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "policy"
-    And the last "license" is associated to the last "user"
+    And the last "license" is associated to the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$0/tokens"
@@ -1368,7 +1368,7 @@ Feature: Generate authentication token for product
     And the current account has 2 "users"
     And the current account has 1 "token" for each "user"
     And the current account has 3 "licenses" for the last "policy"
-    And the last "license" is associated to the last "user"
+    And the last "license" is associated to the last "user" as "owner"
     And I am the last user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/tokens"

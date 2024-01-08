@@ -143,7 +143,7 @@ Feature: Publish release
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"

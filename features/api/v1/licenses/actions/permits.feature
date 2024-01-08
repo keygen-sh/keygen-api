@@ -302,7 +302,7 @@ Feature: License permit actions
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
@@ -431,7 +431,7 @@ Feature: License permit actions
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the last "license" has the following attributes:
       """
       { "suspended": true }
@@ -814,7 +814,7 @@ Feature: License permit actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 2 "licenses" for the last "user"
+    And the current account has 2 "licenses" for the last "user" as "owner"
     And the current account has 1 "license"
     And I am a user of account "test1"
     And I use an authentication token

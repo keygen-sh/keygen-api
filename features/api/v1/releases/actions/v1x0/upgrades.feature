@@ -992,7 +992,7 @@ Feature: Release upgrade actions
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0.tar.gz | tar.gz   | linux    |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.1.0.tar.gz | tar.gz   | linux    |
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"

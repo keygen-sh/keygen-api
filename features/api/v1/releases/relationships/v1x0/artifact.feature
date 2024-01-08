@@ -935,7 +935,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1079,7 +1079,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1210,7 +1210,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"

@@ -44,7 +44,7 @@ module Api::V1
           end
         end
         param :relationships, type: :hash, optional: true do
-          param :bearer, type: :hash, optional: true do
+          param :bearer, type: :hash, polymorphic: true, optional: true do
             param :data, type: :hash do
               param :type, type: :string, inclusion: { in: %w[environment environments product products user users license licenses] }
               param :id, type: :uuid

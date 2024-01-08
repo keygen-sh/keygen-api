@@ -46,7 +46,7 @@ module UnionOf
         reflection  = association.reflection
         primary_key = reflection.active_record_primary_key
 
-        # FIXME(ezekg) Should we use Arel here instead?
+        # FIXME(ezekg) Should we use Arel here instead of this private API?
         association.send(:association_scope)
                    .select(primary_key)
                    .unscope(:order)
@@ -184,8 +184,8 @@ module UnionOf
 
           scope = if reflection.through_reflection?
                     through_reflection  = reflection.through_reflection
-                    through_klass       = through_reflection.klass
                     through_foreign_key = through_reflection.foreign_key
+                    through_klass       = through_reflection.klass
                     through_table       = through_klass.arel_table
 
                     # FIXME(ezekg) Seems like there should be a better way to do this?

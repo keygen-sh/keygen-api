@@ -21,7 +21,8 @@ class Machine < ApplicationRecord
     optional: true
   has_one :product, through: :license
   has_one :policy, through: :license
-  has_one :user, through: :license
+  has_one :owner, through: :license
+  has_many :users, through: :license
   has_many :processes,
     class_name: 'MachineProcess',
     inverse_of: :machine,
@@ -268,20 +269,47 @@ class Machine < ApplicationRecord
     )
   }
 
+  scope :search_owner, -> (term) {
+    owner_identifier = term.to_s
+    return none if
+      owner_identifier.empty?
+
+    return joins(:owner).where(users: { id: user_identifier }) if
+      UUID_RE.match?(user_identifier)
+
+    scope = joins(:owner).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    return scope unless
+      UUID_CHAR_RE.match?(user_identifier)
+
+    scope.or(
+      joins(:owner).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+        to_tsvector('simple', users.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
+  }
+
   scope :search_user, -> (term) {
     user_identifier = term.to_s
     return none if
       user_identifier.empty?
 
-    return joins(:user).where(user: { id: user_identifier }) if
+    return joins(:users).where(users: { id: user_identifier }) if
       UUID_RE.match?(user_identifier)
 
-    scope = joins(:user).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    scope = joins(:users).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(user_identifier)
 
     scope.or(
-      joins(:user).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:users).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
@@ -355,8 +383,9 @@ class Machine < ApplicationRecord
   scope :with_ip, -> (ip_address) { where ip: ip_address }
   scope :for_license, -> (id) { where license: id }
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
-  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user, -> id { joins(:license).where(licenses: { user_id: id }) }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_user, -> user { joins(:users).where(users: { id: user }) }
+  scope :for_owner, -> owner { joins(:owner).where(owner:) }
   scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
   scope :for_group, -> id { where(group: id) }
