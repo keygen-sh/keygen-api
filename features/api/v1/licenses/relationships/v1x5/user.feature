@@ -1,4 +1,4 @@
-@api/v1
+@api/v1.5 @deprecated
 Feature: License user relationship
   Background:
     Given the following "accounts" exist:
@@ -13,6 +13,7 @@ Feature: License user relationship
     And the current account is "test1"
     And the current account has 1 "license"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "403"
 
@@ -26,6 +27,7 @@ Feature: License user relationship
       { "key": "test-key" }
       """
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/test-key/user"
     Then the response status should be "200"
     And the response body should be a "user"
@@ -42,6 +44,7 @@ Feature: License user relationship
       """
       { "Keygen-Environment": "shared" }
       """
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
@@ -65,6 +68,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
@@ -89,6 +93,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "404"
 
@@ -99,6 +104,7 @@ Feature: License user relationship
     And the current account has 2 "licenses"
     And I am a user of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
@@ -109,6 +115,7 @@ Feature: License user relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$2/user"
     Then the response status should be "404"
 
@@ -117,6 +124,7 @@ Feature: License user relationship
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "401"
 
@@ -133,6 +141,7 @@ Feature: License user relationship
       }
       """
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -167,6 +176,7 @@ Feature: License user relationship
       { "userId": "$users[1]" }
       """
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       { "data": null }
@@ -185,72 +195,7 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a non-existent owner (default)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
-      """
-      {
-        "data": {
-          "type": "users",
-          "id": "8784f31d-ab66-4384-9fec-e69f1cdb189b"
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "OWNER_NOT_FOUND",
-        "source": {
-          "pointer": "/data/relationships/owner"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin changes a license's policy relationship to a non-existent owner (v1.6)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And I use an authentication token
-    And I use API version "1.6"
-    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
-      """
-      {
-        "data": {
-          "type": "users",
-          "id": "8784f31d-ab66-4384-9fec-e69f1cdb189b"
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "OWNER_NOT_FOUND",
-        "source": {
-          "pointer": "/data/relationships/owner"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin changes a license's policy relationship to a non-existent user (v1.5)
+  Scenario: Admin changes a license's policy relationship to a non-existent user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -296,6 +241,7 @@ Feature: License user relationship
       }
       """
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test2/licenses/$0/user" with the following:
       """
       {
@@ -337,6 +283,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -379,6 +326,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -420,6 +368,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -464,6 +413,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -507,6 +457,7 @@ Feature: License user relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -540,6 +491,7 @@ Feature: License user relationship
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {
@@ -571,6 +523,7 @@ Feature: License user relationship
         "userId": null
       }
       """
+    And I use API version "1.5"
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """
       {

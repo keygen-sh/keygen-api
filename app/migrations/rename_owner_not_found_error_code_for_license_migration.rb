@@ -21,7 +21,7 @@ class RenameOwnerNotFoundErrorCodeForLicenseMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.status == 422 && res.request.params in controller: 'api/v1/licenses' | 'api/v1/licenses/relationships/owners',
+  response if: -> res { res.status == 422 && res.request.params in controller: 'api/v1/licenses' | 'api/v1/licenses/relationships/v1x5/users',
                                                                    action: 'create' | 'update' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 

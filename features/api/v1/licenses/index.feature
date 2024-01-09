@@ -244,6 +244,127 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?unassigned=true"
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[1]/owner" },
+          "data": null
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all unassigned licenses (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[0]" }
+      """
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a GET request to "/accounts/test1/licenses?unassigned=true"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[1]/user" },
+          "data": null
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all assigned licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?unassigned=false"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[2]/owner" },
+          "data": { "type": "users", "id": "$users[2]" }
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all assigned licenses (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a GET request to "/accounts/test1/licenses?unassigned=false"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[2]/user" },
+          "data": { "type": "users", "id": "$users[2]" }
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
 
   Scenario: Admin retrieves all activated licenses
     Given I am an admin of account "test1"
