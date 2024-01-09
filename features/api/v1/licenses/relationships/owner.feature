@@ -1,5 +1,5 @@
 @api/v1
-Feature: License user relationship
+Feature: License owner relationship
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -13,10 +13,10 @@ Feature: License user relationship
     And the current account is "test1"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves the user for a license
+  Scenario: Admin retrieves the owner for a license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
@@ -26,13 +26,13 @@ Feature: License user relationship
       { "key": "test-key" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/test-key/user"
+    When I send a GET request to "/accounts/test1/licenses/test-key/owner"
     Then the response status should be "200"
     And the response body should be a "user"
     And the response should contain a valid signature header for "test1"
 
   @ee
-  Scenario: Environment retrieves the user of a shared license
+  Scenario: Environment retrieves the owner of a shared license
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared+owned "license"
@@ -42,11 +42,11 @@ Feature: License user relationship
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: Product retrieves the user for a license
+  Scenario: Product retrieves the owner for a license
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 "policy"
@@ -65,11 +65,11 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: Product retrieves the user for a license of another product
+  Scenario: Product retrieves the owner for a license of another product
     Given the current account is "test1"
     And the current account has 3 "products"
     And the current account has 1 "policy"
@@ -89,38 +89,38 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "404"
 
-  Scenario: User attempts to retrieve the user for a license they own
+  Scenario: User attempts to retrieve the owner for a license they own
     Given the current account is "test1"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: User attempts to retrieve the user for a license they don't own
+  Scenario: User attempts to retrieve the owner for a license they don't own
     Given the current account is "test1"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$2/user"
+    When I send a GET request to "/accounts/test1/licenses/$2/owner"
     Then the response status should be "404"
 
-  Scenario: Admin attempts to retrieve the user for a license of another account
+  Scenario: Admin attempts to retrieve the owner for a license of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/owner"
     Then the response status should be "401"
 
-  Scenario: Admin changes a license's user relationship to another user
+  Scenario: Admin changes a license's owner relationship to another user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "users"
@@ -133,7 +133,7 @@ Feature: License user relationship
       }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -146,8 +146,8 @@ Feature: License user relationship
     And the response body should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
           "data": { "type": "users", "id": "$users[2]" }
         }
       }
@@ -156,7 +156,7 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin removes a license's user relationship
+  Scenario: Admin removes a license's owner relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "users"
@@ -167,7 +167,7 @@ Feature: License user relationship
       { "userId": "$users[1]" }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       { "data": null }
       """
@@ -175,8 +175,8 @@ Feature: License user relationship
     And the response body should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
           "data": null
         }
       }
@@ -250,40 +250,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a non-existent user (v1.5)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And I use an authentication token
-    And I use API version "1.5"
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
-      """
-      {
-        "data": {
-          "type": "users",
-          "id": "8784f31d-ab66-4384-9fec-e69f1cdb189b"
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "USER_NOT_FOUND",
-        "source": {
-          "pointer": "/data/relationships/user"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin changes a license's user relationship to a user for another account
+  Scenario: Admin changes a license's owner relationship to a user for another account
     Given I am an admin of account "test1"
     And the current account is "test2"
     And the current account has 2 "users"
@@ -296,7 +263,7 @@ Feature: License user relationship
       }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test2/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test2/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -310,7 +277,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship to another user
+  Scenario: Product changes a license's owner relationship to another user
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -337,7 +304,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -350,8 +317,8 @@ Feature: License user relationship
     And the response body should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
           "data": { "type": "users", "id": "$users[1]" }
         }
       }
@@ -360,7 +327,7 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship to a new user they don't own
+  Scenario: Product changes a license's owner relationship to a new user they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -379,7 +346,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -392,8 +359,8 @@ Feature: License user relationship
     And the response body should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
           "data": { "type": "users", "id": "$users[1]" }
         }
       }
@@ -402,7 +369,7 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship to a new user for a license they don't own
+  Scenario: Product changes a license's owner relationship to a new user for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -420,7 +387,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -434,7 +401,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship that would exceed group limits
+  Scenario: Product changes a license's owner relationship that would exceed group limits
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -464,7 +431,7 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -490,7 +457,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to change a license's user relationship
+  Scenario: User attempts to change a license's owner relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -514,7 +481,7 @@ Feature: License user relationship
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -528,7 +495,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a license's user relationship to another user for a license they don't own
+  Scenario: User changes a license's owner relationship to another user for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -547,7 +514,7 @@ Feature: License user relationship
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
@@ -561,7 +528,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous changes a license's user relationship to a different user
+  Scenario: Anonymous changes a license's owner relationship to a different user
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -578,7 +545,7 @@ Feature: License user relationship
         "userId": null
       }
       """
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/owner" with the following:
       """
       {
         "data": {
