@@ -49,7 +49,7 @@ describe RenameOwnerRelationshipToUserForLicenseMigration do
             user: {
               data: nil,
               links: {
-                related: v1_account_license_user_path(subject.account_id, subject.id),
+                related: v1_account_license_v1_5_user_path(subject.account_id, subject.id),
               },
             },
           ),
@@ -90,7 +90,7 @@ describe RenameOwnerRelationshipToUserForLicenseMigration do
             user: {
               data: { type: :users, id: subject.owner_id },
               links: {
-                related: v1_account_license_user_path(subject.account_id, subject.id),
+                related: v1_account_license_v1_5_user_path(subject.account_id, subject.id),
               },
             },
           ),
