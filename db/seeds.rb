@@ -73,6 +73,7 @@ permissions = %w[
   license.entitlements.attach
   license.entitlements.detach
   license.group.update
+  license.owner.update
   license.policy.update
   license.read
   license.reinstate
@@ -84,7 +85,6 @@ permissions = %w[
   license.usage.decrement
   license.usage.increment
   license.usage.reset
-  license.owner.update
   license.user.update
   license.validate
 
@@ -221,6 +221,7 @@ events = %w[
   license.expired
   license.expiring-soon
   license.group.updated
+  license.owner.updated
   license.policy.updated
   license.reinstated
   license.renewed
@@ -230,7 +231,6 @@ events = %w[
   license.usage.decremented
   license.usage.incremented
   license.usage.reset
-  license.owner.updated
   license.user.updated
   license.validated
   license.validation.failed
