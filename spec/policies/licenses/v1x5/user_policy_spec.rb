@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Licenses::OwnerPolicy, type: :policy do
+describe Licenses::V1x5::UserPolicy, type: :policy do
   subject { described_class.new(record, account:, environment:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
@@ -19,13 +19,13 @@ describe Licenses::OwnerPolicy, type: :policy do
           with_permissions %w[license.owner.update] do
             without_token_permissions { denies :update }
 
-            allows :update
+            denies :update
           end
 
           with_permissions %w[license.user.update] do
             without_token_permissions { denies :update }
 
-            denies :update
+            allows :update
           end
 
           with_wildcard_permissions do
@@ -130,13 +130,13 @@ describe Licenses::OwnerPolicy, type: :policy do
             with_permissions %w[license.owner.update] do
               without_token_permissions { denies :update }
 
-              allows :update
+              denies :update
             end
 
             with_permissions %w[license.user.update] do
               without_token_permissions { denies :update }
 
-              denies :update
+              allows :update
             end
 
             with_wildcard_permissions do
@@ -203,13 +203,13 @@ describe Licenses::OwnerPolicy, type: :policy do
           with_permissions %w[license.owner.update] do
             without_token_permissions { denies :update }
 
-            allows :update
+            denies :update
           end
 
           with_permissions %w[license.user.update] do
             without_token_permissions { denies :update }
 
-            denies :update
+            allows :update
           end
 
           with_wildcard_permissions do
