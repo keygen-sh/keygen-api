@@ -33,7 +33,7 @@ module Api::V1::Licenses::Relationships
       license.update!(user_id: owner_params[:id])
 
       BroadcastEventService.call(
-        event: 'license.user.updated',
+        event: 'license.owner.updated',
         account: current_account,
         resource: license,
       )

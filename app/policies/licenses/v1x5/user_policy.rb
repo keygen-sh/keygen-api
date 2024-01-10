@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Licenses
-  class OwnerPolicy < ApplicationPolicy
+module Licenses::V1x5
+  class UserPolicy < ApplicationPolicy
     authorize :license
 
     def show?
@@ -25,7 +25,7 @@ module Licenses
     end
 
     def update?
-      verify_permissions!('license.owner.update')
+      verify_permissions!('license.user.update')
       verify_environment!
 
       case bearer
