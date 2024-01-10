@@ -91,6 +91,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
@@ -244,6 +245,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
@@ -463,6 +465,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
