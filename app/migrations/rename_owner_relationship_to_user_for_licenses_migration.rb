@@ -16,7 +16,7 @@ class RenameOwnerRelationshipToUserForLicensesMigration < BaseMigration
           rels[:user] = rels.delete(:owner)
                             .merge!(
                               links: {
-                                related: v1_account_license_user_path(account_id, license_id),
+                                related: v1_account_license_v1_5_user_path(account_id, license_id),
                               },
                             )
         else
@@ -35,7 +35,7 @@ class RenameOwnerRelationshipToUserForLicensesMigration < BaseMigration
           rels[:user] = rels.delete(:owner)
                             .merge!(
                               links: {
-                                related: v1_account_license_user_path(account_id, license_id),
+                                related: v1_account_license_v1_5_user_path(account_id, license_id),
                               },
                             )
         else
