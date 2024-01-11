@@ -539,7 +539,7 @@ describe Licenses::UserPolicy, type: :policy do
       end
     end
 
-    with_bearer_traits %i[with_attached_licenses] do
+    with_bearer_traits %i[with_user_licenses] do
       with_scenarios %i[accessing_its_license accessing_its_users] do
         with_token_authentication do
           with_permissions %w[user.read] do

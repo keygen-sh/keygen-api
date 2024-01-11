@@ -819,7 +819,117 @@ describe ReleasePolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
+    with_bearer_trait :with_owned_licenses do
+      with_scenarios %i[accessing_its_releases] do
+        with_token_authentication do
+          with_permissions %w[release.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_its_release] do
+        with_token_authentication do
+          with_permissions %w[release.upgrade] do
+            allows :upgrade
+          end
+
+          with_permissions %w[release.read] do
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            denies :create, :update, :destroy, :upload, :publish, :yank
+            allows :show, :upgrade
+          end
+
+          with_default_permissions do
+            denies :create, :update, :destroy, :upload, :publish, :yank
+            allows :show, :upgrade
+          end
+
+          without_permissions do
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_releases] do
+        with_release_traits %i[open] do
+          with_token_authentication do
+            with_permissions %w[release.read] do
+              allows :index
+            end
+
+            with_wildcard_permissions { allows :index }
+            with_default_permissions  { allows :index }
+            without_permissions       { denies :index }
+          end
+        end
+
+        with_token_authentication do
+          with_permissions %w[release.read] do
+            denies :index
+          end
+
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_a_release] do
+        with_release_traits %i[open] do
+          with_token_authentication do
+            with_permissions %w[release.read] do
+              allows :show
+            end
+
+            with_wildcard_permissions do
+              denies :create, :update, :destroy
+              allows :show
+            end
+
+            with_default_permissions do
+              denies :create, :update, :destroy
+              allows :show
+            end
+
+            without_permissions do
+              denies :show, :create, :update, :destroy
+            end
+          end
+        end
+
+        with_token_authentication do
+          with_permissions %w[release.upgrade] do
+            denies :upgrade
+          end
+
+          with_permissions %w[release.read] do
+            denies :show
+          end
+
+          with_wildcard_permissions do
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+
+          with_default_permissions do
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+
+          without_permissions do
+            denies :show, :upgrade, :create, :update, :destroy, :upload, :publish, :yank
+          end
+        end
+      end
+    end
+
+    with_bearer_trait :with_user_licenses do
       with_scenarios %i[accessing_its_releases] do
         with_token_authentication do
           with_permissions %w[release.read] do
@@ -944,7 +1054,11 @@ describe ReleasePolicy, type: :policy do
             allows :show, :upgrade
           end
 
-          with_bearer_trait :with_licenses do
+          with_bearer_trait :with_owned_licenses do
+            denies :show, :upgrade
+          end
+
+          with_bearer_trait :with_user_licenses do
             denies :show, :upgrade
           end
         end
