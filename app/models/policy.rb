@@ -132,7 +132,6 @@ class Policy < ApplicationRecord
 
   belongs_to :product
   has_many :licenses, dependent: :destroy_async
-  # TODO(ezekg) Remove the :user source once we migrate to multi-user licenses.
   has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :machines, through: :licenses
   has_many :pool, class_name: "Key", dependent: :destroy_async
