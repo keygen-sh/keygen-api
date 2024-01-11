@@ -138,6 +138,12 @@ class LicenseSerializer < BaseSerializer
     end
   end
 
+  relationship :users do
+    link :related do
+      @url_helpers.v1_account_license_users_path @object.account_id, @object
+    end
+  end
+
   relationship :machines do
     link :related do
       @url_helpers.v1_account_license_machines_path @object.account_id, @object

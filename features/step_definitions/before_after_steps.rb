@@ -61,13 +61,16 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    log scenario.exception
+    puts scenario.exception
+    puts
 
     req_headers = last_request.env
       .select { |k, v| k.start_with?('HTTP_') }
       .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
-    log JSON.pretty_generate(
+    puts "dump:"
+    puts
+    pp(
       request: {
         method: last_request.request_method,
         url: last_request.url,
