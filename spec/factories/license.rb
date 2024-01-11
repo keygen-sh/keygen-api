@@ -111,14 +111,14 @@ FactoryBot.define do
       without_owner
     end
 
-    trait :with_attached_users do
+    trait :with_licensees do
       after :create do |license|
         create_list(:license_user, 3, account: license.account, environment: license.environment, license:)
       end
     end
 
     trait :with_users do
-      with_attached_users
+      with_licensees
       with_owner
     end
 

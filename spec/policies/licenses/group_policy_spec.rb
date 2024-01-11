@@ -311,7 +311,33 @@ describe Licenses::GroupPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
+    with_bearer_trait :with_owned_licenses do
+      with_scenarios %i[accessing_its_license accessing_its_group] do
+        with_token_authentication do
+          with_permissions %w[group.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            denies :update
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :update
+            allows :show
+          end
+
+          without_permissions do
+            denies :show, :update
+          end
+        end
+      end
+    end
+
+    with_bearer_trait :with_user_licenses do
       with_scenarios %i[accessing_its_license accessing_its_group] do
         with_token_authentication do
           with_permissions %w[group.read] do

@@ -44,21 +44,27 @@ FactoryBot.define do
       password { nil }
     end
 
-    trait :with_attached_licenses do
-      after :create do |user|
-        create_list(:license_user, 3, account: user.account, environment: user.environment, user:)
-      end
-    end
-
     trait :with_owned_licenses do
       after :create do |user|
         create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
       end
     end
 
+    trait :with_owned_license do
+      after :create do |user|
+        create(:license, account: user.account, environment: user.environment, owner: user)
+      end
+    end
+
+    trait :with_user_licenses do
+      after :create do |user|
+        create_list(:license_user, 3, account: user.account, environment: user.environment, user:)
+      end
+    end
+
     trait :with_licenses do
-      with_attached_licenses
-      with_owned_licenses
+      with_user_licenses
+      with_owned_license
     end
 
     trait :with_expired_licenses do

@@ -12,7 +12,7 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.owner == bearer }
+    in role: Role(:user) if record.all? { _1.owner == bearer || _1.id.in?(bearer.machine_ids) }
       allow!
     in role: Role(:license) if record.all? { _1.license == bearer }
       allow!
@@ -32,7 +32,7 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.owner == bearer || bearer.machines.exists?(record.id)
       allow!
     in role: Role(:license) if record.license == bearer
       allow!
@@ -104,7 +104,7 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.owner == bearer || bearer.machines.exists?(record.id)
       !record.license.protected?
     in role: Role(:license) if record.license == bearer
       allow!
