@@ -803,7 +803,7 @@ Feature: License entitlements relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "entitlement 'd22692b1-0b4b-4cb7-9e3e-449e0fdf9cd8' relationship not found",
+        "detail": "cannot detach entitlement 'd22692b1-0b4b-4cb7-9e3e-449e0fdf9cd8' (entitlement is not attached)",
         "source": {
           "pointer": "/data/0"
         }
