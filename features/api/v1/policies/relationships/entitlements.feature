@@ -795,7 +795,7 @@ Feature: Policy entitlements relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "entitlement '818f1f34-676b-4e0b-ba57-a98d02263212' relationship not found",
+        "detail": "cannot detach entitlement '818f1f34-676b-4e0b-ba57-a98d02263212' (entitlement is not attached)",
         "source": {
           "pointer": "/data/1"
         }
