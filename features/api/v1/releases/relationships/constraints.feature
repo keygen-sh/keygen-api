@@ -837,7 +837,7 @@ Feature: Release constraints relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "constraint 'f40913d3-a786-407f-8dd6-94664b95ade8' relationship not found",
+        "detail": "cannot detach constraint 'f40913d3-a786-407f-8dd6-94664b95ade8' (constraint is not attached)",
         "source": {
           "pointer": "/data/2"
         }
