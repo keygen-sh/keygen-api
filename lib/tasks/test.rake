@@ -45,7 +45,7 @@ begin
 
     desc 'run rspec test suite'
     task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
-      pattern = args[:pattern]
+      pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
 
       if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
         rspec = Rake::Task['spec']
@@ -64,7 +64,7 @@ begin
 
     desc 'run cucumber test suite'
     task :cucumber, %i[pattern] => %i[test:environment log:clear] do |_, args|
-      pattern = args[:pattern]
+      pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
 
       if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers
         cucumber = Rake::Task['cucumber']
