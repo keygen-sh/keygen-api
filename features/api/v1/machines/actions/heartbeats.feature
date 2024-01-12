@@ -706,12 +706,16 @@ Feature: Machine heartbeat actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
+    And the last "license" has the following attributes:
+      """
+      { "protected": true }
+      """
     And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
-    And the first "machine" has the following attributes:
+    And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": "$time.1.hour.ago" }
       """
-    And I am a user of account "test1"
+    And I am the last user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "403"

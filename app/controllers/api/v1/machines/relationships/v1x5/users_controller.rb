@@ -10,7 +10,8 @@ module Api::V1::Machines::Relationships::V1x5
     authorize :machine
 
     def show
-      user = machine.owner
+      license = machine.license
+      user    = license.owner
       authorize! user,
         with: Machines::V1x5::UserPolicy
 
