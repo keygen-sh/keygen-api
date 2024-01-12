@@ -197,6 +197,7 @@ class Machine < ApplicationRecord
     errors.add :group, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
   end
 
+  # Assert owner is a license user (i.e. licensee or owner)
   validate on: %i[create update] do
     next unless
       owner_id_changed?
