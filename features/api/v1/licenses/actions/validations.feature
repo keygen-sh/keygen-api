@@ -8492,7 +8492,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous validates a license key that requires a user scope (provided)
+  Scenario: Anonymous validates a license key that requires a user scope (match owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -8520,6 +8520,119 @@ Feature: License validation actions
       {
         "meta": {
           "scope": { "user": "$users[1]" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match owner email)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]",
+        "key": "user-key"
+      }
+      """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "key": "user-key" }
+      """
+    And the current account has 2 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[3]" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match user email)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "key": "user-key" }
+      """
+    And the current account has 2 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[3].email" },
           "key": "user-key"
         }
       }
