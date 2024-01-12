@@ -100,9 +100,10 @@ class Permission < ApplicationRecord
     machine.check-out
     machine.create
     machine.delete
-    machine.group.update
+    machine.owner.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.group.update
     machine.proofs.generate
     machine.read
     machine.update
@@ -259,6 +260,7 @@ class Permission < ApplicationRecord
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.owner.update
     machine.proofs.generate
     machine.read
     machine.update
@@ -481,6 +483,7 @@ class Permission < ApplicationRecord
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.owner.update
     machine.proofs.generate
     machine.read
     machine.update

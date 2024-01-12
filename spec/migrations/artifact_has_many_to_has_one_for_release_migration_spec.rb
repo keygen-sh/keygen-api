@@ -87,6 +87,10 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
                 related: v1_account_release_v1_0_release_artifact_path(subject.account_id, subject.id),
               },
             },
+          ).and(
+            exclude(
+              artifacts: anything,
+            ),
           ),
         ),
       )

@@ -96,6 +96,7 @@ permissions = %w[
   machine.group.update
   machine.heartbeat.ping
   machine.heartbeat.reset
+  machine.owner.update
   machine.proofs.generate
   machine.read
   machine.update
@@ -249,6 +250,7 @@ events = %w[
   machine.heartbeat.pong
   machine.heartbeat.reset
   machine.heartbeat.resurrected
+  machine.owner.updated
   machine.proofs.generated
   machine.updated
 

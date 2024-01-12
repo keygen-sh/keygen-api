@@ -52,6 +52,10 @@ describe RenameOwnerRelationshipToUserForLicenseMigration do
                 related: v1_account_license_v1_5_user_path(subject.account_id, subject.id),
               },
             },
+          ).and(
+            exclude(
+              owner: anything,
+            ),
           ),
         ),
       )
@@ -93,6 +97,10 @@ describe RenameOwnerRelationshipToUserForLicenseMigration do
                 related: v1_account_license_v1_5_user_path(subject.account_id, subject.id),
               },
             },
+          ).and(
+            exclude(
+              owner: anything,
+            ),
           ),
         ),
       )
