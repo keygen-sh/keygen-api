@@ -109,7 +109,7 @@ Rails.application.routes.draw do
           resource :product, only: %i[show]
           resource :group,   only: %i[show update]
           resource :license, only: %i[show]
-          resource :owner,   only: %i[show]
+          resource :owner,   only: %i[show update]
 
           scope module: :v1x5 do
             resource :user, only: %i[show], as: :v1_5_user

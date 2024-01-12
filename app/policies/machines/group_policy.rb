@@ -15,7 +15,7 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.owner == bearer || bearer.machines.exists?(machine.id) || record.id == bearer.group_id || record.id.in?(bearer.group_ids)
+      in role: Role(:user) if machine.owner == bearer || machine.license.owner == bearer || bearer.machines.exists?(machine.id) || record.id == bearer.group_id || record.id.in?(bearer.group_ids)
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!
