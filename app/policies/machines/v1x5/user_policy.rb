@@ -15,7 +15,7 @@ module Machines::V1x5
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.owner == bearer || bearer.machines.exists?(machine.id)
+      in role: Role(:user) if machine.owner == bearer || machine.license.owner == bearer  || bearer.machines.exists?(machine.id)
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!

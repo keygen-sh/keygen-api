@@ -620,6 +620,65 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=owner"
+    Then the response status should be "200"
+    And the response body should be a "machine-file" with the following encoded certificate data:
+      """
+      {
+        "data": {
+          "relationships": {
+            "owner": {
+              "links": { "related": "/v1/accounts/$account/machines/$machines[0]/owner" },
+              "data": null
+            }
+          }
+        },
+        "included": [
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with an owner include (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=owner"
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate with the following encoded data:
+      """
+      {
+        "data": {
+          "relationships": {
+            "owner": {
+              "links": { "related": "/v1/accounts/$account/machines/$machines[0]/owner" },
+              "data": { "type": "users", "id": "$users[1]" }
+            }
+          }
+        },
+        "included": [
+          { "type": "users", "id": "$users[1]" }
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with a license owner include (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.owner"
     Then the response status should be "200"
     And the response body should be a "machine-file" with the following encoded certificate data:
@@ -629,7 +688,7 @@ Feature: Machine checkout actions
           "relationships": {
             "owner": {
               "links": { "related": "/v1/accounts/$account/machines/$machines[0]/owner" },
-              "data": { "type": "users", "id": "$users[1]" }
+              "data": null
             }
           }
         },
@@ -643,7 +702,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin performs a machine checkout with a user include (POST, v1.5)
+  Scenario: Admin performs a machine checkout with a license user include (POST, v1.5)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"

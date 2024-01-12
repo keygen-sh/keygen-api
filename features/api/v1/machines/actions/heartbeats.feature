@@ -497,22 +497,18 @@ Feature: Machine heartbeat actions
   Scenario: User pings an unprotected machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "user"
-    And I am a user of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the last "license" has the following attributes:
       """
       { "protected": false }
       """
-    And the current account has 1 "machine"
-    And all "machines" have the following attributes:
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
       """
-      {
-        "licenseId": "$licenses[0]",
-        "lastHeartbeatAt": null
-      }
+      { "lastHeartbeatAt": null }
       """
-    And the current user has 1 "machine" as "owner"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
@@ -528,22 +524,18 @@ Feature: Machine heartbeat actions
   Scenario: User pings a protected machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "user"
-    And I am a user of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the last "license" has the following attributes:
       """
       { "protected": true }
       """
-    And the current account has 1 "machine"
-    And all "machines" have the following attributes:
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
       """
-      {
-        "licenseId": "$licenses[0]",
-        "lastHeartbeatAt": null
-      }
+      { "lastHeartbeatAt": null }
       """
-    And the current user has 1 "machine" as "owner"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "403"
@@ -712,15 +704,19 @@ Feature: Machine heartbeat actions
 
   Scenario: User resets a machine's heartbeat
     Given the current account is "test1"
-    And the current account has 1 "user"
-    And I am a user of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "machine"
-    And the current user has 1 "machine" as "owner"
-    And the first "machine" has the following attributes:
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the last "license" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": "$time.1.hour.ago" }
       """
+    And I am the last user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "403"

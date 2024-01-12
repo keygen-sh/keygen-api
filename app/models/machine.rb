@@ -17,11 +17,13 @@ class Machine < ApplicationRecord
   HEARTBEAT_TTL = 10.minutes
 
   belongs_to :license, counter_cache: true
+  belongs_to :owner,
+    class_name: User.name,
+    optional: true
   belongs_to :group,
     optional: true
   has_one :product, through: :license
   has_one :policy, through: :license
-  has_one :owner, through: :license
   has_many :users, through: :license
   has_many :processes,
     class_name: 'MachineProcess',
@@ -42,10 +44,17 @@ class Machine < ApplicationRecord
   accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
   tracks_nested_attributes_for :components
 
-  # Machines automatically inherit their license's group ID
+  # Machines firstly automatically inherit their license's group ID.
   before_validation -> { self.group_id = license.group_id },
     if: -> { license.present? && group_id.nil? },
     on: %i[create]
+
+  # Machines secondly automatically inherit their owner's group ID. We're using before_validation
+  # instead of before_create so that this can be run when the owner is changed as well,
+  # and so that we can keep our group limit validations in play.
+  before_validation -> { self.group_id = owner.group_id },
+    if: -> { owner_id_changed? && owner.present? && group_id.nil? },
+    on: %i[create update]
 
   # Set initial heartbeat if heartbeat is required
   before_validation -> { self.last_heartbeat_at ||= Time.current },
@@ -63,6 +72,13 @@ class Machine < ApplicationRecord
 
   validates :license,
     scope: { by: :account_id }
+
+  validates :owner,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> {
+      owner_id_before_type_cast.nil?
+    }
 
   validates :group,
     presence: { message: 'must exist' },
@@ -179,6 +195,18 @@ class Machine < ApplicationRecord
       group.machines.count >= group.max_machines
 
     errors.add :group, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
+  end
+
+  validate on: %i[create update] do
+    next unless
+      owner_id_changed?
+
+    next unless
+      owner.present?
+
+    unless license.users.exists?(owner.id)
+      errors.add :owner, :invalid, message: 'must be a valid license user'
+    end
   end
 
   scope :search_id, -> (term) {
