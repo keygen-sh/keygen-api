@@ -10,6 +10,20 @@ FactoryBot.define do
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     license     { build(:license, account:, environment:) }
+    owner       { nil }
+
+    trait :with_owner do
+      owner   { build(:user, account:, environment:) }
+      license { build(:license, account:, environment:, owner:) }
+    end
+
+    trait :without_owner do
+      owner { nil }
+    end
+
+    trait :owned do
+      with_owner
+    end
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
