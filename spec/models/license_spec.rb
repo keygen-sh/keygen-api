@@ -81,6 +81,30 @@ describe License, type: :model do
     end
   end
 
+  describe '#owner=' do
+    context 'on update' do
+      it "should not raise when owner is a new user" do
+        license = create(:license, :with_owner, account:)
+        owner   = create(:user, account:)
+
+        expect { license.update!(owner:) }.to_not raise_error
+      end
+
+      it "should raise when owner is an existing user" do
+        license = create(:license, :with_licensees, account:)
+        owner   = license.licensees.take
+
+        expect { license.update!(owner:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it "should not raise when owner is nil" do
+        license = create(:license, :with_owner, account:)
+
+        expect { license.update!(owner: nil) }.to_not raise_error
+      end
+    end
+  end
+
   describe '#role_attributes=' do
     it 'should set role and permissions' do
       license = create(:license, account:)
