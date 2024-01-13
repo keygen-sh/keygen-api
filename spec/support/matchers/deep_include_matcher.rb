@@ -53,7 +53,7 @@ RSpec::Matchers.define :deep_include do |expected|
         Actual array did not include value at #{path}:
           expected:
             #{@failing_expected_array_item.inspect}
-          but matching value not found in array:
+          got:
             #{@failing_array.inspect}
       MSG
     else
