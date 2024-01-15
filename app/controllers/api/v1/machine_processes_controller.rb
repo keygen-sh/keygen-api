@@ -14,7 +14,7 @@ module Api::V1
     before_action :set_machine_process, only: %i[show update destroy]
 
     def index
-      machine_processes = apply_pagination(authorized_scope(apply_scopes(current_account.machine_processes)).preload(:machine, :license, :policy, :product, :group, :owner))
+      machine_processes = apply_pagination(authorized_scope(apply_scopes(current_account.machine_processes)).preload(:machine, :policy, :product, :group, :owner, license: %i[owner]))
       authorize! machine_processes
 
       render jsonapi: machine_processes
