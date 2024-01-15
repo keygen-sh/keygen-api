@@ -3,18 +3,21 @@
 require 'active_record_union'
 
 module UnionOf
+  class ReadonlyAssociationError < ActiveRecord::ActiveRecordError
+    def initialize(owner, reflection)
+      super("Cannot modify association '#{owner.class.name}##{reflection.name}' because it is read-only.")
+    end
+  end
+
   class ReadonlyAssociation < ActiveRecord::Associations::CollectionAssociation
-    # TODO(ezekg) Implement a readonly association. Raise proper errors.
-
-    def writer(...)      = raise NotImplementedError
-    def ids_writer       = raise NotImplementedError
-    def destroy_all(...) = raise NotImplementedError
-    def delete_all(...)  = raise NotImplementedError
-
-    def insert_record(...)  = raise NotImplementedError
-    def delete_records(...) = raise NotImplementedError
-    def concat_records(...) = raise NotImplementedError
-    def build_record(...)   = raise NotImplementedError
+    def writer(...)         = raise ReadonlyAssociationError.new(owner, reflection)
+    def ids_writer          = raise ReadonlyAssociationError.new(owner, reflection)
+    def destroy_all(...)    = raise ReadonlyAssociationError.new(owner, reflection)
+    def delete_all(...)     = raise ReadonlyAssociationError.new(owner, reflection)
+    def insert_record(...)  = raise ReadonlyAssociationError.new(owner, reflection)
+    def delete_records(...) = raise ReadonlyAssociationError.new(owner, reflection)
+    def concat_records(...) = raise ReadonlyAssociationError.new(owner, reflection)
+    def build_record(...)   = raise ReadonlyAssociationError.new(owner, reflection)
   end
 
   class Association < ReadonlyAssociation
