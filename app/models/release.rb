@@ -277,11 +277,11 @@ class Release < ApplicationRecord
     # intersecting their entitlements, or no constraints at all.
     entl = within_constraints(user.entitlement_codes, strict: true)
 
-    entl.joins(product: %i[licenses])
+    entl.joins(product: %i[users])
       .where(
         product: {
           distribution_strategy: ['LICENSED', nil],
-          licenses: { id: License.for_user(user) },
+          users: { id: user },
         },
       )
       .union(
