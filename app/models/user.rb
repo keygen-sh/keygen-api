@@ -19,7 +19,7 @@ class User < ApplicationRecord
   has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
   has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id
   has_many :user_licenses, index_errors: true, through: :license_users, source: :license
-  union_of :licenses, sources: %i[owned_licenses user_licenses], class_name: License.name do
+  union_of :licenses, sources: %i[owned_licenses user_licenses] do
     def owned = where(owner: proxy_association.owner)
   end
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
