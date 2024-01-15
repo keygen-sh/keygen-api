@@ -499,7 +499,7 @@ class License < ApplicationRecord
     end
   }
   scope :banned, -> {
-    joins(:owner).where.not(users: { banned_at: nil })
+    joins(:owner).where.not(owner: { banned_at: nil })
   }
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :with_status, -> status {
