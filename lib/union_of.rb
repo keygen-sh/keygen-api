@@ -22,7 +22,8 @@ module UnionOf
 
   class Association < ReadonlyAssociation
     def association_scope
-      return if klass.nil?
+      return if
+        klass.nil?
 
       @association_scope ||= Scope.create.scope(self)
     end
@@ -44,7 +45,7 @@ module UnionOf
         primary_key = reflection.active_record_primary_key
 
         # FIXME(ezekg) Find an alternative to this private API.
-        next nil if
+        next if
           reflection.belongs_to? && !association.send(:foreign_key_present?)
 
         association.scope.select(primary_key)
