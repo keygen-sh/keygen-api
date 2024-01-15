@@ -12,7 +12,7 @@ class MachineFile
   attribute :issued_at,      :datetime
   attribute :expires_at,     :datetime
   attribute :ttl,            :integer
-  attribute :includes,       :array
+  attribute :includes,       :array,    default: []
 
   validates :account_id,  presence: true
   validates :license_id,  presence: true
@@ -33,17 +33,31 @@ class MachineFile
     allow_nil: true
 
   def persisted? = false
+  def id         = @id      ||= SecureRandom.uuid
+  def product    = @product ||= license&.product
+  def owner      = @owner   ||= license&.owner
 
-  def id      = @id      ||= SecureRandom.uuid
   def account = @account ||= Account.find_by(id: account_id)
+  def account=(account)
+    self.account_id = account&.id
+  end
+
   def license = @license ||= License.find_by(id: license_id, account_id:)
+  def license=(license)
+    self.license_id = license&.id
+  end
+
   def machine = @machine ||= Machine.find_by(id: machine_id, account_id:)
-  def product = @product ||= license&.product
-  def owner   = @owner   ||= license&.owner
+  def machine=(machine)
+    self.machine_id = machine&.id
+  end
 
   def environment
     @environment ||= unless environment_id.nil?
-                       Environment.find_by(id: environment_id, account_id:)
-                     end
+                        Environment.find_by(id: environment_id, account_id:)
+                      end
+  end
+  def environment=(environment)
+    self.environment_id = environment&.id
   end
 end
