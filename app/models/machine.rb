@@ -303,15 +303,15 @@ class Machine < ApplicationRecord
     return none if
       owner_identifier.empty?
 
-    return joins(:owner).where(users: { id: user_identifier }) if
-      UUID_RE.match?(user_identifier)
+    return joins(:owner).where(users: { id: owner_identifier }) if
+      UUID_RE.match?(owner_identifier)
 
-    scope = joins(:owner).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    scope = joins(:owner).where('users.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%")
     return scope unless
-      UUID_CHAR_RE.match?(user_identifier)
+      UUID_CHAR_RE.match?(owner_identifier)
 
     scope.or(
-      joins(:owner).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:owner).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
@@ -338,7 +338,7 @@ class Machine < ApplicationRecord
       UUID_CHAR_RE.match?(user_identifier)
 
     scope.or(
-      joins(:users).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:users).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
