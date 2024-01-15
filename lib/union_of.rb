@@ -164,12 +164,6 @@ module UnionOf
       end
     end
 
-    def association_scope
-      return if klass.nil?
-
-      Scope.create(self)
-    end
-
     def join_scope(table, foreign_table, foreign_klass)
       predicate_builder = predicate_builder(table)
       scope_chain_items = join_scopes(table, predicate_builder)
@@ -177,15 +171,17 @@ module UnionOf
 
       klass_scope.where!(
         join_foreign_key => union_sources.reduce(nil) do |chain, union_source|
-          reflection = foreign_klass.reflect_on_association(union_source)
-          relation   = reflection.klass.scope_for_association.except(:order)
-                                                             .select(:id)
+          union_reflection  = foreign_klass.reflect_on_association(union_source)
+          union_klass       = union_reflection.klass
 
-          primary_key = reflection.join_primary_key
-          foreign_key = reflection.join_foreign_key
+          relation = union_reflection.klass.scope_for_association.select(union_klass.primary_key)
+                                                                 .except(:order)
 
-          scope = if reflection.through_reflection?
-                    through_reflection  = reflection.through_reflection
+          primary_key = union_reflection.join_primary_key
+          foreign_key = union_reflection.join_foreign_key
+
+          scope = if union_reflection.through_reflection?
+                    through_reflection  = union_reflection.through_reflection
                     through_foreign_key = through_reflection.foreign_key
                     through_klass       = through_reflection.klass
                     through_table       = through_klass.arel_table
