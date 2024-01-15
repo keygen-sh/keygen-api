@@ -303,16 +303,18 @@ class Machine < ApplicationRecord
     return none if
       owner_identifier.empty?
 
-    return joins(:owner).where(users: { id: owner_identifier }) if
+    return joins(:owner).where(owner: { id: owner_identifier }) if
       UUID_RE.match?(owner_identifier)
 
-    scope = joins(:owner).where('users.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%")
+    scope = joins(:owner).where.not(owner: { email: nil }) # FIXME(ezekg) Hack so our join gets aliased
+                         .where('owner.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%")
     return scope unless
       UUID_CHAR_RE.match?(owner_identifier)
 
     scope.or(
-      joins(:owner).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
-        to_tsvector('simple', users.id::text)
+      joins(:owner).where.not(owner: { id: nil })
+                   .where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
+        to_tsvector('simple', owner.id::text)
         @@
         to_tsquery(
           'simple',
