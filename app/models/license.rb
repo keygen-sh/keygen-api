@@ -437,6 +437,13 @@ class License < ApplicationRecord
       where 'user_id IS NOT NULL'
     end
   }
+  scope :assigned, -> (status = true) {
+    if ActiveRecord::Type::Boolean.new.cast(status)
+      where 'user_id IS NOT NULL'
+    else
+      where 'user_id IS NULL'
+    end
+  }
   scope :activated, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
       where('machines_count >= 1')
