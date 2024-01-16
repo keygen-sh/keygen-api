@@ -47,7 +47,11 @@ Feature: Group licenses relationship
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 2 isolated "groups"
-    And the current account has 5 isolated "licenses" for the first "group"
+    And the current account has 3 isolated "users"
+    And the current account has 3 isolated "licenses" for the first "group"
+    And the current account has 1 isolated "license" for the first "group" and the second "user" as "owner"
+    And the current account has 1 isolated "license" for the first "group" and the third "user" as "owner"
+    And the current account has 1 isolated "license-user" for the last "license" and the fourth "user"
     And the current account has 2 isolated "licenses" for the second "group"
     And I am an environment of account "test1"
     And I use an authentication token
