@@ -129,7 +129,7 @@ Feature: Delete release
     When I send a DELETE request to "/accounts/test1/releases/$2"
     Then the response status should be "403"
 
-  Scenario: User attempts to delete a release for their product
+  Scenario: User attempts to delete a release for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
@@ -141,6 +141,20 @@ Feature: Delete release
       """
       { "userId": "$users[1]" }
       """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/releases/$2"
+    Then the response status should be "403"
+
+  Scenario: User attempts to delete a release for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 4 "releases" for an existing "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/releases/$2"
