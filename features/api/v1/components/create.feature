@@ -1026,7 +1026,7 @@ Feature: Create machine component
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates a component for their machine
+  Scenario: User creates a component for their machine (license owner)
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
@@ -1064,6 +1064,81 @@ Feature: Create machine component
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a component for their machine (license user, as owner)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "26f93d8e-e7e0-4078-93af-9132886799c5",
+            "name": "HDD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "component" with the following attributes:
+      """
+      {
+        "fingerprint": "26f93d8e-e7e0-4078-93af-9132886799c5",
+        "name": "HDD"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a component for their machine (license user, no owner)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "26f93d8e-e7e0-4078-93af-9132886799c5",
+            "name": "HDD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for their machine with a protected policy

@@ -1189,7 +1189,7 @@ Feature: Upgrade release
       """
 
   # Users
-  Scenario: User retrieves an upgrade for a release of their product (upgrade available)
+  Scenario: User retrieves an upgrade for a release of their product (license owner, upgrade available)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     |
@@ -1208,6 +1208,39 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license" as "owner"
+    When I send a GET request to "/accounts/test1/releases/$1/upgrade"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "2.0.0-beta.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1-beta.1",
+        "next": "2.0.0-beta.1"
+      }
+      """
+
+  Scenario: User retrieves an upgrade for a release of their product (license user, upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1-beta.1 | beta  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$1/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:

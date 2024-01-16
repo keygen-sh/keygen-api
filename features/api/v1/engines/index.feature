@@ -330,7 +330,7 @@ Feature: List release engines
     Then the response status should be "200"
     And the response body should be an array of 0 "engines"
 
-  Scenario: User attempts to retrieve the engines for a product (licensed)
+  Scenario: User attempts to retrieve the engines for their licenses (license owner)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "engine"
@@ -346,7 +346,23 @@ Feature: List release engines
     Then the response status should be "200"
     And the response body should be an array of 1 "engine"
 
-  Scenario: User attempts to retrieve the engines for a product (unlicensed)
+  Scenario: User attempts to retrieve the engines for their licenses (license user)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "engine"
+    And the current account has 1 "package" for the last "product"
+    And the last "package" belongs to the last "engine"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines"
+    Then the response status should be "200"
+    And the response body should be an array of 1 "engine"
+
+  Scenario: User attempts to retrieve their engines (unlicensed)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "engine"

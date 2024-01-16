@@ -289,7 +289,7 @@ Feature: List packages
     And the response body should be an array with 0 "packages"
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to retrieve their packages
+  Scenario: User attempts to retrieve the packages for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "packages" for the last "product"
@@ -297,6 +297,21 @@ Feature: List packages
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And the last "license" belongs to the last "user" through "owner"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/packages"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "packages"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve the packages for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "packages" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am the last user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/packages"

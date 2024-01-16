@@ -497,7 +497,7 @@ Feature: List machines
     Then the response status should be "200"
     And the response body should be an array with 1 "machine"
 
-  Scenario: User attempts to retrieve all machines for their account
+  Scenario: User attempts to retrieve all machines for their account (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -511,6 +511,19 @@ Feature: List machines
       """
       { "licenseId": "$licenses[0]" }
       """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "machines"
+
+  Scenario: User attempts to retrieve all machines for their account (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 2 "machines"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"

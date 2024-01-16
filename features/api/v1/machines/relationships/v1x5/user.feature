@@ -156,6 +156,18 @@ Feature: Machine user relationship
     Then the response status should be "200"
     And the response body should be a "user"
 
+  Scenario: User attempts to retrieve the user for a machine they have
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the first "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for the last "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
+    Then the response status should be "403"
+
   Scenario: User attempts to retrieve the user for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"

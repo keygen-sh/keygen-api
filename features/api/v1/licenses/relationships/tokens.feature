@@ -1438,12 +1438,23 @@ Feature: Generate authentication token for license
     When I send a POST request to "/accounts/test1/licenses/$1/tokens"
     Then the response status should be "404"
 
-   Scenario: User attempts to generate a token for their license
+  Scenario: User attempts to generate a token for their license (license owner)
     Given the current account is "test1"
     And the current account has 2 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: User attempts to generate a token for their license (license user)
+    Given the current account is "test1"
+    And the current account has 2 "licenses"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am a user of account "test1"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
@@ -1528,13 +1539,24 @@ Feature: Generate authentication token for license
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
     Then the response status should be "404"
 
-  Scenario: User requests all tokens for their license
+  Scenario: User requests all tokens for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And the current user has 3 "licenses" as "owner"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: User requests all tokens for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "token" for each "license"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "403"
