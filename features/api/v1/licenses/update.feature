@@ -920,13 +920,37 @@ Feature: Update license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to update their license
+  Scenario: User attempts to update their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 3 "licenses" as "owner"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "x"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """

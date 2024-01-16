@@ -160,6 +160,26 @@ Feature: License group relationship
     Then the response status should be "200"
     And the response body should be a "group"
 
+  Scenario: User attempts to retrieve the group for a license they have (in group)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "200"
+    And the response body should be a "group"
+
   Scenario: User attempts to retrieve the group for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "license"
@@ -439,7 +459,7 @@ Feature: License group relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to change a license's group relationship
+  Scenario: User attempts to change a license's group relationship (license owner)
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "group"
@@ -451,6 +471,32 @@ Feature: License group relationship
         "userId": "$users[1]"
       }
       """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
+      """
+      {
+        "data": {
+          "type": "groups",
+          "id": "$licenses[0]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to change a license's group relationship (license user)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:

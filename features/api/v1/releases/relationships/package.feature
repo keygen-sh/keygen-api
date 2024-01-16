@@ -95,7 +95,7 @@ Feature: Release package relationship
     When I send a GET request to "/accounts/test1/releases/$0/package"
     Then the response status should be "404"
 
-  Scenario: User retrieves the package for a release of another product
+  Scenario: User retrieves the package for a release of a product (license owner)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "package" for the last "product"
@@ -105,6 +105,22 @@ Feature: Release package relationship
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And the last "license" belongs to the last "user" through "owner"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/package"
+    Then the response status should be "200"
+    And the response body should be a "package"
+
+  Scenario: User retrieves the package for a release of a product (license user)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "package" for the last "product"
+    And the current account has 1 "release" for the last "product"
+    And the last "release" belongs to the last "package"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am the last user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/package"

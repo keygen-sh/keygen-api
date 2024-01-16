@@ -373,11 +373,29 @@ Feature: Tauri upgrade package
       }
       """
 
-  Scenario: User retrieves an upgrade when an upgrade is available
+  Scenario: User retrieves an upgrade when an upgrade is available (license owner)
     Given the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And the last "license" belongs to the last "user" through "owner"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://api.keygen.sh/v1/accounts/$account/artifacts/77aaaf13-cfc3-4339-8350-163efcaf8814/myapp.app.tar.gz",
+        "signature": "qjuxG7/3e44SUMRWSc8h3mOMk11L8lMSpKmEujgYmSjc+PnRY/Jedbw74a0+AMWkGSBCXvOISWK3bfylbNkaxw==",
+        "version": "1.1.0"
+      }
+      """
+
+  Scenario: User retrieves an upgrade when an upgrade is available (license user)
+    Given the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"

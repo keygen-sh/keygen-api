@@ -422,7 +422,7 @@ Feature: List release channels
     Then the response status should be "200"
     And the response body should be an array of 0 "channels"
 
-  Scenario: User attempts to retrieve the channels for a product (licensed)
+  Scenario: User attempts to retrieve the channels for their licenses (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -437,7 +437,22 @@ Feature: List release channels
     Then the response status should be "200"
     And the response body should be an array of 1 "channel"
 
-  Scenario: User attempts to retrieve the channels for a product (unlicensed)
+  Scenario: User attempts to retrieve the channels for their licenses (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "artifact" for the first "release"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/channels"
+    Then the response status should be "200"
+    And the response body should be an array of 1 "channel"
+
+  Scenario: User attempts to retrieve their channels (unlicensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"

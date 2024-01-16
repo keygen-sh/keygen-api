@@ -170,10 +170,23 @@ Feature: Machine components relationship
     When I send a GET request to "/accounts/test1/machines/$0/components"
     Then the response status should be "404"
 
-  Scenario: User retrieves the components for a machine
+  Scenario: User retrieves the components for their machine (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "components" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/components"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "components"
+
+  Scenario: User retrieves the components for their machine (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "components" for the last "machine"
     And I am a user of account "test1"
@@ -277,13 +290,25 @@ Feature: Machine components relationship
     When I send a GET request to "/accounts/test1/machines/$0/components"
     Then the response status should be "404"
 
-  Scenario: User retrieves a machine's component
+  Scenario: User retrieves their machine's component (license owner)
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 1 "machine" for the last "license"
     And the current account has 1 "component" for the last "machine"
     And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/components/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves their machine's component (license user)
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I am the last user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/components/$0"
     Then the response status should be "200"

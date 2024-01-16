@@ -247,11 +247,11 @@ Feature: List policies
     Then the response status should be "403"
     And sidekiq should have 1 "request-log" job
 
-   Scenario: User attempts to retrieve their policies (explicit permission)
+  Scenario: User attempts to retrieve their policies (license owner, explicit permission)
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 4 "policies" for each "product"
-    And the current account has 2 "license" for each "policy"
+    And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "user"
     And the last "user" has the following attributes:
       """
@@ -260,6 +260,26 @@ Feature: List policies
     And the first "license" belongs to the last "user" through "owner"
     And the second "license" belongs to the last "user" through "owner"
     And the third "license" belongs to the last "user" through "owner"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "policies"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policies (license user, explicit permission)
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 4 "policies" for each "product"
+    And the current account has 2 "licenses" for each "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And the current account has 1 "license-user" for the third "license" and the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"

@@ -260,7 +260,7 @@ Feature: License usage actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User increments the usage count for a license
+  Scenario: User increments the usage count for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
@@ -288,6 +288,32 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User increments the usage count for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "uses": 4
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license that is at its usage limit
@@ -645,7 +671,7 @@ Feature: License usage actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User decrements the usage count for a license
+  Scenario: User decrements the usage count for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
@@ -664,6 +690,32 @@ Feature: License usage actions
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User decrements the usage count for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "uses": 1
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
@@ -864,7 +916,7 @@ Feature: License usage actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User resets the usage count for a license
+  Scenario: User resets the usage count for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
@@ -883,6 +935,32 @@ Feature: License usage actions
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User resets the usage count for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 5 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "uses": 1
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
