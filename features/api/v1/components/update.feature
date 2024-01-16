@@ -439,6 +439,97 @@ Feature: Update machine component
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User updates a component's name (license owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/components/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "id": "$components[0].id",
+          "attributes": {
+            "name": "GPU"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "component" with the following attributes:
+      """
+      { "name": "GPU" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User updates a component's name (license user, as owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 1 "component" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/components/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "id": "$components[0].id",
+          "attributes": {
+            "name": "GPU"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "component" with the following attributes:
+      """
+      { "name": "GPU" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User updates a component's name (license user, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/components/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "id": "$components[0].id",
+          "attributes": {
+            "name": "GPU"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User updates a component's metadata
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

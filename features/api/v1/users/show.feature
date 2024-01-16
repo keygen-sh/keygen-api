@@ -215,6 +215,18 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/$2"
     Then the response status should be "404"
 
+  Scenario: User attempts to retreive an associated user
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+
   Scenario: User retrieves their profile
     Given the current account is "test1"
     And the current account has 1 "user"
