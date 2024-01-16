@@ -173,6 +173,18 @@ Feature: User licenses relationship
     When I send a GET request to "/accounts/test1/users/$2/licenses"
     Then the response status should be "404"
 
+  Scenario: User attempts to retrieve the licenses for an associated user
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/licenses"
+    Then the response status should be "403"
+
   Scenario: User attempts to retrieve their licenses
     Given the current account is "test1"
     And the current account has 1 "product"

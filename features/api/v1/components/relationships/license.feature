@@ -91,10 +91,23 @@ Feature: Component license relationship
     When I send a GET request to "/accounts/test1/components/$0/license"
     Then the response status should be "404"
 
-  Scenario: User attempts to retrieve the license for a component they own
+  Scenario: User attempts to retrieve the license for a component they own (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "components" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/components/$0/license"
+    Then the response status should be "200"
+    And the response body should be a "license"
+
+  Scenario: User attempts to retrieve the license for a component they own (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "components" for the last "machine"
     And I am a user of account "test1"

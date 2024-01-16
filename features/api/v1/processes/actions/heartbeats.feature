@@ -327,7 +327,7 @@ Feature: Process heartbeat actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User pings an unprotected process's heartbeat
+  Scenario: User pings an unprotected process's heartbeat (license owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -358,6 +358,39 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: User pings an unprotected process's heartbeat (license user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": false }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "process" for the last "machine"
+    And time is frozen at "2022-10-16T14:52:48.000Z"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
+    Then the response status should be "200"
+    And the response body should be a "process" with the following attributes:
+      """
+      {
+        "lastHeartbeat": "2022-10-16T14:52:48.000Z",
+        "nextHeartbeat": "2022-10-16T15:02:48.000Z",
+        "status": "ALIVE"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
