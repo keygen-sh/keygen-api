@@ -53,8 +53,10 @@ class LicenseSerializer < BaseSerializer
   attribute :last_check_out do
     @object.last_check_out_at
   end
-  attribute :permissions, if: -> { @account.ent? } do
-    @object.permissions.actions
+  ee do
+    attribute :permissions, if: -> { @account.ent? } do
+      @object.permissions.actions
+    end
   end
   attribute :metadata do
     @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}
