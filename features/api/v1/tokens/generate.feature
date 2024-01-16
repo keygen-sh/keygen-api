@@ -1514,6 +1514,7 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User generates a new token with inherited permissions (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "user" with the following:
@@ -1552,6 +1553,7 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  @ee
   Scenario: User attempts to generate a new token without permission (ent tier)
     Given the current account is "ent1"
     And the current account has 1 "user" with the following:
