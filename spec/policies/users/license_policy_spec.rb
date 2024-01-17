@@ -419,6 +419,40 @@ describe Users::LicensePolicy, type: :policy do
       end
     end
 
+    with_bearer_trait :with_teammates do
+      with_scenarios %i[accessing_its_teammate accessing_its_licenses] do
+        with_token_authentication do
+          with_permissions %w[license.read] do
+            denies :index
+          end
+
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_its_teammate accessing_its_license] do
+        with_token_authentication do
+          with_permissions %w[license.read] do
+            denies :show
+          end
+
+          with_wildcard_permissions do
+            denies :show
+          end
+
+          with_default_permissions do
+            denies :show
+          end
+
+          without_permissions do
+            denies :show
+          end
+        end
+      end
+    end
+
     with_scenarios %i[accessing_a_user accessing_its_licenses] do
       with_token_authentication do
         with_permissions %w[license.read] do
