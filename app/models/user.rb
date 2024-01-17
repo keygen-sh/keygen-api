@@ -22,6 +22,11 @@ class User < ApplicationRecord
   union_of :licenses, sources: %i[owned_licenses user_licenses] do
     def owned = where(owner: proxy_association.owner)
   end
+  # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
+  #              Maybe collaborators or associated_users?
+  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).where.not(id: user.id) },
+    through: :licenses,
+    source: :users
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
@@ -349,9 +354,11 @@ class User < ApplicationRecord
     end
   }
 
-  # FIXME(ezekg) Selecting on ID isn't supported by our association scopes.
-  def product_ids = products.reorder(nil).ids
-  def policy_ids  = policies.reorder(nil).ids
+  # FIXME(ezekg) Selecting on ID isn't supported by our association scopes because
+  #              we're using DISTINCT and reordering on created_at.
+  def teammate_ids = teammates.reorder(nil).ids
+  def product_ids  = products.reorder(nil).ids
+  def policy_ids   = policies.reorder(nil).ids
 
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids
