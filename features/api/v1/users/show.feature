@@ -162,7 +162,7 @@ Feature: Show user
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: License retrieves their user (with permissions)
+  Scenario: License retrieves their owner (with permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
@@ -176,7 +176,7 @@ Feature: Show user
     Then the response status should be "200"
     And the response body should be a "user"
 
-   Scenario: License retrieves their user (without permissions)
+   Scenario: License retrieves their owner (without permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
@@ -189,10 +189,49 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/$1"
     Then the response status should be "403"
 
-  Scenario: License retrieves their user (default permissions)
+  Scenario: License retrieves their owner (default permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+
+  Scenario: License retrieves their user (with permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["user.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the response body should be a "user"
+
+   Scenario: License retrieves their user (without permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+
+  Scenario: License retrieves their user (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
@@ -215,7 +254,43 @@ Feature: Show user
     When I send a GET request to "/accounts/test1/users/$2"
     Then the response status should be "404"
 
-  Scenario: User attempts to retreive an associated user
+  Scenario: User attempts to retreive an associated owner (as license owner)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the response body should be a "user"
+
+  Scenario: User attempts to retreive an associated owner (as license user)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the response body should be a "user"
+
+  Scenario: User attempts to retreive an associated user (as license owner)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the response body should be a "user"
+
+  Scenario: User attempts to retreive an associated user (as license user)
     Given the current account is "test1"
     And the current account has 3 "users"
     And the current account has 1 "license"
@@ -225,9 +300,10 @@ Feature: Show user
     And I am the last user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the response body should be a "user"
 
-  Scenario: User retrieves their profile
+  Scenario: User retrieves themself
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"

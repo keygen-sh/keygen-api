@@ -1273,6 +1273,36 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
 
+  Scenario: Admin retrieves licenses filtered by owner ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?owner=$users[1]"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+
   Scenario: Admin retrieves licenses filtered by user ID
     Given I am an admin of account "test1"
     And the current account is "test1"
