@@ -529,7 +529,8 @@ describe Licenses::UserPolicy, type: :policy do
           end
 
           with_default_permissions do
-            allows :show, :attach, :detach
+            denies :attach, :detach
+            allows :show
           end
 
           without_permissions do
