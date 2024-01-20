@@ -5,12 +5,9 @@ namespace :keygen do
   task setup: %i[environment db:schema:load db:migrate db:seed] do |_, args|
     require 'io/console'
 
-    def getp(...) = STDIN.getpass(...)&.chomp
-    def gets(...) = STDIN.gets(...)&.chomp
-
-    unless STDIN.tty?
-      abort "Setup requires stdin to be a TTY"
-    end
+    def tty!      = STDIN.tty? || abort('Setup requires stdin to be a TTY')
+    def getp(...) = tty! && STDIN.getpass(...)&.chomp
+    def gets(...) = tty! && STDIN.gets(...)&.chomp
 
     ActiveRecord::Base.logger.silence do
       edition = (args.extras[0] || ENV.fetch('KEYGEN_EDITION') { 'CE' }).upcase
