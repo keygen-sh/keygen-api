@@ -91,11 +91,12 @@ class User < ApplicationRecord
       in Role(:read_only)
         Permission::READ_ONLY_PERMISSIONS
       else
-        # NOTE(ezekg) Removing these from defaults for backwards compatibility
         Permission::USER_PERMISSIONS - %w[
           account.read
-          product.read
+          license.users.attach
+          license.users.detach
           policy.read
+          product.read
         ]
       end
     }
