@@ -50,7 +50,7 @@ gem 'kaminari', '~> 1.2.0'
 
 # Postgres/DB extensions
 gem 'active_record_union'
-gem 'active_record_distinct_on', github: 'ezekg/active_record_distinct_on', branch: 'feature/support-rails-7-1'
+gem 'active_record_distinct_on', '~> 1.6'
 gem 'activerecord_where_assoc', '~> 1.1.4'
 
 # Pattern matching
