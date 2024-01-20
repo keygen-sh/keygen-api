@@ -38,7 +38,6 @@ class License < ApplicationRecord
   has_account default: -> { policy&.account_id }, inverse_of: :licenses
   has_role :license
   has_permissions Permission::LICENSE_PERMISSIONS,
-    # NOTE(ezekg) Removing these from defaults for backwards compatibility
     default: Permission::LICENSE_PERMISSIONS - %w[
       account.read
       product.read
