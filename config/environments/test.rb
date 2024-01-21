@@ -29,6 +29,12 @@ Rails.application.configure do
     'Cache-Control' => 'public, max-age=3600'
   }
 
+  # Disable logging in test environment unless explicitly enabled.
+  unless ENV.key?('RAILS_LOG')
+    config.logger    = Logger.new(nil)
+    config.log_level = :fatal
+  end
+
   # Enable/disable caching with redis.
   if ENV['REDIS_URL'].present?
     config.action_controller.perform_caching = true
