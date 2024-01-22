@@ -938,7 +938,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Now Renewal Basis",
-            "renewalBasis": "FROM_MPW"
+            "renewalBasis": "FROM_NOW"
           },
           "relationships": {
             "product": {
@@ -990,7 +990,7 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "unsupported expiration basis",
+        "detail": "unsupported renewal basis",
         "code": "RENEWAL_BASIS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/renewalBasis"
