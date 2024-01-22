@@ -18,6 +18,7 @@ class PolicySerializer < BaseSerializer
   attribute :component_matching_strategy
   attribute :expiration_strategy
   attribute :expiration_basis
+  attribute :renewal_basis
   attribute :transfer_strategy
   attribute :authentication_strategy
   attribute :leasing_strategy

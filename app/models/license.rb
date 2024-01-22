@@ -456,6 +456,7 @@ class License < ApplicationRecord
     :expire_from_first_activation?,
     :expire_from_first_use?,
     :expire_from_first_download?,
+    :renew_from_expiry?, :renew_from_now?,
     :supports_token_auth?,
     :supports_license_auth?,
     :supports_mixed_auth?,
@@ -661,9 +662,19 @@ class License < ApplicationRecord
   end
 
   def renew!
-    return false if expiry.nil? || policy.duration.nil?
+    return false if
+      expiry.nil? || policy.duration.nil?
 
-    self.expiry += ActiveSupport::Duration.build(policy.duration)
+    duration = ActiveSupport::Duration.build(policy.duration)
+    now      = Time.current
+
+    case
+    when renew_from_expiry?
+      self.expiry = expiry + duration
+    when renew_from_now?
+      self.expiry = now + duration
+    end
+
     save
   end
 

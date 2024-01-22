@@ -76,6 +76,11 @@ class Policy < ApplicationRecord
     FROM_FIRST_USE
   ].freeze
 
+  RENEWAL_BASES = %w[
+    FROM_EXPIRY
+    FROM_NOW
+  ].freeze
+
   TRANSFER_STRATEGIES = %w[
     RESET_EXPIRY
     KEEP_EXPIRY
@@ -146,6 +151,7 @@ class Policy < ApplicationRecord
   before_create -> { self.component_matching_strategy = 'MATCH_ANY' }, if: -> { component_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
+  before_create -> { self.renewal_basis = 'FROM_EXPIRY' }, if: -> { renewal_basis.nil? }
   before_create -> { self.transfer_strategy = 'KEEP_EXPIRY' }, if: -> { heartbeat_resurrection_strategy.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
@@ -180,6 +186,7 @@ class Policy < ApplicationRecord
   validates :component_matching_strategy, inclusion: { in: COMPONENT_MATCHING_STRATEGIES, message: "unsupported component matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
+  validates :renewal_basis, inclusion: { in: RENEWAL_BASES, message: "unsupported renewal basis" }, allow_nil: true
   validates :authentication_strategy,
     inclusion: { in: AUTHENTICATION_STRATEGIES, message: "unsupported authentication strategy" },
     allow_nil: true
@@ -522,6 +529,18 @@ class Policy < ApplicationRecord
 
   def expire_from_first_download?
     expiration_basis == 'FROM_FIRST_DOWNLOAD'
+  end
+
+  def renew_from_expiry?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      renewal_basis.nil?
+
+    renewal_basis == 'FROM_EXPIRY'
+  end
+
+  def renew_from_now?
+    renewal_basis == 'FROM_NOW'
   end
 
   def supports_token_auth?
