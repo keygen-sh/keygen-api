@@ -91,6 +91,7 @@ Feature: Create policy
         "machineMatchingStrategy": "MATCH_ANY",
         "expirationStrategy": "RESTRICT_ACCESS",
         "expirationBasis": "FROM_CREATION",
+        "renewalBasis": "FROM_EXPIRY",
         "transferStrategy": "KEEP_EXPIRY",
         "authenticationStrategy": "TOKEN",
         "heartbeatCullStrategy": "DEACTIVATE_DEAD",
@@ -884,6 +885,115 @@ Feature: Create policy
         "code": "EXPIRATION_BASIS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/expirationBasis"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an expiry renewal basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Expiry Renewal Basis",
+            "renewalBasis": "FROM_EXPIRY"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalBasis "FROM_EXPIRY"
+    And the response body should be a "policy" with the name "Expiry Renewal Basis"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a now renewal basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Now Renewal Basis",
+            "renewalBasis": "FROM_MPW"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the renewalBasis "FROM_NOW"
+    And the response body should be a "policy" with the name "Now Renewal Basis"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid renewal basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Invalid Renewal Basis",
+            "renewalBasis": "FROM_NEVER"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported expiration basis",
+        "code": "RENEWAL_BASIS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/renewalBasis"
         }
       }
       """

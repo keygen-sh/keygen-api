@@ -528,6 +528,58 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin renews a license (from expiry renewal basis)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalBasis": "FROM_EXPIRY"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2021-07-19T00:00:00.000Z" }
+      """
+    And time is frozen at "2024-01-21T21:30:00.000Z"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
+    Then the response status should be "200"
+    And the response body should be a "license" with the expiry "2021-08-19T00:00:00.000Z"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin renews a license (from now renewal basis)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "duration": $time.1.month.to_i,
+        "renewalBasis": "FROM_NOW"
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2021-07-19T00:00:00.000Z" }
+      """
+    And time is frozen at "2024-01-21T21:30:00.000Z"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
+    Then the response status should be "200"
+    And the response body should be a "license" with the expiry "2024-02-21T21:30:00.000Z"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: Admin renews a license that belongs to a perpetual policy
     Given I am an admin of account "test1"
     And the current account is "test1"

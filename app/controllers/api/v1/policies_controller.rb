@@ -49,6 +49,7 @@ module Api::V1
           param :component_matching_strategy, type: :string, optional: true
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
+          param :renewal_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
           param :leasing_strategy, type: :string, optional: true
@@ -135,6 +136,7 @@ module Api::V1
           param :component_matching_strategy, type: :string, optional: true
           param :expiration_strategy, type: :string, optional: true
           param :expiration_basis, type: :string, optional: true
+          param :renewal_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
           param :leasing_strategy, type: :string, optional: true
