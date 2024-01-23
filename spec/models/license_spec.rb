@@ -7,6 +7,7 @@ describe License, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :encryptable
   it_behaves_like :dirtyable
 
   describe '#environment=' do

@@ -4,6 +4,16 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Account, type: :model do
+  it_behaves_like :encryptable do
+    let(:record) { create(:account) }
+
+    # FIXME(ezekg) Unstub key generation methods (see support/helpers/stub_helper.rb)
+    before do
+      allow_any_instance_of(Account).to receive(:generate_ed25519_keys!).and_call_original
+      allow_any_instance_of(Account).to receive(:generate_rsa_keys!).and_call_original
+    end
+  end
+
   it 'should promote nested users to admins on create' do
     users_attributes = [
       attributes_for(:user),
