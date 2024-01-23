@@ -63,6 +63,7 @@ module Keygen
     config.active_record.encryption.deterministic_key   = ENV.fetch('ENCRYPTION_DETERMINISTIC_KEY')
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ENCRYPTION_KEY_DERIVATION_SALT')
 
+    # See: https://github.com/rails/rails/issues/48204
     config.active_record.encryption.hash_digest_class                             = OpenSSL::Digest::SHA256
     config.active_record.encryption.support_sha1_for_non_deterministic_encryption = true
 
