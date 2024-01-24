@@ -80,6 +80,9 @@ module Keygen
     # Update async destroy batch size
     config.active_record.destroy_association_async_batch_size = 100
 
+    # FIXME(ezekg) Use 7.0 cache format until we can roll over to 7.1.
+    config.active_support.cache_format_version 7.0
+
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
 
