@@ -71,6 +71,12 @@ module Keygen
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
+    # FIXME(ezekg) Remove after we upgrade to Rails 7.1.4.
+    # See: https://github.com/rails/rails/issues/50604
+    ActiveRecord::Encryption.configure(
+      **config.active_record.encryption,
+    )
+
     # Update async destroy batch size
     config.active_record.destroy_association_async_batch_size = 100
 
