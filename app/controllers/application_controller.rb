@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  # FIXME(ezekg) Why is this needed?
-  self.default_url_options = Rails.application.default_url_options
-
   include Rendering::JSON
   include CurrentRequestAttributes
+  include DefaultUrlOptions
   include RateLimiting
   include TypedParams::Controller
   include ActionPolicy::Controller
