@@ -308,4 +308,19 @@ describe User, type: :model do
       expect(User.users.with_status(:banned).count).to eq 1
     end
   end
+
+  describe '#destroy' do
+    it 'should destroy owned machines' do
+      user    = create(:user, account:)
+      license = create(:license, account:)
+
+      create(:license_user, account:, license:, user:)
+      create(:machine, account:, license:, owner: user)
+      create(:machine, account:, license:)
+
+      perform_enqueued_jobs only: ActiveRecord::DestroyAssociationAsyncJob do
+        expect { user.destroy }.to change { license.machines.count }.by -1
+      end
+    end
+  end
 end
