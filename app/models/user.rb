@@ -31,6 +31,7 @@ class User < ApplicationRecord
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
   has_many :policy_entitlements, through: :licenses
+  has_many :owned_machines, dependent: :destroy_async, class_name: Machine.name, foreign_key: :owner_id
   has_many :machines, through: :licenses do
     def owned = where(owner: proxy_association.owner)
   end
