@@ -44,7 +44,7 @@ Feature: User licenses relationship
     And the current account has 3 isolated "licenses" for the last "user" as "owner"
     And I am an environment of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/$1/licenses?environment=isolated"
+    When I send a GET request to "/accounts/test1/users/$2/licenses?environment=isolated"
     Then the response status should be "200"
     And the response body should be an array with 3 "licenses"
 

@@ -841,7 +841,7 @@ Feature: Create license
               "data": { "type": "policies", "id": "$policies[0]" }
             },
             "user": {
-              "data": { "type": "users", "id": "$users[1]" }
+              "data": { "type": "users", "id": "$users[2]" }
             }
           }
         }

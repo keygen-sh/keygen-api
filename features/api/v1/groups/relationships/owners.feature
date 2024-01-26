@@ -843,11 +843,11 @@ Feature: Group owners relationship
     And the current account has 2 shared "group-owners"
     And the first "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[1]" }
+      { "groupId": "$groups[0]", "userId": "$users[2]" }
       """
     And the second "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[2]" }
+      { "groupId": "$groups[0]", "userId": "$users[3]" }
       """
     And I am an environment of account "test1"
     And I use an authentication token
@@ -855,8 +855,8 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "users", "id": "$users[1]" },
-          { "type": "users", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" },
+          { "type": "users", "id": "$users[3]" }
         ]
       }
       """
@@ -881,11 +881,11 @@ Feature: Group owners relationship
     And the current account has 2 shared "group-owners"
     And the first "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[1]" }
+      { "groupId": "$groups[0]", "userId": "$users[2]" }
       """
     And the second "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[2]" }
+      { "groupId": "$groups[0]", "userId": "$users[3]" }
       """
     And I am an environment of account "test1"
     And I use an authentication token
@@ -893,8 +893,8 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "users", "id": "$users[1]" },
-          { "type": "users", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" },
+          { "type": "users", "id": "$users[3]" }
         ]
       }
       """
@@ -919,11 +919,11 @@ Feature: Group owners relationship
     And the current account has 2 global "group-owners"
     And the first "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[1]" }
+      { "groupId": "$groups[0]", "userId": "$users[2]" }
       """
     And the second "group-owner" has the following attributes:
       """
-      { "groupId": "$groups[0]", "userId": "$users[2]" }
+      { "groupId": "$groups[0]", "userId": "$users[3]" }
       """
     And I am an environment of account "test1"
     And I use an authentication token
@@ -931,8 +931,8 @@ Feature: Group owners relationship
       """
       {
         "data": [
-          { "type": "users", "id": "$users[1]" },
-          { "type": "users", "id": "$users[2]" }
+          { "type": "users", "id": "$users[2]" },
+          { "type": "users", "id": "$users[3]" }
         ]
       }
       """

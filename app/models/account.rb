@@ -59,7 +59,7 @@ class Account < ApplicationRecord
   encrypts :private_key
   encrypts :secret_key
 
-  before_validation :set_founding_users_roles!,
+  before_validation :set_founding_nested_users_to_admins!,
     if: :users_attributes_assigned?,
     on: :create
 
@@ -320,7 +320,7 @@ class Account < ApplicationRecord
 
   private
 
-  def set_founding_users_roles!
+  def set_founding_nested_users_to_admins!
     users.each do |user|
       next unless
         user.new_record?
