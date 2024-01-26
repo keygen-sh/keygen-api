@@ -22,7 +22,7 @@ class License < ApplicationRecord
   has_one :product, through: :policy
   has_many :license_users, dependent: :destroy_async
   has_many :licensees, through: :license_users, source: :user
-  union_of :users, sources: %i[licensees owner]
+  union_of :users, -> { preload(:role) }, sources: %i[licensees owner]
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
