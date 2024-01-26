@@ -26,7 +26,6 @@ Feature: Generate authentication token for environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "admin"
-    And the current account has 1 isolated "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -74,8 +73,8 @@ Feature: Generate authentication token for environment
   Scenario: Shared admin generates a token for an isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
+    And the current account has 1 shared "environment"
     And the current account has 1 shared "admin"
-    And the current account has 1 isolated "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -107,7 +106,6 @@ Feature: Generate authentication token for environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 global "admin"
-    And the current account has 1 isolated "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -139,7 +137,6 @@ Feature: Generate authentication token for environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "admin"
-    And the current account has 1 shared "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -183,17 +180,16 @@ Feature: Generate authentication token for environment
 
   Scenario: Isolated admin generates a token for a shared environment
     Given the current account is "test1"
+    And the current account has 1 shared "environment"
     And the current account has 1 isolated "environment"
-    And the current account has 1 shared "environment"
     And the current account has 1 isolated "admin"
-    And the current account has 1 shared "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
+    When I send a POST request to "/accounts/test1/environments/$1/tokens" with the following:
       """
       {
         "data": {
@@ -218,7 +214,6 @@ Feature: Generate authentication token for environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global "admin"
-    And the current account has 1 shared "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -257,8 +252,8 @@ Feature: Generate authentication token for environment
 
   Scenario: Global admin generates a token for an isolated environment
     Given the current account is "test1"
-    And the current account has 1 global "admin"
     And the current account has 1 isolated "environment"
+    And the current account has 1 global "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
@@ -291,8 +286,8 @@ Feature: Generate authentication token for environment
 
   Scenario: Global admin generates a token for a shared environment
     Given the current account is "test1"
-    And the current account has 1 global "admin"
     And the current account has 1 shared "environment"
+    And the current account has 1 global "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
@@ -327,7 +322,6 @@ Feature: Generate authentication token for environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "admin"
-    And the current account has 1 isolated "environment"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -365,8 +359,8 @@ Feature: Generate authentication token for environment
   Scenario: Admin generates a token for an isolated environment (from a shared environment)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 shared "admin"
     And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -404,8 +398,8 @@ Feature: Generate authentication token for environment
   Scenario: Admin generates a token for a shared environment (from an isolated environment)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 isolated "admin"
     And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:

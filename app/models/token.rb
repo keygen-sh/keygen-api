@@ -100,6 +100,9 @@ class Token < ApplicationRecord
       self.all
     in role: Role(:environment)
       self.for_environment(accessor)
+          .where.not(
+            bearer: accessor.admins.reorder(nil),
+          )
           .or(
             where(bearer: accessor)
           )

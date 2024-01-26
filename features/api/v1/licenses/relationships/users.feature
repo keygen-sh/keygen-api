@@ -1539,7 +1539,7 @@ Feature: License users relationship
       """
       {
         "data": [
-          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
           { "type": "user", "id": "$users[3]" }
         ]
       }

@@ -221,7 +221,7 @@ Feature: Delete user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to delete themself when they're not the only admin
+  Scenario: Admin attempts to delete themself when they're not the only admin for the account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -234,7 +234,7 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to delete themself when they're the only admin
+  Scenario: Admin attempts to delete themself when they're the only admin for the account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -252,3 +252,75 @@ Feature: Delete user
           }
         }
       """
+
+  @ee
+  Scenario: Admin attempts to delete themself when they're not the only admin for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "admins"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/users/$2"
+    Then the response status should be "204"
+    And the current account should have 3 "admins"
+
+  @ee
+  Scenario: Admin attempts to delete themself when they're the only admin for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    # NOTE(ezekg) Isolated environments automatically have an admin created for them,
+    #             so we're authenticating as the isolated admin here.
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "422"
+    And the current account should have 2 "admins"
+    And the first error should have the following properties:
+      """
+        {
+          "title": "Unprocessable resource",
+          "detail": "environment must have at least 1 admin user",
+          "code": "ENVIRONMENT_ADMINS_REQUIRED",
+          "source": {
+            "pointer": "/data/relationships/environment"
+          }
+        }
+      """
+
+  @ee
+  Scenario: Admin attempts to delete themself when they're not the only admin for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "admins"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/users/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "admins"
+
+  @ee
+  Scenario: Admin attempts to delete themself when they're the only admin for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "shared" }
+      """
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "204"
+    And the current account should have 1 "admin"
