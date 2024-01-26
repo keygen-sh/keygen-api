@@ -1526,7 +1526,7 @@ Feature: Update user
       """
       { "keygen-environment": "isolated" }
       """
-    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
         "data": {

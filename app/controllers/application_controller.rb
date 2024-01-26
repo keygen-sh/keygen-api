@@ -296,6 +296,8 @@ class ApplicationController < ActionController::API
         error.pointer = '/data/attributes/engine'
       in source: { pointer: %r{^/data/relationships/arch} }
         error.pointer = '/data/attributes/arch'
+      in source: { pointer: %r{^/data/attributes/admins} }
+        error.pointer = '/data/relationships/admins'
       else
       end
 
