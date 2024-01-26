@@ -12045,7 +12045,7 @@ Feature: License validation actions
     And the current account has 1 global "webhook-endpoint"
     And the current account has 1 isolated "license"
     And the current environment is "shared"
-    And I am the last admin of account "ent1"
+    And I am the first admin of account "ent1"
     And I use an authentication token
     And I send the following headers:
       """

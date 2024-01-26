@@ -42,7 +42,7 @@ class Environment < ApplicationRecord
 
   after_initialize -> { self.isolation_strategy ||= 'ISOLATED' }
 
-  before_validation :set_founding_users_account_and_roles!,
+  before_validation :set_founding_nested_users_to_admins!,
     if: :users_attributes_assigned?,
     on: :create
 
@@ -51,6 +51,10 @@ class Environment < ApplicationRecord
       destroy
       update
     ]
+
+  validate :enforce_founding_admins!,
+    if: :isolated?,
+    on: :create
 
   validates :code,
     exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
@@ -98,12 +102,16 @@ class Environment < ApplicationRecord
   def shared?   = isolation_strategy == 'SHARED'
 
   ##
+  # admins returns the admins accessible from the environment.
+  def admins = account.admins.for_environment(self, strict: false)
+
+  ##
   # codes returns the codes of the environments.
   def self.codes = reorder(code: :asc).pluck(:code)
 
   private
 
-  def set_founding_users_account_and_roles!
+  def set_founding_nested_users_to_admins!
     users.each do |user|
       next unless
         user.new_record?
@@ -113,5 +121,14 @@ class Environment < ApplicationRecord
         account_id:,
       )
     end
+  end
+
+  def enforce_founding_admins!
+    return if
+      users.count(&:admin?) >= User::MINIMUM_ADMIN_COUNT
+
+    errors.add :admins, :required, message: "environment must have at least #{User::MINIMUM_ADMIN_COUNT} admin user"
+
+    throw :abort
   end
 end

@@ -29,6 +29,19 @@ Feature: Create environments
           "attributes": {
             "name": "Test Environment",
             "code": "test"
+          },
+          "relationships": {
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "admin@isolated.example",
+                    "password": "$ecr3t"
+                  }
+                }
+              ]
+            }
           }
         }
       }
@@ -46,69 +59,7 @@ Feature: Create environments
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates an isolated environment for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
-    And the current account has 1 "webhook-endpoint"
-    When I send a POST request to "/accounts/test1/environments" with the following:
-      """
-      {
-        "data": {
-          "type": "environments",
-          "attributes": {
-            "isolationStrategy": "ISOLATED",
-            "name": "Isolated Environment",
-            "code": "ISOLATED"
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the response body should be an "environment" with the following attributes:
-      """
-      {
-        "isolationStrategy": "ISOLATED",
-        "name": "Isolated Environment",
-        "code": "ISOLATED"
-      }
-      """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a shared environment for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
-    And the current account has 1 "webhook-endpoint"
-    When I send a POST request to "/accounts/test1/environments" with the following:
-      """
-      {
-        "data": {
-          "type": "environments",
-          "attributes": {
-            "isolationStrategy": "SHARED",
-            "name": "Shared Environment",
-            "code": "SHARED"
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the response body should be an "environment" with the following attributes:
-      """
-      {
-        "isolationStrategy": "SHARED",
-        "name": "Shared Environment",
-        "code": "SHARED"
-      }
-      """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates an isolated environment for their account with an admin
+  Scenario: Admin creates an isolated environment for their account (with admin)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -153,7 +104,42 @@ Feature: Create environments
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a shared environment for their account with 2 admins
+  Scenario: Admin creates an isolated environment for their account (no admin)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "isolationStrategy": "ISOLATED",
+            "name": "Isolated Environment",
+            "code": "ISOLATED"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "environment must have at least 1 admin user",
+        "code": "ADMINS_REQUIRED",
+        "source": {
+          "pointer": "/data/relationships/admins"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a shared environment for their account (with admins)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -200,6 +186,37 @@ Feature: Create environments
       }
       """
     And the current account should have 3 "admins"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a shared environment for their account (no admin)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environments",
+          "attributes": {
+            "isolationStrategy": "SHARED",
+            "name": "Shared Environment",
+            "code": "SHARED"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be an "environment" with the following attributes:
+      """
+      {
+        "isolationStrategy": "SHARED",
+        "name": "Shared Environment",
+        "code": "SHARED"
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -259,6 +276,7 @@ Feature: Create environments
         "data": {
           "type": "environments",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "Development",
             "code": "development"
           }
@@ -282,6 +300,7 @@ Feature: Create environments
         "data": {
           "type": "environments",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "Oops",
             "code": "oops"
           }
@@ -305,6 +324,7 @@ Feature: Create environments
         "data": {
           "type": "environments",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "QA",
             "code": "qa"
           }
@@ -331,6 +351,7 @@ Feature: Create environments
         "data": {
           "type": "environment",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "Other",
             "code": "other"
           }
@@ -354,6 +375,7 @@ Feature: Create environments
         "data": {
           "type": "environment",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "App",
             "code": "app"
           }
@@ -377,6 +399,7 @@ Feature: Create environments
         "data": {
           "type": "environment",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "Hacker",
             "code": "hax"
           }
@@ -400,6 +423,7 @@ Feature: Create environments
         "data": {
           "type": "environment",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "CLI",
             "code": "cli"
           }
@@ -420,6 +444,7 @@ Feature: Create environments
         "data": {
           "type": "environment",
           "attributes": {
+            "isolationStrategy": "SHARED",
             "name": "Oof",
             "code": "oof"
           }

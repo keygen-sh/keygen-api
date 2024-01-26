@@ -73,9 +73,10 @@ Feature: List authentication tokens
     And the response body should be an array of 1 "token"
 
   @ee
-  Scenario: Environment requests their tokens while authenticated
+  Scenario: Isolated environment requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
     And the current account has 1 isolated "token" for each "environment"
     And the current account has 2 isolated "products"
     And the current account has 1 isolated "token" for each "product"
@@ -86,6 +87,24 @@ Feature: List authentication tokens
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?environment=isolated"
+    Then the response status should be "200"
+    And the response body should be an array of 7 "tokens"
+
+  @ee
+  Scenario: Shared environment requests their tokens while authenticated
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 1 shared "token" for each "environment"
+    And the current account has 2 shared "products"
+    And the current account has 1 shared "token" for each "product"
+    And the current account has 2 shared "users"
+    And the current account has 1 shared "token" for each "user"
+    And the current account has 2 shared "licenses"
+    And the current account has 1 shared "token" for each "license"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?environment=shared"
     Then the response status should be "200"
     And the response body should be an array of 7 "tokens"
 

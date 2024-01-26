@@ -771,7 +771,7 @@ Feature: Generate authentication token
     And I send the following headers:
       """
       {
-        "Authorization": "Basic \"$users[1].email:password\"",
+        "Authorization": "Basic \"$users[2].email:password\"",
         "Keygen-Environment": "shared"
       }
       """
@@ -950,7 +950,7 @@ Feature: Generate authentication token
     And I send the following headers:
       """
       {
-        "Authorization": "Basic \"$users[1].email:password\"",
+        "Authorization": "Basic \"$users[2].email:password\"",
         "Keygen-Environment": "isolated"
       }
       """

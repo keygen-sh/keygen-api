@@ -111,6 +111,9 @@ class User < ApplicationRecord
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
 
+  before_destroy :enforce_admin_minimums_on_environment!
+  before_update :enforce_admin_minimums_on_environment!, if: -> { role.present? && role.changed? }
+
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
     if: -> { role&.name_changed? }
@@ -494,11 +497,17 @@ class User < ApplicationRecord
     nil
   end
 
-  def enforce_admin_minimums_on_account!
+  def enforce_admin_minimums_on_account!     = enforce_admin_minimums_for(:account,     abort_on_error: true)
+  def enforce_admin_minimums_on_environment! = enforce_admin_minimums_for(:environment, abort_on_error: true)
+  def enforce_admin_minimums_for(association_name, abort_on_error: false)
+    association = public_send(association_name)
+    return if
+      association.nil?
+
     return if
       !has_role?(:admin) && !was_role?(:admin)
 
-    other_admins = account.admins.preload(role: %i[role_permissions]).where.not(id:)
+    other_admins = association.admins.preload(role: %i[role_permissions]).where.not(id:)
     admin_count  = other_admins.size
     unless marked_for_destruction?
       admin_count += 1 # current admin
@@ -518,15 +527,15 @@ class User < ApplicationRecord
     # When sole admin: do not allow their permissions to be changed.
     when admin_count  > MINIMUM_ADMIN_COUNT && !all_permissions? && !role_changed? && other_admins.none?(&:all_permissions?),
          admin_count == MINIMUM_ADMIN_COUNT && !all_permissions? && !role_changed?
-      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
+      errors.add association_name, :admins_required, message: "#{association_name} must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
 
-      throw :abort
+      throw :abort if abort_on_error
     # When no admins, do not allow the last admin to be destroyed or their role to be changed.
     when admin_count < MINIMUM_ADMIN_COUNT && marked_for_destruction?,
          admin_count < MINIMUM_ADMIN_COUNT && role_changed?
-      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
+      errors.add association_name, :admins_required, message: "#{association_name} must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
-      throw :abort
+      throw :abort if abort_on_error
     end
   end
 end
