@@ -10,6 +10,7 @@ class MachineCheckoutService < AbstractCheckoutService
     license.product
     license.policy
     license.owner
+    license.users
     license
     components
     environment
