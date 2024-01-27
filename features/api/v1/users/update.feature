@@ -586,7 +586,7 @@ Feature: Update user
     Then the response status should be "200"
     And the last "user" should have 0 "tokens"
 
-  Scenario: Admin attempts to demote themself to user when they're not the only admin
+  Scenario: Admin attempts to demote themself to user when they're not the only admin for the account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "admin"
@@ -606,7 +606,7 @@ Feature: Update user
     Then the response status should be "200"
     And the current user should have 1 "token"
 
-  Scenario: Admin attempts to demote themself to user when they're the only admin
+  Scenario: Admin attempts to demote themself to user when they're the only admin for the account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -634,6 +634,105 @@ Feature: Update user
       }
       """
     And the current user should have 1 "token"
+
+  @ee
+  Scenario: Admin attempts to demote themself to user when they're not the only admin for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "admins"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  @ee
+  Scenario: Admin attempts to demote themself to user when they're the only admin for an isolated environment
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "environment must have at least 1 admin user",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        },
+        "code": "ENVIRONMENT_ADMINS_REQUIRED"
+      }
+      """
+    And the current user should have 1 "token"
+
+  @ee
+  Scenario: Admin attempts to demote themself to user when they're not the only admin for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 2 shared "admins"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1?environment=shared" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  @ee
+  Scenario: Admin attempts to demote themself to user when they're the only admin for a shared environment
+    Given the current account is "test1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1?environment=shared" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
 
   Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"
@@ -1248,6 +1347,64 @@ Feature: Update user
         "code": "ACCOUNT_ADMINS_REQUIRED"
       }
       """
+
+  @ee
+  Scenario: Admin updates their permissions (isolated environment, other admins without full permissions)
+    Given the current account is "ent1"
+    And the current account has 1 isolated "environment"
+    And the current account has 2 isolated "admins" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am the second admin of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1?environment=isolated" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "environment must have at least 1 admin user with a full permission set",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        },
+        "code": "ENVIRONMENT_ADMINS_REQUIRED"
+      }
+      """
+
+  @ee
+  Scenario: Admin updates their permissions (shared environment, other admins without full permissions)
+    Given the current account is "ent1"
+    And the current account has 1 shared "environment"
+    And the current account has 1 shared "admin"
+    And the current account has 2 shared "admins" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am the second admin of account "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1?environment=shared" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
 
   @ee
   Scenario: Admin updates their permissions (other admins with full permissions)
