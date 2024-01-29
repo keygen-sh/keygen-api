@@ -150,6 +150,20 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be a "user"
 
+  Scenario: Admin retrieves a user by email
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 3 "license-users" for the last "license"
+    And the last "user" has the following attributes:
+      """
+      { "email": "test@keygen.example" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/users/test@keygen.example"
+    Then the response status should be "200"
+    And the response body should be a "user"
+
   Scenario: Product retrieves a user for a license
     Given the current account is "test1"
     And the current account has 1 "product"
