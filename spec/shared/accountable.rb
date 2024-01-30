@@ -28,7 +28,7 @@ shared_examples :accountable do
       end
 
       context 'with current account' do
-        before { Current.account = account }
+        before { Current.account = create(:account) }
         after  { Current.account = nil }
 
         it 'should raise when account is nil' do
