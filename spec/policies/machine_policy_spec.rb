@@ -773,6 +773,72 @@ describe MachinePolicy, type: :policy do
           end
 
           with_permissions %w[machine.create] do
+            without_token_permissions { denies :create }
+
+            allows :create
+          end
+
+          with_permissions %w[machine.update] do
+            without_token_permissions { denies :update }
+
+            allows :update
+          end
+
+          with_permissions %w[machine.delete] do
+            without_token_permissions { denies :destroy }
+
+            allows :destroy
+          end
+
+          with_permissions %w[machine.check-out] do
+            without_token_permissions { denies :check_out }
+
+            allows :check_out
+          end
+
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy, :check_out
+            end
+
+            allows :show, :create, :update, :destroy, :check_out
+          end
+
+          with_default_permissions do
+            without_token_permissions do
+              denies :show, :create, :update, :destroy, :check_out
+            end
+
+            allows :show, :create, :update, :destroy, :check_out
+          end
+
+          without_permissions do
+            denies :show, :create, :update, :destroy, :check_out
+          end
+        end
+      end
+
+      with_scenarios %i[accessing_our_machines] do
+        with_token_authentication do
+          with_permissions %w[machine.read] do
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_our_machine] do
+        with_token_authentication do
+          with_permissions %w[machine.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_permissions %w[machine.create] do
             denies :create
           end
 
@@ -806,38 +872,6 @@ describe MachinePolicy, type: :policy do
 
             denies :create, :update, :destroy
             allows :show, :check_out
-          end
-
-          without_permissions do
-            denies :show, :create, :update, :destroy, :check_out
-          end
-        end
-      end
-
-      with_scenarios %i[accessing_machines] do
-        with_token_authentication do
-          with_permissions %w[machine.read] do
-            denies :index
-          end
-
-          with_wildcard_permissions { denies :index }
-          with_default_permissions  { denies :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_a_machine] do
-        with_token_authentication do
-          with_permissions %w[machine.read] do
-            denies :show
-          end
-
-          with_wildcard_permissions do
-            denies :show, :create, :update, :destroy, :check_out
-          end
-
-          with_default_permissions do
-            denies :show, :create, :update, :destroy, :check_out
           end
 
           without_permissions do
