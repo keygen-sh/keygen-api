@@ -36,6 +36,7 @@ class User < ApplicationRecord
     def owned = where(owner: proxy_association.owner)
   end
   has_many :components, through: :machines
+  has_many :processes, through: :machines
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :products
