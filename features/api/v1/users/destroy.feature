@@ -48,16 +48,18 @@ Feature: Delete user
       """
     And the current account has 1 "user"
     And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "204"
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
-    And the current account should have 0 "licenses"
+    And the current account should have 1 "license"
+    And the current account should have 0 "license-users"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
-
 
   Scenario: Developer attempts to delete an admin
     Given the current account is "test1"
