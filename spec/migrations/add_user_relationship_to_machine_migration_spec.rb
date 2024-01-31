@@ -7,8 +7,6 @@ describe AddUserRelationshipToMachineMigration do
   let(:account)               { create(:account) }
   let(:license_without_owner) { create(:license, :without_owner, account:) }
   let(:license_with_owner)    { create(:license, :with_owner, account:) }
-  let(:machine_without_owner) { create(:machine, :without_owner, license: license_without_owner, account:) }
-  let(:machine_with_owner)    { create(:machine, :with_owner, license: license_with_owner, account:) }
 
   before do
     RequestMigrations.configure do |config|
@@ -19,10 +17,10 @@ describe AddUserRelationshipToMachineMigration do
     end
   end
 
-  context 'when the machine does not have an owner' do
-    subject { machine_without_owner }
+  context "when the machine's license does not have an owner" do
+    subject { create(:machine, :without_owner, license: license_without_owner, account:) }
 
-    it 'should migrate a machine owner relationship' do
+    it 'should migrate a machine user relationship' do
       migrator = RequestMigrations::Migrator.new(from: CURRENT_API_VERSION, to: '1.0')
       data     = Keygen::JSONAPI.render(
         subject,
@@ -68,10 +66,10 @@ describe AddUserRelationshipToMachineMigration do
     end
   end
 
-  context 'when the machine has an owner' do
-    subject { machine_with_owner }
+  context "when the machine's license has an owner" do
+    subject { create(:machine, :with_owner, license: license_with_owner, account:) }
 
-    it 'should migrate a machine owner relationship' do
+    it 'should migrate a machine user relationship' do
       migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data     = Keygen::JSONAPI.render(
         subject,
