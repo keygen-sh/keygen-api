@@ -19,7 +19,7 @@ describe AddUserRelationshipToMachinesMigration do
     end
   end
 
-  it 'should migrate machine owner relationships' do
+  it 'should migrate machine user relationships' do
     migrator = RequestMigrations::Migrator.new(from: CURRENT_API_VERSION, to: '1.0')
     data     = Keygen::JSONAPI.render(
       [
