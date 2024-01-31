@@ -16,6 +16,7 @@ module Api::V1
     has_scope :expiring
     has_scope :expired
     has_scope :unassigned
+    has_scope :activated
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

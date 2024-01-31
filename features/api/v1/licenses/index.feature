@@ -245,6 +245,28 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
 
+  Scenario: Admin retrieves all activated licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 1 "machine" for the second "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activated=true"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+
+  Scenario: Admin retrieves all unactivated licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 1 "machine" for the second "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activated=false"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+
   Scenario: Admin retrieves all expiring licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
