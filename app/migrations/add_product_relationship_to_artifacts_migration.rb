@@ -20,7 +20,7 @@ class AddProductRelationshipToArtifactsMigration < BaseMigration
           product = products[artifact_id]&.first
 
           artifact[:relationships][:product] = {
-            data: product.present? ? { type: :products, id: product.id } : nil,
+            data: { type: :products, id: product.id },
             links: {
               related: v1_account_product_path(account_id, product.id),
             },
