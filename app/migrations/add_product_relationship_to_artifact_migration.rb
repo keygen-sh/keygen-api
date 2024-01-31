@@ -5,15 +5,15 @@ class AddProductRelationshipToArtifactMigration < BaseMigration
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
-    in data: { type: /\Aartifacts\z/, id:, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } } } }
-      product_id = Product.joins(:release_artifacts)
-                          .where(account_id:, release_artifacts: { id: })
+    in data: { type: /\Aartifacts\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } }, release: { data: { type: /\Areleases\z/, id: release_id } } } }
+      product_id = Product.joins(:releases)
+                          .where(account_id:, releases: { id: release_id })
                           .limit(1)
                           .pluck(:id)
                           .first
 
       body[:data][:relationships][:product] = {
-        data: product_id.present? ? { type: :products, id: product_id } : nil,
+        data: { type: :products, id: product_id },
         links: {
           related: v1_account_product_path(account_id, product_id),
         },
