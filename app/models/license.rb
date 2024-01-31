@@ -367,6 +367,13 @@ class License < ApplicationRecord
       where 'user_id IS NOT NULL'
     end
   }
+  scope :activated, -> (status = true) {
+    if ActiveRecord::Type::Boolean.new.cast(status)
+      where 'machines_count >= 1'
+    else
+      where 'machines_count <= 0'
+    end
+  }
   scope :expiring, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
       where 'expiry IS NOT NULL AND expiry > ? AND expiry < ?', Time.current, 3.days.from_now
