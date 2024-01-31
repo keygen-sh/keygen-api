@@ -398,13 +398,11 @@ describe Licenses::UserPolicy, type: :policy do
           end
 
           with_default_permissions do
-            denies :attach, :detach
-            denies :show
+            denies :show, :attach, :detach
           end
 
           without_permissions do
-            denies :attach, :detach
-            denies :show
+            denies :show, :attach, :detach
           end
         end
 
@@ -421,13 +419,11 @@ describe Licenses::UserPolicy, type: :policy do
           end
 
           with_default_permissions do
-            denies :attach, :detach
-            denies :show
+            denies :show, :attach, :detach
           end
 
           without_permissions do
-            denies :attach, :detach
-            denies :show
+            denies :show, :attach, :detach
           end
         end
       end
