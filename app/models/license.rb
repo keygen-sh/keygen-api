@@ -406,13 +406,16 @@ class License < ApplicationRecord
   }
 
   scope :active, -> (start_date = 90.days.ago) {
-    # include any licenses newer than :t or with any activity
-    where(<<~SQL.squish, start_date:)
-      licenses.created_at >= :start_date OR
-        last_validated_at >= :start_date OR
-        last_check_out_at >= :start_date OR
-        last_check_in_at >= :start_date
-    SQL
+    # exclude licenses of banned users (if any)
+    left_outer_joins(:users)
+      .where(users: { banned_at: nil })
+      # include any licenses newer than :t or with any activity
+      .where(<<~SQL.squish, start_date:)
+        licenses.created_at >= :start_date OR
+          last_validated_at >= :start_date OR
+          last_check_out_at >= :start_date OR
+          last_check_in_at >= :start_date
+      SQL
   }
 
   scope :inactive, -> (start_date = 90.days.ago) {

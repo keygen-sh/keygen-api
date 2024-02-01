@@ -292,12 +292,12 @@ describe License, type: :model do
       # old license recently validated with banned user (active, banned)
       create(:license, :banned, account:, created_at: 1.year.ago, last_validated_at: 1.minute.ago)
 
-      # old license with banned user (banned)
+      # old license with banned user (inactive, banned)
       create(:license, :banned, account:, created_at: 1.year.ago)
     end
 
     it 'should return active licenses' do
-      expect(License.with_status(:active).count).to eq 7
+      expect(License.with_status(:active).count).to eq 5
     end
 
     it 'should return inactive licenses' do
