@@ -424,21 +424,21 @@ class License < ApplicationRecord
   }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
-  scope :unassigned, -> (status = true) {
+  scope :assigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      left_outer_joins(:users).where(user_id: nil)
-                              .where.missing(:users)
-                              .distinct
-    else
       joins(:users).where.not(user_id: nil)
                    .or(
                      where.associated(:users),
                    )
                    .distinct
+    else
+      left_outer_joins(:users).where(user_id: nil)
+                              .where.missing(:users)
+                              .distinct
     end
   }
-  scope :assigned, -> (status = true) {
-    unassigned(!ActiveRecord::Type::Boolean.new.cast(status))
+  scope :unassigned, -> (status = true) {
+    assigned(!ActiveRecord::Type::Boolean.new.cast(status))
   }
   scope :activated, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
