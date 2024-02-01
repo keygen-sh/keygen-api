@@ -44,6 +44,10 @@ FactoryBot.define do
       password { nil }
     end
 
+    trait :banned do
+      banned_at { 1.minute.ago }
+    end
+
     trait :with_licenses do
       after :create do |user|
         create_list(:license, 3, account: user.account, environment: user.environment, user:)

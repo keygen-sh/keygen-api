@@ -81,6 +81,10 @@ FactoryBot.define do
       suspended { true }
     end
 
+    trait :banned do
+      user { build(:user, :banned, account:, environment:) }
+    end
+
     trait :protected do |license|
       protected { true }
     end
