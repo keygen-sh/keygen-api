@@ -227,10 +227,11 @@ Feature: List license
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "licenses"
+    And the current account has 2 "users"
+    And the current account has 7 "licenses"
     And the first "license" has the following attributes:
       """
-      { "userId": "$users[0]" }
+      { "userId": "$users[1]" }
       """
     And the second "license" has the following attributes:
       """
@@ -238,13 +239,42 @@ Feature: List license
       """
     And the third "license" has the following attributes:
       """
-      { "userId": "$users[0]" }
+      { "userId": "$users[2]" }
       """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the current account has 1 "license-user" for the first "license" and the third "user"
+    And the current account has 1 "license-user" for the fourth "license" and the second "user"
+    And the current account has 1 "license-user" for the fifth "license" and the second "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?unassigned=true"
     Then the response status should be "200"
-    And the response body should be an array with 1 "license"
+    And the response body should be an array with 3 "licenses"
     And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[6]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[5]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the third "license" should have the following relationships:
       """
       {
         "owner": {
@@ -289,7 +319,7 @@ Feature: List license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 3 "licenses"
+    And the current account has 7 "licenses"
     And the first "license" has the following attributes:
       """
       { "userId": "$users[1]" }
@@ -302,11 +332,40 @@ Feature: List license
       """
       { "userId": "$users[2]" }
       """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the current account has 1 "license-user" for the first "license" and the third "user"
+    And the current account has 1 "license-user" for the fourth "license" and the second "user"
+    And the current account has 1 "license-user" for the fifth "license" and the second "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?assigned=true"
     Then the response status should be "200"
-    And the response body should be an array with 2 "licenses"
+    And the response body should be an array with 4 "licenses"
     And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[4]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[3]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the third "license" should have the following relationships:
       """
       {
         "owner": {
@@ -315,7 +374,7 @@ Feature: List license
         }
       }
       """
-    And the second "license" should have the following relationships:
+    And the fourth "license" should have the following relationships:
       """
       {
         "owner": {
