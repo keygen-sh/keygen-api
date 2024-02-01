@@ -206,4 +206,60 @@ describe User, type: :model do
       expect(user.permissions.ids).to match_array User.default_permission_ids
     end
   end
+
+  describe '.with_status' do
+    before do
+      # new user (active)
+      create(:user, account:)
+
+      # old user (inactive)
+      create(:user, account:, created_at: 1.year.ago)
+
+      # old user with new license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
+
+      # old user with old license (inactive)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, created_at: 1.year.ago)
+
+      # old user with recently validated license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
+
+      # old user with recently checked out license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
+
+      # old user with recently checked in license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_check_in_at: 6.days.ago)
+
+      # old user with active and inactive licenses (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
+      create(:license, account:, user:, last_check_in_at: 6.days.ago)
+
+      # banned user (banned)
+      create(:user, :banned, account:)
+    end
+
+    it 'should return active users' do
+      expect(User.users.with_status(:active).count).to eq 6
+    end
+
+    it 'should return inactive users' do
+      expect(User.users.with_status(:inactive).count).to eq 2
+    end
+
+    it 'should return banned users' do
+      expect(User.users.with_status(:banned).count).to eq 1
+    end
+  end
 end

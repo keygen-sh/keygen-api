@@ -267,33 +267,51 @@ class User < ApplicationRecord
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
+  scope :users, -> { with_role(:user) }
   scope :banned, -> { where.not(banned_at: nil) }
   scope :active, -> (t = 90.days.ago) {
+    # include any users newer than :t or with an active license
     where('users.created_at >= ?', t)
       .where(banned_at: nil)
       .union(
         joins(:licenses)
           .where(banned_at: nil)
           .where(<<~SQL.squish, t:)
-            licenses.created_at >= :t OR licenses.last_validated_at >= :t
-              OR licenses.last_check_out_at >= :t
-              OR licenses.last_check_in_at >= :t
+            licenses.created_at >= :t OR
+              licenses.last_validated_at >= :t OR
+              licenses.last_check_out_at >= :t OR
+              licenses.last_check_in_at >= :t
           SQL
       )
   }
   scope :inactive, -> (t = 90.days.ago) {
+    # include users older than :t with no licenses
     where('users.created_at < ?', t)
       .where.missing(:licenses)
       .where(banned_at: nil)
       .union(
+        # include users older than :t with inactive licenses
         joins(:licenses)
           .where('users.created_at < ?', t)
           .where(banned_at: nil)
           .where(<<~SQL.squish, t:)
-            licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t)
-              AND (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :t)
-              AND (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :t)
+            licenses.created_at < :t AND
+              (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t) AND
+              (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :t) AND
+              (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :t)
           SQL
+      )
+      # exclude users older than :t with active licenses
+      .where.not(
+        id: joins(:licenses)
+              .where('users.created_at < ?', t)
+              .where(banned_at: nil)
+              .where(<<~SQL.squish, t:)
+                licenses.created_at >= :t OR
+                  licenses.last_validated_at >= :t OR
+                  licenses.last_check_out_at >= :t OR
+                  licenses.last_check_in_at >= :t
+              SQL
       )
   }
   scope :assigned, -> (status = true) {

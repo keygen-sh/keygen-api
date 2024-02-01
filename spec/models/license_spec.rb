@@ -185,4 +185,61 @@ describe License, type: :model do
       end
     end
   end
+
+  describe '.with_status' do
+    before do
+      # new license (active)
+      create(:license, account:)
+
+      # old license (inactive)
+      create(:license, account:, created_at: 1.year.ago)
+
+      # old license recently validated (active)
+      create(:license, account:, created_at: 1.year.ago, last_validated_at: 1.second.ago)
+
+      # old license expired (inactive, expired)
+      create(:license, account:, created_at: 1.year.ago, expiry: 11.months.ago)
+
+      # old license expired recently validated (active, expired)
+      create(:license, account:, created_at: 1.year.ago, expiry: 6.months.ago, last_validated_at: 3.days.ago)
+
+      # old license recently checked out (active)
+      create(:license, account:, created_at: 1.year.ago, last_check_out_at: 1.second.ago)
+
+      # old license recently checked in (active, expiring)
+      create(:license, account:, created_at: 1.year.ago, expiry: 2.days.from_now, last_check_in_at: 1.second.ago)
+
+      # old license expiring (inactive, expiring)
+      create(:license, account:, created_at: 1.year.ago, expiry: 2.days.from_now)
+
+      # new license with banned user (active, banned)
+      create(:license, :banned, account:)
+
+      # old license recently validated with banned user (active, banned)
+      create(:license, :banned, account:, created_at: 1.year.ago, last_validated_at: 1.minute.ago)
+
+      # old license with banned user (banned)
+      create(:license, :banned, account:, created_at: 1.year.ago)
+    end
+
+    it 'should return active licenses' do
+      expect(License.with_status(:active).count).to eq 7
+    end
+
+    it 'should return inactive licenses' do
+      expect(License.with_status(:inactive).count).to eq 3
+    end
+
+    it 'should return expiring licenses' do
+      expect(License.with_status(:expiring).count).to eq 2
+    end
+
+    it 'should return expired licenses' do
+      expect(License.with_status(:expired).count).to eq 2
+    end
+
+    it 'should return banned licenses' do
+      expect(License.with_status(:banned).count).to eq 3
+    end
+  end
 end
