@@ -369,9 +369,25 @@ class License < ApplicationRecord
   }
   scope :activated, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'machines_count >= 1'
+      where('machines_count >= 1')
     else
-      where 'machines_count <= 0'
+      where('machines_count <= 0')
+    end
+  }
+  scope :activations, -> (eq: nil, gt: nil, gte: nil, lt: nil, lte: nil) {
+    case
+    when eq.present?
+      where('machines_count = ?', eq.to_i)
+    when gt.present?
+      where('machines_count > ?', gt.to_i)
+    when gte.present?
+      where('machines_count >= ?', gte.to_i)
+    when lt.present?
+      where('machines_count < ?', lt.to_i)
+    when lte.present?
+      where('machines_count <= ?', lte.to_i)
+    else
+      none
     end
   }
   scope :expiring, -> (status = true) {

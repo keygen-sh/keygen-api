@@ -267,6 +267,76 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
 
+  Scenario: Admin retrieves all licenses with 2 activations
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 2 "machines" for the second "license"
+    And the current account has 3 "machines" for the third "license"
+    And the current account has 1 "machine" for the fourth "license"
+    And the current account has 1 "machine" for the fifth "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activations[eq]=2"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+
+  Scenario: Admin retrieves all licenses with more than 2 activations
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 2 "machines" for the second "license"
+    And the current account has 3 "machines" for the third "license"
+    And the current account has 1 "machine" for the fourth "license"
+    And the current account has 1 "machine" for the fifth "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activations[gt]=2"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+
+  Scenario: Admin retrieves all licenses with at least 2 activations
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 2 "machines" for the second "license"
+    And the current account has 3 "machines" for the third "license"
+    And the current account has 1 "machine" for the fourth "license"
+    And the current account has 1 "machine" for the fifth "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activations[gte]=2"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves all licenses with less than 2 activations
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 2 "machines" for the second "license"
+    And the current account has 3 "machines" for the third "license"
+    And the current account has 1 "machine" for the fourth "license"
+    And the current account has 1 "machine" for the fifth "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activations[lt]=2"
+    Then the response status should be "200"
+    And the response body should be an array with 7 "licenses"
+
+  Scenario: Admin retrieves all licenses with at most 2 activations
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the current account has 2 "machines" for the first "license"
+    And the current account has 2 "machines" for the second "license"
+    And the current account has 3 "machines" for the third "license"
+    And the current account has 1 "machine" for the fourth "license"
+    And the current account has 1 "machine" for the fifth "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activations[lte]=2"
+    Then the response status should be "200"
+    And the response body should be an array with 9 "licenses"
+
   Scenario: Admin retrieves all expiring licenses
     Given I am an admin of account "test1"
     And the current account is "test1"

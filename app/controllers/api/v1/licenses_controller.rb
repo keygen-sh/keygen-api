@@ -17,6 +17,9 @@ module Api::V1
     has_scope :expired
     has_scope :unassigned
     has_scope :activated
+    has_scope(:activations, type: :hash, only: :index) { |c, s, v|
+      s.activations(**v.symbolize_keys.slice(:eq, :gt, :gte, :lt, :lte))
+    }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
