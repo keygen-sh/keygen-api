@@ -78,6 +78,12 @@ gem 'premailer-rails'
 gem 'haml-rails'
 gem 'sass-rails'
 
+# Monitoring/APM
+unless ENV.key?('NO_SENTRY')
+  gem 'sentry-ruby'
+  gem 'sentry-rails'
+end
+
 # Logging
 gem 'lograge'
 
