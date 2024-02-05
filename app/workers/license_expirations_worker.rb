@@ -2,7 +2,7 @@
 
 class LicenseExpirationsWorker < BaseWorker
   sidekiq_options queue: :critical,
-                  lock: :until_executed, lock_ttl: 10.minutes,
+                  lock: :until_executed, lock_ttl: 10.minutes, on_conflict: :raise,
                   cronitor_disabled: false
 
   def perform

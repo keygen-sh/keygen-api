@@ -2,7 +2,7 @@
 
 class CullDeadProcessesWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  lock: :until_executed,
+                  lock: :until_executed, lock_ttl: 10.minutes, on_conflict: :raise,
                   cronitor_disabled: false
 
   # In some cases, a process can be orphaned from its heartbeat worker.
