@@ -437,6 +437,11 @@ GEM
       sendgrid-ruby (~> 6.4)
     sendgrid-ruby (6.6.2)
       ruby_http_client (~> 3.4)
+    sentry-rails (5.16.1)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.16.1)
+    sentry-ruby (5.16.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     sexp_processor (4.16.0)
     sidekiq (7.1.4)
       concurrent-ruby (< 2)
@@ -546,6 +551,8 @@ DEPENDENCIES
   semverse
   sendgrid-actionmailer
   sendgrid-ruby
+  sentry-rails
+  sentry-ruby
   sidekiq (~> 7.1.3)
   sidekiq-cron (~> 1.12.0)
   sidekiq-cronitor (~> 3.6.0)
