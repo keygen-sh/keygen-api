@@ -2,7 +2,7 @@
 
 class CullDeadMachinesWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  lock: :until_executed, lock_ttl: 10.minutes, on_conflict: :raise,
+                  lock: :until_executed, lock_ttl: 30.minutes, on_conflict: :raise,
                   cronitor_disabled: false
 
   # In some cases, a machine can be orphaned from its heartbeat worker.
