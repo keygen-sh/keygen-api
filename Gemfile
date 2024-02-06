@@ -56,8 +56,8 @@ gem 'activerecord_where_assoc', '~> 1.1.4'
 gem 'rails-pattern_matching'
 
 # Background jobs
-gem 'sidekiq', '~> 7.1.3'
-gem 'sidekiq-unique-jobs', '~> 8.0.3'
+gem 'sidekiq', '~> 7.2.1'
+gem 'sidekiq-unique-jobs', '~> 8.0.7'
 gem 'sidekiq-cron', '~> 1.12.0'
 gem 'sidekiq-cronitor', '~> 3.6.0'
 
