@@ -327,24 +327,14 @@ class LicenseValidationService < BaseService
     return [true, "is valid", :VALID]
   end
 
-  # TODO(ezekg) Move to a background job so we can read from replicas for validations.
   def touch!
     return if
-      skip_touch? || touches.empty?
+      skip_touch? || license.nil? || touches.empty?
 
-    # We're going to attempt to update the license's last validated timestamp and
-    # other metadata, but if there's a concurrent update then we'll skip. This
-    # sheds load when a license is validated too often, e.g. in an infinite
-    # loop or via a high number of concurrent processes.
-    license&.with_lock 'FOR UPDATE SKIP LOCKED' do
-      license.update!(**touches)
-    end
-  rescue ActiveRecord::LockWaitTimeout, # For NOWAIT lock wait timeout error
-         ActiveRecord::RecordNotFound   # SKIP LOCKED raises not found
-    # noop
-  rescue => e
-    Keygen.logger.exception(e)
+    # Attempt to store touches in database
+    TouchLicenseWorker.perform_async(license.id, touches.as_json)
 
-    raise e
+    # Store in-memory for response
+    license.assign_attributes(**touches)
   end
 end
