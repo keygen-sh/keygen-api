@@ -295,7 +295,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2022.0105)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     multi_json (1.15.0)
     multi_test (0.1.2)
@@ -311,7 +311,7 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.4)
+    nokogiri (1.16.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     oj (3.13.23)
@@ -528,7 +528,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (>= 3.8.0)
   lograge
-  nokogiri (~> 1.15.4)
+  nokogiri (~> 1.16.0)
   oj
   openssl (~> 3.1.0)
   parallel_tests (~> 4.2.1)
@@ -568,7 +568,7 @@ DEPENDENCIES
   whacamole
 
 RUBY VERSION
-   ruby 3.2.3p157
+   ruby 3.3.0p157
 
 BUNDLED WITH
    2.4.1
