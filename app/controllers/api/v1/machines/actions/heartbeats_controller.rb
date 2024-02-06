@@ -30,22 +30,6 @@ module Api::V1::Machines::Actions
         )
       end
 
-      # Queue up heartbeat worker which will handle deactivating dead machines
-      jid = MachineHeartbeatWorker.perform_in(
-        machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
-        machine.id,
-      )
-
-      Keygen.logger.info {
-        "[machine.heartbeat.ping] account_id=#{current_account.id} machine_id=#{machine.id}" \
-          " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
-          " machine_jid=#{jid} machine_jid_was=#{machine.heartbeat_jid_previously_was}"
-      }
-
-      machine.update(
-        heartbeat_jid: jid,
-      )
-
       render jsonapi: machine
     rescue Machine::ResurrectionUnsupportedError,
            Machine::ResurrectionExpiredError

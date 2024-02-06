@@ -7,11 +7,11 @@ check_for_license_overdue_check_ins:
   class: "LicenseOverdueCheckInsWorker"
 
 cull_dead_machines:
-  cron: "*/10 * * * *" # Every 10 mins
+  cron: "*/2 * * * *" # Every 2 mins
   class: "CullDeadMachinesWorker"
 
 cull_dead_processes:
-  cron: "*/10 * * * *" # Every 10 mins
+  cron: "*/2 * * * *" # Every 2 mins
   class: "CullDeadProcessesWorker"
 
 report_account_request_limits:

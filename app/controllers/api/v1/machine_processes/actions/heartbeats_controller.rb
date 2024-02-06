@@ -30,22 +30,6 @@ module Api::V1::MachineProcesses::Actions
         )
       end
 
-      # Queue up heartbeat worker which will handle deactivating dead processes
-      jid = ProcessHeartbeatWorker.perform_in(
-        machine_process.interval + MachineProcess::HEARTBEAT_DRIFT,
-        machine_process.id,
-      )
-
-      machine_process.update(
-        heartbeat_jid: jid,
-      )
-
-      Keygen.logger.info {
-        "[process.heartbeat.ping] account_id=#{current_account.id} process_id=#{machine_process.id}" \
-          " process_status=#{machine_process.status} process_interval=#{machine_process.interval}" \
-          " process_jid=#{jid} process_jid_was=#{machine_process.heartbeat_jid_previously_was}"
-      }
-
       render jsonapi: machine_process
     rescue MachineProcess::ResurrectionUnsupportedError,
            MachineProcess::ResurrectionExpiredError

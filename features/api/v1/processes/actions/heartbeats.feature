@@ -35,7 +35,6 @@ Feature: Process heartbeat actions
         "status": "ALIVE"
       }
       """
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -61,7 +60,6 @@ Feature: Process heartbeat actions
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
     And the response body should be a "process"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -87,7 +85,6 @@ Feature: Process heartbeat actions
         "detail": "is dead"
       }
       """
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -127,7 +124,6 @@ Feature: Process heartbeat actions
     And the response should contain a valid signature header for "test1"
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "process" should have the status "ALIVE"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -164,7 +160,6 @@ Feature: Process heartbeat actions
         "detail": "is dead"
       }
       """
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -190,7 +185,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -220,7 +214,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -248,7 +241,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -263,7 +255,6 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -288,7 +279,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job queued in 10.5 minutes
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -319,7 +309,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job queued in 2 weeks
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -334,7 +323,6 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -370,7 +358,6 @@ Feature: Process heartbeat actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -398,7 +385,6 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "403"
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -413,7 +399,6 @@ Feature: Process heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
     Then the response status should be "404"
-    And sidekiq should have 0 "process-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

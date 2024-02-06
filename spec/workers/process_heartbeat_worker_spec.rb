@@ -185,41 +185,4 @@ describe ProcessHeartbeatWorker do
       end
     end
   end
-
-  context 'when the process uses the default heartbeat duration' do
-    let(:heartbeat_duration) { MachineProcess::HEARTBEAT_TTL + MachineProcess::HEARTBEAT_DRIFT }
-    let(:process) { create(:machine_process, account:) }
-    let(:event) { 'process.heartbeat.pong' }
-    let(:last_heartbeat_at) { Time.current }
-
-    it 'should be enqueued at the default duration' do
-      worker.perform_in heartbeat_duration, process.id
-
-      job = worker.jobs.last
-
-      expect(job['at'].to_i).to be_within(30.seconds).of(
-        job['created_at'].to_i + heartbeat_duration.to_i,
-      )
-    end
-  end
-
-  context 'when the process uses a custom heartbeat duration' do
-    let(:heartbeat_duration) { 7.days }
-    let(:policy) { create(:policy, heartbeat_duration:, account:) }
-    let(:license) { create(:license, policy:, account:) }
-    let(:machine) { create(:machine, license:, account:) }
-    let(:process) { create(:machine_process, machine:, account:) }
-    let(:event) { 'process.heartbeat.pong' }
-    let(:last_heartbeat_at) { Time.current }
-
-    it 'should be enqueued at the custom duration' do
-      worker.perform_in heartbeat_duration, process.id
-
-      job = worker.jobs.last
-
-      expect(job['at'].to_i).to be_within(30.seconds).of(
-        job['created_at'].to_i + heartbeat_duration.to_i,
-      )
-    end
-  end
 end
