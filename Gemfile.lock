@@ -297,6 +297,7 @@ GEM
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
     minitest (5.20.0)
+    msgpack (1.7.2)
     multi_json (1.15.0)
     multi_test (0.1.2)
     multi_xml (0.6.0)
@@ -531,6 +532,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (>= 3.8.0)
   lograge
+  msgpack (~> 1.7)
   nokogiri (~> 1.15.4)
   oj
   openssl (~> 3.1.0)

@@ -22,13 +22,12 @@ gem 'request_migrations', '~> 1.1'
 # API params
 gem 'typed_params', '~> 1.1'
 
-# JSON API serializers
+# Serializers
 gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
-
-# XML/HTML
 gem 'nokogiri', '~> 1.15.4'
+gem 'msgpack', '~> 1.7'
 
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
