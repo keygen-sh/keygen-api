@@ -45,6 +45,8 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     EventNotificationWorker.drain
   when "event_log_worker"
     EventLogWorker.drain
+  when "touch_license_worker"
+    TouchLicenseWorker.drain
   end
 
   # Future queueing

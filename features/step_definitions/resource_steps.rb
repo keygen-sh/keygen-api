@@ -432,7 +432,7 @@ Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
   resource = resource.pluralize.underscore
   numbers = {
     "first"   => 1,
@@ -629,7 +629,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
   model.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   metadata = JSON.parse(body).deep_transform_keys!(&:underscore)
@@ -830,7 +830,7 @@ Given /^AWS S3 is (responding with a 200 status|responding with a 404 status|tim
   }
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
@@ -855,7 +855,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]
   m.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
@@ -979,7 +979,7 @@ Then /^the current token should have the following attributes:$/ do |body|
   expect(@token.reload.attributes.as_json).to include attributes
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should have a correct machine core count$/ do |word_index|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have a correct machine core count$/ do |word_index|
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -997,7 +997,26 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have an? (\w+) within seconds of "([^\"]+)"$/ do |index_in_words, attr_name, value|
+  value = parse_placeholders(value, account: @account, bearer: @bearer, crypt: @crypt)
+
+  license   = @account.licenses.send(index_in_words).reload # why?
+  attribute = attr_name.underscore.to_sym
+  time      = value&.to_time
+
+  expect(license.send(attribute)).to be_within(3.seconds).of(time)
+end
+
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have an? (\w+) "([^\"]+)"$/ do |index_in_words, attr_name, value|
+  value = parse_placeholders(value, account: @account, bearer: @bearer, crypt: @crypt)
+
+  license   = @account.licenses.send(index_in_words).reload # why?
+  attribute = attr_name.underscore.to_sym
+
+  expect(license.send(attribute)).to eq value
+end
+
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
   license  = @account.licenses.send(index_in_words)
   duration = duration_count.to_i.send(duration_interval)
   expiry   = duration.from_now
@@ -1005,7 +1024,7 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license
   expect(license.expiry).to be_within(30.seconds).of(expiry)
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should not have an expiry$/ do |index_in_words|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should not have an expiry$/ do |index_in_words|
   license = @account.licenses.send(index_in_words)
 
   expect(license.expiry).to be nil

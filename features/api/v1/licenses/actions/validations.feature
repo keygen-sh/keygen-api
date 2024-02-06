@@ -319,6 +319,8 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And the response should contain a valid signature header for "test1"
+    And sidekiq should process 1 "touch-license" job
+    And the first "license" should have a lastValidatedAt within seconds of "$time.now.iso"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -8686,6 +8688,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
+    And sidekiq should process 1 "touch-license" job
+    And the first "license" should have a lastValidatedVersion "$releases[0].version"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -8749,6 +8753,9 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
+    And sidekiq should process 1 "touch-license" job
+    And the first "license" should have a lastValidatedChecksum "49a01da77a888350f45d329ecd45c3e18cb282f69959b1290a1cee1b26780c30"
+    And the first "license" should have a lastValidatedVersion "2.0.1+hotfix"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
