@@ -26,7 +26,7 @@ gem 'typed_params', '~> 1.1'
 gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
-gem 'nokogiri', '~> 1.15.4'
+gem 'nokogiri', '~> 1.16.2'
 gem 'msgpack', '~> 1.7'
 
 # Billing and subscriptions
