@@ -442,6 +442,9 @@ GEM
       sentry-ruby (~> 5.16.1)
     sentry-ruby (5.16.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
+    sentry-sidekiq (5.16.1)
+      sentry-ruby (~> 5.16.1)
+      sidekiq (>= 3.0)
     sexp_processor (4.16.0)
     sidekiq (7.1.4)
       concurrent-ruby (< 2)
@@ -553,6 +556,7 @@ DEPENDENCIES
   sendgrid-ruby
   sentry-rails
   sentry-ruby
+  sentry-sidekiq
   sidekiq (~> 7.1.3)
   sidekiq-cron (~> 1.12.0)
   sidekiq-cronitor (~> 3.6.0)
