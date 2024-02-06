@@ -82,6 +82,7 @@ gem 'sass-rails'
 unless ENV.key?('NO_SENTRY')
   gem 'sentry-ruby'
   gem 'sentry-rails'
+  gem 'sentry-sidekiq'
 end
 
 # Logging
