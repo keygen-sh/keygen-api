@@ -30,10 +30,12 @@ Sidekiq.configure_client do |config|
   config.logger = Rails.logger if Rails.env.test?
   config.redis  = {
     ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
-    size: 5,
-    pool_timeout: 5,
-    connect_timeout: 5,
-    network_timeout: 5,
+    size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
+    pool_timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
+    connect_timeout: ENV.fetch('REDIS_CONNECT_TIMEOUT') { 5 }.to_i,
+    network_timeout: ENV.fetch('REDIS_NETWORK_TIMEOUT') { 5 }.to_i,
+    write_timeout: ENV.fetch('REDIS_WRITE_TIMEOUT') { 5 }.to_i,
+    read_timeout: ENV.fetch('REDIS_READ_TIMEOUT') { 5 }.to_i,
   }
 
   config.client_middleware do |chain|
