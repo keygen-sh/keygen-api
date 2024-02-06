@@ -35,6 +35,36 @@ rescue => e
   false
 end
 
+Rack::Attack.blocklist("req/block/account") do |rack_req|
+  req     = ActionDispatch::Request.new(rack_req.env)
+  matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
+  account = matches[1] unless
+    matches.nil?
+
+  next unless
+    account.present?
+
+  Rack::Attack.cache.read("req/block/account:#{account}").present?
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
+end
+
+Rack::Attack.blocklist("req/block/path") do |rack_req|
+  req  = ActionDispatch::Request.new(rack_req.env)
+  path = req.path
+
+  next unless
+    path.present?
+
+  Rack::Attack.cache.read("req/block/path:#{path}").present?
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
+end
+
 Rack::Attack.blocklist("req/block/bots") do |rack_req|
   req = ActionDispatch::Request.new(rack_req.env)
   ip  = req.remote_ip
