@@ -23,7 +23,7 @@ class MachineHeartbeatWorker < BaseWorker
       machine.requires_heartbeat?
 
     Keygen.logger.info {
-      "[machine.heartbeat.monitor] account_id=#{machine.account.id} machine_id=#{machine.id}" \
+      "[machine.heartbeat.worker] account_id=#{machine.account.id} machine_id=#{machine.id}" \
         " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
         " machine_jid=#{machine.heartbeat_jid} jid=#{jid}"
     }

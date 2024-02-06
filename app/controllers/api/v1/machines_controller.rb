@@ -119,23 +119,6 @@ module Api::V1
       end
 
       if machine.save
-        if machine.requires_heartbeat?
-          jid = MachineHeartbeatWorker.perform_in(
-            machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
-            machine.id,
-          )
-
-          Keygen.logger.info {
-            "[machine.heartbeat.start] account_id=#{current_account.id} machine_id=#{machine.id}" \
-              " machine_status=#{machine.heartbeat_status} machine_interval=#{machine.heartbeat_duration}" \
-              " machine_jid=#{jid}"
-          }
-
-          machine.update(
-            heartbeat_jid: jid,
-          )
-        end
-
         BroadcastEventService.call(
           event: 'machine.created',
           account: current_account,

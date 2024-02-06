@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_22_032049) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -194,6 +194,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_032049) do
     t.index ["license_id"], name: "index_license_entitlements_on_license_id"
   end
 
+  create_table "license_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "license_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_license_users_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_license_users_on_environment_id"
+    t.index ["license_id", "user_id", "account_id"], name: "index_license_users_on_license_id_and_user_id_and_account_id", unique: true
+    t.index ["user_id"], name: "index_license_users_on_user_id"
+  end
+
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "key", null: false
     t.datetime "expiry", precision: nil
@@ -268,6 +281,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_032049) do
     t.index "machine_id, md5((pid)::text)", name: "index_machine_processes_on_machine_id_md5_pid", unique: true
     t.index ["account_id"], name: "index_machine_processes_on_account_id"
     t.index ["environment_id"], name: "index_machine_processes_on_environment_id"
+    t.index ["heartbeat_jid"], name: "index_machine_processes_on_heartbeat_jid"
     t.index ["last_heartbeat_at"], name: "index_machine_processes_on_last_heartbeat_at"
     t.index ["machine_id"], name: "index_machine_processes_on_machine_id"
   end
@@ -291,6 +305,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_032049) do
     t.datetime "last_check_out_at", precision: nil
     t.uuid "environment_id"
     t.string "heartbeat_jid"
+    t.uuid "owner_id"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -300,9 +315,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_22_032049) do
     t.index ["environment_id"], name: "index_machines_on_environment_id"
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["group_id"], name: "index_machines_on_group_id"
+    t.index ["heartbeat_jid"], name: "index_machines_on_heartbeat_jid"
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
     t.index ["last_heartbeat_at"], name: "index_machines_on_last_heartbeat_at"
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
+    t.index ["owner_id"], name: "index_machines_on_owner_id"
   end
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
