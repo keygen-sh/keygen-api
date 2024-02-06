@@ -467,6 +467,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    stackprof (0.2.26)
     statsd-ruby (1.5.0)
     stringio (3.0.8)
     stripe (5.48.0)
@@ -560,6 +561,7 @@ DEPENDENCIES
   sidekiq-cronitor (~> 3.6.0)
   sidekiq-unique-jobs (~> 8.0.7)
   sprockets (~> 3.0)
+  stackprof
   stripe (~> 5.43)
   stripe-ruby-mock!
   timecop (~> 0.9.5)
