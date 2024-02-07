@@ -552,16 +552,17 @@ class License < ApplicationRecord
         )
   end
 
-  def entitled?(*identifiers)
-    identifiers = identifiers.flatten
-                             .compact
-
+  def entitled?(*entls)
+    entls = entls.flatten.compact
     return true if
-      identifiers.empty?
+      entls.empty?
 
-    entls = Entitlement.where(id: identifiers).or(
-      Entitlement.where(code: identifiers),
-    )
+    unless entls.all?(Entitlement)
+      entls = Entitlement.where(id: entls)
+                         .or(
+                           Entitlement.where(code: entls),
+                         )
+    end
 
     (entls & entitlements).size == entls.size
   end
