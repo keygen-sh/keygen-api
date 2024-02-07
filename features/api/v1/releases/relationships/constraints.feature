@@ -418,12 +418,11 @@ Feature: Release constraints relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
+        "title": "Unprocessable entity",
+        "detail": "entitlement 'f5bcf743-52a3-4318-b35c-044fb201d70e' relationship not found",
         "source": {
-          "pointer": "/data/relationships/entitlement"
-        },
-        "code": "ENTITLEMENT_NOT_FOUND"
+          "pointer": "/data/2"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs

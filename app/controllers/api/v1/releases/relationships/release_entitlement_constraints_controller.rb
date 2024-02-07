@@ -10,7 +10,7 @@ module Api::V1::Releases::Relationships
     authorize :release
 
     def index
-      constraints = apply_pagination(authorized_scope(apply_scopes(release.constraints)))
+      constraints = apply_pagination(authorized_scope(apply_scopes(release.constraints)).preload(:entitlement))
       authorize! constraints,
         with: Releases::ReleaseEntitlementConstraintPolicy
 
@@ -47,8 +47,24 @@ module Api::V1::Releases::Relationships
       authorize! entitlements,
         with: Releases::ReleaseEntitlementConstraintPolicy
 
+      # Ensure all entitlements exist. Attaching non-existent entitlements would be
+      # a noop, but responding with a 2xx status code is a confusing DX.
+      unless entitlements.size == entitlement_ids.size
+        existing_entitlement_ids = entitlements.pluck(:id)
+        invalid_entitlement_ids  = entitlement_ids - existing_entitlement_ids
+        invalid_entitlement_id   = invalid_entitlement_ids.first
+        invalid_idx              = entitlement_ids.find_index(invalid_entitlement_id)
+
+        return render_unprocessable_entity(
+          detail: "entitlement '#{invalid_entitlement_id}' relationship not found",
+          source: {
+            pointer: "/data/#{invalid_idx}"
+          }
+        )
+      end
+
       attached = release.constraints.create!(
-        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+        entitlements.map {{ account: current_account, entitlement: _1 }},
       )
 
       BroadcastEventService.call(
