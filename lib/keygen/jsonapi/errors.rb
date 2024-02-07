@@ -24,6 +24,10 @@ module Keygen::JSONAPI
       def to_h = { title:, detail:, code:, source:, links: }.compact_blank
       alias to_hash to_h # for json serialization
 
+      # for uniq
+      def eql?(other) = other.code == code && other.source == source
+      def hash        = [code, source].hash
+
       def deconstruct_keys(keys) = to_h.slice(*keys)
     end
 
@@ -32,7 +36,7 @@ module Keygen::JSONAPI
 
       included do
         def as_jsonapi(options = nil)
-          group_by_attribute.flat_map do |key, errors|
+          resource_errors = group_by_attribute.flat_map do |key, errors|
             source, *rest =
             path          = key.to_s.gsub(/\[(\d+)\]/, '.\1') # remove brackets from indexes
                                     .split('.')
@@ -102,6 +106,8 @@ module Keygen::JSONAPI
               )
             end
           end
+
+          resource_errors.uniq
         end
       end
     end
