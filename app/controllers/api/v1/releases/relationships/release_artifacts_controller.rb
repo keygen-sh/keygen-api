@@ -17,7 +17,7 @@ module Api::V1::Releases::Relationships
     authorize :release
 
     def index
-      artifacts = apply_pagination(authorized_scope(apply_scopes(release.artifacts)).preload(:platform, :arch, :filetype))
+      artifacts = apply_pagination(authorized_scope(apply_scopes(release.artifacts)).preload(:platform, :arch, :filetype, release: %i[product entitlements constraints]))
       authorize! artifacts,
         with: Releases::ReleaseArtifactPolicy
 
