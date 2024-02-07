@@ -85,6 +85,9 @@ module Keygen
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
 
+    # FIXME(ezekg) Fix deprecation warning (not sure where it's coming from)
+    config.action_dispatch.show_exceptions = :none
+
     # Add support for trusted proxies
     config.action_dispatch.trusted_proxies =
       ActionDispatch::RemoteIp::TRUSTED_PROXIES + ENV.fetch('TRUSTED_PROXIES') { '' }
