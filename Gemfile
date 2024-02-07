@@ -105,7 +105,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
-  gem 'bullet', '~> 7.1.1'
+  gem 'bullet', '~> 7.1.6'
   gem 'parallel_tests', '~> 4.2.1'
   gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
   gem 'faker', '~> 2.20.0'
