@@ -207,7 +207,7 @@ describe User, type: :model do
     end
   end
 
-  describe '.with_status' do
+  context 'with a variety of users' do
     before do
       # new user (active)
       create(:user, account:)
@@ -248,6 +248,12 @@ describe User, type: :model do
 
       # banned user (banned)
       create(:user, :banned, account:)
+    end
+
+    it 'should preload user statuses' do
+      statuses = nil
+      expect { statuses = User.preload(:any_active_license).collect(&:status) }.to make_database_queries(count: 2)
+      expect(statuses).to eq User.all.collect(&:status)
     end
 
     it 'should return active users' do

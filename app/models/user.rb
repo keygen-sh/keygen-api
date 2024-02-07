@@ -30,6 +30,16 @@ class User < ApplicationRecord
   has_many :groups,
     through: :group_owners
 
+  # NOTE(ezekg) This association is only used to preload a user's status, since
+  #             the #status needs to check if a user has any active licenses.
+  #
+  #             We're doing a DISTINCT ON so that we can query ANY one active
+  #             license for each user, since users can potentially have thousands
+  #             and thousands of licenses, and superfluously preloading/querying
+  #             that many records would a bad idea.
+  has_one :any_active_license, -> { active.reorder(nil).distinct_on(:user_id) },
+    class_name: License.name
+
   has_secure_password :password, validations: false
   has_environment
   has_default_role :user
@@ -388,11 +398,11 @@ class User < ApplicationRecord
   end
 
   def active?(t = 90.days.ago)
-    created_at >= t || licenses.active.exists?
+    created_at >= t || any_active_license.present?
   end
 
   def inactive?(t = 90.days.ago)
-    created_at < t && !licenses.active.exists?
+    created_at < t && any_active_license.nil?
   end
 
   def banned?
