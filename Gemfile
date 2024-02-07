@@ -96,8 +96,10 @@ group :production do
   # Monitoring/APM
   gem 'barnes'
 
-  unless ENV.key?('NO_RAILS_AUTOSCALE')
-    gem 'rails_autoscale_agent'
+  # Autoscaling
+  unless ENV.key?('NO_JUDOSCALE') || ENV.key?('NO_RAILS_AUTOSCALE')
+    gem 'judoscale-rails'
+    gem 'judoscale-sidekiq'
   end
 end
 
