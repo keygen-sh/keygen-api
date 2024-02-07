@@ -396,204 +396,122 @@ Feature: List users
   Scenario: Admin retrieves users filtered by status (active)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 7 "users"
-    And the second "user" has the following attributes:
-      """
-      { "bannedAt": "$time.now" }
-      """
-    And the current account has 6 userless "licenses"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[7]" }
-      """
-    And the second "license" has the following attributes:
-      """
-      { "userId": "$users[4]" }
-      """
-    And the third "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.2.days.ago",
-        "createdAt": "$time.91.days.ago",
-        "userId": "$users[5]"
-      }
-      """
-    And the fourth "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.91.days.ago",
-        "createdAt": "$time.101.days.ago",
-        "userId": "$users[3]"
-      }
-      """
-    # NOTE(ezekg) Updating user created timestamps in reverse order,
-    #             after license assignment.
-    And the fifth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
+    And time is frozen at "2024-02-07T00:00:00.000Z"
+    And the current account has the following "user" rows:
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+    And the current account has the following "license" rows:
+      | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | af5c7d44-26bd-4bfd-9dcc-8aed721308ab | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
+      | ee26deca-5688-451f-86bd-801291dd2d24 | 44dce69e-bb15-4915-9adc-074f8b57a61c | 2023-02-07T00:00:00.000Z |                          | 2024-02-07T00:00:00.000Z |                          |
+      | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
+      | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=ACTIVE"
     Then the response status should be "200"
-    And the response body should be an array with 5 "users"
+    And the response body should be an array with 6 "users"
+    And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (inactive)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 7 "users"
-    And the first "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the second "user" has the following attributes:
-      """
-      { "bannedAt": "$time.now" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the current account has 6 userless "licenses"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[7]" }
-      """
-    And the second "license" has the following attributes:
-      """
-      { "userId": "$users[4]" }
-      """
-    And the third "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.2.days.ago",
-        "createdAt": "$time.91.days.ago",
-        "userId": "$users[6]"
-      }
-      """
-    And the fourth "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.91.days.ago",
-        "createdAt": "$time.101.days.ago",
-        "userId": "$users[3]"
-      }
-      """
+    And time is frozen at "2024-02-07T00:00:00.000Z"
+    And the current account has the following "user" rows:
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+    And the current account has the following "license" rows:
+      | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | af5c7d44-26bd-4bfd-9dcc-8aed721308ab | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
+      | ee26deca-5688-451f-86bd-801291dd2d24 | 44dce69e-bb15-4915-9adc-074f8b57a61c | 2023-02-07T00:00:00.000Z |                          | 2024-02-07T00:00:00.000Z |                          |
+      | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
+      | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INACTIVE"
     Then the response status should be "200"
     And the response body should be an array with 2 "users"
+    And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (banned)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 7 "users"
-    And the first "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the second "user" has the following attributes:
-      """
-      { "bannedAt": "$time.now" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the current account has 6 userless "licenses"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[7]" }
-      """
-    And the second "license" has the following attributes:
-      """
-      { "userId": "$users[4]" }
-      """
-    And the third "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.2.days.ago",
-        "createdAt": "$time.91.days.ago",
-        "userId": "$users[6]"
-      }
-      """
-    And the fourth "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.91.days.ago",
-        "createdAt": "$time.101.days.ago",
-        "userId": "$users[3]"
-      }
-      """
+    And time is frozen at "2024-02-07T00:00:00.000Z"
+    And the current account has the following "user" rows:
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+    And the current account has the following "license" rows:
+      | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | af5c7d44-26bd-4bfd-9dcc-8aed721308ab | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
+      | ee26deca-5688-451f-86bd-801291dd2d24 | 44dce69e-bb15-4915-9adc-074f8b57a61c | 2023-02-07T00:00:00.000Z |                          | 2024-02-07T00:00:00.000Z |                          |
+      | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
+      | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=BANNED"
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
+    And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (invalid)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 7 "users"
-    And the first "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the second "user" has the following attributes:
-      """
-      { "bannedAt": "$time.now" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the current account has 6 userless "licenses"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[7]" }
-      """
-    And the second "license" has the following attributes:
-      """
-      { "userId": "$users[4]" }
-      """
-    And the third "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.2.days.ago",
-        "createdAt": "$time.91.days.ago",
-        "userId": "$users[6]"
-      }
-      """
-    And the fourth "license" has the following attributes:
-      """
-      {
-        "lastValidatedAt": "$time.91.days.ago",
-        "createdAt": "$time.101.days.ago",
-        "userId": "$users[3]"
-      }
-      """
+    And time is frozen at "2024-02-07T00:00:00.000Z"
+    And the current account has the following "user" rows:
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+    And the current account has the following "license" rows:
+      | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
+      | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
+      | c29fc20f-ec09-4cf4-8145-f910109e5705 | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | af5c7d44-26bd-4bfd-9dcc-8aed721308ab | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
+      | ee26deca-5688-451f-86bd-801291dd2d24 | 44dce69e-bb15-4915-9adc-074f8b57a61c | 2023-02-07T00:00:00.000Z |                          | 2024-02-07T00:00:00.000Z |                          |
+      | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
+      | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
+      | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INVALID"
     Then the response status should be "200"
     And the response body should be an array with 0 "users"
+    And time is unfrozen
 
   Scenario: Product retrieves all users for their product (multiple licenses per-user)
     Given the current account is "test1"

@@ -121,6 +121,7 @@ group :test do
   gem 'cucumber-rails', '~> 2.5', require: false
   gem 'rspec-rails', '~> 6.0.3'
   gem 'rspec-expectations', '~> 3.12.1'
+  gem 'db-query-matchers'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'
   gem 'webmock', '~> 3.14.0'
