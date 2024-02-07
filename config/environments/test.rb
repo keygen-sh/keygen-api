@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'bullet'
-
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
   config.annotations.register_directories('features')
@@ -95,17 +93,12 @@ Rails.application.configure do
   # Disable colored logs in test env
   config.colorize_logging = false
 
-  # Configure Bullet for performance tests
+  # Configure Prosopite for performance tests (e.g. N+1s)
   config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-
-    # Raise an error if e.g. an n+1 query is detected
-    Bullet.raise = true
-
-    # FIXME(ezekg) For some reason, we're seeing failures even though
-    #              we're not eager loading anything.
-    Bullet.unused_eager_loading_enable = false
+    Prosopite.enabled          = true
+    Prosopite.prosopite_logger = true
+    Prosopite.rails_logger     = true
+    Prosopite.raise            = true
   end
 end
 

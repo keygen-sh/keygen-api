@@ -1,4 +1,4 @@
-@skip/bullet
+@skip/prosopite
 @api/v1
 Feature: Search
 

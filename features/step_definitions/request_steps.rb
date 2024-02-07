@@ -61,10 +61,12 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
   else
   end
 
-  unless path.starts_with?('//')
-    get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    get path
+  Prosopite.scan do
+    unless path.starts_with?('//')
+      get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+    else
+      get path
+    end
   end
 end
 
@@ -79,7 +81,9 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  Prosopite.scan do
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
@@ -93,7 +97,9 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
   else
   end
 
-  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  Prosopite.scan do
+    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
 end
 
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
@@ -107,7 +113,9 @@ When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   else
   end
 
-  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  Prosopite.scan do
+    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
@@ -122,7 +130,9 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  Prosopite.scan do
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  end
 end
 
 When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
@@ -137,7 +147,9 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+  Prosopite.scan do
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+  end
 end
 
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
@@ -152,7 +164,9 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   else
   end
 
-  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  Prosopite.scan do
+    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  end
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
@@ -167,7 +181,9 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  Prosopite.scan do
+    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  end
 end
 
 When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, body|
@@ -182,7 +198,9 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   else
   end
 
-  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  Prosopite.scan do
+    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  end
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
@@ -196,7 +214,9 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   else
   end
 
-  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  Prosopite.scan do
+    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
 
   # Wait for all async deletion workers to finish
   YankArtifactWorker.drain

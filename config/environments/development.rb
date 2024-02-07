@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'bullet'
-
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
   config.annotations.register_directories('features')
@@ -88,13 +86,6 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
-
-  # Configure Bullet for performance tests
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-    Bullet.rails_logger = true
-  end
 
   # Clear cache on reload when using caching (see https://github.com/rails/rails/issues/43767)
   unless config.cache_classes
