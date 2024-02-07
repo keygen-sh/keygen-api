@@ -12,7 +12,7 @@ module Api::V1
     before_action :set_package, only: %i[show update destroy]
 
     def index
-      packages = apply_pagination(authorized_scope(apply_scopes(current_account.release_packages)).preload(:engine))
+      packages = apply_pagination(authorized_scope(apply_scopes(current_account.release_packages)).preload(:product, :engine))
       authorize! packages
 
       render jsonapi: packages
