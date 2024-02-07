@@ -99,9 +99,6 @@ group :production do
   unless ENV.key?('NO_RAILS_AUTOSCALE')
     gem 'rails_autoscale_agent'
   end
-
-  # Dyno management
-  gem 'whacamole'
 end
 
 group :development, :test do
