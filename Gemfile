@@ -98,8 +98,8 @@ group :production do
 
   # Autoscaling
   unless ENV.key?('NO_JUDOSCALE') || ENV.key?('NO_RAILS_AUTOSCALE')
-    gem 'judoscale-rails'
-    gem 'judoscale-sidekiq'
+    gem 'judoscale-rails', '~> 1.5.4'
+    gem 'judoscale-sidekiq', '~> 1.5.4'
   end
 end
 
