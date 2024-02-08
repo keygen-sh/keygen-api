@@ -407,9 +407,9 @@ class License < ApplicationRecord
       # include any licenses newer than :t or with any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at >= :start_date OR
-          last_validated_at >= :start_date OR
-          last_check_out_at >= :start_date OR
-          last_check_in_at >= :start_date
+          licenses.last_validated_at >= :start_date OR
+          licenses.last_check_out_at >= :start_date OR
+          licenses.last_check_in_at >= :start_date
       SQL
   }
 
@@ -420,9 +420,9 @@ class License < ApplicationRecord
       # include licenses older than :t without any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at < :start_date AND
-          (last_validated_at IS NULL OR last_validated_at < :start_date) AND
-          (last_check_out_at IS NULL OR last_check_out_at < :start_date) AND
-          (last_check_in_at IS NULL OR last_check_in_at < :start_date)
+          (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :start_date) AND
+          (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :start_date) AND
+          (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :start_date)
       SQL
   }
 
