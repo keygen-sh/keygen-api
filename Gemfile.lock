@@ -257,12 +257,12 @@ GEM
     jsonapi-renderer (0.2.2)
     jsonapi-serializable (0.3.1)
       jsonapi-renderer (~> 0.2.0)
-    judoscale-rails (1.5.3)
-      judoscale-ruby (= 1.5.3)
+    judoscale-rails (1.5.4)
+      judoscale-ruby (= 1.5.4)
       railties
-    judoscale-ruby (1.5.3)
-    judoscale-sidekiq (1.5.3)
-      judoscale-ruby (= 1.5.3)
+    judoscale-ruby (1.5.4)
+    judoscale-sidekiq (1.5.4)
+      judoscale-ruby (= 1.5.4)
       sidekiq (>= 5.0)
     jwt (2.3.0)
     kaminari (1.2.2)
@@ -530,8 +530,8 @@ DEPENDENCIES
   httparty (~> 0.21.0)
   json (~> 2.3.0)
   jsonapi-rails (= 0.4.0)
-  judoscale-rails
-  judoscale-sidekiq
+  judoscale-rails (~> 1.5.4)
+  judoscale-sidekiq (~> 1.5.4)
   jwt
   kaminari (~> 1.2.0)
   listen (>= 3.8.0)
