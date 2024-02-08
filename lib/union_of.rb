@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'active_record_union'
-
 module UnionOf
   class ReadonlyAssociationError < ActiveRecord::ActiveRecordError
     def initialize(owner, reflection)
@@ -151,11 +149,10 @@ module UnionOf
 
     def join_scope(table, foreign_table, foreign_klass)
       predicate_builder = predicate_builder(table)
-      scope_chain_items = join_scopes(table, predicate_builder)
-      klass_scope       = klass_join_scope(table, predicate_builder)
+      scope             = klass_join_scope(table, predicate_builder)
 
-      klass_scope.where!(
-        join_foreign_key => union_sources.reduce(nil) do |chain, union_source|
+      scope.where!(
+        join_foreign_key => union_sources.reduce(nil) do |left, union_source|
           union_reflection  = foreign_klass.reflect_on_association(union_source)
 
           relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
@@ -164,7 +161,7 @@ module UnionOf
           primary_key = union_reflection.join_primary_key
           foreign_key = union_reflection.join_foreign_key
 
-          scope = if union_reflection.through_reflection?
+          right = if union_reflection.through_reflection?
                     through_reflection  = union_reflection.through_reflection
                     through_foreign_key = through_reflection.foreign_key
                     through_klass       = through_reflection.klass
@@ -191,10 +188,10 @@ module UnionOf
                     relation.where(table[primary_key].eq(foreign_table[foreign_key]))
                   end
 
-          if chain
-            chain.union(scope)
+          if left
+            Arel::Nodes::Union.new(left, right)
           else
-            scope
+            right
           end
         end
       )
