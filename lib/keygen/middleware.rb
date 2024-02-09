@@ -243,6 +243,8 @@ module Keygen
           else
             # Leave as-is
           end
+        rescue Mime::Type::InvalidMimeType
+          # will be handled later
         rescue => e
           Keygen.logger.exception(e)
         end
