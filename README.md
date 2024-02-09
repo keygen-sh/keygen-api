@@ -152,6 +152,12 @@ To start a worker, run:
 bundle exec sidekiq
 ```
 
+To start a console, run:
+
+```bash
+bundle exec rails console
+```
+
 ### Testing
 
 To run the entire test suite, specs and features, run (takes about 20 mins on a 16-core CPU):
