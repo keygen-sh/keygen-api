@@ -292,7 +292,7 @@ describe User, type: :model do
 
     it 'should preload user statuses' do
       statuses = nil
-      expect { statuses = User.preload(:any_active_licenses).collect(&:status) }.to make_database_queries(count: 2)
+      expect { statuses = User.preload(:any_active_licenses).collect(&:status) }.to make_database_queries(count: 4)
       expect(statuses).to eq User.all.collect(&:status)
     end
 

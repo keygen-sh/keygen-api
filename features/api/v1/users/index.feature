@@ -431,6 +431,10 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?status=ACTIVE"
     Then the response status should be "200"
     And the response body should be an array with 8 "users"
+    And the response body should be an array with 8 "users" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
     And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (inactive)
@@ -472,6 +476,10 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?status=INACTIVE"
     Then the response status should be "200"
     And the response body should be an array with 3 "users"
+    And the response body should be an array with 3 "users" with the following attributes:
+      """
+      { "status": "INACTIVE" }
+      """
     And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (banned)
@@ -513,6 +521,10 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?status=BANNED"
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
+    And the response body should be an array with 1 "users" with the following attributes:
+      """
+      { "status": "BANNED" }
+      """
     And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (invalid)
