@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 module UnionOf
-  class ReadonlyAssociationError < ActiveRecord::ActiveRecordError
+  class Error < ActiveRecord::ActiveRecordError; end
+
+  class ReadonlyAssociationError < Error
     def initialize(owner, reflection)
-      super("Cannot modify association '#{owner.class.name}##{reflection.name}' because it is read-only.")
+      super("Cannot modify association '#{owner.class.name}##{reflection.name}' because it is read-only")
     end
   end
 
@@ -24,6 +26,78 @@ module UnionOf
         klass.nil?
 
       @association_scope ||= Scope.create.scope(self)
+    end
+  end
+
+  module Preloader
+    class Association < ActiveRecord::Associations::Preloader::ThroughAssociation
+      def load_records(raw_records = nil)
+        preloaded_records # we don't need to load anything except the union associations
+      end
+
+      def preloaded_records
+        @preloaded_records ||= union_preloaders.flat_map(&:preloaded_records)
+      end
+
+      def records_by_owner
+        @records_by_owner ||= owners.each_with_object({}) do |owner, result|
+          if loaded?(owner)
+            result[owner] = target_for(owner)
+
+            next
+          end
+
+          records = union_records_by_owner[owner] || []
+          records.compact!
+          records.sort_by! { preload_index[_1] } if scope.order_values.any?
+          records.uniq! if scope.distinct_value
+
+          result[owner] = records
+        end
+      end
+
+      def runnable_loaders
+        return [self] if
+          data_available?
+
+        union_preloaders.flat_map(&:runnable_loaders)
+      end
+
+      def future_classes
+        return [] if
+          run?
+
+        union_classes  = union_preloaders.flat_map(&:future_classes).uniq
+        source_classes = source_reflection.chain.map(&:klass)
+
+        (union_classes + source_classes).uniq
+      end
+
+      private
+
+      def data_available?
+        owners.all? { loaded?(_1) } || union_preloaders.all?(&:run?)
+      end
+
+      def source_reflection = reflection
+      def union_reflections = reflection.union_reflections
+
+      def union_preloaders
+        @union_preloaders ||= ActiveRecord::Associations::Preloader.new(scope:, records: owners, associations: union_reflections.collect(&:name))
+                                                                   .loaders
+      end
+
+      def union_records_by_owner
+        @union_records_by_owner ||= union_preloaders.map(&:records_by_owner).reduce do |left, right|
+          left.merge(right) do |owner, left_records, right_records|
+            left_records | right_records # merge record sets
+          end
+        end
+      end
+
+      def build_scope
+        super.except(:order) # FIXME(ezekg) doesn't work when combined with e.g. DISTINCT ON
+      end
     end
   end
 
@@ -147,63 +221,75 @@ module UnionOf
     def collection?       = true
     def association_class = Association
 
+    # Unlike other reflections, we don't have a single foreign key.
+    # Instead, we have many, one from each union source.
+    def foreign_keys = union_sources.collect { active_record.reflect_on_association(_1).foreign_key }
+    def foreign_key  = foreign_keys
+
     def join_scope(table, foreign_table, foreign_klass)
       predicate_builder = predicate_builder(table)
+      scope_chain_items = join_scopes(table, predicate_builder)
       scope             = klass_join_scope(table, predicate_builder)
 
-      scope.where!(
-        join_foreign_key => union_sources.reduce(nil) do |left, union_source|
-          union_reflection  = foreign_klass.reflect_on_association(union_source)
+      unions = union_sources.reduce(nil) do |left, union_source|
+        union_reflection  = foreign_klass.reflect_on_association(union_source)
 
-          relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
-                                                                 .except(:order)
+        relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
+                                                               .except(:order)
 
-          primary_key = union_reflection.join_primary_key
-          foreign_key = union_reflection.join_foreign_key
+        primary_key = union_reflection.join_primary_key
+        foreign_key = union_reflection.join_foreign_key
 
-          right = if union_reflection.through_reflection?
-                    through_reflection  = union_reflection.through_reflection
-                    through_foreign_key = through_reflection.foreign_key
-                    through_klass       = through_reflection.klass
-                    through_table       = through_klass.arel_table
+        right = if union_reflection.through_reflection?
+                  through_reflection  = union_reflection.through_reflection
+                  through_foreign_key = through_reflection.foreign_key
+                  through_klass       = through_reflection.klass
+                  through_table       = through_klass.arel_table
 
-                    # FIXME(ezekg) Seems like there should be a better way to do this?
-                    unaliased_table = case table
-                                      in Arel::Nodes::TableAlias => aliased_table
-                                        Arel::Table.new(aliased_table.right)
-                                      in Arel::Table => table
-                                        table
-                                      end
+                  # FIXME(ezekg) Seems like there should be a better way to do this?
+                  unaliased_table = case table
+                                    in Arel::Nodes::TableAlias => aliased_table
+                                      Arel::Table.new(aliased_table.right)
+                                    in Arel::Table => table
+                                      table
+                                    end
 
-                    join_sources = unaliased_table.join(through_table, Arel::Nodes::InnerJoin)
-                                                  .from(table)
-                                                  .on(
-                                                    table[primary_key].eq(through_table[foreign_key]),
-                                                    foreign_table[primary_key].eq(through_table[through_foreign_key]),
-                                                  )
-                                                  .join_sources
+                  join_sources = unaliased_table.join(through_table, Arel::Nodes::InnerJoin)
+                                                .from(table)
+                                                .on(
+                                                  table[primary_key].eq(through_table[foreign_key]),
+                                                  foreign_table[primary_key].eq(through_table[through_foreign_key]),
+                                                )
+                                                .join_sources
 
-                    relation.joins(join_sources)
-                  else
-                    relation.where(table[primary_key].eq(foreign_table[foreign_key]))
-                  end
+                  relation.joins(join_sources)
+                          .arel
+                else
+                  relation.where(table[primary_key].eq(foreign_table[foreign_key]))
+                          .arel
+                end
 
-          if left
-            Arel::Nodes::Union.new(left, right)
-          else
-            right
-          end
+        if left
+          Arel::Nodes::Union.new(left, right)
+        else
+          right
         end
+      end
+
+      scope.where!(
+        table[join_foreign_key].in(
+          unions,
+        )
       )
     end
 
-    def can_find_inverse_of_automatically?(...) = false
+    def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
     def deconstruct_keys(keys) = { name:, options: }
   end
 
   class Builder < ActiveRecord::Associations::Builder::CollectionAssociation
-    private_class_method def self.valid_options(...) = %i[sources class_name extend]
+    private_class_method def self.valid_options(...) = %i[sources class_name inverse_of extend]
     private_class_method def self.macro              = :union_of
 
     def self.define_writers(...)
@@ -287,10 +373,21 @@ module UnionOf
     end
   end
 
+  module PreloaderExtension
+    def preloader_for(reflection)
+      if reflection.union_of?
+        Preloader::Association
+      else
+        super
+      end
+    end
+  end
+
   ActiveRecord::Reflection.singleton_class.prepend(ReflectionExtension)
   ActiveRecord::Reflection::MacroReflection.prepend(MacroReflectionExtension)
   ActiveRecord::Reflection::RuntimeReflection.prepend(RuntimeReflectionExtension)
   ActiveRecord::Reflection::ThroughReflection.prepend(ThroughReflectionExtension)
   ActiveRecord::Associations::Association.prepend(AssociationExtension)
+  ActiveRecord::Associations::Preloader::Branch.prepend(PreloaderExtension)
   ActiveRecord::Base.include(ActiveRecordExtensions)
 end
