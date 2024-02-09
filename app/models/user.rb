@@ -19,7 +19,7 @@ class User < ApplicationRecord
   has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
   has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id
   has_many :user_licenses, index_errors: true, through: :license_users, source: :license
-  union_of :licenses, sources: %i[owned_licenses user_licenses] do
+  union_of :licenses, sources: %i[owned_licenses user_licenses], inverse_of: :users do
     def owned = where(owner: proxy_association.owner)
   end
   # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
@@ -61,7 +61,8 @@ class User < ApplicationRecord
     through: :any_active_license_user,
     source: :license
   union_of :any_active_licenses, sources: %i[any_active_owned_license any_active_user_license],
-    class_name: License.name
+    class_name: License.name,
+    inverse_of: :users
 
   has_secure_password :password, validations: false
   has_environment
