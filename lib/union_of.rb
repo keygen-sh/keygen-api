@@ -435,12 +435,15 @@ module UnionOf
     end
   end
 
-  ActiveRecord::Delegation.singleton_class.prepend(DelegationExtension)
-  ActiveRecord::Reflection.singleton_class.prepend(ReflectionExtension)
-  ActiveRecord::Reflection::MacroReflection.prepend(MacroReflectionExtension)
-  ActiveRecord::Reflection::RuntimeReflection.prepend(RuntimeReflectionExtension)
-  ActiveRecord::Reflection::ThroughReflection.prepend(ThroughReflectionExtension)
-  ActiveRecord::Associations::Association.prepend(AssociationExtension)
-  ActiveRecord::Associations::Preloader::Branch.prepend(PreloaderExtension)
-  ActiveRecord::Base.include(ActiveRecordExtensions)
+  ActiveSupport.on_load :active_record do
+    include ActiveRecordExtensions
+
+    ActiveRecord::Reflection.singleton_class.prepend(ReflectionExtension)
+    ActiveRecord::Reflection::MacroReflection.prepend(MacroReflectionExtension)
+    ActiveRecord::Reflection::RuntimeReflection.prepend(RuntimeReflectionExtension)
+    ActiveRecord::Reflection::ThroughReflection.prepend(ThroughReflectionExtension)
+    ActiveRecord::Associations::Association.prepend(AssociationExtension)
+    ActiveRecord::Associations::Preloader::Branch.prepend(PreloaderExtension)
+    ActiveRecord::Delegation.singleton_class.prepend(DelegationExtension)
+  end
 end
