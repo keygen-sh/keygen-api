@@ -9,15 +9,45 @@ module UnionOf
     end
   end
 
+  class ReadonlyAssociationProxy < ActiveRecord::Associations::CollectionProxy
+    MUTATION_METHODS = %i[
+      insert insert! insert_all insert_all!
+      build new create create!
+      upsert upsert_all update_all update! update
+      delete destroy destroy_all delete_all
+    ]
+
+    MUTATION_METHODS.each do |method_name|
+      define_method method_name do |*, **|
+        raise ReadonlyAssociationError.new(@association.owner, @association.reflection)
+      end
+    end
+  end
+
   class ReadonlyAssociation < ActiveRecord::Associations::CollectionAssociation
-    def writer(...)         = raise ReadonlyAssociationError.new(owner, reflection)
-    def ids_writer          = raise ReadonlyAssociationError.new(owner, reflection)
-    def destroy_all(...)    = raise ReadonlyAssociationError.new(owner, reflection)
-    def delete_all(...)     = raise ReadonlyAssociationError.new(owner, reflection)
-    def insert_record(...)  = raise ReadonlyAssociationError.new(owner, reflection)
-    def delete_records(...) = raise ReadonlyAssociationError.new(owner, reflection)
-    def concat_records(...) = raise ReadonlyAssociationError.new(owner, reflection)
-    def build_record(...)   = raise ReadonlyAssociationError.new(owner, reflection)
+    MUTATION_METHODS = %i[
+      writer ids_writer
+      insert_record build_record
+      destroy_all delete_all delete_records
+      update_all concat_records
+    ]
+
+    MUTATION_METHODS.each do |method_name|
+      define_method method_name do |*, **|
+        raise ReadonlyAssociationError.new(owner, reflection)
+      end
+    end
+
+    def reader
+      ensure_klass_exists!
+
+      if stale_target?
+        reload
+      end
+
+      @proxy ||= ReadonlyAssociationProxy.create(klass, self)
+      @proxy.reset_scope
+    end
   end
 
   class Association < ReadonlyAssociation
@@ -303,10 +333,6 @@ module UnionOf
   class Builder < ActiveRecord::Associations::Builder::CollectionAssociation
     private_class_method def self.valid_options(...) = %i[sources class_name inverse_of extend]
     private_class_method def self.macro              = :union_of
-
-    def self.define_writers(...)
-      # noop
-    end
   end
 
   module Macro
@@ -395,6 +421,13 @@ module UnionOf
     end
   end
 
+  module DelegationExtension
+    def delegated_classes
+      super << ReadonlyAssociationProxy
+    end
+  end
+
+  ActiveRecord::Delegation.singleton_class.prepend(DelegationExtension)
   ActiveRecord::Reflection.singleton_class.prepend(ReflectionExtension)
   ActiveRecord::Reflection::MacroReflection.prepend(MacroReflectionExtension)
   ActiveRecord::Reflection::RuntimeReflection.prepend(RuntimeReflectionExtension)
