@@ -367,6 +367,55 @@ describe UnionOf do
     end
   end
 
+  describe 'querying' do
+    it 'should support querying a union' do
+      user           = create(:user, account:)
+      other_user     = create(:user, account:)
+      owned_license  = create(:license, account:, owner: user)
+      user_license_1 = create(:license, account:)
+      user_license_2 = create(:license, account:)
+
+      create(:license_user, account:, license: owned_license, user: other_user)
+      create(:license_user, account:, license: user_license_1, user:)
+      create(:license_user, account:, license: user_license_2, user:)
+
+      expect(owned_license.users.count).to eq 2
+      expect(owned_license.users).to satisfy { _1 in [user, other_user] }
+
+      expect(user.licenses.count).to eq 3
+      expect(user.licenses).to satisfy { _1 in [owned_license, user_license_1, user_license_2] }
+      expect(user.licenses.where.not(id: owned_license)).to satisfy { _1 in [user_license_1, user_license_2] }
+      expect(user.licenses.where(id: owned_license).count).to eq 1
+    end
+
+    it 'should support querying a through union' do
+      product_1 = create(:product, account:)
+      product_2 = create(:product, account:)
+      policy_1  = create(:policy, account:, product: product_1)
+      policy_2  = create(:policy, account:, product: product_2)
+
+      user           = create(:user, account:)
+      owned_license  = create(:license, account:, policy: policy_1, owner: user)
+      user_license_1 = create(:license, account:, policy: policy_2)
+      user_license_2 = create(:license, account:, policy: policy_2)
+
+      create(:license_user, account:, license: user_license_1, user:)
+      create(:license_user, account:, license: user_license_2, user:)
+
+      machine_1 = create(:machine, license: user_license_1, owner: user)
+      machine_2 = create(:machine, license: user_license_2, owner: user)
+      machine_3 = create(:machine, license: owned_license, owner: user)
+
+      expect(user.products.count).to eq 2
+      expect(user.products).to satisfy { _1 in [product_1, product_2] }
+
+      expect(user.machines.count).to eq 3
+      expect(user.machines).to satisfy { _1 in [machine_1, machine_2, machine_3] }
+      expect(user.machines.where.not(id: machine_3)).to satisfy { _1 in [machine_1, machine_2] }
+      expect(user.machines.where(id: machine_3).count).to eq 1
+    end
+  end
+
   describe 'preloading' do
     before do
       # user with no licenses
