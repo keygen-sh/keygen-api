@@ -386,6 +386,9 @@ describe UnionOf do
       expect(user.licenses).to satisfy { _1 in [owned_license, user_license_1, user_license_2] }
       expect(user.licenses.where.not(id: owned_license)).to satisfy { _1 in [user_license_1, user_license_2] }
       expect(user.licenses.where(id: owned_license).count).to eq 1
+
+      expect(other_user.licenses.count).to eq 1
+      expect(other_user.licenses).to satisfy { _1 in [owned_license] }
     end
 
     it 'should support querying a through union' do
@@ -395,24 +398,40 @@ describe UnionOf do
       policy_2  = create(:policy, account:, product: product_2)
 
       user           = create(:user, account:)
+      other_user     = create(:user, account:)
       owned_license  = create(:license, account:, policy: policy_1, owner: user)
       user_license_1 = create(:license, account:, policy: policy_2)
       user_license_2 = create(:license, account:, policy: policy_2)
 
+      create(:license_user, account:, license: owned_license, user: other_user)
       create(:license_user, account:, license: user_license_1, user:)
       create(:license_user, account:, license: user_license_2, user:)
 
       machine_1 = create(:machine, license: user_license_1, owner: user)
       machine_2 = create(:machine, license: user_license_2, owner: user)
       machine_3 = create(:machine, license: owned_license, owner: user)
+      machine_4 = create(:machine, license: owned_license, owner: other_user)
 
       expect(user.products.count).to eq 2
       expect(user.products).to satisfy { _1 in [product_1, product_2] }
 
-      expect(user.machines.count).to eq 3
-      expect(user.machines).to satisfy { _1 in [machine_1, machine_2, machine_3] }
-      expect(user.machines.where.not(id: machine_3)).to satisfy { _1 in [machine_1, machine_2] }
+      expect(user.machines.count).to eq 4
+      expect(user.machines.owned.count).to eq 3
+      expect(user.machines).to satisfy { _1 in [machine_1, machine_2, machine_3, machine_4] }
+      expect(user.machines.owned).to satisfy { _1 in [machine_1, machine_2, machine_3] }
+      expect(user.machines.where.not(id: machine_3)).to satisfy { _1 in [machine_1, machine_2, machine_4] }
       expect(user.machines.where(id: machine_3).count).to eq 1
+
+      expect(other_user.machines.count).to eq 2
+      expect(other_user.machines.owned.count).to eq 1
+      expect(other_user.machines).to satisfy { _1 in [machine_1, machine_4] }
+      expect(other_user.machines.owned).to satisfy { _1 in [machine_4] }
+
+      expect(user.teammates.count).to eq 1
+      expect(user.teammates).to satisfy { _1 in [other_user] }
+
+      expect(other_user.teammates.count).to eq 1
+      expect(other_user.teammates).to satisfy { _1 in [user] }
     end
   end
 
