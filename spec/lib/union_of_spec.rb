@@ -559,6 +559,9 @@ describe UnionOf do
 
       licenses.each do |license|
         expect(license.association(:users).loaded?).to be true
+        expect(license.association(:owner).loaded?).to be false
+        expect(license.association(:licensees).loaded?).to be false
+
         expect { license.users }.to_not make_database_queries
         expect(license.users.sort_by(&:id)).to eq license.reload.users.sort_by(&:id)
       end
@@ -635,6 +638,8 @@ describe UnionOf do
 
       users.each do |user|
         expect(user.association(:machines).loaded?).to be true
+        expect(user.association(:licenses).loaded?).to be false
+
         expect { user.machines }.to_not make_database_queries
         expect(user.machines.sort_by(&:id)).to eq user.reload.machines.sort_by(&:id)
       end
@@ -649,6 +654,9 @@ describe UnionOf do
 
       licenses.each do |license|
         expect(license.association(:users).loaded?).to be true
+        expect(license.association(:owner).loaded?).to be true
+        expect(license.association(:licensees).loaded?).to be true
+
         expect { license.users }.to_not make_database_queries
         expect(license.users.sort_by(&:id)).to eq license.reload.users.sort_by(&:id)
       end
@@ -663,6 +671,8 @@ describe UnionOf do
 
       users.each do |user|
         expect(user.association(:machines).loaded?).to be true
+        expect(user.association(:licenses).loaded?).to be true
+
         expect { user.machines }.to_not make_database_queries
         expect(user.machines.sort_by(&:id)).to eq user.reload.machines.sort_by(&:id)
       end
