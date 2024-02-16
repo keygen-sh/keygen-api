@@ -298,14 +298,15 @@ class License < ApplicationRecord
     return where(user_id: owner_identifier) if
       UUID_RE.match?(owner_identifier)
 
-    scope = joins(:owner).where.not(owner: { email: nil }) # FIXME(ezekg) hack so our join gets aliased
-                         .where('owner.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%")
+    scope = joins(:owner).where(owner: { email: owner_identifier })
+                         .or(
+                           joins(:owner).where('owner.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%"),
+                         )
     return scope unless
       UUID_CHAR_RE.match?(owner_identifier)
 
     scope.or(
-      joins(:owner).where.not(owner: { id: nil })
-                   .where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:owner).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', owner.id::text)
         @@
         to_tsquery(
@@ -327,7 +328,10 @@ class License < ApplicationRecord
     return joins(:users).where(users: { id: user_identifier }) if
       UUID_RE.match?(user_identifier)
 
-    scope = joins(:users).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    scope = joins(:users).where(users: { email: user_identifier })
+                         .or(
+                           joins(:users).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%"),
+                         )
     return scope unless
       UUID_CHAR_RE.match?(user_identifier)
 
@@ -534,15 +538,22 @@ class License < ApplicationRecord
     when User
       joins(:users).where(users: { id: user })
     else
-      search_user(user)
+      joins(:users).where(users: { id: user })
+                   .or(
+                     joins(:users).where(users: { email: user }),
+                   )
     end
   }
   scope :for_owner, -> owner {
     case owner
-    when User
+    when User,
+         nil
       where(owner:)
     else
-      search_owner(owner)
+      joins(:owner).where(owner: { id: owner })
+                   .or(
+                     joins(:owner).where(owner: { email: owner }),
+                   )
     end
   }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
