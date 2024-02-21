@@ -439,9 +439,10 @@ Rails.application.routes.draw do
       end
     end
 
-    # Routes for Stdout (e.g. unsubscribe)
-    scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :jsonapi } do
+    # Routes for Stdout (e.g. unsubscribe, resubscribe)
+    scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :html } do
       get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
+      get 'resub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#resubscribe', as: :stdout_resubscribe
     end
   end
 
