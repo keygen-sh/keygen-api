@@ -2,6 +2,8 @@
 
 module Stdout
   class SubscribersController < ApplicationController
+    include Rendering::HTML
+
     skip_verify_authorized
 
     def unsubscribe
@@ -10,22 +12,40 @@ module Stdout
       return if
         email.nil?
 
-      user = User.where(email: email, stdout_unsubscribed_at: nil)
+      user = User.where(email:, stdout_unsubscribed_at: nil)
 
       # Unsubscribe all users with this email across all accounts
       user.update_all(stdout_unsubscribed_at: Time.current)
     rescue => e
       Keygen.logger.error "[stdout] Unsubscribe failed: err=#{e.message}"
     ensure
-      response.headers['Content-Type'] = 'text/plain'
+      render html: <<~HTML.html_safe
+        You've been unsubscribed. To resubscribe, follow this link: #{helpers.link_to(nil, stdout_resubscribe_url(ciphertext))}
+      HTML
+    end
 
-      render plain: "You've been unsubscribed"
+    def resubscribe
+      ciphertext = params.fetch(:ciphertext)
+      email      = decrypt(ciphertext)
+      return if
+        email.nil?
+
+      user = User.where.not(stdout_unsubscribed_at: nil)
+                 .where(email:)
+
+      # Resubscribe all users with this email across all accounts
+      user.update_all(stdout_unsubscribed_at: nil)
+    rescue => e
+      Keygen.logger.error "[stdout] Resubscribe failed: err=#{e.message}"
+    ensure
+      render html: <<~HTML.html_safe
+        You've been resubscribed. To unsubscribe, follow this link: #{helpers.link_to(nil, stdout_unsubscribe_url(ciphertext))}
+      HTML
     end
 
     private
 
     def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
-
     def decrypt(ciphertext)
       crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
       enc   = ciphertext.split('.')
