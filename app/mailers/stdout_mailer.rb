@@ -674,10 +674,53 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_six(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "The straw that took Keygen down for over 10 hours",
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        On February 5th, I woke up at 4am to my phone lighting up with a barrage of notifications. Through my daze, I scanned text messages and calls from numbers I didn't know, Discord chats from the community, and thousands of emails all saying the same thing: Keygen is DOWN. And it had been down... for over 4 hours. Total downtime on Februrary 5th was 5 and a half hours. And I wish I could say that was the end of the nightmare, but unfortunately, it wasn't.
+
+        Within the next 24 hours, we would go down again for another 5 hours. Why this occurred was a mixture of things, from failures in Keygen's on-call alerting, to failures to adequately scale to meet a sudden increase in traffic, to failures in a third-party dependency. But the onus is on me.
+
+        To my customers: I am deeply sorry. I regret that this happened. I understand the importance that business-critical software like Keygen has on day-to-day operations, and I am sorry if this outage caused you or your business any negative effects.
+
+        I know many are wondering exactly what happened. And in case you or your stakeholders are curious, I've written a detailed postmortem here:
+
+          https://keygen.sh/blog/that-one-time-keygen-went-down-for-5-hours-twice/
+
+        Have questions or comments? I'm here. You can reply back to this email directly.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+      TXT
+    )
+  end
+
   private
 
   def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
-
   def encrypt(plaintext)
     crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
     enc   = crypt.encrypt_and_sign(plaintext)
