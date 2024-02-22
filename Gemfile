@@ -57,7 +57,7 @@ gem 'rails-pattern_matching'
 
 # Background jobs
 gem 'sidekiq', '~> 7.2.1'
-gem 'sidekiq-unique-jobs', '~> 8.0.9'
+gem 'sidekiq-unique-jobs', '~> 8.0.10'
 gem 'sidekiq-cron', '~> 1.12.0'
 gem 'sidekiq-cronitor', '~> 3.6.0'
 
