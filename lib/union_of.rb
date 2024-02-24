@@ -193,12 +193,12 @@ module UnionOf
       return super unless
         reflection.union_of?
 
-      table = reflection.aliased_table
-      klass = reflection.klass
+      table         = reflection.aliased_table
+      klass         = reflection.klass
       foreign_table = next_reflection.aliased_table
       foreign_klass = next_reflection.klass
-      primary_key = reflection.join_primary_key
-      foreign_key = reflection.join_foreign_key
+      primary_key   = reflection.join_primary_key
+      foreign_key   = reflection.join_foreign_key
 
       scopes = reflection.union_sources.map do |union_source|
         union_source_reflection  = foreign_klass.reflect_on_association(union_source)
@@ -275,7 +275,7 @@ module UnionOf
       scope             = klass_join_scope(table, predicate_builder)
 
       unions = union_sources.reduce(nil) do |left, union_source|
-        union_reflection  = foreign_klass.reflect_on_association(union_source)
+        union_reflection = foreign_klass.reflect_on_association(union_source)
 
         relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
                                                                .except(:order)
