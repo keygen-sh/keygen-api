@@ -16,6 +16,7 @@ Rails.application.configure do
     authn = controller.current_http_scheme
     authz = controller.current_bearer&.role&.name
     api_version = controller.current_api_version
+    api_revision = Keygen.revision&.first(7)
     req = controller.request
     res = controller.response
     query_params =
@@ -87,6 +88,7 @@ Rails.application.configure do
     {
       host: req.host,
       request_id: req.request_id,
+      api_revision: api_revision || 'N/A',
       api_version: api_version || 'N/A',
       query_params: query_params || 'N/A',
       account_id: account_id || 'N/A',

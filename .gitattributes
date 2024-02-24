@@ -1,1 +1,2 @@
+/VERSION ident
 spec/fixtures/files/* text !filter !merge !diff

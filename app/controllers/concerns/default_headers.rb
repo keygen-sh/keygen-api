@@ -27,6 +27,7 @@ module DefaultHeaders
     add_license_header
     add_edition_header
     add_mode_header
+    add_revision_header
     add_version_header
     add_powered_by_header
   end
@@ -118,6 +119,10 @@ module DefaultHeaders
 
   def add_mode_header
     response.headers['Keygen-Mode'] = Keygen.mode
+  end
+
+  def add_revision_header
+    response.headers['Keygen-Revision'] = Keygen.revision
   end
 
   def add_version_header
