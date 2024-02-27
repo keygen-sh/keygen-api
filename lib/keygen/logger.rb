@@ -6,6 +6,7 @@ module Keygen
       Rails.logger.error(context) if context.present?
       Rails.logger.error(e.message)
       Rails.logger.error(e.backtrace&.join("\n"))
+      Sentry.capture_exception(e)
     end
 
     def self.error(msg = nil, &block)
