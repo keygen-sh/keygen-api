@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Product < ApplicationRecord
+  include UnionOf::Macro
   include Environmental
   include Accountable
   include Limitable
