@@ -16,7 +16,6 @@ module Api::V1
     has_scope :expiring
     has_scope :expired
     has_scope :unassigned
-    has_scope :assigned
     has_scope :activated
     has_scope(:activations, type: :hash, only: :index) { |c, s, v|
       s.activations(**v.symbolize_keys.slice(:eq, :gt, :gte, :lt, :lte))
@@ -28,7 +27,7 @@ module Api::V1
     before_action :set_license, only: %i[show update destroy]
 
     def index
-      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :product, :policy, owner: %i[role]))
+      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :owner, :policy, :product))
       authorize! licenses
 
       render jsonapi: licenses

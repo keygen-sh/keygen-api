@@ -303,7 +303,7 @@ Feature: List license
       { "userId": "$users[2]" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses?assigned=true"
+    When I send a GET request to "/accounts/test1/licenses?unassigned=false"
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
     And the first "license" should have the following relationships:
