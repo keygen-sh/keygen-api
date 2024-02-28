@@ -42,25 +42,6 @@ describe Environmental, type: :concern do
     context 'with default' do
       let(:environment) { create(:environment, account:) }
 
-      context 'with current' do
-        before {
-          Current.environment = environment
-
-          environmental.has_environment default: -> { nil }
-        }
-
-        after {
-          Current.environment = nil
-        }
-
-        it 'should have an environment default' do
-          instance = environmental.new
-
-          expect(instance.environment_id).to eq environment.id
-          expect(instance.environment).to eq environment
-        end
-      end
-
       context 'with string' do
         before {
           env = environment # close over environment

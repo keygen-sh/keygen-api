@@ -71,25 +71,6 @@ describe Accountable, type: :concern do
     context 'with default' do
       let(:account) { create(:account) }
 
-      context 'with current' do
-        before {
-          Current.account = account
-
-          accountable.has_account default: -> { nil }
-        }
-
-        after {
-          Current.account = nil
-        }
-
-        it 'should have an account default' do
-          instance = accountable.new
-
-          expect(instance.account_id).to eq account.id
-          expect(instance.account).to eq account
-        end
-      end
-
       context 'with string' do
         before {
           acct = account # close over account
