@@ -41,7 +41,6 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
-  config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
   config.include AuthorizationHelper, type: :policy
