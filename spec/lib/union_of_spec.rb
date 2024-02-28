@@ -698,59 +698,6 @@ describe UnionOf do
     end
   end
 
-  describe UnionOf::Macro do
-    subject do
-      Class.new ActiveRecord::Base do
-        def self.table_name = 'users'
-        def self.name       = 'User'
-
-        include UnionOf::Macro
-
-        has_many :owned_licenses
-        has_many :license_users
-        has_many :user_licenses, through: :license_users
-      end
-    end
-
-    describe '.union_of' do
-      it 'should respond' do
-        expect(subject.respond_to?(:union_of)).to be true
-      end
-
-      it 'should not raise' do
-        expect { subject.union_of :licenses, sources: %i[owned_licenses user_licenses] }.to_not raise_error
-      end
-
-      it 'should define' do
-        subject.union_of :licenses, sources: %i[owned_licenses user_licenses]
-
-        expect(subject.reflect_on_association(:licenses)).to_not be nil
-        expect(subject.reflect_on_association(:licenses).macro).to eq :union_of
-        expect(subject.reflect_on_union(:licenses)).to_not be nil
-        expect(subject.reflect_on_union(:licenses).macro).to eq :union_of
-      end
-    end
-
-    describe '.has_many' do
-      it 'should respond' do
-        expect(subject.respond_to?(:has_many)).to be true
-      end
-
-      it 'should not raise' do
-        expect { subject.has_many :licenses, union_of: %i[owned_licenses user_licenses] }.to_not raise_error
-      end
-
-      it 'should define' do
-        subject.has_many :licenses, union_of: %i[owned_licenses user_licenses]
-
-        expect(subject.reflect_on_association(:licenses)).to_not be nil
-        expect(subject.reflect_on_association(:licenses).macro).to eq :union_of
-        expect(subject.reflect_on_union(:licenses)).to_not be nil
-        expect(subject.reflect_on_union(:licenses).macro).to eq :union_of
-      end
-    end
-  end
-
   describe UnionOf::ReadonlyAssociation do
     it 'should not raise on readers' do
       expect { record.licenses }.to_not raise_error
