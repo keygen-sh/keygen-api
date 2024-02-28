@@ -109,17 +109,6 @@ Feature: License user relationship
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: User attempts to retrieve the user for a license they have
-    Given the current account is "test1"
-    And the current account has 3 "licenses"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the first "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    And I use API version "1.5"
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
-    Then the response status should be "403"
-
   Scenario: User attempts to retrieve the user for a license they don't own
     Given the current account is "test1"
     And the current account has 3 "licenses"
@@ -451,7 +440,7 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to change their license's user relationship
+  Scenario: User attempts to change a license's user relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"

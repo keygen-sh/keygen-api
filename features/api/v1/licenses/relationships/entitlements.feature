@@ -113,25 +113,10 @@ Feature: License entitlements relationship
     Then the response status should be "200"
     And the response body should be an array with 4 "entitlements"
 
-  Scenario: User attempts to retrieve the entitlements for their license (license owner)
+  Scenario: User attempts to retrieve the entitlements for their license
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 3 "licenses" for the last "user" as "owner"
-    And the current account has 2 "license-entitlements" for the first "license"
-    And the current account has 4 "license-entitlements" for the second "license"
-    And the current account has 6 "license-entitlements" for the third "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
-    Then the response status should be "200"
-    And the response body should be an array with 2 "entitlements"
-
-  Scenario: User attempts to retrieve the entitlements for their license (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 3 "licenses"
-    And the current account has 1 "license-user" for the first "license" and the last "user"
-    And the current account has 1 "license-user" for the second "license" and the last "user"
     And the current account has 2 "license-entitlements" for the first "license"
     And the current account has 4 "license-entitlements" for the second "license"
     And the current account has 6 "license-entitlements" for the third "license"
@@ -723,57 +708,12 @@ Feature: License entitlements relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to attach entitlements to their license (license owner)
-    Given the current account is "test1"
-    And the current account has 2 "entitlements"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
-      """
-      {
-        "data": [
-          { "type": "entitlements", "id": "$entitlements[0]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User attempts to attach entitlements to their license (license user)
-    Given the current account is "test1"
-    And the current account has 2 "entitlements"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/entitlements" with the following:
-      """
-      {
-        "data": [
-          { "type": "entitlements", "id": "$entitlements[0]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
   Scenario: User attempts to attach entitlements to a license
     Given the current account is "test1"
     And the current account has 2 "entitlements"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "policies" for existing "products"
+    And the current account has 1 "license" for existing "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -1173,13 +1113,17 @@ Feature: License entitlements relationship
       """
     Then the response status should be "404"
 
-  Scenario: User attempts to detach entitlements from their license (license owner)
+  Scenario: User attempts to detach entitlements from their license
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "policies" for existing "products"
+    And the current account has 1 "license" for existing "policies"
+    And the current account has 2 "license-entitlements" for existing "licenses"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And the current account has 2 "license-entitlements" for the last "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
@@ -1191,42 +1135,3 @@ Feature: License entitlements relationship
       }
       """
     Then the response status should be "403"
-
-  Scenario: User attempts to detach entitlements from their license (license user)
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 2 "license-entitlements" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
-      """
-      {
-        "data": [
-          { "type": "entitlements", "id": "$entitlements[0]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-
-  Scenario: User attempts to detach entitlements from a license
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 2 "license-entitlements" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:
-      """
-      {
-        "data": [
-          { "type": "entitlements", "id": "$entitlements[0]" }
-        ]
-      }
-      """
-    Then the response status should be "404"

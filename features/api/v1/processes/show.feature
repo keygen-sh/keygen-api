@@ -168,23 +168,10 @@ Feature: Show machine process
     When I send a GET request to "/accounts/test1/processes/$0"
     Then the response status should be "404"
 
-  Scenario: User retrieves a process for their license (license owner)
+  Scenario: User retrieves a process for their license
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license"
-    And the current account has 3 "processes" for the last "machine"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/processes/$0"
-    Then the response status should be "200"
-    And the response body should be a "process"
-
-  Scenario: User retrieves a process for their license (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
     And I am a user of account "test1"

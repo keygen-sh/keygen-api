@@ -609,11 +609,8 @@ Feature: List users
 
   Scenario: User attempts to retrieve all users for their account
     Given the current account is "test1"
-    And the current account has 5 "users"
-    And the current account has 1 "license" for the second "user" as "owner"
-    And the current account has 1 "license-user" for the last "license" and the third "user"
-    And the current account has 1 "license-user" for the last "license" and the fourth "user"
-    And I am the fourth user of account "test1"
+    And the current account has 5 "user"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "403"

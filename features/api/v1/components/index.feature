@@ -355,7 +355,7 @@ Feature: List machine components
     Then the response status should be "200"
     And the response body should be an array with 0 "components"
 
-  Scenario: User attempts to retrieve all their components (license owner)
+  Scenario: User attempts to retrieve all components for their account
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
@@ -367,20 +367,6 @@ Feature: List machine components
     When I send a GET request to "/accounts/test1/components"
     Then the response status should be "200"
     And the response body should be an array with 3 "components"
-
-  Scenario: User attempts to retrieve all their components (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 3 "licenses"
-    And the current account has 1 "license-user" for the first "license" and the last "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for each "license"
-    And the current account has 3 "components" for each "machine"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/components"
-    Then the response status should be "200"
-    And the response body should be an array with 6 "components"
 
   Scenario: License retrieves all components for their license with matches
     Given the current account is "test1"

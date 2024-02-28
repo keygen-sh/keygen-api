@@ -299,15 +299,17 @@ describe Machines::V1x5::UserPolicy, type: :policy do
       with_scenarios %i[accessing_its_machine accessing_its_owner] do
         with_token_authentication do
           with_permissions %w[user.read] do
-            denies :show
+            without_token_permissions { denies :show }
+
+            allows :show
           end
 
           with_wildcard_permissions do
-            denies :show
+            allows :show
           end
 
           with_default_permissions do
-            denies :show
+            allows :show
           end
 
           without_permissions do

@@ -119,23 +119,6 @@ Feature: Process product relationship
     Then the response status should be "200"
     And the response body should be a "product"
 
-  Scenario: User attempts to retrieve the product for a process they have (has permission)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And the current account has 3 "processes" for the last "machine"
-    And the last "user" has the following attributes:
-      """
-      { "permissions": ["product.read"] }
-      """
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/processes/$0/product"
-    Then the response status should be "200"
-    And the response body should be a "product"
-
   Scenario: User attempts to retrieve the product for a process they own (no permission)
     Given the current account is "test1"
     And the current account has 1 "user"

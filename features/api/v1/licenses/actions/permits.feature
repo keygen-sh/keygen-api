@@ -151,7 +151,7 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User checks in one of their licenses (license owner)
+  Scenario: User checks in one of their licenses
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
@@ -181,28 +181,6 @@ Feature: License permit actions
     And the response body should be a "license" with a nextCheckIn that is not nil
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User checks in one of their licenses (license user)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies" with the following:
-      """
-      {
-        "requireCheckIn": true,
-        "checkInInterval": "day",
-        "checkInIntervalCount": 1
-      }
-      """
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User checks in one of their licenses for an unprotected policy
@@ -319,7 +297,7 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User suspends their license (license owner)
+  Scenario: User suspends their license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -327,21 +305,6 @@ Feature: License permit actions
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User suspends their license (license user)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
@@ -463,35 +426,20 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User reinstates their license (license owner)
+  Scenario: User reinstates their license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license" with the following:
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
       """
-      { "suspended": true }
+      {
+        "suspended": true
+      }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license" as "owner"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User reinstates their license (license owner)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license" with the following:
-      """
-      { "suspended": true }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
@@ -691,7 +639,7 @@ Feature: License permit actions
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
-  Scenario: User renews their license (license owner)
+  Scenario: User renews their license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -719,29 +667,6 @@ Feature: License permit actions
     And the response body should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User renews their license (license user)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies" with the following:
-      """
-      { "duration": $time.30.days.to_i }
-      """
-    And the current account has 1 "license" for the last "policy"
-    And the last "license" has the following attributes:
-      """
-      { "expiry": "2016-12-01T22:53:37.000Z" }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User renews their license without permission
@@ -889,7 +814,7 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User revokes their own license (license owner)
+  Scenario: User revokes their own license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
@@ -902,21 +827,6 @@ Feature: License permit actions
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User revokes their own license (license user)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 3 "licenses"
-    And the current account has 1 "license-user" for the second "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$1/actions/revoke"
-    Then the response status should be "403"
-    And the current account should have 3 "licenses"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin revokes a license that implements a protected policy

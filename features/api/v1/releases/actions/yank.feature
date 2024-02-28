@@ -150,7 +150,7 @@ Feature: Yank release
     When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
     Then the response status should be "404"
 
-  Scenario: User yanks a release with a license for it (license owner)
+  Scenario: User yanks a release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -160,19 +160,6 @@ Feature: Yank release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license" as "owner"
-    When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
-    Then the response status should be "403"
-
-  Scenario: User yanks a release with a license for it (license user)
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "release" for the last "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
     Then the response status should be "403"
 

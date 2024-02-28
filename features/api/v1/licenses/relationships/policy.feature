@@ -86,16 +86,6 @@ Feature: License policy relationship
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the policy for a license they have
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/policy"
-    Then the response status should be "403"
-
   Scenario: Admin attempts to retrieve the policy for a license of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
@@ -926,7 +916,7 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy (license owner)
+  Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -965,38 +955,6 @@ Feature: License policy relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy (license user)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 3 "policies" for the first "product"
-    And all "policies" have the following attributes:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And the first "license" has the following attributes:
-      """
-      { "expiry": "$time.1.day.from_now" }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
-      """
-      {
-        "data": {
-          "type": "policies",
-          "id": "$policies[1]"
-        }
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's policy relationship from a protected policy to a protected policy

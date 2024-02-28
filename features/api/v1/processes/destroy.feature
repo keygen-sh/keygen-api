@@ -132,7 +132,7 @@ Feature: Kill machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User kills a process for their unprotected license (license owner)
+  Scenario: User kills a process for their unprotected license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -155,49 +155,6 @@ Feature: Kill machine process
     And the current account should have 0 "processes"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User kills a process for their unprotected license (license user, machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
-    And the current account has 1 "process" for the last "machine"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/processes/$0"
-    Then the response status should be "204"
-    And the current account should have 0 "processes"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User kills a process for their unprotected license (license user, not owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And the current account has 1 "process" for the last "machine"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/processes/$0"
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User kills a process for their protected license

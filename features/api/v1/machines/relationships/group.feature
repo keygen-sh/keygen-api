@@ -186,21 +186,6 @@ Feature: Machine group relationship
     Then the response status should be "200"
     And the response body should be a "group"
 
-  Scenario: User attempts to retrieve the group for a machine they have (in group)
-    Given the current account is "test1"
-    And the current account has 1 "group"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And the last "machine" is in the last "group"
-    And the last "user" is in the last "group"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/group"
-    Then the response status should be "200"
-    And the response body should be a "group"
-
   Scenario: User attempts to retrieve the group for a machine they don't own
     Given the current account is "test1"
     And the current account has 1 "group"
@@ -509,35 +494,11 @@ Feature: Machine group relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to change a machine's group relationship (license owner)
+  Scenario: User attempts to change a machine's group relationship
     Given the current account is "test1"
     And the current account has 2 "groups"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license"
-    And the last "machine" is in the last "group"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
-      """
-      {
-        "data": {
-          "type": "groups",
-          "id": "$groups[1]"
-        }
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User attempts to change a machine's group relationship (license user)
-    Given the current account is "test1"
-    And the current account has 2 "groups"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
     And the current account has 1 "machine" for the last "license"
     And the last "machine" is in the last "group"
     And I am a user of account "test1"

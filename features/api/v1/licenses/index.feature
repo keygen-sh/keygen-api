@@ -1955,41 +1955,16 @@ Feature: List license
     Then the response status should be "401"
     And the response body should be an array of 1 error
 
-  Scenario: User retrieves all licenses for their account (license owner)
+  Scenario: User retrieves all licenses for their account
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user" as "owner"
-    And the current account has 3 "licenses"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses"
-    Then the response status should be "200"
-    And the response body should be an array with 3 "licenses"
-
-  Scenario: User retrieves all licenses for their account (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
     And the current account has 3 "licenses"
-    And the current account has 1 "license-user" for the first "license" and the last "user"
-    And the current account has 1 "license-user" for the second "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the response body should be an array with 2 "licenses"
-
-  Scenario: User retrieves all licenses for their account (mixed)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user" as "owner"
-    And the current account has 3 "licenses"
-    And the current account has 1 "license-user" for the fourth "license" and the last "user"
-    And the current account has 1 "license-user" for the fifth "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses"
-    Then the response status should be "200"
-    And the response body should be an array with 5 "license"
+    And the response body should be an array with 1 "license"
 
   Scenario: User retrieves all licenses for their group
     Given the current account is "test1"

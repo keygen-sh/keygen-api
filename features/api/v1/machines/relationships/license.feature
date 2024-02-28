@@ -133,18 +133,6 @@ Feature: Machine license relationship
     Then the response status should be "200"
     And the response body should be a "license"
 
-  Scenario: User attempts to retrieve the license for a machine they have
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 3 "machines" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/license"
-    Then the response status should be "200"
-    And the response body should be a "license"
-
   Scenario: User attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"

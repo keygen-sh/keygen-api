@@ -494,7 +494,7 @@ Feature: Machine heartbeat actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User pings an unprotected machine's heartbeat (license owner)
+  Scenario: User pings an unprotected machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "webhook-endpoint"
@@ -517,34 +517,6 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a lastHeartbeat that is not nil
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User pings an unprotected machine's heartbeat (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license" with the following:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And the last "machine" has the following attributes:
-      """
-      { "lastHeartbeatAt": null }
-      """
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
-    Then the response status should be "200"
-    And the response body should be a "machine" that does requireHeartbeat
-    And the response body should be a "machine" with the heartbeatStatus "ALIVE"
-    And the response body should be a "machine" with a lastHeartbeat that is not nil
-    And the response body should be a "machine" with a nextHeartbeat that is not nil
-    And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

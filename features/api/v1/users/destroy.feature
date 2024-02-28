@@ -187,24 +187,6 @@ Feature: Delete user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to delete an associated user
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 3 "users"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the first "user"
-    And the current account has 1 "license-user" for the last "license" and the second "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am the last user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$1"
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
-    And the current account should have 3 "users"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
   Scenario: User attempts to delete another user
     Given the current account is "test1"
     And the current account has 3 "users"

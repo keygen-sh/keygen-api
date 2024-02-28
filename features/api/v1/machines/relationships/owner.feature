@@ -17,7 +17,7 @@ Feature: Machine owner relationship
     Then the response status should be "403"
 
   # Retrieval
-  Scenario: Admin retrieves the owner for a machine (license owner exists)
+  Scenario: Admin retrieves the owner for a machine (owner exists)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"

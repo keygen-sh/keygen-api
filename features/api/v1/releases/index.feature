@@ -610,7 +610,7 @@ Feature: List releases
     Then the response status should be "200"
     And the response body should be an array with 1 "release"
 
-  Scenario: User retrieves all releases for their license (license owner)
+  Scenario: User retrieves all releases for their products
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 2 "products"
@@ -621,21 +621,6 @@ Feature: List releases
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license" as "owner"
-    When I send a GET request to "/accounts/test1/releases"
-    Then the response status should be "200"
-    And the response body should be an array with 3 "releases"
-
-  Scenario: User retrieves all releases for their license (license user)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 2 "products"
-    And the current account has 3 "releases" for the first "product"
-    And the current account has 7 "releases" for the second "product"
-    And the current account has 1 "policy" for the first "product"
-    And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 3 "releases"
