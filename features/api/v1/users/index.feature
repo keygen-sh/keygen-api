@@ -1,5 +1,6 @@
 @api/v1
 Feature: List users
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -19,7 +20,7 @@ Feature: List users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "users"
-    And the current account has 15 "licenses" for existing "users" through "owner"
+    And the current account has 15 "licenses" for existing "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
@@ -33,7 +34,7 @@ Feature: List users
       """
       { "createdAt": "$time.1.year.ago" }
       """
-    And the current account has 15 "licenses" for existing "users" through "owner"
+    And the current account has 15 "licenses" for existing "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"

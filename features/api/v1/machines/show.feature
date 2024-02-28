@@ -226,7 +226,7 @@ Feature: Show machine
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 1 "machine"
-    And the current user has 1 "machine" as "owner"
+    And the current user has 1 "machine"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
     And the response body should be a "machine"

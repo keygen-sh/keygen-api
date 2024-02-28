@@ -15,7 +15,7 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.owner == bearer
+      in role: Role(:user) if machine.user == bearer
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!
@@ -35,7 +35,7 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.owner == bearer
+      in role: Role(:user) if machine.user == bearer
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!

@@ -14,7 +14,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.owner == bearer }
+    in role: Role(:user) if record.all? { _1.user == bearer }
       allow!
     else
       deny!
@@ -32,7 +32,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
     in role: Role(:license) if record == bearer
       allow!
@@ -50,7 +50,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy&.protected?
     else
       deny!
@@ -80,7 +80,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!
@@ -96,7 +96,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.protected?
     in role: Role(:license) if record == bearer
       allow!
@@ -114,7 +114,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.protected?
     in role: Role(:license) if record == bearer
       allow!
@@ -134,7 +134,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
     in role: Role(:license) if record == bearer
       allow!
@@ -162,7 +162,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!
@@ -178,7 +178,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       !record.policy.protected?
     else
       deny!

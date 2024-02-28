@@ -403,8 +403,8 @@ describe Users::TokenPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_bearer_trait :with_owner do
-      with_scenarios %i[accessing_its_owner accessing_its_tokens] do
+    with_bearer_trait :with_user do
+      with_scenarios %i[accessing_its_user accessing_its_tokens] do
         with_token_authentication do
           with_wildcard_permissions { denies :index }
           with_default_permissions  { denies :index }
@@ -412,7 +412,7 @@ describe Users::TokenPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_owner accessing_its_token] do
+      with_scenarios %i[accessing_its_user accessing_its_token] do
         with_license_authentication do
           with_wildcard_permissions do
             denies :show, :create

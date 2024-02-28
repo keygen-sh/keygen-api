@@ -3,12 +3,12 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Licenses::OwnerPolicy, type: :policy do
+describe Licenses::UserPolicy, type: :policy do
   subject { described_class.new(record, account:, environment:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
-    with_license_trait :with_owner do
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+    with_license_trait :with_user do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -80,7 +80,7 @@ describe Licenses::OwnerPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_another_account accessing_a_license accessing_its_owner] do
+      with_scenarios %i[accessing_another_account accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             denies :show
@@ -107,9 +107,9 @@ describe Licenses::OwnerPolicy, type: :policy do
   end
 
   with_role_authorization :environment do
-    with_license_trait :with_owner do
+    with_license_trait :with_user do
       within_environment :self do
-        with_scenarios %i[accessing_a_license accessing_its_owner] do
+        with_scenarios %i[accessing_a_license accessing_its_user] do
           with_token_authentication do
             with_permissions %w[user.read] do
               without_token_permissions { denies :show }
@@ -138,7 +138,7 @@ describe Licenses::OwnerPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -169,8 +169,8 @@ describe Licenses::OwnerPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_license_trait :with_owner do
-      with_scenarios %i[accessing_its_license accessing_its_owner] do
+    with_license_trait :with_user do
+      with_scenarios %i[accessing_its_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -198,7 +198,7 @@ describe Licenses::OwnerPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -229,8 +229,8 @@ describe Licenses::OwnerPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_bearer_trait :with_owner do
-      with_scenarios %i[accessing_itself accessing_its_owner] do
+    with_bearer_trait :with_user do
+      with_scenarios %i[accessing_itself accessing_its_user] do
         with_license_authentication do
           with_permissions %w[user.read] do
             allows :show
@@ -273,8 +273,8 @@ describe Licenses::OwnerPolicy, type: :policy do
       end
     end
 
-    with_license_trait :with_owner do
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+    with_license_trait :with_user do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         with_license_authentication do
           with_permissions %w[user.read] do
             denies :show
@@ -317,9 +317,8 @@ describe Licenses::OwnerPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    # FIXME(ezekg) Rename this trait to :with_owned_licenses?
     with_bearer_trait :with_licenses do
-      with_scenarios %i[accessing_its_license accessing_its_owner] do
+      with_scenarios %i[accessing_its_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -344,8 +343,8 @@ describe Licenses::OwnerPolicy, type: :policy do
       end
     end
 
-    with_license_trait :with_owner do
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+    with_license_trait :with_user do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
             without_token_permissions { denies :show }
@@ -370,8 +369,8 @@ describe Licenses::OwnerPolicy, type: :policy do
   end
 
   without_authorization do
-    with_license_trait :with_owner do
-      with_scenarios %i[accessing_a_license accessing_its_owner] do
+    with_license_trait :with_user do
+      with_scenarios %i[accessing_a_license accessing_its_user] do
         without_authentication do
           denies :show, :update
         end

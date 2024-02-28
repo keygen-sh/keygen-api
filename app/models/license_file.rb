@@ -35,7 +35,7 @@ class LicenseFile
   def account    = @account ||= Account.find_by(id: account_id)
   def license    = @license ||= License.find_by(id: license_id, account_id:)
   def product    = @product ||= license&.product
-  def owner      = @owner   ||= license&.owner
+  def user       = @user    ||= license&.user
 
   def environment
     @environment ||= unless environment_id.nil?

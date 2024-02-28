@@ -81,7 +81,7 @@ Feature: License policy relationship
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "403"
@@ -932,7 +932,7 @@ Feature: License policy relationship
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -973,7 +973,7 @@ Feature: License policy relationship
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -1005,7 +1005,7 @@ Feature: License policy relationship
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -1041,7 +1041,7 @@ Feature: License policy relationship
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -1073,7 +1073,7 @@ Feature: License policy relationship
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """

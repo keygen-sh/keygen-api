@@ -278,7 +278,7 @@ Feature: License usage actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
@@ -458,7 +458,7 @@ Feature: License usage actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "422"
@@ -492,7 +492,7 @@ Feature: License usage actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "403"
@@ -663,7 +663,7 @@ Feature: License usage actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
@@ -882,7 +882,7 @@ Feature: License usage actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"

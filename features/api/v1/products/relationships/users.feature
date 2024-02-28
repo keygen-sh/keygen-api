@@ -1,5 +1,6 @@
 @api/v1
 Feature: Product users relationship
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -54,7 +55,7 @@ Feature: Product users relationship
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "product"
     And the current account has 1 isolated "policy" for the last "product"
-    And the current account has 3 isolated+owned "licenses" for the last "policy"
+    And the current account has 3 isolated+user "licenses" for the last "policy"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users?environment=isolated"
@@ -67,8 +68,8 @@ Feature: Product users relationship
     And the current account has 1 shared "environment"
     And the current account has 1 global "product"
     And the current account has 1 global "policy" for the last "product"
-    And the current account has 1 global+owned "license" for the last "policy"
-    And the current account has 1 shared+owned "license" for the last "policy"
+    And the current account has 1 global+user "license" for the last "policy"
+    And the current account has 1 shared+user "license" for the last "policy"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users?environment=shared"
@@ -188,7 +189,7 @@ Feature: Product users relationship
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user" through "owner"
+    And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users"

@@ -926,7 +926,7 @@ Feature: Update license
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses" as "owner"
+    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
@@ -1174,7 +1174,7 @@ Feature: Update license
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses" as "owner"
+    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
@@ -1198,7 +1198,7 @@ Feature: Update license
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses" as "owner"
+    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """

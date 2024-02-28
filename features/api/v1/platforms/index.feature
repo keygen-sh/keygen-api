@@ -421,7 +421,7 @@ Feature: List release platforms
     And the current account has 1 "release" for an existing "product"
     And the current account has 1 "artifact" for an existing "release"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "200"

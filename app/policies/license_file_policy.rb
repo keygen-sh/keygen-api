@@ -12,7 +12,7 @@ class LicenseFilePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer
+    in role: Role(:user) if record.user == bearer
       allow!
     in role: Role(:license) if record.license == bearer
       allow!
@@ -31,7 +31,7 @@ class LicenseFilePolicy < ApplicationPolicy
     perms << 'entitlement.read' if record.includes.include?('entitlements')
     perms << 'environment.read' if record.includes.include?('environment')
     perms << 'group.read'       if record.includes.include?('group')
-    perms << 'user.read'        if record.includes.include?('owner')
+    perms << 'user.read'        if record.includes.include?('user')
     perms << 'product.read'     if record.includes.include?('product')
     perms << 'policy.read'      if record.includes.include?('policy')
 

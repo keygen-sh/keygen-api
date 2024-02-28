@@ -15,7 +15,7 @@ module MachineComponents
         allow!
       in role: Role(:product) if machine_component.product == bearer
         allow!
-      in role: Role(:user) if machine_component.owner == bearer
+      in role: Role(:user) if machine_component.user == bearer
         allow!
       in role: Role(:license) if machine_component.license == bearer
         allow!

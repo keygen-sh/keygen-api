@@ -170,7 +170,7 @@ Feature: Delete product
     And the current account has 1 "license" for an existing "policy"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a DELETE request to "/accounts/test1/products/$0"
     Then the response status should be "403"
 
@@ -179,7 +179,7 @@ Feature: Delete product
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$0"

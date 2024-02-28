@@ -297,13 +297,7 @@ module AuthorizationHelper
         let(:product) { license.product }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:product) {
-          license = user.licenses.first || create(:license, *license_traits, account: user.account, owner: user)
-
-          license.product
-        }
-      in [*, :accessing_its_owner, *]
-        let(:product) {
-          license = owner.licenses.first || create(:license, *license_traits, account: user.account, owner:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           license.product
         }
@@ -331,13 +325,7 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:products) {
-          licenses = user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, owner: user)
-
-          licenses.collect(&:product)
-        }
-      in [*, :accessing_its_owner, *]
-        let(:products) {
-          licenses = owner.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, owner:)
+          licenses = user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, user:)
 
           licenses.collect(&:product)
         }
@@ -444,8 +432,6 @@ module AuthorizationHelper
         let(:tokens)   { create_list(:token, 3, account: license.account, bearer: license) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:tokens)   { create_list(:token, 3, account: user.account, bearer: user) }
-      in [*, :accessing_its_owner, *]
-        let(:tokens)   { create_list(:token, 3, account: user.account, bearer: owner) }
       in [*, :accessing_itself, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
@@ -463,8 +449,6 @@ module AuthorizationHelper
         let(:_token) { create(:token, account: license.account, bearer: license) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:_token) { create(:token, account: user.account, bearer: user) }
-      in [*, :accessing_its_owner, *]
-        let(:_token) { create(:token, account: user.account, bearer: owner) }
       in [*, :accessing_itself, *]
         let(:_token) { create(:token, account: bearer.account, bearer:) }
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
@@ -478,8 +462,6 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:second_factors) { create_list(:second_factor, 1, account: user.account, user:) }
-      in [*, :accessing_its_owner, *]
-        let(:second_factors) { create_list(:second_factor, 1, account: user.account, user: owner) }
       in [:as_admin | :as_user, :accessing_itself, *]
         let(:second_factors) { create_list(:second_factor, 1, account:, user: bearer) }
       end
@@ -491,8 +473,6 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:second_factor) { create(:second_factor, account: user.account, user:) }
-      in [*, :accessing_its_owner, *]
-        let(:second_factor) { create(:second_factor, account: user.account, user: owner) }
       in [:as_admin | :as_user, :accessing_itself, *]
         let(:second_factor) { create(:second_factor, account:, user: bearer) }
       end
@@ -549,16 +529,16 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:users) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
-          licenses = create_list(:license, 3, *license_traits, :with_owner, account: policy.account, policy:)
+          licenses = create_list(:license, 3, *license_traits, :with_user, account: policy.account, policy:)
 
-          licenses.collect(&:owner)
+          licenses.collect(&:user)
         }
       in [:as_product, :accessing_a_group, *]
         let(:users) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, *user_traits, account:, group:)
 
-          users.each { create(:license, *license_traits, account:, policy:, owner: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
           users
         }
@@ -569,7 +549,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, *user_traits, account:)
 
-          users.each { create(:license, *license_traits, account:, policy:, owner: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
           users
         }
@@ -583,16 +563,24 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:user) {
           policy  = create(:policy, *policy_traits, account: product.account, product:)
-          license = create(:license, *license_traits, :with_owner, account: policy.account, policy:)
+          license = create(:license, *license_traits, :with_user, account: policy.account, policy:)
 
-          license.owner
+          license.user
         }
+      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
+        let(:user) { machine_component.user }
+      in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
+        let(:user) { machine_process.user }
+      in [*, :accessing_its_machine | :accessing_a_machine, *]
+        let(:user) { machine.user }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:user) { license.user }
       in [:as_product, :accessing_a_group, *]
         let(:user) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
           user   = create(:user, *user_traits, account:, group:)
 
-          create(:license, *license_traits, account:, policy:, owner: user)
+          create(:license, *license_traits, account:, policy:, user:)
 
           user
         }
@@ -603,10 +591,12 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           user   = create(:user, *user_traits, account:)
 
-          create(:license, *license_traits, account:, policy:, owner: user)
+          create(:license, *license_traits, account:, policy:, user:)
 
           user
         }
+      in [:as_license, *]
+        let(:user) { bearer.user }
       end
 
       let(:record) { user }
@@ -657,8 +647,6 @@ module AuthorizationHelper
         let(:group) { create(:group, account: machine.account, machines: [machine]) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:group) { create(:group, account: user.account, users: [user]) }
-      in [*, :accessing_its_owner, *]
-        let(:group) { create(:group, account: user.account, users: [owner]) }
       in [:as_license, *]
         let(:group) { create(:group, account:, licenses: [bearer]) }
       in [:as_user, *]
@@ -767,13 +755,7 @@ module AuthorizationHelper
         let(:machines) { create_list(:machine, 3, account: license.account, license:) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:machines) {
-          license = user.licenses.first || create(:license, *license_traits, account: user.account, owner: user)
-
-          create_list(:machine, 3, account: license.account, license:)
-        }
-      in [*, :accessing_its_owner, *]
-        let(:machines) {
-          license = owner.licenses.first || create(:license, *license_traits, account: user.account, owner:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           create_list(:machine, 3, account: license.account, license:)
         }
@@ -819,13 +801,7 @@ module AuthorizationHelper
         let(:machine) { create(:machine, account: license.account, license:) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:machine) {
-          license = user.licenses.first || create(:license, *license_traits, account: user.account, owner: user)
-
-          create(:machine, account: license.account, license:)
-        }
-      in [*, :accessing_its_owner, *]
-        let(:machine) {
-          license = owner.licenses.first || create(:license, *license_traits, account: user.account, owner:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           create(:machine, account: license.account, license:)
         }
@@ -981,38 +957,23 @@ module AuthorizationHelper
     def accessing_its_owners(scenarios)
       case scenarios
       in [*, :accessing_a_group, :as_group_owner, *]
-        let(:owners) { create_list(:group_owner, 3, account: group.account, group:) << group_owner }
+        let(:group_owners) { create_list(:group_owner, 3, account: group.account, group:) << group_owner }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:owners) { create_list(:group_owner, 3, account: group.account, group:) }
+        let(:group_owners) { create_list(:group_owner, 3, account: group.account, group:) }
       end
 
-      let(:record) { owners }
+      let(:record) { group_owners }
     end
 
     def accessing_its_owner(scenarios)
       case scenarios
       in [*, :accessing_a_group, :as_group_owner, *]
-        let(:owner) { create(:group_owner, account: group.account, group:) }
+        let(:_group_owner) { create(:group_owner, account: group.account, group:) }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:owner) { create(:group_owner, account: group.account, group:) }
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:user)  { license.owner }
-        let(:owner) { user }
-      in [*, :accessing_its_machine_component | :accessing_a_machine_component, *]
-        let(:user)  { machine_component.owner }
-        let(:owner) { user }
-      in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
-        let(:user)  { machine_process.owner }
-        let(:owner) { user }
-      in [*, :accessing_its_machine | :accessing_a_machine, *]
-        let(:user)  { machine.owner }
-        let(:owner) { user }
-      in [:as_license, *]
-        let(:user)  { bearer.owner }
-        let(:owner) { user }
+        let(:_group_owner) { create(:group_owner, account: group.account, group:) }
       end
 
-      let(:record) { owner }
+      let(:record) { _group_owner }
     end
 
     def accessing_releases(scenarios)
@@ -1306,11 +1267,7 @@ module AuthorizationHelper
         let(:licenses) { create_list(:license, 3, *license_traits, account: _policy.account, policy: _policy) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:licenses) {
-          user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, owner: user)
-        }
-      in [*, :accessing_its_owner, *]
-        let(:licenses) {
-          owner.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, owner:)
+          user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, user:)
         }
       in [:as_product, :accessing_a_group, *]
         let(:licenses) {
@@ -1349,11 +1306,7 @@ module AuthorizationHelper
         let(:license) { create(:license, *license_traits, account: _policy.account, policy: _policy) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:license) {
-          user.licenses.first || create(:license, *license_traits, account: user.account, owner: user)
-        }
-      in [*, :accessing_its_owner, *]
-        let(:license) {
-          owner.licenses.first || create(:license, *license_traits, account: user.account, owner:)
+          user.licenses.first || create(:license, *license_traits, account: user.account, user:)
         }
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:license) { machine.license }

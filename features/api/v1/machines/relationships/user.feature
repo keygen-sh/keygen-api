@@ -21,7 +21,7 @@ Feature: Machine user relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And the current account has 3 "machines" for the last "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/user"
@@ -33,7 +33,7 @@ Feature: Machine user relationship
   Scenario: Isolated environment retrieves the product for an isolated machine
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 isolated+owned "license"
+    And the current account has 1 isolated+user "license"
     And the current account has 1 isolated "machine" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
@@ -49,7 +49,7 @@ Feature: Machine user relationship
   Scenario: Shared environment retrieves the product for a shared machine
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 shared+owned "license"
+    And the current account has 1 shared+user "license"
     And the current account has 1 shared "machine" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
@@ -61,7 +61,7 @@ Feature: Machine user relationship
   Scenario: Shared environment retrieves the product for a global machine
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 global+owned "license"
+    And the current account has 1 global+user "license"
     And the current account has 1 global "machine" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
@@ -170,8 +170,8 @@ Feature: Machine user relationship
   Scenario: License attempts to retrieve their user (default permission)
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
     And the current account has 2 "machines" for the first "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -181,8 +181,8 @@ Feature: Machine user relationship
   Scenario: License attempts to retrieve their user (has permission)
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
     And the current account has 2 "machines" for the first "license"
     And the first "license" has the following attributes:
       """
@@ -197,8 +197,8 @@ Feature: Machine user relationship
   Scenario: License attempts to retrieve the user for a different license
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
     And the current account has 2 "machines" for the second "license"
     And I am a license of account "test1"
     And I use an authentication token

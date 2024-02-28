@@ -32,7 +32,7 @@ class UserPolicy < ApplicationPolicy
       allow!
     in role: Role(:user) if record == bearer
       allow!
-    in role: Role(:license) if record == bearer.owner
+    in role: Role(:license) if record == bearer.user
       allow!
     else
       deny!

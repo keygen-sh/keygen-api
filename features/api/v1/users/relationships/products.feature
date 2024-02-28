@@ -42,7 +42,7 @@ Feature: User products relationship
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "user"
-    And the current account has 3 isolated "licenses" for the last "user" as "owner"
+    And the current account has 3 isolated "licenses" for the last "user"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products?environment=isolated"
@@ -55,7 +55,7 @@ Feature: User products relationship
     And the current account has 1 "policy" for each "product"
     And the current account has 1 "user"
     And the current account has 1 "license" for each "policy"
-    And the last 2 "licenses" belong to the last "user" through "owner"
+    And the last 2 "licenses" belong to the last "user"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"
@@ -108,8 +108,8 @@ Feature: User products relationship
     And the current account has 1 "policy" for each "product"
     And the current account has 1 "user"
     And the current account has 1 "license" for each "policy"
-    And the first "license" belongs to the last "user" through "owner"
-    And the second "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"
@@ -119,7 +119,7 @@ Feature: User products relationship
   Scenario: License attempts to retrieve the products for their user
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"
@@ -137,7 +137,7 @@ Feature: User products relationship
   Scenario: User attempts to retrieve their products
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 2 "licenses" for the last "user" as "owner"
+    And the current account has 2 "licenses" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/products"

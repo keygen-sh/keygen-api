@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Licenses
-  class OwnerPolicy < ApplicationPolicy
+  class UserPolicy < ApplicationPolicy
     authorize :license
 
     def show?
@@ -15,7 +15,7 @@ module Licenses
         allow!
       in role: Role(:product) if license.product == bearer
         allow!
-      in role: Role(:user) if license.owner == bearer
+      in role: Role(:user) if license.user == bearer
         allow!
       in role: Role(:license) if license == bearer
         allow!

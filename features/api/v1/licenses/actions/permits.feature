@@ -173,7 +173,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
@@ -206,7 +206,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
@@ -236,7 +236,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "403"
@@ -304,7 +304,7 @@ Feature: License permit actions
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
@@ -359,7 +359,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
@@ -439,7 +439,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
@@ -498,7 +498,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
@@ -660,7 +660,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
@@ -690,7 +690,7 @@ Feature: License permit actions
       { "permissions": [] }
       """
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
@@ -762,7 +762,7 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
@@ -820,7 +820,7 @@ Feature: License permit actions
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I am a user of account "test1"
-    And the current user has 2 "licenses" as "owner"
+    And the current user has 2 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$1/actions/revoke"
     Then the response status should be "204"
@@ -868,7 +868,7 @@ Feature: License permit actions
     And the current account has 1 protected "policy"
     And the current account has 3 "licenses" for the last "policy"
     And I am a user of account "test1"
-    And the current user has 2 "licenses" as "owner"
+    And the current user has 2 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$1/actions/revoke"
     Then the response status should be "403"

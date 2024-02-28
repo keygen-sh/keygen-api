@@ -492,7 +492,7 @@ GEM
     timecop (0.9.5)
     timeout (0.4.0)
     tracer (0.1.1)
-    typed_params (1.2.3)
+    typed_params (1.1.0)
       rails (>= 6.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -580,7 +580,7 @@ DEPENDENCIES
   stripe-ruby-mock!
   timecop (~> 0.9.5)
   tracer
-  typed_params (~> 1.2.3)
+  typed_params (~> 1.1)
   uri (>= 0.12.2)
   webmock (~> 3.14.0)
 

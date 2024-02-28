@@ -202,7 +202,7 @@ Feature: Show product
     And the current account has 2 "policies" for each "product"
     And the current account has 2 "licenses" for each "policy"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
@@ -219,7 +219,7 @@ Feature: Show product
       """
       { "permissions": ["product.read"] }
       """
-    And the first "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
@@ -238,7 +238,7 @@ Feature: Show product
       """
       { "permissions": ["license.validate"] }
       """
-    And the first "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0"
@@ -250,7 +250,7 @@ Feature: Show product
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1"

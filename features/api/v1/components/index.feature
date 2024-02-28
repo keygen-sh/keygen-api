@@ -358,7 +358,7 @@ Feature: List machine components
   Scenario: User attempts to retrieve all components for their account
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "components" for the last "machine"
     And the current account has 2 "components"

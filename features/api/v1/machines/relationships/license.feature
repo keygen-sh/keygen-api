@@ -1,5 +1,6 @@
 @api/v1
 Feature: Machine license relationship
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -154,8 +155,8 @@ Feature: Machine license relationship
   Scenario: License attempts to retrieve themself
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
     And the current account has 2 "machines" for the first "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -166,8 +167,8 @@ Feature: Machine license relationship
   Scenario: License attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
     And the current account has 2 "machines" for the second "license"
     And I am a license of account "test1"
     And I use an authentication token

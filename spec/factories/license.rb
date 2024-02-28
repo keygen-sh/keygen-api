@@ -7,7 +7,7 @@ FactoryBot.define do
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     policy      { build(:policy, account:, environment:) }
-    owner       { nil }
+    user        { nil }
 
     trait :legacy_encrypt do
       policy { build(:policy, :legacy_encrypt, account:, environment:) }
@@ -99,35 +99,22 @@ FactoryBot.define do
       end
     end
 
-    trait :with_owner do
-      owner { build(:user, account:, environment:) }
-    end
-
-    trait :owned do
-      with_owner
-    end
-
-    trait :unowned do
-      owner { nil }
-    end
-
     trait :with_users do
       after :create do |license|
         build_list(:license_user, 3, account:, environment:, license:)
       end
     end
 
-    trait :assigned do
-      with_users
-    end
-
-    trait :unassigned do
-      # noop
+    trait :with_user do
+      user { build(:user, account:, environment:) }
     end
 
     trait :userless do
-      unowned
-      unassigned
+      user { nil }
+    end
+
+    trait :user do
+      with_user
     end
 
     trait :with_group do

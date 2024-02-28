@@ -125,7 +125,7 @@ Feature: List authentication tokens
     And the current account has 2 "licenses" for the last "policy"
     And the current account has 2 "users"
     And the current account has 2 "tokens" for each "user"
-    And the last "license" is associated to the last "user" as "owner"
+    And the last "license" is associated to the last "user"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[2]"

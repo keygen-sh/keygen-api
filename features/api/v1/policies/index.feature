@@ -1,5 +1,6 @@
 @api/v1
 Feature: List policies
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -240,7 +241,7 @@ Feature: List policies
     And the current account has 3 "policies" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user" through "owner"
+    And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
@@ -257,9 +258,9 @@ Feature: List policies
       """
       { "permissions": ["policy.read"] }
       """
-    And the first "license" belongs to the last "user" through "owner"
-    And the second "license" belongs to the last "user" through "owner"
-    And the third "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
+    And the third "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"
@@ -277,8 +278,8 @@ Feature: List policies
       """
       { "permissions": ["license.validate"] }
       """
-    And the first "license" belongs to the last "user" through "owner"
-    And the second "license" belongs to the last "user" through "owner"
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies"

@@ -1,11 +1,14 @@
 @api/v1
 Feature: List releases
+
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
+    # TODO(ezekg) Remove after we switch new accounts to v1.1
+    And I use API version "1.1"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
@@ -620,7 +623,7 @@ Feature: List releases
     And the current account has 1 "license" for the first "policy"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 3 "releases"
@@ -826,7 +829,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 8 "releases"
@@ -854,7 +857,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?limit=1"
     Then the response status should be "200"
     And the response body should be an array with 1 "release"
@@ -882,7 +885,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?product=$products[1]"
     Then the response status should be "200"
     And the response body should be an array with 5 "releases"
@@ -949,7 +952,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 0 "releases"
@@ -1037,7 +1040,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 0 "releases"
@@ -1198,7 +1201,7 @@ Feature: List releases
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license" as "owner"
+    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 2 "releases"
@@ -1248,7 +1251,7 @@ Feature: List releases
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses" as "owner"
+    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 2 "releases"
@@ -1305,7 +1308,7 @@ Feature: List releases
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses" as "owner"
+    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 3 "releases"

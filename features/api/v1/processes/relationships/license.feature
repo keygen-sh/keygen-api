@@ -95,7 +95,7 @@ Feature: Process license relationship
   Scenario: User attempts to retrieve the license for a process they own
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
     And I am a user of account "test1"

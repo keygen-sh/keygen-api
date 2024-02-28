@@ -62,7 +62,7 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
   end
 
   context 'the errors do not contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
-    it 'should not migrate the error' do
+    it 'should migrate the error' do
       migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data    = {
         errors: [

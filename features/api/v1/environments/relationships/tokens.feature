@@ -1042,7 +1042,7 @@ Feature: Generate authentication token for environment
     And the current account has 1 shared "policy" for the last "environment"
     And the current account has 1 shared "user"
     And the current account has 1 shared "license" for the last "policy"
-    And the last "license" is associated to the last "user" as "owner"
+    And the last "license" is associated to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I send the following headers:

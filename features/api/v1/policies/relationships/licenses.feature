@@ -1,5 +1,6 @@
 @api/v1
 Feature: Policy licenses relationship
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -155,7 +156,7 @@ Feature: Policy licenses relationship
     And the current account has 1 "policy"
     And the current account has 3 "licenses" for the last "policy"
     And the current account has 1 "user"
-    And the last "license" belongs to the last "user" through "owner"
+    And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"

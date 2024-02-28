@@ -47,7 +47,7 @@ Feature: Delete user
       }
       """
     And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 3 "licenses" for the last "user"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "204"
@@ -146,7 +146,7 @@ Feature: Delete user
   Scenario: License attempts to delete their user
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user"
     And the current account has 1 "webhook-endpoint"
     And I am a license of account "test1"
     And I use an authentication token

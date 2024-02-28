@@ -512,7 +512,7 @@ Feature: Machine heartbeat actions
         "lastHeartbeatAt": null
       }
       """
-    And the current user has 1 "machine" as "owner"
+    And the current user has 1 "machine"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
@@ -543,7 +543,7 @@ Feature: Machine heartbeat actions
         "lastHeartbeatAt": null
       }
       """
-    And the current user has 1 "machine" as "owner"
+    And the current user has 1 "machine"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "403"
@@ -716,7 +716,7 @@ Feature: Machine heartbeat actions
     And I am a user of account "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
-    And the current user has 1 "machine" as "owner"
+    And the current user has 1 "machine"
     And the first "machine" has the following attributes:
       """
       { "lastHeartbeatAt": "$time.1.hour.ago" }
