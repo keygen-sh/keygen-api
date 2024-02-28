@@ -6,7 +6,7 @@ require 'spec_helper'
 describe Environmental, type: :concern do
   let(:account) { create(:account) }
 
-  describe '.has_environment' do
+  describe '.has_environent' do
     let(:environmental) {
       Class.new ActiveRecord::Base do
         def self.table_name = 'licenses'
