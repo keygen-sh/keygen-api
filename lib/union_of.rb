@@ -79,7 +79,7 @@ module UnionOf
 
           records = union_records_by_owner[owner] || []
           records.compact!
-          records.sort_by! { preload_index[_1] } unless scope.order_values.empty?
+          records.sort_by! { preload_index[_1] } if scope.order_values.any?
           records.uniq! if scope.distinct_value
 
           result[owner] = records
@@ -344,14 +344,6 @@ module UnionOf
 
         ActiveRecord::Reflection.add_union_reflection(self, name, reflection)
         ActiveRecord::Reflection.add_reflection(self, name, reflection)
-      end
-
-      def has_many(name, scope = nil, **options, &extension)
-        if sources = options.delete(:union_of)
-          union_of(name, scope, **options.merge(sources:), &extension)
-        else
-          super
-        end
       end
     end
   end
