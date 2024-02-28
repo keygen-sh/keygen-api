@@ -126,37 +126,26 @@ loop do
         )
 
         rand(0..10_000).times do
-          owner = if rand(0..5).zero?
-                    User.create!(
-                      email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
-                      environment:,
-                      account:,
-                    )
-                  end
-
           license = License.create!(
             name: 'Floating License',
             environment:,
             policy:,
             account:,
-            owner:,
           )
 
           if rand(1..10).zero?
             rand(1..10).times do
               user = if rand(0..10).zero?
-                       User.where.not(id: owner) # filter out the owner otherwise it'll raise
-                           .reorder(:id) # sorting on UUID is effectively random
-                           .find_by!(
-                             environment:,
-                             account:,
-                           )
-                     else
-                       User.create!(
-                         email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                       User.reorder(:id).find_by!(
                          environment:,
                          account:,
                        )
+                     else
+                       User.create!(
+                          email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                          environment:,
+                          account:,
+                        )
                      end
 
               if rand(0..1).zero? && user.present?
