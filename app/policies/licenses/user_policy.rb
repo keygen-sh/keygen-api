@@ -58,7 +58,7 @@ module Licenses
       in role: Role(:product) if license.product == bearer
         allow!
       in role: Role(:user) if license.owner == bearer
-        !license.protected?
+        allow!
       else
         deny!
       end
@@ -77,7 +77,7 @@ module Licenses
       in role: Role(:product) if license.product == bearer
         allow!
       in role: Role(:user) if license.owner == bearer
-        !license.protected?
+        allow!
       else
         deny!
       end

@@ -592,6 +592,8 @@ describe Licenses::UserPolicy, type: :policy do
       with_scenarios %i[accessing_a_license accessing_its_users] do
         with_token_authentication do
           with_permissions %w[user.read] do
+            without_token_permissions { denies :index }
+
             denies :index
           end
 
@@ -604,6 +606,8 @@ describe Licenses::UserPolicy, type: :policy do
       with_scenarios %i[accessing_a_license accessing_its_user] do
         with_token_authentication do
           with_permissions %w[user.read] do
+            without_token_permissions { denies :show }
+
             denies :show
           end
 
@@ -613,40 +617,6 @@ describe Licenses::UserPolicy, type: :policy do
 
           with_default_permissions do
             denies :show, :attach, :detach
-          end
-
-          without_permissions do
-            denies :show, :attach, :detach
-          end
-        end
-      end
-    end
-
-    with_license_traits %i[protected] do
-      with_scenarios %i[accessing_its_license accessing_its_user] do
-        with_token_authentication do
-          with_permissions %w[user.read] do
-            without_token_permissions { denies :show }
-
-            allows :show
-          end
-
-          with_permissions %w[license.users.attach] do
-            denies :attach
-          end
-
-          with_permissions %w[license.users.detach] do
-            denies :detach
-          end
-
-          with_wildcard_permissions do
-            denies :attach, :detach
-            allows :show
-          end
-
-          with_default_permissions do
-            denies :attach, :detach
-            allows :show
           end
 
           without_permissions do

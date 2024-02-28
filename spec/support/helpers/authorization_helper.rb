@@ -1352,17 +1352,11 @@ module AuthorizationHelper
         }
       in [*, :accessing_its_owner, *]
         let(:licenses) {
-          owner.licenses.presence || create_list(:license, 3, *license_traits, account: owner.account, owner:)
+          owner.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, owner:)
         }
       in [*, :accessing_its_teammate, *]
         let(:licenses) {
-          user.licenses.presence || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            user.licenses
-          end
+          user.licenses
         }
       in [:as_product, :accessing_a_group, *]
         let(:licenses) {
@@ -1409,13 +1403,7 @@ module AuthorizationHelper
         }
       in [*, :accessing_its_teammate, *]
         let(:license) {
-          user.licenses.take || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            license
-          end
+          user.licenses.take
         }
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:license) { machine.license }
@@ -1434,9 +1422,7 @@ module AuthorizationHelper
           create(:license, *license_traits, account:, policy:)
         }
       in [:as_user, *]
-        let(:license) {
-          bearer.licenses.take || create(:license, *license_traits, account: bearer.account, owner: bearer)
-        }
+        let(:license) { bearer.licenses.take }
       end
 
       let(:record) { license }
