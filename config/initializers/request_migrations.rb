@@ -21,9 +21,9 @@ RequestMigrations.configure do |config|
     '1.5' => %i[
       rename_owner_relationship_to_user_for_licenses_migration
       rename_owner_relationship_to_user_for_license_migration
+      rename_owner_relationship_to_user_for_machines_migration
+      rename_owner_relationship_to_user_for_machine_migration
       rename_owner_not_found_error_code_for_license_migration
-      add_user_relationship_to_machines_migration
-      add_user_relationship_to_machine_migration
     ],
     '1.4' => %i[
       update_nested_key_casing_to_snakecase_for_metadata_migration

@@ -15,23 +15,9 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.owner == bearer || machine.license.owner == bearer || bearer.machines.exists?(machine.id)
+      in role: Role(:user) if machine.owner == bearer || bearer.machines.exists?(machine.id)
         allow!
       in role: Role(:license) if machine.license == bearer
-        allow!
-      else
-        deny!
-      end
-    end
-
-    def update?
-      verify_permissions!('machine.owner.update')
-      verify_environment!
-
-      case bearer
-      in role: Role(:admin | :developer | :sales_agent | :environment)
-        allow!
-      in role: Role(:product) if machine.product == bearer
         allow!
       else
         deny!

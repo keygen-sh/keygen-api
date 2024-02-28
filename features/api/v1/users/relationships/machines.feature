@@ -47,8 +47,7 @@ Feature: User machines relationship
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "user"
-    And the current account has 1 isolated "license" for the last "user" as "owner"
-    And the current account has 3 isolated "machines" for the last "license"
+    And the current account has 3 isolated "machines" for the last "user" as "owner"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines?environment=isolated"

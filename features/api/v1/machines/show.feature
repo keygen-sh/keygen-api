@@ -102,12 +102,20 @@ Feature: Show machine
     And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a machine for their account that has an owner
+  Scenario: Admin retrieves a license for their account that has an owner
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
@@ -123,29 +131,7 @@ Feature: Show machine
       }
       """
 
-  Scenario: Admin retrieves a machine for their account that has a user (v1.5)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 3 "machines" for the last "license"
-    And I use an authentication token
-    And I use API version "1.5"
-    When I send a GET request to "/accounts/test1/machines/$0"
-    Then the response status should be "200"
-    And the response body should be a "machine"
-    And the response should contain a valid signature header for "test1"
-    And the response body should be a "machine" with the following relationships:
-      """
-      {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/user" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
-
-  Scenario: Admin retrieves a machine for their account that doesn't have an owner
+  Scenario: Admin retrieves a license for their account that doesn't have an owner
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
@@ -173,7 +159,7 @@ Feature: Show machine
       }
       """
 
-  Scenario: Admin retrieves a machine for their account that has a user (v1.5)
+  Scenario: Admin retrieves a license for their account that has a user (v1.5)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
@@ -203,7 +189,7 @@ Feature: Show machine
       }
       """
 
-  Scenario: Admin retrieves a machine for their account that doesn't have a user (v1.5)
+  Scenario: Admin retrieves a license for their account that doesn't have a user (v1.5)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
@@ -293,37 +279,16 @@ Feature: Show machine
     Then the response status should be "200"
     And the response body should be a "machine"
 
-  Scenario: Owner retrieves a machine for their license
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license"
-    And I am the last user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0"
-    Then the response status should be "200"
-    And the response body should be a "machine"
-
   Scenario: User retrieves a machine for their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And I am the last user of account "test1"
+    And I am a user of account "test1"
     And I use an authentication token
+    And the current account has 1 "machine"
+    And the current user has 1 "machine" as "owner"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
     And the response body should be a "machine"
-
-  Scenario: User retrieves a machine for a license
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "machine"
-    And I am the last user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0"
-    Then the response status should be "404"
 
   Scenario: License retrieves a machine for their license
     Given the current account is "test1"

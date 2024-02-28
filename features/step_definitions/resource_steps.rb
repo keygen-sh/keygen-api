@@ -299,50 +299,6 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"(?: as "([^\"]*)")? and the (\w+) "([^\"]*)"(?: as "([^\"]*)")?$/ do |count, traits, resource, first_assoc_idx, first_assoc_model, first_assoc_name, second_assoc_idx, second_assoc_model, second_assoc_name|
-  traits = traits&.split('+')&.map(&:to_sym)
-
-  count.to_i.times do
-    first_assoc_name    ||= first_assoc_model.singularize.underscore.to_sym
-    first_assoc_records   =
-      case first_assoc_model.underscore.pluralize
-      when 'components'
-        @account.machine_components
-      when 'processes'
-        @account.machine_processes
-      when 'artifacts'
-        @account.release_artifacts
-      when 'packages'
-        @account.release_packages
-      when 'engines'
-        @account.release_engines
-      else
-        @account.send(first_assoc_model.pluralize.underscore)
-      end
-
-    second_assoc_name    ||= second_assoc_model.singularize.underscore.to_sym
-    second_assoc_records   =
-      case second_assoc_model.underscore.pluralize
-      when 'components'
-        @account.machine_components
-      when 'processes'
-        @account.machine_processes
-      when 'artifacts'
-        @account.release_artifacts
-      when 'packages'
-        @account.release_packages
-      when 'engines'
-        @account.release_engines
-      else
-        @account.send(second_assoc_model.pluralize.underscore)
-      end
-
-    create resource.singularize.underscore, *traits, account: @account,
-      first_assoc_name => first_assoc_records.send(first_assoc_idx),
-      second_assoc_name => second_assoc_records.send(second_assoc_idx)
-  end
-end
-
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)"(?: as "([^\"]*)")?$/ do |count, traits, resource, index, association, association_name|
   traits = traits&.split('+')&.map(&:to_sym)
 

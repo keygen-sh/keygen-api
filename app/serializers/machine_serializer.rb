@@ -95,8 +95,8 @@ class MachineSerializer < BaseSerializer
 
   relationship :owner do
     linkage always: true do
-      if @object.owner_id?
-        { type: :users, id: @object.owner_id }
+      if @object.license&.owner_id?
+        { type: :users, id: @object.license.owner_id }
       else
         nil
       end

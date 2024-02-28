@@ -14,7 +14,6 @@ class MachineCheckoutService < AbstractCheckoutService
     components
     environment
     group
-    owner
   ].freeze
 
   def initialize(machine:, environment: nil, include: [], **kwargs)

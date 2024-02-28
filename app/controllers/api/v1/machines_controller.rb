@@ -20,7 +20,7 @@ module Api::V1
     before_action :set_machine, only: [:show, :update, :destroy]
 
     def index
-      machines = apply_pagination(authorized_scope(apply_scopes(current_account.machines)).preload(:product, :policy, :owner, license: %i[owner]))
+      machines = apply_pagination(authorized_scope(apply_scopes(current_account.machines)).preload(:product, :policy, :license, :owner))
       authorize! machines
 
       render jsonapi: machines
@@ -54,14 +54,6 @@ module Api::V1
               param :id, type: :uuid
             end
           end
-
-          param :owner, type: :hash, optional: true do
-            param :data, type: :hash do
-              param :type, type: :string, inclusion: { in: %w[user users] }
-              param :id, type: :uuid
-            end
-          end
-
           param :group, type: :hash, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :environment) } do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[group groups] }

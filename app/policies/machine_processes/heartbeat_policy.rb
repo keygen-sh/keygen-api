@@ -15,7 +15,7 @@ module MachineProcesses
         allow!
       in role: Role(:product) if machine_process.product == bearer
         allow!
-      in role: Role(:user) if machine_process.owner == bearer || machine_process.license.owner == bearer || bearer.machines.exists?(machine_process.machine_id)
+      in role: Role(:user) if machine_process.owner == bearer || bearer.machines.exists?(machine_process.machine_id)
         !machine_process.license.protected?
       in role: Role(:license) if machine_process.license == bearer
         allow!

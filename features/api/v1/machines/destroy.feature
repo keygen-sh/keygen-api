@@ -218,18 +218,23 @@ Feature: Delete machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Owner deletes a machine for their unprotected license (is machine owner)
+  Scenario: User deletes a machine for their unprotected license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "policy" with the following:
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
       """
       { "protected": false }
       """
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
+    And the current user has 1 "machine" as "owner"
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "204"
     And the current account should have 0 "machines"
@@ -237,132 +242,23 @@ Feature: Delete machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Owner deletes a machine for their unprotected license (not machine owner)
+  Scenario: User deletes a machine for their protected license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "policy" with the following:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "204"
-    And the current account should have 0 "machines"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User deletes a machine for their unprotected license (is machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" with the following:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "204"
-    And the current account should have 0 "machines"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User deletes a machine for their unprotected license (not machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" with the following:
-      """
-      { "protected": false }
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "403"
-    And the current account should have 1 "machine"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Owner deletes a machine for their protected license (is machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "policy" with the following:
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
       """
       { "protected": true }
       """
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "403"
-    And the current account should have 1 "machine"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Owner deletes a machine for their protected license (not machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
     And the current account has 1 "user"
-    And the current account has 1 "policy" with the following:
-      """
-      { "protected": true }
-      """
-    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
-    And the current account has 1 "machine" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "403"
-    And the current account should have 1 "machine"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User deletes a machine for their protected license (is machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" with the following:
-      """
-      { "protected": true }
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/machines/$0"
-    Then the response status should be "403"
-    And the current account should have 1 "machine"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User deletes a machine for their protected license (not machine owner)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" with the following:
-      """
-      { "protected": true }
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And the current account has 1 "machine" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
+    And the current user has 1 "machine" as "owner"
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "403"
     And the current account should have 1 "machine"

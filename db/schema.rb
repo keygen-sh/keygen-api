@@ -305,7 +305,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.datetime "last_check_out_at", precision: nil
     t.uuid "environment_id"
     t.string "heartbeat_jid"
-    t.uuid "owner_id"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -319,7 +318,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
     t.index ["last_heartbeat_at"], name: "index_machines_on_last_heartbeat_at"
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
-    t.index ["owner_id"], name: "index_machines_on_owner_id"
   end
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

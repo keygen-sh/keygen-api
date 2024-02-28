@@ -17,30 +17,6 @@ module Api::V1::Machines::Relationships
       render jsonapi: owner
     end
 
-    typed_params {
-      format :jsonapi
-
-      param :data, type: :hash, allow_nil: true do
-        param :type, type: :string, inclusion: { in: %w[user users] }
-        param :id, type: :uuid
-      end
-    }
-    def update
-      owner = machine.owner
-      authorize! owner,
-        with: Machines::OwnerPolicy
-
-      machine.update!(owner_id: owner_params[:id])
-
-      BroadcastEventService.call(
-        event: 'machine.owner.updated',
-        account: current_account,
-        resource: machine,
-      )
-
-      render jsonapi: machine
-    end
-
     private
 
     attr_reader :machine

@@ -60,10 +60,6 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
                 related: v1_account_release_v1_0_release_artifact_path(release_without_artifact.account_id, release_without_artifact.id),
               },
             },
-          ).and(
-            exclude(
-              artifacts: anything,
-            ),
           ),
         ),
         include(
@@ -77,10 +73,6 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
                 related: v1_account_release_v1_0_release_artifact_path(release_with_artifact.account_id, release_with_artifact.id),
               },
             },
-          ).and(
-            exclude(
-              artifacts: anything,
-            ),
           ),
         ),
       ],
