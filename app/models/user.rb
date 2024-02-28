@@ -53,9 +53,23 @@ class User < ApplicationRecord
   #             license for each user, since users can potentially have thousands
   #             and thousands of licenses, and superfluously preloading/querying
   #             that many records would a bad idea.
-  has_one :any_active_owned_license, -> { active.reorder(nil).distinct_on(:user_id) },
+  has_one :any_active_owned_license, -> {
+      where(<<~SQL.squish, start_date: 90.days.ago).reorder(nil).distinct_on(:user_id)
+        licenses.created_at >= :start_date OR
+          (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :start_date) OR
+          (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :start_date) OR
+          (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :start_date)
+      SQL
+    },
     class_name: License.name
-  has_one :any_active_license_user, -> { active.reorder(nil).distinct_on(:user_id) },
+  has_one :any_active_license_user, -> {
+      joins(:license).where(<<~SQL.squish, start_date: 90.days.ago).reorder(nil).distinct_on(:user_id)
+        licenses.created_at >= :start_date OR
+          (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :start_date) OR
+          (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :start_date) OR
+          (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :start_date)
+      SQL
+    },
     class_name: LicenseUser.name
   has_one :any_active_user_license,
     through: :any_active_license_user,
@@ -319,9 +333,9 @@ class User < ApplicationRecord
           .where(banned_at: nil)
           .where(<<~SQL.squish, t:)
             licenses.created_at >= :t OR
-              licenses.last_validated_at >= :t OR
-              licenses.last_check_out_at >= :t OR
-              licenses.last_check_in_at >= :t
+              (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
+              (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
+              (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
           SQL
       )
   }
@@ -349,9 +363,9 @@ class User < ApplicationRecord
               .where(banned_at: nil)
               .where(<<~SQL.squish, t:)
                 licenses.created_at >= :t OR
-                  licenses.last_validated_at >= :t OR
-                  licenses.last_check_out_at >= :t OR
-                  licenses.last_check_in_at >= :t
+                  (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
+                  (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
+                  (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
               SQL
       )
   }
