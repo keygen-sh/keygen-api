@@ -18,11 +18,7 @@ module UnionOf
   end
 
   class Association < ReadonlyAssociation
-    def association_scope
-      return if klass.nil?
-
-      @association_scope ||= Scope.scope(self)
-    end
+    def association_scope = Scope.scope(self)
   end
 
   class ThroughAssociation < Association
