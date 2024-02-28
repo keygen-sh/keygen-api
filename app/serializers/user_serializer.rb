@@ -11,10 +11,8 @@ class UserSerializer < BaseSerializer
   attribute :role do
     @object.role&.name&.dasherize
   end
-  ee do
-    attribute :permissions, if: -> { @account.ent? } do
-      @object.permissions.actions
-    end
+  attribute :permissions, if: -> { @account.ent? } do
+    @object.permissions.actions
   end
   attribute :metadata do
     @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}

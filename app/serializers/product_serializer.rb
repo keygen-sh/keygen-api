@@ -7,10 +7,8 @@ class ProductSerializer < BaseSerializer
   attribute :distribution_strategy
   attribute :url
   attribute :platforms
-  ee do
-    attribute :permissions, if: -> { @account.ent? } do
-      @object.permissions.actions
-    end
+  attribute :permissions, if: -> { @account.ent? } do
+    @object.permissions.actions
   end
   attribute :metadata do
     @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}

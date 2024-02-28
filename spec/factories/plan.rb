@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :plan do
     initialize_with { new(**attributes) }
 
-    name         { Keygen.ee? ? 'Ent 1' : 'Std 1' }
+    name         { Faker::Company.buzzword }
     price        { Faker::Number.number digits: 4 }
     max_admins   { Faker::Number.between from: 50, to: 5000 }
     max_users    { Faker::Number.between from: 50, to: 5000 }
