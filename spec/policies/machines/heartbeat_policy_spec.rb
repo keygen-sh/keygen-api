@@ -389,8 +389,10 @@ describe Machines::HeartbeatPolicy, type: :policy do
           end
         end
       end
+    end
 
-      with_scenarios %i[accessing_our_machine] do
+    with_bearer_trait :with_teammates do
+      with_scenarios %i[accessing_its_teammate accessing_its_machine] do
         with_token_authentication do
           with_permissions %w[machine.heartbeat.ping] do
             denies :ping

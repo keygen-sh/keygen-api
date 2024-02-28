@@ -351,8 +351,10 @@ describe MachineProcesses::HeartbeatPolicy, type: :policy do
           end
         end
       end
+    end
 
-      with_scenarios %i[accessing_our_machine_process] do
+    with_bearer_trait :with_teammates do
+      with_scenarios %i[accessing_its_teammate accessing_its_machine_process] do
         with_token_authentication do
           with_permissions %w[process.heartbeat.ping] do
             denies :ping
