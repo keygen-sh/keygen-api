@@ -53,7 +53,7 @@ RSpec::Matchers.define :log do |message|
       Expected block to output matching log messages to the following log levels: #{@levels.inspect}.
         expected:
           #{@expected.inspect}
-        got:
+        actual:
           #{@messages.join.inspect}
     MSG
   end

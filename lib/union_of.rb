@@ -46,16 +46,14 @@ module UnionOf
         reflection  = association.reflection
         primary_key = reflection.active_record_primary_key
 
-        # FIXME(ezekg) Find an alternative to this private API.
-        next nil if
-          reflection.belongs_to? && !association.send(:foreign_key_present?)
-
-        association.scope.select(primary_key)
-                         .unscope(:order)
-                         .arel
+        # FIXME(ezekg) Should we use Arel here instead of this private API?
+        association.send(:association_scope)
+                   .select(primary_key)
+                   .unscope(:order)
+                   .arel
       end
 
-      unions = sources.compact.reduce(nil) do |left, right|
+      unions = sources.reduce(nil) do |left, right|
         if left
           Arel::Nodes::Union.new(left, right)
         else

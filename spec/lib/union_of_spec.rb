@@ -28,7 +28,8 @@ describe UnionOf do
   end
 
   it 'should be a union' do
-    expect(record.licenses.to_sql).to match_sql <<~SQL.squish
+    # FIXME(ezekg) The gsubs are to match the #to_sql format. Maybe create a SQL matcher?
+    expect(record.licenses.to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "licenses".*
       FROM
@@ -73,7 +74,7 @@ describe UnionOf do
   end
 
   it 'should produce a union join' do
-    expect(model.joins(:machines).to_sql).to match_sql <<~SQL.squish
+    expect(model.joins(:machines).to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "users".*
       FROM
@@ -110,7 +111,7 @@ describe UnionOf do
 
   it 'should produce a union query' do
     # TODO(ezekg) Add DISTINCT?
-    expect(record.machines.to_sql).to match_sql <<~SQL.squish
+    expect(record.machines.to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "machines".*
       FROM
@@ -148,7 +149,7 @@ describe UnionOf do
   end
 
   it 'should produce a deep union join' do
-    expect(model.joins(:components).to_sql).to match_sql <<~SQL.squish
+    expect(model.joins(:components).to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "users".*
       FROM
@@ -186,7 +187,7 @@ describe UnionOf do
 
   it 'should produce a deep union query' do
     # TODO(ezekg) Add DISTINCT?
-    expect(record.components.to_sql).to match_sql <<~SQL.squish
+    expect(record.components.to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "machine_components".*
       FROM
@@ -225,7 +226,7 @@ describe UnionOf do
   end
 
   it 'should produce a deeper union join' do
-    expect(Product.joins(:users).to_sql).to match_sql <<~SQL.squish
+    expect(Product.joins(:users).to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2')
       SELECT
         "products".*
       FROM
@@ -264,7 +265,9 @@ describe UnionOf do
   it 'should produce a deeper union query' do
     product = create(:product, account:)
 
-    expect(product.users.to_sql).to match_sql <<~SQL.squish
+    # FIXME(ezekg) The additional gsubs are because #to_sql will format the SQL
+    #              "( ( ( SELECT" to "(( (SELECT"
+    expect(product.users.to_sql).to eq <<~SQL.squish.gsub(/(\()\s*([\w'"])/, '\1\2').gsub(/([\w"'])\s*(\))/, '\1\2').gsub(/\s+(\()\s+(\()\s+/, ' \1\2 ').gsub(/\s+(\))\s+(\))\s+/, ' \1\2 ')
       SELECT
         DISTINCT "users".*
       FROM
@@ -296,36 +299,6 @@ describe UnionOf do
       ORDER BY
         "users"."created_at" ASC
     SQL
-  end
-
-  context 'with nil belongs_to association' do
-    let(:record) { create(:license, account:) }
-
-    it 'should not produce a union query' do
-      expect(record.users.to_sql).to match_sql <<~SQL.squish
-        SELECT
-          "users".*
-        FROM
-          "users"
-        WHERE
-          "users"."id" IN (
-            SELECT
-              "users"."id"
-            FROM
-              (
-                SELECT
-                  "users"."id"
-                FROM
-                  "users"
-                  INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
-                WHERE
-                  "license_users"."license_id" = '#{record.id}'
-              ) "users"
-          )
-        ORDER BY
-          "users"."created_at" ASC
-      SQL
-    end
   end
 
   # TODO(ezekg) Add exhaustive tests for all association macros, e.g.
