@@ -410,9 +410,9 @@ class License < ApplicationRecord
   }
 
   scope :active, -> (start_date = 90.days.ago) {
-    # exclude licenses of banned users (if any)
-    left_outer_joins(:users)
-      .where(users: { banned_at: nil })
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
       # include any licenses newer than :t or with any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at >= :start_date OR
@@ -423,9 +423,9 @@ class License < ApplicationRecord
   }
 
   scope :inactive, -> (start_date = 90.days.ago) {
-    # exclude licenses of banned users (if any)
-    left_outer_joins(:users)
-      .where(users: { banned_at: nil })
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
       # include licenses older than :t without any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at < :start_date AND
@@ -438,15 +438,9 @@ class License < ApplicationRecord
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :assigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      joins(:users).where.not(user_id: nil)
-                   .or(
-                     where.associated(:users),
-                   )
-                   .distinct
+      where.associated(:owner).union(where.associated(:licensees)) # where_assoc doesn't support union_of
     else
-      left_outer_joins(:users).where(user_id: nil)
-                              .where.missing(:users)
-                              .distinct
+      where.missing(:owner, :licensees)
     end
   }
   scope :unassigned, -> (status = true) {
