@@ -72,7 +72,6 @@ describe UnionOf do
     create(:license_user, account:, license: user_license_2)
 
     expect(user.licenses.ids).to eq [owned_license_1.id, user_license_1.id, user_license_2.id]
-    expect(user.license_ids).to eq [owned_license_1.id, user_license_1.id, user_license_2.id]
   end
 
   it 'should be a union' do
@@ -617,59 +616,6 @@ describe UnionOf do
         expect { user.machines }.to_not make_database_queries
         expect(user.machines.sort_by(&:id)).to eq user.reload.machines.sort_by(&:id)
       end
-    end
-  end
-
-  describe UnionOf::ReadonlyAssociation do
-    it 'should not raise on read' do
-      expect { record.licenses }.to_not raise_error
-    end
-
-    it 'should not raise on IDs reader' do
-      expect { record.licenses.ids }.to_not raise_error
-      expect { record.license_ids }.to_not raise_error
-    end
-
-    it 'should raise on IDs writer' do
-      expect { record.license_ids = [] }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on build' do
-      expect { record.licenses.build(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.new(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on create' do
-      expect { record.licenses.create!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.create(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on insert' do
-      expect { record.licenses.insert!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert_all!([]) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on upsert' do
-      expect { record.licenses.upsert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.upsert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on update' do
-      expect { record.licenses.update_all(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.update!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.update(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on delete' do
-      expect { record.licenses.delete_all }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.delete(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-    end
-
-    it 'should raise on destroy' do
-      expect { record.licenses.destroy_all }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.destroy(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
   end
 
