@@ -106,7 +106,7 @@ FactoryBot.define do
     trait :with_user do
       users { build_list(:user, 1, account:, environment:) }
 
-      # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
+      # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
       after :create do |license|
         license.update!(user: license.users.first)
       end
@@ -115,7 +115,7 @@ FactoryBot.define do
     trait :userless do
       users { [] }
 
-      # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
+      # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
       user { nil }
     end
 

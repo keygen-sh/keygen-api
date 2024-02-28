@@ -15,8 +15,7 @@ class License < ApplicationRecord
   belongs_to :group,
     optional: true
   has_one :product, through: :policy
-  has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
-  has_many :users, index_errors: true, through: :license_users
+  has_and_belongs_to_many :users, index_errors: true, dependent: :delete_all
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
@@ -28,7 +27,7 @@ class License < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  # TODO(ezekg) Deprecated. Remove once migrated to multi-user licenses.
+  # TODO(ezekg) Deprecated. Remove once migrated to HABTM.
   belongs_to :user,
     optional: true
 
@@ -553,7 +552,7 @@ class License < ApplicationRecord
   def user_ids          = users.reorder(nil).ids
 
   # NOTE(ezekg) For backwards compatibility. Dual writing until we migrate
-  #             data from licenses.user_id column to multi-user licenses.
+  #             data from licenses.user_id column to HABTM.
   def user=(value)
     case value
     in User => user

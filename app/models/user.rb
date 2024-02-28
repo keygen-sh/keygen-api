@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  # FIXME(ezekg) Drop these columns after we've migrated to multi-user licenses.
-  # TODO(ezekg) Uncomment once we move to multi-user licenses.
+  # FIXME(ezekg) Drop these columns after we've migrated to HABTM.
+  # TODO(ezekg) Uncomment once we move to HABTM licenses.
   # self.ignored_columns = %w[user_id]
 
   MINIMUM_ADMIN_COUNT = 1
@@ -19,11 +19,10 @@ class User < ApplicationRecord
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
-  has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
-  # TODO(ezekg) Rename to :licenses once data is migrated to multi-user licenses.
+  # TODO(ezekg) Rename to :licenses once data is migrated to HABTM.
   # TODO(ezekg) Uncomment destroy callback.
-  has_many :_licenses, index_errors: true, through: :license_users, source: :license
-  # TODO(ezekg) Deprecated. Remove when migrated to multi-user licenses.
+  has_and_belongs_to_many :_licenses, class_name: 'License', index_errors: true, dependent: :destroy_async
+  # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
   has_many :licenses, dependent: :destroy_async
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -101,7 +100,7 @@ class User < ApplicationRecord
   #             case. Instead, the license is simply disassociated
   #             from the user.
   #
-  # TODO(ezekg) Uncomment once we migrate licenses to multi-user licenses.
+  # TODO(ezekg) Uncomment once we migrate licenses to HABTM.
   # TODO(ezekg) Should we batch this?
   #
   # after_destroy {
@@ -132,10 +131,6 @@ class User < ApplicationRecord
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
     if: -> { role&.name_changed? }
-
-  validates_associated :_licenses,
-    scope: { by: :account_id },
-    on: %i[create]
 
   validates :group,
     presence: { message: 'must exist' },

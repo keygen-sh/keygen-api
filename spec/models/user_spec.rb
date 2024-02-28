@@ -270,16 +270,16 @@ describe User, type: :model do
     end
   end
 
-  # FIXME(ezekg) Rename to #licenses after we fully migrate to multi-user licenses.
-  describe '#_licenses' do
-    let(:user) { create(:user, account:) }
+  describe '#licenses' do
+    let(:policy) { build(:policy, account:) }
+    let(:user)   { create(:user, account:) }
 
-    it 'should raise on license account mismatch' do
-      other_account = create(:account)
+    # FIXME(ezekg) Remove dual-writing after we fully migrate to HABTM.
+    it 'should should dual-write to #_licenses and #licenses associations' do
+      license = user.licenses.create!(account:, policy:)
 
-      expect { user._licenses << create(:license, account: other_account) }.to(
-        raise_error ActiveRecord::RecordInvalid
-      )
+      expect(user._licenses).to eq [license]
+      expect(user.licenses).to eq [license]
     end
   end
 end
