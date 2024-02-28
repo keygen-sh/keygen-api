@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Product < ApplicationRecord
-  include UnionOf::Macro
   include Environmental
   include Accountable
   include Limitable
@@ -20,9 +19,8 @@ class Product < ApplicationRecord
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
   has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses, source: :users do
-    def owners = where.not(licenses: { user_id: nil })
-  end
+  # TODO(ezekg) Remove the :user source once we migrate to multi-user licenses.
+  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses, source: :user
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, inverse_of: :product, dependent: :destroy_async
   has_many :release_packages, inverse_of: :product, dependent: :destroy_async

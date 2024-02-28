@@ -40,6 +40,7 @@ begin
       ::STATS_DIRECTORIES << %w(Cucumber\ features features) if File.exist?('features')
       ::CodeStatistics::TEST_TYPES << "Cucumber features" if File.exist?('features')
     end
+    
   end
 
   desc 'Alias for cucumber:ok'
@@ -56,6 +57,8 @@ begin
   end
 
   task stats: 'cucumber:statsetup'
+
+  
 rescue LoadError
   desc 'cucumber rake task not available (cucumber not installed)'
   task :cucumber do

@@ -486,7 +486,7 @@ Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
+Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do |i, a, j, b|
   numbers = {
     "first"   => 1,
     "second"  => 2,
@@ -499,25 +499,14 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
     "ninth"   => 9
   }
 
-  resource   = @account.send(model_name.pluralize.underscore).limit(numbers[model_idx]).last
-  associated = @account.send(assoc_name.pluralize.underscore).limit(numbers[assoc_idx]).last
+  resource = @account.send(a.pluralize.underscore).limit(numbers[i]).last
+  association = @account.send(b.pluralize.underscore).limit(numbers[j]).last
 
-  association = resource.association(assoc_name)
-  reflection  = association.reflection
-
-  case
-  when reflection.union_of?
-    # FIXME(ezekg) This doesn't work with union associations.
-    raise NotImplementedError
-  when reflection.belongs_to?
-    resource.update!(reflection.name => associated)
-  when reflection.has_one?
-    # TODO(ezekg) Implement when needed.
-    raise NotImplementedError
-  else
-    relation = association.send(:association_scope)
-
-    relation << associated
+  # FIXME(ezekg) We should use reflection here.
+  begin
+    association.send(a.pluralize.underscore) << resource
+  rescue
+    association.send(a.singularize.underscore) << resource
   end
 end
 

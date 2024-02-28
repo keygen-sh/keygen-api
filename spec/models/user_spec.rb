@@ -216,75 +216,36 @@ describe User, type: :model do
       # old user (inactive)
       create(:user, account:, created_at: 1.year.ago)
 
-      # old user with new owned license (active)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
-
-      # old user with new user license (active)
-      user    = create(:user, account:, created_at: 1.year.ago)
-      license = create(:license, account:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
-
-      create(:license_user, account:, license:, user:)
-
-      # old user with old owned license (inactive)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, created_at: 1.year.ago)
-
-      # old user with old user license (inactive)
-      user    = create(:user, account:, created_at: 1.year.ago)
-      license = create(:license, account:, created_at: 1.year.ago)
-
-      create(:license_user, account:, license:, user:)
-
-      # old user with recently validated owned license (active)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
-
-      # old user with recently validated user license (active)
-      user    = create(:user, account:, created_at: 1.year.ago)
-      license = create(:license, account:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
-
-      create(:license_user, account:, license:, user:)
-
-      # old user with recently checked out owned license (active)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
-
-      # old user with recently checked out user license (active)
-      user    = create(:user, account:, created_at: 1.year.ago)
-      license = create(:license, account:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
-
-      create(:license_user, account:, license:, user:)
-
-      # old user with recently checked in owned license (active)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, last_check_in_at: 6.days.ago)
-
-      # old user with recently checked in user license (active)
-      user    = create(:user, account:, created_at: 1.year.ago)
-      license = create(:license, account:, last_check_in_at: 6.days.ago)
-
-      create(:license_user, account:, license:, user:)
-
-      # old user with active and inactive owned licenses (active)
-      owner = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, owner:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
-      create(:license, account:, owner:, last_check_in_at: 6.days.ago)
-
-      # old user with active and inactive user licenses (active)
+      # old user with new license (active)
       user = create(:user, account:, created_at: 1.year.ago)
 
-      license = create(:license, account:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
-      create(:license_user, account:, license:, user:)
+      create(:license, account:, user:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
 
-      license = create(:license, account:, last_check_in_at: 6.days.ago)
-      create(:license_user, account:, license:, user:)
+      # old user with old license (inactive)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, created_at: 1.year.ago)
+
+      # old user with recently validated license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
+
+      # old user with recently checked out license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
+
+      # old user with recently checked in license (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, last_check_in_at: 6.days.ago)
+
+      # old user with active and inactive licenses (active)
+      user = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, user:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
+      create(:license, account:, user:, last_check_in_at: 6.days.ago)
 
       # banned user (banned)
       create(:user, :banned, account:)
@@ -297,15 +258,28 @@ describe User, type: :model do
     end
 
     it 'should return active users' do
-      expect(User.users.with_status(:active).count).to eq 11
+      expect(User.users.with_status(:active).count).to eq 6
     end
 
     it 'should return inactive users' do
-      expect(User.users.with_status(:inactive).count).to eq 3
+      expect(User.users.with_status(:inactive).count).to eq 2
     end
 
     it 'should return banned users' do
       expect(User.users.with_status(:banned).count).to eq 1
+    end
+  end
+
+  # FIXME(ezekg) Rename to #licenses after we fully migrate to multi-user licenses.
+  describe '#_licenses' do
+    let(:user) { create(:user, account:) }
+
+    it 'should raise on license account mismatch' do
+      other_account = create(:account)
+
+      expect { user._licenses << create(:license, account: other_account) }.to(
+        raise_error ActiveRecord::RecordInvalid
+      )
     end
   end
 end
