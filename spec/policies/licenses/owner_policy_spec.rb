@@ -16,16 +16,10 @@ describe Licenses::OwnerPolicy, type: :policy do
             allows :show
           end
 
-          with_permissions %w[license.owner.update] do
-            without_token_permissions { denies :update }
-
-            allows :update
-          end
-
           with_permissions %w[license.user.update] do
             without_token_permissions { denies :update }
 
-            denies :update
+            allows :update
           end
 
           with_wildcard_permissions do
@@ -92,10 +86,6 @@ describe Licenses::OwnerPolicy, type: :policy do
             denies :show
           end
 
-          with_permissions %w[license.owner.update] do
-            denies :update
-          end
-
           with_permissions %w[license.user.update] do
             denies :update
           end
@@ -127,16 +117,10 @@ describe Licenses::OwnerPolicy, type: :policy do
               allows :show
             end
 
-            with_permissions %w[license.owner.update] do
-              without_token_permissions { denies :update }
-
-              allows :update
-            end
-
             with_permissions %w[license.user.update] do
               without_token_permissions { denies :update }
 
-              denies :update
+              allows :update
             end
 
             with_wildcard_permissions do
@@ -160,12 +144,6 @@ describe Licenses::OwnerPolicy, type: :policy do
             without_token_permissions { denies :show }
 
             denies :show
-          end
-
-          with_permissions %w[license.owner.update] do
-            without_token_permissions { denies :update }
-
-            denies :update
           end
 
           with_permissions %w[license.user.update] do
@@ -200,16 +178,10 @@ describe Licenses::OwnerPolicy, type: :policy do
             allows :show
           end
 
-          with_permissions %w[license.owner.update] do
-            without_token_permissions { denies :update }
-
-            allows :update
-          end
-
           with_permissions %w[license.user.update] do
             without_token_permissions { denies :update }
 
-            denies :update
+            allows :update
           end
 
           with_wildcard_permissions do
@@ -232,12 +204,6 @@ describe Licenses::OwnerPolicy, type: :policy do
             without_token_permissions { denies :show }
 
             denies :show
-          end
-
-          with_permissions %w[license.owner.update] do
-            without_token_permissions { denies :update }
-
-            denies :update
           end
 
           with_permissions %w[license.user.update] do
