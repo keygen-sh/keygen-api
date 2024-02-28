@@ -11,13 +11,12 @@ class License < ApplicationRecord
   include Diffable
 
   belongs_to :account
+  belongs_to :user,
+    optional: true
   belongs_to :policy
   belongs_to :group,
     optional: true
   has_one :product, through: :policy
-  has_many :license_users, index_errors: true, dependent: :delete_all
-  # TODO(ezekg) Enable once migrated to license_users.
-  # has_many :users, through: :license_users
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
@@ -28,10 +27,6 @@ class License < ApplicationRecord
     through: :product
   has_many :event_logs,
     as: :resource
-
-  # FIXME(ezekg) Deprecated. Remove once migrated to license_users.
-  belongs_to :user,
-    optional: true
 
   has_environment default: -> { policy&.environment_id }
   has_role :license
@@ -546,25 +541,6 @@ class License < ApplicationRecord
 
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids
-  def user_ids          = users.reorder(nil).ids
-
-  # NOTE(ezekg) For backwards compatibility. Dual writing until we migrate
-  #             data from licenses.user_id column to license_users table.
-  def user=(record)
-    pp(record:)
-    case record
-    in String => user_id
-      self.license_users = [license_users.build(user_id:)]
-      write_attribute(:user_id, user_id) # avoid recursion
-    in User => user
-      self.license_users = [license_users.build(user:)]
-      write_attribute(:user_id, user.id)
-    in nil
-      self.license_users = []
-      write_attribute(:user_id, nil)
-    end
-  end
-  alias_method :user_id=, :user=
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct

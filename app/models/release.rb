@@ -43,6 +43,10 @@ class Release < ApplicationRecord
     foreign_key: :release_package_id,
     inverse_of: :releases,
     optional: true
+  has_many :users,
+    through: :product
+  has_many :licenses,
+    through: :product
   belongs_to :channel,
     class_name: 'ReleaseChannel',
     foreign_key: :release_channel_id,
@@ -278,7 +282,7 @@ class Release < ApplicationRecord
     entl = within_constraints(user.entitlement_codes, strict: true)
 
     # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(product: %i[users])
+    entl.joins(:users, :product)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: user },
@@ -301,7 +305,7 @@ class Release < ApplicationRecord
     entl = within_constraints(license.entitlement_codes, strict: true)
 
     # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(product: %i[licenses])
+    entl.joins(:licenses, :product)
         .where(
           product: { distribution_strategy: ['LICENSED', nil] },
           licenses: { id: license },

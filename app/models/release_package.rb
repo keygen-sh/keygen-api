@@ -22,6 +22,10 @@ class ReleasePackage < ApplicationRecord
   has_many :artifacts,
     through: :releases,
     source: :artifacts
+  has_many :licenses,
+    through: :product
+  has_many :users,
+    through: :product
 
   has_environment default: -> { product&.environment_id }
 
@@ -52,7 +56,7 @@ class ReleasePackage < ApplicationRecord
   }
 
   scope :for_user, -> id {
-    joins(product: %i[users])
+    joins(:product, :users)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: },
@@ -63,7 +67,7 @@ class ReleasePackage < ApplicationRecord
   }
 
   scope :for_license, -> id {
-    joins(product: %i[licenses])
+    joins(:product, :licenses)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: },

@@ -14,6 +14,10 @@ class ReleasePlatform < ApplicationRecord
     through: :artifacts
   has_many :products,
     through: :releases
+  has_many :licenses,
+    through: :products
+  has_many :users,
+    through: :licenses
 
   validates :key,
     presence: true,

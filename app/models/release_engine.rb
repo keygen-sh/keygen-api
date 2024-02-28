@@ -22,7 +22,7 @@ class ReleaseEngine < ApplicationRecord
   has_many :licenses,
     through: :products
   has_many :users,
-    through: :products
+    through: :licenses
 
   validates :key,
     presence: true,
