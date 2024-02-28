@@ -262,11 +262,10 @@ module UnionOf
     def union_of?         = true
     def collection?       = true
     def association_class = Association
-    def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
     # Unlike other reflections, we don't have a single foreign key.
     # Instead, we have many, one from each union source.
-    def foreign_keys = union_reflections.collect(&:foreign_key)
+    def foreign_keys = union_sources.collect { active_record.reflect_on_association(_1).foreign_key }
     def foreign_key  = foreign_keys
 
     def join_scope(table, foreign_table, foreign_klass)
@@ -325,6 +324,8 @@ module UnionOf
         )
       )
     end
+
+    def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
     def deconstruct_keys(keys) = { name:, options: }
   end
