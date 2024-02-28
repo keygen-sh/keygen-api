@@ -23,8 +23,8 @@ class LicenseUser < ApplicationRecord
     next unless
       license.present? && user.present?
 
-    next if
-      user != license.owner
+    next unless
+      user == license.owner
 
     errors.add :user, :conflict, message: 'already exists (user is attached through owner)'
   end
