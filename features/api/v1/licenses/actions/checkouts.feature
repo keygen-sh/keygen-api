@@ -641,49 +641,6 @@ Feature: License checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin performs a license checkout with a users include (POST)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 3 "license-users" for the last "license"
-    And I am an admin of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=users"
-    Then the response status should be "200"
-    And the response should contain a valid signature header for "test1"
-    And the response body should be a "license-file" with the following encoded certificate data:
-      """
-      {
-        "data": {
-          "relationships": {
-            "owner": {
-              "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
-              "data": { "type": "users", "id": "$users[1]" }
-            },
-            "users": {
-              "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/users" },
-              "data": [
-                { "type": "users", "id": "$users[1]" },
-                { "type": "users", "id": "$users[2]" },
-                { "type": "users", "id": "$users[3]" },
-                { "type": "users", "id": "$users[4]" }
-              ]
-            }
-          }
-        },
-        "included": [
-          { "type": "users", "id": "$users[1]" },
-          { "type": "users", "id": "$users[2]" },
-          { "type": "users", "id": "$users[3]" },
-          { "type": "users", "id": "$users[4]" }
-        ]
-      }
-      """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
   Scenario: Admin performs a license checkout with a policy include (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
