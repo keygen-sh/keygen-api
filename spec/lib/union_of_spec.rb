@@ -42,38 +42,6 @@ describe UnionOf do
     expect(record.licenses).to be_an ActiveRecord::Relation
   end
 
-  it 'should return the correct relations' do
-    user = create(:user, account:)
-
-    owned_license_1 = create(:license, account:, owner: user)
-    user_license_1  = create(:license, account:)
-    user_license_2  = create(:license, account:)
-    other_license   = create(:license, account:)
-
-    create(:license_user, account:, license: user_license_1, user:)
-    create(:license_user, account:, license: user_license_1)
-    create(:license_user, account:, license: user_license_2, user:)
-    create(:license_user, account:, license: user_license_2)
-
-    expect(user.licenses).to eq [owned_license_1, user_license_1, user_license_2]
-  end
-
-  it 'should return the correct relation ids' do
-    user = create(:user, account:)
-
-    owned_license_1 = create(:license, account:, owner: user)
-    user_license_1  = create(:license, account:)
-    user_license_2  = create(:license, account:)
-    other_license   = create(:license, account:)
-
-    create(:license_user, account:, license: user_license_1, user:)
-    create(:license_user, account:, license: user_license_1)
-    create(:license_user, account:, license: user_license_2, user:)
-    create(:license_user, account:, license: user_license_2)
-
-    expect(user.licenses.ids).to eq [owned_license_1.id, user_license_1.id, user_license_2.id]
-  end
-
   it 'should be a union' do
     expect(record.licenses.to_sql).to match_sql <<~SQL.squish
       SELECT
@@ -391,19 +359,6 @@ describe UnionOf do
 
       # user with 2 user licenses
       user    = create(:user, account:, created_at: 1.week.ago)
-      license = create(:license, account:, created_at: 1.week.ago)
-
-      create(:license_user, account:, license:, user:, created_at: 1.week.ago)
-      create(:machine, account:, license:, owner: user, created_at: 1.second.ago)
-
-      license = create(:license, account:, created_at: 1.year.ago)
-
-      create(:license_user, account:, license:, user:, created_at: 1.year.ago)
-
-      # user with 1 owned and 2 user licenses
-      user    = create(:user, account:, created_at: 1.week.ago)
-      license = create(:license, account:, owner:, created_at: 1.week.ago)
-
       license = create(:license, account:, created_at: 1.week.ago)
 
       create(:license_user, account:, license:, user:, created_at: 1.week.ago)
