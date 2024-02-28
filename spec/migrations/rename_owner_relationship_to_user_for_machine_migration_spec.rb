@@ -51,7 +51,7 @@ describe RenameOwnerRelationshipToUserForMachineMigration do
             user: {
               data: nil,
               links: {
-                related: v1_account_machine_v1_5_user_path(subject.account_id, subject.id),
+                related: v1_account_machine_user_path(subject.account_id, subject.id),
               },
             },
           ),
@@ -92,7 +92,7 @@ describe RenameOwnerRelationshipToUserForMachineMigration do
             user: {
               data: { type: :users, id: subject.owner.id },
               links: {
-                related: v1_account_machine_v1_5_user_path(subject.account_id, subject.id),
+                related: v1_account_machine_user_path(subject.account_id, subject.id),
               },
             },
           ),

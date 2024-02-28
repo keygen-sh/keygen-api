@@ -112,7 +112,7 @@ Rails.application.routes.draw do
           resource :owner,   only: %i[show]
 
           scope module: :v1x5 do
-            resource :user, only: %i[show], as: :v1_5_user
+            resource :user, only: %i[show]
           end
         end
 
@@ -195,15 +195,8 @@ Rails.application.routes.draw do
             end
           end
 
-          resources :users, only: %i[index show] do
-            collection do
-              post '/',   to: 'users#attach', as: :attach
-              delete '/', to: 'users#detach', as: :detach
-            end
-          end
-
           scope module: :v1x5 do
-            resource :user, only: %i[show update], as: :v1_5_user
+            resource :user, only: %i[show update]
           end
         end
 

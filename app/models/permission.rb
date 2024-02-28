@@ -80,7 +80,6 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
-    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -92,6 +91,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
@@ -234,7 +234,6 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
-    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -246,6 +245,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
@@ -454,7 +454,6 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
-    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -466,6 +465,7 @@ class Permission < ApplicationRecord
     license.usage.decrement
     license.usage.increment
     license.usage.reset
+    license.owner.update
     license.user.update
     license.validate
 
