@@ -21,11 +21,21 @@ module UnionOf
     def association_scope
       return if klass.nil?
 
-      @association_scope ||= Scope.create.scope(self)
+      @association_scope ||= Scope.scope(self)
     end
   end
 
+  class ThroughAssociation < Association
+    include ActiveRecord::Associations::ThroughAssociation
+  end
+
   class Scope < ActiveRecord::Associations::AssociationScope
+    INSTANCE = create
+
+    def self.scope(association)
+      INSTANCE.scope(association)
+    end
+
     private
 
     def last_chain_scope(scope, reflection, owner)
@@ -138,12 +148,25 @@ module UnionOf
       super
 
       @union_sources = @options[:sources]
+
+      # FIXME(ezekg) Remove this workaround and add a proper klass lookup.
+      # TODO(ezekg) Add polymorphic support?
+      @klass ||= @union_sources.map { active_record._reflect_on_association(_1).klass }
+                               .uniq
+                               .sole
     end
 
-    def macro             = :union_of
-    def union_of?         = true
-    def collection?       = true
-    def association_class = Association
+    def macro       = :union_of
+    def union_of?   = true
+    def collection? = true
+
+    def association_class
+      if options[:through]
+        ThroughAssociation
+      else
+        Association
+      end
+    end
 
     def join_scope(table, foreign_table, foreign_klass)
       predicate_builder = predicate_builder(table)
@@ -153,8 +176,9 @@ module UnionOf
       klass_scope.where!(
         join_foreign_key => union_sources.reduce(nil) do |chain, union_source|
           union_reflection  = foreign_klass.reflect_on_association(union_source)
+          union_klass       = union_reflection.klass
 
-          relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
+          relation = union_reflection.klass.scope_for_association.select(union_klass.primary_key)
                                                                  .except(:order)
 
           primary_key = union_reflection.join_primary_key
@@ -215,6 +239,8 @@ module UnionOf
 
     class_methods do
       def union_of(name, scope = nil, **options, &extension)
+        # TODO(ezekg) Validate sources against association reflections.
+
         reflection = Builder.build(self, name, scope, options, &extension)
 
         ActiveRecord::Reflection.add_union_reflection(self, name, reflection)
