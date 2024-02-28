@@ -397,19 +397,16 @@ Feature: List users
     And the current account is "test1"
     And time is frozen at "2024-02-07T00:00:00.000Z"
     And the current account has the following "user" rows:
-      | id                                   | email                                      | created_at               | banned_at                |
-      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example             | 2024-02-07T00:00:00.000Z |                          |
-      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example           | 2023-02-07T00:00:00.000Z |                          |
-      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
-      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
-      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example     | 2023-02-07T00:00:00.000Z |                          |
-      | be3ea9f0-e7ca-4eea-9326-a7658c247e5f | old.user.new.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | 4dface92-de40-4950-ab0e-f79e611884f5 | old.user.old.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | b2966243-fd44-4649-9724-a0ba1e5f4384 | old.user.valid.user.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
-      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example                 | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
     And the current account has the following "license" rows:
       | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
       | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
@@ -419,18 +416,10 @@ Feature: List users
       | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
       | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
       | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-      | 12b570c9-1cbe-4b47-b60a-cc525e60ddab |                                      | 2024-02-07T00:00:00.000Z |                          |                          |                          |
-      | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de |                                      | 2023-02-07T00:00:00.000Z |                          |                          |                          |
-      | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 |                                      | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-    And the current account has the following "license_user" rows:
-      | id                                   | license_id                           | user_id                              |
-      | 85a3fc7e-dfb7-40d5-9420-9d1f342b2140 | 12b570c9-1cbe-4b47-b60a-cc525e60ddab | be3ea9f0-e7ca-4eea-9326-a7658c247e5f |
-      | 0bf8c414-8505-4e8e-9d5f-800c387906bc | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | 4dface92-de40-4950-ab0e-f79e611884f5 |
-      | bbd3becd-1abf-4a5c-860e-18b53d14d10a | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 | b2966243-fd44-4649-9724-a0ba1e5f4384 |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=ACTIVE"
     Then the response status should be "200"
-    And the response body should be an array with 8 "users"
+    And the response body should be an array with 6 "users"
     And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (inactive)
@@ -438,19 +427,16 @@ Feature: List users
     And the current account is "test1"
     And time is frozen at "2024-02-07T00:00:00.000Z"
     And the current account has the following "user" rows:
-      | id                                   | email                                      | created_at               | banned_at                |
-      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example             | 2024-02-07T00:00:00.000Z |                          |
-      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example           | 2023-02-07T00:00:00.000Z |                          |
-      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
-      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
-      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example     | 2023-02-07T00:00:00.000Z |                          |
-      | be3ea9f0-e7ca-4eea-9326-a7658c247e5f | old.user.new.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | 4dface92-de40-4950-ab0e-f79e611884f5 | old.user.old.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | b2966243-fd44-4649-9724-a0ba1e5f4384 | old.user.valid.user.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
-      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example                 | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
     And the current account has the following "license" rows:
       | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
       | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
@@ -460,18 +446,10 @@ Feature: List users
       | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
       | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
       | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-      | 12b570c9-1cbe-4b47-b60a-cc525e60ddab |                                      | 2024-02-07T00:00:00.000Z |                          |                          |                          |
-      | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de |                                      | 2023-02-07T00:00:00.000Z |                          |                          |                          |
-      | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 |                                      | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-    And the current account has the following "license_user" rows:
-      | id                                   | license_id                           | user_id                              |
-      | 85a3fc7e-dfb7-40d5-9420-9d1f342b2140 | 12b570c9-1cbe-4b47-b60a-cc525e60ddab | be3ea9f0-e7ca-4eea-9326-a7658c247e5f |
-      | 0bf8c414-8505-4e8e-9d5f-800c387906bc | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | 4dface92-de40-4950-ab0e-f79e611884f5 |
-      | bbd3becd-1abf-4a5c-860e-18b53d14d10a | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 | b2966243-fd44-4649-9724-a0ba1e5f4384 |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INACTIVE"
     Then the response status should be "200"
-    And the response body should be an array with 3 "users"
+    And the response body should be an array with 2 "users"
     And time is unfrozen
 
   Scenario: Admin retrieves users filtered by status (banned)
@@ -479,19 +457,16 @@ Feature: List users
     And the current account is "test1"
     And time is frozen at "2024-02-07T00:00:00.000Z"
     And the current account has the following "user" rows:
-      | id                                   | email                                      | created_at               | banned_at                |
-      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example             | 2024-02-07T00:00:00.000Z |                          |
-      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example           | 2023-02-07T00:00:00.000Z |                          |
-      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
-      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
-      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example     | 2023-02-07T00:00:00.000Z |                          |
-      | be3ea9f0-e7ca-4eea-9326-a7658c247e5f | old.user.new.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | 4dface92-de40-4950-ab0e-f79e611884f5 | old.user.old.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | b2966243-fd44-4649-9724-a0ba1e5f4384 | old.user.valid.user.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
-      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example                 | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
     And the current account has the following "license" rows:
       | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
       | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
@@ -501,14 +476,6 @@ Feature: List users
       | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
       | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
       | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-      | 12b570c9-1cbe-4b47-b60a-cc525e60ddab |                                      | 2024-02-07T00:00:00.000Z |                          |                          |                          |
-      | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de |                                      | 2023-02-07T00:00:00.000Z |                          |                          |                          |
-      | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 |                                      | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-    And the current account has the following "license_user" rows:
-      | id                                   | license_id                           | user_id                              |
-      | 85a3fc7e-dfb7-40d5-9420-9d1f342b2140 | 12b570c9-1cbe-4b47-b60a-cc525e60ddab | be3ea9f0-e7ca-4eea-9326-a7658c247e5f |
-      | 0bf8c414-8505-4e8e-9d5f-800c387906bc | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | 4dface92-de40-4950-ab0e-f79e611884f5 |
-      | bbd3becd-1abf-4a5c-860e-18b53d14d10a | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 | b2966243-fd44-4649-9724-a0ba1e5f4384 |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=BANNED"
     Then the response status should be "200"
@@ -520,19 +487,16 @@ Feature: List users
     And the current account is "test1"
     And time is frozen at "2024-02-07T00:00:00.000Z"
     And the current account has the following "user" rows:
-      | id                                   | email                                      | created_at               | banned_at                |
-      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example             | 2024-02-07T00:00:00.000Z |                          |
-      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example           | 2023-02-07T00:00:00.000Z |                          |
-      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example        | 2023-02-07T00:00:00.000Z |                          |
-      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
-      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
-      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example     | 2023-02-07T00:00:00.000Z |                          |
-      | be3ea9f0-e7ca-4eea-9326-a7658c247e5f | old.user.new.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | 4dface92-de40-4950-ab0e-f79e611884f5 | old.user.old.user.license@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
-      | b2966243-fd44-4649-9724-a0ba1e5f4384 | old.user.valid.user.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
-      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example                 | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
+      | id                                   | email                                    | created_at               | banned_at                |
+      | d00998f9-d224-4ee7-ac4e-f1e5fe318ff7 | new.user.active@keygen.example           | 2024-02-07T00:00:00.000Z |                          |
+      | 31e30cc1-d454-40dc-b4ae-93ad683ddf33 | old.user.inactive@keygen.example         | 2023-02-07T00:00:00.000Z |                          |
+      | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | old.user.new.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 08c7f078-85d3-46cf-b34c-8dbcef0d30cd | old.user.old.license@keygen.example      | 2023-02-07T00:00:00.000Z |                          |
+      | 2b8dcb3b-4518-4ffb-8512-b49d36dd7dd5 | old.user.valid.license@keygen.example    | 2023-02-07T00:00:00.000Z |                          |
+      | 44dce69e-bb15-4915-9adc-074f8b57a61c | old.user.checkout.license@keygen.example | 2023-02-07T00:00:00.000Z |                          |
+      | a04ac105-ec12-4dc9-89d0-06dd99124349 | old.user.checkin.license@keygen.example  | 2023-02-07T00:00:00.000Z |                          |
+      | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | old.user.mixed.licenses@keygen.example   | 2023-02-07T00:00:00.000Z |                          |
+      | 5e360440-acd7-4c63-973e-5133b2ebfdbb | banned.user@keygen.example               | 2024-02-07T00:00:00.000Z | 2024-01-07T00:00:00.000Z |
     And the current account has the following "license" rows:
       | id                                   | user_id                              | created_at               | last_validated_at        | last_check_out_at        | last_check_in_at         |
       | df0beed9-1ab2-4097-9558-cd0adddf321a | 31e7d077-88ed-4808-bd4b-00b23fc35a57 | 2024-02-07T00:00:00.000Z |                          |                          |                          |
@@ -542,14 +506,6 @@ Feature: List users
       | e4304d3f-4d6c-4faf-86ee-0ddbb3324aa5 | a04ac105-ec12-4dc9-89d0-06dd99124349 | 2023-02-07T00:00:00.000Z |                          |                          | 2024-02-07T00:00:00.000Z |
       | 2022a17f-87e4-4b4c-a07b-e28b45f43d6a | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z |                          |                          |                          |
       | ce5fc968-cff0-4b41-9f5d-cb42c330d01c | 6a0e6577-05eb-47d4-8498-a32d81f5c2b8 | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-      | 12b570c9-1cbe-4b47-b60a-cc525e60ddab |                                      | 2024-02-07T00:00:00.000Z |                          |                          |                          |
-      | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de |                                      | 2023-02-07T00:00:00.000Z |                          |                          |                          |
-      | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 |                                      | 2023-02-07T00:00:00.000Z | 2024-02-07T00:00:00.000Z |                          |                          |
-    And the current account has the following "license_user" rows:
-      | id                                   | license_id                           | user_id                              |
-      | 85a3fc7e-dfb7-40d5-9420-9d1f342b2140 | 12b570c9-1cbe-4b47-b60a-cc525e60ddab | be3ea9f0-e7ca-4eea-9326-a7658c247e5f |
-      | 0bf8c414-8505-4e8e-9d5f-800c387906bc | 5796eb0e-cae8-43b7-9fdc-d5a6bf6597de | 4dface92-de40-4950-ab0e-f79e611884f5 |
-      | bbd3becd-1abf-4a5c-860e-18b53d14d10a | e5bdae6f-2f76-4b83-aa28-85a3321bbc95 | b2966243-fd44-4649-9724-a0ba1e5f4384 |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=INVALID"
     Then the response status should be "200"

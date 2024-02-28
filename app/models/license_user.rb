@@ -29,10 +29,6 @@ class LicenseUser < ApplicationRecord
     errors.add :user, :conflict, message: 'already exists (user is attached through owner)'
   end
 
-  scope :active, -> {
-    joins(:license).merge(License.active)
-  }
-
   private
 
   def nullify_machines_for_user

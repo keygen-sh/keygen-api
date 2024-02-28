@@ -53,14 +53,7 @@ class User < ApplicationRecord
   #             license for each user, since users can potentially have thousands
   #             and thousands of licenses, and superfluously preloading/querying
   #             that many records would a bad idea.
-  has_one :any_active_owned_license, -> { active.reorder(nil).distinct_on(:user_id) },
-    class_name: License.name
-  has_one :any_active_license_user, -> { active.reorder(nil).distinct_on(:user_id) },
-    class_name: LicenseUser.name
-  has_one :any_active_user_license,
-    through: :any_active_license_user,
-    source: :license
-  union_of :any_active_licenses, sources: %i[any_active_owned_license any_active_user_license],
+  has_one :any_active_license, -> { active.reorder(nil).distinct_on(:user_id) },
     class_name: License.name
 
   has_secure_password :password, validations: false
@@ -431,11 +424,11 @@ class User < ApplicationRecord
   end
 
   def active?(t = 90.days.ago)
-    created_at >= t || any_active_licenses.any?
+    created_at >= t || any_active_license.present?
   end
 
   def inactive?(t = 90.days.ago)
-    created_at < t && any_active_licenses.empty?
+    created_at < t && any_active_license.nil?
   end
 
   def banned?
