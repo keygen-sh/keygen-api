@@ -5,6 +5,14 @@ module Accountable
 
   included do
     include Dirtyable
+
+    default_scope -> {
+      if Current.account.present?
+        where(account_id: Current.account.id)
+      else
+        all
+      end
+    }
   end
 
   class_methods do
