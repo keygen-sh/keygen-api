@@ -747,7 +747,7 @@ class Release < ApplicationRecord
 
   def validate_associated_records_for_channel
     return unless
-      channel.present? && account.present?
+      channel.present?
 
     # Clear channel if the key is empty e.g. "" or nil
     return self.channel = nil unless
