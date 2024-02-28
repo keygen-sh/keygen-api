@@ -109,13 +109,9 @@ class LicenseValidationService < BaseService
           return [false, "machine is not activated (has no associated machines)", :NO_MACHINES]
         else
           machine = license.machines.find_by(id: scope[:machine])
-          user    = scope[:user]
 
           return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] unless
             machine.present?
-
-          return [false, "user scope does not match (does not match associated machine owner)", :USER_SCOPE_MISMATCH] unless
-            user.nil? || !machine.owner_id? || machine.owner_id == user || machine.owner.email == user
 
           return [false, 'machine heartbeat is required', :HEARTBEAT_NOT_STARTED] if
             license.policy.require_heartbeat? &&
@@ -143,38 +139,33 @@ class LicenseValidationService < BaseService
         when license.policy.floating? && license.machines_count == 0
           return [false, "fingerprint is not activated (has no associated machines)", :NO_MACHINES]
         else
-          machines = license.machines.with_fingerprint(fingerprints)
-          user     = scope[:user]
-
-          dead_machines = machines.dead
           return [false, 'machine heartbeat is dead', :HEARTBEAT_DEAD] if
-            dead_machines.count == fingerprints.size
+            license.machines.dead.with_fingerprint(fingerprints).count == fingerprints.size
 
-          alive_machines = machines.alive
+          machines = license.machines.with_fingerprint(fingerprints)
+                                     .alive
+
           case
           when fingerprints.size > 1 && license.policy.machine_match_most?
             return [false, "one or more fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              alive_machines.count < (fingerprints.size / 2.0).ceil
+              machines.count < (fingerprints.size / 2.0).ceil
           when fingerprints.size > 1 && license.policy.machine_match_two?
             return [false, "one or more fingerprint is not activated (does not match at least 2 associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              alive_machines.count < 2
+              machines.count < 2
           when fingerprints.size > 1 && license.policy.machine_match_all?
             return [false, "one or more fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              alive_machines.count < fingerprints.size
+              machines.count < fingerprints.size
           when fingerprints.size > 1 && license.policy.machine_match_any?
             return [false, "one or more fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              alive_machines.count == 0
+              machines.empty?
           else
             return [false, "fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              alive_machines.count == 0
+              machines.empty?
           end
-
-          return [false, "user scope does not match (does not match associated machine owners)", :USER_SCOPE_MISMATCH] unless
-            user.nil? || alive_machines.for_owner(user).union(alive_machines.for_owner(nil)).count == alive_machines.count
 
           return [false, 'machine heartbeat is required', :HEARTBEAT_NOT_STARTED] if
             license.policy.require_heartbeat? &&
-            alive_machines.any?(&:not_started?)
+            machines.any?(&:not_started?)
         end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
@@ -211,7 +202,7 @@ class LicenseValidationService < BaseService
             components.count < fingerprints.size
         else
           return [false, "one or more component is not activated (does not match any associated components)", :COMPONENTS_SCOPE_MISMATCH] if
-            components.count == 0
+            components.empty?
         end
       else
         return [false, "components scope is required", :COMPONENTS_SCOPE_REQUIRED] if license.policy.require_components_scope?
