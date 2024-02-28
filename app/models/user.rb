@@ -104,7 +104,7 @@ class User < ApplicationRecord
   # TODO(ezekg) Uncomment once we migrate licenses to multi-user licenses.
   # TODO(ezekg) Should we batch this?
   #
-  # after_destroy prepend: true do
+  # after_destroy {
   #   next unless
   #     Current.api_version.present? # skip outside of web context
 
@@ -122,7 +122,7 @@ class User < ApplicationRecord
   #     association_primary_key_column: _licenses.klass.primary_key.to_s,
   #     ensuring_owner_was_method: nil,
   #   )
-  # end
+  # }
 
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
