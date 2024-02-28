@@ -5,5 +5,4 @@ require 'spec_helper'
 
 describe EventLog, type: :model do
   it_behaves_like :environmental
-  it_behaves_like :accountable
 end

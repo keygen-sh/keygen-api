@@ -8,7 +8,6 @@ describe ReleaseArtifact, type: :model do
   let(:product) { create(:product, account:) }
 
   it_behaves_like :environmental
-  it_behaves_like :accountable
 
   describe '#environment=' do
     context 'on create' do

@@ -7,7 +7,6 @@ describe Product, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
-  it_behaves_like :accountable
 
   describe '#role_attributes=' do
     it 'should set role and permissions' do
