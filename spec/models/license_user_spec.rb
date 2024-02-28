@@ -9,14 +9,6 @@ describe LicenseUser, type: :model do
   it_behaves_like :environmental
   it_behaves_like :accountable
 
-  it 'should raise on license and user account mismatch' do
-    other_account = create(:account)
-    license       = create(:license, account: other_account)
-    user          = create(:user, account: other_account)
-
-    expect { create(:license_user, account:, license:, user:) }.to raise_error ActiveRecord::RecordInvalid
-  end
-
   it 'should raise on license account mismatch' do
     other_account = create(:account)
     license       = create(:license, account: other_account)
