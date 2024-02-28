@@ -18,7 +18,7 @@ module Api::V1::Licenses::Relationships
     end
 
     def show
-      user = FindByAliasService.call(license.users, id: params[:id], aliases: :email)
+      user = license.users.find(params[:id])
       authorize! user,
         with: Licenses::UserPolicy
 
