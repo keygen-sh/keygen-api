@@ -31,7 +31,7 @@ module UnionOf
 
   module Preloader
     class Association < ActiveRecord::Associations::Preloader::ThroughAssociation
-      def load_records(*)
+      def load_records(raw_records = nil)
         preloaded_records # we don't need to load anything except the union associations
       end
 
@@ -96,19 +96,7 @@ module UnionOf
       end
 
       def build_scope
-        scope = source_reflection.klass.unscoped
-
-        if reflection.type && !reflection.through_reflection?
-          scope.where!(reflection.type => model.polymorphic_name)
-        end
-
-        scope.merge!(reflection_scope) unless reflection_scope.empty_scope?
-
-        if preload_scope && !preload_scope.empty_scope?
-          scope.merge!(preload_scope)
-        end
-
-        cascade_strict_loading(scope)
+        super.except(:order) # FIXME(ezekg) doesn't work when combined with e.g. DISTINCT ON
       end
     end
   end
