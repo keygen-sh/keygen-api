@@ -75,15 +75,8 @@ class LicenseValidationService < BaseService
 
       # Check against :user scope requirements
       if scope.present? && scope.key?(:user)
-        user_identifier = scope[:user]
-
         return [false, "user scope does not match", :USER_SCOPE_MISMATCH] unless
-          license.owner_id == user_identifier ||
-            license.users.where(id: user_identifier)
-                         .or(
-                           license.users.where(email: user_identifier),
-                         )
-                         .exists?
+          license.owner_id == scope[:user] || license.owner&.email == scope[:user]
       else
         return [false, "user scope is required", :USER_SCOPE_REQUIRED] if
           license.policy.require_user_scope?
