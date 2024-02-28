@@ -890,17 +890,17 @@ describe ReleasePolicy, type: :policy do
             end
 
             with_wildcard_permissions do
-              denies :create, :update, :destroy, :upload, :publish, :yank
+              denies :create, :update, :destroy
               allows :show
             end
 
             with_default_permissions do
-              denies :create, :update, :destroy, :upload, :publish, :yank
+              denies :create, :update, :destroy
               allows :show
             end
 
             without_permissions do
-              denies :show, :create, :update, :destroy, :upload, :publish, :yank
+              denies :show, :create, :update, :destroy
             end
           end
         end
@@ -1000,17 +1000,17 @@ describe ReleasePolicy, type: :policy do
             end
 
             with_wildcard_permissions do
-              denies :create, :update, :destroy, :upload, :publish, :yank
+              denies :create, :update, :destroy
               allows :show
             end
 
             with_default_permissions do
-              denies :create, :update, :destroy, :upload, :publish, :yank
+              denies :create, :update, :destroy
               allows :show
             end
 
             without_permissions do
-              denies :show, :create, :update, :destroy, :upload, :publish, :yank
+              denies :show, :create, :update, :destroy
             end
           end
         end
