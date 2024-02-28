@@ -36,7 +36,9 @@ shared_examples :accountable do
         end
 
         it 'should set provided account' do
-          instance = create(factory, account:)
+          # FIXME(ezekg) Using build here because this could break validation due
+          #              to default accountable scope on child objects.
+          instance = build(factory, account:)
 
           expect(instance.account).to eq account
         end
