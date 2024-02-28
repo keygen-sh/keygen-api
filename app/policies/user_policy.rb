@@ -14,10 +14,6 @@ class UserPolicy < ApplicationPolicy
       allow!
     in role: Role(:product | :environment) if record.all?(&:user?)
       allow!
-    in role: Role(:user) if record.all? { _1 == bearer || _1.id.in?(bearer.teammate_ids) }
-      allow!
-    in role: Role(:license) if record_ids & bearer.user_ids == record_ids
-      allow!
     else
       deny!
     end
@@ -34,9 +30,9 @@ class UserPolicy < ApplicationPolicy
       allow!
     in role: Role(:product | :environment) if record.user?
       allow!
-    in role: Role(:user) if record == bearer || record_id.in?(bearer.teammate_ids)
+    in role: Role(:user) if record == bearer
       allow!
-    in role: Role(:license) if record == bearer.owner || record_id.in?(bearer.user_ids)
+    in role: Role(:license) if record == bearer.owner
       allow!
     else
       deny!

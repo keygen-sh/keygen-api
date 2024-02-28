@@ -46,7 +46,6 @@ class ApplicationPolicy
 
   def whatami = bearer.role.name.underscore.humanize(capitalize: false)
 
-  def record_id = record.respond_to?(:id) ? record.id : nil
   def record_ids
     case
     when record.respond_to?(:ids)

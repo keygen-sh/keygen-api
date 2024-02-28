@@ -71,14 +71,6 @@ FactoryBot.define do
       with_owned_license
     end
 
-    trait :with_teammates do
-      after :create do |user|
-        license = create(:license, :with_users, account: user.account, environment: user.environment)
-
-        create(:license_user, account: user.account, environment: user.environment, license:, user:)
-      end
-    end
-
     trait :with_expired_licenses do
       after :create do |user|
         create_list(:license, 3, :expired, account: user.account, environment: user.environment, owner: user)

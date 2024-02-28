@@ -597,54 +597,27 @@ Feature: List users
     Then the response status should be "401"
     And the response body should be an array of 1 error
 
-  Scenario: License attempts to retrieve all associated users (without permission)
+  Scenario: License attempts to retrieve all users for their account
     Given the current account is "test1"
+    And the current account has 1 "license"
     And the current account has 5 "users"
-    And the current account has 1 "license" for the second "user" as "owner"
-    And the current account has 1 "license-user" for the last "license" and the third "user"
-    And the current account has 1 "license-user" for the last "license" and the fourth "user"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "403"
+    And the response body should be an array of 1 error
 
-  Scenario: License attempts to retrieve all associated users (with permission)
-    Given the current account is "test1"
-    And the current account has 5 "users"
-    And the current account has 1 "license" for the second "user" as "owner"
-    And the last "license" has the following permissions:
-      """
-      ["user.read"]
-      """
-    And the current account has 1 "license-user" for the last "license" and the third "user"
-    And the current account has 1 "license-user" for the last "license" and the fourth "user"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/users"
-    Then the response status should be "200"
-    And the response body should be an array with 3 "users"
-
-  Scenario: User attempts to retrieve all associated users (has teammates)
+  Scenario: User attempts to retrieve all users for their account
     Given the current account is "test1"
     And the current account has 5 "users"
     And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 1 "license-user" for the last "license" and the third "user"
     And the current account has 1 "license-user" for the last "license" and the fourth "user"
-    And I am the third user of account "test1"
+    And I am the fourth user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
-    Then the response status should be "200"
-    And the response body should be an array with 3 "users"
-
-  Scenario: User attempts to retrieve all associated users (no teammates)
-    Given the current account is "test1"
-    And the current account has 5 "users"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And I am the last user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/users"
-    Then the response status should be "200"
-    And the response body should be an array with 1 "user"
+    Then the response status should be "403"
+    And the response body should be an array of 1 error
 
   Scenario: User attempts to retrieve all users for their group
     Given the current account is "test1"
@@ -673,5 +646,4 @@ Feature: List users
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
-    Then the response status should be "200"
-    And the response body should be an array with 1 "user"
+    Then the response status should be "403"
