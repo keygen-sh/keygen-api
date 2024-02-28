@@ -63,7 +63,7 @@ class License < ApplicationRecord
   # instead of before_create so that this can be run when the owner is changed as well,
   # and so that we can keep our group limit validations in play.
   before_validation -> { self.group_id = owner.group_id },
-    if: -> { owner_id_changed? && owner.present? && group_id.nil? },
+    if: -> { user_id_changed? && owner.present? && group_id.nil? },
     on: %i[create update]
 
   on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
@@ -101,7 +101,7 @@ class License < ApplicationRecord
     unless: -> {
       # Using before type cast because non-UUIDs are silently ignored and we
       # want to raise an error in that case
-      owner_id_before_type_cast.nil?
+      user_id_before_type_cast.nil?
     }
 
   # Same for the group association
@@ -179,7 +179,7 @@ class License < ApplicationRecord
   # Assert owner is not a license user (i.e. licensee)
   validate on: %i[create update] do
     next unless
-      owner_id_changed?
+      user_id_changed?
 
     next unless
       owner.present?
@@ -595,8 +595,6 @@ class License < ApplicationRecord
   end
 
   # FIXME(ezekg) Should we eventually rename the user_id column?
-  def owner_id_before_type_cast = user_id_before_type_cast
-  def owner_id_changed?         = user_id_changed?
   def owner_id? = user_id?
   def owner_id  = user_id
   def owner_id=(id)
