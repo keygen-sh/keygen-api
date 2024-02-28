@@ -11,13 +11,13 @@ class MachineComponent < ApplicationRecord
     inverse_of: :components
   has_one :group,
     through: :machine
-  has_one :owner,
-    through: :machine
   has_one :license,
     through: :machine
   has_one :product,
     through: :license
   has_one :policy,
+    through: :license
+  has_one :owner,
     through: :license
   has_many :users,
     through: :license
