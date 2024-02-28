@@ -8,8 +8,8 @@ FactoryBot.define do
     payload  { '{}' }
     jid      { SecureRandom.hex }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     event_type
 
     trait :in_isolated_environment do

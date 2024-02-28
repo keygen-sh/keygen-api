@@ -6,8 +6,8 @@ FactoryBot.define do
     # to insert duplicate codes would fail, and this prevents that.
     initialize_with { Entitlement.find_by(code:) || new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
 
     # Our entitlement codes cycle in sets of 10, so we can do things like
     # constrain a release with 10 entitlements via the :with_constraints

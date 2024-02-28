@@ -4,8 +4,8 @@ FactoryBot.define do
   factory :request_log do
     initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     requestor   { build(:admin, account:, environment:) }
     resource    { build(:artifact, account:, environment:) }
 

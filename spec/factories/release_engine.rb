@@ -6,7 +6,7 @@ FactoryBot.define do
 
     sequence :key, %w[pypi tauri].cycle
 
-    account { Current.account }
+    account { nil }
 
     trait :pypi do
       name { 'PyPI' }

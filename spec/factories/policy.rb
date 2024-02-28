@@ -22,8 +22,8 @@ FactoryBot.define do
     max_uses                  { nil }
     scheme                    { nil }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
 
     trait :legacy_encrypt do

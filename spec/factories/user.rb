@@ -9,8 +9,8 @@ FactoryBot.define do
     email      { SecureRandom.hex(4) + Faker::Internet.safe_email }
     password   { 'password' }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
 
     factory :admin do
       role { build(:role, :admin) }

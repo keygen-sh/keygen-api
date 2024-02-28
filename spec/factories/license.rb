@@ -4,8 +4,8 @@ FactoryBot.define do
   factory :license do
     initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     policy      { build(:policy, account:, environment:) }
     user        { nil }
 

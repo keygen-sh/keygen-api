@@ -6,8 +6,8 @@ FactoryBot.define do
 
     pid { SecureRandom.hex(12) }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     machine     { build(:machine, account:, environment:) }
 
     trait :in_isolated_environment do

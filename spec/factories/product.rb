@@ -13,8 +13,8 @@ FactoryBot.define do
       ]
     }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
 
     trait :licensed do
       distribution_strategy { 'LICENSED' }

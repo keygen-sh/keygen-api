@@ -8,8 +8,8 @@ FactoryBot.define do
         new(**attributes.reject { NIL_ENVIRONMENT == _2 })
     end
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     entitlement { build(:entitlement, account:, environment:) }
     policy      { build(:policy, account:, environment:) }
 

@@ -504,9 +504,9 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
 
   # FIXME(ezekg) We should use reflection here.
   begin
-    association.send(a.pluralize.underscore) << resource
-  rescue
     association.send(a.singularize.underscore) << resource
+  rescue
+    association.send(a.pluralize.underscore) << resource
   end
 end
 

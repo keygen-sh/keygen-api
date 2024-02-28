@@ -6,8 +6,8 @@ FactoryBot.define do
 
     digest { "test_#{SecureRandom.hex}" }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     bearer      { build(:user, account:, environment:) }
 
     trait :in_isolated_environment do

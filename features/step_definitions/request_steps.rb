@@ -729,16 +729,6 @@ Given /^the (\w+) error should have the following properties:$/ do |named_idx, b
   expect(err).to include JSON.parse(body)
 end
 
-Given /^an error should have the following properties:$/ do |body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-  json = JSON.parse(last_response.body)
-  errs = json["errors"]
-
-  expect(errs).to include(
-    include JSON.parse(body)
-  )
-end
-
 Then /^the response body should contain the following links:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 

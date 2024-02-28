@@ -6,8 +6,8 @@ FactoryBot.define do
 
     key { SecureRandom.hex(12).upcase.scan(/.{4}/).join "-" }
 
-    account     { Current.account }
-    environment { Current.environment || NIL_ENVIRONMENT }
+    account     { nil }
+    environment { NIL_ENVIRONMENT }
     policy      { build(:policy, :pooled, account:, environment:) }
 
     trait :in_isolated_environment do
