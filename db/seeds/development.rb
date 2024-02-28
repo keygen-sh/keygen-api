@@ -70,8 +70,6 @@ loop do
         package = if rand(0..1).zero?
                     engine = if rand(0..1).zero?
                                { engine_attributes: { key: %w[pypi tauri].sample } }
-                             else
-                               {}
                              end
 
                     ReleasePackage.create!(
@@ -126,40 +124,25 @@ loop do
         )
 
         rand(0..10_000).times do
+          user = if rand(0..10).zero?
+                   User.create!(
+                     email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                     environment:,
+                     account:,
+                   )
+                 end
+
+          if rand(0..1).zero? && user.present?
+            Token.create!(bearer: user, account:, environment:)
+          end
+
           license = License.create!(
             name: 'Floating License',
             environment:,
             policy:,
+            user:,
             account:,
           )
-
-          if rand(1..10).zero?
-            rand(1..10).times do
-              user = if rand(0..10).zero?
-                       User.reorder(:id).find_by!(
-                         environment:,
-                         account:,
-                       )
-                     else
-                       User.create!(
-                          email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
-                          environment:,
-                          account:,
-                        )
-                     end
-
-              if rand(0..1).zero? && user.present?
-                Token.create!(bearer: user, account:, environment:)
-              end
-
-              LicenseUser.create!(
-                environment:,
-                account:,
-                license:,
-                user:,
-              )
-            end
-          end
 
           rand(0..5).times do
             if rand(0..10).zero?
