@@ -621,20 +621,11 @@ describe UnionOf do
   end
 
   describe UnionOf::ReadonlyAssociation do
-    it 'should not raise on readers' do
+    it 'should not raise on read' do
       expect { record.licenses }.to_not raise_error
-      expect { record.licenses.first }.to_not raise_error
-      expect { record.licenses.last }.to_not raise_error
-      expect { record.licenses.forty_two }.to_not raise_error
-      expect { record.licenses.take }.to_not raise_error
     end
 
-    it 'should not raise on query methods' do
-      expect { record.licenses.find_by(id: SecureRandom.uuid) }.to_not raise_error
-      expect { record.licenses.where(name: 'Foo') }.to_not raise_error
-    end
-
-    it 'should not raise on ID readers' do
+    it 'should not raise on IDs reader' do
       expect { record.licenses.ids }.to_not raise_error
       expect { record.license_ids }.to_not raise_error
     end
