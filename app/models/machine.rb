@@ -6,7 +6,6 @@ class Machine < ApplicationRecord
 
   include Envented::Callbacks
   include Environmental
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -16,6 +15,7 @@ class Machine < ApplicationRecord
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes
 
+  belongs_to :account
   belongs_to :license, counter_cache: true
   belongs_to :group,
     optional: true
@@ -35,7 +35,6 @@ class Machine < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_account default: -> { license&.account_id }
   has_environment default: -> { license&.environment_id }
 
   accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
@@ -613,6 +612,23 @@ class Machine < ApplicationRecord
     license.update!(machines_core_count: core_count)
   rescue => e
     Keygen.logger.exception e
+  end
+
+  def validate_associated_records_for_components
+    return if
+      components.nil? || components.empty?
+
+    components.each_with_index do |component, i|
+      component.account = account if
+        component.account.nil?
+
+      next if
+        component.valid?
+
+      component.errors.each do |err|
+        errors.import(err, attribute: "components[#{i}].#{err.attribute}")
+      end
+    end
   end
 
   def reject_associated_records_for_components(attrs)

@@ -2,12 +2,13 @@
 
 class ReleasePackage < ApplicationRecord
   include Environmental
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Diffable
 
+  belongs_to :account,
+    inverse_of: :release_packages
   belongs_to :product,
     inverse_of: :release_packages
   belongs_to :engine,
@@ -22,7 +23,6 @@ class ReleasePackage < ApplicationRecord
     through: :releases,
     source: :artifacts
 
-  has_account default: -> { product&.account_id }, inverse_of: :release_packages
   has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :engine

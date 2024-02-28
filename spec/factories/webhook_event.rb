@@ -2,14 +2,14 @@
 
 FactoryBot.define do
   factory :webhook_event do
-    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
+    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
 
     endpoint { Faker::Internet.url }
     payload  { '{}' }
     jid      { SecureRandom.hex }
 
-    account     { NIL_ACCOUNT }
-    environment { NIL_ENVIRONMENT }
+    account     { Current.account }
+    environment { Current.environment || NIL_ENVIRONMENT }
     event_type
 
     trait :in_isolated_environment do

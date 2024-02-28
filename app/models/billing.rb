@@ -5,12 +5,10 @@ class Billing < ApplicationRecord
   AVAILABLE_STATES = %w[pending trialing subscribed paused canceling canceled].freeze
   ACTIVE_STATES = %w[pending trialing subscribed canceling].freeze
 
-  include Accountable
   include AASM
 
+  belongs_to :account, touch: true
   has_many :receipts, dependent: :destroy_async
-
-  has_account touch: true
   has_one :plan, through: :account
 
   before_destroy :close_customer_account

@@ -2,18 +2,17 @@
 
 class Key < ApplicationRecord
   include Environmental
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Diffable
 
+  belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
   has_many :event_logs,
     as: :resource
 
-  has_account default: -> { policy&.account_id }
   has_environment default: -> { policy&.environment_id }
 
   validates :policy,

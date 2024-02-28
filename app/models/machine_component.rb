@@ -2,11 +2,11 @@
 
 class MachineComponent < ApplicationRecord
   include Environmental
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
+  belongs_to :account
   belongs_to :machine,
     inverse_of: :components
   has_one :group,
@@ -20,7 +20,6 @@ class MachineComponent < ApplicationRecord
   has_one :user,
     through: :license
 
-  has_account default: -> { machine&.account_id }
   has_environment default: -> { machine&.environment_id }
 
   validates :machine,

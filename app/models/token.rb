@@ -6,7 +6,6 @@ class Token < ApplicationRecord
   TOKEN_DURATION = 2.weeks
 
   include Environmental
-  include Accountable
   include Tokenable
   include Limitable
   include Orderable
@@ -14,6 +13,7 @@ class Token < ApplicationRecord
   include Permissible
   include Dirtyable
 
+  belongs_to :account
   belongs_to :bearer,
     polymorphic: true
 
@@ -21,7 +21,6 @@ class Token < ApplicationRecord
     dependent: :delete_all,
     autosave: true
 
-  has_account default: -> { bearer&.account_id }
   has_environment default: -> {
     case bearer
     in Environment(id: environment_id)

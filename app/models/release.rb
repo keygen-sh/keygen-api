@@ -5,7 +5,6 @@ class Release < ApplicationRecord
   self.ignored_columns = %w[release_platform_id release_filetype_id filename filesize signature checksum]
 
   include Environmental
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -35,6 +34,8 @@ class Release < ApplicationRecord
     YANKED
   ]
 
+  belongs_to :account,
+    inverse_of: :releases
   belongs_to :product,
     inverse_of: :releases
   belongs_to :package,
@@ -89,7 +90,6 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete
 
-  has_account default: -> { product&.account_id }, inverse_of: :releases
   has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
@@ -802,6 +802,23 @@ class Release < ApplicationRecord
     SQL
 
     self.channel = rows.first
+  end
+
+  def validate_associated_records_for_constraints
+    return if
+      constraints.nil? || constraints.empty?
+
+    constraints.each_with_index do |constraint, i|
+      constraint.account = account if
+        constraint.account.nil?
+
+      next if
+        constraint.valid?
+
+      constraint.errors.each do |err|
+        errors.import(err, attribute: "constraints[#{i}].#{err.attribute}")
+      end
+    end
   end
 
   def reject_associated_records_for_constraints(attrs)

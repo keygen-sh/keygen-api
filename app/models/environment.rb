@@ -1,6 +1,5 @@
 class Environment < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[environments]]
-  include Accountable
   include Limitable
   include Orderable
   include Dirtyable
@@ -13,6 +12,7 @@ class Environment < ApplicationRecord
     SHARED
   ].freeze
 
+  belongs_to :account
   has_many :tokens, dependent: :destroy_async do
     def owned = where(bearer: proxy_association.owner)
   end
@@ -31,7 +31,6 @@ class Environment < ApplicationRecord
   has_many :releases,          dependent: :destroy_async
   has_many :release_artifacts, dependent: :destroy_async
 
-  has_account
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 

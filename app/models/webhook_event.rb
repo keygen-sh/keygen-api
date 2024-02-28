@@ -2,16 +2,15 @@
 
 class WebhookEvent < ApplicationRecord
   include Environmental
-  include Accountable
   include Idempotentable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :event_type
-
-  has_account
   has_environment
+
+  belongs_to :account
+  belongs_to :event_type
 
   validates :endpoint, url: true, presence: true
 

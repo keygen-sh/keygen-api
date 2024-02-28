@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class ReleasePlatform < ApplicationRecord
-  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
+  belongs_to :account,
+    inverse_of: :release_platforms
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :platform
@@ -13,8 +14,6 @@ class ReleasePlatform < ApplicationRecord
     through: :artifacts
   has_many :products,
     through: :releases
-
-  has_account inverse_of: :release_platforms
 
   validates :key,
     presence: true,
