@@ -1394,36 +1394,6 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
-    def accessing_its_license_file(scenarios)
-      case scenarios
-      in [*, :accessing_another_account, *]
-        let(:license_file) { build(:license_file, account: other_account) }
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:license_file) {
-          build(:license_file, account:, license:, environment:)
-        }
-      in [:as_license, :accessing_itself, *]
-        let(:license_file) {
-          build(:license_file, account:, license: bearer, environment:)
-        }
-      end
-
-      let(:record) { license_file }
-    end
-
-    def accessing_its_machine_file(scenarios)
-      case scenarios
-      in [*, :accessing_another_account, *]
-        let(:machine_file) { build(:machine_file, account: other_account) }
-      in [*, :accessing_its_machine | :accessing_a_machine, *]
-        let(:machine_file) {
-          build(:machine_file, account:, machine:, license: machine.license, environment:)
-        }
-      end
-
-      let(:record) { machine_file }
-    end
-
     def accessing_a_pooled_key(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
