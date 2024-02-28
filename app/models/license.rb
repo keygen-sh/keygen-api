@@ -176,19 +176,6 @@ class License < ApplicationRecord
     errors.add :group, :license_limit_exceeded, message: "license count has exceeded maximum allowed by current group (#{group.max_licenses})"
   end
 
-  # Assert owner is not a license user (i.e. licensee)
-  validate on: %i[create update] do
-    next unless
-      user_id_changed?
-
-    next unless
-      owner.present?
-
-    if licensees.exists?(owner.id)
-      errors.add :owner, :invalid, message: 'already exists (user is attached through users)'
-    end
-  end
-
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
