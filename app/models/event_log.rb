@@ -19,8 +19,8 @@ class EventLog < ApplicationRecord
   belongs_to :request_log,
     optional: true
 
-  has_environment
   has_account
+  has_environment
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.

@@ -8,8 +8,8 @@ class GroupOwner < ApplicationRecord
   belongs_to :group
   belongs_to :user
 
-  has_environment default: -> { group&.environment_id }
   has_account default: -> { group&.account_id }
+  has_environment default: -> { group&.environment_id }
 
   validates :group,
     scope: { by: :account_id }

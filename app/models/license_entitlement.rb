@@ -12,8 +12,8 @@ class LicenseEntitlement < ApplicationRecord
   has_one :policy,
     through: :license
 
-  has_environment default: -> { license&.environment_id }
   has_account default: -> { license&.account_id }
+  has_environment default: -> { license&.environment_id }
 
   validates :license,
     scope: { by: :account_id }

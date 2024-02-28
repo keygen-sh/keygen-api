@@ -22,8 +22,8 @@ class ReleasePackage < ApplicationRecord
     through: :releases,
     source: :artifacts
 
-  has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :release_packages
+  has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :engine
 

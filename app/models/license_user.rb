@@ -10,8 +10,8 @@ class LicenseUser < ApplicationRecord
   belongs_to :license
   belongs_to :user
 
-  has_environment default: -> { license&.environment_id }
   has_account default: -> { license&.account_id }
+  has_environment default: -> { license&.environment_id }
 
   validates :license,
     uniqueness: { message: 'already exists', scope: %i[account_id license_id user_id] },

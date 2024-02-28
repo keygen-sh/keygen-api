@@ -13,8 +13,8 @@ class Key < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_environment default: -> { policy&.environment_id }
   has_account default: -> { policy&.account_id }
+  has_environment default: -> { policy&.environment_id }
 
   validates :policy,
     scope: { by: :account_id }

@@ -11,8 +11,8 @@ class ReleaseDownloadLink < ApplicationRecord
     counter_cache: :download_count,
     inverse_of: :download_links
 
-  has_environment default: -> { release&.environment_id }
   has_account default: -> { release&.account_id }
+  has_environment default: -> { release&.environment_id }
 
   encrypts :url
 

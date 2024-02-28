@@ -35,8 +35,8 @@ class Machine < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  has_environment default: -> { license&.environment_id }
   has_account default: -> { license&.account_id }
+  has_environment default: -> { license&.environment_id }
 
   accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
   tracks_nested_attributes_for :components

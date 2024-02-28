@@ -47,8 +47,8 @@ class ReleaseArtifact < ApplicationRecord
   has_many :constraints,
     through: :release
 
-  has_environment default: -> { release&.environment_id }
   has_account default: -> { release&.account_id }
+  has_environment default: -> { release&.environment_id }
 
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :platform

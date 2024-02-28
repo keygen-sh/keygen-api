@@ -89,8 +89,8 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete
 
-  has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :releases
+  has_environment default: -> { product&.environment_id }
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
   tracks_nested_attributes_for :constraints

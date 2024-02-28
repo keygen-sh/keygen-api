@@ -50,8 +50,8 @@ class User < ApplicationRecord
     class_name: License.name
 
   has_secure_password :password, validations: false
-  has_environment
   has_account inverse_of: :users
+  has_environment
   has_default_role :user
   has_permissions -> user {
       role = if user.respond_to?(:role)

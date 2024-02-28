@@ -11,8 +11,8 @@ class ReleaseUpgradeLink < ApplicationRecord
     counter_cache: :upgrade_count,
     inverse_of: :upgrade_links
 
-  has_environment default: -> { release&.environment_id }
   has_account default: -> { release&.account_id }
+  has_environment default: -> { release&.environment_id }
 
   encrypts :url
 

@@ -20,8 +20,8 @@ class MachineComponent < ApplicationRecord
   has_one :user,
     through: :license
 
-  has_environment default: -> { machine&.environment_id }
   has_account default: -> { machine&.account_id }
+  has_environment default: -> { machine&.environment_id }
 
   validates :machine,
     scope: { by: :account_id }
