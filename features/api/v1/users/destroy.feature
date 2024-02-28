@@ -36,29 +36,6 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin deletes one of their users with licenses
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the first "webhook-endpoint" has the following attributes:
-      """
-      {
-        "subscriptions": ["user.created", "user.updated"]
-      }
-      """
-    And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$1"
-    Then the response status should be "204"
-    And the response should contain a valid signature header for "test1"
-    And the current account should have 0 "users"
-    And the current account should have 0 "licenses"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-
   Scenario: Developer attempts to delete an admin
     Given the current account is "test1"
     And the current account has 1 "developer"

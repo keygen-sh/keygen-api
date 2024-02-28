@@ -15,7 +15,9 @@ class License < ApplicationRecord
   belongs_to :group,
     optional: true
   has_one :product, through: :policy
-  has_and_belongs_to_many :users, index_errors: true, dependent: :delete_all
+  has_many :license_users, index_errors: true, dependent: :delete_all
+  # TODO(ezekg) Enable once migrated to license_users.
+  # has_many :users, through: :license_users
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
@@ -27,7 +29,7 @@ class License < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  # TODO(ezekg) Deprecated. Remove once migrated to HABTM.
+  # FIXME(ezekg) Deprecated. Remove once migrated to license_users.
   belongs_to :user,
     optional: true
 
@@ -86,10 +88,6 @@ class License < ApplicationRecord
   on_exclusive_event 'release.upgraded', :set_expiry_on_first_download!,
     auto_release_lock: true,
     unless: :expiry?
-
-  validates_associated :users,
-    scope: { by: :account_id },
-    on: %i[create]
 
   validates :policy,
     scope: { by: :account_id }
@@ -551,25 +549,22 @@ class License < ApplicationRecord
   def user_ids          = users.reorder(nil).ids
 
   # NOTE(ezekg) For backwards compatibility. Dual writing until we migrate
-  #             data from licenses.user_id column to HABTM.
+  #             data from licenses.user_id column to license_users table.
   def user=(record)
+    pp(record:)
     case record
     in String => user_id
-      self.users = User.where(id: user_id)
+      self.license_users = [license_users.build(user_id:)]
+      write_attribute(:user_id, user_id) # avoid recursion
     in User => user
-      self.users = [user]
+      self.license_users = [license_users.build(user:)]
+      write_attribute(:user_id, user.id)
     in nil
-      self.users = []
+      self.license_users = []
+      write_attribute(:user_id, nil)
     end
-
-    super
   end
-
-  def user_id=(id)
-    self.users = User.where(id:)
-
-    super
-  end
+  alias_method :user_id=, :user=
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct

@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  # FIXME(ezekg) Drop these columns after we've migrated to HABTM.
-  # TODO(ezekg) Uncomment once we move to HABTM licenses.
-  # self.ignored_columns = %w[user_id]
-
   MINIMUM_ADMIN_COUNT = 1
 
   include PasswordResettable
@@ -19,9 +15,11 @@ class User < ApplicationRecord
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
-  # TODO(ezekg) Rename to :licenses once data is migrated to HABTM.
-  has_and_belongs_to_many :_licenses, class_name: 'License', index_errors: true, dependent: :delete_all
-  # TODO(ezekg) Deprecated. Remove when migrated to HABTM.
+  has_many :license_users, index_errors: true, dependent: :delete_all
+  # TODO(ezekg) Swap this over to through: :license_users once migrated
+  #             to license_users.
+  #
+  # NOTE(ezekg) Be sure to mirror destroy callback for <= v1.5!
   has_many :licenses, dependent: :destroy_async
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -46,33 +44,6 @@ class User < ApplicationRecord
   #             that many records would a bad idea.
   has_one :any_active_license, -> { active.reorder(nil).distinct_on(:user_id) },
     class_name: License.name
-
-  # NOTE(ezekg) This mirrors behavior for <= v1.5 where a user's licenses
-  #             were destroyed when the user was destroyed. With the
-  #             advent of multi-user licenses, this is no longer the
-  #             case. Instead, the license is simply disassociated
-  #             from the user.
-  #
-  # TODO(ezekg) Uncomment once we migrate licenses to HABTM.
-  # after_destroy {
-  #   next unless
-  #     Current.api_version.present? # skip outside of web context
-
-  #   next unless
-  #     Semverse::Constraint.new('<= 1.5')
-  #                         .satisfies?(
-  #                           Semverse::Version.new(Current.api_version),
-  #                         )
-
-  #   destroy_association_async_job.perform_later(
-  #     owner_model_name: self.class.to_s,
-  #     owner_id: id,
-  #     association_class: _licenses.klass.to_s,
-  #     association_ids: _licenses.ids,
-  #     association_primary_key_column: _licenses.klass.primary_key.to_s,
-  #     ensuring_owner_was_method: nil,
-  #   )
-  # }
 
   has_secure_password :password, validations: false
   has_environment
