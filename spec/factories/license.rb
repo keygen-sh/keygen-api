@@ -103,16 +103,12 @@ FactoryBot.define do
       owner { build(:user, account:, environment:) }
     end
 
-    trait :without_owner do
-      owner { nil }
-    end
-
     trait :owned do
       with_owner
     end
 
     trait :unowned do
-      without_owner
+      owner { nil }
     end
 
     trait :with_users do
@@ -121,16 +117,12 @@ FactoryBot.define do
       end
     end
 
-    trait :without_users do
-      # noop
-    end
-
     trait :assigned do
       with_users
     end
 
     trait :unassigned do
-      without_users
+      # noop
     end
 
     trait :userless do

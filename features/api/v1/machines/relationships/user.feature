@@ -1,5 +1,6 @@
 @api/v1
-Feature: Machine owner relationship
+Feature: Machine user relationship
+
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -13,23 +14,23 @@ Feature: Machine owner relationship
     And the current account is "test1"
     And the current account has 1 "machine"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves the owner for a machine
+  Scenario: Admin retrieves the user for a machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 3 "machines" for the last "license"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
     And the response should contain a valid signature header for "test1"
 
   @ee
-  Scenario: Isolated environment retrieves the owner for an isolated machine
+  Scenario: Isolated environment retrieves the product for an isolated machine
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated+owned "license"
@@ -40,24 +41,24 @@ Feature: Machine owner relationship
       """
       { "Keygen-Environment": "isolated" }
       """
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
 
   @ee
-  Scenario: Shared environment retrieves the owner for a shared machine
+  Scenario: Shared environment retrieves the product for a shared machine
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared+owned "license"
     And the current account has 1 shared "machine" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner?environment=shared"
+    When I send a GET request to "/accounts/test1/machines/$0/user?environment=shared"
     Then the response status should be "200"
     And the response body should be a "user"
 
   @ee
-  Scenario: Shared environment retrieves the owner for a global machine
+  Scenario: Shared environment retrieves the product for a global machine
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global+owned "license"
@@ -68,11 +69,11 @@ Feature: Machine owner relationship
       """
       { "Keygen-Environment": "shared" }
       """
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: Product retrieves the owner for a machine
+  Scenario: Product retrieves the user for a machine
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 "policy"
@@ -97,11 +98,11 @@ Feature: Machine owner relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: Product retrieves the owner for a machine of another product
+  Scenario: Product retrieves the user for a machine of another product
     Given the current account is "test1"
     And the current account has 3 "products"
     And the current account has 1 "policy"
@@ -126,10 +127,10 @@ Feature: Machine owner relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "404"
 
-  Scenario: User attempts to retrieve the owner for a machine they own
+  Scenario: User attempts to retrieve the user for a machine they own
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license"
@@ -144,11 +145,11 @@ Feature: Machine owner relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: User attempts to retrieve the owner for a machine they don't own
+  Scenario: User attempts to retrieve the user for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license"
@@ -163,10 +164,10 @@ Feature: Machine owner relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "404"
 
-  Scenario: License attempts to retrieve their owner (default permission)
+  Scenario: License attempts to retrieve their user (default permission)
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the first "user" as "owner"
@@ -174,10 +175,10 @@ Feature: Machine owner relationship
     And the current account has 2 "machines" for the first "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "403"
 
-  Scenario: License attempts to retrieve their owner (has permission)
+  Scenario: License attempts to retrieve their user (has permission)
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the first "user" as "owner"
@@ -189,11 +190,11 @@ Feature: Machine owner relationship
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the response body should be a "user"
 
-  Scenario: License attempts to retrieve the owner for a different license
+  Scenario: License attempts to retrieve the user for a different license
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the first "user" as "owner"
@@ -201,13 +202,13 @@ Feature: Machine owner relationship
     And the current account has 2 "machines" for the second "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$1/owner"
+    When I send a GET request to "/accounts/test1/machines/$1/user"
     Then the response status should be "404"
 
-  Scenario: Admin attempts to retrieve the owner for a machine of another account
+  Scenario: Admin attempts to retrieve the user for a machine of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
     And the current account has 3 "machines"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/owner"
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "401"

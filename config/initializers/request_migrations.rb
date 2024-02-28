@@ -19,10 +19,6 @@ RequestMigrations.configure do |config|
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
     '1.5' => %i[
-      rename_owner_relationship_to_user_for_licenses_migration
-      rename_owner_relationship_to_user_for_license_migration
-      rename_owner_relationship_to_user_for_machines_migration
-      rename_owner_relationship_to_user_for_machine_migration
       rename_owner_not_found_error_code_for_license_migration
     ],
     '1.4' => %i[

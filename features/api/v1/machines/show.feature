@@ -102,7 +102,7 @@ Feature: Show machine
     And the response body should be a "machine"
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a license for their account that has an owner
+  Scenario: Admin retrieves a license for their account that has a user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
@@ -117,64 +117,6 @@ Feature: Show machine
       { "licenseId": "$licenses[0]" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0"
-    Then the response status should be "200"
-    And the response body should be a "machine"
-    And the response should contain a valid signature header for "test1"
-    And the response body should be a "machine" with the following relationships:
-      """
-      {
-        "owner": {
-          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/owner" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
-
-  Scenario: Admin retrieves a license for their account that doesn't have an owner
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "userId": null }
-      """
-    And the current account has 1 "machine"
-    And the first "machine" has the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0"
-    Then the response status should be "200"
-    And the response body should be a "machine"
-    And the response should contain a valid signature header for "test1"
-    And the response body should be a "machine" with the following relationships:
-      """
-      {
-        "owner": {
-          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/owner" },
-          "data": null
-        }
-      }
-      """
-
-  Scenario: Admin retrieves a license for their account that has a user (v1.5)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[1]" }
-      """
-    And the current account has 3 "machines"
-    And all "machines" have the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
-    And I use an authentication token
-    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
     And the response body should be a "machine"
@@ -189,7 +131,7 @@ Feature: Show machine
       }
       """
 
-  Scenario: Admin retrieves a license for their account that doesn't have a user (v1.5)
+  Scenario: Admin retrieves a license for their account that doesn't have a user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
@@ -203,7 +145,6 @@ Feature: Show machine
       { "licenseId": "$licenses[0]" }
       """
     And I use an authentication token
-    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
     And the response body should be a "machine"

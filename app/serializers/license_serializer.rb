@@ -125,7 +125,7 @@ class LicenseSerializer < BaseSerializer
     end
   end
 
-  relationship :owner do
+  relationship :user do
     linkage always: true do
       if @object.owner_id?
         { type: :users, id: @object.owner_id }
@@ -134,7 +134,7 @@ class LicenseSerializer < BaseSerializer
       end
     end
     link :related do
-      @url_helpers.v1_account_license_owner_path @object.account_id, @object
+      @url_helpers.v1_account_license_user_path @object.account_id, @object
     end
   end
 

@@ -110,10 +110,7 @@ Rails.application.routes.draw do
           resource :group,   only: %i[show update]
           resource :license, only: %i[show]
           resource :owner,   only: %i[show]
-
-          scope module: :v1x5 do
-            resource :user, only: %i[show]
-          end
+          resource :user,    only: %i[show], controller: :owners
         end
 
         member do
@@ -187,16 +184,13 @@ Rails.application.routes.draw do
           resource :policy,  only: %i[show update]
           resource :group,   only: %i[show update]
           resource :owner,   only: %i[show update]
+          resource :user,    only: %i[show update], controller: :owners
 
           resources :entitlements, only: %i[index show] do
             collection do
               post '/',   to: 'entitlements#attach', as: :attach
               delete '/', to: 'entitlements#detach', as: :detach
             end
-          end
-
-          scope module: :v1x5 do
-            resource :user, only: %i[show update]
           end
         end
 

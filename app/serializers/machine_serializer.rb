@@ -93,7 +93,7 @@ class MachineSerializer < BaseSerializer
     end
   end
 
-  relationship :owner do
+  relationship :user do
     linkage always: true do
       if @object.license&.owner_id?
         { type: :users, id: @object.license.owner_id }
@@ -102,7 +102,7 @@ class MachineSerializer < BaseSerializer
       end
     end
     link :related do
-      @url_helpers.v1_account_machine_owner_path @object.account_id, @object
+      @url_helpers.v1_account_machine_user_path @object.account_id, @object
     end
   end
 

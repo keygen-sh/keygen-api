@@ -94,7 +94,7 @@ class License < ApplicationRecord
   validates :policy,
     scope: { by: :account_id }
 
-  # Validate this association only if we've been given an owner (because it's optional)
+  # Validate this association only if we've been given a owner (because it's optional)
   validates :owner,
     presence: { message: 'must exist' },
     scope: { by: :account_id },

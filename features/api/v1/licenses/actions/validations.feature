@@ -2826,60 +2826,6 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
-    And the response body should be a "license" with the following relationships:
-      """
-      {
-        "owner": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: An admin validates a valid license scoped to a specific user email (v1.5)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      {
-        "userId": "$users[1]",
-        "expiry": "$time.1.year.from_now"
-      }
-      """
-    And I use an authentication token
-    And I use API version "1.5"
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
-      """
-      {
-        "meta": {
-          "scope": {
-            "user": "$users[1].email"
-          }
-        }
-      }
-      """
-    Then the response status should be "200"
-    And the response should contain a valid signature header for "test1"
-    And the response body should contain a "license"
-    And the response body should contain meta which includes the following:
-      """
-      { "valid": true, "detail": "is valid", "code": "VALID" }
-      """
-    And the response body should be a "license" with the following relationships:
-      """
-      {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -10578,56 +10524,6 @@ Feature: License validation actions
     And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
-      """
-    And the response body should be a "license" with the following relationships:
-      """
-      {
-        "owner": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
-
-  Scenario: A user validates a license key scoped to their own ID (v1.5)
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 2 "users"
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      {
-        "userId": "$users[1]",
-        "expiry": "$time.1.year.from_now"
-      }
-      """
-    And I am a user of account "test1"
-    And I use an authentication token
-    And I use API version "1.5"
-    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
-      """
-      {
-        "meta": {
-          "key": "$licenses[0].key",
-          "scope": {
-            "user": "$users[1]"
-          }
-        }
-      }
-      """
-    Then the response status should be "200"
-    And the response body should contain meta which includes the following:
-      """
-      { "valid": true, "detail": "is valid", "code": "VALID" }
-      """
-    And the response body should be a "license" with the following relationships:
-      """
-      {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
       """
 
   Scenario: A user validates a license key scoped to their own email
