@@ -42,7 +42,7 @@ describe UnionOf do
             (
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                 WHERE
@@ -51,7 +51,7 @@ describe UnionOf do
               UNION
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
@@ -125,7 +125,7 @@ describe UnionOf do
             (
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                 WHERE
@@ -134,7 +134,7 @@ describe UnionOf do
               UNION
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
@@ -202,7 +202,7 @@ describe UnionOf do
             (
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                 WHERE
@@ -211,7 +211,7 @@ describe UnionOf do
               UNION
               (
                 SELECT
-                  "licenses"."id"
+                  "licenses".*
                 FROM
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
