@@ -85,25 +85,23 @@ After do |scenario|
       debug: {
         env_number: ENV['TEST_ENV_NUMBER'].to_i,
         error_log: $!&.backtrace || [],
-        query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
-          Elif.open(log_path) do |log|
-            count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
-            lines = []
+        query_log: Elif.open(Rails.root / 'log' / 'test.log') do |log|
+          count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
+          lines = []
 
-            # Read the last n SQL lines from the log file (useful when debugging CI)
-            log.each do |line|
-              break if lines.count >= count
+          # Read the last n SQL lines from the log file (useful when debugging CI)
+          log.each do |line|
+            break if lines.count >= count
 
-              if line =~ /application='Keygen',pid='#{Process.pid}'/
-                lines << line.squish
-              end
+            if line =~ /application:Keygen,pid:#{Process.pid}/
+              lines << line.squish
             end
-
-            lines
-          rescue
-            lines
           end
-        end,
+
+          lines
+        rescue
+          lines
+        end
       },
     )
   end
