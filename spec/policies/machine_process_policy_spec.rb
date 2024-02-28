@@ -607,7 +607,7 @@ describe MachineProcessPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_machine_processes] do
         with_token_authentication do
           with_permissions %w[process.read] do
@@ -660,96 +660,6 @@ describe MachineProcessPolicy, type: :policy do
             end
 
             allows :show, :create, :update, :destroy
-          end
-
-          without_permissions do
-            denies :show, :create, :update, :destroy
-          end
-        end
-      end
-
-      with_scenarios %i[accessing_machine_processes] do
-        with_token_authentication do
-          with_permissions %w[process.read] do
-            denies :index
-          end
-
-          with_wildcard_permissions { denies :index }
-          with_default_permissions  { denies :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_a_machine_process] do
-        with_token_authentication do
-          with_permissions %w[process.read] do
-            denies :show
-          end
-
-          with_wildcard_permissions do
-            denies :show, :create, :update, :destroy
-          end
-
-          with_default_permissions do
-            denies :show, :create, :update, :destroy
-          end
-
-          without_permissions do
-            denies :show, :create, :update, :destroy
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
-      with_scenarios %i[accessing_its_machine_processes] do
-        with_token_authentication do
-          with_permissions %w[process.read] do
-            allows :index
-          end
-
-          with_wildcard_permissions { allows :index }
-          with_default_permissions  { allows :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_its_machine_process] do
-        with_token_authentication do
-          with_permissions %w[process.read] do
-            without_token_permissions { denies :show }
-
-            allows :show
-          end
-
-          with_permissions %w[process.create] do
-            denies :create
-          end
-
-          with_permissions %w[process.update] do
-            denies :update
-          end
-
-          with_permissions %w[process.delete] do
-            denies :destroy
-          end
-
-          with_wildcard_permissions do
-            without_token_permissions do
-              denies :show, :create, :update, :destroy
-            end
-
-            denies :create, :update, :destroy
-            allows :show
-          end
-
-          with_default_permissions do
-            without_token_permissions do
-              denies :show, :create, :update, :destroy
-            end
-
-            denies :create, :update, :destroy
-            allows :show
           end
 
           without_permissions do

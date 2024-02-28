@@ -12,7 +12,7 @@ class MachineFilePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer || bearer.licenses.exists?(record.id)
+    in role: Role(:user) if record.owner == bearer
       allow!
     in role: Role(:license) if record.license == bearer
       allow!

@@ -319,57 +319,7 @@ describe Releases::ReleasePackagePolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
-      with_release_traits %i[packaged] do
-        with_scenarios %i[accessing_its_release accessing_its_package] do
-          with_token_authentication do
-            with_permissions %w[package.read] do
-              without_token_permissions { denies :show }
-
-              allows :show
-            end
-
-            with_wildcard_permissions do
-              denies :update
-              allows :show
-            end
-
-            with_default_permissions do
-              denies :update
-              allows :show
-            end
-
-            without_permissions do
-              denies :show, :update
-            end
-          end
-        end
-      end
-
-      with_scenarios %i[accessing_a_release accessing_its_package] do
-        with_token_authentication do
-          with_permissions %w[package.read] do
-            without_token_permissions { denies :show }
-
-            denies :show
-          end
-
-          with_wildcard_permissions do
-            denies :show, :update
-          end
-
-          with_default_permissions do
-            denies :show, :update
-          end
-
-          without_permissions do
-            denies :show, :update
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
+    with_bearer_trait :with_licenses do
       with_release_traits %i[packaged] do
         with_scenarios %i[accessing_its_release accessing_its_package] do
           with_token_authentication do

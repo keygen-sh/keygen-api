@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  # FIXME(ezekg) Drop these columns after we've migrated to multi-user licenses.
+  # TODO(ezekg) Uncomment once we move to multi-user licenses.
+  # self.ignored_columns = %w[user_id]
+
   MINIMUM_ADMIN_COUNT = 1
 
   include UnionOf::Macro
@@ -92,6 +96,35 @@ class User < ApplicationRecord
         ]
       end
     }
+
+  # NOTE(ezekg) This mirrors behavior for <= v1.5 where a user's licenses
+  #             were destroyed when the user was destroyed. With the
+  #             advent of multi-user licenses, this is no longer the
+  #             case. Instead, the license is simply disassociated
+  #             from the user.
+  #
+  # TODO(ezekg) Uncomment once we migrate licenses to multi-user licenses.
+  # TODO(ezekg) Should we batch this?
+  #
+  # after_destroy prepend: true do
+  #   next unless
+  #     Current.api_version.present? # skip outside of web context
+
+  #   next unless
+  #     Semverse::Constraint.new('<= 1.5')
+  #                         .satisfies?(
+  #                           Semverse::Version.new(Current.api_version),
+  #                         )
+
+  #   destroy_association_async_job.perform_later(
+  #     owner_model_name: self.class.to_s,
+  #     owner_id: id,
+  #     association_class: _licenses.klass.to_s,
+  #     association_ids: _licenses.ids,
+  #     association_primary_key_column: _licenses.klass.primary_key.to_s,
+  #     ensuring_owner_was_method: nil,
+  #   )
+  # end
 
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }

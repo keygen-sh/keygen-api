@@ -14,7 +14,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.owner == bearer || _1.id.in?(bearer.license_ids) }
+    in role: Role(:user) if record.all? { _1.owner == bearer }
       allow!
     else
       deny!
@@ -32,7 +32,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer || bearer.licenses.exists?(record.id)
+    in role: Role(:user) if record.owner == bearer
       allow!
     in role: Role(:license) if record == bearer
       allow!
@@ -96,7 +96,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer || bearer.licenses.exists?(record.id)
+    in role: Role(:user) if record.owner == bearer
       !record.protected?
     in role: Role(:license) if record == bearer
       allow!
@@ -134,7 +134,7 @@ class LicensePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer || bearer.licenses.exists?(record.id)
+    in role: Role(:user) if record.owner == bearer
       allow!
     in role: Role(:license) if record == bearer
       allow!

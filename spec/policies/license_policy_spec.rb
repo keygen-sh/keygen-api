@@ -809,7 +809,7 @@ describe LicensePolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_licenses] do
         with_token_authentication do
           with_permissions %w[license.read] do
@@ -888,136 +888,6 @@ describe LicensePolicy, type: :policy do
 
             allows :show, :create, :destroy, :validate, :check_out, :check_in, :revoke, :renew
             denies :update, :suspend, :reinstate
-          end
-
-          without_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-          end
-        end
-      end
-
-      with_scenarios %i[accessing_licenses] do
-        with_token_authentication do
-          with_permissions %w[license.read] do
-            denies :index
-          end
-
-          with_wildcard_permissions { denies :index }
-          with_default_permissions  { denies :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_a_license] do
-        with_token_authentication do
-          with_permissions %w[license.read] do
-            denies :show
-          end
-
-          with_permissions %w[license.validate] do
-            denies :validate, :validate_key
-          end
-
-          with_permissions %w[license.check-out] do
-            denies :check_out
-          end
-
-          with_permissions %w[license.check-in] do
-            denies :check_in
-          end
-
-          with_permissions %w[license.revoke] do
-            denies :revoke
-          end
-
-          with_permissions %w[license.renew] do
-            denies :renew
-          end
-
-          with_wildcard_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-          end
-
-          with_default_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-          end
-
-          without_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
-      with_scenarios %i[accessing_its_licenses] do
-        with_token_authentication do
-          with_permissions %w[license.read] do
-            allows :index
-          end
-
-          with_wildcard_permissions { allows :index }
-          with_default_permissions  { allows :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_its_license] do
-        with_token_authentication do
-          with_permissions %w[license.read] do
-            without_token_permissions { denies :show }
-
-            allows :show
-          end
-
-          with_permissions %w[license.create] do
-            denies :create
-          end
-
-          with_permissions %w[license.delete] do
-            denies :destroy
-          end
-
-          with_permissions %w[license.validate] do
-            without_token_permissions { denies :validate, :validate_key }
-
-            allows :validate, :validate_key
-          end
-
-          with_permissions %w[license.check-out] do
-            without_token_permissions { denies :check_out }
-
-            allows :check_out
-          end
-
-          with_permissions %w[license.check-in] do
-            denies :check_in
-          end
-
-          with_permissions %w[license.revoke] do
-            denies :revoke
-          end
-
-          with_permissions %w[license.renew] do
-            denies :renew
-          end
-
-          with_wildcard_permissions do
-            without_token_permissions do
-              denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-            end
-
-            denies :create, :update, :destroy, :check_in, :revoke, :renew, :suspend, :reinstate
-            allows :show, :validate, :check_out
-          end
-
-          with_default_permissions do
-            without_token_permissions do
-              denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
-            end
-
-            denies :create, :update, :destroy, :check_in, :revoke, :renew, :suspend, :reinstate
-            allows :show, :validate, :check_out
           end
 
           without_permissions do

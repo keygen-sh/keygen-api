@@ -341,25 +341,7 @@ describe Products::TokenPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
-      with_scenarios %i[accessing_its_product accessing_its_tokens] do
-        with_token_authentication do
-          with_wildcard_permissions { denies :index }
-          with_default_permissions  { denies :index }
-          without_permissions       { denies :index }
-        end
-      end
-
-      with_scenarios %i[accessing_its_product accessing_its_token] do
-        with_token_authentication do
-          with_wildcard_permissions { denies :show, :create }
-          with_default_permissions  { denies :show, :create }
-          without_permissions       { denies :show, :create }
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_product accessing_its_tokens] do
         with_token_authentication do
           with_wildcard_permissions { denies :index }

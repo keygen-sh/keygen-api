@@ -329,45 +329,7 @@ describe Releases::V1x0::DownloadPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
-      with_scenarios %i[accessing_its_release] do
-        with_token_authentication do
-          with_permissions %w[release.download] do
-            without_token_permissions { denies :download }
-
-            allows :download
-          end
-
-          with_permissions %w[release.upgrade] do
-            without_token_permissions { denies :upgrade }
-
-            allows :upgrade
-          end
-
-          with_wildcard_permissions do
-            without_token_permissions do
-              denies :download, :upgrade
-            end
-
-            allows :download, :upgrade
-          end
-
-          with_default_permissions do
-            without_token_permissions do
-              denies :download, :upgrade
-            end
-
-            allows :download, :upgrade
-          end
-
-          without_permissions do
-            denies :download, :upgrade
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_release] do
         with_token_authentication do
           with_permissions %w[release.download] do

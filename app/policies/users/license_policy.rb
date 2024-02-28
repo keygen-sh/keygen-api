@@ -16,7 +16,7 @@ module Users
       in role: Role(:product) if user.user?
         record.all? { _1.product == bearer }
       in role: Role(:user) if user == bearer
-        record.all? { _1.owner == bearer || _1.id.in?(bearer.license_ids) }
+        record.all? { _1.owner == bearer }
       else
         deny!
       end
@@ -34,7 +34,7 @@ module Users
       in role: Role(:product) if user.user?
         record.product == bearer
       in role: Role(:user) if user == bearer
-        record.owner == bearer || bearer.licenses.exists?(record.id)
+        record.owner == bearer
       else
         deny!
       end

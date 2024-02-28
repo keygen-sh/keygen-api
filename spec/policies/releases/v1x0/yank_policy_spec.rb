@@ -271,33 +271,7 @@ describe Releases::V1x0::YankPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
-      with_scenarios %i[accessing_its_release] do
-        with_token_authentication do
-          with_wildcard_permissions do
-            without_token_permissions do
-              denies :yank
-            end
-
-            denies :yank
-          end
-
-          with_default_permissions do
-            without_token_permissions do
-              denies :yank
-            end
-
-            denies :yank
-          end
-
-          without_permissions do
-            denies :yank
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_release] do
         with_token_authentication do
           with_wildcard_permissions do

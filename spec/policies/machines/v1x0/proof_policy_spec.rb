@@ -289,7 +289,7 @@ describe Machines::V1x0::ProofPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_machine] do
         with_token_authentication do
           with_permissions %w[machine.proofs.generate] do
@@ -312,28 +312,6 @@ describe Machines::V1x0::ProofPolicy, type: :policy do
             end
 
             allows :create
-          end
-
-          without_permissions do
-            denies :create
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
-      with_scenarios %i[accessing_its_machine] do
-        with_token_authentication do
-          with_permissions %w[machine.proofs.generate] do
-            denies :create
-          end
-
-          with_wildcard_permissions do
-            denies :create
-          end
-
-          with_default_permissions do
-            denies :create
           end
 
           without_permissions do

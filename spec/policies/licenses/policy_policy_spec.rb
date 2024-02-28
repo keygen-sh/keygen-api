@@ -307,7 +307,7 @@ describe Licenses::PolicyPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_owned_licenses do
+    with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_license accessing_its_policy] do
         with_token_authentication do
           with_permissions %w[policy.read] do
@@ -329,37 +329,6 @@ describe Licenses::PolicyPolicy, type: :policy do
           with_default_permissions do
             allows :update
             denies :show
-          end
-
-          without_permissions do
-            denies :show, :update
-          end
-        end
-      end
-    end
-
-    with_bearer_trait :with_user_licenses do
-      with_scenarios %i[accessing_its_license accessing_its_policy] do
-        with_token_authentication do
-          with_permissions %w[policy.read] do
-            without_token_permissions { denies :show }
-
-            allows :show
-          end
-
-          with_permissions %w[license.policy.update] do
-            without_token_permissions { denies :update }
-
-            denies :update
-          end
-
-          with_wildcard_permissions do
-            denies :update
-            allows :show
-          end
-
-          with_default_permissions do
-            denies :show, :update
           end
 
           without_permissions do
