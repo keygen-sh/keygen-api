@@ -817,33 +817,9 @@ Feature: License users relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Owner attempts to attach users to a license (default permissions)
+  Scenario: Owner attempts to attach users to a license
     Given the current account is "test1"
     And the current account has 3 "users"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And I am the last user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[1]" },
-          { "type": "users", "id": "$users[2]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Owner attempts to attach users to a license (explicit permission)
-    Given the current account is "test1"
-    And the current account has 3 "users"
-    And the last "user" has the following permissions:
-      """
-      ["license.users.attach"]
-      """
     And the current account has 1 "license" for the last "user" as "owner"
     And I am the last user of account "test1"
     And I use an authentication token
@@ -878,50 +854,6 @@ Feature: License users relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User attempts to attach users to their license (default permission)
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[1]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: User attempts to attach users to their license (explicit permission)
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the last "user" has the following permissions:
-      """
-      ["license.users.attach"]
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[1]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach users to a license
@@ -1316,30 +1248,9 @@ Feature: License users relationship
       """
     Then the response status should be "404"
 
-  Scenario: Owner attempts to detach a user from their license (default permission)
+  Scenario: Owner attempts to detach a user from their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user" as "owner"
-    And the current account has 2 "license-users" for the last "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[2]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-
-  Scenario: Owner attempts to detach a user from their license (explicit permission)
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the last "user" has the following permissions:
-      """
-      ["license.users.detach"]
-      """
     And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 2 "license-users" for the last "license"
     And I am a user of account "test1"
@@ -1357,10 +1268,6 @@ Feature: License users relationship
   Scenario: Owner attempts to detach themself from their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the last "user" has the following permissions:
-      """
-      ["license.users.detach"]
-      """
     And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 2 "license-users" for the last "license"
     And I am a user of account "test1"
@@ -1385,11 +1292,10 @@ Feature: License users relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to detach users from their license (default permission)
+  Scenario: User attempts to detach users from their license
     Given the current account is "test1"
     And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "license-users" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$0/users" with the following:
@@ -1401,40 +1307,3 @@ Feature: License users relationship
       }
       """
     Then the response status should be "403"
-
-  Scenario: User attempts to detach users from their license (explicit permission)
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
-    And the last "user" has the following permissions:
-      """
-      ["license.users.detach"]
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[1]" }
-        ]
-      }
-      """
-    Then the response status should be "403"
-
-  Scenario: User attempts to detach users from a license
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "license"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/licenses/$0/users" with the following:
-      """
-      {
-        "data": [
-          { "type": "users", "id": "$users[1]" }
-        ]
-      }
-      """
-    Then the response status should be "404"
