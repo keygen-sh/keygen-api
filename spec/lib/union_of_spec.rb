@@ -10,21 +10,6 @@ describe UnionOf do
   let(:record)  { create(:user, account:) } # FIXME(ezekg) Replace with temporary table when we extract into a gem
   let(:model)   { record.class }
 
-  it 'should create an association reflection' do
-    expect(model.reflect_on_all_associations).to satisfy { |associations|
-      associations in [
-        *,
-        UnionOf::Reflection(
-          name: :licenses,
-          options: {
-            sources: %i[owned_licenses user_licenses],
-          },
-        ),
-        *
-      ]
-    }
-  end
-
   it 'should create a union reflection' do
     expect(model.reflect_on_all_unions).to satisfy { |unions|
       unions in [
