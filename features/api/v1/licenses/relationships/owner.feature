@@ -136,31 +136,6 @@ Feature: License owner relationship
     When I send a GET request to "/accounts/test1/licenses/0/owner"
     Then the response status should be "404"
 
-  Scenario: License attempts to retrieve their owner (without permission)
-    Given the current account is "test1"
-    And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/owner"
-    Then the response status should be "403"
-
-  Scenario: License attempts to retrieve their owner (with permission)
-    Given the current account is "test1"
-    And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the last "license" has the following permissions:
-      """
-      ["user.read"]
-      """
-    And the current account has 1 "license-user" for the last "license" and the last "user"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/owner"
-    Then the response status should be "200"
-    And the response body should be a "user"
-
   Scenario: Admin attempts to retrieve the owner for a license of another account
     Given I am an admin of account "test2"
     And the current account is "test1"

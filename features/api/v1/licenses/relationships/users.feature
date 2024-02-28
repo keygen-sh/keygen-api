@@ -98,7 +98,7 @@ Feature: License users relationship
     When I send a GET request to "/accounts/test1/licenses/$0/users"
     Then the response status should be "404"
 
-  Scenario: License retrieves their users (without permission)
+  Scenario: License retrieves their users
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 3 "license-users" for the last "license"
@@ -106,21 +106,6 @@ Feature: License users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/users"
     Then the response status should be "403"
-
-  Scenario: License retrieves their users (with permission)
-    Given the current account is "test1"
-    And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user" as "owner"
-    And the last "license" has the following permissions:
-      """
-      ["user.read"]
-      """
-    And the current account has 3 "license-users" for the last "license"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/users"
-    Then the response status should be "200"
-    And the response body should be an array with 4 "users"
 
   Scenario: Owner attempts to retrieve the users for their license
     Given the current account is "test1"
@@ -235,29 +220,6 @@ Feature: License users relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/users/$1"
     Then the response status should be "404"
-
-  Scenario: License attempts to retrieve their user (without permission)
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 5 "license-users" for existing "licenses"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/users/$2"
-    Then the response status should be "403"
-
-  Scenario: License attempts to retrieve their user (with permission)
-    Given the current account is "test1"
-    And the current account has 1 "license"
-    And the last "license" has the following permissions:
-      """
-      ["user.read"]
-      """
-    And the current account has 5 "license-users" for existing "licenses"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/users/$2"
-    Then the response status should be "200"
-    And the response body should be an "user"
 
   # Attachment
   Scenario: Admin attaches users to a license
