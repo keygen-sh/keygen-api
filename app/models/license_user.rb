@@ -13,17 +13,11 @@ class LicenseUser < ApplicationRecord
   has_environment default: -> { license&.environment_id }
   has_account default: -> { license&.account_id }
 
-  validates :user,
+  validates :license,
     uniqueness: { message: 'already exists', scope: %i[account_id license_id user_id] },
     scope: { by: :account_id }
 
-  validate on: :create do
-    next unless
-      license.present? && user.present?
-
-    next unless
-      user == license.owner
-
-    errors.add :user, :conflict, message: 'already exists (user is attached through owner)'
-  end
+  validates :user,
+    uniqueness: { message: 'already exists', scope: %i[account_id license_id user_id] },
+    scope: { by: :account_id }
 end

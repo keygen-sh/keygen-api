@@ -281,7 +281,7 @@ class Release < ApplicationRecord
       .where(
         product: {
           distribution_strategy: ['LICENSED', nil],
-          licenses: { id: License.for_user(user) },
+          licenses: License.for_user(user),
         },
       )
       .union(

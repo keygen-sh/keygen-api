@@ -24,7 +24,7 @@ class User < ApplicationRecord
   has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id
   has_many :user_licenses, index_errors: true, through: :license_users, source: :license
   union_of :licenses, sources: %i[owned_licenses user_licenses], class_name: License.name do
-    def owned = where(owner: proxy_association.owner)
+    def owned = where(user: proxy_association.owner)
   end
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -295,9 +295,10 @@ class User < ApplicationRecord
     end
   }
 
+  # Give products the ability to read all groups
   scope :accessible_by, -> accessor {
     case accessor
-    in role: Role(:admin | :product) # give products the ability to read all users
+    in role: Role(:admin | :product)
       self.all
     in role: Role(:environment)
       self.for_environment(accessor.id)
@@ -310,16 +311,10 @@ class User < ApplicationRecord
     end
   }
 
-  scope :for_product, -> id { joins(licenses: :policy).where(policies: { product_id: id }).distinct }
-  scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
-  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
-  scope :for_user, -> id {
-    left_outer_joins(:licenses).where(licenses: { id: License.for_user(id) } ) # users of any associated licenses
-                               .or(
-                                 where(id:), # itself
-                               )
-                               .distinct
-  }
+  scope :for_product, -> (id) { joins(licenses: :policy).where policies: { product_id: id } }
+  scope :for_license, -> (id) { joins(:licenses).where licenses: { id: id } }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_user, -> id { where(id:) }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }

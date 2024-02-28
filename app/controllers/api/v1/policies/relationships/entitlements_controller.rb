@@ -79,7 +79,7 @@ module Api::V1::Policies::Relationships
         invalid_idx             = entitlement_ids.find_index(invalid_entitlement_id)
 
         return render_unprocessable_entity(
-          detail: "cannot detach entitlement '#{invalid_entitlement_id}' (entitlement is not attached)",
+          detail: "entitlement '#{invalid_entitlement_id}' relationship not found",
           source: {
             pointer: "/data/#{invalid_idx}",
           },

@@ -91,19 +91,6 @@ Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |id, coun
   end
 end
 
-Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following:$/ do |id, count, traits, resource, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
-  account = FindByAliasService.call(Account, id:, aliases: :slug)
-  attrs   = JSON.parse(body).deep_transform_keys!(&:underscore)
-  traits  = traits&.split('+')&.map(&:to_sym)
-
-  count.to_i.times do
-    create resource.singularize.underscore, *traits, **attrs, account:
-  end
-end
-
-
 Given /^the account "([^\"]*)" has its billing uninitialized$/ do |id|
   account = FindByAliasService.call(Account, id:, aliases: :slug)
 

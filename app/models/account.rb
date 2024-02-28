@@ -23,7 +23,6 @@ class Account < ApplicationRecord
   has_many :policies
   has_many :keys
   has_many :licenses
-  has_many :license_users
   has_many :machines
   has_many :machine_components
   has_many :machine_processes

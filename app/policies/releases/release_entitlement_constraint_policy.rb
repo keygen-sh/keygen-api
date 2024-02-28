@@ -15,7 +15,7 @@ module Releases
         allow!
       in role: Role(:product) if release.product == bearer
         allow!
-      in role: Role(:user) if bearer.products.exists?(release.product_id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow!
       in role: Role(:license) if release.product == bearer.product
         allow!
@@ -35,7 +35,7 @@ module Releases
         allow!
       in role: Role(:product) if release.product == bearer
         allow!
-      in role: Role(:user) if bearer.products.exists?(release.product_id)
+      in role: Role(:user) if bearer.products.exists?(release.product.id)
         allow!
       in role: Role(:license) if release.product == bearer.product
         allow!

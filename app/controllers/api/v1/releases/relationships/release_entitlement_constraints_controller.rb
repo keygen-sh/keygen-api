@@ -86,7 +86,7 @@ module Api::V1::Releases::Relationships
         invalid_idx             = constraint_ids.find_index(invalid_constraint_id)
 
         return render_unprocessable_entity(
-          detail: "cannot detach constraint '#{invalid_constraint_id}' (constraint is not attached)",
+          detail: "constraint '#{invalid_constraint_id}' relationship not found",
           source: {
             pointer: "/data/#{invalid_idx}"
           }

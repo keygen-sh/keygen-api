@@ -93,8 +93,6 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
-    license.users.attach
-    license.users.detach
     license.validate
 
     machine.check-out
@@ -249,8 +247,6 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
-    license.users.attach
-    license.users.detach
     license.validate
 
     machine.check-out
@@ -471,8 +467,6 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
-    license.users.attach
-    license.users.detach
     license.validate
 
     machine.check-out
@@ -579,8 +573,6 @@ class Permission < ApplicationRecord
     license.revoke
     license.usage.increment
     license.validate
-    license.users.attach
-    license.users.detach
 
     machine.check-out
     machine.create

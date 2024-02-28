@@ -553,14 +553,6 @@ module AuthorizationHelper
 
           licenses.collect(&:owner)
         }
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:users) {
-          license.users
-        }
-      in [:as_license, :accessing_itself, *]
-        let(:users) {
-          license.users
-        }
       in [:as_product, :accessing_a_group, *]
         let(:users) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
@@ -594,14 +586,6 @@ module AuthorizationHelper
           license = create(:license, *license_traits, :with_owner, account: policy.account, policy:)
 
           license.owner
-        }
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:user) {
-          license.users.first
-        }
-      in [:as_license, :accessing_itself, *]
-        let(:user) {
-          license.users.first
         }
       in [:as_product, :accessing_a_group, *]
         let(:user) {

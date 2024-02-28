@@ -86,8 +86,6 @@ permissions = %w[
   license.usage.increment
   license.usage.reset
   license.user.update
-  license.users.attach
-  license.users.detach
   license.validate
 
   machine.check-out
@@ -234,8 +232,6 @@ events = %w[
   license.usage.incremented
   license.usage.reset
   license.user.updated
-  license.users.attached
-  license.users.detached
   license.validated
   license.validation.failed
   license.validation.succeeded

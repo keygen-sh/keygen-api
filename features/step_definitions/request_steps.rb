@@ -226,31 +226,18 @@ Then /^the response body should be the following:$/ do |body|
   expect(json).to eq JSON.parse(body)
 end
 
-Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, resource|
-  json    = JSON.parse last_response.body
-  matches = json['data'].select { _1['type'] == resource.pluralize }
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
+  json = JSON.parse last_response.body
 
-  expect(matches.size).to eq count.to_i
+  expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
 
   if @account.present?
-    json['data'].all? do |data|
-      account_id =  data['relationships']['account']['data']['id']
+    json["data"].all? do |data|
+      account_id =  data["relationships"]["account"]["data"]["id"]
 
       expect(account_id).to eq @account.id
     end
   end
-end
-
-Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following:$/ do |count, resource, body|
-  body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-  json  = JSON.parse(last_response.body)
-  props = JSON.parse(body)
-
-  matches = json['data'].select { |data|
-    data['type'] == resource.pluralize && props <= data
-  }
-
-  expect(matches.count).to eq count.to_i
 end
 
 Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following attributes:$/ do |count, resource, body|
