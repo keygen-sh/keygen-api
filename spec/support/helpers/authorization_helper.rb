@@ -819,16 +819,6 @@ module AuthorizationHelper
 
           create_list(:machine, 3, *machine_traits, account: license.account, license:)
         }
-      in [*, :accessing_its_teammate, *]
-        let(:machines) {
-          user.machines.presence || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            create_list(:machine, 3, *machine_traits, account: user.account, license:)
-          end
-        }
       in [:as_product, :accessing_a_group, *]
         let(:machines) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
@@ -848,7 +838,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:machines) { create_list(:machine, 3, *machine_traits, account:, license: bearer) }
       in [:as_user, *]
-        let(:machines) { create_list(:machine, 3, *machine_traits, account:, license: bearer.licenses.take, owner: bearer) }
+        let(:machines) { create_list(:machine, 3, *machine_traits, account:, license: bearer.licenses.take) }
       end
 
       let(:record) { machines }
@@ -881,16 +871,6 @@ module AuthorizationHelper
 
           create(:machine, *machine_traits, account: license.account, license:)
         }
-      in [*, :accessing_its_teammate, *]
-        let(:machine) {
-          user.machines.take || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            create(:machine, *machine_traits, account: user.account, license:)
-          end
-        }
       in [:as_product, :accessing_a_group, *]
         let(:machine) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
@@ -910,7 +890,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:machine) { create(:machine, *machine_traits, account:, license: bearer) }
       in [:as_user, *]
-        let(:machine) { create(:machine, *machine_traits, account:, license: bearer.licenses.take, owner: bearer) }
+        let(:machine) { create(:machine, *machine_traits, account:, license: bearer.licenses.take) }
       end
 
       let(:record) { machine }
@@ -1004,18 +984,6 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:machine_processes) { create_list(:process, 3, account: machine.account, machine:) }
-      in [*, :accessing_its_teammate, *]
-        let(:machine_processes) {
-          user.processes.presence || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            machine = create(:machine, *machine_traits, account: user.account, license:)
-
-            create_list(:process, 3, account: user.account, machine:)
-          end
-        }
       in [:as_product, *]
         let(:_policy)           { create(:policy, *policy_traits, account:, product: bearer) }
         let(:_license)          { create(:license, *license_traits, account:, policy: _policy) }
@@ -1025,7 +993,7 @@ module AuthorizationHelper
         let(:_machine)          { create(:machine, *machine_traits, account:, license: bearer) }
         let(:machine_processes) { create_list(:process, 3, account:, machine: _machine) }
       in [:as_user, *]
-        let(:_machine)          { create(:machine, *machine_traits, account:, license: bearer.licenses.take, owner: bearer) }
+        let(:_machine)          { create(:machine, *machine_traits, account:, license: bearer.licenses.take) }
         let(:machine_processes) { create_list(:process, 3, account:, machine: _machine) }
       end
 
@@ -1036,18 +1004,6 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:machine_process) { create(:process, account: machine.account, machine:) }
-      in [*, :accessing_its_teammate, *]
-        let(:machine_process) {
-          user.processes.take || begin
-            license = create(:license, :with_users, *license_traits, account: user.account)
-
-            create(:license_user, account: user.account, license:, user:)
-
-            machine = create(:machine, *machine_traits, account: user.account, license:)
-
-            create(:process, account: user.account, machine:)
-          end
-        }
       in [:as_product, *]
         let(:_policy)         { create(:policy, *policy_traits, account:, product: bearer) }
         let(:_license)        { create(:license, *license_traits, account:, policy: _policy) }
@@ -1057,7 +1013,7 @@ module AuthorizationHelper
         let(:_machine)        { create(:machine, *machine_traits, account:, license: bearer) }
         let(:machine_process) { create(:process, account:, machine: _machine) }
       in [:as_user, *]
-        let(:_machine)        { create(:machine, *machine_traits, account:, license: bearer.licenses.take, owner: bearer) }
+        let(:_machine)        { create(:machine, *machine_traits, account:, license: bearer.licenses.take) }
         let(:machine_process) { create(:process, account:, machine: _machine) }
       end
 
