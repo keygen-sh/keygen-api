@@ -17,12 +17,12 @@ RSpec::Matchers.define :log do |message|
     block.call
 
     expect(@messages).to be_any { |actual|
-      expected = case @expected
-                 in String => s
-                   /#{Regexp.escape(s)}/
-                 in Regexp => re
-                   re
-                 end
+    expected = case @expected
+               in String => s
+                 /#{Regexp.escape(s)}/
+               in Regexp => re
+                 re
+               end
 
       expected.match?(actual)
     }
