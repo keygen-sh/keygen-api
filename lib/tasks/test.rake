@@ -47,14 +47,14 @@ begin
     task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]
 
-      if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
+      if pattern&.match?(/(\[\d)?(:\d)+\]?$/) # parallel_tests doesn't support line numbers/example IDs
         rspec = Rake::Task['spec']
 
         # FIXME(ezekg) Remove [ from GLOB_PATTERN so spec/foo_spec.rb[1:2:3:4] patterns are supported
         #              See: https://github.com/rspec/rspec-core/issues/3062
         Rake::FileList::GLOB_PATTERN = %r{[*?\{]}
 
-        ENV['SPEC'] = pattern
+        ENV['SPEC'] = pattern.shellescape
 
         rspec.invoke
       else
@@ -69,7 +69,7 @@ begin
       if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers
         cucumber = Rake::Task['cucumber']
 
-        ENV['FEATURE'] = pattern
+        ENV['FEATURE'] = pattern.shellescape
 
         cucumber.invoke
       else
