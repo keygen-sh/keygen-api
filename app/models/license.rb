@@ -331,7 +331,7 @@ class License < ApplicationRecord
       UUID_CHAR_RE.match?(user_identifier)
 
     scope.or(
-      joins(:users).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:users).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
