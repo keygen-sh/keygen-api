@@ -50,7 +50,7 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.owner == bearer || record.license.owner == bearer
+    in role: Role(:user) if record.owner == bearer || record.license&.owner == bearer
       !record.license&.protected?
     in role: Role(:license) if record.license == bearer
       allow!
