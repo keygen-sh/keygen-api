@@ -87,8 +87,11 @@ module Api::V1::Machines::Actions
     attr_reader :machine
 
     def set_machine
-      scoped_machines = authorized_scope(current_account.machines).preload(
+      scoped_machines = authorized_scope(current_account.machines).lazy_preload(
         components: %i[product license],
+        license: {
+          users: %i[role],
+        },
       )
 
       @machine = FindByAliasService.call(scoped_machines, id: params[:id], aliases: :fingerprint)
