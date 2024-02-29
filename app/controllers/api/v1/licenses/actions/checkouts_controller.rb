@@ -87,7 +87,9 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      scoped_licenses = authorized_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses).lazy_preload(
+        users: :role,
+      )
 
       @license = FindByAliasService.call(scoped_licenses, id: params[:id], aliases: :key)
 
