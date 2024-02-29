@@ -668,7 +668,7 @@ describe UnionOf do
       licenses = License.preload(:users)
 
       # FIXME(ezekg) How can I test the actual SQL used for preloading?
-      expect { licenses.to_a }.to make_database_queries(count: 6)
+      expect { licenses.to_a }.to make_database_queries(count: 4)
         .and not_raise_error
 
       licenses.each do |license|
