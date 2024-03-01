@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 # NOTE(ezekg) This takes about an hour in multiplayer mode with a Ryzen 3700x
-#             CPU, generating roughly 2GB of data. n = number of accounts.
+#             CPU, generating roughly 2GB of data when n = 10.
+n = ENV.fetch('N') { 1 }.to_i
 i = 0
-n = 10
 
 loop do
   event_types = EventType.pluck(:id)
 
-  Account.transaction do
+  begin
     domain  = Faker::Internet.unique.domain_name
     account = Account.create!(
       users_attributes: Array.new(rand(1..5)) {{ email: Faker::Internet.unique.email(domain:), password: Faker::Internet.password }},
@@ -113,19 +113,19 @@ loop do
       end
 
       # Licensing
-      rand(0..3).times do
+      rand(1..5).times do
         policy = Policy.create!(
           name: 'Floating Policy',
           authentication_strategy: %w[TOKEN LICENSE MIXED].sample,
           duration: [nil, 1.year, 1.month, 2.weeks].sample,
-          max_machines: 5,
+          max_machines: nil,
           floating: true,
           environment:,
           product:,
           account:,
         )
 
-        rand(0..10_000).times do
+        rand(1..10_000).times do
           owner = if rand(0..5).zero?
                     User.create!(
                       email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
@@ -142,12 +142,12 @@ loop do
             owner:,
           )
 
-          if rand(1..10).zero?
-            rand(1..10).times do
+          if rand(0..3).zero?
+            rand(0..100).times do
               user = if rand(0..10).zero?
                        User.where.not(id: owner) # filter out the owner otherwise it'll raise
                            .reorder(:id) # sorting on UUID is effectively random
-                           .find_by!(
+                           .find_by(
                              environment:,
                              account:,
                            )
@@ -169,10 +169,20 @@ loop do
                 license:,
                 user:,
               )
+            rescue ActiveRecord::RecordInvalid
+              # ignore duplicates
             end
           end
 
-          rand(0..5).times do
+          rand(0..license.users.count).times do
+            owner = if rand(0..5).zero?
+                      license.users.reorder(:id) # sorting on UUID is effectively random
+                                   .find_by(
+                                     environment:,
+                                     account:,
+                                   )
+                    end
+
             if rand(0..10).zero?
               Token.create!(bearer: license, account:, environment:)
             end
@@ -182,6 +192,7 @@ loop do
               environment:,
               license:,
               account:,
+              owner:,
             )
           end
         end
@@ -189,46 +200,58 @@ loop do
     end
 
     # Activity
-    rand(0..100_000).times do
-      request_time = rand(1.year).seconds.ago
-      request_id   = SecureRandom.uuid
+    unless ENV.key?('SKIP_ACTIVITY')
+      routes = Rails.application.routes.routes.select { _1.requirements[:subdomain] == 'api' }
 
-      # Attempt to select a random resource
-      resource = account.licenses.sample || account.releases.sample || account.products.sample
-      next if
-        resource.nil?
+      rand(0..100_000).times do
+        request_time = rand(1.year).seconds.ago
+        request_id   = SecureRandom.uuid
 
-      environment = resource.environment
-      requestor   = account.admins.for_environment(environment).sample || resource
+        # Select a random route
+        route  = routes.sample
+        method = route.verb
+        url    = route.format(
+          route.required_parts.reduce({}) { _1.merge(_2 => SecureRandom.uuid) },
+        )
 
-      request_log = RequestLog.create!(
-        id: request_id,
-        created_date: request_time,
-        created_at: request_time,
-        updated_at: Time.current,
-        user_agent: Faker::Internet.user_agent,
-        method: %w[GET POST PUT PATCH DELETE].sample,
-        url: '/',
-        request_body: nil,
-        ip: Faker::Internet.ip_v4_address,
-        response_signature: SecureRandom.base64,
-        response_body: '{"data":null,"errors":[],"meta":{"sample":true}}',
-        status: %w[200 201 204 303 302 307 400 401 403 404 422],
-        environment:,
-        resource:,
-        requestor:,
-        account:,
-      )
+        resource    = route.requirements[:controller].classify.split('::').last.safe_constantize
+        environment = resource.try(:environment)
+        admins      = account.admins.for_environment(environment).sample
+        requestor   = if resource.respond_to?(:role) && rand(0..1).zero?
+                        resource
+                      else
+                        admin
+                      end
 
-      event_log = EventLog.create!(
-        event_type_id: event_types.sample,
-        idempotency_key: SecureRandom.hex,
-        whodunnit: requestor,
-        environment:,
-        resource:,
-        request_log:,
-        account:,
-      )
+        request_log = RequestLog.create!(
+          id: request_id,
+          created_date: request_time,
+          created_at: request_time,
+          updated_at: Time.current,
+          user_agent: Faker::Internet.user_agent,
+          ip: Faker::Internet.ip_v4_address,
+          request_body: method.in?(%w[POST PUT PATCH]) ? '{"data":null,"meta":{"sample":true}}' : nil,
+          response_signature: SecureRandom.base64,
+          response_body: '{"data":null,"errors":[],"meta":{"sample":true}}',
+          status: %w[200 201 204 303 302 307 400 401 403 404 422],
+          method:,
+          url:,
+          environment:,
+          resource:,
+          requestor:,
+          account:,
+        )
+
+        event_log = EventLog.create!(
+          event_type_id: event_types.sample,
+          idempotency_key: SecureRandom.hex,
+          whodunnit: requestor,
+          environment:,
+          resource:,
+          request_log:,
+          account:,
+        )
+      end
     end
   rescue ActiveRecord::RecordNotSaved => e
     pp(errors: e.record.errors.full_messages)
