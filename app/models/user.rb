@@ -22,6 +22,11 @@ class User < ApplicationRecord
   has_many :licenses, union_of: %i[owned_licenses user_licenses], inverse_of: :users do
     def owned = where(owner: proxy_association.owner)
   end
+  # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
+  #              Maybe collaborators or associated_users?
+  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).where.not(id: user.id) },
+    through: :licenses,
+    source: :users
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
@@ -308,25 +313,11 @@ class User < ApplicationRecord
   scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> id {
-    license_ids = License.for_user(id).ids
-    itself      = case id
-                  when User, UUID_RE
-                    where(id:)
-                  when nil
-                    none
-                  else
-                    where(email: id)
-                  end
-
-    joins(:owned_licenses).where(owned_licenses: { id: license_ids }) # users of any associated owned licenses
-      .union(
-        joins(:license_users).where(license_users: { license_id: license_ids }), # users of any associated user licenses
-      )
-      .union(
-        itself,
-      )
-      .distinct
-
+    joins(:licenses).where(licenses: { id: License.for_user(id) }) # users of any associated licenses
+                    .union(
+                      where(id:), # itself
+                    )
+                    .distinct
   }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
@@ -390,15 +381,9 @@ class User < ApplicationRecord
 
   # FIXME(ezekg) Selecting on ID isn't supported by our association scopes because
   #              we're using DISTINCT and reordering on created_at.
-  def product_ids = products.reorder(nil).ids
-  def policy_ids  = policies.reorder(nil).ids
-
-  # FIXME(ezekg) This should be an association, but the union_of JOIN IN structure
-  #              is not ideal for particularly large associations.
   def teammate_ids = teammates.reorder(nil).ids
-  def teammates
-    account.users.for_user(self).excluding(self)
-  end
+  def product_ids  = products.reorder(nil).ids
+  def policy_ids   = policies.reorder(nil).ids
 
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids

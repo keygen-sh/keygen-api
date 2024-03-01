@@ -534,28 +534,25 @@ class License < ApplicationRecord
   scope :for_policy, -> policy { where(policy:) }
   scope :for_user, -> user {
     case user
-    when User, UUID_RE
-      joins(:owner).where(owner: { id: user })
-        .union(
-          joins(:license_users).where(license_users: { user_id: user }),
-        )
-    when nil
-      none
+    when User
+      joins(:users).where(users: { id: user })
     else
-      joins(:owner).where(owner: { email: user })
-        .union(
-          joins(:licensees).where(licensees: { email: user }),
-        )
+      joins(:users).where(users: { id: user })
+                   .or(
+                     joins(:users).where(users: { email: user }),
+                   )
     end
   }
   scope :for_owner, -> owner {
     case owner
-    when User, UUID_RE
-      joins(:owner).where(owner: { id: owner })
-    when nil
+    when User,
+         nil
       where(owner:)
     else
-      joins(:owner).where(owner: { email: owner })
+      joins(:owner).where(owner: { id: owner })
+                   .or(
+                     joins(:owner).where(owner: { email: owner }),
+                   )
     end
   }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
