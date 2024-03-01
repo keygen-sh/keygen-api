@@ -23,6 +23,7 @@ class ReleasePolicy < ApplicationPolicy
     else
       relation.open
               .published
+              .without_constraints
     end
   end
 

@@ -646,22 +646,23 @@ Feature: List releases
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
-      { "distributionStrategy": "LICENSED" }
+      { "distributionStrategy": "OPEN" }
       """
     And the second "product" has the following attributes:
       """
-      { "distributionStrategy": "OPEN" }
+      { "distributionStrategy": "LICENSED" }
       """
     And the third "product" has the following attributes:
       """
       { "distributionStrategy": "CLOSED" }
       """
-    And the current account has 3 "releases" for the first "product"
-    And the current account has 5 "releases" for the second "product"
+    And the current account has 5 "releases" for the first "product"
+    And the current account has 3 "constraints" for the second "release"
+    And the current account has 3 "releases" for the second "product"
     And the current account has 7 "releases" for the third "product"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the response body should be an array with 5 "releases"
+    And the response body should be an array with 4 "releases"
 
   Scenario: License attempts to retrieve all draft releases
     Given the current account is "test1"
