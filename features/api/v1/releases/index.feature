@@ -1081,22 +1081,24 @@ Feature: List releases
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "constraint" for each "release"
+    And the current account has 1 "release" for the last "product"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?constraints[]=$entitlements[0].code"
     Then the response status should be "200"
-    And the response body should be an array with 1 "release"
+    And the response body should be an array with 2 "releases"
 
   Scenario: Admin retrieves releases filtered by entitlement
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "constraint" for each "release"
+    And the current account has 1 "release" for the last "product"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?entitlements[]=$entitlements[0].code"
     Then the response status should be "200"
-    And the response body should be an array with 1 "release"
+    And the response body should be an array with 2 "releases"
 
   Scenario: License retrieves their product releases with constraints (no entitlements)
     Given the current account is "test1"
