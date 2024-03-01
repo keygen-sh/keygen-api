@@ -3,8 +3,8 @@
 module Api::V1
   class ReleasesController < Api::V1::BaseController
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
-    has_scope(:entitlements) { |c, s, v| s.within_constraints(v) }
-    has_scope(:constraints) { |c, s, v| s.within_constraints(v) }
+    has_scope(:entitlements, type: :array) { |c, s, v| s.within_constraints(v, strict: true) }
+    has_scope(:constraints, type: :array) { |c, s, v| s.within_constraints(v, strict: true) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:package, allow_blank: true) { |c, s, v| s.for_package(v.presence) }
