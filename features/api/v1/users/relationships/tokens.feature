@@ -1424,7 +1424,7 @@ Feature: User tokens relationship
     And the current account has 1 isolated "token" for each "user"
     And I am an environment of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/$1/tokens?environment=isolated"
+    When I send a GET request to "/accounts/test1/users/$2/tokens?environment=isolated"
     Then the response status should be "200"
 
   Scenario: Product requests tokens for one of their users

@@ -68,7 +68,7 @@ Feature: User ban actions
       """
       { "keygen-environment": "isolated" }
       """
-    When I send a POST request to "/accounts/test1/users/$1/actions/ban"
+    When I send a POST request to "/accounts/test1/users/$2/actions/ban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
     And the response body should be a "user" with the following attributes:
@@ -235,7 +235,7 @@ Feature: User ban actions
       """
       { "keygen-environment": "isolated" }
       """
-    When I send a POST request to "/accounts/test1/users/$1/actions/unban"
+    When I send a POST request to "/accounts/test1/users/$2/actions/unban"
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
     And the response body should be a "user" with the following attributes:
