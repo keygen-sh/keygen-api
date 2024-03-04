@@ -197,28 +197,27 @@ module UnionOf
       foreign_key   = reflection.join_foreign_key
 
       scopes = reflection.union_sources.map do |union_source|
-        union_source_reflection  = foreign_klass.reflect_on_association(union_source)
-        union_source_foreign_key = union_source_reflection.foreign_key
+        union_reflection  = foreign_klass.reflect_on_association(union_source)
+        union_primary_key = primary_key[union_reflection.name]
+        union_foreign_key = union_reflection.foreign_key
 
         constraints = foreign_klass.default_scoped.where_clause
-        sources     = if union_source_reflection.through_reflection?
-                          through_reflection  = union_source_reflection.through_reflection
+        sources     = if union_reflection.through_reflection?
+                          through_reflection  = union_reflection.through_reflection
                           through_foreign_key = through_reflection.foreign_key
                           through_klass       = through_reflection.klass
                           through_table       = through_klass.arel_table
                           through_constraints = through_klass.default_scoped.where_clause
+                          constraints         = constraints.merge(through_constraints)
 
-                          constraints = constraints.merge(through_constraints)
-
-                          # FIXME(ezekg) How should we decide which primary key to use?
-                          foreign_table.project(foreign_table[:id], through_table[primary_key.first].as('union_id'))
+                          foreign_table.project(foreign_table[:id], through_table[union_primary_key].as('union_id'))
                                        .from(foreign_table)
                                        .join(through_table, Arel::Nodes::InnerJoin)
                                        .on(
                                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                                        )
                         else
-                          foreign_table.project(foreign_table[:id], foreign_table[primary_key.first].as('union_id'))
+                          foreign_table.project(foreign_table[:id], foreign_table[union_primary_key].as('union_id'))
                                        .from(foreign_table)
                         end
 
@@ -269,7 +268,7 @@ module UnionOf
 
     # Unlike other reflections, we don't have a single foreign key.
     # Instead, we have many, one from each union source.
-    def foreign_keys = union_reflections.collect(&:foreign_key)
+    def foreign_keys = union_reflections.reduce({}) { _1.merge(_2.name => _2.foreign_key) }
     def foreign_key  = foreign_keys
 
     def join_scope(table, foreign_table, foreign_klass)
