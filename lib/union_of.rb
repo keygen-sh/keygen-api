@@ -285,44 +285,45 @@ module UnionOf
       scope_chain_items = join_scopes(table, predicate_builder)
       scope             = klass_join_scope(table, predicate_builder)
 
-      unions = union_sources.reduce(nil) do |left, union_source|
+      scopes = union_sources.map do |union_source|
         union_reflection = foreign_klass.reflect_on_association(union_source)
-
-        relation = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
-                                                               .except(:order)
+        union_relation   = union_reflection.klass.scope_for_association.select(union_reflection.active_record_primary_key)
+                                                                       .except(:order)
 
         primary_key = union_reflection.join_primary_key
         foreign_key = union_reflection.join_foreign_key
 
-        right = if union_reflection.through_reflection?
-                  through_reflection  = union_reflection.through_reflection
-                  through_foreign_key = through_reflection.foreign_key
-                  through_klass       = through_reflection.klass
-                  through_table       = through_klass.arel_table
+        if union_reflection.through_reflection?
+            through_reflection  = union_reflection.through_reflection
+            through_foreign_key = through_reflection.foreign_key
+            through_klass       = through_reflection.klass
+            through_table       = through_klass.arel_table
 
-                  # FIXME(ezekg) Seems like there should be a better way to do this?
-                  unaliased_table = case table
-                                    in Arel::Nodes::TableAlias => aliased_table
-                                      Arel::Table.new(aliased_table.right)
-                                    in Arel::Table => table
-                                      table
-                                    end
+            # FIXME(ezekg) Seems like there should be a better way to do this?
+            unaliased_table = case table
+                              in Arel::Nodes::TableAlias => aliased_table
+                                Arel::Table.new(aliased_table.right)
+                              in Arel::Table => table
+                                table
+                              end
 
-                  join_sources = unaliased_table.join(through_table, Arel::Nodes::InnerJoin)
-                                                .from(table)
-                                                .on(
-                                                  table[primary_key].eq(through_table[foreign_key]),
-                                                  foreign_table[primary_key].eq(through_table[through_foreign_key]),
-                                                )
-                                                .join_sources
+            join_sources = unaliased_table.join(through_table, Arel::Nodes::InnerJoin)
+                                          .from(table)
+                                          .on(
+                                            table[primary_key].eq(through_table[foreign_key]),
+                                            foreign_table[primary_key].eq(through_table[through_foreign_key]),
+                                          )
+                                          .join_sources
 
-                  relation.joins(join_sources)
+            union_relation.joins(join_sources)
                           .arel
-                else
-                  relation.where(table[primary_key].eq(foreign_table[foreign_key]))
+          else
+            union_relation.where(table[primary_key].eq(foreign_table[foreign_key]))
                           .arel
-                end
+          end
+      end
 
+      unions = scopes.reduce(nil) do |left, right|
         if left
           Arel::Nodes::Union.new(left, right)
         else
@@ -335,6 +336,8 @@ module UnionOf
           unions,
         )
       )
+
+      scope
     end
 
     def deconstruct_keys(keys) = { name:, options: }
