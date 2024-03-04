@@ -36,7 +36,7 @@ loop do
         Token.create!(bearer: environment, account:, environment:)
       end
 
-      rand(0..10).times do
+      rand(0..100).times do
         buzzword = Faker::Company.unique.buzzword
 
         Entitlement.create!(
@@ -64,136 +64,167 @@ loop do
       end
 
       # Distribution
-      rand(0..3).times do
-        name    = "#{product.name} #{Faker::Hacker.unique.noun.capitalize}"
+      unless ENV.key?('SKIP_DISTRIBUTION')
+        rand(0..3).times do
+          name    = "#{product.name} #{Faker::Hacker.unique.noun.capitalize}"
+          package = if rand(0..1).zero?
+                      engine = if rand(0..1).zero?
+                                { engine_attributes: { key: %w[pypi tauri].sample } }
+                              else
+                                {}
+                              end
 
-        package = if rand(0..1).zero?
-                    engine = if rand(0..1).zero?
-                               { engine_attributes: { key: %w[pypi tauri].sample } }
-                             else
-                               {}
-                             end
+                      ReleasePackage.create!(
+                        key: name.parameterize,
+                        name: name,
+                        environment:,
+                        product:,
+                        account:,
+                        **engine,
+                      )
+                    end
 
-                    ReleasePackage.create!(
-                      key: name.parameterize,
-                      name: name,
-                      environment:,
-                      product:,
-                      account:,
-                      **engine,
-                    )
-                  end
-
-        rand(0..20).times do
-          version = Faker::App.unique.semantic_version
-          release = Release.create!(
-            channel_attributes: { key: 'stable' },
-            name: "#{name} v#{version}",
-            version:,
-            environment:,
-            package:,
-            product:,
-            account:,
-          )
-
-          rand(1..10).times do
-            ext = %w[exe tar.gz zip dmg].sample
-            artifact = ReleaseArtifact.create!(
-              platform_attributes: { key: Faker::Computer.platform.downcase },
-              arch_attributes: { key: %w[x86 386 amd64 arm arm64].sample },
-              filetype_attributes: { key: ext },
-              filename: Faker::File.unique.file_name(ext:),
-              filesize: rand(1.gigabyte),
+          rand(0..20).times do
+            version = Faker::App.unique.semantic_version
+            release = Release.create!(
+              channel_attributes: { key: 'stable' },
+              name: "#{name} v#{version}",
+              version:,
               environment:,
-              release:,
+              package:,
+              product:,
               account:,
             )
+
+            rand(1..10).times do
+              ext = %w[exe tar.gz zip dmg].sample
+              artifact = ReleaseArtifact.create!(
+                platform_attributes: { key: Faker::Computer.platform.downcase },
+                arch_attributes: { key: %w[x86 386 amd64 arm arm64].sample },
+                filetype_attributes: { key: ext },
+                filename: Faker::File.unique.file_name(ext:),
+                filesize: rand(1.gigabyte),
+                environment:,
+                release:,
+                account:,
+              )
+            end
           end
         end
       end
 
       # Licensing
-      rand(1..5).times do
-        policy = Policy.create!(
-          name: 'Floating Policy',
-          authentication_strategy: %w[TOKEN LICENSE MIXED].sample,
-          duration: [nil, 1.year, 1.month, 2.weeks].sample,
-          max_machines: nil,
-          floating: true,
-          environment:,
-          product:,
-          account:,
-        )
-
-        rand(1..10_000).times do
-          owner = if rand(0..5).zero?
-                    User.create!(
-                      email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
-                      environment:,
-                      account:,
-                    )
-                  end
-
-          license = License.create!(
-            name: 'Floating License',
+      unless ENV.key?('SKIP_LICENSING')
+        rand(1..3).times do
+          policy = Policy.create!(
+            name: 'Floating Policy',
+            authentication_strategy: %w[TOKEN LICENSE MIXED].sample,
+            duration: [nil, 1.year, 1.month, 2.weeks].sample,
+            max_machines: nil,
+            floating: true,
             environment:,
-            policy:,
+            product:,
             account:,
-            owner:,
           )
 
           if rand(0..3).zero?
-            rand(0..100).times do
-              user = if rand(0..10).zero?
-                       User.where.not(id: owner) # filter out the owner otherwise it'll raise
-                           .reorder(:id) # sorting on UUID is effectively random
-                           .find_by(
-                             environment:,
-                             account:,
-                           )
-                     else
-                       User.create!(
-                         email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
-                         environment:,
-                         account:,
-                       )
-                     end
-
-              if rand(0..1).zero? && user.present?
-                Token.create!(bearer: user, account:, environment:)
+            account.entitlements.for_environment(environment, strict: true).find_each do |entitlement|
+              unless rand(0..5).zero?
+                PolicyEntitlement.create!(
+                  environment:,
+                  account:,
+                  entitlement:,
+                  policy:,
+                )
               end
-
-              LicenseUser.create!(
-                environment:,
-                account:,
-                license:,
-                user:,
-              )
-            rescue ActiveRecord::RecordInvalid
-              # ignore duplicates
             end
           end
 
-          rand(0..license.users.count).times do
+          rand(1..10_000).times do
             owner = if rand(0..5).zero?
-                      license.users.reorder(:id) # sorting on UUID is effectively random
-                                   .find_by(
-                                     environment:,
-                                     account:,
-                                   )
+                      User.create!(
+                        email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                        environment:,
+                        account:,
+                      )
                     end
+
+            license = License.create!(
+              name: 'Floating License',
+              environment:,
+              policy:,
+              account:,
+              owner:,
+            )
 
             if rand(0..10).zero?
               Token.create!(bearer: license, account:, environment:)
             end
 
-            Machine.create!(
-              fingerprint: SecureRandom.hex,
-              environment:,
-              license:,
-              account:,
-              owner:,
-            )
+            if rand(0..3).zero?
+              LicenseEntitlement.create!(
+                entitlement: account.entitlements.for_environment(environment, strict: true)
+                                                 .excluding(*policy.entitlements)
+                                                 .to_a.sample,
+                environment:,
+                account:,
+                license:,
+              )
+            end
+
+            if rand(0..5).zero?
+              rand(0..10).times do
+                user = if rand(0..3).zero?
+                        User.create!(
+                          email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                          environment:,
+                          account:,
+                        )
+                      else
+                        User.where.not(id: owner) # filter out the owner otherwise it'll raise
+                            .reorder(:id) # sorting on UUID is effectively random if inserts are constant
+                            .offset((rand() * account.users.for_environment(environment, strict: true).count).floor) # random user
+                            .limit(1)
+                            .find_by(
+                              environment:,
+                              account:,
+                            )
+                      end
+
+                if rand(0..1).zero? && user.present?
+                  Token.create!(bearer: user, account:, environment:)
+                end
+
+                LicenseUser.create!(
+                  environment:,
+                  account:,
+                  license:,
+                  user:,
+                )
+              rescue ActiveRecord::RecordInvalid
+                # ignore duplicates
+              end
+            end
+
+            rand(0..license.users.count).times do
+              owner = if rand(0..5).zero?
+                        license.users.reorder(:id) # sorting on UUID is effectively random if inserts are constant
+                                     .offset((rand() * license.users.count).floor) # random user
+                                     .limit(1)
+                                     .find_by(
+                                       environment:,
+                                       account:,
+                                     )
+                      end
+
+              Machine.create!(
+                fingerprint: SecureRandom.hex,
+                environment:,
+                license:,
+                account:,
+                owner:,
+              )
+            end
           end
         end
       end
@@ -216,7 +247,7 @@ loop do
 
         resource    = route.requirements[:controller].classify.split('::').last.safe_constantize
         environment = resource.try(:environment)
-        admins      = account.admins.for_environment(environment).sample
+        admins      = account.admins.for_environment(environment, strict: true).sample
         requestor   = if resource.respond_to?(:role) && rand(0..1).zero?
                         resource
                       else
