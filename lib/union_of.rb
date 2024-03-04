@@ -196,6 +196,8 @@ module UnionOf
       primary_key   = reflection.join_primary_key
       foreign_key   = reflection.join_foreign_key
 
+      default_constraints = foreign_klass.default_scoped.where_clause
+
       scopes = reflection.union_sources.map do |union_source|
         union_source_reflection  = foreign_klass.reflect_on_association(union_source)
         union_source_foreign_key = union_source_reflection.foreign_key
@@ -205,16 +207,29 @@ module UnionOf
           through_foreign_key = through_reflection.foreign_key
           through_klass       = through_reflection.klass
           through_table       = through_klass.arel_table
+          through_constraints = through_klass.default_scoped.where_clause
 
-          foreign_table.project(foreign_table[foreign_key], through_table[primary_key.first].as('union_id'))
+          constraints = default_constraints.merge(through_constraints)
+                                           .ast
+
+          # FIXME(ezekg) How should we decide which primary key to use?
+          foreign_table.project(foreign_table[:id], through_table[primary_key.first].as('union_id'))
                        .from(foreign_table)
                        .join(through_table, Arel::Nodes::InnerJoin)
                        .on(
                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                        )
+                       .where(
+                         constraints,
+                       )
         else
-          foreign_table.project(foreign_table[foreign_key], foreign_table[primary_key.first].as('union_id'))
+          constraints = default_constraints.ast
+
+          foreign_table.project(foreign_table[:id], foreign_table[primary_key.first].as('union_id'))
                        .from(foreign_table)
+                       .where(
+                         constraints,
+                       )
         end
       end
 
