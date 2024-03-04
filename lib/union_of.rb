@@ -182,9 +182,11 @@ module UnionOf
         ),
       )
 
-      scope.merge(
+      scope.merge!(
         scope.default_scoped,
       )
+
+      scope
     end
 
     def next_chain_scope(scope, reflection, next_reflection)
@@ -250,9 +252,11 @@ module UnionOf
         )
       )
 
-      scope.merge(
+      scope.merge!(
         scope.default_scoped,
       )
+
+      scope
     end
   end
 
