@@ -50,6 +50,7 @@ gem 'kaminari', '~> 1.2.0'
 # Postgres/DB extensions
 gem 'active_record_union'
 gem 'active_record_distinct_on', '~> 1.6'
+gem 'activerecord_follow_assoc', '~> 0.1'
 gem 'activerecord_where_assoc', '~> 1.1.4'
 gem 'ar_lazy_preload', '~> 2.0'
 gem 'strong_migrations'
