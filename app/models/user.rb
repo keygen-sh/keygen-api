@@ -24,7 +24,7 @@ class User < ApplicationRecord
   end
   # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
   #              Maybe collaborators or associated_users?
-  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).where.not(id: user.id) },
+  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).excluding(user) },
     through: :licenses,
     source: :users
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
