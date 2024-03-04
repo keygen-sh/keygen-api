@@ -410,9 +410,9 @@ class License < ApplicationRecord
   }
 
   scope :active, -> (start_date = 90.days.ago) {
-    # exclude licenses of banned users (if any)
-    left_outer_joins(:users)
-      .where(users: { banned_at: nil })
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
       # include any licenses newer than :t or with any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at >= :start_date OR
@@ -423,9 +423,9 @@ class License < ApplicationRecord
   }
 
   scope :inactive, -> (start_date = 90.days.ago) {
-    # exclude licenses of banned users (if any)
-    left_outer_joins(:users)
-      .where(users: { banned_at: nil })
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
       # include licenses older than :t without any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at < :start_date AND
@@ -438,15 +438,12 @@ class License < ApplicationRecord
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :assigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      joins(:users).where.not(user_id: nil)
-                   .or(
-                     where.associated(:users),
-                   )
-                   .distinct
+      where_assoc_exists(:owner).or(
+        where_assoc_exists(:licensees),
+      )
     else
-      left_outer_joins(:users).where(user_id: nil)
-                              .where.missing(:users)
-                              .distinct
+      where_assoc_not_exists(:owner)
+        .where_assoc_not_exists(:licensees)
     end
   }
   scope :unassigned, -> (status = true) {
@@ -540,7 +537,7 @@ class License < ApplicationRecord
   scope :for_policy, -> policy { where(policy:) }
   scope :for_user, -> user {
     case user
-    when User
+    when User, UUID_RE
       joins(:users).where(users: { id: user })
     else
       joins(:users).where(users: { id: user })
@@ -551,8 +548,9 @@ class License < ApplicationRecord
   }
   scope :for_owner, -> owner {
     case owner
-    when User,
-         nil
+    when User, UUID_RE
+      where(owner: { id: owner })
+    when nil
       where(owner:)
     else
       joins(:owner).where(owner: { id: owner })

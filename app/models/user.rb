@@ -313,11 +313,11 @@ class User < ApplicationRecord
   scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> id {
-    left_outer_joins(:licenses).where(licenses: { id: License.for_user(id) } ) # users of any associated licenses
-                               .or(
-                                 where(id:), # itself
-                               )
-                               .distinct
+    joins(:licenses).where(licenses: { id: License.for_user(id) } ) # users of any associated licenses
+                    .union(
+                      where(id:), # itself
+                    )
+                    .distinct
   }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
