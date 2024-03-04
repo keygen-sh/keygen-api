@@ -158,10 +158,6 @@ module UnionOf
         reflection  = association.reflection
         primary_key = reflection.active_record_primary_key
 
-        # FIXME(ezekg) Find an alternative to this private API.
-        next if
-          reflection.belongs_to? && !association.send(:foreign_key_present?)
-
         association.scope.select(primary_key)
                          .unscope(:order)
                          .arel
@@ -210,19 +206,15 @@ module UnionOf
           through_klass       = through_reflection.klass
           through_table       = through_klass.arel_table
 
-          foreign_table.project(foreign_table[foreign_key])
+          foreign_table.project(foreign_table[foreign_key], through_table[primary_key.first].as('union_id'))
                        .from(foreign_table)
                        .join(through_table, Arel::Nodes::InnerJoin)
                        .on(
-                         table[foreign_key].eq(through_table[union_source_foreign_key]),
                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                        )
         else
-          foreign_table.project(foreign_table[foreign_key])
+          foreign_table.project(foreign_table[foreign_key], foreign_table[primary_key.first].as('union_id'))
                        .from(foreign_table)
-                       .where(
-                         table[foreign_key].eq(foreign_table[union_source_foreign_key]),
-                       )
         end
       end
 
@@ -235,12 +227,12 @@ module UnionOf
       end
 
       scope.joins!(
-        join(
-          foreign_table,
-          foreign_table[foreign_key].in(
-            unions,
+        Arel::Nodes::LeadingJoin.new(
+          Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+          Arel::Nodes::On.new(
+            foreign_table[:union_id].eq(table[foreign_key]),
           ),
-        ),
+        )
       )
 
       scope.merge(
@@ -378,6 +370,7 @@ module UnionOf
 
   module RuntimeReflectionExtension
     delegate :union_of?, :union_sources, to: :@reflection
+    delegate :name, to: :@reflection
   end
 
   module ActiveRecordExtensions

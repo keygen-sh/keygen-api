@@ -308,63 +308,30 @@ describe UnionOf do
         DISTINCT "users".*
       FROM
         "users"
-        INNER JOIN "licenses" ON "licenses"."id" IN (
+        INNER JOIN (
           (
-            (
-              SELECT
-                "licenses"."id"
-              FROM
-                "licenses"
-                INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
-                AND "licenses"."id" = "license_users"."license_id"
-            )
-            UNION
-            (
-              SELECT
-                "licenses"."id"
-              FROM
-                "licenses"
-              WHERE
-                "users"."id" = "licenses"."user_id"
-            )
+            SELECT
+              "licenses"."id",
+              "license_users"."user_id" AS union_id
+            FROM
+              "licenses"
+              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
           )
-        )
+          UNION
+          (
+            SELECT
+              "licenses"."id",
+              "licenses"."user_id" AS union_id
+            FROM
+              "licenses"
+          )
+        ) "licenses" ON "licenses"."union_id" = "users"."id"
         INNER JOIN "policies" ON "licenses"."policy_id" = "policies"."id"
       WHERE
         "policies"."product_id" = '#{product.id}'
       ORDER BY
         "users"."created_at" ASC
     SQL
-  end
-
-  context 'with nil belongs_to association' do
-    let(:record) { create(:license, account:) }
-
-    it 'should not produce a union query' do
-      expect(record.users.to_sql).to match_sql <<~SQL.squish
-        SELECT
-          "users".*
-        FROM
-          "users"
-        WHERE
-          "users"."id" IN (
-            SELECT
-              "users"."id"
-            FROM
-              (
-                SELECT
-                  "users"."id"
-                FROM
-                  "users"
-                  INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
-                WHERE
-                  "license_users"."license_id" = '#{record.id}'
-              ) "users"
-          )
-        ORDER BY
-          "users"."created_at" ASC
-      SQL
-    end
   end
 
   describe 'querying' do
