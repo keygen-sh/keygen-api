@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module UnionOf
+  UNION_ID = 'union_id'.freeze
+
   class Error < ActiveRecord::ActiveRecordError; end
 
   class ReadonlyAssociationError < Error
@@ -208,16 +210,19 @@ module UnionOf
                           through_klass       = through_reflection.klass
                           through_table       = through_klass.arel_table
                           through_constraints = through_klass.default_scoped.where_clause
-                          constraints         = constraints.merge(through_constraints)
 
-                          foreign_table.project(foreign_table[:id], through_table[union_primary_key].as('union_id'))
+                          unless through_constraints.empty?
+                            constraints = constraints.merge(through_constraints)
+                          end
+
+                          foreign_table.project(foreign_table[:id], through_table[union_primary_key].as(UNION_ID))
                                        .from(foreign_table)
                                        .join(through_table, Arel::Nodes::InnerJoin)
                                        .on(
                                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                                        )
                         else
-                          foreign_table.project(foreign_table[:id], foreign_table[union_primary_key].as('union_id'))
+                          foreign_table.project(foreign_table[:id], foreign_table[union_primary_key].as(UNION_ID))
                                        .from(foreign_table)
                         end
 
@@ -240,7 +245,7 @@ module UnionOf
         Arel::Nodes::LeadingJoin.new(
           Arel::Nodes::TableAlias.new(unions, foreign_table.name),
           Arel::Nodes::On.new(
-            foreign_table[:union_id].eq(table[foreign_key]),
+            foreign_table[UNION_ID].eq(table[foreign_key]),
           ),
         )
       )
