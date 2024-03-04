@@ -217,14 +217,14 @@ module UnionOf
                             constraints = constraints.merge(through_constraints)
                           end
 
-                          foreign_table.project(foreign_table[:id], through_table[union_primary_key].as(UNION_ID))
+                          foreign_table.project(foreign_table[foreign_key], through_table[union_primary_key].as(UNION_ID))
                                        .from(foreign_table)
                                        .join(through_table, Arel::Nodes::InnerJoin)
                                        .on(
                                          foreign_table[foreign_key].eq(through_table[through_foreign_key]),
                                        )
                         else
-                          foreign_table.project(foreign_table[:id], foreign_table[union_primary_key].as(UNION_ID))
+                          foreign_table.project(foreign_table[foreign_key], foreign_table[union_primary_key].as(UNION_ID))
                                        .from(foreign_table)
                         end
 
