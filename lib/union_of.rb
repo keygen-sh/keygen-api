@@ -556,7 +556,10 @@ module UnionOf
           end
 
           unaliased_table = unaliased_table(table)
-          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union")
+
+          # FIXME(ezekg) The return might seem weird, and it is. But it avoids an issue
+          #              where we make the same join multiple times.
+          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") { return [] }
           unions      = scopes.reduce(nil) do |left, right|
             if left
               Arel::Nodes::Union.new(left, right)

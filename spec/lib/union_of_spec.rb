@@ -186,39 +186,38 @@ describe UnionOf do
     SQL
   end
 
-  # it 'should produce multiple joins' do
-  #   expect(model.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
-  #     SELECT
-  #       "users".*
-  #     FROM
-  #       "users"
-  #       INNER JOIN (
-  #         (
-  #           SELECT
-  #             "licenses"."id",
-  #             "licenses"."user_id" AS union_id
-  #           FROM
-  #             "licenses"
-  #         )
-  #         UNION
-  #         (
-  #           SELECT
-  #             "licenses"."id",
-  #             "license_users"."user_id" AS union_id
-  #           FROM
-  #             "licenses"
-  #             INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
-  #         )
-  #       ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
-  #       INNER JOIN "licenses" ON "licenses_union"."id" = "licenses"."id"
-  #       INNER JOIN "machines" ON "machines"."license_id" = "licenses"."id"
-  #     ORDER BY
-  #       "users"."created_at" ASC
-  #   SQL
-  # end
+  it 'should produce multiple joins' do
+    expect(model.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
+      SELECT
+        "users".*
+      FROM
+        "users"
+        INNER JOIN (
+          (
+            SELECT
+              "licenses"."id" AS id,
+              "licenses"."user_id" AS union_id
+            FROM
+              "licenses"
+          )
+          UNION
+          (
+            SELECT
+              "licenses"."id" AS id,
+              "license_users"."user_id" AS union_id
+            FROM
+              "licenses"
+              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+          )
+        ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+        INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+        INNER JOIN "machines" ON "machines"."license_id" = "licenses"."id"
+      ORDER BY
+        "users"."created_at" ASC
+    SQL
+  end
 
   it 'should produce a union query' do
-    # TODO(ezekg) Add DISTINCT?
     expect(record.machines.to_sql).to match_sql <<~SQL.squish
       SELECT
         "machines".*
