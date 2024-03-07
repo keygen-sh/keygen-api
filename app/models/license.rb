@@ -548,9 +548,7 @@ class License < ApplicationRecord
   }
   scope :for_owner, -> owner {
     case owner
-    when User, UUID_RE
-      where(owner: { id: owner })
-    when nil
+    when User, UUID_RE, nil
       where(owner:)
     else
       joins(:owner).where(owner: { id: owner })
