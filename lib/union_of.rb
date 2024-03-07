@@ -810,14 +810,13 @@ module UnionOf
   end
 
   module JoinAssociationExtension
-    def initialize(reflection, children)
-      # FIXME(ezekg) Bug in Rails?
-      @table = reflection.klass.arel_table
+    # def initialize(reflection, children)
+    #   @table = reflection.klass.arel_table
 
-      super
-    end
+    #   super
+    # end
 
-    def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
+    def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker, &)
       pp(
         reflection: reflection.name,
         through_union_of?: reflection.through_union_of?,
@@ -831,9 +830,9 @@ module UnionOf
       )
       case
       when reflection.through_union_of?
-        join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker)
+        join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
       when reflection.union_of?
-        join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker)
+        join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
       else
         super
       end
@@ -855,9 +854,21 @@ module UnionOf
     #   joins
     # end
 
-    def join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker)
-      chain = reflection.chain
+    def join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
       joins = []
+      chain = []
+
+      reflection.chain.each do |reflection|
+        table, terminated = yield reflection
+        @table ||= table
+
+        if terminated
+          foreign_table, foreign_klass = table, reflection.klass
+          break
+        end
+
+        chain << [reflection, table]
+      end
 
       # pp(
       #   reflection: through_reflection.name,
@@ -868,17 +879,16 @@ module UnionOf
       #   through_reflection: through_reflection.through_reflection? ? through_reflection.through_reflection.name : nil,
       # )
 
-      pp(chain: chain.collect(&:name), size: chain.size)
+      pp(chain: chain.map { [_1.name, _2.name] }, size: chain.size)
 
-      chain.each_with_index.reverse_each do |reflection, index|
+      chain.each_with_index.reverse_each do |(reflection, table), index|
         primary_key = reflection.active_record_primary_key
         foreign_key = reflection.foreign_key
         klass       = reflection.klass
-        table       = klass.arel_table
 
-        join_reflection = chain[index + 1]
-        join_klass      = join_reflection&.klass || foreign_klass
-        join_table      = join_klass&.arel_table || foreign_table
+        join_reflection, join_table = chain[index + 1]
+        join_klass                  = join_reflection&.klass || foreign_klass
+        join_table                ||= foreign_table
 
         pp(
           foreign_table: foreign_table.name,
@@ -916,7 +926,7 @@ module UnionOf
         when reflection.union_of?
           pp(join_constraints_for_through_union: :union_of?)
           joins.concat(
-            join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker),
+            join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &),
           )
         # FIXME(ezekg) Add default constraints for association
         when reflection.belongs_to? || join_reflection&.belongs_to?
@@ -941,21 +951,33 @@ module UnionOf
       joins
     end
 
-    def join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker)
-      chain = reflection.chain
+    def join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
       joins = []
+      chain = []
 
-      pp(chain: chain.collect(&:name), size: chain.size)
+      reflection.chain.each do |reflection|
+        table, terminated = yield reflection
+        @table ||= table
 
-      chain.each_with_index.reverse_each do |reflection, index|
+        if terminated
+          foreign_table, foreign_klass = table, reflection.klass
+
+          break
+        end
+
+        chain << [reflection, table]
+      end
+
+      pp(chain: chain.map { [_1.name, _2.name] }, size: chain.size)
+
+      chain.each_with_index.reverse_each do |(reflection, table), index|
         primary_key = reflection.active_record_primary_key
         foreign_key = reflection.foreign_key
         klass       = reflection.klass
-        table       = klass.arel_table
 
-        join_reflection = chain[index + 1]
-        join_klass      = join_reflection&.klass || foreign_klass
-        join_table      = join_klass&.arel_table || foreign_table
+        join_reflection, join_table = chain[index + 1]
+        join_klass                  = join_reflection&.klass || foreign_klass
+        join_table                ||= foreign_table
 
         pp(
           foreign_table: foreign_table.name,
