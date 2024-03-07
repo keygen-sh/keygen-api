@@ -421,7 +421,7 @@ class Machine < ApplicationRecord
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> user {
     case user
-    when User
+    when User, UUID_RE
       joins(:users).where(users: { id: user })
     else
       joins(:users).where(users: { id: user })
@@ -432,8 +432,7 @@ class Machine < ApplicationRecord
   }
   scope :for_owner, -> owner {
     case owner
-    when User,
-         nil
+    when User, UUID_RE, nil
       where(owner:)
     else
       joins(:owner).where(owner: { id: owner })

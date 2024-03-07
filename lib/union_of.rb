@@ -234,7 +234,8 @@ module UnionOf
         sources
       end
 
-      unions = scopes.reduce(nil) do |left, right|
+      union_table = Arel::Nodes::TableAlias.new(foreign_table, "#{foreign_table.name}_union")
+      unions      = scopes.reduce(nil) do |left, right|
         if left
           Arel::Nodes::Union.new(left, right)
         else
@@ -243,12 +244,20 @@ module UnionOf
       end
 
       scope.joins!(
+        # Joining onto our union associations
         Arel::Nodes::LeadingJoin.new(
-          Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+          Arel::Nodes::TableAlias.new(unions, union_table.name),
           Arel::Nodes::On.new(
-            foreign_table[UNION_ID].eq(table[primary_key]),
+            union_table[UNION_ID].eq(table[klass.primary_key]),
           ),
-        )
+        ),
+        # Joining the target association onto our union
+        Arel::Nodes::LeadingJoin.new(
+          foreign_table,
+          Arel::Nodes::On.new(
+            foreign_table[foreign_klass.primary_key].eq(union_table[klass.primary_key]),
+          ),
+        ),
       )
 
       scope.merge!(
