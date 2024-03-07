@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module UnionOf
-  UNION_ID = 'union_id'.freeze
+  UNION_PRIMARY_KEY = 'id'.freeze
+  UNION_FOREIGN_KEY = 'union_id'.freeze
 
   class Error < ActiveRecord::ActiveRecordError; end
 
@@ -237,14 +238,14 @@ module UnionOf
                       constraints = constraints.merge(through_constraints)
                     end
 
-                    foreign_table.project(foreign_table[primary_key], through_table[union_foreign_key].as(UNION_ID))
+                    foreign_table.project(foreign_table[primary_key].as(UNION_PRIMARY_KEY), through_table[union_foreign_key].as(UNION_FOREIGN_KEY))
                                  .from(foreign_table)
                                  .join(through_table, Arel::Nodes::InnerJoin)
                                  .on(
                                    foreign_table[primary_key].eq(through_table[through_foreign_key]),
                                  )
                   else
-                    foreign_table.project(foreign_table[primary_key], foreign_table[union_foreign_key].as(UNION_ID))
+                    foreign_table.project(foreign_table[primary_key].as(UNION_PRIMARY_KEY), foreign_table[union_foreign_key].as(UNION_FOREIGN_KEY))
                                  .from(foreign_table)
                   end
 
@@ -269,14 +270,14 @@ module UnionOf
         Arel::Nodes::LeadingJoin.new(
           Arel::Nodes::TableAlias.new(unions, union_table.name),
           Arel::Nodes::On.new(
-            union_table[UNION_ID].eq(table[klass.primary_key]),
+            union_table[UNION_FOREIGN_KEY].eq(table[klass.primary_key]),
           ),
         ),
         # Joining the target association onto our union
         Arel::Nodes::LeadingJoin.new(
           foreign_table,
           Arel::Nodes::On.new(
-            foreign_table[foreign_klass.primary_key].eq(union_table[klass.primary_key]),
+            foreign_table[foreign_klass.primary_key].eq(union_table[UNION_PRIMARY_KEY]),
           ),
         ),
       )
@@ -307,7 +308,7 @@ module UnionOf
     # Unlike other reflections, we don't have a single foreign key.
     # Instead, we have many, from each union source.
     def foreign_keys = union_reflections.reduce({}) { _1.merge(_2.name => _2.foreign_key) }
-    def foreign_key  = UNION_ID
+    def foreign_key  = UNION_FOREIGN_KEY
 
     def deconstruct_keys(keys) = { name:, options: }
   end
@@ -547,14 +548,8 @@ module UnionOf
                         union_constraints = union_constraints.merge(through_constraints)
                       end
 
-                      unaliased_source_table.project(
-                                              source_table[:id].as('id'),
-                                              through_table[through_foreign_key].as('union_id'),
-                                            )
-                                            .join(
-                                              through_table,
-                                              Arel::Nodes::InnerJoin,
-                                            )
+                      unaliased_source_table.project(source_table[:id].as(UNION_PRIMARY_KEY), through_table[through_foreign_key].as(UNION_FOREIGN_KEY))
+                                            .join(through_table, Arel::Nodes::InnerJoin)
                                             .on(
                                               source_table[source_primary_key].eq(through_table[source_foreign_key]),
                                             )
@@ -567,14 +562,8 @@ module UnionOf
                         union_constraints = union_constraints.merge(join_constraints)
                       end
 
-                      unaliased_table.project(
-                                       table[:id].as('id'),
-                                       join_table[:id].as('union_id'),
-                                     )
-                                     .join(
-                                       join_table,
-                                       Arel::Nodes::InnerJoin,
-                                     )
+                      unaliased_table.project(table[:id].as(UNION_PRIMARY_KEY), join_table[:id].as(UNION_FOREIGN_KEY))
+                                     .join(join_table, Arel::Nodes::InnerJoin)
                                      .on(
                                        table[:id].eq(join_table[foreign_key]),
                                      )
@@ -584,8 +573,8 @@ module UnionOf
                       foreign_key      = union_reflection.foreign_key
 
                       unaliased_table.project(
-                                       table[:id].as('id'),
-                                       table[foreign_key].as('union_id'),
+                                       table[:id].as(UNION_PRIMARY_KEY),
+                                       table[foreign_key].as(UNION_FOREIGN_KEY),
                                      )
                     end
 
@@ -613,7 +602,7 @@ module UnionOf
           joins << join_type.new(
             Arel::Nodes::TableAlias.new(unions, union_table.name),
             Arel::Nodes::On.new(
-              union_table[UNION_ID].eq(join_table[join_klass.primary_key]),
+              union_table[UNION_FOREIGN_KEY].eq(join_table[join_klass.primary_key]),
             ),
           )
 
