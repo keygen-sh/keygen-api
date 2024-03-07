@@ -417,7 +417,8 @@ describe UnionOf do
             FROM
               "licenses"
           )
-        ) "licenses" ON "licenses"."union_id" = "users"."id"
+        ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+        INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
         INNER JOIN "policies" ON "licenses"."policy_id" = "policies"."id"
       WHERE
         "policies"."product_id" = '#{product.id}'
