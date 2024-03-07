@@ -818,33 +818,17 @@ module UnionOf
       end
     end
 
-    # def join_constraints_for_through_association(reflection, foreign_table, foreign_klass, join_type, alias_tracker)
-    #   source_reflection  = reflection.source_reflection
-    #   through_reflection = reflection.through_reflection
-    #   through_klass      = through_reflection.klass
-    #   through_table      = through_klass.arel_table
-
-    #   joins = case
-    #           when reflection.through_union_of?
-    #             join_constraints_for_through_union(through_reflection, through_table, through_klass, join_type, alias_tracker)
-    #           when reflection.union_of?
-    #             join_constraints_for_union(source_reflection, through_table, through_klass, join_type, alias_tracker)
-    #           end
-
-    #   joins
-    # end
-
     def join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
       joins = []
       chain = []
 
       reflection.chain.each do |reflection|
-        table, terminated = yield reflection
+        table, _ = yield reflection
         @table ||= table
 
-        if terminated
-          foreign_table, foreign_klass = table, reflection.klass
-          break
+        # FIXME(ezekg) Aliasing unions isn't working properly
+        if reflection.union_of?
+          table = reflection.klass.arel_table
         end
 
         chain << [reflection, table]
@@ -866,14 +850,14 @@ module UnionOf
           )
         # FIXME(ezekg) Add default constraints for association
         when reflection.belongs_to? || join_reflection&.belongs_to?
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             table,
             Arel::Nodes::On.new(
               table[primary_key].eq(join_table[foreign_key]),
             ),
           )
         else
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             table,
             Arel::Nodes::On.new(
               table[foreign_key].eq(join_table[primary_key]),
@@ -890,13 +874,12 @@ module UnionOf
       chain = []
 
       reflection.chain.each do |reflection|
-        table, terminated = yield reflection
+        table, _ = yield reflection
         @table ||= table
 
-        if terminated
-          foreign_table, foreign_klass = table, reflection.klass
-
-          break
+        # FIXME(ezekg) Aliasing unions isn't working properly
+        if reflection.union_of?
+          table = reflection.klass.arel_table
         end
 
         chain << [reflection, table]
@@ -921,37 +904,53 @@ module UnionOf
             # FIXME(ezekg) Add default constraints for association
             case
             when union_reflection.through_reflection?
+              source_table           = union_reflection.source_reflection.klass.arel_table
+              unaliased_source_table = unaliased_table(source_table)
+              source_primary_key     = union_reflection.source_reflection.association_primary_key
+              source_foreign_key     = union_reflection.source_reflection.foreign_key
+
               through_table       = union_reflection.through_reflection.klass.arel_table
-              source_table        = union_reflection.source_reflection.klass.arel_table
               through_foreign_key = union_reflection.through_reflection.foreign_key
-              source_foreign_key  = union_reflection.source_reflection.foreign_key
 
-              join_condition = source_table[union_reflection.source_reflection.association_primary_key].eq(through_table[source_foreign_key])
-
-              source_table.project(
-                source_table[:id].as('id'),
-                through_table[union_reflection.through_reflection.foreign_key].as('union_id')
-              ).join(through_table).on(join_condition)
+              unaliased_source_table.project(
+                                      source_table[:id].as('id'),
+                                      through_table[through_foreign_key].as('union_id'),
+                                    )
+                                    .join(
+                                      through_table,
+                                      Arel::Nodes::InnerJoin,
+                                    )
+                                    .on(
+                                      source_table[source_primary_key].eq(through_table[source_foreign_key]),
+                                    )
             when union_reflection.belongs_to?
-              foreign_key = union_reflection.foreign_key
+              unaliased_table = unaliased_table(table)
+              foreign_key     = union_reflection.foreign_key
 
-              join_condition = table[:id].eq(join_table[foreign_key])
-
-              table.project(
-                table[:id].as('id'),
-                join_table[:id].as('union_id'),
-              ).join(join_table).on(join_condition)
+              unaliased_table.project(
+                                table[:id].as('id'),
+                                join_table[:id].as('union_id'),
+                              )
+                              .join(
+                                join_table,
+                                Arel::Nodes::InnerJoin,
+                              )
+                              .on(
+                                table[:id].eq(join_table[foreign_key]),
+                              )
             else
-              foreign_key = union_reflection.foreign_key
+              unaliased_table = unaliased_table(table)
+              foreign_key     = union_reflection.foreign_key
 
-              table.project(
-                table[:id].as('id'),
-                table[foreign_key].as('union_id')
-              )
+              unaliased_table.project(
+                                table[:id].as('id'),
+                                table[foreign_key].as('union_id'),
+                              )
             end
           end
 
-          union_table = alias_tracker.aliased_table_for(table, "#{table.name}_union")
+          unaliased_table = unaliased_table(table)
+          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union")
           unions      = scopes.reduce(nil) do |left, right|
             if left
               Arel::Nodes::Union.new(left, right)
@@ -961,7 +960,7 @@ module UnionOf
           end
 
           # Joining onto our union associations
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             Arel::Nodes::TableAlias.new(unions, union_table.name),
             Arel::Nodes::On.new(
               union_table[UNION_ID].eq(join_table[join_klass.primary_key]),
@@ -969,7 +968,7 @@ module UnionOf
           )
 
           # Joining the target association onto our union
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             table,
             Arel::Nodes::On.new(
               table[klass.primary_key].eq(union_table[klass.primary_key]),
@@ -977,14 +976,14 @@ module UnionOf
           )
         # FIXME(ezekg) Add default constraints for association
         when reflection.belongs_to? || join_reflection&.belongs_to?
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             table,
             Arel::Nodes::On.new(
               table[primary_key].eq(join_table[foreign_key]),
             ),
           )
         else
-          joins << Arel::Nodes::InnerJoin.new(
+          joins << join_type.new(
             table,
             Arel::Nodes::On.new(
               table[foreign_key].eq(join_table[primary_key]),
@@ -994,6 +993,15 @@ module UnionOf
       end
 
       joins
+    end
+
+    def unaliased_table(table)
+      case table
+      in Arel::Nodes::TableAlias => aliased_table
+        Arel::Table.new(aliased_table.right)
+      in Arel::Table => table
+        table
+      end
     end
 
     # def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
