@@ -152,6 +152,7 @@ module UnionOf
       return super unless
         reflection.union_of?
 
+      foreign_klass = reflection.klass
       foreign_table = reflection.aliased_table
       primary_key   = reflection.active_record_primary_key
 
@@ -171,14 +172,34 @@ module UnionOf
         end
       end
 
-      scope.where!(
-        foreign_table[primary_key].in(
-          foreign_table.project(foreign_table[primary_key])
-                       .from(
-                         Arel::Nodes::TableAlias.new(unions, foreign_table.name),
-                       ),
-        ),
-      )
+      # We can simplify the query if the scope class is the same as our foreign class
+      if scope.klass == foreign_klass
+        scope.where!(
+          foreign_table[primary_key].in(
+            foreign_table.project(foreign_table[primary_key])
+                        .from(
+                          Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+                        ),
+          ),
+        )
+      else
+        # FIXME(ezekg) Selecting IDs in a separate query is faster than a subquery
+        #              selecting IDs, or an EXISTS subquery, or even a
+        #              materialized CTE. Not sure why...
+        ids = foreign_klass.find_by_sql(
+                              foreign_table.project(foreign_table[primary_key])
+                                           .from(
+                                             Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+                                           ),
+                            )
+                            .pluck(
+                              primary_key,
+                            )
+
+        scope.where!(
+          foreign_table[primary_key].in(ids),
+        )
+      end
 
       scope.merge!(
         scope.default_scoped,
