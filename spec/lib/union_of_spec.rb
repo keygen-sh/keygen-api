@@ -609,27 +609,26 @@ describe UnionOf do
           "users"."environment_id" AS t1_r15
         FROM
           "licenses"
-          LEFT OUTER JOIN "users" ON "users"."id" IN (
+          LEFT OUTER JOIN (
             (
-              (
-                SELECT
-                  "users"."id"
-                FROM
-                  "users"
-                  INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
-                  AND "licenses"."id" = "license_users"."license_id"
-              )
-              UNION
-              (
-                SELECT
-                  "users"."id"
-                FROM
-                  "users"
-                WHERE
-                  "users"."id" = "licenses"."user_id"
-              )
+              SELECT
+                "users"."id" AS id,
+                "license_users"."license_id" AS union_id
+              FROM
+                "users"
+                INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
             )
-          )
+            UNION
+            (
+              SELECT
+                "users"."id" AS id,
+                "licenses"."id" AS union_id
+              FROM
+                "users"
+                INNER JOIN "licenses" ON "users"."id" = "licenses"."user_id"
+            )
+          ) "users_union" ON "users_union"."union_id" = "licenses"."id"
+          LEFT OUTER JOIN "users" ON "users"."id" = "users_union"."id"
         ORDER BY
           "licenses"."created_at" ASC
       SQL
@@ -688,27 +687,25 @@ describe UnionOf do
           "machines"."owner_id" AS t1_r19
         FROM
           "users"
-          LEFT OUTER JOIN "licenses" ON "licenses"."id" IN (
+          LEFT OUTER JOIN (
             (
-              (
-                SELECT
-                  "licenses"."id"
-                FROM
-                  "licenses"
-                WHERE
-                  "licenses"."user_id" = "users"."id"
-              )
-              UNION
-              (
-                SELECT
-                  "licenses"."id"
-                FROM
-                  "licenses"
-                  INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
-                  AND "users"."id" = "license_users"."user_id"
-              )
+              SELECT
+                "licenses"."id"      AS id,
+                "licenses"."user_id" AS union_id
+              FROM
+                "licenses"
             )
-          )
+            UNION
+            (
+              SELECT
+                "licenses"."id"           AS id,
+                "license_users"."user_id" AS union_id
+              FROM
+                "licenses"
+                INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+            )
+          ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+          LEFT OUTER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
           LEFT OUTER JOIN "machines" ON "machines"."license_id" = "licenses"."id"
         ORDER BY
           "users"."created_at" ASC
