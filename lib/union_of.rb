@@ -149,8 +149,6 @@ module UnionOf
     private
 
     def last_chain_scope(scope, reflection, owner)
-      pp(last_chain_scope: Time.now.to_i)
-
       return super unless
         reflection.union_of?
 
@@ -190,8 +188,6 @@ module UnionOf
     end
 
     def next_chain_scope(scope, reflection, next_reflection)
-      pp(next_chain_scope: Time.now.to_i)
-
       return super unless
         reflection.union_of?
 
@@ -701,9 +697,6 @@ module UnionOf
     end
 
     def build_union_join_source(association, foreign_table, foreign_klass)
-      pp(association:, foreign_table: foreign_table.name, foreign_klass: foreign_klass.name)
-      pp(klass: klass.name, table: table.name)
-
       reflection   = union_reflection_for(association)
       primary_key  = reflection.active_record_primary_key
       foreign_keys = reflection.foreign_keys
@@ -751,8 +744,6 @@ module UnionOf
 
       #   sources
       # end
-
-      pp(scope: reflection.klass.scope_for_association)
 
       union_table = Arel::Table.new(:"#{foreign_table.name}_union")
       unions      = scopes.reduce(nil) do |left, right|
@@ -802,11 +793,11 @@ module UnionOf
   end
 
   module JoinDependencyExtension
-    def initialize(base, table, associations, join_type)
-      pp(base: base.name, table: table.name, associations:, join_type: join_type&.name)
+    # def initialize(base, table, associations, join_type)
+    #   pp(base: base.name, table: table.name, associations:, join_type: join_type&.name)
 
-      super
-    end
+    #   super
+    # end
   end
 
   module JoinAssociationExtension
@@ -817,17 +808,6 @@ module UnionOf
     # end
 
     def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker, &)
-      pp(
-        reflection: reflection.name,
-        through_union_of?: reflection.through_union_of?,
-        union_of?: reflection.union_of?,
-        through_reflection?: reflection.through_reflection?,
-        source_reflection: reflection.through_reflection? ? reflection.source_reflection.name : nil,
-        through_reflection: reflection.through_reflection? ? reflection.through_reflection.name : nil,
-        foreign_table: foreign_table.name,
-        foreign_klass: foreign_klass.name,
-        join_type: join_type&.name,
-      )
       case
       when reflection.through_union_of?
         join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
@@ -870,17 +850,6 @@ module UnionOf
         chain << [reflection, table]
       end
 
-      # pp(
-      #   reflection: through_reflection.name,
-      #   through_union_of?: through_reflection.through_union_of?,
-      #   union_of?: through_reflection.union_of?,
-      #   through_reflection?: through_reflection.through_reflection?,
-      #   source_reflection: through_reflection.through_reflection? ? through_reflection.source_reflection.name : nil,
-      #   through_reflection: through_reflection.through_reflection? ? through_reflection.through_reflection.name : nil,
-      # )
-
-      pp(chain: chain.map { [_1.name, _2.name] }, size: chain.size)
-
       chain.each_with_index.reverse_each do |(reflection, table), index|
         primary_key = reflection.active_record_primary_key
         foreign_key = reflection.foreign_key
@@ -890,47 +859,13 @@ module UnionOf
         join_klass                  = join_reflection&.klass || foreign_klass
         join_table                ||= foreign_table
 
-        pp(
-          foreign_table: foreign_table.name,
-          foreign_klass: foreign_klass.name,
-          index:,
-          reflection: {
-            name: reflection.name,
-            through_reflection?: reflection.through_reflection?,
-            through_reflection: reflection.through_reflection? ? reflection.through_reflection.name : nil,
-            union_of?: reflection.union_of?,
-            through_union_of?: reflection.through_union_of?,
-            belongs_to?: reflection.belongs_to?,
-            primary_key: reflection.active_record_primary_key,
-            foreign_key: reflection.foreign_key,
-            table: table.name,
-          },
-          join_reflection: {
-            name: join_reflection&.name,
-            through_reflection?: join_reflection&.through_reflection?,
-            through_reflection: join_reflection&.through_reflection? ? join_reflection&.through_reflection&.name : nil,
-            union_of?: join_reflection&.union_of?,
-            through_union_of?: join_reflection&.through_union_of?,
-            belongs_to?: join_reflection&.belongs_to?,
-            primary_key: join_reflection&.active_record_primary_key,
-            foreign_key: join_reflection&.foreign_key,
-            table: join_table&.name,
-          }
-        )
-
         case
-        # when join_reflection.through_union_of?
-        #   joins.concat(
-        #     join_constraints_for_through_union(join_reflection, foreign_table, foreign_klass, join_type, alias_tracker),
-        #   )
         when reflection.union_of?
-          pp(join_constraints_for_through_union: :union_of?)
           joins.concat(
             join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &),
           )
         # FIXME(ezekg) Add default constraints for association
         when reflection.belongs_to? || join_reflection&.belongs_to?
-          pp(join_constraints_for_through_union: :belongs_to?)
           joins << Arel::Nodes::InnerJoin.new(
             table,
             Arel::Nodes::On.new(
@@ -938,7 +873,6 @@ module UnionOf
             ),
           )
         else
-          pp(join_constraints_for_through_union: :else)
           joins << Arel::Nodes::InnerJoin.new(
             table,
             Arel::Nodes::On.new(
@@ -968,8 +902,6 @@ module UnionOf
         chain << [reflection, table]
       end
 
-      pp(chain: chain.map { [_1.name, _2.name] }, size: chain.size)
-
       chain.each_with_index.reverse_each do |(reflection, table), index|
         primary_key = reflection.active_record_primary_key
         foreign_key = reflection.foreign_key
@@ -979,51 +911,8 @@ module UnionOf
         join_klass                  = join_reflection&.klass || foreign_klass
         join_table                ||= foreign_table
 
-        pp(
-          foreign_table: foreign_table.name,
-          foreign_klass: foreign_klass.name,
-          index:,
-          reflection: {
-            name: reflection.name,
-            through_reflection?: reflection.through_reflection?,
-            through_reflection: reflection.through_reflection? ? reflection.through_reflection.name : nil,
-            union_of?: reflection.union_of?,
-            through_union_of?: reflection.through_union_of?,
-            belongs_to?: reflection.belongs_to?,
-            primary_key: reflection.active_record_primary_key,
-            foreign_key: reflection.foreign_key,
-            table: table.name,
-          },
-          join_reflection: {
-            name: join_reflection&.name,
-            through_reflection?: join_reflection&.through_reflection?,
-            through_reflection: join_reflection&.through_reflection? ? join_reflection&.through_reflection&.name : nil,
-            union_of?: join_reflection&.union_of?,
-            through_union_of?: join_reflection&.through_union_of?,
-            belongs_to?: join_reflection&.belongs_to?,
-            primary_key: join_reflection&.active_record_primary_key,
-            foreign_key: join_reflection&.foreign_key,
-            table: join_table&.name,
-          }
-        )
-
         case
-        # when reflection.through_reflection?
-        #   pp(join_constraints_for_union: :through_reflection?)
-        #   through_reflection = reflection.source_reflection
-
-        #   joins.concat(
-        #     join_constraints_for_union(through_reflection, foreign_table, foreign_klass, join_type, alias_tracker)
-        #   )
-
-        #   joins << Arel::Nodes::InnerJoin.new(
-        #     table,
-        #     Arel::Nodes::On.new(
-        #       table[foreign_key].eq(join_table[primary_key]),
-        #     ),
-        #   )
         when reflection.union_of?
-          pp(join_constraints_for_union: :union_of?)
           union_sources = reflection.union_sources
 
           scopes = union_sources.map do |union_source|
@@ -1081,14 +970,13 @@ module UnionOf
 
           # Joining the target association onto our union
           joins << Arel::Nodes::InnerJoin.new(
-            reflection.klass.arel_table,
+            table,
             Arel::Nodes::On.new(
               table[klass.primary_key].eq(union_table[klass.primary_key]),
             ),
           )
         # FIXME(ezekg) Add default constraints for association
         when reflection.belongs_to? || join_reflection&.belongs_to?
-          pp(join_constraints_for_union: :belongs_to?)
           joins << Arel::Nodes::InnerJoin.new(
             table,
             Arel::Nodes::On.new(
@@ -1096,7 +984,6 @@ module UnionOf
             ),
           )
         else
-          pp(join_constraints_for_union: :else)
           joins << Arel::Nodes::InnerJoin.new(
             table,
             Arel::Nodes::On.new(
