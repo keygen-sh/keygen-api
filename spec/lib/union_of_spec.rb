@@ -113,13 +113,13 @@ describe UnionOf do
   end
 
   it 'should not raise on shallow join' do
-    expect { model.union_joins(:licenses).to_a }.to_not raise_error
+    expect { model.joins(:licenses).to_a }.to_not raise_error
   end
 
   it 'should produce a shallow join' do
     user = create(:user, account:)
 
-    expect(License.union_joins(:users).where(users: { id: user }).to_sql).to match_sql <<~SQL.squish
+    expect(License.joins(:users).where(users: { id: user }).to_sql).to match_sql <<~SQL.squish
       SELECT
         "licenses".*
       FROM
@@ -152,11 +152,11 @@ describe UnionOf do
   end
 
   it 'should not raise on deep join' do
-    expect { model.union_joins(:machines).to_a }.to_not raise_error
+    expect { model.joins(:machines).to_a }.to_not raise_error
   end
 
   it 'should produce a union join' do
-    expect(model.union_joins(:machines).to_sql).to match_sql <<~SQL.squish
+    expect(model.joins(:machines).to_sql).to match_sql <<~SQL.squish
       SELECT
         "users".*
       FROM
@@ -187,7 +187,7 @@ describe UnionOf do
   end
 
   # it 'should produce multiple joins' do
-  #   expect(model.union_joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
+  #   expect(model.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
   #     SELECT
   #       "users".*
   #     FROM
@@ -257,7 +257,7 @@ describe UnionOf do
   end
 
   it 'should produce a deep union join' do
-    expect(model.union_joins(:components).to_sql).to match_sql <<~SQL.squish
+    expect(model.joins(:components).to_sql).to match_sql <<~SQL.squish
       SELECT
         "users".*
       FROM
@@ -329,7 +329,7 @@ describe UnionOf do
   end
 
   it 'should produce a deeper union join' do
-    # expect(Product.union_joins(:users).to_sql).to match_sql <<~SQL.squish
+    # expect(Product.joins(:users).to_sql).to match_sql <<~SQL.squish
     #   SELECT
     #     "products".*
     #   FROM
@@ -360,7 +360,7 @@ describe UnionOf do
     #   ORDER BY
     #     "products"."created_at" ASC
     # SQL
-    expect(Product.union_joins(:users).to_sql).to match_sql <<~SQL.squish
+    expect(Product.joins(:users).to_sql).to match_sql <<~SQL.squish
       SELECT
         "products".*
       FROM
