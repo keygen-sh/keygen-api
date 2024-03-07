@@ -811,7 +811,8 @@ module UnionOf
 
   module JoinAssociationExtension
     def initialize(reflection, children)
-      pp(reflection: reflection.name, union_of?: reflection.union_of?, through_union_of?: reflection.through_union_of?, children: children.collect(&:name))
+      # FIXME(ezekg) Bug in Rails?
+      @table = reflection.klass.arel_table
 
       super
     end
