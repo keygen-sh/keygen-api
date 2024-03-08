@@ -211,7 +211,26 @@ describe UnionOf do
           )
         ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
         INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
-        INNER JOIN "machines" ON "machines"."license_id" = "licenses"."id"
+        INNER JOIN (
+          (
+            SELECT
+              "licenses"."id" AS id,
+              "licenses"."user_id" AS union_id
+            FROM
+              "licenses"
+          )
+          UNION
+          (
+            SELECT
+              "licenses"."id" AS id,
+              "license_users"."user_id" AS union_id
+            FROM
+              "licenses"
+              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+          )
+        ) "licenses_users_join_union" ON "licenses_users_join_union"."union_id" = "users"."id"
+        INNER JOIN "licenses" "licenses_users_join" ON "licenses_users_join"."id" = "licenses_users_join_union"."id"
+        INNER JOIN "machines" ON "machines"."license_id" = "licenses_users_join"."id"
       ORDER BY
         "users"."created_at" ASC
     SQL
