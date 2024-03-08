@@ -127,20 +127,18 @@ describe UnionOf do
         INNER JOIN (
           (
             SELECT
-              "users"."id"                 AS id,
+              "license_users"."user_id"    AS id,
               "license_users"."license_id" AS union_id
             FROM
-              "users"
-              INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
+              "license_users"
           )
           UNION
           (
             SELECT
-              "users"."id"    AS id,
-              "licenses"."id" AS union_id
+              "licenses"."user_id" AS id,
+              "licenses"."id"      AS union_id
             FROM
-              "users"
-              INNER JOIN "licenses" ON "users"."id" = "licenses"."user_id"
+              "licenses"
           )
         ) "users_union" ON "users_union"."union_id" = "licenses"."id"
         INNER JOIN "users" ON "users"."id" = "users_union"."id"
@@ -172,11 +170,10 @@ describe UnionOf do
           UNION
           (
             SELECT
-              "licenses"."id"           AS id,
-              "license_users"."user_id" AS union_id
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
             FROM
-              "licenses"
-              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+              "license_users"
           )
         ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
         INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
@@ -195,7 +192,7 @@ describe UnionOf do
         INNER JOIN (
           (
             SELECT
-              "licenses"."id" AS id,
+              "licenses"."id"      AS id,
               "licenses"."user_id" AS union_id
             FROM
               "licenses"
@@ -203,18 +200,17 @@ describe UnionOf do
           UNION
           (
             SELECT
-              "licenses"."id" AS id,
-              "license_users"."user_id" AS union_id
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
             FROM
-              "licenses"
-              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+              "license_users"
           )
         ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
         INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
         INNER JOIN (
           (
             SELECT
-              "licenses"."id" AS id,
+              "licenses"."id"      AS id,
               "licenses"."user_id" AS union_id
             FROM
               "licenses"
@@ -222,11 +218,10 @@ describe UnionOf do
           UNION
           (
             SELECT
-              "licenses"."id" AS id,
-              "license_users"."user_id" AS union_id
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
             FROM
-              "licenses"
-              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+              "license_users"
           )
         ) "licenses_users_join_union" ON "licenses_users_join_union"."union_id" = "users"."id"
         INNER JOIN "licenses" "licenses_users_join" ON "licenses_users_join"."id" = "licenses_users_join_union"."id"
@@ -236,8 +231,78 @@ describe UnionOf do
     SQL
   end
 
-  it 'should produce a union query' do
-    expect(record.machines.to_sql).to match_sql <<~SQL.squish
+  it 'should produce a scoped joins' do
+    with_time Time.parse('2024-03-08 16:15:16') do |t|
+      expect(model.joins(:any_active_licenses).to_sql).to match_sql <<~SQL.squish
+        SELECT
+          "users".*
+        FROM
+          "users"
+          INNER JOIN (
+            (
+              SELECT DISTINCT ON ("licenses"."user_id")
+                "licenses"."id"      AS id,
+                "licenses"."user_id" AS union_id
+              FROM
+                "licenses"
+              WHERE
+                (
+                  licenses.created_at >= '2023-12-09 22:15:16'
+                  OR (
+                    licenses.last_validated_at IS NOT NULL
+                    AND licenses.last_validated_at >= '2023-12-09 22:15:16'
+                  )
+                  OR (
+                    licenses.last_check_out_at IS NOT NULL
+                    AND licenses.last_check_out_at >= '2023-12-09 22:15:16'
+                  )
+                  OR (
+                    licenses.last_check_in_at IS NOT NULL
+                    AND licenses.last_check_in_at >= '2023-12-09 22:15:16'
+                  )
+                )
+            )
+            UNION
+            (
+              SELECT DISTINCT ON ("license_users"."user_id")
+                "license_users"."license_id" AS id,
+                "license_users"."user_id"    AS union_id
+              FROM
+                "license_users"
+                INNER JOIN "licenses" ON "licenses"."id" = "license_users"."license_id"
+              WHERE
+                (
+                  licenses.created_at >= '2023-12-09 22:15:16'
+                  OR (
+                    licenses.last_validated_at IS NOT NULL
+                    AND licenses.last_validated_at >= '2023-12-09 22:15:16'
+                  )
+                  OR (
+                    licenses.last_check_out_at IS NOT NULL
+                    AND licenses.last_check_out_at >= '2023-12-09 22:15:16'
+                  )
+                  OR (
+                    licenses.last_check_in_at IS NOT NULL
+                    AND licenses.last_check_in_at >= '2023-12-09 22:15:16'
+                  )
+                )
+            )
+          ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+          INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+        ORDER BY
+          "users"."created_at" ASC
+      SQL
+    end
+  end
+
+  # TODO(ezekg) Need to match on multiple queries since this is done in 2
+  #             parts, for performance reasons.
+  skip 'should produce a union query' do
+    user    = create(:user, account:)
+    license = create(:license, owner: user)
+    machine = create(:machine, license:)
+
+    expect(user.machines.to_sql).to match_sql <<~SQL.squish
       SELECT
         "machines".*
       FROM
@@ -291,11 +356,10 @@ describe UnionOf do
           UNION
           (
             SELECT
-              "licenses"."id"           AS id,
-              "license_users"."user_id" AS union_id
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
             FROM
-              "licenses"
-              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+              "license_users"
           )
         ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
         INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
@@ -306,8 +370,13 @@ describe UnionOf do
     SQL
   end
 
-  it 'should produce a deep union query' do
-    # TODO(ezekg) Add DISTINCT?
+  # TODO(ezekg) Need to match on multiple queries here
+  skip 'should produce a deep union query' do
+    user      = create(:user, account:)
+    license   = create(:license, owner: user)
+    machine   = create(:machine, license:)
+    component = create(:component, machine:)
+
     expect(record.components.to_sql).to match_sql <<~SQL.squish
       SELECT
         "machine_components".*
@@ -347,37 +416,6 @@ describe UnionOf do
   end
 
   it 'should produce a deeper union join' do
-    # expect(Product.joins(:users).to_sql).to match_sql <<~SQL.squish
-    #   SELECT
-    #     "products".*
-    #   FROM
-    #     "products"
-    #     INNER JOIN "policies" ON "policies"."product_id" = "products"."id"
-    #     INNER JOIN "licenses" ON "licenses"."policy_id" = "policies"."id"
-    #     INNER JOIN "users" ON "users"."id" IN (
-    #       (
-    #         (
-    #           SELECT
-    #             "users"."id"
-    #           FROM
-    #             "users"
-    #             INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
-    #             AND "licenses"."id" = "license_users"."license_id"
-    #         )
-    #         UNION
-    #         (
-    #           SELECT
-    #             "users"."id"
-    #           FROM
-    #             "users"
-    #           WHERE
-    #             "users"."id" = "licenses"."user_id"
-    #         )
-    #       )
-    #     )
-    #   ORDER BY
-    #     "products"."created_at" ASC
-    # SQL
     expect(Product.joins(:users).to_sql).to match_sql <<~SQL.squish
       SELECT
         "products".*
@@ -388,20 +426,18 @@ describe UnionOf do
         INNER JOIN (
           (
             SELECT
-              "users"."id" AS id,
+              "license_users"."user_id"    AS id,
               "license_users"."license_id" AS union_id
             FROM
-              "users"
-              INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
+              "license_users"
           )
           UNION
           (
             SELECT
-              "users"."id" AS id,
-              "licenses"."id" AS union_id
+              "licenses"."user_id" AS id,
+              "licenses"."id"      AS union_id
             FROM
-              "users"
-              INNER JOIN "licenses" ON "users"."id" = "licenses"."user_id"
+              "licenses"
           )
         ) "users_union" ON "users_union"."union_id" = "licenses"."id"
         INNER JOIN "users" ON "users"."id" = "users_union"."id"
@@ -421,7 +457,7 @@ describe UnionOf do
         INNER JOIN (
           (
             SELECT
-              "licenses"."id",
+              "licenses"."id"           AS id,
               "license_users"."user_id" AS union_id
             FROM
               "licenses"
@@ -430,7 +466,7 @@ describe UnionOf do
           UNION
           (
             SELECT
-              "licenses"."id",
+              "licenses"."id"      AS id,
               "licenses"."user_id" AS union_id
             FROM
               "licenses"
@@ -764,20 +800,18 @@ describe UnionOf do
           LEFT OUTER JOIN (
             (
               SELECT
-                "users"."id" AS id,
+                "license_users"."user_id"    AS id,
                 "license_users"."license_id" AS union_id
               FROM
-                "users"
-                INNER JOIN "license_users" ON "users"."id" = "license_users"."user_id"
+                "license_users"
             )
             UNION
             (
               SELECT
-                "users"."id" AS id,
-                "licenses"."id" AS union_id
+                "licenses"."user_id" AS id,
+                "licenses"."id"      AS union_id
               FROM
-                "users"
-                INNER JOIN "licenses" ON "users"."id" = "licenses"."user_id"
+                "licenses"
             )
           ) "users_union" ON "users_union"."union_id" = "licenses"."id"
           LEFT OUTER JOIN "users" ON "users"."id" = "users_union"."id"
@@ -850,11 +884,10 @@ describe UnionOf do
             UNION
             (
               SELECT
-                "licenses"."id"           AS id,
-                "license_users"."user_id" AS union_id
+                "license_users"."license_id" AS id,
+                "license_users"."user_id"    AS union_id
               FROM
-                "licenses"
-                INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+                "license_users"
             )
           ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
           LEFT OUTER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"

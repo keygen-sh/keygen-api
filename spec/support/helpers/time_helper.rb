@@ -2,6 +2,6 @@
 
 module TimeHelper
   def with_time(t, &)
-    travel_to(t) { yield }
+    travel_to(t) { yield t }
   end
 end
