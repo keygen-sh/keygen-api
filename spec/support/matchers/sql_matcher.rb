@@ -1,27 +1,32 @@
 # frozen_string_literal: true
 
+require 'anbt-sql-formatter/formatter'
+
+rule = AnbtSql::Rule.new
+rule.keyword = AnbtSql::Rule::KEYWORD_UPPER_CASE
+%w[count sum substr date].each { rule.function_names << _1.upcase }
+rule.indent_string = '  '
+formatter = AnbtSql::Formatter.new(rule)
+
 RSpec::Matchers.define :match_sql do |expected|
-  # NOTE(ezekg) Make our expected SQL string match #to_sql format.
-  #             This mostly deals with formatting parentheses.
-  expected = expected.dup.tap do |s|
-    s.squish!
-    s.gsub!(/(\()\s*([\w'"])/, '\1\2')     # `( "table"."column"` => `("table"."column"`
-    s.gsub!(/([\w"'])\s*(\))/, '\1\2')     # `"table"."column" = 'value')` => `"table"."column" = 'value')`
-    s.gsub!(/\s+(\()\s+(\()\s+/, ' \1\2 ') # ` ( ( ` => ` (( `
-    s.gsub!(/\s+(\))\s+(\))\s+/, ' \1\2 ') # ` ) ) ` => ` )) `
-  end
+  attr_reader :actual, :expected
+
+  diffable
 
   match do |actual|
-    actual == expected
+    @expected = formatter.format(+expected)
+    @actual   = formatter.format(+actual)
+
+    @actual == @expected
   end
 
   failure_message do |actual|
     <<~MSG
       Expected SQL to match:
         expected:
-          #{expected}
+          #{@expected.squish}
         got:
-          #{actual}
+          #{@actual.squish}
     MSG
   end
 end

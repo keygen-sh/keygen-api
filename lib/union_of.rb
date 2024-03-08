@@ -187,6 +187,9 @@ module UnionOf
         # FIXME(ezekg) Selecting IDs in a separate query is faster than a subquery
         #              selecting IDs, or an EXISTS subquery, or even a
         #              materialized CTE. Not sure why...
+        #
+        #              How can we make this lazy? Using the #find_by_sql method
+        #              immediately executes the query.
         ids = foreign_klass.find_by_sql(
                               foreign_table.project(foreign_table[primary_key])
                                            .from(
@@ -437,6 +440,10 @@ module UnionOf
       joins = []
       chain = []
 
+      # FIXME(ezekg) Through joins should prefix all dependent joins with the root association
+      #              name, to keep them out of the way in the case of multiple union joins.
+      #
+      #              Granted, this seems to be a bug in Rails, not on our end.
       reflection.chain.each do |reflection|
         table, _ = @union_references.fetch(reflection.name.to_sym) { yield reflection }
 
@@ -519,79 +526,77 @@ module UnionOf
         join_klass      ||= foreign_klass
         join_table      ||= foreign_table
 
+        join_primary_key = join_reflection.association_primary_key
+        join_foreign_key = join_reflection.foreign_key
+
+        join_scope = join_reflection.build_scope(join_table)
+        join_scope = join_reflection.scope_for(join_scope) unless join_reflection.scope.nil?
+
         case
         when reflection.union_of?
           union_sources = reflection.union_sources
 
           scopes = union_sources.map do |union_source|
             union_reflection  = join_klass.reflect_on_association(union_source)
+            union_primary_key = union_reflection.association_primary_key
+            union_foreign_key = union_reflection.foreign_key
             union_klass       = union_reflection.klass
             union_table       = union_klass.arel_table
-            union_constraints = union_klass.default_scoped.where_clause
 
-            unless union_constraints.empty?
-              union_constraints = union_constraints.merge(constraints)
+            union_scope = union_reflection.build_scope(union_table)
+            union_scope = union_reflection.scope_for(union_scope) unless union_reflection.scope.nil?
+
+            case
+            when union_reflection.through_reflection?
+              source_reflection      = union_reflection.source_reflection
+              source_klass           = source_reflection.klass
+              source_table           = source_klass.arel_table
+              unaliased_source_table = unaliased_table(source_table)
+              source_primary_key     = source_reflection.association_primary_key
+              source_foreign_key     = source_reflection.foreign_key
+
+              through_reflection  = union_reflection.through_reflection
+              through_klass       = through_reflection.klass
+              through_table       = through_klass.arel_table
+              through_primary_key = through_reflection.association_primary_key
+              through_foreign_key = through_reflection.foreign_key
+
+              through_scope = through_reflection.build_scope(through_table)
+              through_scope = through_reflection.scope_for(through_scope) unless through_reflection.scope.nil?
+
+              source_scope = source_reflection.build_scope(source_table)
+              source_scope = source_reflection.scope_for(source_scope) unless source_reflection.scope.nil?
+
+              union_scope = through_scope.merge(union_scope)
+              union_arel  = union_scope.arel
+
+              union_arel.projections.clear
+              union_arel.project(
+                through_table[source_foreign_key].as(UNION_PRIMARY_KEY),
+                through_table[through_foreign_key].as(UNION_FOREIGN_KEY),
+              )
+            when union_reflection.belongs_to?
+              union_arel = join_scope.arel
+
+              union_arel.projections.clear
+              union_arel.project(
+                join_table[union_foreign_key].as(UNION_PRIMARY_KEY),
+                join_table[union_primary_key].as(UNION_FOREIGN_KEY),
+              )
+            else
+              union_arel = union_scope.arel
+
+              union_arel.projections.clear
+              union_arel.project(
+                union_table[:id].as(UNION_PRIMARY_KEY),
+                union_table[union_foreign_key].as(UNION_FOREIGN_KEY),
+              )
             end
-
-            scope = case
-                    when union_reflection.through_reflection?
-                      source_reflection      = union_reflection.source_reflection
-                      source_klass           = source_reflection.klass
-                      source_table           = source_klass.arel_table
-                      unaliased_source_table = unaliased_table(source_table)
-                      source_primary_key     = source_reflection.association_primary_key
-                      source_foreign_key     = source_reflection.foreign_key
-
-                      through_reflection  = union_reflection.through_reflection
-                      through_klass       = through_reflection.klass
-                      through_table       = through_klass.arel_table
-                      through_foreign_key = union_reflection.through_reflection.foreign_key
-                      through_constraints = through_klass.default_scoped.where_clause
-
-                      unless through_constraints.empty?
-                        union_constraints = union_constraints.merge(through_constraints)
-                      end
-
-                      unaliased_source_table.project(source_table[:id].as(UNION_PRIMARY_KEY), through_table[through_foreign_key].as(UNION_FOREIGN_KEY))
-                                            .join(through_table, Arel::Nodes::InnerJoin)
-                                            .on(
-                                              source_table[source_primary_key].eq(through_table[source_foreign_key]),
-                                            )
-                    when union_reflection.belongs_to?
-                      join_constraints = join_klass.default_scoped.where_clause
-                      unaliased_table  = unaliased_table(table)
-                      foreign_key      = union_reflection.foreign_key
-
-                      unless join_constraints.empty?
-                        union_constraints = union_constraints.merge(join_constraints)
-                      end
-
-                      unaliased_table.project(union_table[:id].as(UNION_PRIMARY_KEY), join_table[:id].as(UNION_FOREIGN_KEY))
-                                     .join(join_table, Arel::Nodes::InnerJoin)
-                                     .on(
-                                       union_table[:id].eq(join_table[foreign_key]),
-                                     )
-                    else
-                      join_constraints = join_klass.default_scoped.where_clause
-                      unaliased_table  = unaliased_table(union_table)
-                      foreign_key      = union_reflection.foreign_key
-
-                      unaliased_table.project(
-                                       union_table[:id].as(UNION_PRIMARY_KEY),
-                                       union_table[foreign_key].as(UNION_FOREIGN_KEY),
-                                     )
-                    end
-
-            unless union_constraints.empty?
-              scope = scope.where(union_constraints.ast)
-            end
-
-            scope
           end
 
           unaliased_table = unaliased_table(table)
-
-          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
+          union_table     = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
+            # FIXME(ezekg) Figure out a way to handle conflicts
             "#{unaliased_table.name}_union"
           }
 
