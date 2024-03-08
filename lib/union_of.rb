@@ -542,60 +542,74 @@ module UnionOf
             union_foreign_key = union_reflection.foreign_key
             union_klass       = union_reflection.klass
             union_table       = union_klass.arel_table
+            union_constraints = union_klass.default_scoped.where_clause
 
             union_scope = union_reflection.build_scope(union_table)
             union_scope = union_reflection.scope_for(union_scope) unless union_reflection.scope.nil?
 
-            case
-            when union_reflection.through_reflection?
-              source_reflection      = union_reflection.source_reflection
-              source_klass           = source_reflection.klass
-              source_table           = source_klass.arel_table
-              unaliased_source_table = unaliased_table(source_table)
-              source_primary_key     = source_reflection.association_primary_key
-              source_foreign_key     = source_reflection.foreign_key
+            scope = case
+                    when union_reflection.through_reflection?
+                      source_reflection      = union_reflection.source_reflection
+                      source_klass           = source_reflection.klass
+                      source_table           = source_klass.arel_table
+                      source_primary_key     = source_reflection.association_primary_key
+                      source_foreign_key     = source_reflection.foreign_key
 
-              through_reflection  = union_reflection.through_reflection
-              through_klass       = through_reflection.klass
-              through_table       = through_klass.arel_table
-              through_primary_key = through_reflection.association_primary_key
-              through_foreign_key = through_reflection.foreign_key
+                      through_reflection  = union_reflection.through_reflection
+                      through_klass       = through_reflection.klass
+                      through_table       = through_klass.arel_table
+                      through_primary_key = through_reflection.association_primary_key
+                      through_foreign_key = through_reflection.foreign_key
 
-              through_scope = through_reflection.build_scope(through_table)
-              through_scope = through_reflection.scope_for(through_scope) unless through_reflection.scope.nil?
+                      through_scope = through_reflection.build_scope(through_table)
+                      through_scope = through_reflection.scope_for(through_scope) unless through_reflection.scope.nil?
 
-              source_scope = source_reflection.build_scope(source_table)
-              source_scope = source_reflection.scope_for(source_scope) unless source_reflection.scope.nil?
+                      source_scope = source_reflection.build_scope(source_table)
+                      source_scope = source_reflection.scope_for(source_scope) unless source_reflection.scope.nil?
 
-              union_scope = through_scope.merge(union_scope)
-              union_arel  = union_scope.arel
+                      union_constraints = through_klass.default_scoped.where_clause # adjust default constraints
+                      union_scope       = through_scope.merge(union_scope)
+                      union_arel        = union_scope.arel
 
-              union_arel.projections.clear
-              union_arel.project(
-                through_table[source_foreign_key].as(UNION_PRIMARY_KEY),
-                through_table[through_foreign_key].as(UNION_FOREIGN_KEY),
-              )
-            when union_reflection.belongs_to?
-              union_arel = join_scope.arel
+                      union_arel.projections.clear
+                      union_arel.project(
+                        through_table[source_foreign_key].as(UNION_PRIMARY_KEY),
+                        through_table[through_foreign_key].as(UNION_FOREIGN_KEY),
+                      )
+                    when union_reflection.belongs_to?
+                      union_constraints = join_klass.default_scoped.where_clause # adjust default constraints
+                      union_arel        = join_scope.arel
 
-              union_arel.projections.clear
-              union_arel.project(
-                join_table[union_foreign_key].as(UNION_PRIMARY_KEY),
-                join_table[union_primary_key].as(UNION_FOREIGN_KEY),
-              )
-            else
-              union_arel = union_scope.arel
+                      union_arel.projections.clear
+                      union_arel.project(
+                        join_table[union_foreign_key].as(UNION_PRIMARY_KEY),
+                        join_table[union_primary_key].as(UNION_FOREIGN_KEY),
+                      )
+                    else
+                      union_arel = union_scope.arel
 
-              union_arel.projections.clear
-              union_arel.project(
-                union_table[:id].as(UNION_PRIMARY_KEY),
-                union_table[union_foreign_key].as(UNION_FOREIGN_KEY),
-              )
+                      union_arel.projections.clear
+                      union_arel.project(
+                        union_table[:id].as(UNION_PRIMARY_KEY),
+                        union_table[union_foreign_key].as(UNION_FOREIGN_KEY),
+                      )
+                    end
+
+            unless union_constraints.empty?
+              scope = scope.where(union_constraints.ast)
             end
+
+            scope
           end
 
-          unaliased_table = unaliased_table(table)
-          union_table     = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
+          unaliased_table = case table
+                            in Arel::Nodes::TableAlias => aliased_table
+                              Arel::Table.new(aliased_table.right)
+                            in Arel::Table => table
+                              table
+                            end
+
+          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
             # FIXME(ezekg) Figure out a way to handle conflicts
             "#{unaliased_table.name}_union"
           }
@@ -617,12 +631,18 @@ module UnionOf
           )
 
           # Joining the target association onto our union
-          joins << join_type.new(
+          join = join_type.new(
             table,
             Arel::Nodes::On.new(
               table[klass.primary_key].eq(union_table[klass.primary_key]),
             ),
           )
+
+          unless constraints.empty?
+            append_constraints(join, [constraints.ast])
+          end
+
+          joins << join
         when reflection.belongs_to? || join_reflection&.belongs_to?
           join = join_type.new(
             table,
@@ -653,15 +673,6 @@ module UnionOf
       end
 
       joins
-    end
-
-    def unaliased_table(table)
-      case table
-      in Arel::Nodes::TableAlias => aliased_table
-        Arel::Table.new(aliased_table.right)
-      in Arel::Table => table
-        table
-      end
     end
   end
 

@@ -231,7 +231,7 @@ describe UnionOf do
     SQL
   end
 
-  it 'should produce a scoped joins' do
+  it 'should produce a join with association scopes' do
     with_time Time.parse('2024-03-08 16:15:16') do |t|
       expect(model.joins(:any_active_licenses).to_sql).to match_sql <<~SQL.squish
         SELECT
@@ -289,6 +289,49 @@ describe UnionOf do
             )
           ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
           INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+        ORDER BY
+          "users"."created_at" ASC
+      SQL
+    end
+  end
+
+  context 'with current account' do
+    before { Current.account = account }
+    after  { Current.account = nil }
+
+    it 'should produce a join with default scopes' do
+      expect(model.joins(:machines).to_sql).to match_sql <<~SQL.squish
+        SELECT
+          "users".*
+        FROM
+          "users"
+          INNER JOIN (
+            (
+              SELECT
+                "licenses"."id"     AS id,
+                "licenses"."user_id" AS union_id
+              FROM
+                "licenses"
+              WHERE
+                "licenses"."account_id" = '#{account.id}'
+            )
+            UNION
+            (
+              SELECT
+                "license_users"."license_id" AS id,
+                "license_users"."user_id"    AS union_id
+              FROM
+                "license_users"
+              WHERE
+                "license_users"."account_id" = '#{account.id}'
+            )
+          ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+          INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+          AND "licenses"."account_id" = '#{account.id}'
+          INNER JOIN "machines" ON "machines"."license_id" = "licenses"."id"
+          AND "machines"."account_id" = '#{account.id}'
+        WHERE
+          "users"."account_id" = '#{account.id}'
         ORDER BY
           "users"."created_at" ASC
       SQL
