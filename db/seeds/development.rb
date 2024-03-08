@@ -217,13 +217,37 @@ loop do
                                      )
                       end
 
-              Machine.create!(
+              machine = Machine.create!(
                 fingerprint: SecureRandom.hex,
                 environment:,
                 license:,
                 account:,
                 owner:,
               )
+
+              if rand(0..5).zero?
+                names = %w[
+                  MOBO
+                  GPU
+                  CPU
+                  MAC
+                  HDD
+                  SSD
+                  RAM
+                ]
+
+                names.each do |name|
+                  next if rand(0..1).zero?
+
+                  MachineComponent.create!(
+                    fingerprint: SecureRandom.hex,
+                    environment:,
+                    account:,
+                    machine:,
+                    name:,
+                  )
+                end
+              end
             end
           end
         end
