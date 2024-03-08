@@ -513,8 +513,11 @@ module UnionOf
         constraints = klass.default_scoped.where_clause
 
         join_reflection, join_table = chain[index + 1]
-        join_klass                  = join_reflection&.klass || foreign_klass
-        join_table                ||= foreign_table
+        join_klass                  = join_reflection&.klass
+
+        join_reflection ||= reflection
+        join_klass      ||= foreign_klass
+        join_table      ||= foreign_table
 
         case
         when reflection.union_of?
@@ -587,10 +590,11 @@ module UnionOf
 
           unaliased_table = unaliased_table(table)
 
-          # FIXME(ezekg) The return might seem weird, and it is. But it avoids an issue
-          #              where we make the same join multiple times.
-          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") { return [] }
-          unions      = scopes.reduce(nil) do |left, right|
+          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
+            "#{unaliased_table.name}_union"
+          }
+
+          unions = scopes.reduce(nil) do |left, right|
             if left
               Arel::Nodes::Union.new(left, right)
             else
