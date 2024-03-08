@@ -391,9 +391,9 @@ class User < ApplicationRecord
     entl = Entitlement.where(account_id: account_id).distinct
 
     entl.left_outer_joins(:policy_entitlements, :license_entitlements)
-        .where(policy_entitlements: { policy_id: licenses.reorder(nil).select(:policy_id) })
+        .where(policy_entitlements: { policy_id: policy_ids })
         .or(
-          entl.where(license_entitlements: { license_id: licenses.reorder(nil).select(:id) })
+          entl.where(license_entitlements: { license_id: license_ids })
         )
   end
 
