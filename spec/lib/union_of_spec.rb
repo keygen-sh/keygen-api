@@ -223,8 +223,8 @@ describe UnionOf do
             FROM
               "license_users"
           )
-        ) "licenses_users_join_union" ON "licenses_users_join_union"."union_id" = "users"."id"
-        INNER JOIN "licenses" "licenses_users_join" ON "licenses_users_join"."id" = "licenses_users_join_union"."id"
+        ) "licenses_union_2" ON "licenses_union_2"."union_id" = "users"."id"
+        INNER JOIN "licenses" "licenses_users_join" ON "licenses_users_join"."id" = "licenses_union_2"."id"
         INNER JOIN "machines" ON "machines"."license_id" = "licenses_users_join"."id"
       ORDER BY
         "users"."created_at" ASC

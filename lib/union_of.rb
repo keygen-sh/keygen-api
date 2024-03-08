@@ -529,9 +529,6 @@ module UnionOf
         join_primary_key = join_reflection.association_primary_key
         join_foreign_key = join_reflection.foreign_key
 
-        join_scope = join_reflection.build_scope(join_table)
-        join_scope = join_reflection.scope_for(join_scope) unless join_reflection.scope.nil?
-
         case
         when reflection.union_of?
           union_sources = reflection.union_sources
@@ -577,13 +574,24 @@ module UnionOf
                         through_table[through_foreign_key].as(UNION_FOREIGN_KEY),
                       )
                     when union_reflection.belongs_to?
+                      # We never want to alias union tables
+                      unaliased_table = case join_table
+                                        in Arel::Nodes::TableAlias => t
+                                          t.left
+                                        in Arel::Table => t
+                                          t
+                                        end
+
+                      join_scope = join_reflection.build_scope(unaliased_table)
+                      join_scope = join_reflection.scope_for(join_scope) unless join_reflection.scope.nil?
+
                       union_constraints = join_klass.default_scoped.where_clause # adjust default constraints
                       union_arel        = join_scope.arel
 
                       union_arel.projections.clear
                       union_arel.project(
-                        join_table[union_foreign_key].as(UNION_PRIMARY_KEY),
-                        join_table[union_primary_key].as(UNION_FOREIGN_KEY),
+                        unaliased_table[union_foreign_key].as(UNION_PRIMARY_KEY),
+                        unaliased_table[union_primary_key].as(UNION_FOREIGN_KEY),
                       )
                     else
                       union_arel = union_scope.arel
@@ -602,15 +610,19 @@ module UnionOf
             scope
           end
 
+          # We need to unalias the table so that we can properly create a union table alias
           unaliased_table = case table
-                            in Arel::Nodes::TableAlias => aliased_table
-                              Arel::Table.new(aliased_table.right)
-                            in Arel::Table => table
-                              table
+                            in Arel::Nodes::TableAlias => t
+                              t.left
+                            in Arel::Table => t
+                              t
                             end
 
           union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
-            # FIXME(ezekg) Figure out a way to handle conflicts
+            # FIXME(ezekg) Is this the best way to handle conflicts? The name will be auto
+            #              incremented, but MAY produce bad joins, depending on order.
+            #
+            #              Could we just skip the new join and reuse the old one?
             "#{unaliased_table.name}_union"
           }
 
