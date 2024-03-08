@@ -97,6 +97,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    anbt-sql-formatter (0.1.0)
     ar_lazy_preload (2.0.0)
     aws-eventstream (1.2.0)
     aws-partitions (1.571.0)
@@ -522,6 +523,7 @@ DEPENDENCIES
   active_record_distinct_on (~> 1.6)
   active_record_union
   activerecord_where_assoc (~> 1.1.4)
+  anbt-sql-formatter
   ar_lazy_preload (~> 2.0)
   aws-sdk-s3 (~> 1)
   barnes
