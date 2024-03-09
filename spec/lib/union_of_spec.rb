@@ -232,7 +232,7 @@ describe UnionOf do
   end
 
   it 'should produce a join with association scopes' do
-    with_time Time.parse('2024-03-08 16:15:16') do |t|
+    with_time Time.parse('2024-03-08 01:23:45 UTC') do |t|
       expect(model.joins(:any_active_licenses).to_sql).to match_sql <<~SQL.squish
         SELECT
           "users".*
@@ -247,18 +247,18 @@ describe UnionOf do
                 "licenses"
               WHERE
                 (
-                  licenses.created_at >= '2023-12-09 22:15:16'
+                  licenses.created_at >= '2023-12-09 01:23:45'
                   OR (
                     licenses.last_validated_at IS NOT NULL
-                    AND licenses.last_validated_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_validated_at >= '2023-12-09 01:23:45'
                   )
                   OR (
                     licenses.last_check_out_at IS NOT NULL
-                    AND licenses.last_check_out_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_check_out_at >= '2023-12-09 01:23:45'
                   )
                   OR (
                     licenses.last_check_in_at IS NOT NULL
-                    AND licenses.last_check_in_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_check_in_at >= '2023-12-09 01:23:45'
                   )
                 )
             )
@@ -272,18 +272,18 @@ describe UnionOf do
                 INNER JOIN "licenses" ON "licenses"."id" = "license_users"."license_id"
               WHERE
                 (
-                  licenses.created_at >= '2023-12-09 22:15:16'
+                  licenses.created_at >= '2023-12-09 01:23:45'
                   OR (
                     licenses.last_validated_at IS NOT NULL
-                    AND licenses.last_validated_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_validated_at >= '2023-12-09 01:23:45'
                   )
                   OR (
                     licenses.last_check_out_at IS NOT NULL
-                    AND licenses.last_check_out_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_check_out_at >= '2023-12-09 01:23:45'
                   )
                   OR (
                     licenses.last_check_in_at IS NOT NULL
-                    AND licenses.last_check_in_at >= '2023-12-09 22:15:16'
+                    AND licenses.last_check_in_at >= '2023-12-09 01:23:45'
                   )
                 )
             )
