@@ -605,11 +605,13 @@ describe UnionOf do
     it 'should support joining a union' do
       user_1 = create(:user, account:)
       user_2 = create(:user, account:)
+      user_3 = create(:user, account:)
 
       license_1 = create(:license, account:, owner: user_1)
       license_2 = create(:license, account:, owner: user_2)
       license_3 = create(:license, account:)
       license_4 = create(:license, account:)
+      license_5 = create(:license, account:)
 
       create(:license_user, account:, license: license_1, user: user_2)
       create(:license_user, account:, license: license_3, user: user_1)
@@ -619,17 +621,21 @@ describe UnionOf do
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_2 }).count).to eq 1
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_3 }).count).to eq 1
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_4 }).count).to eq 1
+      expect(User.distinct.joins(:licenses).where(licenses: { id: license_5 }).count).to eq 0
 
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_1 })).to satisfy { _1 in [user_1, user_2] }
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_2 })).to satisfy { _1 in [user_2] }
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_3 })).to satisfy { _1 in [user_1] }
       expect(User.distinct.joins(:licenses).where(licenses: { id: license_4 })).to satisfy { _1 in [user_1] }
+      expect(User.distinct.joins(:licenses).where(licenses: { id: license_5 })).to satisfy { _1 in [] }
 
       expect(License.distinct.joins(:users).where(users: { id: user_1 }).count).to eq 3
       expect(License.distinct.joins(:users).where(users: { id: user_2 }).count).to eq 2
+      expect(License.distinct.joins(:users).where(users: { id: user_3 }).count).to eq 0
 
       expect(License.distinct.joins(:users).where(users: { id: user_1 })).to satisfy { _1 in [license_1, license_3, license_4] }
       expect(License.distinct.joins(:users).where(users: { id: user_2 })).to satisfy { _1 in [license_1, license_2] }
+      expect(License.distinct.joins(:users).where(users: { id: user_3 })).to satisfy { _1 in [] }
     end
 
     it 'should support joining a through union' do
@@ -641,11 +647,13 @@ describe UnionOf do
 
       user_1 = create(:user, account:)
       user_2 = create(:user, account:)
+      user_3 = create(:user, account:)
 
       license_1 = create(:license, account:, policy: policy_1, owner: user_1)
       license_2 = create(:license, account:, policy: policy_1, owner: user_2)
       license_3 = create(:license, account:, policy: policy_2)
       license_4 = create(:license, account:, policy: policy_2)
+      license_5 = create(:license, account:, policy: policy_2)
 
       create(:license_user, account:, license: license_1, user: user_2)
       create(:license_user, account:, license: license_3, user: user_1)
@@ -656,6 +664,7 @@ describe UnionOf do
       machine_3 = create(:machine, license: license_1, owner: user_1)
       machine_4 = create(:machine, license: license_1, owner: user_2)
       machine_5 = create(:machine, license: license_2, owner: user_2)
+      machine_6 = create(:machine, license: license_5)
 
       component_1 = create(:component, machine: machine_1)
       component_2 = create(:component, machine: machine_4)
@@ -685,52 +694,69 @@ describe UnionOf do
       expect(User.distinct.joins(:machines).where(machines: { id: machine_2 }).count).to eq 1
       expect(User.distinct.joins(:machines).where(machines: { id: machine_3 }).count).to eq 2
       expect(User.distinct.joins(:machines).where(machines: { id: machine_4 }).count).to eq 2
+      expect(User.distinct.joins(:machines).where(machines: { id: machine_5 }).count).to eq 1
+      expect(User.distinct.joins(:machines).where(machines: { id: machine_6 }).count).to eq 0
 
       expect(User.distinct.joins(:machines).where(machines: { id: machine_1 })).to satisfy { _1 in [user_1] }
       expect(User.distinct.joins(:machines).where(machines: { id: machine_2 })).to satisfy { _1 in [user_1] }
       expect(User.distinct.joins(:machines).where(machines: { id: machine_3 })).to satisfy { _1 in [user_1, user_2] }
       expect(User.distinct.joins(:machines).where(machines: { id: machine_4 })).to satisfy { _1 in [user_1, user_2] }
+      expect(User.distinct.joins(:machines).where(machines: { id: machine_5 })).to satisfy { _1 in [user_2] }
+      expect(User.distinct.joins(:machines).where(machines: { id: machine_6 })).to satisfy { _1 in [] }
 
       expect(License.distinct.joins(:users).where(users: { id: user_1 }).count).to eq 3
       expect(License.distinct.joins(:users).where(users: { id: user_2 }).count).to eq 2
+      expect(License.distinct.joins(:users).where(users: { id: user_3 }).count).to eq 0
 
       expect(License.distinct.joins(:users).where(users: { id: user_1 })).to satisfy { _1 in [license_1, license_3, license_4] }
       expect(License.distinct.joins(:users).where(users: { id: user_2 })).to satisfy { _1 in [license_1, license_2] }
+      expect(License.distinct.joins(:users).where(users: { id: user_3 })).to satisfy { _1 in [] }
 
       expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_1 } }).count).to eq 4
       expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_2 } }).count).to eq 3
+      expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_3 } }).count).to eq 0
 
       expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_1 } })).to satisfy { _1 in [machine_1, machine_2, machine_3, machine_4] }
       expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_2 } })).to satisfy { _1 in [machine_3, machine_4, machine_5] }
+      expect(Machine.distinct.joins(license: :users).where(license: { users: { id: user_3 } })).to satisfy { _1 in [] }
 
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_1 }).count).to eq 1
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_2 }).count).to eq 0
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_3 }).count).to eq 0
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_4 }).count).to eq 2
+      expect(User.distinct.joins(:components).where(components: { machine_id: machine_5 }).count).to eq 1
+      expect(User.distinct.joins(:components).where(components: { machine_id: machine_6 }).count).to eq 0
 
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_1 })).to satisfy { _1 in [user_1] }
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_2 })).to satisfy { _1 in [] }
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_3 })).to satisfy { _1 in [] }
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_4 })).to satisfy { _1 in [user_1, user_2] }
       expect(User.distinct.joins(:components).where(components: { machine_id: machine_5 })).to satisfy { _1 in [user_2] }
+      expect(User.distinct.joins(:components).where(components: { machine_id: machine_6 })).to satisfy { _1 in [] }
 
       expect(Product.distinct.joins(:users).where(users: { id: user_1 }).count).to eq 2
       expect(Product.distinct.joins(:users).where(users: { id: user_2 }).count).to eq 1
+      expect(Product.distinct.joins(:users).where(users: { id: user_3 }).count).to eq 0
 
       expect(Product.distinct.joins(:users).where(users: { id: user_1 })).to satisfy { _1 in [product_1, product_2] }
       expect(Product.distinct.joins(:users).where(users: { id: user_2 })).to satisfy { _1 in [product_1] }
+      expect(Product.distinct.joins(:users).where(users: { id: user_3 })).to satisfy { _1 in [] }
 
       expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_1 } }).count).to eq 4
       expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_2 } }).count).to eq 3
+      expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_3 } }).count).to eq 0
 
       expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_1 } })).to satisfy { _1 in [release_1, release_2, release_3, release_4] }
       expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_2 } })).to satisfy { _1 in [release_1, release_2, release_3] }
+      expect(Release.distinct.joins(product: :users).where(product: { users: { id: user_3 } })).to satisfy { _1 in [] }
 
       expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_1 } }).count).to eq 5
       expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_2 } }).count).to eq 4
+      expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_3 } }).count).to eq 0
 
       expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_1 } })).to satisfy { _1 in [artifact_1, artifact_2, artifact_3, artifact_4, artifact_5] }
       expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_2 } })).to satisfy { _1 in [artifact_1, artifact_2, artifact_3, artifact_4] }
+      expect(ReleaseArtifact.distinct.joins(product: :users).where(product: { users: { id: user_3 } })).to satisfy { _1 in [] }
     end
   end
 
