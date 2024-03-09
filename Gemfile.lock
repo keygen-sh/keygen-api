@@ -192,9 +192,6 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
     date (3.3.3)
-    db-query-matchers (0.12.0)
-      activesupport (>= 4.0, < 7.2)
-      rspec (>= 3.0)
     diff-lcs (1.5.0)
     dotenv (2.7.6)
     dotenv-rails (2.7.6)
@@ -408,10 +405,6 @@ GEM
       rack (>= 1.4)
     rexml (3.2.5)
     rotp (6.2.0)
-    rspec (3.12.0)
-      rspec-core (~> 3.12.0)
-      rspec-expectations (~> 3.12.0)
-      rspec-mocks (~> 3.12.0)
     rspec-core (3.12.2)
       rspec-support (~> 3.12.0)
     rspec-expectations (3.12.1)
@@ -533,7 +526,6 @@ DEPENDENCIES
   cucumber-rails (~> 2.5)
   cuke_modeler (~> 3.19)
   database_cleaner (~> 2.0)
-  db-query-matchers
   dotenv-rails
   ed25519
   elif (~> 0.1.0)
