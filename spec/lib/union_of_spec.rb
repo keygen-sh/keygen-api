@@ -338,21 +338,14 @@ describe UnionOf do
     end
   end
 
-  # TODO(ezekg) Need to match on multiple queries since this is done in 2
-  #             parts, for performance reasons.
-  skip 'should produce a union query' do
+  it 'should produce a union query' do
     user    = create(:user, account:)
-    license = create(:license, owner: user)
+    license = create(:license, account:, owner: user)
     machine = create(:machine, license:)
 
-    expect(user.machines.to_sql).to match_sql <<~SQL.squish
-      SELECT
-        "machines".*
-      FROM
-        "machines"
-        INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
-      WHERE
-        "licenses"."id" IN (
+    expect { user.machines }.to(
+      match_queries(count: 2) do |queries|
+        expect(queries.first).to match_sql <<~SQL.squish
           SELECT
             "licenses"."id"
           FROM
@@ -363,7 +356,7 @@ describe UnionOf do
                 FROM
                   "licenses"
                 WHERE
-                  "licenses"."user_id" = '#{record.id}'
+                  "licenses"."user_id" = '#{user.id}'
               )
               UNION
               (
@@ -373,13 +366,24 @@ describe UnionOf do
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
                 WHERE
-                  "license_users"."user_id" = '#{record.id}'
+                  "license_users"."user_id" = '#{user.id}'
               )
             ) "licenses"
-        )
-      ORDER BY
-        "machines"."created_at" ASC
-    SQL
+        SQL
+
+        expect(queries.second).to match_sql <<~SQL.squish
+          SELECT
+            "machines".*
+          FROM
+            "machines"
+            INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
+          WHERE
+            "licenses"."id" IN ('#{license.id}')
+          ORDER BY
+            "machines"."created_at" ASC
+        SQL
+      end
+    )
   end
 
   it 'should produce a deep union join' do
@@ -413,22 +417,15 @@ describe UnionOf do
     SQL
   end
 
-  # TODO(ezekg) Need to match on multiple queries here
-  skip 'should produce a deep union query' do
+  it 'should produce a deep union query' do
     user      = create(:user, account:)
-    license   = create(:license, owner: user)
+    license   = create(:license, account:, owner: user)
     machine   = create(:machine, license:)
     component = create(:component, machine:)
 
-    expect(record.components.to_sql).to match_sql <<~SQL.squish
-      SELECT
-        "machine_components".*
-      FROM
-        "machine_components"
-        INNER JOIN "machines" ON "machine_components"."machine_id" = "machines"."id"
-        INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
-      WHERE
-        "licenses"."id" IN (
+    expect { user.components }.to(
+      match_queries(count: 2) do |queries|
+        expect(queries.first).to match_sql <<~SQL.squish
           SELECT
             "licenses"."id"
           FROM
@@ -439,7 +436,7 @@ describe UnionOf do
                 FROM
                   "licenses"
                 WHERE
-                  "licenses"."user_id" = '#{record.id}'
+                  "licenses"."user_id" = '#{user.id}'
               )
               UNION
               (
@@ -448,14 +445,26 @@ describe UnionOf do
                 FROM
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
-                  WHERE
-                    "license_users"."user_id" = '#{record.id}'
+                WHERE
+                  "license_users"."user_id" = '#{user.id}'
               )
             ) "licenses"
-        )
-      ORDER BY
-        "machine_components"."created_at" ASC
-    SQL
+        SQL
+
+        expect(queries.second).to match_sql <<~SQL.squish
+          SELECT
+            "machine_components".*
+          FROM
+            "machine_components"
+            INNER JOIN "machines" ON "machine_components"."machine_id" = "machines"."id"
+            INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
+          WHERE
+            "licenses"."id" IN ('#{license.id}')
+          ORDER BY
+            "machine_components"."created_at" ASC
+        SQL
+      end
+    )
   end
 
   it 'should produce a deeper union join' do
@@ -868,7 +877,7 @@ describe UnionOf do
         expect(license.association(:owner).loaded?).to be false
         expect(license.association(:licensees).loaded?).to be false
 
-        expect { license.users }.to_not make_database_queries
+        expect { license.users }.to match_queries(count: 0)
         expect(license.users.sort_by(&:id)).to eq license.reload.users.sort_by(&:id)
       end
     end
@@ -943,7 +952,7 @@ describe UnionOf do
         expect(user.association(:machines).loaded?).to be true
         expect(user.association(:licenses).loaded?).to be false
 
-        expect { user.machines }.to_not make_database_queries
+        expect { user.machines }.to match_queries(count: 0)
         expect(user.machines.sort_by(&:id)).to eq user.reload.machines.sort_by(&:id)
       end
     end
@@ -951,16 +960,63 @@ describe UnionOf do
     it 'should support preloading a union' do
       licenses = License.preload(:users)
 
-      # FIXME(ezekg) How can I test the actual SQL used for preloading?
-      expect { licenses.to_a }.to make_database_queries(count: 4)
-        .and not_raise_error
+      expect { licenses }.to(
+        match_queries(count: 4) do |queries|
+          license_ids  = licenses.ids.uniq
+          owner_ids    = licenses.map(&:owner_id).compact.uniq
+          user_ids     = licenses.flat_map(&:licensee_ids).uniq
+
+          expect(queries.first).to match_sql <<~SQL.squish
+            SELECT "licenses".* FROM "licenses" ORDER BY "licenses"."created_at" ASC
+          SQL
+
+          expect(queries.second).to match_sql <<~SQL.squish
+            SELECT
+              "license_users".*
+            FROM
+              "license_users"
+            WHERE
+              "license_users"."license_id" IN (
+                #{license_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "license_users"."created_at" ASC
+          SQL
+
+          expect(queries.third).to match_sql <<~SQL.squish
+            SELECT
+              "users".*
+            FROM
+              "users"
+            WHERE
+              "users"."id" IN (
+                #{owner_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "users"."created_at" ASC
+          SQL
+
+          expect(queries.fourth).to match_sql <<~SQL.squish
+            SELECT
+              "users".*
+            FROM
+              "users"
+            WHERE
+              "users"."id" IN (
+                #{user_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "users"."created_at" ASC
+          SQL
+        end
+      )
 
       licenses.each do |license|
         expect(license.association(:users).loaded?).to be true
         expect(license.association(:owner).loaded?).to be true
         expect(license.association(:licensees).loaded?).to be true
 
-        expect { license.users }.to_not make_database_queries
+        expect { license.users }.to match_queries(count: 0)
         expect(license.users.sort_by(&:id)).to eq license.reload.users.sort_by(&:id)
       end
     end
@@ -968,15 +1024,75 @@ describe UnionOf do
     it 'should support preloading a through union' do
       users = User.preload(:machines)
 
-      # FIXME(ezekg) How can I test the actual SQL used for preloading?
-      expect { users.to_a }.to make_database_queries(count: 5)
-        .and not_raise_error
+      expect { users }.to(
+        match_queries(count: 5) do |queries|
+          user_ids         = users.ids.uniq
+          user_license_ids = users.flat_map(&:user_license_ids).reverse.uniq.reverse # order is significant
+          license_ids      = users.flat_map(&:license_ids).uniq
+
+          expect(queries.first).to match_sql <<~SQL.squish
+            SELECT "users" . * FROM "users" ORDER BY "users"."created_at" ASC
+          SQL
+
+          expect(queries.second).to match_sql <<~SQL.squish
+            SELECT
+              "licenses".*
+            FROM
+              "licenses"
+            WHERE
+              "licenses"."user_id" IN (
+                #{user_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "licenses"."created_at" ASC
+          SQL
+
+          expect(queries.third).to match_sql <<~SQL.squish
+            SELECT
+              "license_users".*
+            FROM
+              "license_users"
+            WHERE
+              "license_users"."user_id" IN (
+                #{user_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "license_users"."created_at" ASC
+          SQL
+
+          expect(queries.fourth).to match_sql <<~SQL.squish
+            SELECT
+              "licenses".*
+            FROM
+              "licenses"
+            WHERE
+              "licenses"."id" IN (
+                #{user_license_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "licenses"."created_at" ASC
+          SQL
+
+          expect(queries.fifth).to match_sql <<~SQL.squish
+            SELECT
+              "machines".*
+            FROM
+              "machines"
+            WHERE
+              "machines"."license_id" IN (
+                #{license_ids.map { "'#{_1}'" }.join(', ')}
+              )
+            ORDER BY
+              "machines"."created_at" ASC
+          SQL
+        end
+      )
 
       users.each do |user|
         expect(user.association(:machines).loaded?).to be true
         expect(user.association(:licenses).loaded?).to be true
 
-        expect { user.machines }.to_not make_database_queries
+        expect { user.machines }.to match_queries(count: 0)
         expect(user.machines.sort_by(&:id)).to eq user.reload.machines.sort_by(&:id)
       end
     end
