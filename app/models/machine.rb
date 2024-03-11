@@ -441,8 +441,8 @@ class Machine < ApplicationRecord
                    )
     end
   }
-  scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
-  scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
+  scope :for_product, -> id { joins(:license).where license: { product_id: id } }
+  scope :for_policy, -> id { joins(:license).where license: { policy_id: id } }
   scope :for_group, -> id { where(group: id) }
 
   scope :alive, -> {
