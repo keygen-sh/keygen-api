@@ -17,8 +17,8 @@ class Product < ApplicationRecord
 
   has_many :policies, dependent: :destroy_async
   has_many :keys, through: :policies, source: :pool
-  has_many :licenses, through: :policies
-  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :licenses, dependent: :destroy_async
+  has_many :machines, through: :licenses
   has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
     def owners = where.not(licenses: { user_id: nil })
   end
