@@ -29,10 +29,10 @@ class User < ApplicationRecord
     source: :users
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :license_entitlements, through: :licenses
-  has_many :policy_entitlements, through: :licenses
+  has_many :license_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :policy_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :owned_machines, dependent: :destroy_async, class_name: Machine.name, foreign_key: :owner_id
-  has_many :machines, through: :licenses do
+  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
     def owned = where(owner: proxy_association.owner)
   end
   has_many :components, through: :machines
@@ -309,7 +309,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :for_product, -> id { joins(licenses: :policy).where(policies: { product_id: id }).distinct }
+  scope :for_product, -> id { joins(:licenses).where(licenses: { product_id: id }).distinct }
   scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> id {

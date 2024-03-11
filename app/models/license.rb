@@ -13,6 +13,9 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
+  # NOTE(ezekg) This is a denormalized association and is automatically
+  #             pulled in from the policy.
+  belongs_to :product, optional: true
   belongs_to :policy
   # NOTE(ezekg) This is a denormalized association and is automatically
   #             pulled in from the policy. Purposefully defined after
@@ -33,8 +36,7 @@ class License < ApplicationRecord
   has_many :machines, dependent: :destroy_async
   has_many :components, through: :machines
   has_many :processes, through: :machines
-  has_many :releases, -> l { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
-    through: :product
+  has_many :releases, through: :product
   has_many :event_logs,
     as: :resource
 
@@ -57,6 +59,7 @@ class License < ApplicationRecord
   attr_reader :raw
 
   before_create :enforce_license_limit_on_account!
+  before_create -> { self.product_id = policy.product_id }, if: -> { product_id.nil? && policy.present? }
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { policy.present? && requires_check_in? }
   before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
@@ -557,7 +560,7 @@ class License < ApplicationRecord
                    )
     end
   }
-  scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
+  scope :for_product, -> id { joins(:product).where product: { id: } }
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
   scope :for_group, -> id { where(group: id) }
@@ -817,7 +820,8 @@ class License < ApplicationRecord
   end
 
   def transfer!(new_policy)
-    self.policy = new_policy
+    self.product = new_policy&.product # denormalized
+    self.policy  = new_policy
 
     if new_policy.present? && new_policy.reset_expiry_on_transfer?
       if new_policy.duration?
