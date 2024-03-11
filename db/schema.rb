@@ -247,6 +247,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.index ["environment_id"], name: "index_licenses_on_environment_id"
     t.index ["group_id"], name: "index_licenses_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
+    t.index ["id", "policy_id", "account_id"], name: "index_licenses_on_id_and_policy_id_and_account_id"
+    t.index ["id", "product_id", "account_id"], name: "index_licenses_on_id_and_product_id_and_account_id"
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
     t.index ["last_validated_at"], name: "index_licenses_on_last_validated_at"
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at"
