@@ -464,6 +464,37 @@ module UnionOf
         join_table                ||= foreign_table
 
         case
+        when reflection.through_reflection?
+          source_reflection   = reflection.source_reflection
+          source_klass        = source_reflection.klass
+          through_reflection  = reflection.through_reflection
+          through_klass       = through_reflection.klass
+
+          join = if source_reflection.belongs_to?
+                   constraints = through_klass.default_scoped.where_clause # adjust default constraints
+
+                   join_type.new(
+                     table,
+                     Arel::Nodes::On.new(
+                       table[primary_key].eq(join_table[foreign_key]),
+                     ),
+                   )
+                 else
+                   constraints = source_klass.default_scoped.where_clause
+
+                   join_type.new(
+                     table,
+                     Arel::Nodes::On.new(
+                       table[foreign_key].eq(join_table[primary_key]),
+                     ),
+                   )
+                 end
+
+          unless constraints.empty?
+            append_constraints(join, [constraints.ast])
+          end
+
+          joins << join
         when reflection.union_of?
           joins.concat(
             join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &),
@@ -598,7 +629,7 @@ module UnionOf
 
                       union_arel.projections.clear
                       union_arel.project(
-                        union_table[:id].as(UNION_PRIMARY_KEY),
+                        union_table[union_primary_key].as(UNION_PRIMARY_KEY),
                         union_table[union_foreign_key].as(UNION_FOREIGN_KEY),
                       )
                     end
