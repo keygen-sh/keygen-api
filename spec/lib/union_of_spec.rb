@@ -373,7 +373,7 @@ describe UnionOf do
 
         expect(queries.second).to match_sql <<~SQL.squish
           SELECT
-            "machines".*
+            DISTINCT "machines".*
           FROM
             "machines"
             INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
@@ -461,6 +461,7 @@ describe UnionOf do
           WHERE
             "licenses"."id" IN ('#{license.id}')
           ORDER BY
+            "machines"."created_at"           ASC,
             "machine_components"."created_at" ASC
         SQL
       end
@@ -473,8 +474,7 @@ describe UnionOf do
         "products".*
       FROM
         "products"
-        INNER JOIN "policies" ON "policies"."product_id" = "products"."id"
-        INNER JOIN "licenses" ON "licenses"."policy_id" = "policies"."id"
+        INNER JOIN "licenses" ON "licenses"."product_id" = "products"."id"
         INNER JOIN (
           (
             SELECT
@@ -525,9 +525,8 @@ describe UnionOf do
           )
         ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
         INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
-        INNER JOIN "policies" ON "licenses"."policy_id" = "policies"."id"
       WHERE
-        "policies"."product_id" = '#{product.id}'
+        "licenses"."product_id" = '#{product.id}'
       ORDER BY
         "users"."created_at" ASC
     SQL
@@ -857,6 +856,7 @@ describe UnionOf do
           "licenses"."environment_id" AS t0_r27,
           "licenses"."last_validated_checksum" AS t0_r28,
           "licenses"."last_validated_version" AS t0_r29,
+          "licenses"."product_id" AS t0_r30,
           "users"."id" AS t1_r0,
           "users"."email" AS t1_r1,
           "users"."password_digest" AS t1_r2,
@@ -1101,7 +1101,7 @@ describe UnionOf do
 
           expect(queries.fifth).to match_sql <<~SQL.squish
             SELECT
-              "machines".*
+              DISTINCT "machines".*
             FROM
               "machines"
             WHERE
