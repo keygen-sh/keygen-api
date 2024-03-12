@@ -5,6 +5,12 @@
 n = ENV.fetch('N') { 1 }.to_i
 i = 0
 
+##
+# brand and srand generate random numbers within a specified range, skewed (srand)
+# and biased (brand) towards lower numbers in the range.
+def brand(range) = (range.begin + (1 - Math.sqrt(rand)) ** 7 * range.end).round
+def srand(range) = rand < 0.9 ? brand(range.begin..(range.begin + range.end * 0.1).to_i) : brand(range)
+
 loop do
   event_types = EventType.pluck(:id)
 
@@ -36,7 +42,7 @@ loop do
         Token.create!(bearer: environment, account:, environment:)
       end
 
-      rand(0..100).times do
+      srand(0..100).times do
         buzzword = Faker::Company.unique.buzzword
 
         Entitlement.create!(
@@ -140,7 +146,7 @@ loop do
             end
           end
 
-          rand(1..10_000).times do
+          srand(1..1_000_000).times do
             owner = if rand(0..5).zero?
                       User.create!(
                         email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
@@ -162,14 +168,18 @@ loop do
             end
 
             if rand(0..3).zero?
-              LicenseEntitlement.create!(
-                entitlement: account.entitlements.for_environment(environment, strict: true)
-                                                 .excluding(*policy.entitlements)
-                                                 .to_a.sample,
-                environment:,
-                account:,
-                license:,
-              )
+              entitlement = account.entitlements.for_environment(environment, strict: true)
+                                                .excluding(*policy.entitlements)
+                                                .to_a.sample
+
+              unless entitlement.nil?
+                LicenseEntitlement.create!(
+                  environment:,
+                  account:,
+                  entitlement:,
+                  license:,
+                )
+              end
             end
 
             if rand(0..5).zero?
@@ -206,7 +216,7 @@ loop do
               end
             end
 
-            rand(0..license.users.count).times do
+            rand(0..srand(1..1_000)).times do # skew even more towards 0 for a realistic distribution
               owner = if rand(0..5).zero?
                         license.users.reorder(:id) # sorting on UUID is effectively random if inserts are constant
                                      .offset((rand() * license.users.count).floor) # random user
@@ -271,7 +281,7 @@ loop do
 
         resource    = route.requirements[:controller].classify.split('::').last.safe_constantize
         environment = resource.try(:environment)
-        admins      = account.admins.for_environment(environment, strict: true).sample
+        admin       = account.admins.for_environment(environment, strict: true).sample
         requestor   = if resource.respond_to?(:role) && rand(0..1).zero?
                         resource
                       else
