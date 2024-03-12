@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_11_180638) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_12_183601) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -203,7 +203,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_11_180638) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_license_users_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_license_users_on_environment_id"
+    t.index ["license_id", "account_id"], name: "index_license_users_on_license_id_and_account_id"
     t.index ["license_id", "user_id", "account_id"], name: "index_license_users_on_license_id_and_user_id_and_account_id", unique: true
+    t.index ["user_id", "account_id"], name: "index_license_users_on_user_id_and_account_id"
     t.index ["user_id"], name: "index_license_users_on_user_id"
   end
 
