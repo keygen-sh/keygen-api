@@ -231,6 +231,8 @@ module UnionOf
         foreign_key = foreign_keys[union_source]
 
         sources = if union_reflection.through_reflection?
+                    source_reflection   = union_reflection.source_reflection
+                    source_foreign_key  = source_reflection.foreign_key
                     through_reflection  = union_reflection.through_reflection
                     through_foreign_key = through_reflection.foreign_key
                     through_klass       = through_reflection.klass
@@ -238,15 +240,11 @@ module UnionOf
                     through_constraints = through_klass.default_scoped.where_clause
 
                     unless through_constraints.empty?
-                      constraints = constraints.merge(through_constraints)
+                      constraints = through_constraints
                     end
 
-                    foreign_table.project(foreign_table[primary_key].as(UNION_PRIMARY_KEY), through_table[union_foreign_key].as(UNION_FOREIGN_KEY))
-                                 .from(foreign_table)
-                                 .join(through_table, Arel::Nodes::InnerJoin)
-                                 .on(
-                                   foreign_table[primary_key].eq(through_table[through_foreign_key]),
-                                 )
+                    foreign_table.project(through_table[through_foreign_key].as(UNION_PRIMARY_KEY), through_table[source_foreign_key].as(UNION_FOREIGN_KEY))
+                                 .from(through_table)
                   else
                     foreign_table.project(foreign_table[primary_key].as(UNION_PRIMARY_KEY), foreign_table[union_foreign_key].as(UNION_FOREIGN_KEY))
                                  .from(foreign_table)

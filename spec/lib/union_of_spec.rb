@@ -338,7 +338,7 @@ describe UnionOf do
     end
   end
 
-  it 'should produce a union query' do
+  it 'should produce a through has-many union query' do
     user    = create(:user, account:)
     license = create(:license, account:, owner: user)
     machine = create(:machine, license:)
@@ -384,6 +384,42 @@ describe UnionOf do
         SQL
       end
     )
+  end
+
+  it 'should produce a through has-one union query' do
+    user      = create(:user, account:)
+    license   = create(:license, account:, owner: user)
+    machine   = create(:machine, license:)
+    component = create(:component, machine:)
+
+    expect(machine.users.to_sql).to match_sql <<~SQL.squish
+      SELECT
+        "users".*
+      FROM
+        "users"
+        INNER JOIN (
+          (
+            SELECT
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
+            FROM
+              "license_users"
+          )
+          UNION
+          (
+            SELECT
+              "licenses"."id"      AS id,
+              "licenses"."user_id" AS union_id
+            FROM
+              "licenses"
+          )
+        ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
+        INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+      WHERE
+        "licenses"."id" = '#{license.id}'
+      ORDER BY
+        "users"."created_at" ASC
+    SQL
   end
 
   it 'should produce a deep union join' do
@@ -509,11 +545,10 @@ describe UnionOf do
         INNER JOIN (
           (
             SELECT
-              "licenses"."id"           AS id,
-              "license_users"."user_id" AS union_id
+              "license_users"."license_id" AS id,
+              "license_users"."user_id"    AS union_id
             FROM
-              "licenses"
-              INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+              "license_users"
           )
           UNION
           (
