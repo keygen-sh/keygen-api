@@ -309,7 +309,27 @@ class User < ApplicationRecord
     end
   }
 
-  scope :for_product, -> id { joins(:licenses).where(licenses: { product_id: id }).distinct }
+  scope :for_product, -> id {
+    license_users = LicenseUser.arel_table
+    licenses      = License.arel_table
+    users         = User.arel_table
+
+    # More optimized union query for this particular association
+    left_outer_joins(:license_users)
+      .joins(
+        Arel::Nodes::InnerJoin.new(
+          licenses,
+          Arel::Nodes::On.new(
+            licenses[:user_id].eq(users[:id]).or(
+              licenses[:id].eq(license_users[:license_id]),
+            )
+          ),
+        ),
+      )
+      .where(
+        licenses: { product_id: id },
+      )
+  }
   scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> id {
