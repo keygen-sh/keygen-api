@@ -12,7 +12,7 @@ module Api::V1::Products::Relationships
     authorize :product
 
     def index
-      users = apply_pagination(authorized_scope(apply_scopes(product.users)).preload(:role))
+      users = apply_pagination(authorized_scope(apply_scopes(product_users)).preload(:role))
       authorize! users,
         with: Products::UserPolicy
 
@@ -20,7 +20,7 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      user = FindByAliasService.call(product.users, id: params[:id], aliases: :email)
+      user = FindByAliasService.call(product_users, id: params[:id], aliases: :email)
       authorize! user,
         with: Products::UserPolicy
 
@@ -30,6 +30,10 @@ module Api::V1::Products::Relationships
     private
 
     attr_reader :product
+
+    # FIXME(ezekg) Uses a more optimized query for large accounts. This should
+    #              be considered a bug in union_of.
+    def product_users = current_account.users.for_product(product)
 
     def set_product
       scoped_products = authorized_scope(current_account.products)
