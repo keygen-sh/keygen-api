@@ -3,6 +3,7 @@
 class License < ApplicationRecord
   include Envented::Callbacks
   include UnionOf::Macro
+  include Denormalizable
   include Environmental
   include Accountable
   include Limitable
@@ -14,6 +15,8 @@ class License < ApplicationRecord
 
   # NOTE(ezekg) This is a denormalized association and is automatically
   #             pulled in from the policy.
+  #
+  # FIXME(ezekg) Remove the :optional flag after data is migrated.
   belongs_to :product, optional: true
   belongs_to :policy
   belongs_to :group,
@@ -46,6 +49,7 @@ class License < ApplicationRecord
       user.read
     ]
 
+  denormalizes :product_id, from: :policy
   encrypts :key,
     deterministic: true
 
@@ -53,7 +57,6 @@ class License < ApplicationRecord
   attr_reader :raw
 
   before_create :enforce_license_limit_on_account!
-  before_create -> { self.product_id = policy.product_id }, if: -> { product_id.nil? && policy.present? }
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { policy.present? && requires_check_in? }
   before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
