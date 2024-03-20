@@ -2,6 +2,7 @@
 
 class License < ApplicationRecord
   include Envented::Callbacks
+  include Denormalizable
   include Environmental
   include Limitable
   include Orderable
@@ -39,6 +40,7 @@ class License < ApplicationRecord
       user.read
     ]
 
+  denormalizes :product_id, from: :policy
   encrypts :key,
     deterministic: true
 

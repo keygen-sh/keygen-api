@@ -85,10 +85,10 @@ class User < ApplicationRecord
       end
     }
 
+  normalizes :email, with: -> email { email.downcase.strip }
+
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
-
-  before_save -> { self.email = email.downcase.strip }
 
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
