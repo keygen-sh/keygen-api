@@ -25,9 +25,11 @@ module Denormalizable
     def instrument_denormalized_attribute_from(attribute_name, from:)
       case from
       in Symbol => association_name
-        before_create     -> { write_attribute(attribute_name, send(association_name)&.read_attribute(attribute_name) ) }, if: :"#{association_name}_id_changed?"
-        before_update     -> { write_attribute(attribute_name, send(association_name)&.read_attribute(attribute_name) ) }, if: :"#{association_name}_id_changed?"
-        before_destroy    -> { write_attribute(attribute_name, nil ) }, unless: -> { association(association_name).reflection.belongs_to? && !association(association_name).options[:optional] }
+        reflection = reflect_on_association(association_name)
+
+        before_create  -> { write_attribute(attribute_name, association(association_name).reader&.read_attribute(attribute_name) ) }, if: :"#{reflection.foreign_key}_changed?"
+        before_update  -> { write_attribute(attribute_name, association(association_name).reader&.read_attribute(attribute_name) ) }, if: :"#{reflection.foreign_key}_changed?"
+        before_destroy -> { write_attribute(attribute_name, nil ) }, unless: proc { reflection.belongs_to? && !reflection.options[:optional] }
       else
         raise ArgumentError, "invalid :from association: #{from.inspect}"
       end
