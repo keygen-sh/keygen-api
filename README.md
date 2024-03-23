@@ -132,9 +132,9 @@ bundle exec rails keygen:setup
 
 ### Seeding
 
-To seed the database with sample data, run (optional, takes about an hour):
+To seed the database with sample data, run (optional):
 
-```
+```bash
 bundle exec rails db:seed:development
 ```
 
@@ -160,7 +160,13 @@ bundle exec rails console
 
 ### Testing
 
-To run the entire test suite, specs and features, run (takes about 20 mins on a 16-core CPU):
+To setup the test environment, run:
+
+```bash
+bundle exec rake test:setup
+```
+
+To run the entire test suite, specs and features, run (takes ~20 mins on a 16-core CPU):
 
 ```bash
 bundle exec rake test
@@ -170,12 +176,14 @@ To run Cucumber features, run:
 
 ```bash
 bundle exec rake test:cucumber
+bundle exec rake test:cucumber[features/api/v1/licenses/create.feature]
 ```
 
 To run Rspec specs, run:
 
 ```bash
 bundle exec rake test:rspec
+bundle exec rake test:rspec[spec/models/license_spec.rb]
 ```
 
 ## License
