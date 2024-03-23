@@ -397,28 +397,13 @@ describe UnionOf do
         "users".*
       FROM
         "users"
-        INNER JOIN (
-          (
-            SELECT
-              "license_users"."license_id" AS id,
-              "license_users"."user_id"    AS union_id
-            FROM
-              "license_users"
-          )
-          UNION
-          (
-            SELECT
-              "licenses"."id"      AS id,
-              "licenses"."user_id" AS union_id
-            FROM
-              "licenses"
-          )
-        ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
-        INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+        LEFT OUTER JOIN "license_users" ON "license_users"."user_id" = "users"."id"
+        INNER JOIN "licenses" ON (
+          "licenses"."id" = "license_users"."license_id"
+          OR "licenses"."user_id" = "users"."id"
+        )
       WHERE
         "licenses"."id" = '#{license.id}'
-      ORDER BY
-        "users"."created_at" ASC
     SQL
   end
 
@@ -542,24 +527,11 @@ describe UnionOf do
         DISTINCT "users".*
       FROM
         "users"
-        INNER JOIN (
-          (
-            SELECT
-              "license_users"."license_id" AS id,
-              "license_users"."user_id"    AS union_id
-            FROM
-              "license_users"
-          )
-          UNION
-          (
-            SELECT
-              "licenses"."id"      AS id,
-              "licenses"."user_id" AS union_id
-            FROM
-              "licenses"
-          )
-        ) "licenses_union" ON "licenses_union"."union_id" = "users"."id"
-        INNER JOIN "licenses" ON "licenses"."id" = "licenses_union"."id"
+        LEFT OUTER JOIN "license_users" ON "license_users"."user_id" = "users"."id"
+        INNER JOIN "licenses" ON (
+          "licenses"."id" = "license_users"."license_id"
+          OR "licenses"."user_id" = "users"."id"
+        )
       WHERE
         "licenses"."product_id" = '#{product.id}'
       ORDER BY
