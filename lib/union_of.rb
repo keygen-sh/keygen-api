@@ -150,8 +150,7 @@ module UnionOf
     private
 
     def last_chain_scope(scope, reflection, owner)
-      return super unless
-        reflection.union_of?
+      return super unless reflection.union_of?
 
       foreign_klass = reflection.klass
       foreign_table = reflection.aliased_table
@@ -178,9 +177,9 @@ module UnionOf
         scope.where!(
           foreign_table[primary_key].in(
             foreign_table.project(foreign_table[primary_key])
-                        .from(
-                          Arel::Nodes::TableAlias.new(unions, foreign_table.name),
-                        ),
+                         .from(
+                           Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+                         ),
           ),
         )
       else
@@ -213,78 +212,38 @@ module UnionOf
     end
 
     def next_chain_scope(scope, reflection, next_reflection)
-      return super unless
-        reflection.union_of?
+      return super unless reflection.union_of?
 
-      table         = reflection.aliased_table
       klass         = reflection.klass
-      foreign_table = next_reflection.aliased_table
+      table         = klass.arel_table
       foreign_klass = next_reflection.klass
-      primary_key   = reflection.active_record_primary_key
-      foreign_keys  = reflection.foreign_keys
+      foreign_table = foreign_klass.arel_table
+      constraints   = []
 
-      scopes = reflection.union_sources.map do |union_source|
-        union_reflection  = foreign_klass.reflect_on_association(union_source)
-        union_foreign_key = union_reflection.foreign_key
+      reflection.union_sources.each do |union_source|
+        union_reflection = foreign_klass.reflect_on_association(union_source)
 
-        constraints = foreign_klass.default_scoped.where_clause
-        foreign_key = foreign_keys[union_source]
+        if union_reflection.through_reflection?
+          through_reflection = union_reflection.through_reflection
+          through_table      = through_reflection.klass.arel_table
 
-        sources = if union_reflection.through_reflection?
-                    source_reflection   = union_reflection.source_reflection
-                    source_foreign_key  = source_reflection.foreign_key
-                    through_reflection  = union_reflection.through_reflection
-                    through_foreign_key = through_reflection.foreign_key
-                    through_klass       = through_reflection.klass
-                    through_table       = through_klass.arel_table
-                    through_constraints = through_klass.default_scoped.where_clause
+          scope.left_outer_joins!(
+            union_reflection.through_reflection.name,
+          )
 
-                    unless through_constraints.empty?
-                      constraints = through_constraints
-                    end
-
-                    foreign_table.project(through_table[through_foreign_key].as(UNION_PRIMARY_KEY), through_table[source_foreign_key].as(UNION_FOREIGN_KEY))
-                                 .from(through_table)
-                  else
-                    foreign_table.project(foreign_table[primary_key].as(UNION_PRIMARY_KEY), foreign_table[union_foreign_key].as(UNION_FOREIGN_KEY))
-                                 .from(foreign_table)
-                  end
-
-        unless constraints.empty?
-          sources = sources.where(constraints.ast)
-        end
-
-        sources
-      end
-
-      union_table = Arel::Nodes::TableAlias.new(foreign_table, "#{foreign_table.name}_union")
-      unions      = scopes.reduce(nil) do |left, right|
-        if left
-          Arel::Nodes::Union.new(left, right)
+          constraints << foreign_table[through_reflection.join_foreign_key].eq(through_table[through_reflection.join_primary_key])
         else
-          right
+          constraints << foreign_table[union_reflection.join_foreign_key].eq(table[union_reflection.join_primary_key])
         end
       end
 
       scope.joins!(
-        # Joining onto our union associations
-        Arel::Nodes::LeadingJoin.new(
-          Arel::Nodes::TableAlias.new(unions, union_table.name),
-          Arel::Nodes::On.new(
-            union_table[UNION_FOREIGN_KEY].eq(table[klass.primary_key]),
-          ),
-        ),
-        # Joining the target association onto our union
-        Arel::Nodes::LeadingJoin.new(
+        Arel::Nodes::InnerJoin.new(
           foreign_table,
           Arel::Nodes::On.new(
-            foreign_table[foreign_klass.primary_key].eq(union_table[UNION_PRIMARY_KEY]),
+            constraints.reduce(&:or),
           ),
         ),
-      )
-
-      scope.merge!(
-        scope.default_scoped,
       )
 
       scope
@@ -305,11 +264,6 @@ module UnionOf
     def collection?       = true
     def association_class = Association
     def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
-
-    # Unlike other reflections, we don't have a single foreign key.
-    # Instead, we have many, from each union source.
-    def foreign_keys = union_reflections.reduce({}) { _1.merge(_2.name => _2.foreign_key) }
-    def foreign_key  = UNION_FOREIGN_KEY
 
     def deconstruct_keys(keys) = { name:, options: }
   end
