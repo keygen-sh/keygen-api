@@ -122,8 +122,10 @@ loop do
       # Licensing
       unless ENV.key?('SKIP_LICENSING')
         rand(1..3).times do
+          buzzword = Faker::Company.buzzword.titleize
+
           policy = Policy.create!(
-            name: 'Floating Policy',
+            name: "#{buzzword} Policy",
             authentication_strategy: %w[TOKEN LICENSE MIXED].sample,
             duration: [nil, 1.year, 1.month, 2.weeks].sample,
             max_machines: nil,
@@ -150,13 +152,15 @@ loop do
             owner = if rand(0..5).zero?
                       User.create!(
                         email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                        created_at: rand(1.year.ago..Time.now),
                         environment:,
                         account:,
                       )
                     end
 
             license = License.create!(
-              name: 'Floating License',
+              name: "#{buzzword} License",
+              created_at: rand(1.year.ago..Time.now), # to simulate expired/expiring licenses
               environment:,
               policy:,
               account:,
@@ -187,6 +191,7 @@ loop do
                 user = if rand(0..3).zero?
                         User.create!(
                           email: Faker::Internet.email(name: "#{Faker::Name.first_name} #{SecureRandom.hex(4)}"),
+                          created_at: rand(1.year.ago..Time.now),
                           environment:,
                           account:,
                         )
@@ -201,11 +206,15 @@ loop do
                             )
                       end
 
-                if rand(0..1).zero? && user.present?
+                next unless
+                  user.present?
+
+                if rand(0..1).zero?
                   Token.create!(bearer: user, account:, environment:)
                 end
 
                 LicenseUser.create!(
+                  created_at: [license.created_at, user.created_at].max,
                   environment:,
                   account:,
                   license:,
