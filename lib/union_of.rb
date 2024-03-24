@@ -265,6 +265,46 @@ module UnionOf
     def association_class = Association
     def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
+    # def foreign_key(klass) = nil
+
+    def join_scope(table, foreign_table, foreign_klass)
+      predicate_builder = predicate_builder(table)
+      scope_chain_items = join_scopes(table, predicate_builder)
+      klass_scope       = klass_join_scope(table, predicate_builder)
+      constraints       = []
+
+      union_sources.each do |union_source|
+        union_reflection = foreign_klass.reflect_on_association(union_source)
+
+        if union_reflection.through_reflection?
+          source_reflection  = union_reflection.source_reflection
+          through_reflection = union_reflection.through_reflection
+          through_table      = through_reflection.klass.arel_table
+
+          join_dependency = ActiveRecord::Associations::JoinDependency.new(
+            foreign_klass,
+            foreign_table,
+            through_reflection.name,
+            Arel::Nodes::OuterJoin,
+          )
+
+          klass_scope.left_outer_joins!(
+            join_dependency,
+          )
+
+          constraints << table[source_reflection.join_primary_key].eq(through_table[source_reflection.join_foreign_key])
+        else
+          constraints << table[union_reflection.join_primary_key].eq(foreign_table[union_reflection.join_foreign_key])
+        end
+      end
+
+      unless constraints.empty?
+        klass_scope.where!(constraints.reduce(&:or))
+      end
+
+      klass_scope
+    end
+
     def deconstruct_keys(keys) = { name:, options: }
   end
 
@@ -317,8 +357,8 @@ module UnionOf
   end
 
   module RuntimeReflectionExtension
-    delegate :union_of?, :union_sources, :foreign_keys, :active_record_primary_key, to: :@reflection
-    delegate :name, to: :@reflection
+    delegate :union_of?, :union_sources, to: :@reflection
+    delegate :name, :active_record_primary_key, to: :@reflection # FIXME(ezekg)
   end
 
   module ActiveRecordExtensions
@@ -337,7 +377,8 @@ module UnionOf
   end
 
   module ThroughReflectionExtension
-    delegate :union_of?, :union_sources, :foreign_keys, to: :source_reflection
+    delegate :union_of?, :union_sources, to: :source_reflection
+    delegate :join_scope, to: :source_reflection
 
     def through_union_of? = through_reflection.union_of? || through_reflection.through_union_of?
   end
@@ -369,302 +410,30 @@ module UnionOf
   end
 
   module JoinAssociationExtension
-    def initialize(...)
-      super
+    def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
+      chain = reflection.chain.reverse
+      joins = super
 
-      @union_references = {}
-    end
+      # FIXME(ezekg) This is inefficient (we're recreating reflection scopes).
+      chain.zip(joins).each do |reflection, join|
+        klass = reflection.klass
+        table = join.left
 
-    def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker, &)
-      case
-      when reflection.through_union_of?
-        join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
-      when reflection.union_of?
-        join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
-      else
-        super
-      end
-    end
+        if reflection.union_of?
+          scope = reflection.join_scope(table, foreign_table, foreign_klass)
 
-    private
+          # Splice union dependencies, i.e. left joins, into join chain. This is the least
+          # intrusive way of doing this, since we don't want to overload AR internals.
+          unless scope.left_outer_joins_values.empty?
+            index = joins.index(join)
+            arel  = scope.arel#(alias_tracker.aliases)
 
-    def join_constraints_for_through_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
-      joins = []
-      chain = []
-
-      # FIXME(ezekg) Through joins should prefix all dependent joins with the root association
-      #              name, to keep them out of the way in the case of multiple union joins.
-      #
-      #              Granted, this seems to be a bug in Rails, not on our end.
-      reflection.chain.each do |reflection|
-        table, _ = @union_references.fetch(reflection.name.to_sym) { yield reflection }
-
-        @union_references[reflection.name.to_sym] = table
-        @table ||= table
-
-        chain << [reflection, table]
-      end
-
-      chain.each_with_index.reverse_each do |(reflection, table), index|
-        primary_key = reflection.active_record_primary_key
-        foreign_key = reflection.foreign_key
-        klass       = reflection.klass
-        constraints = klass.default_scoped.where_clause
-
-        join_reflection, join_table = chain[index + 1]
-        join_klass                  = join_reflection&.klass || foreign_klass
-        join_table                ||= foreign_table
-
-        case
-        when reflection.through_reflection?
-          source_reflection   = reflection.source_reflection
-          source_klass        = source_reflection.klass
-          through_reflection  = reflection.through_reflection
-          through_klass       = through_reflection.klass
-
-          join = if source_reflection.belongs_to?
-                   constraints = through_klass.default_scoped.where_clause # adjust default constraints
-
-                   join_type.new(
-                     table,
-                     Arel::Nodes::On.new(
-                       table[primary_key].eq(join_table[foreign_key]),
-                     ),
-                   )
-                 else
-                   constraints = source_klass.default_scoped.where_clause
-
-                   join_type.new(
-                     table,
-                     Arel::Nodes::On.new(
-                       table[foreign_key].eq(join_table[primary_key]),
-                     ),
-                   )
-                 end
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
+            joins.insert(index, *arel.join_sources)
           end
-
-          joins << join
-        when reflection.union_of?
-          joins.concat(
-            join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &),
-          )
-        when reflection.belongs_to? || join_reflection&.belongs_to?
-          join = join_type.new(
-            table,
-            Arel::Nodes::On.new(
-              table[primary_key].eq(join_table[foreign_key]),
-            ),
-          )
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
-          end
-
-          joins << join
-        else
-          join = join_type.new(
-            table,
-            Arel::Nodes::On.new(
-              table[foreign_key].eq(join_table[primary_key]),
-            ),
-          )
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
-          end
-
-          joins << join
         end
-      end
 
-      joins
-    end
-
-    def join_constraints_for_union(reflection, foreign_table, foreign_klass, join_type, alias_tracker, &)
-      joins = []
-      chain = []
-
-      reflection.chain.each do |reflection|
-        table, _ = @union_references.fetch(reflection.name.to_sym) { yield reflection }
-
-        @union_references[reflection.name.to_sym] = table
-        @table ||= table
-
-        chain << [reflection, table]
-      end
-
-      chain.each_with_index.reverse_each do |(reflection, table), index|
-        primary_key = reflection.active_record_primary_key
-        foreign_key = reflection.foreign_key
-        klass       = reflection.klass
-        constraints = klass.default_scoped.where_clause
-
-        join_reflection, join_table = chain[index + 1]
-        join_klass                  = join_reflection&.klass
-
-        join_reflection ||= reflection
-        join_klass      ||= foreign_klass
-        join_table      ||= foreign_table
-
-        join_primary_key = join_reflection.association_primary_key
-        join_foreign_key = join_reflection.foreign_key
-
-        case
-        when reflection.union_of?
-          union_sources = reflection.union_sources
-
-          scopes = union_sources.map do |union_source|
-            union_reflection  = join_klass.reflect_on_association(union_source)
-            union_primary_key = union_reflection.association_primary_key
-            union_foreign_key = union_reflection.foreign_key
-            union_klass       = union_reflection.klass
-            union_table       = union_klass.arel_table
-            union_constraints = union_klass.default_scoped.where_clause
-
-            union_scope = union_reflection.build_scope(union_table)
-            union_scope = union_reflection.scope_for(union_scope) unless union_reflection.scope.nil?
-
-            scope = case
-                    when union_reflection.through_reflection?
-                      source_reflection      = union_reflection.source_reflection
-                      source_klass           = source_reflection.klass
-                      source_table           = source_klass.arel_table
-                      source_primary_key     = source_reflection.association_primary_key
-                      source_foreign_key     = source_reflection.foreign_key
-
-                      through_reflection  = union_reflection.through_reflection
-                      through_klass       = through_reflection.klass
-                      through_table       = through_klass.arel_table
-                      through_primary_key = through_reflection.association_primary_key
-                      through_foreign_key = through_reflection.foreign_key
-
-                      through_scope = through_reflection.build_scope(through_table)
-                      through_scope = through_reflection.scope_for(through_scope) unless through_reflection.scope.nil?
-
-                      source_scope = source_reflection.build_scope(source_table)
-                      source_scope = source_reflection.scope_for(source_scope) unless source_reflection.scope.nil?
-
-                      union_constraints = through_klass.default_scoped.where_clause # adjust default constraints
-                      union_scope       = through_scope.merge(union_scope)
-                      union_arel        = union_scope.arel
-
-                      union_arel.projections.clear
-                      union_arel.project(
-                        through_table[source_foreign_key].as(UNION_PRIMARY_KEY),
-                        through_table[through_foreign_key].as(UNION_FOREIGN_KEY),
-                      )
-                    when union_reflection.belongs_to?
-                      # We never want to alias union tables
-                      unaliased_table = case join_table
-                                        in Arel::Nodes::TableAlias => t
-                                          t.left
-                                        in Arel::Table => t
-                                          t
-                                        end
-
-                      join_scope = join_reflection.build_scope(unaliased_table)
-                      join_scope = join_reflection.scope_for(join_scope) unless join_reflection.scope.nil?
-
-                      union_constraints = join_klass.default_scoped.where_clause # adjust default constraints
-                      union_arel        = join_scope.arel
-
-                      union_arel.projections.clear
-                      union_arel.project(
-                        unaliased_table[union_foreign_key].as(UNION_PRIMARY_KEY),
-                        unaliased_table[union_primary_key].as(UNION_FOREIGN_KEY),
-                      )
-                    else
-                      union_arel = union_scope.arel
-
-                      union_arel.projections.clear
-                      union_arel.project(
-                        union_table[union_primary_key].as(UNION_PRIMARY_KEY),
-                        union_table[union_foreign_key].as(UNION_FOREIGN_KEY),
-                      )
-                    end
-
-            unless union_constraints.empty?
-              scope = scope.where(union_constraints.ast)
-            end
-
-            scope
-          end
-
-          # We need to unalias the table so that we can properly create a union table alias
-          unaliased_table = case table
-                            in Arel::Nodes::TableAlias => t
-                              t.left
-                            in Arel::Table => t
-                              t
-                            end
-
-          union_table = alias_tracker.aliased_table_for(unaliased_table, "#{unaliased_table.name}_union") {
-            # FIXME(ezekg) Is this the best way to handle conflicts? The name will be auto
-            #              incremented, but MAY produce bad joins, depending on order.
-            #
-            #              Could we just skip the new join and reuse the old one?
-            "#{unaliased_table.name}_union"
-          }
-
-          unions = scopes.reduce(nil) do |left, right|
-            if left
-              Arel::Nodes::Union.new(left, right)
-            else
-              right
-            end
-          end
-
-          # Joining onto our union associations
-          joins << join_type.new(
-            Arel::Nodes::TableAlias.new(unions, union_table.name),
-            Arel::Nodes::On.new(
-              union_table[UNION_FOREIGN_KEY].eq(join_table[join_klass.primary_key]),
-            ),
-          )
-
-          # Joining the target association onto our union
-          join = join_type.new(
-            table,
-            Arel::Nodes::On.new(
-              table[klass.primary_key].eq(union_table[klass.primary_key]),
-            ),
-          )
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
-          end
-
-          joins << join
-        when reflection.belongs_to? || join_reflection&.belongs_to?
-          join = join_type.new(
-            table,
-            Arel::Nodes::On.new(
-              table[primary_key].eq(join_table[foreign_key]),
-            ),
-          )
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
-          end
-
-          joins << join
-        else
-          join = join_type.new(
-            table,
-            Arel::Nodes::On.new(
-              table[foreign_key].eq(join_table[primary_key]),
-            ),
-          )
-
-          unless constraints.empty?
-            append_constraints(join, [constraints.ast])
-          end
-
-          joins << join
-        end
+        # The current table in this iteration becomes the foreign table in the next
+        foreign_table, foreign_klass = table, klass
       end
 
       joins
