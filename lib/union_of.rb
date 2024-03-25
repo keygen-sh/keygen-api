@@ -265,13 +265,16 @@ module UnionOf
     def association_class = Association
     def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
-    # def foreign_key(klass) = nil
-
     def join_scope(table, foreign_table, foreign_klass)
       predicate_builder = predicate_builder(table)
       scope_chain_items = join_scopes(table, predicate_builder)
       klass_scope       = klass_join_scope(table, predicate_builder)
       constraints       = []
+
+      scope_chain_items.inject(
+        klass_scope,
+        &:merge!
+      )
 
       union_sources.each do |union_source|
         union_reflection = foreign_klass.reflect_on_association(union_source)

@@ -157,59 +157,91 @@ describe UnionOf do
     SQL
   end
 
-  skip 'should produce multiple joins' do
-    expect(model.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
-      SELECT
-        "users".*
-      FROM
-        "users"
-        LEFT OUTER JOIN "license_users" ON "license_users"."user_id" = "users"."id"
-        INNER JOIN "licenses" ON (
-          "licenses"."user_id" = "users"."id"
-          OR "licenses"."id" = "license_users"."license_id"
-        )
-        LEFT OUTER JOIN "license_users" ON "license_users"."user_id" = "users"."id"
-        INNER JOIN "licenses" "licenses_users_join" ON (
-          "licenses_users_join"."user_id" = "users"."id"
-          OR "licenses_users_join"."id" = "license_users"."license_id"
-        )
-        INNER JOIN "machines" ON "machines"."license_id" = "licenses_users_join"."id"
-      ORDER BY
-        "users"."created_at" ASC
-    SQL
-  end
+  it 'should produce a preload with association scopes' do
+    user          = create(:user, account:)
+    owned_license = create(:license, owner: user, account:)
+    user_license  = create(:license, account:)
 
-  skip 'should produce a join with association scopes' do
+    create(:license_user, license: user_license, user:, account:)
+
     with_time Time.parse('2024-03-08 01:23:45 UTC') do |t|
-      expect(model.joins(:any_active_licenses).to_sql).to match_sql <<~SQL.squish
-        SELECT
-          "users".*
-        FROM
-          "users"
-          LEFT OUTER JOIN "license_users" ON "license_users"."user_id" = "users"."id"
-          INNER JOIN "licenses" "licenses_license_users" ON "licenses_license_users"."id" = "license_users"."license_id"
-          AND (
-            licenses.created_at >= '2023-12-09 01:23:45'
-            OR (
-              licenses.last_validated_at IS NOT NULL
-              AND licenses.last_validated_at >= '2023-12-09 01:23:45'
-            )
-            OR (
-              licenses.last_check_out_at IS NOT NULL
-              AND licenses.last_check_out_at >= '2023-12-09 01:23:45'
-            )
-            OR (
-              licenses.last_check_in_at IS NOT NULL
-              AND licenses.last_check_in_at >= '2023-12-09 01:23:45'
-            )
-          )
-          INNER JOIN "licenses" ON (
-            "licenses"."user_id" = "users"."id"
-            OR "licenses"."id" = "license_users"."license_id"
-          )
-        ORDER BY
-          "users"."created_at" ASC
-      SQL
+      expect { User.preload(:any_active_licenses).where(id: user.id) }.to(
+        match_queries(count: 4) do |queries|
+          expect(queries.first).to match_sql <<~SQL.squish
+            SELECT
+              "users".*
+            FROM
+              "users"
+            WHERE
+              "users"."id" = '#{user.id}'
+            ORDER BY
+              "users"."created_at" ASC
+          SQL
+
+          expect(queries.second).to match_sql <<~SQL.squish
+            SELECT
+              "licenses".*
+            FROM
+              "licenses"
+            WHERE
+              (
+                licenses.created_at >= '2023-12-09 01:23:45'
+                OR (
+                  licenses.last_validated_at IS NOT NULL
+                  AND licenses.last_validated_at >= '2023-12-09 01:23:45'
+                )
+                OR (
+                  licenses.last_check_out_at IS NOT NULL
+                  AND licenses.last_check_out_at >= '2023-12-09 01:23:45'
+                )
+                OR (
+                  licenses.last_check_in_at IS NOT NULL
+                  AND licenses.last_check_in_at >= '2023-12-09 01:23:45'
+                )
+              )
+              AND "licenses"."user_id" = '#{user.id}'
+            ORDER BY
+              "licenses"."created_at" ASC
+          SQL
+
+          expect(queries.third).to match_sql <<~SQL.squish
+            SELECT
+              "license_users".*
+            FROM
+              "license_users"
+            WHERE
+              "license_users"."user_id" = '#{user.id}'
+            ORDER BY
+              "license_users"."created_at" ASC
+          SQL
+
+          expect(queries.fourth).to match_sql <<~SQL.squish
+            SELECT
+              "licenses".*
+            FROM
+              "licenses"
+            WHERE
+              (
+                licenses.created_at >= '2023-12-09 01:23:45'
+                OR (
+                  licenses.last_validated_at IS NOT NULL
+                  AND licenses.last_validated_at >= '2023-12-09 01:23:45'
+                )
+                OR (
+                  licenses.last_check_out_at IS NOT NULL
+                  AND licenses.last_check_out_at >= '2023-12-09 01:23:45'
+                )
+                OR (
+                  licenses.last_check_in_at IS NOT NULL
+                  AND licenses.last_check_in_at >= '2023-12-09 01:23:45'
+                )
+              )
+              AND "licenses"."id" = '#{user_license.id}'
+            ORDER BY
+              "licenses"."created_at" ASC
+          SQL
+        end
+      )
     end
   end
 
