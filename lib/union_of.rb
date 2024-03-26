@@ -265,16 +265,11 @@ module UnionOf
     def association_class = Association
     def union_reflections = union_sources.collect { active_record.reflect_on_association(_1) }
 
-    def join_scope(table, foreign_table, foreign_klass)
+    def join_scope(table, foreign_table, foreign_klass, alias_tracker = nil)
       predicate_builder = predicate_builder(table)
       scope_chain_items = join_scopes(table, predicate_builder)
       klass_scope       = klass_join_scope(table, predicate_builder)
       constraints       = []
-
-      scope_chain_items.inject(
-        klass_scope,
-        &:merge!
-      )
 
       union_sources.each do |union_source|
         union_reflection = foreign_klass.reflect_on_association(union_source)
@@ -282,17 +277,30 @@ module UnionOf
         if union_reflection.through_reflection?
           source_reflection  = union_reflection.source_reflection
           through_reflection = union_reflection.through_reflection
-          through_table      = through_reflection.klass.arel_table
+          through_klass      = through_reflection.klass
+          through_table      = through_klass.arel_table
 
-          join_dependency = ActiveRecord::Associations::JoinDependency.new(
-            foreign_klass,
-            foreign_table,
-            through_reflection.name,
-            Arel::Nodes::OuterJoin,
+          # alias table if we're provided with an alias tracker
+          unless alias_tracker.nil?
+            through_table = alias_tracker.aliased_table_for(through_table) do
+              through_reflection.alias_candidate(union_source)
+            end
+          end
+
+          # create base join constraints and add default constraints if available
+          through_constraints = through_table[through_reflection.join_primary_key].eq(
+            foreign_table[through_reflection.join_foreign_key],
           )
 
-          klass_scope.left_outer_joins!(
-            join_dependency,
+          unless (where_clause = through_klass.default_scoped.where_clause).empty?
+            through_constraints = where_clause.ast.and(through_constraints)
+          end
+
+          klass_scope.joins!(
+            Arel::Nodes::OuterJoin.new(
+              through_table,
+              Arel::Nodes::On.new(through_constraints),
+            ),
           )
 
           constraints << table[source_reflection.join_primary_key].eq(through_table[source_reflection.join_foreign_key])
@@ -304,6 +312,11 @@ module UnionOf
       unless constraints.empty?
         klass_scope.where!(constraints.reduce(&:or))
       end
+
+      scope_chain_items.inject(
+        klass_scope,
+        &:merge!
+      )
 
       klass_scope
     end
@@ -417,19 +430,27 @@ module UnionOf
       chain = reflection.chain.reverse
       joins = super
 
-      # FIXME(ezekg) This is inefficient (we're recreating reflection scopes).
+      # FIXME(ezekg) This is inefficient (we're recreating reflection scopes), and it also
+      #              doesn't work well with the alias tracker, i.e. duplicate joins fail.
       chain.zip(joins).each do |reflection, join|
         klass = reflection.klass
         table = join.left
 
         if reflection.union_of?
-          scope = reflection.join_scope(table, foreign_table, foreign_klass)
+          scope = reflection.join_scope(table, foreign_table, foreign_klass, alias_tracker)
+          arel  = scope.arel(alias_tracker.aliases)
 
-          # Splice union dependencies, i.e. left joins, into join chain. This is the least
+          # Splice union dependencies, i.e. left joins, into the join chain. This is the least
           # intrusive way of doing this, since we don't want to overload AR internals.
-          unless scope.left_outer_joins_values.empty?
+          unless arel.join_sources.empty?
             index = joins.index(join)
-            arel  = scope.arel#(alias_tracker.aliases)
+
+            # replace with updated aliases
+            unless (constraints = arel.constraints).empty?
+              right = join.right
+
+              right.expr = constraints
+            end
 
             joins.insert(index, *arel.join_sources)
           end
