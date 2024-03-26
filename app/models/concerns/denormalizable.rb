@@ -59,7 +59,7 @@ module Denormalizable
       in Symbol => association_name if reflection = reflect_on_association(association_name)
         prefixed_attribute_name = case prefix
                                   when true
-                                    "#{association_name.to_s}_#{attribute_name.to_s}"
+                                    "#{name.to_s}_#{attribute_name.to_s}"
                                   when Symbol,
                                        String
                                     "#{prefix.to_s}_#{attribute_name.to_s}"
@@ -86,6 +86,7 @@ module Denormalizable
   end
 
   # FIXME(ezekg) Move this out into a separate module so that we don't pollute the model.
+  # FIXME(ezekg) These could probably figure out persistence automatically.
   included do
     private
 
