@@ -821,8 +821,7 @@ class License < ApplicationRecord
   end
 
   def transfer!(new_policy)
-    self.product = new_policy&.product # denormalized
-    self.policy  = new_policy
+    self.policy = new_policy
 
     if new_policy.present? && new_policy.reset_expiry_on_transfer?
       if new_policy.duration?
