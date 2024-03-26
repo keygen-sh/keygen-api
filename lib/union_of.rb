@@ -269,7 +269,11 @@ module UnionOf
       predicate_builder = predicate_builder(table)
       scope_chain_items = join_scopes(table, predicate_builder)
       klass_scope       = klass_join_scope(table, predicate_builder)
-      constraints       = []
+
+      # This holds our union's constraints. For example, if we're unioning across 3
+      # tables, then this will hold constraints for all 3 of those tables, so that
+      # the join on our target table mirrors the union of all 3 associations.
+      constraints = []
 
       union_sources.each do |union_source|
         union_reflection = foreign_klass.reflect_on_association(union_source)
@@ -280,14 +284,14 @@ module UnionOf
           through_klass      = through_reflection.klass
           through_table      = through_klass.arel_table
 
-          # alias table if we're provided with an alias tracker
+          # Alias table if we're provided with an alias tracker (i.e. via our #join_constraints overload)
           unless alias_tracker.nil?
             through_table = alias_tracker.aliased_table_for(through_table) do
               through_reflection.alias_candidate(union_source)
             end
           end
 
-          # create base join constraints and add default constraints if available
+          # Create base join constraints and add default constraints if available
           through_constraints = through_table[through_reflection.join_primary_key].eq(
             foreign_table[through_reflection.join_foreign_key],
           )
@@ -313,10 +317,21 @@ module UnionOf
         klass_scope.where!(constraints.reduce(&:or))
       end
 
-      scope_chain_items.inject(
-        klass_scope,
-        &:merge!
-      )
+      unless scope_chain_items.empty?
+        scope_chain_items.reduce(klass_scope) do |scope, item|
+          scope.merge!(item) # e.g. default scope constraints
+        end
+
+        # FIXME(ezekg) Wrapping the where clause in a grouping node so that Rails
+        #              doesn't append our left outer joins a second time. This is
+        #              because internally, during joining in #join_constraints,
+        #              if Rails sees an Arel::Nodes::And node with predicates that
+        #              don't match the current table, it'll concat all join
+        #              sources. We don't want that, thus the hack.
+        klass_scope.where_clause = ActiveRecord::Relation::WhereClause.new(
+          [Arel::Nodes::Grouping.new(klass_scope.where_clause.ast)],
+        )
+      end
 
       klass_scope
     end
@@ -426,6 +441,8 @@ module UnionOf
   end
 
   module JoinAssociationExtension
+    # Overloads Rails internals to prepend our left outer joins onto the join chain since Rails
+    # unfortunately does not do this for us (it can do inner joins but not outer joins).
     def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
       chain = reflection.chain.reverse
       joins = super
@@ -445,11 +462,10 @@ module UnionOf
           unless arel.join_sources.empty?
             index = joins.index(join)
 
-            # replace with updated aliases
             unless (constraints = arel.constraints).empty?
               right = join.right
 
-              right.expr = constraints
+              right.expr = constraints # updated aliases
             end
 
             joins.insert(index, *arel.join_sources)
