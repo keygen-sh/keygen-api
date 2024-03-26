@@ -154,6 +154,37 @@ describe License, type: :model do
     end
   end
 
+  describe '#policy=' do
+    context 'on build' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = build(:license, policy:, account:)
+
+        expect(license.product_id).to eq policy.product_id
+      end
+    end
+
+    context 'on create' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = create(:license, policy:, account:)
+
+        expect(license.product_id).to eq policy.product_id
+      end
+    end
+
+    context 'on update' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = create(:license, account:)
+
+        license.update!(policy:)
+
+        expect(license.product_id).to eq policy.product_id
+      end
+    end
+  end
+
   describe '#role_attributes=' do
     it 'should set role and permissions' do
       license = create(:license, account:)
