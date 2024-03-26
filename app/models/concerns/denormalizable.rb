@@ -33,10 +33,10 @@ module Denormalizable
       in Symbol => association_name if reflection = reflect_on_association(association_name)
         prefixed_attribute_name = case prefix
                                   when true
-                                    "#{association_name.to_s}_#{attribute_name.to_s}"
+                                    "#{association_name}_#{attribute_name}"
                                   when Symbol,
                                        String
-                                    "#{prefix.to_s}_#{attribute_name.to_s}"
+                                    "#{prefix}_#{attribute_name}"
                                   else
                                     attribute_name.to_s
                                   end
@@ -59,10 +59,10 @@ module Denormalizable
       in Symbol => association_name if reflection = reflect_on_association(association_name)
         prefixed_attribute_name = case prefix
                                   when true
-                                    "#{name.to_s}_#{attribute_name.to_s}"
+                                    "#{name}_#{attribute_name}"
                                   when Symbol,
                                        String
-                                    "#{prefix.to_s}_#{attribute_name.to_s}"
+                                    "#{prefix}_#{attribute_name}"
                                   else
                                     attribute_name.to_s
                                   end
