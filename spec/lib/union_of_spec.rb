@@ -7,11 +7,9 @@ require_dependency Rails.root / 'lib' / 'union_of'
 
 describe UnionOf do
   let(:account) { create(:account) }
-  let(:record)  { create(:user, account:) } # FIXME(ezekg) Replace with temporary table when we extract into a gem
-  let(:model)   { record.class }
 
   it 'should create an association reflection' do
-    expect(model.reflect_on_all_associations).to satisfy { |associations|
+    expect(User.reflect_on_all_associations).to satisfy { |associations|
       associations in [
         *,
         UnionOf::Reflection(
@@ -26,7 +24,7 @@ describe UnionOf do
   end
 
   it 'should create a union reflection' do
-    expect(model.reflect_on_all_unions).to satisfy { |unions|
+    expect(User.reflect_on_all_unions).to satisfy { |unions|
       unions in [
         UnionOf::Reflection(
           name: :licenses,
@@ -39,7 +37,9 @@ describe UnionOf do
   end
 
   it 'should be a relation' do
-    expect(record.licenses).to be_an ActiveRecord::Relation
+    user = create(:user, account:)
+
+    expect(user.licenses).to be_an ActiveRecord::Relation
   end
 
   it 'should return the correct relations' do
@@ -76,7 +76,9 @@ describe UnionOf do
   end
 
   it 'should be a union' do
-    expect(record.licenses.to_sql).to match_sql <<~SQL.squish
+    user = create(:user, account:)
+
+    expect(user.licenses.to_sql).to match_sql <<~SQL.squish
       SELECT
         "licenses".*
       FROM
@@ -93,7 +95,7 @@ describe UnionOf do
                 FROM
                   "licenses"
                 WHERE
-                  "licenses"."user_id" = '#{record.id}'
+                  "licenses"."user_id" = '#{user.id}'
               )
               UNION
               (
@@ -103,7 +105,7 @@ describe UnionOf do
                   "licenses"
                   INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
                 WHERE
-                  "license_users"."user_id" = '#{record.id}'
+                  "license_users"."user_id" = '#{user.id}'
               )
             ) "licenses"
         )
@@ -113,7 +115,7 @@ describe UnionOf do
   end
 
   it 'should not raise on shallow join' do
-    expect { model.joins(:licenses).to_a }.to_not raise_error
+    expect { User.joins(:licenses).to_a }.to_not raise_error
   end
 
   it 'should produce a shallow join' do
@@ -137,11 +139,11 @@ describe UnionOf do
   end
 
   it 'should not raise on deep join' do
-    expect { model.joins(:machines).to_a }.to_not raise_error
+    expect { User.joins(:machines).to_a }.to_not raise_error
   end
 
   it 'should produce a union join' do
-    expect(model.joins(:machines).to_sql).to match_sql <<~SQL.squish
+    expect(User.joins(:machines).to_sql).to match_sql <<~SQL.squish
       SELECT
         "users".*
       FROM
@@ -159,7 +161,7 @@ describe UnionOf do
 
   # FIXME(ezekg) Remove :record and :model lets
   it 'should produce multiple joins' do
-    expect(model.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
+    expect(User.joins(:licenses, :machines).to_sql).to match_sql <<~SQL.squish
       SELECT
         "users".*
       FROM
@@ -308,7 +310,7 @@ describe UnionOf do
     after  { Current.account = nil }
 
     it 'should produce a join with default scopes' do
-      expect(model.joins(:machines).to_sql).to match_sql <<~SQL.squish
+      expect(User.joins(:machines).to_sql).to match_sql <<~SQL.squish
         SELECT
           "users".*
         FROM
@@ -400,7 +402,7 @@ describe UnionOf do
   end
 
   it 'should produce a deep union join' do
-    expect(model.joins(:components).to_sql).to match_sql <<~SQL.squish
+    expect(User.joins(:components).to_sql).to match_sql <<~SQL.squish
       SELECT
         "users".*
       FROM
@@ -1125,64 +1127,66 @@ describe UnionOf do
   end
 
   describe UnionOf::ReadonlyAssociation do
+    subject { create(:user, account:) }
+
     it 'should not raise on readers' do
-      expect { record.licenses }.to_not raise_error
-      expect { record.licenses.first }.to_not raise_error
-      expect { record.licenses.last }.to_not raise_error
-      expect { record.licenses.forty_two }.to_not raise_error
-      expect { record.licenses.take }.to_not raise_error
+      expect { subject.licenses }.to_not raise_error
+      expect { subject.licenses.first }.to_not raise_error
+      expect { subject.licenses.last }.to_not raise_error
+      expect { subject.licenses.forty_two }.to_not raise_error
+      expect { subject.licenses.take }.to_not raise_error
     end
 
     it 'should not raise on query methods' do
-      expect { record.licenses.find_by(id: SecureRandom.uuid) }.to_not raise_error
-      expect { record.licenses.where(name: 'Foo') }.to_not raise_error
+      expect { subject.licenses.find_by(id: SecureRandom.uuid) }.to_not raise_error
+      expect { subject.licenses.where(name: 'Foo') }.to_not raise_error
     end
 
     it 'should not raise on ID readers' do
-      expect { record.licenses.ids }.to_not raise_error
-      expect { record.license_ids }.to_not raise_error
+      expect { subject.licenses.ids }.to_not raise_error
+      expect { subject.license_ids }.to_not raise_error
     end
 
     it 'should raise on IDs writer' do
-      expect { record.license_ids = [] }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.license_ids = [] }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on build' do
-      expect { record.licenses.build(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.new(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.build(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.new(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on create' do
-      expect { record.licenses.create!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.create(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.create!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.create(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on insert' do
-      expect { record.licenses.insert!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert_all!([]) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.insert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.insert!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.insert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.insert_all!([]) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.insert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on upsert' do
-      expect { record.licenses.upsert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.upsert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.upsert(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.upsert_all([]) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on update' do
-      expect { record.licenses.update_all(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.update!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.update(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.update_all(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.update!(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.update(id: SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on delete' do
-      expect { record.licenses.delete_all }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.delete(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.delete_all }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.delete(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
 
     it 'should raise on destroy' do
-      expect { record.licenses.destroy_all }.to raise_error UnionOf::ReadonlyAssociationError
-      expect { record.licenses.destroy(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.destroy_all }.to raise_error UnionOf::ReadonlyAssociationError
+      expect { subject.licenses.destroy(SecureRandom.uuid) }.to raise_error UnionOf::ReadonlyAssociationError
     end
   end
 
