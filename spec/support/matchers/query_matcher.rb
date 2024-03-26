@@ -21,11 +21,9 @@ class QueryMatcher
   def matches?(block)
     @queries = QueryLogger.log(&block)
 
-    if @block
-      @block.call(@queries)
-    end
-
-    @queries.size == @count
+    @queries.size == @count && (
+      @block.nil? || @block.call(@queries)
+    )
   end
 
   def failure_message
