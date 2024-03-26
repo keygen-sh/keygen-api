@@ -6,6 +6,7 @@ class Policy < ApplicationRecord
   class UnsupportedPoolError < StandardError; end
   class EmptyPoolError < StandardError; end
 
+  include Denormalizable
   include Environmental
   include Limitable
   include Orderable
@@ -141,6 +142,9 @@ class Policy < ApplicationRecord
     as: :resource
 
   has_environment default: -> { product&.environment_id }
+
+  denormalizes :product_id,
+    to: :licenses
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
