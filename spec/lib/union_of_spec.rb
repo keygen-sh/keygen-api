@@ -309,6 +309,58 @@ describe UnionOf do
     before { Current.account = account }
     after  { Current.account = nil }
 
+    it 'should produce a query with default scopes' do
+      user    = create(:user, account:)
+      license = create(:license, account:, owner: user)
+      machine = create(:machine, license:, account:)
+
+      expect { user.machines }.to(
+        match_queries(count: 2) do |queries|
+          expect(queries.first).to match_sql <<~SQL.squish
+            SELECT
+              "licenses"."id"
+            FROM
+              (
+                (
+                  SELECT
+                    "licenses"."id"
+                  FROM
+                    "licenses"
+                  WHERE
+                    "licenses"."account_id" = '#{account.id}'
+                    AND "licenses"."user_id" = '#{user.id}'
+                )
+                UNION
+                (
+                  SELECT
+                    "licenses"."id"
+                  FROM
+                    "licenses"
+                    INNER JOIN "license_users" ON "licenses"."id" = "license_users"."license_id"
+                  WHERE
+                    "licenses"."account_id" = '#{account.id}'
+                    AND "license_users"."account_id" = '#{account.id}'
+                    AND "license_users"."user_id" = '#{user.id}'
+                )
+              ) "licenses"
+          SQL
+
+          expect(queries.second).to match_sql <<~SQL.squish
+            SELECT
+              DISTINCT "machines".*
+            FROM
+              "machines"
+              INNER JOIN "licenses" ON "machines"."license_id" = "licenses"."id"
+            WHERE
+              "licenses"."id" IN ('#{license.id}')
+              AND "machines"."account_id" = '#{account.id}'
+            ORDER BY
+              "machines"."created_at" ASC
+          SQL
+        end
+      )
+    end
+
     it 'should produce a join with default scopes' do
       expect(User.joins(:machines).to_sql).to match_sql <<~SQL.squish
         SELECT
