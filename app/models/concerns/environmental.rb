@@ -139,10 +139,6 @@ module Environmental
           next unless
             (reflection.options in polymorphic: true) || reflection.klass < Environmental
 
-          # Skip asserting environment when :validate is explicitly set to false.
-          next if
-            reflection.options in validate: false
-
           # Perform asserts on create and update.
           validate on: %i[create update] do
             next unless
