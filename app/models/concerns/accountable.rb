@@ -104,10 +104,6 @@ module Accountable
           next unless
             (reflection.options in polymorphic: true) || reflection.klass < Accountable
 
-          # Skip asserting account when :validate is explicitly set to false.
-          next if
-            reflection.options in validate: false
-
           # Perform asserts on create and update.
           validate on: %i[create update] do
             next unless

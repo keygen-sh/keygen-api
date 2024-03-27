@@ -13,11 +13,6 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  # NOTE(ezekg) This is a denormalized association and is automatically
-  #             pulled in from the policy.
-  #
-  # FIXME(ezekg) Remove the :optional flag after data is migrated.
-  belongs_to :product, validate: false, optional: true
   belongs_to :policy
   # NOTE(ezekg) This is a denormalized association and is automatically
   #             pulled in from the policy. Purposefully defined after
