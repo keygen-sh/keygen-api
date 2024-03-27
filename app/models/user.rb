@@ -16,7 +16,7 @@ class User < ApplicationRecord
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
-  has_many :license_users, validate: false, index_errors: true, dependent: :destroy_async
+  has_many :license_users, index_errors: true, dependent: :destroy_async
   has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id, inverse_of: :owner
   has_many :user_licenses, index_errors: true, through: :license_users, source: :license
   has_many :licenses, union_of: %i[owned_licenses user_licenses], inverse_of: :users do
