@@ -2,12 +2,12 @@
 
 class Entitlement < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Diffable
 
-  belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, dependent: :delete_all
   has_many :release_entitlement_constraints,
@@ -17,6 +17,7 @@ class Entitlement < ApplicationRecord
     as: :resource
 
   has_environment
+  has_account
 
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }

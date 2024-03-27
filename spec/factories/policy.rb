@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :policy do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     name                      { Faker::Company.buzzword }
     max_machines              { nil }
@@ -22,7 +22,7 @@ FactoryBot.define do
     max_uses                  { nil }
     scheme                    { nil }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     product     { build(:product, account:, environment:) }
 

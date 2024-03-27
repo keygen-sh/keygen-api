@@ -4,7 +4,7 @@
 #             whether or not a factory's environment should run through
 #             the default flow vs an explicit nil value given during
 #             factory initialization.
-NIL_ENVIRONMENT = Environment.new(id: nil, code: 'FOR_TEST_EYES_ONLY').freeze
+NIL_ENVIRONMENT = Environment.new(id: nil, account: nil, code: 'FOR_TEST_EYES_ONLY').freeze
 
 module EnvironmentHelper
   module ScenarioMethods

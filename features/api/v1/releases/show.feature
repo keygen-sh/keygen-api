@@ -1,14 +1,11 @@
 @api/v1
 Feature: Show release
-
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
-    # TODO(ezekg) Remove after we switch new accounts to v1.1
-    And I use API version "1.1"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
@@ -349,7 +346,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: User retrieves a release with a license for it
+  Scenario: User retrieves a release with a license for it (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -358,7 +355,20 @@ Feature: Show release
     And the current account has 1 "license" for an existing "policy"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves a release with a license for it (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -477,7 +487,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -494,7 +504,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -519,7 +529,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
+    And the current user has 3 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -548,7 +558,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
+    And the current user has 3 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "403"
     And the first error should have the following properties:
@@ -572,7 +582,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
+    And the current user has 3 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -687,7 +697,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -704,7 +714,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -800,7 +810,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -817,7 +827,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -906,7 +916,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -919,7 +929,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -987,7 +997,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -1000,7 +1010,7 @@ Feature: Show release
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 

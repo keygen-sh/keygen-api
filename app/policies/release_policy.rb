@@ -49,7 +49,7 @@ class ReleasePolicy < ApplicationPolicy
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed?)
 
-      licenses = bearer.licenses.preload(:product, :policy, :user)
+      licenses = bearer.licenses.preload(:product, :policy, :owner)
                                 .for_product(
                                   record.collect(&:product_id),
                                 )
@@ -108,7 +108,7 @@ class ReleasePolicy < ApplicationPolicy
       deny! 'release distribution strategy is closed' if
         record.closed?
 
-      licenses = bearer.licenses.preload(:product, :policy, :user)
+      licenses = bearer.licenses.preload(:product, :policy, :owner)
                                 .for_product(record.product)
 
       verify_licenses_for_release!(

@@ -20,7 +20,7 @@ gem 'redis', '~> 4.7.1'
 gem 'request_migrations', '~> 1.1'
 
 # API params
-gem 'typed_params', '~> 1.1'
+gem 'typed_params', '~> 1.2.3'
 
 # Serializers
 gem 'json', '~> 2.3.0'
@@ -51,6 +51,7 @@ gem 'kaminari', '~> 1.2.0'
 gem 'active_record_union'
 gem 'active_record_distinct_on', '~> 1.6'
 gem 'activerecord_where_assoc', '~> 1.1.4'
+gem 'ar_lazy_preload', '~> 2.0'
 
 # Pattern matching
 gem 'rails-pattern_matching'
@@ -123,7 +124,7 @@ group :test do
   gem 'cucumber-rails', '~> 2.5', require: false
   gem 'rspec-rails', '~> 6.0.3'
   gem 'rspec-expectations', '~> 3.12.1'
-  gem 'db-query-matchers'
+  gem 'anbt-sql-formatter'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner', '~> 2.0'
   gem 'webmock', '~> 3.14.0'

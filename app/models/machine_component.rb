@@ -2,14 +2,16 @@
 
 class MachineComponent < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :machine,
     inverse_of: :components
   has_one :group,
+    through: :machine
+  has_one :owner,
     through: :machine
   has_one :license,
     through: :machine
@@ -17,10 +19,11 @@ class MachineComponent < ApplicationRecord
     through: :license
   has_one :policy,
     through: :license
-  has_one :user,
+  has_many :users,
     through: :license
 
   has_environment default: -> { machine&.environment_id }
+  has_account default: -> { machine&.account_id }
 
   validates :machine,
     scope: { by: :account_id }
@@ -70,7 +73,8 @@ class MachineComponent < ApplicationRecord
   scope :for_product, -> id { joins(:product).where(product: { id: }) }
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
-  scope :for_user,    -> id { joins(:user).where(user: { id: }) }
+  scope :for_user,    -> id { joins(:users).where(users: { id: }) }
+  scope :for_owner,   -> id { joins(:owner).where(owner: { id: }) }
 
   scope :with_fingerprint, -> fingerprint { where(fingerprint:) }
 

@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
+    has_scope(:owner) { |c, s, v| s.for_owner(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:group) { |c, s, v| s.for_group(v) }
@@ -16,6 +17,7 @@ module Api::V1
     has_scope :expiring
     has_scope :expired
     has_scope :unassigned
+    has_scope :assigned
     has_scope :activated
     has_scope(:activations, type: :hash, only: :index) { |c, s, v|
       s.activations(**v.symbolize_keys.slice(:eq, :gt, :gte, :lt, :lte))
@@ -27,7 +29,7 @@ module Api::V1
     before_action :set_license, only: %i[show update destroy]
 
     def index
-      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy, :product))
+      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :product, :policy, owner: %i[role]))
       authorize! licenses
 
       render jsonapi: licenses
@@ -75,7 +77,7 @@ module Api::V1
               param :id, type: :uuid
             end
           end
-          param :user, type: :hash, optional: true do
+          param :owner, type: :hash, alias: :user, optional: true do
             param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[user users] }
               param :id, type: :uuid
@@ -103,7 +105,7 @@ module Api::V1
       end
     }
     def create
-      license = current_account.licenses.new(license_params)
+      license = current_account.licenses.new(**license_params)
       authorize! license
 
       if license.save

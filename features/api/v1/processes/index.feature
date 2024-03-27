@@ -165,6 +165,49 @@ Feature: List machine processes
       }
       """
 
+  Scenario: Admin retrieves a paginated list of processes scoped to owner
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy"
+    And the current account has 1 "license" for the second "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the current account has 1 "machine" for the first "license" and the last "user" as "owner"
+    And the current account has 1 "machine" for the second "license"
+    And the current account has 1 "machine" for the third "license"
+    And the current account has 7 "processes" for the first "machine"
+    And the current account has 14 "processes" for the second "machine"
+    And the current account has 4 "processes" for the third "machine"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes?page[number]=1&page[size]=10&owner=$users[1]"
+    Then the response status should be "200"
+    And the response body should be an array with 7 "processes"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/processes?owner=$users[1]&page[number]=1&page[size]=10",
+        "prev": null,
+        "next": null,
+        "first": "/v1/accounts/test1/processes?owner=$users[1]&page[number]=1&page[size]=10",
+        "last": "/v1/accounts/test1/processes?owner=$users[1]&page[number]=1&page[size]=10",
+        "meta": {
+          "pages": 1,
+          "count": 7
+        }
+      }
+      """
+
   Scenario: Admin retrieves a paginated list of processes scoped to user
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -414,10 +457,24 @@ Feature: List machine processes
     Then the response status should be "200"
     And the response body should be an array with 0 "processes"
 
-  Scenario: User attempts to retrieve all processes for their account
+  Scenario: User attempts to retrieve all processes for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "processes" for the last "machine"
+    And the current account has 2 "processes"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "processes"
+
+  Scenario: User attempts to retrieve all processes for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
     And the current account has 2 "processes"

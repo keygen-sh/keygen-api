@@ -9,11 +9,13 @@ class MachineCheckoutService < AbstractCheckoutService
     license.entitlements
     license.product
     license.policy
-    license.user
+    license.owner
+    license.users
     license
     components
     environment
     group
+    owner
   ].freeze
 
   def initialize(machine:, environment: nil, include: [], **kwargs)

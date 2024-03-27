@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Machines
+module Machines::V1x5
   class UserPolicy < ApplicationPolicy
     authorize :machine
 
@@ -15,7 +15,7 @@ module Machines
         allow!
       in role: Role(:product) if machine.product == bearer
         allow!
-      in role: Role(:user) if machine.user == bearer
+      in role: Role(:user) if machine.license.owner == bearer
         allow!
       in role: Role(:license) if machine.license == bearer
         allow!

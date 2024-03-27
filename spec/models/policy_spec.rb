@@ -7,6 +7,7 @@ describe Policy, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#environment=' do
     context 'on create' do
@@ -46,6 +47,43 @@ describe Policy, type: :model do
         policy      = create(:policy, account:, environment:)
 
         expect { policy.update!(product: create(:product, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
+  describe '#product=' do
+    context 'on build' do
+      it 'should denormalize product to licenses' do
+        product = create(:product, account:)
+        policy = build(:policy, product:, account:, licenses: build_list(:license, 10, account:))
+
+        policy.licenses.each do |license|
+          expect(license.product_id).to eq policy.product_id
+        end
+      end
+    end
+
+    context 'on create' do
+      it 'should denormalize product to licenses' do
+        product = create(:product, account:)
+        policy = create(:policy, product:, account:, licenses: build_list(:license, 10, account:))
+
+        policy.licenses.each do |license|
+          expect(license.product_id).to eq policy.product_id
+        end
+      end
+    end
+
+    context 'on update' do
+      it 'should denormalize product to licenses' do
+        product = create(:product, account:)
+        policy  = create(:policy, account:, licenses: build_list(:license, 10, account:))
+
+        policy.update!(product:)
+
+        policy.licenses.each do |license|
+          expect(license.product_id).to eq policy.product_id
+        end
       end
     end
   end

@@ -2,14 +2,14 @@
 
 FactoryBot.define do
   factory :user do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     first_name { Faker::Name.first_name }
     last_name  { Faker::Name.last_name }
     email      { SecureRandom.hex(4) + Faker::Internet.safe_email }
     password   { 'password' }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
 
     factory :admin do
@@ -48,21 +48,46 @@ FactoryBot.define do
       banned_at { 1.minute.ago }
     end
 
-    trait :with_licenses do
+    trait :with_owned_licenses do
       after :create do |user|
-        create_list(:license, 3, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
+      end
+    end
+
+    trait :with_owned_license do
+      after :create do |user|
+        create(:license, account: user.account, environment: user.environment, owner: user)
+      end
+    end
+
+    trait :with_user_licenses do
+      after :create do |user|
+        create_list(:license_user, 3, account: user.account, environment: user.environment, user:)
+      end
+    end
+
+    trait :with_licenses do
+      with_user_licenses
+      with_owned_license
+    end
+
+    trait :with_teammates do
+      after :create do |user|
+        license = create(:license, :with_users, account: user.account, environment: user.environment)
+
+        create(:license_user, account: user.account, environment: user.environment, license:, user:)
       end
     end
 
     trait :with_expired_licenses do
       after :create do |user|
-        create_list(:license, 3, :expired, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, :expired, account: user.account, environment: user.environment, owner: user)
       end
     end
 
     trait :with_entitled_licenses do
       after :create do |user|
-        licenses = create_list(:license, 3, account: user.account, environment: user.environment, user:)
+        licenses = create_list(:license, 3, account: user.account, environment: user.environment, owner: user)
 
         licenses.each do |license|
           create_list(:license_entitlement, 10, account: license.account, environment: license.environment, license:)
@@ -72,7 +97,7 @@ FactoryBot.define do
 
     trait :with_grouped_licenses do
       after :create do |user|
-        create_list(:license, 3, :with_group, account: user.account, environment: user.environment, user:)
+        create_list(:license, 3, :with_group, account: user.account, environment: user.environment, owner: user)
       end
     end
 

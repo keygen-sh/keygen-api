@@ -3,13 +3,13 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Machines::UserPolicy, type: :policy do
-  subject { described_class.new(record, account:, environment:, bearer:, token:, machine:) }
+describe MachineFilePolicy, type: :policy do
+  subject { described_class.new(record, account:, environment:, bearer:, token:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -73,9 +73,9 @@ describe Machines::UserPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_another_account accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_another_account accessing_a_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           denies :show
         end
 
@@ -96,9 +96,9 @@ describe Machines::UserPolicy, type: :policy do
 
   with_role_authorization :environment do
     within_environment :self do
-      with_scenarios %i[accessing_a_machine accessing_its_user] do
+      with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
         with_token_authentication do
-          with_permissions %w[user.read] do
+          with_permissions %w[machine.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -119,9 +119,9 @@ describe Machines::UserPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -143,9 +143,9 @@ describe Machines::UserPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_its_machine accessing_its_user] do
+    with_scenarios %i[accessing_its_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -165,9 +165,9 @@ describe Machines::UserPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -189,9 +189,9 @@ describe Machines::UserPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[accessing_its_machine accessing_its_user] do
+    with_scenarios %i[accessing_its_machine accessing_its_machine_file] do
       with_license_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           allows :show
         end
 
@@ -200,7 +200,7 @@ describe Machines::UserPolicy, type: :policy do
         end
 
         with_default_permissions do
-          denies :show
+          allows :show
         end
 
         without_permissions do
@@ -209,7 +209,7 @@ describe Machines::UserPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -220,7 +220,7 @@ describe Machines::UserPolicy, type: :policy do
         end
 
         with_default_permissions do
-          denies :show
+          allows :show
         end
 
         without_permissions do
@@ -229,9 +229,9 @@ describe Machines::UserPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       with_license_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           denies :show
         end
 
@@ -249,7 +249,7 @@ describe Machines::UserPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -271,10 +271,10 @@ describe Machines::UserPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
-      with_scenarios %i[accessing_its_machine accessing_its_user] do
+    with_bearer_trait :with_owned_licenses do
+      with_scenarios %i[accessing_its_machine accessing_its_machine_file] do
         with_token_authentication do
-          with_permissions %w[user.read] do
+          with_permissions %w[machine.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -295,9 +295,33 @@ describe Machines::UserPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_bearer_trait :with_user_licenses do
+      with_scenarios %i[accessing_its_machine accessing_its_machine_file] do
+        with_token_authentication do
+          with_permissions %w[machine.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            allows :show
+          end
+
+          with_default_permissions do
+            allows :show
+          end
+
+          without_permissions do
+            denies :show
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -319,7 +343,7 @@ describe Machines::UserPolicy, type: :policy do
   end
 
   without_authorization do
-    with_scenarios %i[accessing_a_machine accessing_its_user] do
+    with_scenarios %i[accessing_a_machine accessing_its_machine_file] do
       without_authentication do
         denies :show
       end

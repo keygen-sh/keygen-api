@@ -5,10 +5,10 @@ FactoryBot.define do
     # Prevent duplicates due to cyclic entitlement codes.
     initialize_with do
       ReleaseEntitlementConstraint.find_by(entitlement_id: entitlement&.id, release_id: release&.id) ||
-        new(**attributes.reject { NIL_ENVIRONMENT == _2 })
+        new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT })
     end
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     entitlement { build(:entitlement, account:, environment:) }
     release     { build(:release, account:, environment:) }

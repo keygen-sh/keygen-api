@@ -2,13 +2,12 @@
 
 class ReleasePackage < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Diffable
 
-  belongs_to :account,
-    inverse_of: :release_packages
   belongs_to :product,
     inverse_of: :release_packages
   belongs_to :engine,
@@ -22,12 +21,9 @@ class ReleasePackage < ApplicationRecord
   has_many :artifacts,
     through: :releases,
     source: :artifacts
-  has_many :licenses,
-    through: :product
-  has_many :users,
-    through: :product
 
   has_environment default: -> { product&.environment_id }
+  has_account default: -> { product&.account_id }, inverse_of: :release_packages
 
   accepts_nested_attributes_for :engine
 
@@ -56,7 +52,7 @@ class ReleasePackage < ApplicationRecord
   }
 
   scope :for_user, -> id {
-    joins(:product, :users)
+    joins(product: %i[users])
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: },
@@ -67,7 +63,7 @@ class ReleasePackage < ApplicationRecord
   }
 
   scope :for_license, -> id {
-    joins(:product, :licenses)
+    joins(product: %i[licenses])
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: },
@@ -105,7 +101,7 @@ class ReleasePackage < ApplicationRecord
 
   def validate_associated_records_for_engine
     return unless
-      engine.present?
+      engine.present? && account.present?
 
     # Clear engine if the key is empty e.g. "" or nil
     return self.engine = nil unless

@@ -2,16 +2,17 @@
 
 class ReleaseDownloadLink < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :release,
     counter_cache: :download_count,
     inverse_of: :download_links
 
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   encrypts :url
 

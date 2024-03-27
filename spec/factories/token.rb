@@ -2,11 +2,11 @@
 
 FactoryBot.define do
   factory :token do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     digest { "test_#{SecureRandom.hex}" }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     bearer      { build(:user, account:, environment:) }
 

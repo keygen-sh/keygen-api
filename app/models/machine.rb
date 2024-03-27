@@ -6,6 +6,7 @@ class Machine < ApplicationRecord
 
   include Envented::Callbacks
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -15,13 +16,15 @@ class Machine < ApplicationRecord
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes
 
-  belongs_to :account
   belongs_to :license, counter_cache: true
+  belongs_to :owner,
+    class_name: User.name,
+    optional: true
   belongs_to :group,
     optional: true
   has_one :product, through: :license
   has_one :policy, through: :license
-  has_one :user, through: :license
+  has_many :users, through: :license
   has_many :processes,
     class_name: 'MachineProcess',
     inverse_of: :machine,
@@ -36,14 +39,22 @@ class Machine < ApplicationRecord
     as: :resource
 
   has_environment default: -> { license&.environment_id }
+  has_account default: -> { license&.account_id }
 
   accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
   tracks_nested_attributes_for :components
 
-  # Machines automatically inherit their license's group ID
+  # Machines firstly automatically inherit their license's group ID.
   before_validation -> { self.group_id = license.group_id },
     if: -> { license.present? && group_id.nil? },
     on: %i[create]
+
+  # Machines secondly automatically inherit their owner's group ID. We're using before_validation
+  # instead of before_create so that this can be run when the owner is changed as well,
+  # and so that we can keep our group limit validations in play.
+  before_validation -> { self.group_id = owner.group_id },
+    if: -> { owner_id_changed? && owner.present? && group_id.nil? },
+    on: %i[create update]
 
   # Set initial heartbeat if heartbeat is required
   before_validation -> { self.last_heartbeat_at ||= Time.current },
@@ -61,6 +72,13 @@ class Machine < ApplicationRecord
 
   validates :license,
     scope: { by: :account_id }
+
+  validates :owner,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> {
+      owner_id_before_type_cast.nil?
+    }
 
   validates :group,
     presence: { message: 'must exist' },
@@ -179,6 +197,19 @@ class Machine < ApplicationRecord
     errors.add :group, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
   end
 
+  # Assert owner is a license user (i.e. licensee or owner)
+  validate on: %i[create update] do
+    next unless
+      owner_id_changed?
+
+    next unless
+      owner.present?
+
+    unless license.users.exists?(owner.id)
+      errors.add :owner, :invalid, message: 'must be a valid license user'
+    end
+  end
+
   scope :search_id, -> (term) {
     identifier = term.to_s
     return none if
@@ -267,20 +298,53 @@ class Machine < ApplicationRecord
     )
   }
 
+  scope :search_owner, -> (term) {
+    owner_identifier = term.to_s
+    return none if
+      owner_identifier.empty?
+
+    return joins(:owner).where(owner: { id: owner_identifier }) if
+      UUID_RE.match?(owner_identifier)
+
+    scope = joins(:owner).where(owner: { email: owner_identifier })
+                         .or(
+                           joins(:owner).where('owner.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%"),
+                         )
+    return scope unless
+      UUID_CHAR_RE.match?(owner_identifier)
+
+    scope.or(
+      joins(:owner).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
+        to_tsvector('simple', owner.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
+  }
+
   scope :search_user, -> (term) {
     user_identifier = term.to_s
     return none if
       user_identifier.empty?
 
-    return joins(:user).where(user: { id: user_identifier }) if
+    return joins(:users).where(users: { id: user_identifier }) if
       UUID_RE.match?(user_identifier)
 
-    scope = joins(:user).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    scope = joins(:users).where(users: { email: user_identifier })
+                         .or(
+                           joins(:users).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%"),
+                         )
     return scope unless
       UUID_CHAR_RE.match?(user_identifier)
 
     scope.or(
-      joins(:user).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:users).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
@@ -354,10 +418,31 @@ class Machine < ApplicationRecord
   scope :with_ip, -> (ip_address) { where ip: ip_address }
   scope :for_license, -> (id) { where license: id }
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
-  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user, -> id { joins(:license).where(licenses: { user_id: id }) }
-  scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
-  scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_user, -> user {
+    case user
+    when User, UUID_RE
+      joins(:users).where(users: { id: user })
+    else
+      joins(:users).where(users: { id: user })
+                   .or(
+                     joins(:users).where(users: { email: user }),
+                   )
+    end
+  }
+  scope :for_owner, -> owner {
+    case owner
+    when User, UUID_RE, nil
+      where(owner:)
+    else
+      joins(:owner).where(owner: { id: owner })
+                   .or(
+                     joins(:owner).where(owner: { email: owner }),
+                   )
+    end
+  }
+  scope :for_product, -> id { joins(:license).where license: { product_id: id } }
+  scope :for_policy, -> id { joins(:license).where license: { policy_id: id } }
   scope :for_group, -> id { where(group: id) }
 
   scope :alive, -> {
@@ -612,23 +697,6 @@ class Machine < ApplicationRecord
     license.update!(machines_core_count: core_count)
   rescue => e
     Keygen.logger.exception e
-  end
-
-  def validate_associated_records_for_components
-    return if
-      components.nil? || components.empty?
-
-    components.each_with_index do |component, i|
-      component.account = account if
-        component.account.nil?
-
-      next if
-        component.valid?
-
-      component.errors.each do |err|
-        errors.import(err, attribute: "components[#{i}].#{err.attribute}")
-      end
-    end
   end
 
   def reject_associated_records_for_components(attrs)

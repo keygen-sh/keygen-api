@@ -2,13 +2,13 @@
 
 FactoryBot.define do
   factory :release_artifact, aliases: %i[artifact] do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     filename { "#{release.name}-#{release.version}+#{SecureRandom.hex}.#{filetype.key}" }
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
     status   { 'UPLOADED' }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     release     { build(:release, account:, environment:) }
     platform    { build(:platform, key: 'darwin', account:) }

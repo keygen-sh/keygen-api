@@ -36,6 +36,31 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin deletes one of their users with licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["user.created", "user.updated"]
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "204"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "users"
+    And the current account should have 1 "license"
+    And the current account should have 0 "license-users"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Developer attempts to delete an admin
     Given the current account is "test1"
     And the current account has 1 "developer"
@@ -123,7 +148,7 @@ Feature: Delete user
   Scenario: License attempts to delete their user
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 1 "webhook-endpoint"
     And I am a license of account "test1"
     And I use an authentication token
@@ -155,6 +180,24 @@ Feature: Delete user
     And the current account has 3 "users"
     And the current account has 1 "webhook-endpoint"
     And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+    And the response body should be an array of 1 error
+    And the current account should have 3 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to delete an associated user
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "403"

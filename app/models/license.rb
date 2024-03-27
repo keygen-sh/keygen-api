@@ -2,7 +2,10 @@
 
 class License < ApplicationRecord
   include Envented::Callbacks
+  include UnionOf::Macro
+  include Denormalizable
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Tokenable
@@ -10,28 +13,36 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
-  belongs_to :account
-  belongs_to :user,
-    optional: true
   belongs_to :policy
+  # NOTE(ezekg) This is a denormalized association and is automatically
+  #             pulled in from the policy. Purposefully defined after
+  #             the policy association for order of validation.
+  #
+  # FIXME(ezekg) Remove the :optional flag after data is migrated.
+  belongs_to :product, optional: true
   belongs_to :group,
     optional: true
-  has_one :product, through: :policy
+  belongs_to :owner,
+    foreign_key: :user_id,
+    class_name: User.name,
+    optional: true
+  has_many :license_users, dependent: :destroy_async
+  has_many :licensees, through: :license_users, source: :user
+  has_many :users, union_of: %i[licensees owner], inverse_of: :licenses
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :machines, dependent: :destroy_async
   has_many :components, through: :machines
   has_many :processes, through: :machines
-  has_many :releases, -> l { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
-    through: :product
+  has_many :releases, through: :product
   has_many :event_logs,
     as: :resource
 
   has_environment default: -> { policy&.environment_id }
+  has_account default: -> { policy&.account_id }, inverse_of: :licenses
   has_role :license
   has_permissions Permission::LICENSE_PERMISSIONS,
-    # NOTE(ezekg) Removing these from defaults for backwards compatibility
     default: Permission::LICENSE_PERMISSIONS - %w[
       account.read
       product.read
@@ -39,6 +50,7 @@ class License < ApplicationRecord
       user.read
     ]
 
+  denormalizes :product_id, from: :policy
   encrypts :key,
     deterministic: true
 
@@ -52,11 +64,11 @@ class License < ApplicationRecord
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
 
-  # Licenses automatically inherit their user's group ID. We're using before_validation
-  # instead of before_create so that this can be run when the user is changed as well,
+  # Licenses automatically inherit their owner's group ID. We're using before_validation
+  # instead of before_create so that this can be run when the owner is changed as well,
   # and so that we can keep our group limit validations in play.
-  before_validation -> { self.group_id = user.group_id },
-    if: -> { user_id_changed? && user.present? && group_id.nil? },
+  before_validation -> { self.group_id = owner.group_id },
+    if: -> { owner_id_changed? && owner.present? && group_id.nil? },
     on: %i[create update]
 
   on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
@@ -87,14 +99,14 @@ class License < ApplicationRecord
   validates :policy,
     scope: { by: :account_id }
 
-  # Validate this association only if we've been given a user (because it's optional)
-  validates :user,
+  # Validate this association only if we've been given an owner (because it's optional)
+  validates :owner,
     presence: { message: 'must exist' },
     scope: { by: :account_id },
     unless: -> {
       # Using before type cast because non-UUIDs are silently ignored and we
       # want to raise an error in that case
-      user_id_before_type_cast.nil?
+      owner_id_before_type_cast.nil?
     }
 
   # Same for the group association
@@ -167,6 +179,19 @@ class License < ApplicationRecord
       group.licenses.count >= group.max_licenses
 
     errors.add :group, :license_limit_exceeded, message: "license count has exceeded maximum allowed by current group (#{group.max_licenses})"
+  end
+
+  # Assert owner is not a license user (i.e. licensee)
+  validate on: %i[create update] do
+    next unless
+      owner_id_changed?
+
+    next unless
+      owner.present?
+
+    if licensees.exists?(owner.id)
+      errors.add :owner, :invalid, message: 'already exists (user is attached through users)'
+    end
   end
 
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
@@ -271,20 +296,53 @@ class License < ApplicationRecord
     end
   }
 
+  scope :search_owner, -> (term) {
+    owner_identifier = term.to_s
+    return none if
+      owner_identifier.empty?
+
+    return where(user_id: owner_identifier) if
+      UUID_RE.match?(owner_identifier)
+
+    scope = joins(:owner).where(owner: { email: owner_identifier })
+                         .or(
+                           joins(:owner).where('owner.email ILIKE ?', "%#{sanitize_sql_like(owner_identifier)}%"),
+                         )
+    return scope unless
+      UUID_CHAR_RE.match?(owner_identifier)
+
+    scope.or(
+      joins(:owner).where(<<~SQL.squish, owner_identifier.gsub(SANITIZE_TSV_RE, ' '))
+        to_tsvector('simple', owner.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
+  }
+
   scope :search_user, -> (term) {
     user_identifier = term.to_s
     return none if
       user_identifier.empty?
 
-    return where(user_id: user_identifier) if
+    return joins(:users).where(users: { id: user_identifier }) if
       UUID_RE.match?(user_identifier)
 
-    scope = joins(:user).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%")
+    scope = joins(:users).where(users: { email: user_identifier })
+                         .or(
+                           joins(:users).where('users.email ILIKE ?', "%#{sanitize_sql_like(user_identifier)}%"),
+                         )
     return scope unless
       UUID_CHAR_RE.match?(user_identifier)
 
     scope.or(
-      joins(:user).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
+      joins(:users).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', users.id::text)
         @@
         to_tsquery(
@@ -353,35 +411,44 @@ class License < ApplicationRecord
   }
 
   scope :active, -> (start_date = 90.days.ago) {
-    # include any licenses newer than :t or with any activity
-    where(<<~SQL.squish, start_date:)
-      licenses.created_at >= :start_date OR
-        last_validated_at >= :start_date OR
-        last_check_out_at >= :start_date OR
-        last_check_in_at >= :start_date
-    SQL
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
+      # include any licenses newer than :t or with any activity
+      .where(<<~SQL.squish, start_date:)
+        licenses.created_at >= :start_date OR
+          (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :start_date) OR
+          (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :start_date) OR
+          (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :start_date)
+      SQL
   }
 
   scope :inactive, -> (start_date = 90.days.ago) {
-    # exclude licenses of banned users (if any)
-    left_outer_joins(:user)
-      .where(user: { banned_at: nil })
+    # exclude licenses owned by banned users (if any)
+    left_outer_joins(:owner)
+      .where(owner: { banned_at: nil })
       # include licenses older than :t without any activity
       .where(<<~SQL.squish, start_date:)
         licenses.created_at < :start_date AND
-          (last_validated_at IS NULL OR last_validated_at < :start_date) AND
-          (last_check_out_at IS NULL OR last_check_out_at < :start_date) AND
-          (last_check_in_at IS NULL OR last_check_in_at < :start_date)
+          (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :start_date) AND
+          (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :start_date) AND
+          (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :start_date)
       SQL
   }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
-  scope :unassigned, -> (status = true) {
+  scope :assigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'user_id IS NULL'
+      where_assoc_exists(:owner).or(
+        where_assoc_exists(:licensees),
+      )
     else
-      where 'user_id IS NOT NULL'
+      where_assoc_not_exists(:owner)
+        .where_assoc_not_exists(:licensees)
     end
+  }
+  scope :unassigned, -> (status = true) {
+    assigned(!ActiveRecord::Type::Boolean.new.cast(status))
   }
   scope :activated, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
@@ -447,7 +514,7 @@ class License < ApplicationRecord
     end
   }
   scope :banned, -> {
-    joins(:user).where.not(user: { banned_at: nil })
+    joins(:owner).where.not(owner: { banned_at: nil })
   }
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :with_status, -> status {
@@ -468,20 +535,34 @@ class License < ApplicationRecord
       self.none
     end
   }
-  scope :for_policy, -> (id) { where policy: id }
+  scope :for_policy, -> policy { where(policy:) }
   scope :for_user, -> user {
     case user
-    when User
-      where(user:)
+    when User, UUID_RE
+      joins(:users).where(users: { id: user })
     else
-      search_user(user)
+      joins(:users).where(users: { id: user })
+                   .or(
+                     joins(:users).where(users: { email: user }),
+                   )
     end
   }
-  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
+  scope :for_owner, -> owner {
+    case owner
+    when User, UUID_RE, nil
+      where(owner:)
+    else
+      joins(:owner).where(owner: { id: owner })
+                   .or(
+                     joins(:owner).where(owner: { email: owner }),
+                   )
+    end
+  }
+  scope :for_product, -> id { joins(:product).where product: { id: } }
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
   scope :for_group, -> id { where(group: id) }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_license, -> id { where(id: id) }
 
   delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
@@ -509,17 +590,17 @@ class License < ApplicationRecord
       role.present?
 
     return role.permissions unless
-      user.present?
+      owner.present?
 
-    # When license has wildcard permissions, defer to user.
-    return user.permissions if
+    # When license has wildcard permissions, defer to owner.
+    return owner.permissions if
       role.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
 
-    # When user has wildcard permissions, defer to license.
+    # When owner has wildcard permissions, defer to license.
     return role.permissions if
-      user.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
+      owner.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
 
-    # A license's permission set is the intersection of its user's role
+    # A license's permission set is the intersection of its owner's role
     # permissions and its own permissions.
     conn = Permission.connection
 
@@ -533,15 +614,23 @@ class License < ApplicationRecord
               SQL
               .joins(<<~SQL.squish)
                 INNER JOIN role_permissions user_role_permissions ON
-                  user_role_permissions.role_id       = #{conn.quote user.role.id} AND
+                  user_role_permissions.role_id       = #{conn.quote owner.role.id} AND
                   user_role_permissions.permission_id = permissions.id
               SQL
               .reorder(nil)
   end
 
+  # FIXME(ezekg) Should we eventually rename the user_id column?
+  def owner_id_before_type_cast = user_id_before_type_cast
+  def owner_id_changed?         = user_id_changed?
+  def owner_id? = user_id?
+  def owner_id  = user_id
+  def owner_id=(id)
+    self.user_id = id
+  end
+
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids
-
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 
@@ -647,9 +736,9 @@ class License < ApplicationRecord
   end
 
   def banned?
-    return false if user_id.nil? || user.nil?
+    return false if user_id.nil? || owner.nil?
 
-    user.banned?
+    owner.banned?
   end
 
   def suspended?
@@ -760,8 +849,8 @@ class License < ApplicationRecord
         account: { id: account.id },
         product: { id: product.id },
         policy: { id: policy.id, duration: policy.duration },
-        user: if user.present?
-                { id: user.id, email: user.email }
+        user: if owner.present?
+                { id: owner.id, email: owner.email }
               else
                 nil
               end,
@@ -867,8 +956,8 @@ class License < ApplicationRecord
       account: account&.id,
       product: product&.id,
       policy: policy&.id,
-      user: user&.id,
-      email: user&.email,
+      user: owner&.id,
+      email: owner&.email,
       created: created_at&.iso8601(3),
       expiry: expiry&.iso8601(3),
       duration: duration,

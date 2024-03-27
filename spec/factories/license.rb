@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :license do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     policy      { build(:policy, account:, environment:) }
-    user        { nil }
+    owner       { nil }
 
     trait :legacy_encrypt do
       policy { build(:policy, :legacy_encrypt, account:, environment:) }
@@ -82,7 +82,7 @@ FactoryBot.define do
     end
 
     trait :banned do
-      user { build(:user, :banned, account:, environment:) }
+      owner { build(:user, :banned, account:, environment:) }
     end
 
     trait :protected do |license|
@@ -99,16 +99,48 @@ FactoryBot.define do
       end
     end
 
-    trait :with_user do
-      user { build(:user, account:, environment:) }
+    trait :with_owner do
+      owner { build(:user, account:, environment:) }
+    end
+
+    trait :without_owner do
+      owner { nil }
+    end
+
+    trait :owned do
+      with_owner
+    end
+
+    trait :unowned do
+      without_owner
+    end
+
+    trait :with_licensees do
+      after :create do |license|
+        create_list(:license_user, 3, account: license.account, environment: license.environment, license:)
+      end
+    end
+
+    trait :with_users do
+      with_licensees
+      with_owner
+    end
+
+    trait :without_users do
+      # noop
+    end
+
+    trait :assigned do
+      with_users
+    end
+
+    trait :unassigned do
+      without_users
     end
 
     trait :userless do
-      user { nil }
-    end
-
-    trait :user do
-      with_user
+      unowned
+      unassigned
     end
 
     trait :with_group do

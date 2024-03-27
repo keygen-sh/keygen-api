@@ -183,6 +183,8 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   end
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+
+  drain_async_destroy_jobs
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
@@ -198,8 +200,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 
-  # Wait for all async deletion workers to finish
-  YankArtifactWorker.drain
+  drain_async_destroy_jobs
 rescue Timeout::Error
 end
 
@@ -225,18 +226,31 @@ Then /^the response body should be the following:$/ do |body|
   expect(json).to eq JSON.parse(body)
 end
 
-Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
-  json = JSON.parse last_response.body
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, resource|
+  json    = JSON.parse last_response.body
+  matches = json['data'].select { _1['type'] == resource.pluralize }
 
-  expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
+  expect(matches.size).to eq count.to_i
 
   if @account.present?
-    json["data"].all? do |data|
-      account_id =  data["relationships"]["account"]["data"]["id"]
+    json['data'].all? do |data|
+      account_id =  data['relationships']['account']['data']['id']
 
       expect(account_id).to eq @account.id
     end
   end
+end
+
+Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following:$/ do |count, resource, body|
+  body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json  = JSON.parse(last_response.body)
+  props = JSON.parse(body)
+
+  matches = json['data'].select { |data|
+    data['type'] == resource.pluralize && props <= data
+  }
+
+  expect(matches.count).to eq count.to_i
 end
 
 Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)" with the following attributes:$/ do |count, resource, body|
@@ -726,6 +740,16 @@ Given /^the (\w+) error should have the following properties:$/ do |named_idx, b
   err  = json["errors"].send(named_idx)
 
   expect(err).to include JSON.parse(body)
+end
+
+Given /^an error should have the following properties:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  errs = json["errors"]
+
+  expect(errs).to include(
+    include JSON.parse(body)
+  )
 end
 
 Then /^the response body should contain the following links:$/ do |body|

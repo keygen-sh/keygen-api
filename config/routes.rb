@@ -109,7 +109,11 @@ Rails.application.routes.draw do
           resource :product, only: %i[show]
           resource :group,   only: %i[show update]
           resource :license, only: %i[show]
-          resource :user,    only: %i[show]
+          resource :owner,   only: %i[show update]
+
+          scope module: :v1x5 do
+            resource :user, only: %i[show], as: :v1_5_user
+          end
         end
 
         member do
@@ -182,13 +186,24 @@ Rails.application.routes.draw do
           resource :product, only: %i[show]
           resource :policy,  only: %i[show update]
           resource :group,   only: %i[show update]
-          resource :user,    only: %i[show update]
+          resource :owner,   only: %i[show update]
 
           resources :entitlements, only: %i[index show] do
             collection do
               post '/',   to: 'entitlements#attach', as: :attach
               delete '/', to: 'entitlements#detach', as: :detach
             end
+          end
+
+          resources :users, only: %i[index show] do
+            collection do
+              post '/',   to: 'users#attach', as: :attach
+              delete '/', to: 'users#detach', as: :detach
+            end
+          end
+
+          scope module: :v1x5 do
+            resource :user, only: %i[show update], as: :v1_5_user
           end
         end
 

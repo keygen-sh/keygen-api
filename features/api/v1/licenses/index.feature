@@ -227,6 +227,66 @@ Feature: List license
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 7 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the current account has 1 "license-user" for the first "license" and the third "user"
+    And the current account has 1 "license-user" for the fourth "license" and the second "user"
+    And the current account has 1 "license-user" for the fifth "license" and the second "user"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?unassigned=true"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[6]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[5]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the third "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[1]/owner" },
+          "data": null
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all unassigned licenses (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
     And the current account has 3 "licenses"
     And the first "license" has the following attributes:
       """
@@ -241,9 +301,129 @@ Feature: List license
       { "userId": "$users[0]" }
       """
     And I use an authentication token
+    And I use API version "1.5"
     When I send a GET request to "/accounts/test1/licenses?unassigned=true"
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[1]/user" },
+          "data": null
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all assigned licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 7 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the current account has 1 "license-user" for the first "license" and the third "user"
+    And the current account has 1 "license-user" for the fourth "license" and the second "user"
+    And the current account has 1 "license-user" for the fifth "license" and the second "user"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?assigned=true"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "licenses"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[4]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[3]/owner" },
+          "data": null
+        }
+      }
+      """
+    And the third "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[2]/owner" },
+          "data": { "type": "users", "id": "$users[2]" }
+        }
+      }
+      """
+    And the fourth "license" should have the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all assigned licenses (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a GET request to "/accounts/test1/licenses?unassigned=false"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And the first "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[2]/user" },
+          "data": { "type": "users", "id": "$users[2]" }
+        }
+      }
+      """
+    And the second "license" should have the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
 
   Scenario: Admin retrieves all activated licenses
     Given I am an admin of account "test1"
@@ -1152,6 +1332,36 @@ Feature: List license
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
 
+  Scenario: Admin retrieves licenses filtered by owner ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?owner=$users[1]"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+
   Scenario: Admin retrieves licenses filtered by user ID
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1834,16 +2044,41 @@ Feature: List license
     Then the response status should be "401"
     And the response body should be an array of 1 error
 
-  Scenario: User retrieves all licenses for their account
+  Scenario: User retrieves all licenses for their account (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 3 "licenses"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current account has 3 "licenses"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the response body should be an array with 1 "license"
+    And the response body should be an array with 3 "licenses"
+
+  Scenario: User retrieves all licenses for their account (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+
+  Scenario: User retrieves all licenses for their account (mixed)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 3 "licenses"
+    And the current account has 1 "license-user" for the fourth "license" and the last "user"
+    And the current account has 1 "license-user" for the fifth "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "license"
 
   Scenario: User retrieves all licenses for their group
     Given the current account is "test1"
@@ -1902,7 +2137,7 @@ Feature: List license
       """
       { "metadata": { "id": "9cd5a11f-7649-4770-8744-74bd794ddc08", "user": "foo-3@example.com" } }
       """
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f-7649-4770-8744-74bd794ddc08"
     Then the response status should be "200"
     And the response body should be an array with 1 "license"
@@ -1913,7 +2148,7 @@ Feature: List license
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 3 "licenses"
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
     Then the response status should be "200"
     And the response body should be an array with 0 "licenses"

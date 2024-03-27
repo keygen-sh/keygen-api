@@ -47,7 +47,8 @@ Feature: User machines relationship
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "user"
-    And the current account has 3 isolated "machines" for the last "user"
+    And the current account has 1 isolated "license" for the last "user" as "owner"
+    And the current account has 3 isolated "machines" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines?environment=isolated"
@@ -159,7 +160,7 @@ Feature: User machines relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "users"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And the current account has 3 "machines" for each "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -171,7 +172,7 @@ Feature: User machines relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 3 "machines" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -183,19 +184,32 @@ Feature: User machines relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "users"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And the current account has 3 "machines" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$2/machines"
     Then the response status should be "404"
 
+  Scenario: User attempts to retrieve the machines for an associated user
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for each "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/machines"
+    Then the response status should be "403"
+
   Scenario: User attempts to retrieve their machines
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And the current account has 3 "machines" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token

@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :event_log do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     resource    { build(:license, account:, environment:) }
     whodunnit   { build(:user, account:, environment:) }

@@ -1457,7 +1457,7 @@ Feature: User tokens relationship
     And the current account has 1 "token" for each "product"
     And the current account has 6 "users"
     And the current account has 1 "token" for each "user"
-    And the current account has 1 "license" for each "user"
+    And the current account has 1 "license" for each "user" through "owner"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/tokens"
@@ -1486,6 +1486,21 @@ Feature: User tokens relationship
     When I send a GET request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
     And the response body should be an array of 1 "token"
+
+  Scenario: User requests tokens for an associated user
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the first "user"
+    And the current account has 1 "license-user" for the last "license" and the second "user"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "token" for each "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "403"
 
   Scenario: User requests tokens for another user
     Given the current account is "test1"

@@ -1,6 +1,5 @@
 @api/v1
 Feature: Machine license relationship
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -134,6 +133,18 @@ Feature: Machine license relationship
     Then the response status should be "200"
     And the response body should be a "license"
 
+  Scenario: User attempts to retrieve the license for a machine they have
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/license"
+    Then the response status should be "200"
+    And the response body should be a "license"
+
   Scenario: User attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"
@@ -155,8 +166,8 @@ Feature: Machine license relationship
   Scenario: License attempts to retrieve themself
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user"
-    And the current account has 1 "license" for the second "user"
+    And the current account has 1 "license" for the first "user" as "owner"
+    And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 2 "machines" for the first "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -167,8 +178,8 @@ Feature: Machine license relationship
   Scenario: License attempts to retrieve the license for a machine they don't own
     Given the current account is "test1"
     And the current account has 2 "users"
-    And the current account has 1 "license" for the first "user"
-    And the current account has 1 "license" for the second "user"
+    And the current account has 1 "license" for the first "user" as "owner"
+    And the current account has 1 "license" for the second "user" as "owner"
     And the current account has 2 "machines" for the second "license"
     And I am a license of account "test1"
     And I use an authentication token

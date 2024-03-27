@@ -1,5 +1,6 @@
 class Environment < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[environments]]
+  include Accountable
   include Limitable
   include Orderable
   include Dirtyable
@@ -12,25 +13,27 @@ class Environment < ApplicationRecord
     SHARED
   ].freeze
 
-  belongs_to :account
   has_many :tokens, dependent: :destroy_async do
     def owned = where(bearer: proxy_association.owner)
   end
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :webhook_endpoints, dependent: :destroy_async
-  has_many :webhook_event,     dependent: :destroy_async
-  has_many :entitlements,      dependent: :destroy_async
-  has_many :groups,            dependent: :destroy_async
-  has_many :products,          dependent: :destroy_async
-  has_many :policies,          dependent: :destroy_async
-  has_many :licenses,          dependent: :destroy_async
-  has_many :machines,          dependent: :destroy_async
-  has_many :machine_processes, dependent: :destroy_async
-  has_many :users,             dependent: :destroy_async
-  has_many :releases,          dependent: :destroy_async
-  has_many :release_artifacts, dependent: :destroy_async
+  has_many :webhook_endpoints,  dependent: :destroy_async
+  has_many :webhook_event,      dependent: :destroy_async
+  has_many :entitlements,       dependent: :destroy_async
+  has_many :groups,             dependent: :destroy_async
+  has_many :products,           dependent: :destroy_async
+  has_many :policies,           dependent: :destroy_async
+  has_many :licenses,           dependent: :destroy_async
+  has_many :license_users,      dependent: :destroy_async
+  has_many :machines,           dependent: :destroy_async
+  has_many :machine_processes,  dependent: :destroy_async
+  has_many :machine_components, dependent: :destroy_async
+  has_many :users,              dependent: :destroy_async
+  has_many :releases,           dependent: :destroy_async
+  has_many :release_artifacts,  dependent: :destroy_async
 
+  has_account
   has_role :environment
   has_permissions Permission::ENVIRONMENT_PERMISSIONS
 

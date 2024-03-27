@@ -53,8 +53,10 @@ class LicenseSerializer < BaseSerializer
   attribute :last_check_out do
     @object.last_check_out_at
   end
-  attribute :permissions, if: -> { @account.ent? } do
-    @object.permissions.actions
+  ee do
+    attribute :permissions, if: -> { @account.ent? } do
+      @object.permissions.actions
+    end
   end
   attribute :metadata do
     @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}
@@ -125,16 +127,22 @@ class LicenseSerializer < BaseSerializer
     end
   end
 
-  relationship :user do
+  relationship :owner do
     linkage always: true do
-      if @object.user_id.present?
-        { type: :users, id: @object.user_id }
+      if @object.owner_id?
+        { type: :users, id: @object.owner_id }
       else
         nil
       end
     end
     link :related do
-      @url_helpers.v1_account_license_user_path @object.account_id, @object
+      @url_helpers.v1_account_license_owner_path @object.account_id, @object
+    end
+  end
+
+  relationship :users do
+    link :related do
+      @url_helpers.v1_account_license_users_path @object.account_id, @object
     end
   end
 

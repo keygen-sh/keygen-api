@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_12_194200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -194,6 +194,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.index ["license_id"], name: "index_license_entitlements_on_license_id"
   end
 
+  create_table "license_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "license_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_license_users_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "license_id"], name: "index_license_users_on_account_id_and_license_id"
+    t.index ["account_id", "user_id"], name: "index_license_users_on_account_id_and_user_id"
+    t.index ["environment_id"], name: "index_license_users_on_environment_id"
+    t.index ["license_id", "user_id", "account_id"], name: "index_license_users_on_license_id_and_user_id_and_account_id", unique: true
+    t.index ["user_id"], name: "index_license_users_on_user_id"
+  end
+
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "key", null: false
     t.datetime "expiry", precision: nil
@@ -224,11 +239,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.uuid "environment_id"
     t.string "last_validated_checksum"
     t.string "last_validated_version"
+    t.uuid "product_id"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
+    t.index ["account_id", "id"], name: "index_licenses_on_account_id_and_id", unique: true
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_licenses_on_environment_id"
     t.index ["group_id"], name: "index_licenses_on_group_id"
@@ -236,7 +253,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
     t.index ["last_validated_at"], name: "index_licenses_on_last_validated_at"
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at"
+    t.index ["policy_id", "id", "account_id"], name: "index_licenses_on_policy_id_and_id_and_account_id", unique: true
+    t.index ["product_id", "id", "account_id"], name: "index_licenses_on_product_id_and_id_and_account_id", unique: true
+    t.index ["product_id"], name: "index_licenses_on_product_id"
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at"
+    t.index ["user_id", "id", "account_id"], name: "index_licenses_on_user_id_and_id_and_account_id", unique: true
   end
 
   create_table "machine_components", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -292,6 +313,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.datetime "last_check_out_at", precision: nil
     t.uuid "environment_id"
     t.string "heartbeat_jid"
+    t.uuid "owner_id"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -305,6 +327,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_170649) do
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
     t.index ["last_heartbeat_at"], name: "index_machines_on_last_heartbeat_at"
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
+    t.index ["owner_id"], name: "index_machines_on_owner_id"
   end
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

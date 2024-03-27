@@ -2,11 +2,11 @@
 
 FactoryBot.define do
   factory :machine_process, aliases: %i[process] do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     pid { SecureRandom.hex(12) }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     machine     { build(:machine, account:, environment:) }
 

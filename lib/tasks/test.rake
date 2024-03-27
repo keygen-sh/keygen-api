@@ -44,18 +44,38 @@ begin
     ]
 
     desc 'run rspec test suite'
-    task rspec: %i[
-      test:environment
-      log:clear
-      parallel:spec
-    ]
+    task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
+      pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
+
+      if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
+        rspec = Rake::Task['spec']
+
+        # FIXME(ezekg) Remove [ from GLOB_PATTERN so spec/foo_spec.rb[1:2:3:4] patterns are supported
+        #              See: https://github.com/rspec/rspec-core/issues/3062
+        Rake::FileList::GLOB_PATTERN = %r{[*?\{]}
+
+        ENV['SPEC'] = pattern
+
+        rspec.invoke
+      else
+        Rake::Task['parallel:spec'].invoke(nil, pattern)
+      end
+    end
 
     desc 'run cucumber test suite'
-    task cucumber: %i[
-      test:environment
-      log:clear
-      parallel:features
-    ]
+    task :cucumber, %i[pattern] => %i[test:environment log:clear] do |_, args|
+      pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
+
+      if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers
+        cucumber = Rake::Task['cucumber']
+
+        ENV['FEATURE'] = pattern
+
+        cucumber.invoke
+      else
+        Rake::Task['parallel:features'].invoke(nil, pattern)
+      end
+    end
   end
 rescue LoadError
   # NOTE(ezekg) Wrapping this in a rescue clause so that we can use our

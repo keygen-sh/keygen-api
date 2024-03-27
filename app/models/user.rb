@@ -3,24 +3,40 @@
 class User < ApplicationRecord
   MINIMUM_ADMIN_COUNT = 1
 
+  include UnionOf::Macro
   include PasswordResettable
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
   include Roleable
   include Diffable
 
-  belongs_to :account, inverse_of: :users
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy_async
-  has_many :licenses, dependent: :destroy_async
+  has_many :license_users, index_errors: true, dependent: :destroy_async
+  has_many :owned_licenses, dependent: :destroy_async, class_name: License.name, foreign_key: :user_id, inverse_of: :owner
+  has_many :user_licenses, index_errors: true, through: :license_users, source: :license
+  has_many :licenses, union_of: %i[owned_licenses user_licenses], inverse_of: :users do
+    def owned = where(owner: proxy_association.owner)
+  end
+  # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
+  #              Maybe collaborators or associated_users?
+  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).excluding(user) },
+    through: :licenses,
+    source: :users
   has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :license_entitlements, through: :licenses
-  has_many :policy_entitlements, through: :licenses
-  has_many :machines, through: :licenses
+  has_many :license_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :policy_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :owned_machines, dependent: :destroy_async, class_name: Machine.name, foreign_key: :owner_id
+  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
+    def owned = where(owner: proxy_association.owner)
+  end
+  has_many :components, through: :machines
+  has_many :processes, through: :machines
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :products
@@ -32,16 +48,20 @@ class User < ApplicationRecord
 
   # NOTE(ezekg) This association is only used to preload a user's status, since
   #             the #status needs to check if a user has any active licenses.
-  #
-  #             We're doing a DISTINCT ON so that we can query ANY one active
-  #             license for each user, since users can potentially have thousands
-  #             and thousands of licenses, and superfluously preloading/querying
-  #             that many records would a bad idea.
-  has_one :any_active_license, -> { active.reorder(nil).distinct_on(:user_id) },
+  has_many :any_active_licenses, -> {
+    where(<<~SQL.squish, start_date: 90.days.ago)
+      licenses.created_at >= :start_date OR
+        (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :start_date) OR
+        (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :start_date) OR
+        (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :start_date)
+    SQL
+  },
+    union_of: %i[owned_licenses user_licenses],
     class_name: License.name
 
   has_secure_password :password, validations: false
   has_environment
+  has_account inverse_of: :users
   has_default_role :user
   has_permissions -> user {
       role = if user.respond_to?(:role)
@@ -76,19 +96,20 @@ class User < ApplicationRecord
       in Role(:read_only)
         Permission::READ_ONLY_PERMISSIONS
       else
-        # NOTE(ezekg) Removing these from defaults for backwards compatibility
         Permission::USER_PERMISSIONS - %w[
           account.read
-          product.read
+          license.users.attach
+          license.users.detach
           policy.read
+          product.read
         ]
       end
     }
 
+  normalizes :email, with: -> email { email.downcase.strip }
+
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
-
-  before_save -> { self.email = email.downcase.strip }
 
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
@@ -254,10 +275,9 @@ class User < ApplicationRecord
     end
   }
 
-  # Give products the ability to read all groups
   scope :accessible_by, -> accessor {
     case accessor
-    in role: Role(:admin | :product)
+    in role: Role(:admin | :product) # give products the ability to read all users
       self.all
     in role: Role(:environment)
       self.for_environment(accessor.id)
@@ -270,10 +290,36 @@ class User < ApplicationRecord
     end
   }
 
-  scope :for_product, -> (id) { joins(licenses: :policy).where policies: { product_id: id } }
-  scope :for_license, -> (id) { joins(:licenses).where licenses: { id: id } }
-  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user, -> id { where(id:) }
+  scope :for_product, -> id {
+    license_users = LicenseUser.arel_table
+    licenses      = License.arel_table
+    users         = User.arel_table
+
+    # More optimized union query for this particular association
+    left_outer_joins(:license_users)
+      .joins(
+        Arel::Nodes::InnerJoin.new(
+          licenses,
+          Arel::Nodes::On.new(
+            licenses[:user_id].eq(users[:id]).or(
+              licenses[:id].eq(license_users[:license_id]),
+            )
+          ),
+        ),
+      )
+      .where(
+        licenses: { product_id: id },
+      )
+  }
+  scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
+  scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
+  scope :for_user, -> id {
+    joins(:licenses).where(licenses: { id: License.for_user(id) } ) # users of any associated licenses
+                    .union(
+                      where(id:), # itself
+                    )
+                    .distinct
+  }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
@@ -288,9 +334,9 @@ class User < ApplicationRecord
           .where(banned_at: nil)
           .where(<<~SQL.squish, t:)
             licenses.created_at >= :t OR
-              licenses.last_validated_at >= :t OR
-              licenses.last_check_out_at >= :t OR
-              licenses.last_check_in_at >= :t
+              (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
+              (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
+              (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
           SQL
       )
   }
@@ -318,9 +364,9 @@ class User < ApplicationRecord
               .where(banned_at: nil)
               .where(<<~SQL.squish, t:)
                 licenses.created_at >= :t OR
-                  licenses.last_validated_at >= :t OR
-                  licenses.last_check_out_at >= :t OR
-                  licenses.last_check_in_at >= :t
+                  (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
+                  (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
+                  (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
               SQL
       )
   }
@@ -334,18 +380,22 @@ class User < ApplicationRecord
     end
   }
 
+  # FIXME(ezekg) Selecting on ID isn't supported by our association scopes because
+  #              we're using DISTINCT and reordering on created_at.
+  def teammate_ids = teammates.reorder(nil).ids
+  def machine_ids  = machines.reorder(nil).ids
+  def product_ids  = products.reorder(nil).ids
+  def policy_ids   = policies.reorder(nil).ids
+
   def entitlement_codes = entitlements.reorder(nil).codes
   def entitlement_ids   = entitlements.reorder(nil).ids
-  def product_ids       = products.reorder(nil).ids
-  def policy_ids        = policies.reorder(nil).ids
-
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 
     entl.left_outer_joins(:policy_entitlements, :license_entitlements)
-        .where(policy_entitlements: { policy_id: licenses.reorder(nil).select(:policy_id) })
+        .where(policy_entitlements: { policy_id: policy_ids })
         .or(
-          entl.where(license_entitlements: { license_id: licenses.reorder(nil).select(:id) })
+          entl.where(license_entitlements: { license_id: license_ids })
         )
   end
 
@@ -398,11 +448,11 @@ class User < ApplicationRecord
   end
 
   def active?(t = 90.days.ago)
-    created_at >= t || any_active_license.present?
+    created_at >= t || any_active_licenses.any?
   end
 
   def inactive?(t = 90.days.ago)
-    created_at < t && any_active_license.nil?
+    created_at < t && any_active_licenses.empty?
   end
 
   def banned?

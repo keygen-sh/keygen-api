@@ -1,14 +1,11 @@
 @api/v1
 Feature: Update release
-
   Background:
     Given the following "accounts" exist:
       | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
-    # TODO(ezekg) Remove after we switch new accounts to v1.1
-    And I use API version "1.1"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
@@ -419,7 +416,7 @@ Feature: Update release
       """
     Then the response status should be "403"
 
-  Scenario: User attempts to update a release for their product
+  Scenario: User attempts to update a release for their license (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -428,7 +425,31 @@ Feature: Update release
     And the current account has 1 "license" for an existing "policy"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Not My Release"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
+  Scenario: User attempts to update a release for their license (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
       """

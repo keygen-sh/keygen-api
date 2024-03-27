@@ -5,6 +5,7 @@ class Release < ApplicationRecord
   self.ignored_columns = %w[release_platform_id release_filetype_id filename filesize signature checksum]
 
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -34,8 +35,6 @@ class Release < ApplicationRecord
     YANKED
   ]
 
-  belongs_to :account,
-    inverse_of: :releases
   belongs_to :product,
     inverse_of: :releases
   belongs_to :package,
@@ -43,10 +42,6 @@ class Release < ApplicationRecord
     foreign_key: :release_package_id,
     inverse_of: :releases,
     optional: true
-  has_many :users,
-    through: :product
-  has_many :licenses,
-    through: :product
   belongs_to :channel,
     class_name: 'ReleaseChannel',
     foreign_key: :release_channel_id,
@@ -95,6 +90,7 @@ class Release < ApplicationRecord
     dependent: :delete
 
   has_environment default: -> { product&.environment_id }
+  has_account default: -> { product&.account_id }, inverse_of: :releases
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
   tracks_nested_attributes_for :constraints
@@ -281,14 +277,18 @@ class Release < ApplicationRecord
     # intersecting their entitlements, or no constraints at all.
     entl = within_constraints(user.entitlement_codes, strict: true)
 
-    # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(:users, :product)
+    entl.joins(product: %i[users])
       .where(
-        product: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
+        product: {
+          distribution_strategy: ['LICENSED', nil],
+          users: { id: user },
+        },
       )
       .union(
         self.open
+      )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
       )
   }
 
@@ -305,13 +305,16 @@ class Release < ApplicationRecord
     entl = within_constraints(license.entitlement_codes, strict: true)
 
     # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(:licenses, :product)
+    entl.joins(product: %i[licenses])
         .where(
           product: { distribution_strategy: ['LICENSED', nil] },
           licenses: { id: license },
         )
         .union(
           self.open
+        )
+        .reorder(
+          created_at: DEFAULT_SORT_ORDER,
         )
   }
 
@@ -485,8 +488,11 @@ class Release < ApplicationRecord
 
     # Union with releases without constraints as well.
     scp.union(
-      without_constraints,
-    )
+         without_constraints,
+       )
+       .reorder(
+         created_at: DEFAULT_SORT_ORDER,
+       )
   }
 
   scope :published, -> { with_status(:PUBLISHED) }
@@ -751,7 +757,7 @@ class Release < ApplicationRecord
 
   def validate_associated_records_for_channel
     return unless
-      channel.present?
+      channel.present? && account.present?
 
     # Clear channel if the key is empty e.g. "" or nil
     return self.channel = nil unless
@@ -806,23 +812,6 @@ class Release < ApplicationRecord
     SQL
 
     self.channel = rows.first
-  end
-
-  def validate_associated_records_for_constraints
-    return if
-      constraints.nil? || constraints.empty?
-
-    constraints.each_with_index do |constraint, i|
-      constraint.account = account if
-        constraint.account.nil?
-
-      next if
-        constraint.valid?
-
-      constraint.errors.each do |err|
-        errors.import(err, attribute: "constraints[#{i}].#{err.attribute}")
-      end
-    end
   end
 
   def reject_associated_records_for_constraints(attrs)

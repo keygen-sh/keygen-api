@@ -109,6 +109,46 @@ Feature: List machines
       }
       """
 
+  Scenario: Admin retrieves a paginated list of machines scoped to owner
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the current account has 20 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "ownerId": "$users[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=100&owner=$users[1]"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "machine"
+    And the response body should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/machines?owner=$users[1]&page[number]=1&page[size]=100",
+        "prev": null,
+        "next": null,
+        "first": "/v1/accounts/test1/machines?owner=$users[1]&page[number]=1&page[size]=100",
+        "last": "/v1/accounts/test1/machines?owner=$users[1]&page[number]=1&page[size]=100",
+        "meta": {
+          "pages": 1,
+          "count": 1
+        }
+      }
+      """
+
   Scenario: Admin retrieves a paginated list of machines scoped to user
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -497,7 +537,7 @@ Feature: List machines
     Then the response status should be "200"
     And the response body should be an array with 1 "machine"
 
-  Scenario: User attempts to retrieve all machines for their account
+  Scenario: User attempts to retrieve all machines for their account (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -511,6 +551,19 @@ Feature: List machines
       """
       { "licenseId": "$licenses[0]" }
       """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "machines"
+
+  Scenario: User attempts to retrieve all machines for their account (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 2 "machines"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"

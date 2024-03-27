@@ -2,13 +2,13 @@
 
 class WebhookEndpoint < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
-
   has_environment
+  has_account
 
   before_create -> { self.api_version ||= account.api_version }
   before_save -> { self.subscriptions = subscriptions.uniq }

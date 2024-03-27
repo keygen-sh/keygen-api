@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseChannel < ApplicationRecord
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -13,16 +14,12 @@ class ReleaseChannel < ApplicationRecord
     dev
   ]
 
-  belongs_to :account,
-    inverse_of: :release_channels
   has_many :releases,
     inverse_of: :channel
   has_many :products,
     through: :releases
-  has_many :licenses,
-    through: :products
-  has_many :users,
-    through: :licenses
+
+  has_account inverse_of: :release_channels
 
   validates :key,
     presence: true,

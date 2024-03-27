@@ -2,17 +2,18 @@
 
 class LicenseEntitlement < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :license
   belongs_to :entitlement
   has_one :policy,
     through: :license
 
   has_environment default: -> { license&.environment_id }
+  has_account default: -> { license&.account_id }
 
   validates :license,
     scope: { by: :account_id }

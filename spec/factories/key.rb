@@ -2,11 +2,11 @@
 
 FactoryBot.define do
   factory :key do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     key { SecureRandom.hex(12).upcase.scan(/.{4}/).join "-" }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     policy      { build(:policy, :pooled, account:, environment:) }
 

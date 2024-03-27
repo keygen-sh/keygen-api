@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:license) { |c, s, v| s.for_license(v) }
+    has_scope(:owner) { |c, s, v| s.for_owner(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
 
     before_action :scope_to_current_account!
@@ -13,7 +14,7 @@ module Api::V1
     before_action :set_machine_component, only: %i[show update destroy]
 
     def index
-      machine_components = apply_pagination(authorized_scope(apply_scopes(current_account.machine_components)).preload(:machine, :license, :policy, :product, :group, :user))
+      machine_components = apply_pagination(authorized_scope(apply_scopes(current_account.machine_components)).preload(:machine, :policy, :product, :group, :owner, license: %i[owner]))
       authorize! machine_components
 
       render jsonapi: machine_components

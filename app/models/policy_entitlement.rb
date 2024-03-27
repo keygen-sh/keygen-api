@@ -2,15 +2,16 @@
 
 class PolicyEntitlement < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :policy
   belongs_to :entitlement
 
   has_environment default: -> { policy&.environment_id }
+  has_account default: -> { policy&.account_id }
 
   validates :policy,
     scope: { by: :account_id }

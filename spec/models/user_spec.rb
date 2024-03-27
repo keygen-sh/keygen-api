@@ -7,6 +7,7 @@ describe User, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#role_attributes=' do
     context 'on role assignment' do
@@ -215,36 +216,75 @@ describe User, type: :model do
       # old user (inactive)
       create(:user, account:, created_at: 1.year.ago)
 
-      # old user with new license (active)
+      # old user with new owned license (active)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
+
+      # old user with new user license (active)
+      user    = create(:user, account:, created_at: 1.year.ago)
+      license = create(:license, account:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
+
+      create(:license_user, account:, license:, user:)
+
+      # old user with old owned license (inactive)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, created_at: 1.year.ago)
+
+      # old user with old user license (inactive)
+      user    = create(:user, account:, created_at: 1.year.ago)
+      license = create(:license, account:, created_at: 1.year.ago)
+
+      create(:license_user, account:, license:, user:)
+
+      # old user with recently validated owned license (active)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
+
+      # old user with recently validated user license (active)
+      user    = create(:user, account:, created_at: 1.year.ago)
+      license = create(:license, account:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
+
+      create(:license_user, account:, license:, user:)
+
+      # old user with recently checked out owned license (active)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
+
+      # old user with recently checked out user license (active)
+      user    = create(:user, account:, created_at: 1.year.ago)
+      license = create(:license, account:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
+
+      create(:license_user, account:, license:, user:)
+
+      # old user with recently checked in owned license (active)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, last_check_in_at: 6.days.ago)
+
+      # old user with recently checked in user license (active)
+      user    = create(:user, account:, created_at: 1.year.ago)
+      license = create(:license, account:, last_check_in_at: 6.days.ago)
+
+      create(:license_user, account:, license:, user:)
+
+      # old user with active and inactive owned licenses (active)
+      owner = create(:user, account:, created_at: 1.year.ago)
+
+      create(:license, account:, owner:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
+      create(:license, account:, owner:, last_check_in_at: 6.days.ago)
+
+      # old user with active and inactive user licenses (active)
       user = create(:user, account:, created_at: 1.year.ago)
 
-      create(:license, account:, user:, created_at: 1.week.ago, last_validated_at: 1.second.ago)
+      license = create(:license, account:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
+      create(:license_user, account:, license:, user:)
 
-      # old user with old license (inactive)
-      user = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, user:, created_at: 1.year.ago)
-
-      # old user with recently validated license (active)
-      user = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, user:, last_validated_at: 1.year.ago, last_check_out_at: 32.days.ago)
-
-      # old user with recently checked out license (active)
-      user = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, user:, last_validated_at: 32.days.ago, last_check_out_at: 1.day.ago)
-
-      # old user with recently checked in license (active)
-      user = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, user:, last_check_in_at: 6.days.ago)
-
-      # old user with active and inactive licenses (active)
-      user = create(:user, account:, created_at: 1.year.ago)
-
-      create(:license, account:, user:, created_at: 2.years.ago, last_validated_at: 1.year.ago)
-      create(:license, account:, user:, last_check_in_at: 6.days.ago)
+      license = create(:license, account:, last_check_in_at: 6.days.ago)
+      create(:license_user, account:, license:, user:)
 
       # banned user (banned)
       create(:user, :banned, account:)
@@ -252,20 +292,35 @@ describe User, type: :model do
 
     it 'should preload user statuses' do
       statuses = nil
-      expect { statuses = User.preload(:any_active_license).collect(&:status) }.to make_database_queries(count: 2)
+      expect { statuses = User.preload(:any_active_licenses).collect(&:status) }.to match_queries(count: 4)
       expect(statuses).to eq User.all.collect(&:status)
     end
 
     it 'should return active users' do
-      expect(User.users.with_status(:active).count).to eq 6
+      expect(User.users.with_status(:active).count).to eq 11
     end
 
     it 'should return inactive users' do
-      expect(User.users.with_status(:inactive).count).to eq 2
+      expect(User.users.with_status(:inactive).count).to eq 3
     end
 
     it 'should return banned users' do
       expect(User.users.with_status(:banned).count).to eq 1
+    end
+  end
+
+  describe '#destroy' do
+    it 'should destroy owned machines' do
+      user    = create(:user, account:)
+      license = create(:license, account:)
+
+      create(:license_user, account:, license:, user:)
+      create(:machine, account:, license:, owner: user)
+      create(:machine, account:, license:)
+
+      perform_enqueued_jobs only: ActiveRecord::DestroyAssociationAsyncJob do
+        expect { user.destroy }.to change { license.machines.count }.by -1
+      end
     end
   end
 end

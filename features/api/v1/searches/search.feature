@@ -1241,7 +1241,7 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "licenses"
-    And the current user has 7 "licenses"
+    And the current user has 7 "licenses" as "owner"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """
@@ -1264,7 +1264,7 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "licenses"
-    And the current user has 5 "licenses"
+    And the current user has 5 "licenses" as "owner"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """

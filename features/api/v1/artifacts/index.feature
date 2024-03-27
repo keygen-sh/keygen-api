@@ -1,6 +1,5 @@
 @api/v1
 Feature: List release artifacts
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -674,7 +673,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the response body should be an array of 0 "artifacts"
 
-  Scenario: User attempts to retrieve the artifacts for their products (licensed)
+  Scenario: User attempts to retrieve the artifacts for their licenses (license owner)
     Given the current account is "test1"
     And the current account has 3 "products"
     And the current account has 1 "policy" for each "product"
@@ -683,15 +682,32 @@ Feature: List release artifacts
     And the current account has 2 "releases" for each "product"
     And the current account has 2 "artifacts" for each "release"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user"
-    And the second "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
+    And the second "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array of 4 "artifacts"
 
-  Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
+  Scenario: User attempts to retrieve the artifacts for their licenses (license user)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "policy" for each "product"
+    And the current account has 2 "licenses" for the first "policy"
+    And the current account has 1 "license" for the second "policy"
+    And the current account has 2 "releases" for each "product"
+    And the current account has 2 "artifacts" for each "release"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array of 4 "artifacts"
+
+  Scenario: User attempts to retrieve their artifacts (unlicensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -850,7 +866,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 8 "artifacts"
@@ -879,7 +895,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts?product=$products[0]"
     Then the response status should be "200"
     And the response body should be an array with 3 "artifacts"
@@ -942,7 +958,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1038,7 +1054,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1134,7 +1150,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1230,7 +1246,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1326,7 +1342,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1494,7 +1510,7 @@ Feature: List release artifacts
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 2 "artifacts"
@@ -1545,7 +1561,7 @@ Feature: List release artifacts
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
+    And the current user has 2 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 2 "artifacts"
@@ -1603,7 +1619,7 @@ Feature: List release artifacts
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
+    And the current user has 2 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 3 "artifacts"

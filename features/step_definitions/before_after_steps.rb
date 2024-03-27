@@ -61,13 +61,16 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    log scenario.exception
+    puts scenario.exception
+    puts
 
     req_headers = last_request.env
       .select { |k, v| k.start_with?('HTTP_') }
       .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
-    log JSON.pretty_generate(
+    puts "dump:"
+    puts
+    pp(
       request: {
         method: last_request.request_method,
         url: last_request.url,
@@ -81,23 +84,26 @@ After do |scenario|
       },
       debug: {
         env_number: ENV['TEST_ENV_NUMBER'].to_i,
-        query_log: Elif.open(Rails.root / 'log' / 'test.log') do |log|
-          count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
-          lines = []
+        error_log: $!&.backtrace || [],
+        query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
+          Elif.open(log_path) do |log|
+            count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
+            lines = []
 
-          # Read the last n SQL lines from the log file (useful when debugging CI)
-          log.each do |line|
-            break if lines.count >= count
+            # Read the last n SQL lines from the log file (useful when debugging CI)
+            log.each do |line|
+              break if lines.count >= count
 
-            if line =~ /application:Keygen,pid:#{Process.pid}/
-              lines << line.squish
+              if line =~ /application='Keygen',pid='#{Process.pid}'/
+                lines << line.squish
+              end
             end
-          end
 
-          lines
-        rescue
-          lines
-        end
+            lines
+          rescue
+            lines
+          end
+        end,
       },
     )
   end

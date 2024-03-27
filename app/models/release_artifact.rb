@@ -2,6 +2,7 @@
 
 class ReleaseArtifact < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -15,7 +16,6 @@ class ReleaseArtifact < ApplicationRecord
 
   attr_accessor :redirect_url
 
-  belongs_to :account
   belongs_to :release,
     inverse_of: :artifacts
   belongs_to :platform,
@@ -44,20 +44,16 @@ class ReleaseArtifact < ApplicationRecord
     through: :release
   has_one :engine,
     through: :package
-  has_many :users,
-    through: :product
-  has_many :licenses,
-    through: :product
   has_many :constraints,
     through: :release
 
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :arch
 
-  before_validation -> { self.account_id ||= release&.account_id }
   before_validation -> { self.status ||= 'WAITING' }
 
   before_create -> { self.backend ||= account.backend }
@@ -442,7 +438,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_filetype
     return unless
-      filetype.present?
+      filetype.present? && account.present?
 
     # Clear filetype if the key is empty e.g. "" or nil
     return self.filetype = nil unless
@@ -500,7 +496,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_platform
     return unless
-      platform.present?
+      platform.present? && account.present?
 
     # Clear platform if the key is empty e.g. "" or nil
     return self.platform = nil unless
@@ -550,7 +546,7 @@ class ReleaseArtifact < ApplicationRecord
 
   def validate_associated_records_for_arch
     return unless
-      arch.present?
+      arch.present? && account.present?
 
     # Clear arch if the key is empty e.g. "" or nil
     return self.arch = nil unless

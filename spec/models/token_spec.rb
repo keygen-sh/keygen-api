@@ -8,6 +8,7 @@ describe Token, type: :model do
   let(:bearer) { create(:license, account:) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#environment=' do
     context 'on create' do

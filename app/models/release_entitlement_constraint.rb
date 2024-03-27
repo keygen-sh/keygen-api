@@ -2,11 +2,11 @@
 
 class ReleaseEntitlementConstraint < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :release,
     inverse_of: :constraints
   belongs_to :entitlement,
@@ -15,6 +15,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
     through: :release
 
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   validates :release,
     scope: { by: :account_id }

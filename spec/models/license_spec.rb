@@ -7,6 +7,7 @@ describe License, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
   it_behaves_like :encryptable
   it_behaves_like :dirtyable
 
@@ -34,18 +35,18 @@ describe License, type: :model do
         expect { create(:license, account:, environment:, policy:) }.to raise_error ActiveRecord::RecordInvalid
       end
 
-      it 'should not raise when environment matches user' do
+      it 'should not raise when environment matches owner' do
         environment = create(:environment, account:)
-        user        = create(:user, account:, environment:)
+        owner       = create(:user, account:, environment:)
 
-        expect { create(:license, account:, environment:, user:) }.to_not raise_error
+        expect { create(:license, account:, environment:, owner:) }.to_not raise_error
       end
 
-      it 'should raise when environment does not match user' do
+      it 'should raise when environment does not match owner' do
         environment = create(:environment, account:)
-        user        = create(:user, account:, environment: nil)
+        owner       = create(:user, account:, environment: nil)
 
-        expect { create(:license, account:, environment:, user:) }.to raise_error ActiveRecord::RecordInvalid
+        expect { create(:license, account:, environment:, owner:) }.to raise_error ActiveRecord::RecordInvalid
       end
     end
 
@@ -64,18 +65,73 @@ describe License, type: :model do
         expect { license.update!(policy: create(:policy, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
       end
 
-      it 'should not raise when environment matches user' do
+      it 'should not raise when environment matches owner' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
-        expect { license.update!(user: create(:user, account:, environment:)) }.to_not raise_error
+        expect { license.update!(owner: create(:user, account:, environment:)) }.to_not raise_error
       end
 
-      it 'should raise when environment does not match user' do
+      it 'should raise when environment does not match owner' do
         environment = create(:environment, account:)
         license     = create(:license, account:, environment:)
 
-        expect { license.update!(user: create(:user, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+        expect { license.update!(owner: create(:user, account:, environment: nil)) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
+  describe '#owner=' do
+    context 'on update' do
+      it "should not raise when owner is a new user" do
+        license = create(:license, :with_owner, account:)
+        owner   = create(:user, account:)
+
+        expect { license.update!(owner:) }.to_not raise_error
+      end
+
+      it "should raise when owner is an existing user" do
+        license = create(:license, :with_licensees, account:)
+        owner   = license.licensees.take
+
+        expect { license.update!(owner:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+      it "should not raise when owner is nil" do
+        license = create(:license, :with_owner, account:)
+
+        expect { license.update!(owner: nil) }.to_not raise_error
+      end
+    end
+  end
+
+  describe '#policy=' do
+    context 'on build' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = build(:license, policy:, account:)
+
+        expect(license.product_id).to eq policy.product_id
+      end
+    end
+
+    context 'on create' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = create(:license, policy:, account:)
+
+        expect(license.product_id).to eq policy.product_id
+      end
+    end
+
+    context 'on update' do
+      it 'should denormalize product from policy' do
+        policy  = create(:policy, account:)
+        license = create(:license, account:)
+
+        license.update!(policy:)
+
+        expect(license.product_id).to eq policy.product_id
       end
     end
   end
@@ -107,11 +163,11 @@ describe License, type: :model do
         expect(actions).to match_array %w[license.read license.validate]
       end
 
-      context 'with wildcard user permissions' do
-        let(:user) { create(:user, account:, permissions: %w[*]) }
+      context 'with wildcard owner permissions' do
+        let(:owner) { create(:user, account:, permissions: %w[*]) }
 
         it 'should set custom permissions' do
-          license = create(:license, account:, user:, permissions: %w[license.read license.validate])
+          license = create(:license, account:, owner:, permissions: %w[license.read license.validate])
           actions = license.permissions.actions
 
           expect(actions).to match_array %w[license.read license.validate]
@@ -167,7 +223,7 @@ describe License, type: :model do
   end
 
   describe '#permissions' do
-    context 'without a user' do
+    context 'without an owner' do
       it 'should return permissions' do
         license = create(:license, account:)
 
@@ -175,10 +231,10 @@ describe License, type: :model do
       end
     end
 
-    context 'with a user' do
+    context 'with an owner' do
       it 'should return permission intersection' do
-        user    = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
-        license = create(:license, account:, user:)
+        owner   = create(:user, account:, permissions: %w[license.validate license.read machine.read machine.create machine.delete])
+        license = create(:license, account:, owner:)
         actions = license.permissions.actions
 
         expect(actions).to match_array %w[license.validate license.read machine.read machine.create machine.delete]
@@ -218,12 +274,12 @@ describe License, type: :model do
       # old license recently validated with banned user (active, banned)
       create(:license, :banned, account:, created_at: 1.year.ago, last_validated_at: 1.minute.ago)
 
-      # old license with banned user (banned)
+      # old license with banned user (inactive, banned)
       create(:license, :banned, account:, created_at: 1.year.ago)
     end
 
     it 'should return active licenses' do
-      expect(License.with_status(:active).count).to eq 7
+      expect(License.with_status(:active).count).to eq 5
     end
 
     it 'should return inactive licenses' do

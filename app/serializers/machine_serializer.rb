@@ -93,16 +93,16 @@ class MachineSerializer < BaseSerializer
     end
   end
 
-  relationship :user do
+  relationship :owner do
     linkage always: true do
-      if @object.license&.user_id.present?
-        { type: :users, id: @object.license.user_id }
+      if @object.owner_id?
+        { type: :users, id: @object.owner_id }
       else
         nil
       end
     end
     link :related do
-      @url_helpers.v1_account_machine_user_path @object.account_id, @object
+      @url_helpers.v1_account_machine_owner_path @object.account_id, @object
     end
   end
 

@@ -2,16 +2,17 @@
 
 class ReleaseUpgradeLink < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :release,
     counter_cache: :upgrade_count,
     inverse_of: :upgrade_links
 
   has_environment default: -> { release&.environment_id }
+  has_account default: -> { release&.account_id }
 
   encrypts :url
 

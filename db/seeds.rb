@@ -73,6 +73,7 @@ permissions = %w[
   license.entitlements.attach
   license.entitlements.detach
   license.group.update
+  license.owner.update
   license.policy.update
   license.read
   license.reinstate
@@ -85,6 +86,8 @@ permissions = %w[
   license.usage.increment
   license.usage.reset
   license.user.update
+  license.users.attach
+  license.users.detach
   license.validate
 
   machine.check-out
@@ -93,6 +96,7 @@ permissions = %w[
   machine.group.update
   machine.heartbeat.ping
   machine.heartbeat.reset
+  machine.owner.update
   machine.proofs.generate
   machine.read
   machine.update
@@ -220,6 +224,7 @@ events = %w[
   license.expired
   license.expiring-soon
   license.group.updated
+  license.owner.updated
   license.policy.updated
   license.reinstated
   license.renewed
@@ -230,6 +235,8 @@ events = %w[
   license.usage.incremented
   license.usage.reset
   license.user.updated
+  license.users.attached
+  license.users.detached
   license.validated
   license.validation.failed
   license.validation.succeeded
@@ -243,6 +250,7 @@ events = %w[
   machine.heartbeat.pong
   machine.heartbeat.reset
   machine.heartbeat.resurrected
+  machine.owner.updated
   machine.proofs.generated
   machine.updated
 

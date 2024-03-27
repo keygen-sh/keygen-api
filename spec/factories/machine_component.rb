@@ -2,12 +2,12 @@
 
 FactoryBot.define do
   factory :machine_component, aliases: %i[component] do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     sequence :name, %w[HWID HDDID SSD CPU MOBO IP MAC].cycle
     fingerprint { SecureRandom.hex(16) }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     machine     { build(:machine, account:, environment:) }
 

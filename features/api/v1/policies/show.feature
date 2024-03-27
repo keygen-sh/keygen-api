@@ -1,6 +1,5 @@
 @api/v1
 Feature: Show policy
-
   Background:
     Given the following "accounts" exist:
       | Name    | Slug  |
@@ -179,14 +178,14 @@ Feature: Show policy
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
-    And the first "license" belongs to the last "user"
+    And the first "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "403"
     And sidekiq should have 1 "request-log" job
 
-   Scenario: User attempts to retrieve their policy (explicit permission)
+   Scenario: User attempts to retrieve their policy (license owner, explicit permission)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -196,7 +195,25 @@ Feature: Show policy
       """
       { "permissions": ["policy.read"] }
       """
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the response body should be a "policy"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policy (license user, explicit permission)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And the current account has 1 "license-user" for the last "license" and the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
@@ -215,7 +232,7 @@ Feature: Show policy
       """
       { "permissions": ["license.validate"] }
       """
-    And the last "license" belongs to the last "user"
+    And the last "license" belongs to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0"
@@ -227,7 +244,7 @@ Feature: Show policy
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And the current account has 1 "user"
-    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "license" for the last "user" as "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$1"

@@ -2,6 +2,7 @@
 
 class Product < ApplicationRecord
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -14,12 +15,13 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
-  belongs_to :account
   has_many :policies, dependent: :destroy_async
   has_many :keys, through: :policies, source: :pool
-  has_many :licenses, through: :policies
-  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :licenses, dependent: :destroy_async
+  has_many :machines, through: :licenses
+  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
+    def owners = where.not(licenses: { user_id: nil })
+  end
   has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, inverse_of: :product, dependent: :destroy_async
   has_many :release_packages, inverse_of: :product, dependent: :destroy_async
@@ -32,6 +34,7 @@ class Product < ApplicationRecord
     as: :resource
 
   has_environment
+  has_account
   has_role :product
   has_permissions Permission::PRODUCT_PERMISSIONS
 

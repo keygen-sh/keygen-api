@@ -201,7 +201,7 @@ Feature: List entitlements
     And the current account has 3 "policy-entitlement" for the last "policy"
     And the current account has 2 "licenses" for the last "policy"
     And the current account has 1 "license-entitlement" for each "license"
-    And all "licenses" belong to the last "user"
+    And all "licenses" belong to the last "user" through "owner"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"

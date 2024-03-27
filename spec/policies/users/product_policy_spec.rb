@@ -299,8 +299,8 @@ describe Users::ProductPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_bearer_trait :with_user do
-      with_scenarios %i[accessing_its_user accessing_its_products] do
+    with_bearer_trait :with_owner do
+      with_scenarios %i[accessing_its_owner accessing_its_products] do
         with_license_authentication do
           with_wildcard_permissions { denies :index }
           with_default_permissions  { denies :index }
@@ -314,7 +314,7 @@ describe Users::ProductPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_user accessing_its_product] do
+      with_scenarios %i[accessing_its_owner accessing_its_product] do
         with_license_authentication do
           with_wildcard_permissions { denies :show }
           with_default_permissions  { denies :show }
@@ -359,7 +359,45 @@ describe Users::ProductPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
+    with_bearer_trait :with_owned_licenses do
+      with_scenarios %i[accessing_itself accessing_its_products] do
+        with_token_authentication do
+          with_permissions %w[product.read] do
+            without_token_permissions { denies :index }
+
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
+      end
+
+      with_scenarios %i[accessing_itself accessing_its_product] do
+        with_token_authentication do
+          with_permissions %w[product.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions do
+            allows :show
+          end
+
+          with_default_permissions do
+            denies :show
+          end
+
+          without_permissions do
+            denies :show
+          end
+        end
+      end
+    end
+
+    with_bearer_trait :with_user_licenses do
       with_scenarios %i[accessing_itself accessing_its_products] do
         with_token_authentication do
           with_permissions %w[product.read] do

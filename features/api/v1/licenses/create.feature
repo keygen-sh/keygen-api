@@ -39,6 +39,54 @@ Feature: Create license
                 "id": "$policies[0]"
               }
             },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with a key that is not nil
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And the current account should have 1 "license"
+    And the first "license" should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license for a user of their account (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
             "user": {
               "data": {
                 "type": "users",
@@ -52,7 +100,17 @@ Feature: Create license
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And the response body should be a "license" with a key that is not nil
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
     And the current account should have 1 "license"
+    And the first "license" should have 1 "user"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -794,7 +852,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be compatible with user environment",
+        "detail": "must be compatible with owner environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -897,7 +955,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be compatible with user environment",
+        "detail": "must be compatible with owner environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -943,7 +1001,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be compatible with user environment",
+        "detail": "must be compatible with owner environment",
         "code": "ENVIRONMENT_NOT_ALLOWED",
         "source": {
           "pointer": "/data/relationships/environment"
@@ -1868,12 +1926,102 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license for an invalid user of their account
+  Scenario: Admin creates a license for an invalid owner of their account (default)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "4796e950-0dcf-4bab-9443-8b406889356e"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "OWNER_NOT_FOUND",
+        "source": {
+          "pointer": "/data/relationships/owner"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license for an invalid owner of their account (v1.6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    And I use API version "1.6"
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "4796e950-0dcf-4bab-9443-8b406889356e"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "OWNER_NOT_FOUND",
+        "source": {
+          "pointer": "/data/relationships/owner"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license for an invalid user of their account (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    And I use API version "1.5"
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       {
@@ -5561,9 +5709,7 @@ Feature: Create license
     Given the account "test2" has 2 "users"
     And the second "user" of account "test2" has the following attributes:
       """
-      {
-        "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5"
-      }
+      { "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5" }
       """
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -5584,7 +5730,7 @@ Feature: Create license
                 "id": "$policies[0]"
               }
             },
-            "user": {
+            "owner": {
               "data": {
                 "type": "users",
                 "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5"
@@ -5601,9 +5747,9 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "USER_NOT_FOUND",
+        "code": "OWNER_NOT_FOUND",
         "source": {
-          "pointer": "/data/relationships/user"
+          "pointer": "/data/relationships/owner"
         }
       }
       """

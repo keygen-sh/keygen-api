@@ -2826,6 +2826,60 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
       """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to a specific user email (v1.5)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "userId": "$users[1]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2862,6 +2916,1044 @@ Feature: License validation actions
       { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a fingerprint (invalid fingerprint)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "foo",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a fingerprint (invalid user)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "foo@example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a fingerprint (no machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a fingerprint (license owner == machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a fingerprint (license owner != machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "machine" for the last "license" and the third "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owners)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a fingerprint (no machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a fingerprint (license user == machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user, a fingerprint, and components (license user == machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 2 "components" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "components": ["$components[0].fingerprint", "$components[1].fingerprint"],
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a fingerprint (license user != machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "license-user" for the last "license" and the fourth "user"
+    And the current account has 1 "machine" for the last "license" and the fourth "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[2].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owners)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user, a fingerprint, and components (license user != machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "license-user" for the last "license" and the fourth "user"
+    And the current account has 1 "machine" for the last "license" and the fourth "user" as "owner"
+    And the current account has 2 "components" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "components": ["$components[0].fingerprint", "$components[1].fingerprint"],
+            "fingerprint": "$machines[0].fingerprint",
+            "user": "$users[2].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owners)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and fingerprints (invalid fingerprint)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["foo"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and fingerprints (invalid user)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint"],
+            "user": "foo@example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and fingerprints (no machine owners)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and fingerprints (license owner == machine owners)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and fingerprints (license owner != machine owners)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "machine" for the last "license" and the second "user" as "owner"
+    And the current account has 1 "machine" for the last "license" and the third "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owners)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and fingerprints (no machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and fingerprints (license user == machine owners)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and fingerprints (license user != machine owners)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "license-user" for the last "license" and the fourth "user"
+    And the current account has 1 "machine" for the last "license" and the third "user" as "owner"
+    And the current account has 1 "machine" for the last "license" and the fourth "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint", "$machines[1].fingerprint"],
+            "user": "$users[2].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owners)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a machine (invalid machine)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "foo",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a machine (invalid user)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "foo@example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a machine (no machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a machine (license owner == machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its owner and a machine (license owner != machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "machine" for the last "license" and the third "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owner)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a machine (no machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a machine (license user == machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 "machines" for the last "license" and the last "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: An admin validates a valid license scoped to its user and a machine (license user != machine owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license-user" for the last "license" and the third "user"
+    And the current account has 1 "license-user" for the last "license" and the fourth "user"
+    And the current account has 1 "machine" for the last "license" and the fourth "user" as "owner"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "machine": "$machines[0]",
+            "user": "$users[2].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "user scope does not match (does not match associated machine owner)", "code": "USER_SCOPE_MISMATCH" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
@@ -8438,7 +9530,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous validates a license key that requires a user scope (provided)
+  Scenario: Anonymous validates a license key that requires a user scope (match owner)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -8466,6 +9558,119 @@ Feature: License validation actions
       {
         "meta": {
           "scope": { "user": "$users[1]" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match owner email)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]",
+        "key": "user-key"
+      }
+      """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "key": "user-key" }
+      """
+    And the current account has 2 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[3]" },
+          "key": "user-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key that requires a user scope (match user email)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "requireUserScope": true }
+      """
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "key": "user-key" }
+      """
+    And the current account has 2 "machines" for the last "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[3].email" },
           "key": "user-key"
         }
       }
@@ -10524,6 +11729,56 @@ Feature: License validation actions
     And the response body should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "owner": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/owner" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
+  Scenario: A user validates a license key scoped to their own ID (v1.5)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "userId": "$users[1]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    And I use API version "1.5"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "user": "$users[1]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
       """
 
   Scenario: A user validates a license key scoped to their own email

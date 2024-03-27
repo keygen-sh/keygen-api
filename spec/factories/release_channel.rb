@@ -6,7 +6,7 @@ FactoryBot.define do
 
     sequence :key, %w[stable rc beta alpha dev].cycle
 
-    account { nil }
+    account { NIL_ACCOUNT }
 
     trait :stable do
       key { 'stable' }

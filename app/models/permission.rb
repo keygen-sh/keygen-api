@@ -80,6 +80,7 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
+    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -92,6 +93,8 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
+    license.users.attach
+    license.users.detach
     license.validate
 
     machine.check-out
@@ -100,6 +103,7 @@ class Permission < ApplicationRecord
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.owner.update
     machine.proofs.generate
     machine.read
     machine.update
@@ -233,6 +237,7 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
+    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -245,6 +250,8 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
+    license.users.attach
+    license.users.detach
     license.validate
 
     machine.check-out
@@ -253,6 +260,7 @@ class Permission < ApplicationRecord
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.owner.update
     machine.proofs.generate
     machine.read
     machine.update
@@ -452,6 +460,7 @@ class Permission < ApplicationRecord
     license.entitlements.attach
     license.entitlements.detach
     license.group.update
+    license.owner.update
     license.policy.update
     license.read
     license.reinstate
@@ -464,6 +473,8 @@ class Permission < ApplicationRecord
     license.usage.increment
     license.usage.reset
     license.user.update
+    license.users.attach
+    license.users.detach
     license.validate
 
     machine.check-out
@@ -472,6 +483,7 @@ class Permission < ApplicationRecord
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
+    machine.owner.update
     machine.proofs.generate
     machine.read
     machine.update
@@ -570,6 +582,8 @@ class Permission < ApplicationRecord
     license.revoke
     license.usage.increment
     license.validate
+    license.users.attach
+    license.users.detach
 
     machine.check-out
     machine.create

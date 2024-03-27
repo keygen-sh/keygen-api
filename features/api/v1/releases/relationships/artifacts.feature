@@ -114,7 +114,7 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "404"
 
-  Scenario: User attempts to retrieve the artifacts for a release they do have a license for
+  Scenario: User attempts to retrieve the artifacts for a release they do have a license for (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -124,7 +124,22 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "artifact"
+
+  Scenario: User attempts to retrieve the artifacts for a release they do have a license for (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "artifact" for the first "release"
+    And I am a user of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 1 "artifact"
@@ -746,7 +761,7 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retrieves a release artifact with a license for it
+  Scenario: User retrieves a release artifact with a license for it (license owner)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -756,7 +771,22 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+
+  Scenario: User retrieves a release artifact with a license for it (license user)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "artifact" for the first "release"
+    And I am a user of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -799,7 +829,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=120"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -818,7 +848,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
@@ -840,7 +870,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -859,7 +889,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
@@ -877,7 +907,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
+    And the current user has 2 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -899,7 +929,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
+    And the current user has 3 "licenses" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -928,7 +958,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -971,7 +1001,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -1007,7 +1037,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
@@ -1022,7 +1052,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
@@ -1093,7 +1123,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
@@ -1111,7 +1141,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -1226,7 +1256,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -1244,7 +1274,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
@@ -1347,7 +1377,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
@@ -1365,7 +1395,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
+    And the current user has 1 "license" as "owner"
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 

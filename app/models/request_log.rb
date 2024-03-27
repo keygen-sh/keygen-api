@@ -3,18 +3,19 @@
 class RequestLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[request_logs]]
   include Environmental
+  include Accountable
   include DateRangeable
   include Limitable
   include Orderable
   include Pageable
 
-  belongs_to :account
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true
   has_one :event_log,
     inverse_of: :request_log
 
   has_environment
+  has_account
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.

@@ -6,7 +6,9 @@ class Policy < ApplicationRecord
   class UnsupportedPoolError < StandardError; end
   class EmptyPoolError < StandardError; end
 
+  include Denormalizable
   include Environmental
+  include Accountable
   include Limitable
   include Orderable
   include Pageable
@@ -129,7 +131,6 @@ class Policy < ApplicationRecord
   # Virtual attribute that we'll use to change defaults
   attr_accessor :api_version
 
-  belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy_async
   has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
@@ -141,6 +142,10 @@ class Policy < ApplicationRecord
     as: :resource
 
   has_environment default: -> { product&.environment_id }
+  has_account default: -> { product&.account_id }
+
+  denormalizes :product_id,
+    to: :licenses
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }

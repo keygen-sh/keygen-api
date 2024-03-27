@@ -2,14 +2,28 @@
 
 FactoryBot.define do
   factory :machine do
-    initialize_with { new(**attributes.reject { NIL_ENVIRONMENT == _2 }) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name        { Faker::Company.buzzword }
 
-    account     { nil }
+    account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
     license     { build(:license, account:, environment:) }
+    owner       { nil }
+
+    trait :with_owner do
+      owner   { build(:user, account:, environment:) }
+      license { build(:license, account:, environment:, owner:) }
+    end
+
+    trait :without_owner do
+      owner { nil }
+    end
+
+    trait :owned do
+      with_owner
+    end
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

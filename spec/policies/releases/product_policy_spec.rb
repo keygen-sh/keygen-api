@@ -214,7 +214,23 @@ describe Releases::ProductPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
+    with_bearer_trait :with_owned_licenses do
+      with_scenarios %i[accessing_its_release accessing_its_product] do
+        with_token_authentication do
+          with_permissions %w[product.read] do
+            without_token_permissions { denies :show }
+
+            allows :show
+          end
+
+          with_wildcard_permissions { allows :show }
+          with_default_permissions  { denies :show }
+          without_permissions       { denies :show }
+        end
+      end
+    end
+
+    with_bearer_trait :with_user_licenses do
       with_scenarios %i[accessing_its_release accessing_its_product] do
         with_token_authentication do
           with_permissions %w[product.read] do

@@ -353,7 +353,7 @@ describe Licenses::UsagePolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_trait :with_licenses do
+    with_bearer_trait :with_owned_licenses do
       with_scenarios %i[accessing_its_license] do
         with_token_authentication do
           with_permissions %w[license.usage.increment] do
@@ -378,6 +378,30 @@ describe Licenses::UsagePolicy, type: :policy do
 
             denies :decrement, :reset
             allows :increment
+          end
+
+          without_permissions do
+            denies :increment, :decrement, :reset
+          end
+        end
+      end
+    end
+
+    with_bearer_trait :with_user_licenses do
+      with_scenarios %i[accessing_its_license] do
+        with_token_authentication do
+          with_permissions %w[license.usage.increment] do
+            without_token_permissions { denies :increment }
+
+            denies :increment
+          end
+
+          with_wildcard_permissions do
+            denies :increment, :decrement, :reset
+          end
+
+          with_default_permissions do
+            denies :increment, :decrement, :reset
           end
 
           without_permissions do

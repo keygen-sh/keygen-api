@@ -10,7 +10,8 @@ class LicenseCheckoutService < AbstractCheckoutService
     product
     policy
     group
-    user
+    owner
+    users
   ].freeze
 
   def initialize(license:, environment: nil, include: [], **kwargs)

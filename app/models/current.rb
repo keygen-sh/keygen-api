@@ -5,7 +5,8 @@ class Current < ActiveSupport::CurrentAttributes
             :token,
             :resource
 
-  attribute :request_id,
+  attribute :api_version,
+            :request_id,
             :host,
             :ip
 

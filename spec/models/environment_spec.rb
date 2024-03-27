@@ -6,12 +6,14 @@ require 'spec_helper'
 describe Environment, type: :model do
   let(:account) { create(:account) }
 
+  it_behaves_like :accountable
+
   %i[isolated shared].each do |isolation|
     it "should promote nested #{isolation} users to admins on create" do
       users_attributes = [
-        attributes_for(:user),
-        attributes_for(:user),
-        attributes_for(:user),
+        attributes_for(:user, account:),
+        attributes_for(:user, account:),
+        attributes_for(:user, account:),
       ]
 
       # We also want to make sure existing users in the nil environment are not promoted

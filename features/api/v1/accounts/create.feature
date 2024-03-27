@@ -115,6 +115,82 @@ Feature: Create account
     And the account "google" should not have a referral
     And the account "google" should have 2 "admins"
 
+  Scenario: Anonymous creates an account (default API version)
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Version 1.6",
+            "slug": "v1x6"
+          },
+          "relationships": {
+            "plan": {
+              "data": { "type": "plans", "id": "$plan[0]" }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": { "firstName": "John", "lastName": "Doe", "email": "john.doe@keygen.example", "password": "secret" }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.6" }
+      """
+    And the response body should be an "account" with the following attributes:
+      """
+      { "apiVersion": "1.6" }
+      """
+
+  Scenario: Anonymous creates an account (specific API version)
+    Given I send the following headers:
+      """
+      { "Keygen-Version": "1.5" }
+      """
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Version 1.5",
+            "slug": "v1x5"
+          },
+          "relationships": {
+            "plan": {
+              "data": { "type": "plans", "id": "$plan[0]" }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": { "firstName": "John", "lastName": "Doe", "email": "john.doe@keygen.example", "password": "secret" }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.5" }
+      """
+    And the response body should be an "account" with the following attributes:
+      """
+      { "apiVersion": "1.5" }
+      """
+
   Scenario: Anonymous creates an account with a referral ID
     When I send a POST request to "/accounts" with the following:
       """

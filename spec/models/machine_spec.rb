@@ -7,6 +7,7 @@ describe Machine, type: :model do
   let(:account) { create(:account) }
 
   it_behaves_like :environmental
+  it_behaves_like :accountable
 
   describe '#environment=' do
     context 'on create' do
@@ -50,10 +51,76 @@ describe Machine, type: :model do
     end
   end
 
+  describe '#owner=' do
+    context 'on create' do
+      it "should not raise when owner matches the license's owner" do
+        license = create(:license, :with_owner, account:)
+        owner   = license.owner
+        machine = build(:machine, account:, license:, owner:)
+
+        expect { machine.save! }.to_not raise_error
+      end
+
+      it "should not raise when owner matches one of the license's licensees" do
+        license = create(:license, :with_licensees, account:)
+        owner   = license.licensees.take
+        machine = build(:machine, account:, license:, owner:)
+
+        expect { machine.save! }.to_not raise_error
+      end
+
+      it "should not raise when owner is nil" do
+        machine = build(:machine, account:, owner: nil)
+
+        expect { machine.save! }.to_not raise_error
+      end
+
+      it "should raise when owner does not match one of the license's users" do
+        license = create(:license, :with_users, account:)
+        owner   = create(:user, account:)
+        machine = build(:machine, account:, license:, owner:)
+
+        expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'on update' do
+      it "should not raise when owner matches the license's owner" do
+        license = create(:license, :with_owner, account:)
+        owner   = license.owner
+        machine = create(:machine, account:, license:)
+
+        expect { machine.update!(owner:) }.to_not raise_error
+      end
+
+      it "should not raise when owner matches one of the license's licensees" do
+        license = create(:license, :with_licensees, account:)
+        owner   = license.licensees.take
+        machine = create(:machine, account:, license:)
+
+        expect { machine.update!(owner:) }.to_not raise_error
+      end
+
+      it "should not raise when owner is nil" do
+        machine = create(:machine, :with_owner, account:)
+
+        expect { machine.update!(owner: nil) }.to_not raise_error
+      end
+
+      it "should raise when owner does not match one of the license's users" do
+        license = create(:license, :with_users, account:)
+        owner   = create(:user, account:)
+        machine = create(:machine, account:, license:)
+
+        expect { machine.update!(owner:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+  end
+
   describe '#components_attributes=' do
     it 'should not raise when component is valid' do
       machine = build(:machine, account:, components_attributes: [
-        attributes_for(:component),
+        attributes_for(:component, account:, environment: nil),
       ])
 
       expect { machine.save! }.to_not raise_error
@@ -62,8 +129,8 @@ describe Machine, type: :model do
     it 'should raise when component is duplicated' do
       fingerprint = SecureRandom.hex
       machine     = build(:machine, account:, components_attributes: [
-        attributes_for(:component, fingerprint:),
-        attributes_for(:component, fingerprint:),
+        attributes_for(:component, fingerprint:, account:, environment: nil),
+        attributes_for(:component, fingerprint:, account:, environment: nil),
       ])
 
       expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid
@@ -71,8 +138,8 @@ describe Machine, type: :model do
 
     it 'should raise when component is invalid' do
       machine = build(:machine, account:, components_attributes: [
-        attributes_for(:component, fingerprint: nil),
-        attributes_for(:component),
+        attributes_for(:component, fingerprint: nil, account:, environment: nil),
+        attributes_for(:component, account:, environment: nil),
       ])
 
       expect { machine.save! }.to raise_error ActiveRecord::RecordInvalid
