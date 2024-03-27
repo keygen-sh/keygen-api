@@ -398,6 +398,8 @@ describe UnionOf do
         )
       WHERE
         "licenses"."id" = '#{license.id}'
+      ORDER BY
+        "users"."created_at" ASC
     SQL
   end
 
