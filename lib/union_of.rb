@@ -228,7 +228,7 @@ module UnionOf
           through_table      = through_reflection.klass.arel_table
 
           scope.left_outer_joins!(
-            union_reflection.through_reflection.name,
+            through_reflection.name,
           )
 
           constraints << foreign_table[through_reflection.join_foreign_key].eq(through_table[through_reflection.join_primary_key])
@@ -247,6 +247,11 @@ module UnionOf
       )
 
       scope
+    end
+
+    # NOTE(ezekg) This overloads our scope's joins to not use an Arel::Nodes::LeadingJoin node.
+    def join(table, constraint)
+      Arel::Nodes::InnerJoin.new(table, Arel::Nodes::On.new(constraint))
     end
   end
 
