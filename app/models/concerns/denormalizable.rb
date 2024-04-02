@@ -41,14 +41,15 @@ module Denormalizable
                                     attribute_name.to_s
                                   end
 
-        unless reflection.collection?
-          after_initialize  -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{reflection.foreign_key}_changed?"
-          before_validation -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{reflection.foreign_key}_changed?", on: :create
-          before_create     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: :"#{reflection.foreign_key}_changed?"
-          before_update     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: :"#{reflection.foreign_key}_changed?"
-        else
+        if reflection.collection?
           raise ArgumentError, "must be a singular association: #{association_name.inspect}"
         end
+
+        after_initialize  -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
+        before_validation -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :create
+        before_validation -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :update
+        before_create     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
+        before_update     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
       else
         raise ArgumentError, "invalid :from association: #{from.inspect}"
       end
@@ -71,11 +72,13 @@ module Denormalizable
         if reflection.collection?
           after_initialize  -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?"
           before_validation -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
+          before_validation -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?", on: :update
           before_create     -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?"
           before_update     -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?"
         else
           after_initialize  -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?"
           before_validation -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
+          before_validation -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?", on: :update
           before_create     -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?"
           before_update     -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_changed?"
         end
@@ -119,13 +122,21 @@ module Denormalizable
     def write_denormalized_attribute_from_unpersisted_record(source_association_name, source_attribute_name, target_attribute_name)
       record = send(source_association_name)
 
-      write_attribute(target_attribute_name, record&.send(source_attribute_name))
+      # If we're denormalizing a foreign key, we need to look up the association and denormalize
+      # the actual record, since it likely doesn't have an ID assigned yet.
+      if record&.read_attribute(source_attribute_name).nil? && (source_reflection = record.class.reflect_on_all_associations.find { _1.foreign_key == source_attribute_name.to_s })
+        target_reflection = self.class.reflect_on_all_associations.find { _1.foreign_key == target_attribute_name.to_s }
+
+        send(:"#{target_reflection.name}=", record.send(source_reflection.name))
+      else
+        write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
+      end
     end
 
     def write_denormalized_attribute_from_persisted_record(source_association_name, source_attribute_name, target_attribute_name)
       record = send(source_association_name)
 
-      write_attribute(target_attribute_name, record&.send(source_attribute_name))
+      write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
     end
   end
 end
