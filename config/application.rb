@@ -77,7 +77,7 @@ module Keygen
     )
 
     # Update async destroy batch size
-    config.active_record.destroy_association_async_batch_size = 100
+    config.active_record.destroy_association_async_batch_size = 1_000
 
     # FIXME(ezekg) Use 7.0 cache format until we can roll over to 7.1.
     config.active_support.cache_format_version 7.0
