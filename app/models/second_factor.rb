@@ -26,8 +26,14 @@ class SecondFactor < ApplicationRecord
   scope :enabled,  -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
 
-  scope :for_product, -> id { joins(user: :licenses).where(licenses: { product_id: id }) }
-  scope :for_user,    -> id { joins(:user).where(user: { id: }) }
+  # FIXME(ezekg) Remove this once we can assert product_id is fully denormalized.
+  if License.exists?(product_id: nil)
+    scope :for_product, -> id { joins(user: :products).where(products: { id: }) }
+  else
+    scope :for_product, -> id { joins(user: :licenses).where(licenses: { product_id: id }) }
+  end
+
+  scope :for_user, -> id { joins(:user).where(user: { id: }) }
 
   def uri
     return nil if enabled?
