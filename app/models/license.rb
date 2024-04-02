@@ -556,7 +556,14 @@ class License < ApplicationRecord
                    )
     end
   }
-  scope :for_product, -> id { joins(:product).where product: { id: } }
+
+  # FIXME(ezekg) Remove this once we can assert product_id is fully denormalized.
+  if exists?(product_id: nil)
+    scope :for_product, -> id { joins(:product).where(product: { id: }) }
+  else
+    scope :for_product, -> id { where(product_id: id) }
+  end
+
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
   scope :for_group, -> id { where(group: id) }
