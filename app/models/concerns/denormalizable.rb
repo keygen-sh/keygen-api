@@ -95,6 +95,7 @@ module Denormalizable
       end
     end
 
+    # TODO(ezekg) This should queue up a background job.
     def write_denormalized_attribute_to_persisted_relation(target_association_name, target_attribute_name, source_attribute_name)
       relation = send(target_association_name)
 
