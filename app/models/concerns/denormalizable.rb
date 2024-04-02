@@ -3,6 +3,8 @@
 module Denormalizable
   extend ActiveSupport::Concern
 
+  DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
+
   class_methods do
     cattr_accessor :denormalized_attributes, default: Set.new
 
@@ -95,23 +97,35 @@ module Denormalizable
       end
     end
 
-    # TODO(ezekg) This should queue up a background job.
     def write_denormalized_attribute_to_persisted_relation(target_association_name, target_attribute_name, source_attribute_name)
       relation = send(target_association_name)
 
-      relation.update_all(target_attribute_name => read_attribute(source_attribute_name))
+      relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
+        DenormalizeAssociationAsyncJob.perform_later(
+          source_class_name: self.class.name,
+          source_id: id,
+          source_attribute_name:,
+          target_class_name: relation.klass.name,
+          target_ids: ids,
+          target_attribute_name:,
+        )
+      end
     end
 
     def write_denormalized_attribute_to_unpersisted_record(target_association_name, target_attribute_name, source_attribute_name)
       record = send(target_association_name)
 
-      record.write_attribute(target_attribute_name, read_attribute(source_attribute_name))
+      unless record.nil?
+        record.write_attribute(target_attribute_name, read_attribute(source_attribute_name))
+      end
     end
 
     def write_denormalized_attribute_to_persisted_record(target_association_name, target_attribute_name, source_attribute_name)
       record = send(target_association_name)
 
-      record.update(target_attribute_name => read_attribute(source_attribute_name))
+      unless record.nil?
+        record.update(target_attribute_name => read_attribute(source_attribute_name))
+      end
     end
 
     def write_denormalized_attribute_from_unpersisted_record(source_association_name, source_attribute_name, target_attribute_name)
@@ -132,6 +146,35 @@ module Denormalizable
       record = send(source_association_name)
 
       write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
+    end
+  end
+
+  private
+
+  class DenormalizeAssociationAsyncJob < ActiveJob::Base
+    queue_as { ActiveRecord.queues[:denormalize] }
+
+    discard_on ActiveJob::DeserializationError
+
+    def perform(
+      source_class_name:,
+      source_id:,
+      source_attribute_name:,
+      target_class_name:,
+      target_ids:,
+      target_attribute_name:
+    )
+      source_class = source_class_name.constantize
+      source       = source_class.find_by(source_class.primary_key.to_sym => source_id)
+
+      unless source.nil?
+        target_class = target_class_name.constantize
+        target       = target_class.where(target_class.primary_key.to_sym => target_ids)
+
+        target.update_all(
+          target_attribute_name => source.read_attribute(source_attribute_name),
+        )
+      end
     end
   end
 end

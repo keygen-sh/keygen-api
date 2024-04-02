@@ -78,9 +78,11 @@ describe Policy, type: :model do
         product = create(:product, account:)
         policy  = create(:policy, account:, licenses: build_list(:license, 10, account:))
 
-        policy.update!(product:)
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAssociationAsyncJob do
+          policy.update!(product:)
+        end
 
-        policy.licenses.each do |license|
+        policy.reload.licenses.each do |license|
           expect(license.product_id).to eq policy.product_id
         end
       end
