@@ -14,8 +14,8 @@ RSpec::Matchers.define :match_sql do |expected|
   diffable
 
   match do |actual|
-    @expected = formatter.format(+expected.to_s)
-    @actual   = formatter.format(+actual.to_s)
+    @expected = formatter.format(+expected.to_s.strip)
+    @actual   = formatter.format(+actual.to_s.strip)
 
     @actual == @expected
   end
