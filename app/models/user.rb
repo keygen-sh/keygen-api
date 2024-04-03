@@ -290,13 +290,7 @@ class User < ApplicationRecord
     end
   }
 
-  # FIXME(ezekg) Remove this once we can assert product_id is fully denormalized.
-  if License.exists?(product_id: nil)
-    scope :for_product, -> id { joins(:products).where(products: { id: }).distinct }
-  else
-    scope :for_product, -> id { joins(:licenses).where(licenses: { product_id: id }).distinct }
-  end
-
+  scope :for_product, -> id { joins(:licenses).where(licenses: { product_id: id }).distinct }
   scope :for_license, -> id { joins(:licenses).where(licenses: { id: id }).distinct }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> id {
