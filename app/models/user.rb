@@ -340,6 +340,7 @@ class User < ApplicationRecord
       # exclude users older than :t with active licenses
       .where.not(
         id: joins(:licenses)
+              .reorder(nil)
               .where('users.created_at < ?', t)
               .where(banned_at: nil)
               .where(<<~SQL.squish, t:)
