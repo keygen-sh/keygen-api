@@ -186,18 +186,15 @@ module UnionOf
         # FIXME(ezekg) Selecting IDs in a separate query is faster than a subquery
         #              selecting IDs, or an EXISTS subquery, or even a
         #              materialized CTE. Not sure why...
-        #
-        #              How can we make this lazy? Using the #find_by_sql method
-        #              immediately executes the query.
         ids = foreign_klass.find_by_sql(
-                              foreign_table.project(foreign_table[primary_key])
-                                           .from(
-                                             Arel::Nodes::TableAlias.new(unions, foreign_table.name),
-                                           ),
-                            )
-                            .pluck(
-                              primary_key,
-                            )
+                             foreign_table.project(foreign_table[primary_key])
+                                          .from(
+                                            Arel::Nodes::TableAlias.new(unions, foreign_table.name),
+                                          ),
+                           )
+                           .pluck(
+                             primary_key,
+                           )
 
         scope.where!(
           foreign_table[primary_key].in(ids),
@@ -465,13 +462,13 @@ module UnionOf
 
   module JoinAssociationExtension
     # Overloads Rails internals to prepend our left outer joins onto the join chain since Rails
-    # unfortunately does not do this for us (it can do inner joins but not outer joins).
+    # unfortunately does not do this for us (it can do inner joins via the LeadingJoin arel
+    # node, but it can't do outer joins because there is no LeadingOuterJoin node).
     def join_constraints(foreign_table, foreign_klass, join_type, alias_tracker)
       chain = reflection.chain.reverse
       joins = super
 
-      # FIXME(ezekg) This is inefficient (we're recreating reflection scopes), and it also
-      #              doesn't work well with the alias tracker, i.e. duplicate joins fail.
+      # FIXME(ezekg) This is inefficient (we're recreating reflection scopes).
       chain.zip(joins).each do |reflection, join|
         klass = reflection.klass
         table = join.left
