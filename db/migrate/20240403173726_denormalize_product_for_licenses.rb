@@ -9,14 +9,14 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
 
     until update_count == 0
       batch_count  += 1
-      update_count  = execute(<<~SQL, batch_count:, batch_size: BATCH_SIZE)
+      update_count  = exec_update(<<~SQL.squish, batch_count:, batch_size: BATCH_SIZE)
         WITH batch AS (
           SELECT
             licenses.id AS license_id,
             policies.product_id
           FROM
-            licenses INNER JOIN
-            policies ON policies.id = licenses.policy_id
+            licenses
+            INNER JOIN policies ON policies.id = licenses.policy_id
           WHERE
             licenses.product_id IS NULL
           LIMIT
@@ -41,7 +41,7 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
 
     until update_count == 0
       batch_count  += 1
-      update_count  = execute(<<~SQL, batch_count:, batch_size: BATCH_SIZE)
+      update_count  = exec_update(<<~SQL.squish, batch_count:, batch_size: BATCH_SIZE)
         UPDATE
           licenses
         SET
@@ -64,7 +64,7 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
 
   private
 
-  def execute(sql, **binds)
+  def exec_update(sql, **binds)
     ActiveRecord::Base.connection.exec_update(
       ActiveRecord::Base.sanitize_sql([sql, **binds]),
     )
