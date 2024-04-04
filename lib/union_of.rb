@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 module UnionOf
-  UNION_PRIMARY_KEY = 'id'.freeze
-  UNION_FOREIGN_KEY = 'union_id'.freeze
-
   class Error < ActiveRecord::ActiveRecordError; end
 
   class ReadonlyAssociationError < Error
