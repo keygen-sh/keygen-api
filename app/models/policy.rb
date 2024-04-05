@@ -345,8 +345,13 @@ class Policy < ApplicationRecord
   }
 
   scope :for_user, -> id {
-    joins(:users).where(users: { id: })
-                 .distinct
+    policies = User.distinct
+                   .reselect(arel_table[Arel.star])
+                   .joins(licenses: :policy)
+                   .where(id:)
+                   .reorder(nil)
+
+    from(policies, table_name)
   }
 
   def pool?

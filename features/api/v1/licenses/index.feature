@@ -2152,7 +2152,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
     Then the response status should be "200"
-    And the response body should be an array with 0 "licenses"
+    And the response body should be an array with 1 "license"
 
   @ee
   Scenario: Environment retrieves all isolated licenses

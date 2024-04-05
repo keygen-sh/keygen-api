@@ -51,11 +51,11 @@ class ReleasePackage < ApplicationRecord
     joins(:product).where(product: { id: })
   }
 
-  scope :for_user, -> id {
-    joins(product: %i[users])
+  scope :for_user, -> user {
+    joins(product: %i[licenses])
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: },
+        licenses: { id: License.for_user(user) },
       )
       .union(
         self.open,

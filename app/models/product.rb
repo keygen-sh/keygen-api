@@ -113,12 +113,13 @@ class Product < ApplicationRecord
   }
 
   scope :for_user, -> id {
-    joins(:users).where(users: { id: })
-                 .licensed
-                 .distinct
-                 .union(
-                   self.open,
-                 )
+    products = User.distinct
+                   .reselect(arel_table[Arel.star])
+                   .joins(licenses: :product)
+                   .where(id:)
+                   .reorder(nil)
+
+    from(products, table_name).union(open)
   }
 
   scope :open,     -> { where(distribution_strategy: 'OPEN') }

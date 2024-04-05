@@ -73,7 +73,24 @@ class MachineComponent < ApplicationRecord
   scope :for_product, -> id { joins(:product).where(product: { id: }) }
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
-  scope :for_user,    -> id { joins(:users).where(users: { id: }) }
+  scope :for_user,    -> user {
+    components = User.reselect(arel_table[Arel.star])
+                     .joins(:components)
+                     .reorder(nil)
+
+    case user
+    when User, UUID_RE
+      from(components.where(id: user), table_name)
+    else
+      from(
+        components.where(id: user)
+                  .or(
+                    components.where(email: user),
+                  ),
+        table_name,
+      )
+    end
+  }
   scope :for_owner,   -> id { joins(:owner).where(owner: { id: }) }
 
   scope :with_fingerprint, -> fingerprint { where(fingerprint:) }
