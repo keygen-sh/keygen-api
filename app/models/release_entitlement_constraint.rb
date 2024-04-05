@@ -61,11 +61,11 @@ class ReleaseEntitlementConstraint < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    joins(product: %i[users])
+    joins(product: %i[licenses])
       .reorder(created_at: DEFAULT_SORT_ORDER)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
+        licenses: { id: License.for_user(user) },
       )
       .distinct
       .union(

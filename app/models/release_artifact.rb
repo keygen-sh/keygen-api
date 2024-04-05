@@ -170,10 +170,10 @@ class ReleaseArtifact < ApplicationRecord
     # intersecting their entitlements, or no constraints at all.
     entl = within_constraints(user.entitlement_codes, strict: true)
 
-    entl.joins(product: %i[users])
+    entl.joins(product: %i[licenses])
         .where(
           product: { distribution_strategy: ['LICENSED', nil] },
-          users: { id: user },
+          licenses: { id: License.for_user(user) },
         )
         .union(
           self.open

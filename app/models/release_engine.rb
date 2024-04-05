@@ -44,11 +44,11 @@ class ReleaseEngine < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    joins(products: %i[users])
+    joins(products: %i[licenses])
       .reorder(created_at: DEFAULT_SORT_ORDER)
       .where(
         products: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
+        licenses: { id: License.for_user(user) },
       )
       .distinct
       .union(

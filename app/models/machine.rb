@@ -420,14 +420,21 @@ class Machine < ApplicationRecord
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> user {
+    machines = User.reselect(arel_table[Arel.star])
+                   .joins(:machines)
+                   .reorder(nil)
+
     case user
     when User, UUID_RE
-      joins(:users).where(users: { id: user })
+      from(machines.where(id: user), table_name)
     else
-      joins(:users).where(users: { id: user })
-                   .or(
-                     joins(:users).where(users: { email: user }),
-                   )
+      from(
+        machines.where(id: user)
+                .or(
+                  machines.where(email: user),
+                ),
+        table_name,
+      )
     end
   }
   scope :for_owner, -> owner {
