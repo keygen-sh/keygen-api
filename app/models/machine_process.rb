@@ -95,7 +95,24 @@ class MachineProcess < ApplicationRecord
   scope :for_product, -> id { joins(:product).where(product: { id: }) }
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
-  scope :for_user,    -> id { joins(:users).where(users: { id: }) }
+  scope :for_user,    -> user {
+    processes = User.reselect(arel_table[Arel.star])
+                    .joins(:processes)
+                    .reorder(nil)
+
+    case user
+    when User, UUID_RE
+      from(processes.where(id: user), table_name)
+    else
+      from(
+        processes.where(id: user)
+                 .or(
+                   processes.where(email: user),
+                 ),
+        table_name,
+      )
+    end
+  }
   scope :for_owner,   -> id { joins(:owner).where(owner: { id: }) }
 
   scope :alive, -> {

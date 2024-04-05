@@ -535,14 +535,21 @@ class License < ApplicationRecord
   }
   scope :for_policy, -> policy { where(policy:) }
   scope :for_user, -> user {
+    licenses = User.reselect(arel_table[Arel.star])
+                   .joins(:licenses)
+                   .reorder(nil)
+
     case user
     when User, UUID_RE
-      joins(:users).where(users: { id: user })
+      from(licenses.where(id: user), table_name)
     else
-      joins(:users).where(users: { id: user })
-                   .or(
-                     joins(:users).where(users: { email: user }),
-                   )
+      from(
+        licenses.where(id: user)
+                .or(
+                  licenses.where(email: user),
+                ),
+        table_name,
+      )
     end
   }
   scope :for_owner, -> owner {
