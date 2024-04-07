@@ -38,7 +38,7 @@ COPY . /app
 
 RUN apk add --no-cache \
   bash \
-  postgresql-dev \
+  postgresql-client \
   tzdata \
   libc6-compat
 
