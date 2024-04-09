@@ -80,12 +80,12 @@ class MachineComponent < ApplicationRecord
 
     case user
     when User, UUID_RE
-      from(components.where(id: user), table_name)
+      from(components.where(users: { id: user }), table_name)
     else
       from(
-        components.where(id: user)
+        components.where(users: { id: user })
                   .or(
-                    components.where(email: user),
+                    components.where(users: { email: user }),
                   ),
         table_name,
       )

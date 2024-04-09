@@ -102,12 +102,12 @@ class MachineProcess < ApplicationRecord
 
     case user
     when User, UUID_RE
-      from(processes.where(id: user), table_name)
+      from(processes.where(users: { id: user }), table_name)
     else
       from(
-        processes.where(id: user)
+        processes.where(users: { id: user })
                  .or(
-                   processes.where(email: user),
+                   processes.where(users: { email: user }),
                  ),
         table_name,
       )

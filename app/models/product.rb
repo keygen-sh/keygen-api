@@ -116,7 +116,7 @@ class Product < ApplicationRecord
     products = User.distinct
                    .reselect(arel_table[Arel.star])
                    .joins(licenses: :product)
-                   .where(id:)
+                   .where(users: { id: })
                    .reorder(nil)
 
     from(products, table_name).union(open)

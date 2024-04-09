@@ -541,12 +541,12 @@ class License < ApplicationRecord
 
     case user
     when User, UUID_RE
-      from(licenses.where(id: user), table_name)
+      from(licenses.where(users: { id: user }), table_name)
     else
       from(
-        licenses.where(id: user)
+        licenses.where(users: { id: user })
                 .or(
-                  licenses.where(email: user),
+                  licenses.where(users: { email: user }),
                 ),
         table_name,
       )
