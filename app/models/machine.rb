@@ -426,12 +426,12 @@ class Machine < ApplicationRecord
 
     case user
     when User, UUID_RE
-      from(machines.where(id: user), table_name)
+      from(machines.where(users: { id: user }), table_name)
     else
       from(
-        machines.where(id: user)
+        machines.where(users: { id: user })
                 .or(
-                  machines.where(email: user),
+                  machines.where(users: { email: user }),
                 ),
         table_name,
       )
