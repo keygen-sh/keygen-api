@@ -348,7 +348,7 @@ class Policy < ApplicationRecord
     policies = User.distinct
                    .reselect(arel_table[Arel.star])
                    .joins(licenses: :policy)
-                   .where(id:)
+                   .where(users: { id: })
                    .reorder(nil)
 
     from(policies, table_name)

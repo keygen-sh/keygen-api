@@ -297,7 +297,7 @@ class User < ApplicationRecord
     users = License.distinct
                    .reselect(arel_table[Arel.star])
                    .joins(:users)
-                   .where(id:)
+                   .where(licenses: { id: })
                    .reorder(nil)
 
     from(users, table_name)
