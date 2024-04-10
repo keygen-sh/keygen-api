@@ -74,7 +74,8 @@ class MachineComponent < ApplicationRecord
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
   scope :for_user,    -> user {
-    components = User.reselect(arel_table[Arel.star])
+    components = User.distinct
+                     .reselect(arel_table[Arel.star])
                      .joins(:components)
                      .reorder(nil)
 
