@@ -284,6 +284,7 @@ class Release < ApplicationRecord
           licenses: { id: License.for_user(user) },
         },
       )
+      .distinct
       .union(
         self.open
       )

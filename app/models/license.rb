@@ -535,7 +535,8 @@ class License < ApplicationRecord
   }
   scope :for_policy, -> policy { where(policy:) }
   scope :for_user, -> user {
-    licenses = User.reselect(arel_table[Arel.star])
+    licenses = User.distinct
+                   .reselect(arel_table[Arel.star])
                    .joins(:licenses)
                    .reorder(nil)
 
