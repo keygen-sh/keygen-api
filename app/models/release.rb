@@ -278,6 +278,7 @@ class Release < ApplicationRecord
     entl = within_constraints(user.entitlement_codes, strict: true)
 
     entl.joins(product: %i[licenses])
+      .reorder(created_at: DEFAULT_SORT_ORDER)
       .where(
         product: {
           distribution_strategy: ['LICENSED', nil],
@@ -307,6 +308,7 @@ class Release < ApplicationRecord
 
     # Should we be applying a LIMIT to these UNION'd queries?
     entl.joins(product: %i[licenses])
+        .reorder(created_at: DEFAULT_SORT_ORDER)
         .where(
           product: { distribution_strategy: ['LICENSED', nil] },
           licenses: { id: license },
@@ -488,9 +490,7 @@ class Release < ApplicationRecord
           end
 
     # Union with releases without constraints as well.
-    scp.union(
-         without_constraints,
-       )
+    scp.union(without_constraints)
        .reorder(
          created_at: DEFAULT_SORT_ORDER,
        )
