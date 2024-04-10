@@ -110,6 +110,9 @@ class Product < ApplicationRecord
                     .union(
                       self.open,
                     )
+                    .reorder(
+                      created_at: DEFAULT_SORT_ORDER,
+                    )
   }
 
   scope :for_user, -> id {
@@ -118,8 +121,13 @@ class Product < ApplicationRecord
                    .joins(licenses: :product)
                    .where(users: { id: })
                    .reorder(nil)
+                   .distinct
 
-    from(products, table_name).union(open)
+    from(products, table_name)
+      .union(open)
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
+      )
   }
 
   scope :open,     -> { where(distribution_strategy: 'OPEN') }

@@ -31,6 +31,9 @@ class Group < ApplicationRecord
       .union(
         joins(:owners).where(owners: { user_id: u })
       )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
+      )
       .distinct
   }
 

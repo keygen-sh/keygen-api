@@ -319,6 +319,9 @@ class User < ApplicationRecord
         where(id: user), # itself
       )
       .distinct
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
+      )
   }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
@@ -338,6 +341,9 @@ class User < ApplicationRecord
               (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
               (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
           SQL
+      )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
       )
   }
   scope :inactive, -> (t = 90.days.ago) {
@@ -369,6 +375,9 @@ class User < ApplicationRecord
                   (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
                   (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
               SQL
+      )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
       )
   }
   scope :assigned, -> (status = true) {
