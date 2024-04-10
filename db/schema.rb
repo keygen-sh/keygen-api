@@ -202,8 +202,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_license_users_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "license_id", "user_id"], name: "index_license_users_on_account_id_and_license_id_and_user_id", unique: true
     t.index ["environment_id"], name: "index_license_users_on_environment_id"
-    t.index ["license_id", "user_id", "account_id"], name: "index_license_users_on_license_id_and_user_id_and_account_id", unique: true
+    t.index ["license_id"], name: "index_license_users_on_license_id"
     t.index ["user_id"], name: "index_license_users_on_user_id"
   end
 
@@ -243,6 +244,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
+    t.index ["account_id", "product_id", "user_id"], name: "index_licenses_on_account_id_and_product_id_and_user_id"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_licenses_on_environment_id"
     t.index ["group_id"], name: "index_licenses_on_group_id"
