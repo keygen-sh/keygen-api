@@ -1,6 +1,6 @@
 class CreateLicenseUsers < ActiveRecord::Migration[7.0]
   def change
-    create_table :license_users, id: :uuid, default: -> { 'uuid_generate_v4()' } do |t|
+    create_table :license_users, id: :uuid, default: -> { 'uuid_generate_v4()' }, if_not_exists: true do |t|
       t.uuid :account_id,     null: false
       t.uuid :environment_id, null: true
       t.uuid :license_id,     null: false
