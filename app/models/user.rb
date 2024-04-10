@@ -291,7 +291,17 @@ class User < ApplicationRecord
   }
 
   scope :for_product, -> id {
-    joins(:licenses).where(licenses: { product_id: id })
+    owned_licenses = License.select(1)
+                            .where('licenses.user_id = users.id')
+                            .where(product_id: id)
+    user_licenses  = LicenseUser.select(1)
+                                .joins(:license)
+                                .where('license_users.user_id = users.id')
+                                .where(license: { product_id: id })
+
+    where(owned_licenses.arel.exists).or(
+      where(user_licenses.arel.exists),
+    )
   }
   scope :for_license, -> id {
     users = License.distinct
