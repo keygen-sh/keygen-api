@@ -50,6 +50,9 @@ class ReleasePlatform < ApplicationRecord
       .union(
         self.open
       )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
+      )
   }
 
   scope :for_license, -> license {
@@ -62,6 +65,9 @@ class ReleasePlatform < ApplicationRecord
       .distinct
       .union(
         self.open
+      )
+      .reorder(
+        created_at: DEFAULT_SORT_ORDER,
       )
   }
 

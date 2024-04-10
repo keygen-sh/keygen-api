@@ -171,6 +171,7 @@ class ReleaseArtifact < ApplicationRecord
     entl = within_constraints(user.entitlement_codes, strict: true)
 
     entl.joins(product: %i[licenses])
+        .reorder(created_at: DEFAULT_SORT_ORDER)
         .where(
           product: { distribution_strategy: ['LICENSED', nil] },
           licenses: { id: License.for_user(user) },
@@ -178,6 +179,9 @@ class ReleaseArtifact < ApplicationRecord
         .distinct
         .union(
           self.open
+        )
+        .reorder(
+          created_at: DEFAULT_SORT_ORDER,
         )
   }
 
@@ -200,6 +204,9 @@ class ReleaseArtifact < ApplicationRecord
         )
         .union(
           self.open
+        )
+        .reorder(
+          created_at: DEFAULT_SORT_ORDER,
         )
   }
 
@@ -318,9 +325,10 @@ class ReleaseArtifact < ApplicationRecord
             scp.where(entitlements: { code: codes })
           end
 
-    scp.union(
-      without_constraints,
-    )
+    scp.union(without_constraints)
+       .reorder(
+         created_at: DEFAULT_SORT_ORDER,
+       )
   }
 
   scope :waiting,  -> { with_status(:WAITING) }
