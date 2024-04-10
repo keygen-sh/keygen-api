@@ -244,6 +244,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
+    t.index ["account_id", "product_id", "id"], name: "index_licenses_on_account_id_and_product_id_and_id", unique: true
     t.index ["account_id", "product_id", "user_id"], name: "index_licenses_on_account_id_and_product_id_and_user_id"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_licenses_on_environment_id"
