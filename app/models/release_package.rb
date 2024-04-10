@@ -57,6 +57,7 @@ class ReleasePackage < ApplicationRecord
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: License.for_user(user) },
       )
+      .distinct
       .union(
         self.open,
       )
