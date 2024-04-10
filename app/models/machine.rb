@@ -420,7 +420,8 @@ class Machine < ApplicationRecord
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> user {
-    machines = User.reselect(arel_table[Arel.star])
+    machines = User.distinct
+                   .reselect(arel_table[Arel.star])
                    .joins(:machines)
                    .reorder(nil)
 

@@ -96,7 +96,8 @@ class MachineProcess < ApplicationRecord
   scope :for_license, -> id { joins(:license).where(license: { id: }) }
   scope :for_machine, -> id { joins(:machine).where(machine: { id: }) }
   scope :for_user,    -> user {
-    processes = User.reselect(arel_table[Arel.star])
+    processes = User.distinct
+                    .reselect(arel_table[Arel.star])
                     .joins(:processes)
                     .reorder(nil)
 
