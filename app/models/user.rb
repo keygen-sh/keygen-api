@@ -315,10 +315,10 @@ class User < ApplicationRecord
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }).distinct }
   scope :for_user, -> user {
     for_license(License.for_user(user)) # users of any associated licenses
+      .distinct
       .union(
         where(id: user), # itself
       )
-      .distinct
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )

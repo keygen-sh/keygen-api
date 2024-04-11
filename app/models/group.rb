@@ -28,13 +28,13 @@ class Group < ApplicationRecord
   scope :for_user, -> u {
     joins(:users)
       .where(users: { id: u })
+      .distinct
       .union(
         joins(:owners).where(owners: { user_id: u })
       )
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
-      .distinct
   }
 
   scope :for_license, -> l {
