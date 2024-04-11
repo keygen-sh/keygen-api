@@ -390,9 +390,17 @@ class User < ApplicationRecord
     end
   }
 
+  # FIXME(ezekg) The :teammates association isn't the most efficient for large accounts,
+  #              so we're going to use an optimized version of the ids reader.
+  def teammate_ids
+    self.class.for_license(License.for_user(self))
+              .excluding(self)
+              .reorder(nil)
+              .ids
+  end
+
   # FIXME(ezekg) Selecting on ID isn't supported by our association scopes because
   #              we're using DISTINCT and reordering on created_at.
-  def teammate_ids = teammates.reorder(nil).ids
   def machine_ids  = machines.reorder(nil).ids
   def product_ids  = products.reorder(nil).ids
   def policy_ids   = policies.reorder(nil).ids
