@@ -4,6 +4,8 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
   BATCH_SIZE = 10_000
 
   def up
+    log_level_was, ActiveRecord::Base.logger.level = ActiveRecord::Base.logger.level, Logger::DEBUG
+
     update_count = nil
     batch_count  = 0
 
@@ -33,9 +35,13 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
         /* batch=:batch_count */
       SQL
     end
+  ensure
+    ActiveRecord::Base.logger.level = log_level_was
   end
 
   def down
+    log_level_was, ActiveRecord::Base.logger.level = ActiveRecord::Base.logger.level, Logger::DEBUG
+
     update_count = nil
     batch_count  = 0
 
@@ -60,6 +66,8 @@ class DenormalizeProductForLicenses < ActiveRecord::Migration[7.1]
         /* batch=:batch_count */
       SQL
     end
+  ensure
+    ActiveRecord::Base.logger.level = log_level_was
   end
 
   private
