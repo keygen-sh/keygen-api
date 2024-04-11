@@ -224,7 +224,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.uuid "environment_id"
     t.string "last_validated_checksum"
     t.string "last_validated_version"
-    t.uuid "product_id", null: false
+    t.uuid "product_id"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
