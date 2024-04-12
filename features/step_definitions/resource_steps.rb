@@ -364,40 +364,6 @@ Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, r
   end
 end
 
-Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
-  resource = resource.pluralize.underscore
-
-  model =
-    if resource == "users"
-      @account.send(resource).with_roles :user
-    else
-      @account.send resource
-    end
-
-  model.limit(count.to_i).all.each_with_index do |r|
-    ref = (r.class.reflect_on_association(:licenses) rescue false) ||
-          (r.class.reflect_on_association(:license) rescue false)
-
-    begin
-      case
-      when ref.name.to_s.pluralize == ref.name.to_s
-        r.licenses << @bearer
-      when ref.name.to_s.singularize == ref.name.to_s
-        r.license = @bearer
-      end
-    rescue
-      case
-      when ref&.options[:through] && ref.options[:through].to_s.pluralize == ref.options[:through].to_s
-        r.send(ref.options[:through]).first&.license = @bearer
-      when ref&.options[:through] && ref.options[:through].to_s.singularize == ref.options[:through].to_s
-        r.send(ref.options[:through])&.license = @bearer
-      end
-    end
-
-    r.save!
-  end
-end
-
 Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
   @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     r.user = @bearer

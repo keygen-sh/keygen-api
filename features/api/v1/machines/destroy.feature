@@ -300,10 +300,9 @@ Feature: Delete machine
   Scenario: License deletes a machine for their license
     Given the current account is "test1"
     And the current account has 1 "license"
-    And the current account has 3 "machines"
+    And the current account has 3 "machines" for the last "license"
     And the current account has 1 "webhook-endpoint"
     And I am a license of account "test1"
-    And the current license has 3 "machines"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "204"
