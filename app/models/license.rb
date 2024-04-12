@@ -15,9 +15,12 @@ class License < ApplicationRecord
   belongs_to :user,
     optional: true
   belongs_to :policy
+  # NOTE(ezekg) This is a denormalized association and is automatically
+  #             pulled in from the policy. Purposefully defined after
+  #             the policy association for order of validation.
+  belongs_to :product
   belongs_to :group,
     optional: true
-  has_one :product, through: :policy
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
