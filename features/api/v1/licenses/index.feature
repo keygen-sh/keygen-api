@@ -1818,10 +1818,11 @@ Feature: List license
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 2 "licenses"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 3 "licenses"
-    And the current product has 1 "license"
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the response body should be an array with 1 "license"

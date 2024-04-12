@@ -1431,10 +1431,15 @@ Feature: User tokens relationship
     Given the current account is "test1"
     And the current account has 5 "products"
     And the current account has 1 "token" for each "product"
-    And I am a product of account "test1"
     And the current account has 5 "users"
-    And the current product has 2 "users"
     And the current account has 1 "token" for each "user"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
@@ -1443,10 +1448,15 @@ Feature: User tokens relationship
     Given the current account is "test1"
     And the current account has 5 "products"
     And the current account has 1 "token" for each "product"
-    And I am a product of account "test1"
     And the current account has 5 "users"
-    And the current product has 2 "users"
     And the current account has 1 "token" for each "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[5]" }
+      """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$5/tokens"
     Then the response status should be "200"

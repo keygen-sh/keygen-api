@@ -531,11 +531,10 @@ Feature: Product artifacts relationship
   Scenario: Product retrieves an artifact for their product
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
     And the response body should be an "artifact"

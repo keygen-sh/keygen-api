@@ -110,8 +110,8 @@ Feature: License permit actions
       }
       """
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "200"
@@ -333,12 +333,11 @@ Feature: License permit actions
   Scenario: Product suspends a license that implements a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 protected "policy"
-    And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And the current account has 1 "product"
+    And the current account has 1 protected "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "200"
@@ -468,16 +467,15 @@ Feature: License permit actions
   Scenario: Product reinstates a license that implements a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 protected "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 protected "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       { "suspended": true }
       """
-    And the current account has 1 "user"
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "200"
@@ -724,20 +722,19 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 protected "policy"
-    And all "policies" have the following attributes:
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 protected "policy" for the last "product"
+    And the last "policy" has the following attributes:
       """
       { "duration": $time.30.days.to_i }
       """
     And the current account has 1 "license" for the last "policy"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       { "expiry": "2016-09-05T22:53:37.000Z" }
       """
-    And the current account has 1 "user"
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
@@ -848,11 +845,10 @@ Feature: License permit actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And the current account has 1 protected "policy"
-    And the current account has 3 "licenses" for the last "policy"
     And the current account has 1 "product"
+    And the current account has 1 protected "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$1/actions/revoke"
     Then the response status should be "204"
