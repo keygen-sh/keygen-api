@@ -437,13 +437,15 @@ Feature: List machines
   Scenario: Product retrieves all machines for their product
     Given the current account is "test1"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 2 "machines" for the last "license"
+    And the current account has 2 "machines"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 3 "machines"
-    And the current product has 1 "machine"
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the response body should be an array with 1 "machine"
+    And the response body should be an array with 2 "machines"
 
   Scenario: Admin attempts to retrieve all machines for another account
     Given I am an admin of account "test2"

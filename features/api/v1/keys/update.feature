@@ -171,10 +171,10 @@ Feature: Update key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
+    And the current account has 1 pooled "policy" for the last "product"
+    And the current account has 1 "key" for the last "policy"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "key"
-    And the current product has 1 "key"
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
       {

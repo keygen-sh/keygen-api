@@ -134,7 +134,6 @@ Feature: Show release arch
     And the current account has 1 "artifact" for the last "release"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current product has 1 "release"
     When I send a GET request to "/accounts/test1/arches/$0"
     Then the response status should be "200"
     And the response body should be an "arch"
