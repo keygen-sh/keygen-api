@@ -50,6 +50,9 @@ module Denormalizable
         after_initialize  -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, unless: :persisted?
         before_validation -> { write_denormalized_attribute_from_unpersisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :create
         before_update     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
+
+        # Make sure validation fails if our denormalized column is modified directly
+        validate -> { validate_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
       else
         raise ArgumentError, "invalid :from association: #{from.inspect}"
       end
@@ -146,6 +149,18 @@ module Denormalizable
       record = send(source_association_name)
 
       write_attribute(target_attribute_name, record&.read_attribute(source_attribute_name))
+    end
+
+    def validate_denormalized_attribute_from_persisted_record(source_association_name, source_attribute_name, target_attribute_name)
+      record = send(source_association_name)
+
+      unless read_attribute(target_attribute_name) == record&.read_attribute(source_attribute_name)
+        if target_reflection = self.class.reflect_on_all_associations.find { _1.foreign_key == target_attribute_name.to_s }
+          errors.add target_reflection.name, :not_allowed, message: 'cannot be modified directly because it is a denormalized association'
+        else
+          errors.add target_attribute_name, :not_allowed, message: 'cannot be modified directly because it is a denormalized attribute'
+        end
+      end
     end
   end
 
