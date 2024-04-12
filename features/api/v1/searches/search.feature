@@ -1240,8 +1240,9 @@ Feature: Search
   Scenario: Admin performs a search by license type on the user relationship by ID
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 10 "licenses"
-    And the current user has 7 "licenses"
+    And the current account has 1 "user"
+    And the current account has 7 "licenses" for the last "user"
+    And the current account has 3 "licenses"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """
@@ -1249,7 +1250,7 @@ Feature: Search
         "meta": {
           "type": "licenses",
           "query": {
-            "user": "$users[0]"
+            "user": "$users[1]"
           }
         }
       }
@@ -1263,8 +1264,9 @@ Feature: Search
   Scenario: Admin performs a search by license type on the user relationship by email
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 10 "licenses"
-    And the current user has 5 "licenses"
+    And the current account has 1 "user"
+    And the current account has 5 "licenses" for the last "user"
+    And the current account has 5 "licenses"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """
@@ -1272,7 +1274,7 @@ Feature: Search
         "meta": {
           "type": "licenses",
           "query": {
-            "user": "$users[0].email"
+            "user": "$users[1].email"
           }
         }
       }

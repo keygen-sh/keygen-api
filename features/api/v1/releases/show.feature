@@ -351,12 +351,15 @@ Feature: Show release
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -465,22 +468,22 @@ Feature: Show release
 
   Scenario: User retrieves a LICENSED release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a LICENSED release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -489,15 +492,18 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
   Scenario: User retrieves a LICENSED release with multiple licenses for it (mixed validity)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -514,15 +520,18 @@ Feature: Show release
       """
       { "suspended": true }
       """
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
   Scenario: User retrieves a LICENSED release with multiple licenses for it (all invalid)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -533,20 +542,27 @@ Feature: Show release
     And the current account has 3 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.1.year.ago" }
+      {
+        "expiry": "$time.1.year.ago",
+        "userId": "$users[1]"
+      }
       """
     And the second "license" has the following attributes:
       """
-      { "expiry": "$time.3.days.ago" }
+      {
+        "expiry": "$time.3.days.ago",
+        "userId": "$users[1]"
+      }
       """
     And the third "license" has the following attributes:
       """
-      { "suspended": true }
+      {
+        "userId": "$users[1]",
+        "suspended": true
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "403"
     And the first error should have the following properties:
@@ -559,6 +575,7 @@ Feature: Show release
 
   Scenario: User retrieves a LICENSED release with multiple licenses for it (all valid)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -567,10 +584,12 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 3 "license" for the first "policy"
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -675,22 +694,22 @@ Feature: Show release
 
   Scenario: User retrieves an OPEN release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
   Scenario: User retrieves an OPEN release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -699,10 +718,12 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -788,22 +809,22 @@ Feature: Show release
 
   Scenario: User retrieves a CLOSED release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a CLOSED release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -812,10 +833,12 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -898,26 +921,28 @@ Feature: Show release
 
   Scenario: User retrieves a draft release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a draft release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -979,26 +1004,28 @@ Feature: Show release
 
   Scenario: User retrieves a yanked release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a yanked release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 

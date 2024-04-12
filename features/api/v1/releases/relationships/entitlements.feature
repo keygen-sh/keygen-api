@@ -150,6 +150,10 @@ Feature: Release entitlements relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       { "entitlementId": "$entitlements[0]", "licenseId": "$licenses[0]" }
@@ -176,7 +180,6 @@ Feature: Release entitlements relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/entitlements"
     Then the response status should be "200"
     And the response body should be an array with 3 "entitlements"
@@ -246,6 +249,10 @@ Feature: Release entitlements relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       { "entitlementId": "$entitlements[0]", "licenseId": "$licenses[0]" }
@@ -256,7 +263,6 @@ Feature: Release entitlements relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "200"
     And the response body should be a "entitlement"
@@ -269,13 +275,16 @@ Feature: Release entitlements relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "release-entitlement-constraint" with the following:
       """
       { "entitlementId": "$entitlements[0]", "releaseId": "$releases[0]" }
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/entitlements/$0"
     Then the response status should be "404"
 
