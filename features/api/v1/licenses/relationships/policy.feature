@@ -48,10 +48,10 @@ Feature: License policy relationship
 
   Scenario: Product retrieves the policy for a license
     Given the current account is "test1"
-    And the current account has 3 "licenses"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 3 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "200"

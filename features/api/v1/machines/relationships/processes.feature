@@ -260,7 +260,6 @@ Feature: Machine processes relationship
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
     And I am a product of account "test1"
-    And the current product has 1 "machine"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/processes/$0"
     Then the response status should be "200"

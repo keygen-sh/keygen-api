@@ -384,15 +384,16 @@ Feature: Machine heartbeat actions
 
   Scenario: Product pings a machine's heartbeat
     Given the current account is "test1"
-    And the current account has 1 "product"
-    And I am a product of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "machine"
-    And the current product has 1 "machine"
-    And the first "machine" has the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": null }
       """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "200"
@@ -654,15 +655,16 @@ Feature: Machine heartbeat actions
 
   Scenario: Product resets a machine's heartbeat
     Given the current account is "test1"
-    And the current account has 1 "product"
-    And I am a product of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "machine"
-    And the current product has 1 "machine"
-    And the first "machine" has the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" has the following attributes:
       """
       { "lastHeartbeatAt": "$time.1.hour.ago" }
       """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "200"

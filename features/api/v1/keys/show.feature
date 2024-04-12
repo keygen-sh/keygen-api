@@ -91,10 +91,10 @@ Feature: Show key
   Scenario: Product retrieves a key for their product
     Given the current account is "test1"
     And the current account has 1 "product"
+    And the current account has 1 pooled "policy" for the last "product"
+    And the current account has 1 "key" for the last "policy"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "key"
-    And the current product has 1 "key"
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
     And the response body should be a "key"

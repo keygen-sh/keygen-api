@@ -123,23 +123,10 @@ Feature: Policy pool relationship
   Scenario: Product retrieves the pool for a policy
     Given the current account is "test1"
     And the current account has 2 "products"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "productId": "$products[0]",
-        "usePool": true
-      }
-      """
-    And the current account has 5 "keys"
-    And all "keys" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
+    And the current account has 3 pooled "policies" for the first "product"
+    And the current account has 5 "keys" for the first "policy"
+    And the current account has 5 "keys" for the second "policy"
     And I am a product of account "test1"
-    And the current product has 3 "policies"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
@@ -339,23 +326,9 @@ Feature: Policy pool relationship
   Scenario: Product pops a key from a pool
     Given the current account is "test1"
     And the current account has 2 "products"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "productId": "$products[0]",
-        "usePool": true
-      }
-      """
-    And the current account has 5 "keys"
-    And all "keys" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
+    And the current account has 3 pooled "policies" for the first "product"
+    And the current account has 2 "keys" for the first "policy"
     And I am a product of account "test1"
-    And the current product has 3 "policies"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"

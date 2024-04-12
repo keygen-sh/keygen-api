@@ -95,10 +95,14 @@ Feature: List authentication tokens
     And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
     And the current account has 1 "token" for each "user"
-    And the current account has 2 "licenses"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 2 "licenses" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
     And the current account has 1 "token" for each "license"
     And I am a product of account "test1"
-    And the current product has 2 "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"

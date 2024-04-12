@@ -233,22 +233,18 @@ Feature: License usage actions
   Scenario: Product increments the usage count for a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
       """
       { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 3
-      }
+      { "uses": 3 }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
@@ -357,22 +353,18 @@ Feature: License usage actions
   Scenario: Product increments the usage count for a license that is at its usage limit
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" have the following attributes:
       """
       { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 5
-      }
+      { "uses": 5 }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "422"
@@ -618,22 +610,18 @@ Feature: License usage actions
   Scenario: Product decrements the usage count for a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
       """
       { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 5
-      }
+      { "uses": 5 }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "200"
@@ -837,22 +825,18 @@ Feature: License usage actions
   Scenario: Product resets the usage count for a license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
       """
       { "maxUses": 5 }
       """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "uses": 5
-      }
+      { "uses": 5 }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "200"
