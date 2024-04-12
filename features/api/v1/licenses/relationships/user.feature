@@ -95,10 +95,10 @@ Feature: License user relationship
 
   Scenario: User attempts to retrieve the user for a license they own
     Given the current account is "test1"
-    And the current account has 3 "licenses"
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 2 "licenses"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "200"
@@ -434,26 +434,19 @@ Feature: License user relationship
   Scenario: User attempts to change a license's user relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
     And the current account has 1 "user"
-    And the current account has 1 "policy"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
+      { "protected": false }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the last "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "userId": "$users[1]"
-      }
+      { "userId": "$users[1]" }
       """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
       """

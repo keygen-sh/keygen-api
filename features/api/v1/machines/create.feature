@@ -2151,9 +2151,8 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
-    And the current account has 1 "license"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
@@ -2199,13 +2198,12 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
-    And I am a user of account "test1"
-    And the current account has 1 "license"
-    And the current user has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the last "user"
+    And the last "license" has the following attributes:
       """
       { "protected": true }
       """
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
@@ -2235,13 +2233,12 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
-    And I am a user of account "test1"
-    And the current account has 1 "license"
-    And the current user has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the last "user"
+    And the last "license" has the following attributes:
       """
       { "protected": false }
       """
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """

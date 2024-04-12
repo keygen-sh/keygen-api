@@ -604,12 +604,13 @@ Feature: List releases
   Scenario: Product retrieves all releases
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "releases" for the last "product"
+    And the current account has 2 "releases" for the last "product"
+    And the current account has 2 "releases"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the response body should be an array with 1 "release"
+    And the response body should be an array with 2 "release"
 
   Scenario: User retrieves all releases for their products
     Given the current account is "test1"
@@ -619,9 +620,12 @@ Feature: List releases
     And the current account has 7 "releases" for the second "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 3 "releases"
@@ -807,6 +811,7 @@ Feature: List releases
 
   Scenario: User attempts to retrieve all accessible releases
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
@@ -825,16 +830,19 @@ Feature: List releases
     And the current account has 7 "releases" for the third "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 8 "releases"
 
   Scenario: User attempts to retrieve all accessible releases (limit)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
@@ -853,16 +861,19 @@ Feature: List releases
     And the current account has 1 "release" for the third "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?limit=1"
     Then the response status should be "200"
     And the response body should be an array with 1 "release"
 
   Scenario: User attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
@@ -881,10 +892,12 @@ Feature: List releases
     And the current account has 7 "releases" for the third "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases?product=$products[1]"
     Then the response status should be "200"
     And the response body should be an array with 5 "releases"
@@ -944,14 +957,17 @@ Feature: List releases
 
   Scenario: User retrieves draft releases with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 0 "releases"
@@ -1032,14 +1048,17 @@ Feature: List releases
 
   Scenario: User retrieves yanked releases with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 0 "releases"
@@ -1216,15 +1235,18 @@ Feature: List releases
 
   Scenario: User retrieves their product releases with constraints (no entitlements)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "constraint" for the last "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 2 "releases"
@@ -1232,11 +1254,15 @@ Feature: List releases
   Scenario: User retrieves their product releases with constraints (some entitlements)
     Given the current account is "test1"
     And the current account has 3 "entitlements"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "licenses" for the last "policy"
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1274,7 +1300,6 @@ Feature: List releases
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 2 "releases"
@@ -1282,11 +1307,15 @@ Feature: List releases
   Scenario: User retrieves their product releases with constraints (all entitlements)
     Given the current account is "test1"
     And the current account has 3 "entitlements"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "licenses" for the last "policy"
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1331,7 +1360,6 @@ Feature: List releases
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the response body should be an array with 3 "releases"

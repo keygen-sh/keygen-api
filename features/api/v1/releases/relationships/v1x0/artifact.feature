@@ -578,14 +578,17 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -594,14 +597,17 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=120"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -610,18 +616,20 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.2.days.ago" }
+      {
+        "expiry": "$time.2.days.ago",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
 
@@ -629,13 +637,16 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.2.days.ago" }
+      {
+        "expiry": "$time.2.days.ago",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the first "release" has the following attributes:
       """
       { "createdAt": "$time.1.months.ago" }
@@ -644,7 +655,6 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -653,18 +663,20 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "suspended": true }
+      {
+        "userId": "$users[1]",
+        "suspended": true
+      }
       """
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
 
@@ -672,18 +684,21 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 2 "licenses" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 2 "licenses" for the first "policy"
     And the first "license" has the following attributes:
       """
       { "expiry": "$time.2.days.ago" }
       """
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for the first "release"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -691,8 +706,10 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 3 "licenses" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "licenses" for the first "policy"
     And the first "license" has the following attributes:
       """
       { "expiry": "$time.2.days.ago" }
@@ -701,12 +718,13 @@ Feature: Release artifact relationship
       """
       { "suspended": true }
       """
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for the first "release"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -715,8 +733,12 @@ Feature: Release artifact relationship
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "entitlement"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -724,7 +746,7 @@ Feature: Release artifact relationship
         "licenseId": "$licenses[0]"
       }
       """
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "release-entitlement-constraint" with the following:
       """
       {
@@ -736,7 +758,6 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -745,8 +766,12 @@ Feature: Release artifact relationship
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -761,7 +786,7 @@ Feature: Release artifact relationship
         "licenseId": "$licenses[0]"
       }
       """
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "release-entitlement-constraint" with the following:
       """
       {
@@ -780,7 +805,6 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -789,8 +813,12 @@ Feature: Release artifact relationship
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -798,7 +826,7 @@ Feature: Release artifact relationship
         "licenseId": "$licenses[0]"
       }
       """
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "release-entitlement-constraint" with the following:
       """
       {
@@ -817,7 +845,6 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
@@ -825,15 +852,18 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "release-entitlement-constraint" for an existing "release"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "release-entitlement-constraint" for the first "release"
     And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
@@ -897,6 +927,7 @@ Feature: Release artifact relationship
 
   Scenario: User retrieves a LICENSED release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -904,17 +935,16 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
   Scenario: User retrieves a LICENSED release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -924,11 +954,13 @@ Feature: Release artifact relationship
     And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -1039,6 +1071,7 @@ Feature: Release artifact relationship
 
   Scenario: User retrieves an OPEN release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -1046,17 +1079,16 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
   Scenario: User retrieves an OPEN release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -1066,11 +1098,13 @@ Feature: Release artifact relationship
     And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
 
@@ -1168,6 +1202,7 @@ Feature: Release artifact relationship
 
   Scenario: User retrieves a CLOSED release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -1175,17 +1210,16 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
   Scenario: User retrieves a CLOSED release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
       """
@@ -1195,11 +1229,13 @@ Feature: Release artifact relationship
     And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
 
@@ -1367,14 +1403,17 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
 
@@ -1583,14 +1622,17 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "release" for the first "product"
     And the current account has 1 "artifact" for the first "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
     And the first "release" should not be yanked

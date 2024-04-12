@@ -924,10 +924,9 @@ Feature: Update license
   Scenario: User attempts to update their license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 3 "licenses"
     And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
@@ -1172,10 +1171,9 @@ Feature: Update license
   Scenario: User attempts to update a license expiry for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 3 "licenses"
     And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
@@ -1196,10 +1194,9 @@ Feature: Update license
   Scenario: User attempts to update a license name for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 3 "licenses"
     And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user"
     And I am a user of account "test1"
-    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """

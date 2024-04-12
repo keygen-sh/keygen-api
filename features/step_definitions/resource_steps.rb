@@ -364,13 +364,6 @@ Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, r
   end
 end
 
-Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
-  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
-    r.user = @bearer
-    r.save!
-  end
-end
-
 Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do |i, a, j, b|
   numbers = {
     "first"   => 1,

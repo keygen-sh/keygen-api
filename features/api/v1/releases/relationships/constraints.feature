@@ -147,6 +147,10 @@ Feature: Release constraints relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       { "entitlementId": "$entitlements[0]", "licenseId": "$licenses[0]" }
@@ -173,7 +177,6 @@ Feature: Release constraints relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "200"
     And the response body should be an array with 3 "constraints"
@@ -243,6 +246,10 @@ Feature: Release constraints relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       { "entitlementId": "$entitlements[0]", "licenseId": "$licenses[0]" }
@@ -253,7 +260,6 @@ Feature: Release constraints relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "200"
     And the response body should be a "constraint"
@@ -266,13 +272,16 @@ Feature: Release constraints relationship
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "release-entitlement-constraint" with the following:
       """
       { "entitlementId": "$entitlements[0]", "releaseId": "$releases[0]" }
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "404"
 
@@ -765,12 +774,15 @@ Feature: Release constraints relationship
     And the current account has 2 "entitlements"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a POST request to "/accounts/test1/releases/$0/constraints" with the following:
       """
       {
@@ -1107,9 +1119,13 @@ Feature: Release constraints relationship
     And the current account has 4 "entitlements"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       { "entitlementId": "$entitlements[0]", "licenseId": "$licenses[0]" }
@@ -1144,7 +1160,6 @@ Feature: Release constraints relationship
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     And I am a user of account "test1"
     When I send a DELETE request to "/accounts/test1/releases/$0/constraints" with the following:
       """

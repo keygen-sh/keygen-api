@@ -153,12 +153,15 @@ Feature: Show release channel
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "200"
 
