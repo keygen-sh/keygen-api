@@ -140,26 +140,28 @@ Feature: Publish release
 
   Scenario: User publishes a release without a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
-    And the current account has 1 "license"
-    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "404"
 
   Scenario: User publishes a release with a license for it
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a POST request to "/accounts/test1/releases/$0/actions/publish"
     Then the response status should be "403"
 

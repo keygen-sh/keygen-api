@@ -828,6 +828,7 @@ Feature: List release artifacts
 
   Scenario: User attempts to retrieve all accessible releases
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
@@ -847,16 +848,19 @@ Feature: List release artifacts
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 8 "artifacts"
 
   Scenario: User attempts to retrieve all accessible releases (filtered)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 3 "products"
     And the first "product" has the following attributes:
       """
@@ -876,10 +880,12 @@ Feature: List release artifacts
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts?product=$products[0]"
     Then the response status should be "200"
     And the response body should be an array with 3 "artifacts"
@@ -934,15 +940,18 @@ Feature: List release artifacts
 
   Scenario: User retrieves artifacts for draft releases with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1030,15 +1039,18 @@ Feature: List release artifacts
 
   Scenario: User retrieves artifacts for yanked releases with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1126,15 +1138,18 @@ Feature: List release artifacts
 
   Scenario: User retrieves waiting artifacts with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
     And the current account has 1 waiting "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1222,15 +1237,18 @@ Feature: List release artifacts
 
   Scenario: User retrieves failed artifacts with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
     And the current account has 1 failed "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1318,15 +1336,18 @@ Feature: List release artifacts
 
   Scenario: User retrieves yanked artifacts with a license for them
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
     And the current account has 1 yanked "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 0 "artifacts"
@@ -1485,16 +1506,19 @@ Feature: List release artifacts
 
   Scenario: User retrieves their product artifacts with constraints (no entitlements)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "constraint" for the last "release"
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 2 "artifacts"
@@ -1502,12 +1526,16 @@ Feature: List release artifacts
   Scenario: User retrieves their product artifacts with constraints (some entitlements)
     Given the current account is "test1"
     And the current account has 3 "entitlements"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "licenses" for the last "policy"
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1545,7 +1573,6 @@ Feature: List release artifacts
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 2 "artifacts"
@@ -1553,12 +1580,16 @@ Feature: List release artifacts
   Scenario: User retrieves their product artifacts with constraints (all entitlements)
     Given the current account is "test1"
     And the current account has 3 "entitlements"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
     And the current account has 1 "artifact" for each "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 2 "licenses" for the last "policy"
-    And the current account has 1 "user"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1603,7 +1634,6 @@ Feature: List release artifacts
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 2 "licenses"
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 3 "artifacts"
