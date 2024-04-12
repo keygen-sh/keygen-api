@@ -82,7 +82,16 @@ describe License, type: :model do
 
   describe '#policy=' do
     context 'on build' do
-      it 'should denormalize product from policy' do
+      it 'should denormalize product from unpersisted policy' do
+        product = build(:product, account:)
+        policy  = build(:policy, product:, account:)
+        license = build(:license, policy:, account:)
+
+        expect(license.product_id).to be_nil
+        expect(license.product).to eq product
+      end
+
+      it 'should denormalize product from persisted policy' do
         policy  = create(:policy, account:)
         license = build(:license, policy:, account:)
 
@@ -91,7 +100,16 @@ describe License, type: :model do
     end
 
     context 'on create' do
-      it 'should denormalize product from policy' do
+      it 'should denormalize product from unpersisted policy' do
+        product = build(:product, account:)
+        policy  = build(:policy, product:, account:)
+        license = create(:license, policy:, account:)
+
+        expect(license.product_id).to eq product.id
+        expect(license.product).to eq product
+      end
+
+      it 'should denormalize product from persisted policy' do
         policy  = create(:policy, account:)
         license = create(:license, policy:, account:)
 
