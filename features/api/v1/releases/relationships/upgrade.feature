@@ -1202,12 +1202,15 @@ Feature: Upgrade release
       | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
       | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
       | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "user"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$1/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1232,16 +1235,18 @@ Feature: Upgrade release
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
       | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And the current account has 1 "user"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.2.months.ago" }
+      {
+        "expiry": "$time.2.months.ago",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1254,16 +1259,18 @@ Feature: Upgrade release
       | id                                   | product_id                           | version | channel |
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
+    And the current account has 1 "user"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "suspended": true }
+      {
+        "userId": "$users[1]",
+        "suspended": true
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1276,11 +1283,10 @@ Feature: Upgrade release
       | id                                   | product_id                           | version | channel |
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
-    And the current account has 1 "license"
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
@@ -1295,8 +1301,13 @@ Feature: Upgrade release
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
       | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
     And the current account has 1 "entitlement"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1318,10 +1329,8 @@ Feature: Upgrade release
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1346,8 +1355,13 @@ Feature: Upgrade release
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1383,10 +1397,8 @@ Feature: Upgrade release
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:
@@ -1411,8 +1423,13 @@ Feature: Upgrade release
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1441,10 +1458,8 @@ Feature: Upgrade release
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
@@ -1457,14 +1472,17 @@ Feature: Upgrade release
       | id                                   | product_id                           | version       | channel |
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 2 "release-entitlement-constraints" for the first "release"
     And the current account has 2 "release-entitlement-constraints" for the second "release"
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
@@ -1573,12 +1591,15 @@ Feature: Upgrade release
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
       | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "200"
     And the response body should be a "release" with the following attributes:

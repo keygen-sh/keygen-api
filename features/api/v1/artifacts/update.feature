@@ -645,14 +645,17 @@ Feature: Update artifact
   Scenario: User updates an artifact they have access to
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 published "release" for the last "product"
     And the current account has 1 "artifact" for the last "release"
     And the current account has 1 "policy" for the last "product"
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
       """

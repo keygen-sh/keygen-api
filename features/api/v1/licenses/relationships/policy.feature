@@ -78,10 +78,9 @@ Feature: License policy relationship
 
   Scenario: User attempts to retrieve the policy for a license they own
     Given the current account is "test1"
-    And the current account has 3 "licenses"
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "403"
@@ -919,6 +918,7 @@ Feature: License policy relationship
   Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "policies" for the first "product"
     And all "policies" have the following attributes:
@@ -928,11 +928,12 @@ Feature: License policy relationship
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.1.day.from_now" }
+      {
+        "expiry": "$time.1.day.from_now",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -960,6 +961,7 @@ Feature: License policy relationship
   Scenario: User changes a license's policy relationship from a protected policy to a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 3 "policies" for the first "product"
     And all "policies" have the following attributes:
@@ -969,11 +971,12 @@ Feature: License policy relationship
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.1.day.from_now" }
+      {
+        "expiry": "$time.1.day.from_now",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -992,6 +995,7 @@ Feature: License policy relationship
   Scenario: User changes an unprotected license's policy relationship from an unprotected policy to a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
@@ -1003,9 +1007,11 @@ Feature: License policy relationship
       { "protected": true }
       """
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -1028,6 +1034,7 @@ Feature: License policy relationship
   Scenario: User changes a protected license's policy relationship from a protected policy to an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
@@ -1039,9 +1046,11 @@ Feature: License policy relationship
       { "protected": false }
       """
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -1064,6 +1073,7 @@ Feature: License policy relationship
   Scenario: User changes an unprotected license's policy relationship to a non-existent policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the first "product"
     And the first "policy" has the following attributes:
@@ -1071,9 +1081,11 @@ Feature: License policy relationship
       { "protected": false }
       """
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """

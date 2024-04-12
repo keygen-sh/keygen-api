@@ -180,15 +180,10 @@ Feature: License machines relationship
 
   Scenario: User attempts to retrieve the machines for a license they own
     Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 3 "machines"
-    And all "machines" have the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 3 "machines" for the last "license"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "200"

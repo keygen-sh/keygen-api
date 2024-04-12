@@ -897,13 +897,16 @@ Feature: Release upgrade actions
       | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | Test-App-1.1.0.zip        | zip      | macos    |
       | dde54ea8-731d-4375-9d57-186ef01f3fcb | Test-App-1.3.0.zip        | zip      | macos    |
       | a7fad100-04eb-418f-8af9-e5eac497ad5a | Test-App-2.0.0-beta.1.zip | zip      | macos    |
+    And the current account has 1 "user"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the current account has 1 "user"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade?channel=beta"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -932,15 +935,17 @@ Feature: Release upgrade actions
       | ff04d1c4-cc04-4d19-985a-cb113827b821 | Test-App-1.0.1.zip | zip      | macos    |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
     And the first "license" has the following attributes:
       """
-      { "expiry": "$time.2.months.ago" }
+      {
+        "expiry": "$time.2.months.ago",
+        "userId": "$users[1]"
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
@@ -959,19 +964,21 @@ Feature: Release upgrade actions
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-2.0.0.exe | exe      | win32    |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
     And the first "license" has the following attributes:
       """
-      { "suspended": true }
+      {
+        "userId": "$users[1]",
+        "suspended": true
+      }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
-  Scenario: License retrieves an upgrade for a release of a different product
+  Scenario: User retrieves an upgrade for a release of a different product
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     |
@@ -984,12 +991,11 @@ Feature: Release upgrade actions
       | release_id                           | filename              | filetype | platform |
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0.tar.gz | tar.gz   | linux    |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.1.0.tar.gz | tar.gz   | linux    |
-    And the current account has 1 "license"
     And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "404"
 
@@ -1009,8 +1015,13 @@ Feature: Release upgrade actions
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.1.0.dmg | dmg      | macos    |
       | ff04d1c4-cc04-4d19-985a-cb113827b821 | Test-App-1.2.0.zip | zip      | macos    |
     And the current account has 1 "entitlement"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1032,11 +1043,9 @@ Feature: Release upgrade actions
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -1062,8 +1071,13 @@ Feature: Release upgrade actions
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0-alpha.1.dmg | dmg      | macos    |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.0.0.dmg         | dmg      | macos    |
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1099,11 +1113,9 @@ Feature: Release upgrade actions
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -1129,8 +1141,13 @@ Feature: Release upgrade actions
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0-alpha.1.dmg | dmg      | macos    |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.0.0.dmg         | dmg      | macos    |
     And the current account has 2 "entitlements"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 1 "license-entitlement" with the following:
       """
       {
@@ -1159,11 +1176,9 @@ Feature: Release upgrade actions
         "releaseId": "$releases[1]"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
@@ -1180,15 +1195,18 @@ Feature: Release upgrade actions
       | release_id                           | filename                   | filetype | platform |
       | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0-alpha.1.dmg | dmg      | macos    |
       | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.0.0.dmg         | dmg      | macos    |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And the current account has 2 "release-entitlement-constraints" for the first "release"
     And the current account has 2 "release-entitlement-constraints" for the second "release"
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "404"
 
@@ -2133,13 +2151,16 @@ Feature: Release upgrade actions
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | Test-App-1.0.2.dmg | dmg      | darwin   |
       | f517903b-5126-4405-9793-bf95a287b1f9 | Test-App-1.0.3.dmg | dmg      | darwin   |
       | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2304,13 +2325,16 @@ Feature: Release upgrade actions
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | Test-App-1.0.2.dmg | dmg      | darwin   |
       | f517903b-5126-4405-9793-bf95a287b1f9 | Test-App-1.0.3.dmg | dmg      | darwin   |
       | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2423,13 +2447,16 @@ Feature: Release upgrade actions
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | Test-App-1.0.2.dmg | dmg      | darwin   |
       | f517903b-5126-4405-9793-bf95a287b1f9 | Test-App-1.0.3.dmg | dmg      | darwin   |
       | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
 
@@ -2488,7 +2515,6 @@ Feature: Release upgrade actions
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
     And the response body should be an "artifact"
@@ -2523,7 +2549,6 @@ Feature: Release upgrade actions
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
 
