@@ -4642,8 +4642,8 @@ Feature: Create license
       """
     And the current account has 1 "user"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
@@ -4690,8 +4690,8 @@ Feature: Create license
       """
     And the current account has 1 "user"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
@@ -5503,8 +5503,8 @@ Feature: Create license
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
@@ -5532,8 +5532,8 @@ Feature: Create license
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
@@ -5567,10 +5567,9 @@ Feature: Create license
       """
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policy"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """

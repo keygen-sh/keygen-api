@@ -432,10 +432,11 @@ Feature: Update machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "machine"
-    And the current product has 1 "machine"
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       {

@@ -70,15 +70,10 @@ Feature: Policy licenses relationship
 
   Scenario: Product retrieves the licenses for a policy
     Given the current account is "test1"
-    And the current account has 1 "policy"
-    And the current account has 3 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "licenses" for the first "policy"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"
     Then the response status should be "200"
@@ -100,15 +95,10 @@ Feature: Policy licenses relationship
 
   Scenario: Product retrieves a license for a policy
     Given the current account is "test1"
-    And the current account has 1 "policy"
-    And the current account has 3 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 1 "policy"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses/$0"
     Then the response status should be "200"

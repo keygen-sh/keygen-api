@@ -39,10 +39,9 @@ Feature: Policy product relationship
 
   Scenario: Product retrieves the product for a policy
     Given the current account is "test1"
-    And the current account has 3 "policies"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
-    And the current product has 3 "policies"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/product"
     Then the response status should be "200"

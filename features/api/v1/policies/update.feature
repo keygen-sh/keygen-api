@@ -254,10 +254,9 @@ Feature: Update policy
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "policy"
-    And the current product has 1 "policy"
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       {
