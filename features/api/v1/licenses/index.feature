@@ -2057,7 +2057,8 @@ Feature: List license
   Scenario: User attempts an SQL injection attack for all licenses
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 3 "licenses" for the last "user" as "owner"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 2 "licenses"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
