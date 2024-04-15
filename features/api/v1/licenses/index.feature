@@ -1974,7 +1974,7 @@ Feature: List license
     And the current account has 1 "license-user" for the first "license" and the last "user"
     And the current account has 1 "license-user" for the second "license" and the last "user"
     And I am a user of account "test1"
-    And I use an authentication tokenser authz
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the response body should be an array with 2 "licenses"
