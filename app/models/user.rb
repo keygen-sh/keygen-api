@@ -328,57 +328,27 @@ class User < ApplicationRecord
   scope :admins, -> { with_role(:admin) }
   scope :users, -> { with_role(:user) }
   scope :banned, -> { where.not(banned_at: nil) }
+  scope :unbanned, -> { where(banned_at: nil) }
   scope :active, -> (t = 90.days.ago) {
-    # include any users newer than :t or with an active license
-    where('users.created_at >= ?', t)
-      .where(banned_at: nil)
+    users = License.distinct
+                   .reselect(arel_table[Arel.star])
+                   .joins(:users)
+                   .active
+                   .reorder(nil)
+
+    from(users, table_name)
+      .unbanned
       .union(
-        joins(:licenses)
-          .where(banned_at: nil)
-          .where(<<~SQL.squish, t:)
-            licenses.created_at >= :t OR
-              (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
-              (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
-              (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
-          SQL
+        where('users.created_at >= ?', t).unbanned,
       )
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
   }
   scope :inactive, -> (t = 90.days.ago) {
-    # include users older than :t with no licenses
     where('users.created_at < ?', t)
-      .where.missing(:licenses)
-      .where(banned_at: nil)
-      .union(
-        # include users older than :t with inactive licenses
-        joins(:licenses)
-          .where('users.created_at < ?', t)
-          .where(banned_at: nil)
-          .where(<<~SQL.squish, t:)
-            licenses.created_at < :t AND
-              (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t) AND
-              (licenses.last_check_out_at IS NULL OR licenses.last_check_out_at < :t) AND
-              (licenses.last_check_in_at IS NULL OR licenses.last_check_in_at < :t)
-          SQL
-      )
-      # exclude users older than :t with active licenses
-      .where.not(
-        id: joins(:licenses)
-              .reorder(nil)
-              .where('users.created_at < ?', t)
-              .where(banned_at: nil)
-              .where(<<~SQL.squish, t:)
-                licenses.created_at >= :t OR
-                  (licenses.last_validated_at IS NOT NULL AND licenses.last_validated_at >= :t) OR
-                  (licenses.last_check_out_at IS NOT NULL AND licenses.last_check_out_at >= :t) OR
-                  (licenses.last_check_in_at IS NOT NULL AND licenses.last_check_in_at >= :t)
-              SQL
-      )
-      .reorder(
-        created_at: DEFAULT_SORT_ORDER,
-      )
+      .where.not(id: active)
+      .unbanned
   }
   scope :assigned, -> (status = true) {
     sub_query = License.where('licenses.user_id = users.id').select(1).arel.exists
