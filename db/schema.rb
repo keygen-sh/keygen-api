@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_19_145230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -61,7 +61,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.string "card_brand"
     t.string "card_last4"
     t.string "state"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "referral_id"
     t.datetime "card_added_at", precision: nil
     t.index ["account_id", "created_at"], name: "index_billings_on_account_id_and_created_at"
@@ -168,8 +168,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.string "key"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.uuid "policy_id"
-    t.uuid "account_id"
+    t.uuid "policy_id", null: false
+    t.uuid "account_id", null: false
     t.uuid "environment_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "keys_tsv_key_idx", using: :gist
@@ -201,8 +201,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.datetime "updated_at", precision: nil, null: false
     t.jsonb "metadata"
     t.uuid "user_id"
-    t.uuid "policy_id"
-    t.uuid "account_id"
+    t.uuid "policy_id", null: false
+    t.uuid "account_id", null: false
     t.boolean "suspended", default: false
     t.datetime "last_check_in_at", precision: nil
     t.datetime "last_expiration_event_sent_at", precision: nil
@@ -224,7 +224,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.uuid "environment_id"
     t.string "last_validated_checksum"
     t.string "last_validated_version"
-    t.uuid "product_id"
+    t.uuid "product_id", null: false
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -284,8 +284,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "name"
     t.jsonb "metadata"
-    t.uuid "account_id"
-    t.uuid "license_id"
+    t.uuid "account_id", null: false
+    t.uuid "license_id", null: false
     t.datetime "last_heartbeat_at", precision: nil
     t.integer "cores"
     t.datetime "last_death_event_sent_at", precision: nil
@@ -310,7 +310,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
   end
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.jsonb "data"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -366,8 +366,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.boolean "encrypted", default: false
     t.boolean "protected"
     t.jsonb "metadata"
-    t.uuid "product_id"
-    t.uuid "account_id"
+    t.uuid "product_id", null: false
+    t.uuid "account_id", null: false
     t.string "check_in_interval"
     t.integer "check_in_interval_count"
     t.boolean "require_check_in", default: false
@@ -433,7 +433,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.datetime "updated_at", precision: nil, null: false
     t.jsonb "platforms"
     t.jsonb "metadata"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "url"
     t.string "distribution_strategy"
     t.uuid "environment_id"
@@ -656,7 +656,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
   end
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "url"
     t.string "method"
     t.string "ip"
@@ -696,10 +696,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
-    t.string "resource_type"
+    t.string "resource_type", null: false
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
-    t.uuid "resource_id"
+    t.uuid "resource_id", null: false
     t.index ["created_at"], name: "index_roles_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
     t.index ["name", "created_at"], name: "index_roles_on_name_and_created_at"
@@ -734,12 +734,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
 
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "digest"
-    t.string "bearer_type"
+    t.string "bearer_type", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.datetime "expiry", precision: nil
-    t.uuid "bearer_id"
-    t.uuid "account_id"
+    t.uuid "bearer_id", null: false
+    t.uuid "account_id", null: false
     t.integer "max_activations"
     t.integer "max_deactivations"
     t.integer "activations", default: 0
@@ -762,7 +762,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.string "password_reset_token"
     t.datetime "password_reset_sent_at", precision: nil
     t.jsonb "metadata"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "first_name"
     t.string "last_name"
     t.datetime "stdout_unsubscribed_at", precision: nil
@@ -787,7 +787,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.string "url"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.jsonb "subscriptions", default: ["*"]
     t.string "signature_algorithm", default: "ed25519"
     t.string "api_version"
@@ -804,7 +804,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_03_173726) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "endpoint"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "idempotency_token"
     t.integer "last_response_code"
     t.text "last_response_body"
