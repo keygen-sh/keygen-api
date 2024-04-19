@@ -30,6 +30,15 @@ RUN apk add --no-cache \
   bundle config --global deployment "${BUNDLE_DEPLOYMENT}" && \
   bundle config --global retry 5 && \
   bundle install && \
+  find /usr/local/bundle/ \
+    \( \
+      -name "*.c" -o \
+      -name "*.o" -o \
+      -name "*.a" -o \
+      -name "*.h" -o \
+      -name "Makefile" -o \
+      -name "*.md" \
+    \) -delete && \
   chmod -R a+r "${BUNDLE_PATH}"
 
 # Final stage
