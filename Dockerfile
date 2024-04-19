@@ -25,8 +25,12 @@ RUN apk add --no-cache \
   openssl \
   postgresql-dev \
   libc6-compat && \
-  bundle install --jobs 4 --retry 5 && \
-  chmod -R a+r /usr/local/bundle
+  bundle config --global without "${BUNDLE_WITHOUT}"  && \
+  bundle config --global path "${BUNDLE_PATH}" && \
+  bundle config --global deployment "${BUNDLE_DEPLOYMENT}" && \
+  bundle config --global retry 5 && \
+  bundle install && \
+  chmod -R a+r "${BUNDLE_PATH}"
 
 # Final stage
 FROM base
