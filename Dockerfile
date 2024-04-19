@@ -49,7 +49,10 @@ RUN apk add --no-cache \
   bash \
   postgresql-client \
   tzdata \
-  libc6-compat
+  libc6-compat && \
+  adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen
+
+USER keygen
 
 COPY --from=build --chown=keygen:keygen \
   /usr/local/bundle/ /usr/local/bundle
@@ -57,17 +60,14 @@ COPY --from=build --chown=keygen:keygen \
 WORKDIR /app
 COPY . /app
 
+RUN chmod +x /app/scripts/entrypoint.sh && \
+  chown -R keygen:keygen /app
+
 ENV KEYGEN_EDITION="CE" \
     KEYGEN_MODE="singleplayer" \
     RAILS_LOG_TO_STDOUT="1" \
     PORT="3000" \
     BIND="0.0.0.0"
-
-RUN chmod +x /app/scripts/entrypoint.sh && \
-  adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen && \
-  chown -R keygen:keygen /app
-
-USER keygen
 
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 CMD ["web"]
