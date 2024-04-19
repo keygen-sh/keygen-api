@@ -51,6 +51,7 @@ gem 'kaminari', '~> 1.2.0'
 gem 'active_record_union'
 gem 'active_record_distinct_on', '~> 1.6'
 gem 'activerecord_where_assoc', '~> 1.1.4'
+gem 'strong_migrations'
 
 # Pattern matching
 gem 'rails-pattern_matching'

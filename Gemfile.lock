@@ -484,6 +484,8 @@ GEM
     statsd-ruby (1.5.0)
     stringio (3.0.8)
     stripe (5.48.0)
+    strong_migrations (1.8.0)
+      activerecord (>= 5.2)
     sys-uname (1.2.2)
       ffi (~> 1.1)
     temple (0.8.2)
@@ -578,6 +580,7 @@ DEPENDENCIES
   stackprof
   stripe (~> 5.43)
   stripe-ruby-mock!
+  strong_migrations
   timecop (~> 0.9.5)
   tracer
   typed_params (~> 1.1)
