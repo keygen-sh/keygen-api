@@ -70,5 +70,7 @@ RUN \
 
 USER keygen
 
+EXPOSE $PORT
+
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 CMD ["web"]
