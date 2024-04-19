@@ -63,14 +63,11 @@ ENV KEYGEN_EDITION="CE" \
     PORT="3000" \
     BIND="0.0.0.0"
 
-RUN \
-  chmod +x /app/scripts/entrypoint.sh && \
+RUN chmod +x /app/scripts/entrypoint.sh && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen && \
   chown -R keygen:keygen /app
 
 USER keygen
-
-EXPOSE $PORT
 
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 CMD ["web"]
