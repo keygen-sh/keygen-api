@@ -24,17 +24,13 @@ RUN apk add --no-cache \
   tzdata \
   openssl \
   postgresql-dev \
-  libc6-compat
-
-RUN bundle install --jobs 4 --retry 5 && \
+  libc6-compat && \
+  bundle install --jobs 4 --retry 5 && \
   chmod -R a+r /usr/local/bundle
 
 # Final stage
 FROM base
 LABEL maintainer="keygen.sh <oss@keygen.sh>"
-
-WORKDIR /app
-COPY . /app
 
 RUN apk add --no-cache \
   bash \
@@ -42,18 +38,22 @@ RUN apk add --no-cache \
   tzdata \
   libc6-compat
 
+COPY --from=build --chown=keygen:keygen \
+  /usr/local/bundle/ /usr/local/bundle
+
+WORKDIR /app
+COPY . /app
+
 ENV KEYGEN_EDITION="CE" \
     KEYGEN_MODE="singleplayer" \
     RAILS_LOG_TO_STDOUT="1" \
     PORT="3000" \
     BIND="0.0.0.0"
 
-RUN chmod +x /app/scripts/entrypoint.sh && \
+RUN \
+  chmod +x /app/scripts/entrypoint.sh && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen && \
   chown -R keygen:keygen /app
-
-COPY --from=build --chown=keygen:keygen \
-  /usr/local/bundle/ /usr/local/bundle
 
 USER keygen
 
