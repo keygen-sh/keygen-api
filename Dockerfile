@@ -52,8 +52,6 @@ RUN apk add --no-cache \
   libc6-compat && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen
 
-USER keygen
-
 COPY --from=build --chown=keygen:keygen \
   /usr/local/bundle/ /usr/local/bundle
 
@@ -68,6 +66,8 @@ ENV KEYGEN_EDITION="CE" \
     RAILS_LOG_TO_STDOUT="1" \
     PORT="3000" \
     BIND="0.0.0.0"
+
+USER keygen
 
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 CMD ["web"]
