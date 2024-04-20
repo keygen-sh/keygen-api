@@ -58,6 +58,10 @@ module Keygen
     # See above comment about having to use this multiple
     config.middleware.use Keygen::Middleware::RequestErrorWrapper
 
+    # Use the lowest log level to ensure availability of diagnostic information
+    # when problems arise.
+    config.log_level = ENV.fetch('RAILS_LOG_LEVEL') { :info }.to_sym
+
     # FIXME(ezekg) Should we migrate to credentials?
     config.active_record.encryption.primary_key         = ENV.fetch('ENCRYPTION_PRIMARY_KEY')
     config.active_record.encryption.deterministic_key   = ENV.fetch('ENCRYPTION_DETERMINISTIC_KEY')
