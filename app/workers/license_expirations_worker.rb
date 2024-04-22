@@ -6,7 +6,13 @@ class LicenseExpirationsWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    License.includes(:account, :policy).reorder(nil).where.not(expiry: nil).where(expiry: [3.days.ago..3.days.from_now]).find_each do |license|
+    licenses = License.preload(:account, :policy)
+                      .where.not(expiry: nil)
+                      .where(expiry: 3.days.ago..3.days.from_now)
+                      .reorder(nil)
+                      .distinct
+
+    licenses.find_each do |license|
       next if license.account.nil? || license.policy.nil?
 
       case
@@ -20,10 +26,10 @@ class LicenseExpirationsWorker < BaseWorker
         BroadcastEventService.call(
           event: "license.expired",
           account: license.account,
-          resource: license
+          resource: license,
         )
 
-        license.update last_expiration_event_sent_at: Time.current
+        license.touch(:last_expiration_event_sent_at)
       when license.expiry < 3.days.from_now
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_expiring_soon_event_sent_at.nil? &&
@@ -32,10 +38,10 @@ class LicenseExpirationsWorker < BaseWorker
         BroadcastEventService.call(
           event: "license.expiring-soon",
           account: license.account,
-          resource: license
+          resource: license,
         )
 
-        license.update last_expiring_soon_event_sent_at: Time.current
+        license.touch(:last_expiring_soon_event_sent_at)
       end
     end
   end

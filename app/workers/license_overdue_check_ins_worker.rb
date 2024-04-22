@@ -6,20 +6,24 @@ class LicenseOverdueCheckInsWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    query = %[
-      "policies"."require_check_in" = :require_check_in AND
-      "policies"."check_in_interval_count" IS NOT NULL AND
-      "policies"."check_in_interval" IS NOT NULL AND
-      (
-        "licenses"."last_check_in_at" + (
-          "policies"."check_in_interval_count" || ' ' || "policies"."check_in_interval"
-        )::interval
-      ) BETWEEN
-        :start_date AND
-        :end_date
-    ]
+    licenses = License.preload(:account, :policy)
+                      .joins(:policy)
+                      .reorder(nil)
+                      .distinct
+                      .where(<<~SQL.squish, require_check_in: true, start_date: 3.days.ago, end_date: 3.days.from_now)
+                        "policies"."require_check_in" = :require_check_in AND
+                        "policies"."check_in_interval_count" IS NOT NULL AND
+                        "policies"."check_in_interval" IS NOT NULL AND
+                        (
+                          "licenses"."last_check_in_at" + (
+                            "policies"."check_in_interval_count" || ' ' || "policies"."check_in_interval"
+                          )::interval
+                        ) BETWEEN
+                          :start_date AND
+                          :end_date
+                      SQL
 
-    License.preload(:account, :policy).joins(:policy).where(query, require_check_in: true, start_date: 3.days.ago, end_date: 3.days.from_now).find_each do |license|
+    licenses.find_each do |license|
       next if license.expired? || license.account.nil? || license.policy.nil?
 
       case
@@ -34,10 +38,10 @@ class LicenseOverdueCheckInsWorker < BaseWorker
         BroadcastEventService.call(
           event: "license.check-in-overdue",
           account: license.account,
-          resource: license
+          resource: license,
         )
 
-        license.update last_check_in_event_sent_at: Time.current
+        license.touch(:last_check_in_event_sent_at)
       when !license.next_check_in_at.nil? && license.next_check_in_at < 3.days.from_now
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_check_in_soon_event_sent_at.nil? &&
@@ -46,10 +50,10 @@ class LicenseOverdueCheckInsWorker < BaseWorker
         BroadcastEventService.call(
           event: "license.check-in-required-soon",
           account: license.account,
-          resource: license
+          resource: license,
         )
 
-        license.update last_check_in_soon_event_sent_at: Time.current
+        license.touch(:last_check_in_soon_event_sent_at)
       end
     end
   end
