@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_24_040655) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_24_041010) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -367,7 +367,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_040655) do
     t.boolean "protected"
     t.jsonb "metadata"
     t.uuid "product_id"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.string "check_in_interval"
     t.integer "check_in_interval_count"
     t.boolean "require_check_in", default: false
