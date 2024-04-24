@@ -1437,6 +1437,31 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by machine type on the policy relationship by ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies"
+    And the current account has 2 "licenses" for the first "policy"
+    And the current account has 2 "licenses" for the second "policy"
+    And the current account has 2 "machines" for each "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "machines",
+          "query": {
+            "policy": "$policies[0]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 4 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by machine type on the fingerprint attribute
     Given I am an admin of account "test1"
     And the current account is "test1"

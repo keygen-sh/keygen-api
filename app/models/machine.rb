@@ -326,7 +326,7 @@ class Machine < ApplicationRecord
     return none if
       policy_identifier.empty?
 
-    return where(policy_id: policy_identifier) if
+    return joins(:policy).where(policy: { id: policy_identifier }) if
       UUID_RE.match?(policy_identifier)
 
     scope = joins(:policy).where('policies.name ILIKE ?', "%#{sanitize_sql_like(policy_identifier)}%")
@@ -335,7 +335,7 @@ class Machine < ApplicationRecord
 
     scope.or(
       joins(:policy).where(<<~SQL.squish, policy_identifier.gsub(SANITIZE_TSV_RE, ' '))
-        to_tsvector('simple', policy_id::text)
+        to_tsvector('simple', policies.id::text)
         @@
         to_tsquery(
           'simple',
