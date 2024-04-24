@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_24_022335) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_24_022614) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_022335) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "name"
     t.jsonb "metadata"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.uuid "license_id"
     t.datetime "last_heartbeat_at", precision: nil
     t.integer "cores"
