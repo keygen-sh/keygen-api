@@ -65,7 +65,7 @@ gem 'sidekiq-cron', '~> 1.12.0'
 gem 'sidekiq-cronitor', '~> 3.6.0'
 
 # HTTP requests
-gem 'httparty', '~> 0.21.0'
+gem 'httparty', '~> 0.22.0'
 
 # State machine
 gem 'aasm', '~> 5.0.3'

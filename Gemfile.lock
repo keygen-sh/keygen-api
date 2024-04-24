@@ -144,6 +144,7 @@ GEM
       httparty
     css_parser (1.11.0)
       addressable
+    csv (3.3.0)
     cucumber (7.1.0)
       builder (~> 3.2, >= 3.2.4)
       cucumber-core (~> 10.1, >= 10.1.0)
@@ -236,7 +237,8 @@ GEM
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    httparty (0.21.0)
+    httparty (0.22.0)
+      csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     i18n (1.14.5)
@@ -305,7 +307,8 @@ GEM
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_test (0.1.2)
-    multi_xml (0.6.0)
+    multi_xml (0.7.1)
+      bigdecimal (~> 3.1)
     mutex_m (0.2.0)
     net-imap (0.4.12)
       date
@@ -527,7 +530,7 @@ DEPENDENCIES
   faker (~> 2.20.0)
   haml-rails
   has_scope
-  httparty (~> 0.21.0)
+  httparty (~> 0.22.0)
   json (~> 2.3.0)
   jsonapi-rails (= 0.4.0)
   judoscale-rails (~> 1.5.4)
