@@ -6,7 +6,7 @@ class CullDeadMachinesWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    machines = Machine.joins(:policy)
+    machines = Machine.joins(license: :policy)
                       .where.not(policies: { heartbeat_cull_strategy: 'ALWAYS_REVIVE' })
                       .where(heartbeat_jid: nil)
                       .dead
