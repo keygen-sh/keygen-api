@@ -24,7 +24,7 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
           license = licenses[license_id]&.first
 
           rels[:user] = {
-            data: license.owner_id? ? { type: :users, id: license.owner_id } : nil,
+            data: license&.owner_id? ? { type: :users, id: license.owner_id } : nil,
             links: {
               related: v1_account_machine_v1_5_user_path(account_id, machine_id),
             },
@@ -53,7 +53,7 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
           license = licenses[license_id]&.first
 
           rels[:user] = {
-            data: license.owner_id? ? { type: :users, id: license.owner_id } : nil,
+            data: license&.owner_id? ? { type: :users, id: license.owner_id } : nil,
             links: {
               related: v1_account_machine_v1_5_user_path(account_id, machine_id),
             },
