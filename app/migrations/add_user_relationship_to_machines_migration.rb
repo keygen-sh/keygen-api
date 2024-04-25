@@ -7,14 +7,13 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
     case body
     in included: [
       *,
-      { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } } } },
+      { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } }, license: { data: { type: /\Alicenses\z/, id: _ } } } },
       *
     ] => includes
       account_ids = includes.collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      machine_ids = includes.collect { _1[:id] }.compact.uniq
+      license_ids = includes.collect { _1[:relationships][:license][:data][:id] }.compact.uniq
 
-      licenses = License.joins(:machines)
-                        .where(account_id: account_ids, machines: { id: machine_ids })
+      licenses = License.where(account_id: account_ids, id: license_ids)
                         .select(:id, :user_id)
                         .group_by(&:id)
 
@@ -38,12 +37,15 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
 
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [*, { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } } } }, *] => data
+    in data: [
+      *,
+      { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } }, license: { data: { type: /\Alicenses\z/, id: _ } } } },
+      *
+    ] => data
       account_ids = data.collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      machine_ids = data.collect { _1[:id] }.compact.uniq
+      license_ids = data.collect { _1[:relationships][:license][:data][:id] }.compact.uniq
 
-      licenses = License.joins(:machines)
-                        .where(account_id: account_ids, machines: { id: machine_ids })
+      licenses = License.where(account_id: account_ids, id: license_ids)
                         .select(:id, :user_id)
                         .group_by(&:id)
 
