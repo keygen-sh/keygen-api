@@ -417,7 +417,7 @@ class Machine < ApplicationRecord
   scope :with_hostname, -> (hostname) { where hostname: hostname }
   scope :with_ip, -> (ip_address) { where ip: ip_address }
   scope :for_license, -> (id) { where license: id }
-  scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
+  scope :for_key, -> (key) { joins(:license).where(license: { key: }) }
   scope :for_group_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> user {
     machines = User.distinct
