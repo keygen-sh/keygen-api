@@ -271,7 +271,7 @@ Feature: Policy entitlements relationship
       """
       {
         "title": "Bad request",
-        "detail": "length must be greater than or equal to 1",
+        "detail": "length must be between 1 and 100 (inclusive)",
         "source": {
           "pointer": "/data"
         }
@@ -763,7 +763,7 @@ Feature: Policy entitlements relationship
       """
       {
         "title": "Bad request",
-        "detail": "length must be greater than or equal to 1",
+        "detail": "length must be between 1 and 100 (inclusive)",
         "source": {
           "pointer": "/data"
         }
