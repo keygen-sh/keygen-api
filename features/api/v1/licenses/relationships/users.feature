@@ -410,6 +410,255 @@ Feature: License users relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin bulk attaches 100 users to a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 100 "users"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" },
+          { "type": "user", "id": "$users[4]" },
+          { "type": "user", "id": "$users[5]" },
+          { "type": "user", "id": "$users[6]" },
+          { "type": "user", "id": "$users[7]" },
+          { "type": "user", "id": "$users[8]" },
+          { "type": "user", "id": "$users[9]" },
+          { "type": "user", "id": "$users[10]" },
+          { "type": "user", "id": "$users[11]" },
+          { "type": "user", "id": "$users[12]" },
+          { "type": "user", "id": "$users[13]" },
+          { "type": "user", "id": "$users[14]" },
+          { "type": "user", "id": "$users[15]" },
+          { "type": "user", "id": "$users[16]" },
+          { "type": "user", "id": "$users[17]" },
+          { "type": "user", "id": "$users[18]" },
+          { "type": "user", "id": "$users[19]" },
+          { "type": "user", "id": "$users[20]" },
+          { "type": "user", "id": "$users[21]" },
+          { "type": "user", "id": "$users[22]" },
+          { "type": "user", "id": "$users[23]" },
+          { "type": "user", "id": "$users[24]" },
+          { "type": "user", "id": "$users[25]" },
+          { "type": "user", "id": "$users[26]" },
+          { "type": "user", "id": "$users[27]" },
+          { "type": "user", "id": "$users[28]" },
+          { "type": "user", "id": "$users[29]" },
+          { "type": "user", "id": "$users[30]" },
+          { "type": "user", "id": "$users[31]" },
+          { "type": "user", "id": "$users[32]" },
+          { "type": "user", "id": "$users[33]" },
+          { "type": "user", "id": "$users[34]" },
+          { "type": "user", "id": "$users[35]" },
+          { "type": "user", "id": "$users[36]" },
+          { "type": "user", "id": "$users[37]" },
+          { "type": "user", "id": "$users[38]" },
+          { "type": "user", "id": "$users[39]" },
+          { "type": "user", "id": "$users[40]" },
+          { "type": "user", "id": "$users[41]" },
+          { "type": "user", "id": "$users[42]" },
+          { "type": "user", "id": "$users[43]" },
+          { "type": "user", "id": "$users[44]" },
+          { "type": "user", "id": "$users[45]" },
+          { "type": "user", "id": "$users[46]" },
+          { "type": "user", "id": "$users[47]" },
+          { "type": "user", "id": "$users[48]" },
+          { "type": "user", "id": "$users[49]" },
+          { "type": "user", "id": "$users[50]" },
+          { "type": "user", "id": "$users[51]" },
+          { "type": "user", "id": "$users[52]" },
+          { "type": "user", "id": "$users[53]" },
+          { "type": "user", "id": "$users[54]" },
+          { "type": "user", "id": "$users[55]" },
+          { "type": "user", "id": "$users[56]" },
+          { "type": "user", "id": "$users[57]" },
+          { "type": "user", "id": "$users[58]" },
+          { "type": "user", "id": "$users[59]" },
+          { "type": "user", "id": "$users[60]" },
+          { "type": "user", "id": "$users[61]" },
+          { "type": "user", "id": "$users[62]" },
+          { "type": "user", "id": "$users[63]" },
+          { "type": "user", "id": "$users[64]" },
+          { "type": "user", "id": "$users[65]" },
+          { "type": "user", "id": "$users[66]" },
+          { "type": "user", "id": "$users[67]" },
+          { "type": "user", "id": "$users[68]" },
+          { "type": "user", "id": "$users[69]" },
+          { "type": "user", "id": "$users[70]" },
+          { "type": "user", "id": "$users[71]" },
+          { "type": "user", "id": "$users[72]" },
+          { "type": "user", "id": "$users[73]" },
+          { "type": "user", "id": "$users[74]" },
+          { "type": "user", "id": "$users[75]" },
+          { "type": "user", "id": "$users[76]" },
+          { "type": "user", "id": "$users[77]" },
+          { "type": "user", "id": "$users[78]" },
+          { "type": "user", "id": "$users[79]" },
+          { "type": "user", "id": "$users[80]" },
+          { "type": "user", "id": "$users[81]" },
+          { "type": "user", "id": "$users[82]" },
+          { "type": "user", "id": "$users[83]" },
+          { "type": "user", "id": "$users[84]" },
+          { "type": "user", "id": "$users[85]" },
+          { "type": "user", "id": "$users[86]" },
+          { "type": "user", "id": "$users[87]" },
+          { "type": "user", "id": "$users[88]" },
+          { "type": "user", "id": "$users[89]" },
+          { "type": "user", "id": "$users[90]" },
+          { "type": "user", "id": "$users[91]" },
+          { "type": "user", "id": "$users[92]" },
+          { "type": "user", "id": "$users[93]" },
+          { "type": "user", "id": "$users[94]" },
+          { "type": "user", "id": "$users[95]" },
+          { "type": "user", "id": "$users[96]" },
+          { "type": "user", "id": "$users[97]" },
+          { "type": "user", "id": "$users[98]" },
+          { "type": "user", "id": "$users[99]" },
+          { "type": "user", "id": "$users[100]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the current account should have 100 "license-users"
+    And the current account should have 100 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin bulk attaches 101 users to a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 101 "users"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" },
+          { "type": "user", "id": "$users[4]" },
+          { "type": "user", "id": "$users[5]" },
+          { "type": "user", "id": "$users[6]" },
+          { "type": "user", "id": "$users[7]" },
+          { "type": "user", "id": "$users[8]" },
+          { "type": "user", "id": "$users[9]" },
+          { "type": "user", "id": "$users[10]" },
+          { "type": "user", "id": "$users[11]" },
+          { "type": "user", "id": "$users[12]" },
+          { "type": "user", "id": "$users[13]" },
+          { "type": "user", "id": "$users[14]" },
+          { "type": "user", "id": "$users[15]" },
+          { "type": "user", "id": "$users[16]" },
+          { "type": "user", "id": "$users[17]" },
+          { "type": "user", "id": "$users[18]" },
+          { "type": "user", "id": "$users[19]" },
+          { "type": "user", "id": "$users[20]" },
+          { "type": "user", "id": "$users[21]" },
+          { "type": "user", "id": "$users[22]" },
+          { "type": "user", "id": "$users[23]" },
+          { "type": "user", "id": "$users[24]" },
+          { "type": "user", "id": "$users[25]" },
+          { "type": "user", "id": "$users[26]" },
+          { "type": "user", "id": "$users[27]" },
+          { "type": "user", "id": "$users[28]" },
+          { "type": "user", "id": "$users[29]" },
+          { "type": "user", "id": "$users[30]" },
+          { "type": "user", "id": "$users[31]" },
+          { "type": "user", "id": "$users[32]" },
+          { "type": "user", "id": "$users[33]" },
+          { "type": "user", "id": "$users[34]" },
+          { "type": "user", "id": "$users[35]" },
+          { "type": "user", "id": "$users[36]" },
+          { "type": "user", "id": "$users[37]" },
+          { "type": "user", "id": "$users[38]" },
+          { "type": "user", "id": "$users[39]" },
+          { "type": "user", "id": "$users[40]" },
+          { "type": "user", "id": "$users[41]" },
+          { "type": "user", "id": "$users[42]" },
+          { "type": "user", "id": "$users[43]" },
+          { "type": "user", "id": "$users[44]" },
+          { "type": "user", "id": "$users[45]" },
+          { "type": "user", "id": "$users[46]" },
+          { "type": "user", "id": "$users[47]" },
+          { "type": "user", "id": "$users[48]" },
+          { "type": "user", "id": "$users[49]" },
+          { "type": "user", "id": "$users[50]" },
+          { "type": "user", "id": "$users[51]" },
+          { "type": "user", "id": "$users[52]" },
+          { "type": "user", "id": "$users[53]" },
+          { "type": "user", "id": "$users[54]" },
+          { "type": "user", "id": "$users[55]" },
+          { "type": "user", "id": "$users[56]" },
+          { "type": "user", "id": "$users[57]" },
+          { "type": "user", "id": "$users[58]" },
+          { "type": "user", "id": "$users[59]" },
+          { "type": "user", "id": "$users[60]" },
+          { "type": "user", "id": "$users[61]" },
+          { "type": "user", "id": "$users[62]" },
+          { "type": "user", "id": "$users[63]" },
+          { "type": "user", "id": "$users[64]" },
+          { "type": "user", "id": "$users[65]" },
+          { "type": "user", "id": "$users[66]" },
+          { "type": "user", "id": "$users[67]" },
+          { "type": "user", "id": "$users[68]" },
+          { "type": "user", "id": "$users[69]" },
+          { "type": "user", "id": "$users[70]" },
+          { "type": "user", "id": "$users[71]" },
+          { "type": "user", "id": "$users[72]" },
+          { "type": "user", "id": "$users[73]" },
+          { "type": "user", "id": "$users[74]" },
+          { "type": "user", "id": "$users[75]" },
+          { "type": "user", "id": "$users[76]" },
+          { "type": "user", "id": "$users[77]" },
+          { "type": "user", "id": "$users[78]" },
+          { "type": "user", "id": "$users[79]" },
+          { "type": "user", "id": "$users[80]" },
+          { "type": "user", "id": "$users[81]" },
+          { "type": "user", "id": "$users[82]" },
+          { "type": "user", "id": "$users[83]" },
+          { "type": "user", "id": "$users[84]" },
+          { "type": "user", "id": "$users[85]" },
+          { "type": "user", "id": "$users[86]" },
+          { "type": "user", "id": "$users[87]" },
+          { "type": "user", "id": "$users[88]" },
+          { "type": "user", "id": "$users[89]" },
+          { "type": "user", "id": "$users[90]" },
+          { "type": "user", "id": "$users[91]" },
+          { "type": "user", "id": "$users[92]" },
+          { "type": "user", "id": "$users[93]" },
+          { "type": "user", "id": "$users[94]" },
+          { "type": "user", "id": "$users[95]" },
+          { "type": "user", "id": "$users[96]" },
+          { "type": "user", "id": "$users[97]" },
+          { "type": "user", "id": "$users[98]" },
+          { "type": "user", "id": "$users[99]" },
+          { "type": "user", "id": "$users[100]" },
+          { "type": "user", "id": "$users[101]" }
+        ]
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "length must be between 1 and 100 (inclusive)",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attaches empty users to a license
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -424,7 +673,7 @@ Feature: License users relationship
       """
       {
         "title": "Bad request",
-        "detail": "length must be greater than or equal to 1",
+        "detail": "length must be between 1 and 100 (inclusive)",
         "source": {
           "pointer": "/data"
         }
@@ -1060,7 +1309,7 @@ Feature: License users relationship
       """
       {
         "title": "Bad request",
-        "detail": "length must be greater than or equal to 1",
+        "detail": "length must be between 1 and 100 (inclusive)",
         "source": {
           "pointer": "/data"
         }
