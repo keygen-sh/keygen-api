@@ -28,7 +28,7 @@ module Api::V1::Policies::Relationships
     typed_params {
       format :jsonapi
 
-      param :data, type: :array, length: { minimum: 1 } do
+      param :data, type: :array, length: { minimum: 1, maximum: 100 } do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
           param :id, type: :uuid, as: :entitlement_id
@@ -56,7 +56,7 @@ module Api::V1::Policies::Relationships
     typed_params {
       format :jsonapi
 
-      param :data, type: :array, length: { minimum: 1 } do
+      param :data, type: :array, length: { minimum: 1, maximum: 100 } do
         items type: :hash do
           param :type, type: :string, inclusion: { in: %w[entitlement entitlements] }
           param :id, type: :uuid, as: :entitlement_id
