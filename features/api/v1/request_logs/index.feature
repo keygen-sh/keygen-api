@@ -103,6 +103,75 @@ Feature: List request logs
     When I send a GET request to "/accounts/test1/request-logs?date[start]=foo&date[end]=bar"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves a list of logs by requestor (string)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 100 "request-logs"
+    And "request-logs" 0...25 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "License"
+      }
+      """
+    And "request-logs" 25...40 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?requestor=8949a87d-c470-44f5-b1be-e22ae33647ae&limit=100"
+    Then the response status should be "200"
+    And the response body should be an array with 40 "request-logs"
+
+  Scenario: Admin retrieves a list of logs by requestor (array)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 100 "request-logs"
+    And "request-logs" 0...25 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "License"
+      }
+      """
+    And "request-logs" 25...40 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?requestor[]=user&requestor[]=8949a87d-c470-44f5-b1be-e22ae33647ae&limit=100"
+    Then the response status should be "200"
+    And the response body should be an array with 15 "request-logs"
+
+  Scenario: Admin retrieves a list of logs by requestor (hash)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 100 "request-logs"
+    And "request-logs" 0...25 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "License"
+      }
+      """
+    And "request-logs" 25...40 have the following attributes:
+      """
+      {
+        "requestorId": "8949a87d-c470-44f5-b1be-e22ae33647ae",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?requestor[type]=license&requestor[id]=8949a87d-c470-44f5-b1be-e22ae33647ae&limit=100"
+    Then the response status should be "200"
+    And the response body should be an array with 25 "request-logs"
+
   Scenario: Admin attempts to retrieve all logs for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

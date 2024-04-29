@@ -120,13 +120,31 @@ class Token < ApplicationRecord
     end
   }
 
-  scope :for_product, -> id { for_bearer_type(Product.name).for_bearer_id(id) }
-  scope :for_license, -> id { for_bearer_type(License.name).for_bearer_id(id) }
-  scope :for_user,    -> id { for_bearer_type(User.name).for_bearer_id(id) }
+  scope :for_product, -> id { for_bearer(Product.name, id) }
+  scope :for_license, -> id { for_bearer(License.name, id) }
+  scope :for_user,    -> id { for_bearer(User.name, id) }
 
-  scope :for_bearer, -> type, id {
-    for_bearer_type(type).for_bearer_id(id)
-  }
+  scope :for_bearer, -> *terms {
+    case terms
+    in [ActiveRecord::Base => bearer]
+      where(bearer:)
+    in [Hash => params]
+      for_bearer(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, String => id]]
+      for_bearer_type(type).for_bearer_id(id)
+    in [String | Symbol => type, String => id]
+      for_bearer_type(type).for_bearer_id(id)
+    in [String => id]
+      for_bearer_id(id)
+    else
+      none
+    end
+  } do
+    def environments = for_bearer_type(:environment)
+    def products     = for_bearer_type(:product)
+    def licenses     = for_bearer_type(:license)
+    def users        = for_bearer_type(:user)
+  end
 
   scope :for_bearer_type, -> type {
     bearer_type = type.to_s.underscore.classify

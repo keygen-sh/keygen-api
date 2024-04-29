@@ -24,7 +24,7 @@ Feature: Analytic counts
     And the current account has 50 userless "licenses"
     And the current account has 30 "machines" for existing "licenses"
     # Adjust associations so that some users own multiple liceness
-    And "licenses" 0-10 have the following attributes:
+    And "licenses" 0...10 have the following attributes:
       """
       {
         "userId": "$users[2]"
@@ -37,14 +37,14 @@ Feature: Analytic counts
       }
       """
     # Adjust validation timestamps so that some old licenses are still active
-    And "licenses" 0-20 have the following attributes:
+    And "licenses" 0...20 have the following attributes:
       """
       {
         "lastValidatedAt": "$time.1.day.ago"
       }
       """
     # Adjust created timestamps so that some licenses are old
-    And "licenses" 0-25 have the following attributes:
+    And "licenses" 0...25 have the following attributes:
       """
       {
         "createdAt": "$time.1.year.ago"

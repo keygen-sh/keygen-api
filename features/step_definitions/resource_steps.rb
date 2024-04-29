@@ -518,21 +518,20 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   }
 end
 
-Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
+Given /^(?:the )?"([^\"]*)" (\d+)(?:\.\.(\.)?)(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, exclusive_index, end_index, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
-  start_idx = start_index.to_i
-  end_idx   = end_index.to_i
-  resources = @account.send(resource.pluralize.underscore).limit(start_idx + end_index)
+  exclusive_idx = exclusive_index.present?
+  start_idx     = start_index.to_i
+  end_idx       = end_index.to_i
+
+  resources = @account.send(resource.pluralize.underscore)
   attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
-  slice     =
-    if start_idx.zero?
-      # Arrays start at zero!
-      resources[start_idx..end_idx]
-    else
-      # Oh no, he's retarded...
-      resources[(start_idx - 1)..(end_idx - 1)]
-    end
+  slice     = if exclusive_idx
+                resources[start_idx...end_idx]
+              else
+                resources[start_idx..end_idx]
+              end
 
   slice.each {
     _1.assign_attributes(attrs)

@@ -21,11 +21,11 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "users"
-    And "users" 1-5 have the following attributes:
+    And "users" 0...5 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 6-10 have the following attributes:
+    And "users" 5...10 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
       """
@@ -53,11 +53,11 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "users"
-    And "users" 1-5 have the following attributes:
+    And "users" 0...5 have the following attributes:
       """
       { "firstName": "John", "lastName": "Doe" }
       """
-    And "users" 6-10 have the following attributes:
+    And "users" 5...10 have the following attributes:
       """
       { "firstName": "Jane", "lastName": "Doe" }
       """
@@ -1731,13 +1731,13 @@ Feature: Search
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 100 "request-logs"
-    And "request-logs" 1-4 have the following attributes:
+    And "request-logs" 0...4 have the following attributes:
       """
       {
         "ip": "192.168.1.1"
       }
       """
-    And "request-logs" 5-10 have the following attributes:
+    And "request-logs" 4...10 have the following attributes:
       """
       {
         "ip": "192.168.0.1"
@@ -1766,13 +1766,13 @@ Feature: Search
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 100 "request-logs"
-    And "request-logs" 1-3 have the following attributes:
+    And "request-logs" 0...4 have the following attributes:
       """
       {
         "ip": "192.168.1.1"
       }
       """
-    And "request-logs" 4-10 have the following attributes:
+    And "request-logs" 4...10 have the following attributes:
       """
       {
         "ip": "192.168.0.1"
@@ -1801,13 +1801,13 @@ Feature: Search
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 100 "request-logs"
-    And "request-logs" 1-2 have the following attributes:
+    And "request-logs" 0...2 have the following attributes:
       """
       {
         "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
       }
       """
-    And "request-logs" 3-10 have the following attributes:
+    And "request-logs" 2...10 have the following attributes:
       """
       {
         "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
@@ -1836,13 +1836,13 @@ Feature: Search
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 100 "request-logs"
-    And "request-logs" 1-7 have the following attributes:
+    And "request-logs" 0...7 have the following attributes:
       """
       {
         "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
       }
       """
-    And "request-logs" 8-10 have the following attributes:
+    And "request-logs" 7...10 have the following attributes:
       """
       {
         "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
@@ -1862,6 +1862,66 @@ Feature: Search
       """
     Then the response status should be "200"
     And the response body should be an array with 10 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on resource (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 25 "request-logs"
+    And 8 "request-logs" have the following attributes:
+      """
+      {
+        "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
+        "resourceType": "License"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "resource": "671b5c1e-df06-4479-b8b0-94303149a660"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 8 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on resource (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 25 "request-logs"
+    And 8 "request-logs" have the following attributes:
+      """
+      {
+        "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
+        "resourceType": "License"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "resource": "671b5c1e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 8 "request-logs"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -1926,7 +1986,81 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin performs a search by request log type on requestor ID
+  Scenario: Admin performs a search by request log type on requestor (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 29 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "requestor": "a499bb93-9902-4b52-8a04-76944ad7f660"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "request-log"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on requestor (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 29 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And the second "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-5e1f-4937-9052-a934314c9671",
+        "requestorType": "User"
+      }
+      """
+    And the third "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-52a7-4dc6-b32a-17ae6f89477b",
+        "requestorType": "License"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "requestor": "a499bb93"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on requestor ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
@@ -1946,6 +2080,81 @@ Feature: Search
           "type": "request-log",
           "query": {
             "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "request-log"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on requestor ID (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 29 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "requestorId": "a499bb93"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 1 "request-log"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on requestor ID and type
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 29 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And the second "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And the third "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "License"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+            "requestorType": "license"
           }
         }
       }

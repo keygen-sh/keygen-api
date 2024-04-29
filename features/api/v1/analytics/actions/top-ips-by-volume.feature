@@ -21,25 +21,25 @@ Feature: Analytics of top IPs by volume
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 50 "request-logs"
-    And "request-logs" 1-15 have the following attributes:
+    And "request-logs" 0...15 have the following attributes:
       """
       {
         "ip": "192.168.1.1"
       }
       """
-    And "request-logs" 16-30 have the following attributes:
+    And "request-logs" 15...30 have the following attributes:
       """
       {
         "ip": "192.168.0.1"
       }
       """
-    And "request-logs" 31-50 have the following attributes:
+    And "request-logs" 30...50 have the following attributes:
       """
       {
         "ip": "2600:1700:3e90:a450:42d:239d:bf8d:2078"
       }
       """
-    And "request-logs" 11-25 have the following attributes:
+    And "request-logs" 10...25 have the following attributes:
       """
       {
         "createdAt": "$time.1.year.ago"

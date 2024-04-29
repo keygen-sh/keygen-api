@@ -54,9 +54,25 @@ class RequestLog < ApplicationRecord
     where('request_logs.id::text ILIKE ?', "%#{sanitize_sql_like(id)}%")
   }
 
-  scope :search_requestor, -> (type, id) {
-    search_requestor_type(type).search_requestor_id(id)
-  }
+  scope :search_requestor, -> *terms {
+    case terms
+    in [Hash => params]
+      search_requestor(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, String => id]]
+      search_requestor_type(type).search_requestor_id(id)
+    in [String | Symbol => type, String => id]
+      search_requestor_type(type).search_requestor_id(id)
+    in [String => id]
+      search_requestor_id(id)
+    else
+      none
+    end
+  } do
+    def environments = search_requestor_type(:environment)
+    def products     = search_requestor_type(:product)
+    def licenses     = search_requestor_type(:license)
+    def users        = search_requestor_type(:user)
+  end
 
   scope :search_requestor_type, -> (term) {
     requestor_type = term.to_s.underscore.classify
@@ -77,9 +93,25 @@ class RequestLog < ApplicationRecord
     where('request_logs.requestor_id::text ILIKE ?', "%#{sanitize_sql_like(requestor_id)}%")
   }
 
-  scope :search_resource, -> (type, id) {
-    search_resource_type(type).search_resource_id(id)
-  }
+  scope :search_resource, -> *terms {
+    case terms
+    in [Hash => params]
+      search_resource(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, String => id]]
+      search_resource_type(type).search_resource_id(id)
+    in [String | Symbol => type, String => id]
+      search_resource_type(type).search_resource_id(id)
+    in [String => id]
+      search_resource_id(id)
+    else
+      none
+    end
+  } do
+    def environments = search_resource_type(:environment)
+    def products     = search_resource_type(:product)
+    def licenses     = search_resource_type(:license)
+    def users        = search_resource_type(:user)
+  end
 
   scope :search_resource_type, -> (term) {
     resource_type = term.to_s.underscore.classify

@@ -64,48 +64,50 @@ After do |scenario|
     puts scenario.exception
     puts
 
-    req_headers = last_request.env
-      .select { |k, v| k.start_with?('HTTP_') }
-      .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
+    unless ENV.key?('NO_DUMP')
+      req_headers = last_request.env
+        .select { |k, v| k.start_with?('HTTP_') }
+        .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
-    puts "dump:"
-    puts
-    pp(
-      request: {
-        method: last_request.request_method,
-        url: last_request.url,
-        headers: req_headers,
-        body: (JSON.parse(last_request.body.string) rescue nil)
-      },
-      response: {
-        status: last_response.status,
-        headers: (last_response.headers.to_h rescue {}),
-        body: (JSON.parse(last_response.body) rescue last_response.body)
-      },
-      debug: {
-        env_number: ENV['TEST_ENV_NUMBER'].to_i,
-        error_log: $!&.backtrace || [],
-        query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
-          Elif.open(log_path) do |log|
-            count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
-            lines = []
+      puts "dump:"
+      puts
+      pp(
+        request: {
+          method: last_request.request_method,
+          url: last_request.url,
+          headers: req_headers,
+          body: (JSON.parse(last_request.body.string) rescue nil)
+        },
+        response: {
+          status: last_response.status,
+          headers: (last_response.headers.to_h rescue {}),
+          body: (JSON.parse(last_response.body) rescue last_response.body)
+        },
+        debug: {
+          env_number: ENV['TEST_ENV_NUMBER'].to_i,
+          error_log: $!&.backtrace || [],
+          query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
+            Elif.open(log_path) do |log|
+              count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
+              lines = []
 
-            # Read the last n SQL lines from the log file (useful when debugging CI)
-            log.each do |line|
-              break if lines.count >= count
+              # Read the last n SQL lines from the log file (useful when debugging CI)
+              log.each do |line|
+                break if lines.count >= count
 
-              if line =~ /application='Keygen',pid='#{Process.pid}'/
-                lines << line.squish
+                if line =~ /application='Keygen',pid='#{Process.pid}'/
+                  lines << line.squish
+                end
               end
-            end
 
-            lines
-          rescue
-            lines
-          end
-        end,
-      },
-    )
+              lines
+            rescue
+              lines
+            end
+          end,
+        },
+      )
+    end
   end
 
   @account = nil

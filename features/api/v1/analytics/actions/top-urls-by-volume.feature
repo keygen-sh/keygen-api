@@ -21,49 +21,49 @@ Feature: Analytics of top URLs by volume
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 100 "request-logs"
-    And "request-logs" 1-50 have the following attributes:
+    And "request-logs" 0...50 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/actions/validate-key",
         "method": "POST"
       }
       """
-    And "request-logs" 51-80 have the following attributes:
+    And "request-logs" 50...80 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/machines",
         "method": "POST"
       }
       """
-    And "request-logs" 81-90 have the following attributes:
+    And "request-logs" 80...90 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses",
         "method": "POST"
       }
       """
-    And "request-logs" 91-95 have the following attributes:
+    And "request-logs" 90...95 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/ed65c9d0-4765-4f1a-8632-9865a4d99d19",
         "method": "GET"
       }
       """
-    And "request-logs" 96-98 have the following attributes:
+    And "request-logs" 95...98 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/65ee222a-d5f6-425b-88a3-ae83a9c51bcc",
         "method": "PATCH"
       }
       """
-    And "request-logs" 99-100 have the following attributes:
+    And "request-logs" 98...100 have the following attributes:
       """
       {
         "url": "/v1/accounts/test1/licenses/bf9b523f-dd65-48a2-9512-fb66ba6c3714",
         "method": "GET"
       }
       """
-    And "request-logs" 1-15 have the following attributes:
+    And "request-logs" 0...15 have the following attributes:
       """
       {
         "createdAt": "$time.1.year.ago"
