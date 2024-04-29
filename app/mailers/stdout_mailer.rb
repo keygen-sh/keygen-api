@@ -718,6 +718,68 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_seven(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "What's new in Keygen: multi-user licenses",
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        If I cataloged and ranked all of Keygen's feature requests over the last 8 years by popularity, multi-user licenses would be at the forefront. It's been Keygen's most requested feature by a landslide. But trying to figure out how to implement it in a backwards compatible way always kept the project on the backburner. It was a very hard project.
+
+        That's why, I'm super excited to announce that multi-user licenses is now generally available. This is the culmination of nearly 6 months of hard work, and overcoming lots and lots of technical challenges. (If I'm being honest, the technical challenges this project has had cannot be understated. Multiple soon-to-be open source libraries were born out of the project -- but I'll leave that topic for another day.)
+
+        So, what exactly *is* multi-user licenses anyway?
+
+        As the name may suggest, we are changing the relationship between licenses and users from a *has-one* to a *has-many* relationship. In non-engineering terms -- previously, a license could be associated to only a single user, and now not only can a license be associated to a user (now referred to as its owner), but it can also have multiple *other* users associated to it.
+
+        Going from a single-user model to a multi-user model is quite a big shift, and a lot of internal code has changed to reflect this shift, but all of it has been done in a way that is 100% backwards compatible. So that means nothing changes i.r.t. existing integrations. If you're technical, you know how such a seemingly small change can be a significant challenge, and maintaining 100% backwards compatibility even more so. But we're stoked to share that we were able to pull it off.
+
+        Mutli-user licenses opens up new possibilities for a lot of licensing models that have historically been hard, or even impossible, to implement in Keygen, such as true per-user licensing, and other variations of per-seat licensing. We've seen a big trend towards per-user licensing models, and we wanted Keygen to be able to provide the building blocks for this increasingly popular choice.
+
+        Historically, you *could* work around these shortcomings by retro-fitting machines to model users, or by issuing multiple licenses (e.g. a license per-user), but there were always major tradeoffs, and it ultimately felt like a hack (because it *was*).
+
+        Starting today, it's as simple as creating a license, and then attaching 𝑛 users to that license.
+
+        If you're interested in reading more, check out this short blog post:
+
+          https://keygen.sh/blog/announcing-multi-user-licenses/
+
+        I'd like to reiterate: if you have an existing Keygen integration, *nothing changes.* We strive to maintain 100% backwards compatibility, and we've put a considerable amount of effort into our API versioning system to ensure we meet that promise.
+
+        Anyways, check it out, build with it, and let me know what you think.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. for all your self-hosters, we'll cut a new Keygen CE and EE release soon (after it's been battle-tested in Keygen Cloud).
+
+        p.p.s. we broke 500 stars on GitHub! Star us if you haven't yet: https://github.com/keygen-sh/keygen-api
+      TXT
+    )
+  end
+
   private
 
   def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
