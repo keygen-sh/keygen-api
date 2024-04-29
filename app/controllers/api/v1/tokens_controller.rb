@@ -5,7 +5,7 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
-    has_scope(:bearer, type: :hash, using: %i[type id]) { |c, s, (t, id)| s.for_bearer(t, id) }
+    has_scope(:bearer, type: :any) { |c, s, v| s.for_bearer(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: %i[index regenerate regenerate_current]

@@ -34,7 +34,7 @@ module Api::V1
     }
     def search
       query, type = search_meta.fetch_values(:query, :type)
-      op          = search_meta.fetch(:op) { :AND }.to_sym
+      op          = search_meta.fetch(:op) { :and }.to_s.upcase.to_sym
       model       = type.underscore.classify.safe_constantize
 
       raise UnsupportedSearchTypeError if
@@ -55,7 +55,7 @@ module Api::V1
       authorize! model,
         with: SearchPolicy
 
-      res = model.where(account: current_account)
+      scope = model.where(account: current_account)
 
       # Special cases for certain models
       case
@@ -64,7 +64,7 @@ module Api::V1
         end_date   = Time.current
 
         # Limit request log searches to last 30 days to improve perf
-        res = res.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date: start_date, end_date: end_date)
+        scope = scope.where('request_logs.created_at >= :start_date AND request_logs.created_at <= :end_date', start_date: start_date, end_date: end_date)
       end
 
       Keygen.logger.info "[searches.search] account_id=#{current_account.id} search_type=#{type} search_query=#{query} search_op=#{op}"
@@ -72,7 +72,7 @@ module Api::V1
       query.each do |key, value|
         attribute = key.to_s.underscore.parameterize(separator: '_')
 
-        if !res.respond_to?("search_#{attribute}")
+        unless scope.respond_to?("search_#{attribute}")
           return render_bad_request(
             detail: "search query '#{attribute.camelize(:lower)}' is not supported for resource type '#{type.camelize(:lower)}'",
             source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
@@ -99,11 +99,11 @@ module Api::V1
 
           case op
           when :AND
-            res = res.search_metadata(value)
+            scope = scope.search_metadata(value)
           when :OR
-            res = res.or(res.search_metadata(value))
+            scope = scope.or(scope.search_metadata(value))
           else
-            res = res.none
+            scope = scope.none
           end
         else
           if value.is_a?(String) && value.size < SEARCH_MIN_QUERY_SIZE
@@ -115,16 +115,16 @@ module Api::V1
 
           case op
           when :AND
-            res = res.send("search_#{attribute}", value)
+            scope = scope.send("search_#{attribute}", value)
           when :OR
-            res = res.or(res.send("search_#{attribute}", value))
+            scope = scope.or(scope.send("search_#{attribute}", value))
           else
-            res = res.none
+            scope = scope.none
           end
         end
       end
 
-      search_results = apply_pagination(authorized_scope(apply_scopes(res)))
+      search_results = apply_pagination(authorized_scope(apply_scopes(scope)))
       authorize! search_results,
         to: :index?
 

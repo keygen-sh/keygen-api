@@ -21,28 +21,28 @@ Feature: Analytics of top licences by volume
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 50 "request-logs"
-    And "request-logs" 1-15 have the following attributes:
+    And "request-logs" 0...15 have the following attributes:
       """
       {
         "resourceId": "bf9b523f-dd65-48a2-9512-fb66ba6c3714",
         "resourceType": "License"
       }
       """
-    And "request-logs" 16-30 have the following attributes:
+    And "request-logs" 15...30 have the following attributes:
       """
       {
         "resourceId": "7559899f-2761-4b9c-a43e-2d919efa9b04",
         "resourceType": "User"
       }
       """
-    And "request-logs" 31-50 have the following attributes:
+    And "request-logs" 30...50 have the following attributes:
       """
       {
         "resourceId": "a499bb93-9902-4b52-8a04-76944ad7f660",
         "resourceType": "License"
       }
       """
-    And "request-logs" 1-10 have the following attributes:
+    And "request-logs" 0...10 have the following attributes:
       """
       {
         "createdAt": "$time.1.year.ago"

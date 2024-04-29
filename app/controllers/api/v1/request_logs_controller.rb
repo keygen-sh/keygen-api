@@ -3,8 +3,8 @@
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
     has_scope(:date, type: :hash, using: [:start, :end], only: :index)
-    has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
-    has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
+    has_scope(:requestor, type: :any) { |c, s, v| s.search_requestor(v) }
+    has_scope(:resource, type: :any) { |c, s, v| s.search_resource(v) }
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
     has_scope(:ip) { |c, s, v| s.search_ip(v) }
     has_scope(:method) { |c, s, v| s.search_method(v) }

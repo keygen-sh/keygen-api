@@ -41,9 +41,25 @@ class EventLog < ApplicationRecord
     where('event_logs.request_log_id::text ILIKE ?', "%#{sanitize_sql_like(request_log_id)}%")
   }
 
-  scope :search_whodunnit, -> (type, id) {
-    search_whodunnit_type(type).search_whodunnit_id(id)
-  }
+  scope :search_whodunnit, -> *terms {
+    case terms
+    in [Hash => params]
+      search_whodunnit(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, String => id]]
+      search_whodunnit_type(type).search_whodunnit_id(id)
+    in [String | Symbol => type, String => id]
+      search_whodunnit_type(type).search_whodunnit_id(id)
+    in [String => id]
+      search_whodunnit_id(id)
+    else
+      none
+    end
+  } do
+    def environments = search_whodunnit_type(:environment)
+    def products     = search_whodunnit_type(:product)
+    def licenses     = search_whodunnit_type(:license)
+    def users        = search_whodunnit_type(:user)
+  end
 
   scope :search_whodunnit_type, -> (term) {
     whodunnit_type = term.to_s.underscore.classify
@@ -64,9 +80,25 @@ class EventLog < ApplicationRecord
     where('event_logs.whodunnit_id::text ILIKE ?', "%#{sanitize_sql_like(whodunnit_id)}%")
   }
 
-  scope :search_resource, -> (type, id) {
-    search_resource_type(type).search_resource_id(id)
-  }
+  scope :search_resource, -> *terms {
+    case terms
+    in [Hash => params]
+      search_resource(params.symbolize_keys.values_at(:type, :id))
+    in [[String | Symbol => type, String => id]]
+      search_resource_type(type).search_resource_id(id)
+    in [String | Symbol => type, String => id]
+      search_resource_type(type).search_resource_id(id)
+    in [String => id]
+      search_resource_id(id)
+    else
+      none
+    end
+  } do
+    def environments = search_resource_type(:environment)
+    def products     = search_resource_type(:product)
+    def licenses     = search_resource_type(:license)
+    def users        = search_resource_type(:user)
+  end
 
   scope :search_resource_type, -> (term) {
     resource_type = term.to_s.underscore.classify
