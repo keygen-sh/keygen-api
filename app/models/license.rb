@@ -55,7 +55,7 @@ class License < ApplicationRecord
   # Used for legacy encrypted licenses
   attr_reader :raw
 
-  before_create :enforce_license_limit_on_account!
+  before_create :enforce_active_licensed_user_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { policy.present? && requires_check_in? }
   before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
@@ -1108,7 +1108,7 @@ class License < ApplicationRecord
     self.key = "#{signing_data}.#{encoded_sig}"
   end
 
-  def enforce_license_limit_on_account!
+  def enforce_active_licensed_user_limit_on_account!
     return unless account.trialing_or_free?
 
     active_licensed_user_count = account.active_licensed_user_count
