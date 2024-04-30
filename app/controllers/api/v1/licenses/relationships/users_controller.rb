@@ -41,9 +41,11 @@ module Api::V1::Licenses::Relationships
       authorize! users,
         with: Licenses::UserPolicy
 
-      attached = license.license_users.create!(
-        user_ids.map {{ user_id: _1 }},
-      )
+      attached = license.transaction do
+        license.license_users.create!(
+          user_ids.map {{ user_id: _1 }},
+        )
+      end
 
       BroadcastEventService.call(
         event: 'license.users.attached',
@@ -103,7 +105,9 @@ module Api::V1::Licenses::Relationships
         )
       end
 
-      detached = license.license_users.destroy(license_users)
+      detached = license.transaction do
+        license.license_users.destroy(license_users)
+      end
 
       BroadcastEventService.call(
         event: 'license.users.detached',

@@ -41,9 +41,11 @@ module Api::V1::Licenses::Relationships
       authorize! entitlements,
         with: Licenses::EntitlementPolicy
 
-      attached = license.license_entitlements.create!(
-        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
-      )
+      attached = license.transaction do
+        license.license_entitlements.create!(
+          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+        )
+      end
 
       BroadcastEventService.call(
         event: 'license.entitlements.attached',
@@ -107,7 +109,9 @@ module Api::V1::Licenses::Relationships
         )
       end
 
-      detached = license.license_entitlements.delete(license_entitlements)
+      detached = license.transaction do
+        license.license_entitlements.destroy(license_entitlements)
+      end
 
       BroadcastEventService.call(
         event: 'license.entitlements.detached',
