@@ -5889,7 +5889,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
-        "code": "ACCOUNT_LICENSE_LIMIT_EXCEEDED",
+        "code": "ACCOUNT_ALU_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/relationships/account"
         }
@@ -5933,7 +5933,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
-        "code": "ACCOUNT_LICENSE_LIMIT_EXCEEDED",
+        "code": "ACCOUNT_ALU_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/relationships/account"
         }
