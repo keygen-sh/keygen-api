@@ -773,7 +773,7 @@ class StdoutMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. for all your self-hosters, we'll cut a new Keygen CE and EE release soon (after it's been battle-tested in Keygen Cloud).
+        p.s. for all you self-hosters, we'll cut a new Keygen CE and EE release soon (after it's been battle-tested in Keygen Cloud).
 
         p.p.s. we broke 500 stars on GitHub! Star us if you haven't yet: https://github.com/keygen-sh/keygen-api
       TXT
