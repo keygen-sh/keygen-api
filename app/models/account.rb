@@ -246,11 +246,12 @@ class Account < ApplicationRecord
   end
 
   def active_licensed_user_count
-    license_counts =
-      self.licenses.active
-        .reorder(Arel.sql('"licenses"."user_id" NULLS FIRST'))
-        .group(Arel.sql('"licenses"."user_id"'))
-        .count
+    license_counts = licenses.left_outer_joins(:users)
+                             .group('users.id')
+                             .reorder('users.id NULLS FIRST')
+                             .distinct
+                             .active
+                             .count
 
     # FIXME(ezekg) The nil key here is really weird, but that's what AR gives us for
     #              unassigned licenses i.e. those without a user.
