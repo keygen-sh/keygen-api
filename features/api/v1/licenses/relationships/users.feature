@@ -812,6 +812,48 @@ Feature: License users relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to attach a user while trialing a paid tier without card but has exceeded their max licensed user limit
+    Given I am an admin of account "test1"
+    And the account "test1" has a max license limit of 50
+    And the account "test1" does not have a card on file
+    And the account "test1" is trialing
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 2 "users"
+    And the current account has 9 "licenses"
+    And the current account has 5 "license-users" for each "license"
+    And the current account has 1 "license"
+    And the current account has 4 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "users", "id": "$users[1]" },
+          { "type": "users", "id": "$users[2]" }
+        ]
+      }
+      """
+    Then the response status should be "402"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
+        "code": "ACCOUNT_LICENSE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/account"
+        }
+      }
+      """
+    And the current account should have 10 "licenses"
+    And the current account should have 49 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin of another account attempts to attach themself to a license
     Given I am an admin of account "test2"
     And the current account is "test1"
