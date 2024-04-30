@@ -40,9 +40,11 @@ module Api::V1::Policies::Relationships
       authorize! entitlements,
         with: Policies::EntitlementPolicy
 
-      attached = policy.policy_entitlements.create!(
-        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
-      )
+      attached = policy.transaction do
+        policy.policy_entitlements.create!(
+          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+        )
+      end
 
       BroadcastEventService.call(
         event: 'policy.entitlements.attached',
@@ -86,7 +88,9 @@ module Api::V1::Policies::Relationships
         )
       end
 
-      detached = policy.policy_entitlements.delete(policy_entitlements)
+      detached = policy.transaction do
+        policy.policy_entitlements.destroy(policy_entitlements)
+      end
 
       BroadcastEventService.call(
         event: 'policy.entitlements.detached',
