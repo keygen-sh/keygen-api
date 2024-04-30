@@ -320,7 +320,7 @@ class ApplicationController < ActionController::API
     end
 
     # Special cases where a certain limit has been met on the free tier
-    status = if errors.any? { _1.code == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
+    status = if errors.any? { _1.code == 'ACCOUNT_ALU_LIMIT_EXCEEDED' }
                :payment_required
              else
                :unprocessable_entity
