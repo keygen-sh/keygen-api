@@ -766,6 +766,8 @@ class StdoutMailer < ApplicationMailer
 
         I'd like to reiterate: if you have an existing Keygen integration, *nothing changes.* We strive to maintain 100% backwards compatibility, and we've put a considerable amount of effort into our API versioning system to ensure we meet that promise.
 
+        Right now, this is an API-only feature. We'll be adding the new functionality to the Dashboard soon.
+
         Anyways, check it out, build with it, and let me know what you think.
 
         Until next time.
