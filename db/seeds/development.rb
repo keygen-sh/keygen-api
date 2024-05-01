@@ -288,10 +288,21 @@ loop do
           route.required_parts.reduce({}) { _1.merge(_2 => SecureRandom.uuid) },
         )
 
-        resource    = route.requirements[:controller].classify.split('::').last.safe_constantize
+        # Select a random record
+        resource = if klass = route.requirements[:controller].classify.split('::').last.safe_constantize
+                     next unless klass < ActiveRecord::Base
+
+                     scope  = klass < Accountable ? klass.where(account:) : klass.all
+                     record = scope.offset((rand() * scope.count).floor) # random row
+                                   .limit(1)
+                                   .take
+
+                     record
+                   end
+
         environment = resource.try(:environment)
-        admin       = account.admins.for_environment(environment, strict: true).sample
-        requestor   = if resource.respond_to?(:role) && rand(0..1).zero?
+        admin       = account.admins.for_environment(environment, strict: true).take
+        requestor   = if rand(0..1).zero? && resource.respond_to?(:role)
                         resource
                       else
                         admin
@@ -316,15 +327,17 @@ loop do
           account:,
         )
 
-        event_log = EventLog.create!(
-          event_type_id: event_types.sample,
-          idempotency_key: SecureRandom.hex,
-          whodunnit: requestor,
-          environment:,
-          resource:,
-          request_log:,
-          account:,
-        )
+        unless resource.nil?
+          EventLog.create!(
+            event_type_id: event_types.sample,
+            idempotency_key: SecureRandom.hex,
+            whodunnit: requestor,
+            environment:,
+            resource:,
+            request_log:,
+            account:,
+          )
+        end
       end
     end
   rescue ActiveRecord::RecordNotSaved => e
