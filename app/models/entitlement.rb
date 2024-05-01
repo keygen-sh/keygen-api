@@ -25,13 +25,13 @@ class Entitlement < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin | :product)
-      self.all
+      all
     in role: Role(:environment)
-      self.for_environment(accessor)
+      for_environment(accessor)
     in role: Role(:user | :license)
-      self.merge(accessor.entitlements)
+      merge(accessor.entitlements)
     else
-      self.none
+      none
     end
   }
 

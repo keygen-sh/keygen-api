@@ -334,7 +334,7 @@ Feature: Release artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, restrict access)
     Given the current account is "test1"
@@ -383,7 +383,7 @@ Feature: Release artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, maintain access)
     Given the current account is "test1"
@@ -453,7 +453,7 @@ Feature: Release artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (expired before release, maintain access)
     Given the current account is "test1"
@@ -473,7 +473,7 @@ Feature: Release artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (expired before release, allow access)
     Given the current account is "test1"
@@ -533,7 +533,7 @@ Feature: Release artifacts relationship
     And I am a license of account "test1"
     And I authenticate with my license key
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, expired after release, restrict access)
     Given the current account is "test1"
@@ -861,7 +861,7 @@ Feature: Release artifacts relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves a release artifact with a license for it (expired after release)
     Given the current account is "test1"

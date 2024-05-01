@@ -10,7 +10,7 @@ class V1x0::ReleaseUpgradeService < BaseService
   class InvalidChannelError < StandardError; end
   class UpdateResult < OpenStruct; end
 
-  def initialize(account:, product:, platform:, filetype:, version:, constraint: nil, channel: 'stable')
+  def initialize(account:, product:, platform:, filetype:, version:, constraint: nil, channel: 'stable', accessor: Current.bearer)
     raise InvalidAccountError.new('account must be present') unless
       account.present? && account.instance_of?(Account)
 
@@ -29,6 +29,7 @@ class V1x0::ReleaseUpgradeService < BaseService
     raise InvalidChannelError.new('channel must be present') unless
       channel.present?
 
+    @accessor   = accessor
     @account    = account
     @product    = product
     @platform   = platform
@@ -71,12 +72,15 @@ class V1x0::ReleaseUpgradeService < BaseService
               :filetype,
               :version,
               :constraint,
-              :channel
+              :channel,
+              :accessor
 
   def available_releases
-    @available_releases ||= account.releases.for_product(product)
+    @available_releases ||= account.releases.accessible_by(accessor)
+                                            .for_product(product)
                                             .for_platform(platform)
                                             .for_filetype(filetype)
+                                            .reorder(nil)
   end
 
   def available_upgrades

@@ -1351,14 +1351,7 @@ Feature: Show release artifact
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "403"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (license expiry falls outside of access window)"
-      }
-      """
+    Then the response status should be "404"
 
   Scenario: License retrieves an artifact for a LICENSED release with an expired license for it (revoke access)
     Given the current account is "test1"
@@ -1382,14 +1375,7 @@ Feature: Show release artifact
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "403"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (license is expired)"
-      }
-      """
+    Then the response status should be "404"
 
   Scenario: License retrieves an artifact for a LICENSED release with an expired license for it (expired before release, maintain access)
     Given the current account is "test1"
@@ -1413,14 +1399,7 @@ Feature: Show release artifact
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "403"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (license expiry falls outside of access window)"
-      }
-      """
+    Then the response status should be "404"
 
   Scenario: License retrieves an artifact for a LICENSED release with an expired license for it (expired after release, maintain access)
     Given the current account is "test1"

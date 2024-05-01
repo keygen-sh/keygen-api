@@ -370,7 +370,8 @@ Feature: Product artifacts relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
     Given the current account is "test1"
@@ -412,7 +413,8 @@ Feature: Product artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the response body should be an array with 0 "artifacts"
 
   Scenario: License attempts to retrieve the artifacts for a different product
    Given the current account is "test1"
