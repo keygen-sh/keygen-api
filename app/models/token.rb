@@ -97,29 +97,29 @@ class Token < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin)
-      self.all
+      all
     in role: Role(:environment)
-      self.for_environment(accessor)
-          .where.not(
-            bearer: accessor.admins.reorder(nil),
-          )
-          .or(
-            where(bearer: accessor)
-          )
+      for_environment(accessor)
+        .where.not(
+          bearer: accessor.admins.reorder(nil),
+        )
+        .or(
+          where(bearer: accessor),
+        )
     in role: Role(:product)
-      self.for_product(accessor.id)
-          .or(
-            where(bearer: accessor.licenses.reorder(nil)),
-          )
-          .or(
-            where(bearer: accessor.users.reorder(nil)),
-          )
+      for_product(accessor.id)
+        .or(
+          where(bearer: accessor.licenses.reorder(nil)),
+        )
+        .or(
+          where(bearer: accessor.users.reorder(nil)),
+        )
     in role: Role(:user)
-      self.for_user(accessor.id)
+      for_user(accessor.id)
     in role: Role(:license)
-      self.for_license(accessor.id)
+      for_license(accessor.id)
     else
-      self.none
+      none
     end
   }
 

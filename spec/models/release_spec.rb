@@ -4,8 +4,9 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe Release, type: :model do
-  let(:account) { create(:account) }
-  let(:product) { create(:product, account:) }
+  let(:account)  { create(:account) }
+  let(:product)  { create(:product, account:) }
+  let(:accessor) { create(:admin, account:) }
 
   it_behaves_like :environmental
   it_behaves_like :accountable
@@ -301,7 +302,7 @@ describe Release, type: :model do
       subject { create(:release, :published, product:, account:) }
 
       it 'should not upgrade' do
-        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+        expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -340,7 +341,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+        expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -352,7 +353,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+        expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -364,7 +365,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+        expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -409,7 +410,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0', product:, account:) }
 
           it 'should upgrade to the latest version' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0'
@@ -420,14 +421,14 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should not upgrade to the rc release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
           end
 
           it 'should upgrade with explicit rc channel' do
-            upgrade = subject.upgrade!(channel: 'rc')
+            upgrade = subject.upgrade!(accessor:, channel: 'rc')
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-rc.1'
@@ -438,14 +439,14 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should not upgrade to the beta release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
           end
 
           it 'should upgrade with explicit beta channel' do
-            upgrade = subject.upgrade!(channel: 'beta')
+            upgrade = subject.upgrade!(accessor:, channel: 'beta')
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-beta.1'
@@ -456,14 +457,14 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should not upgrade to the alpha release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
           end
 
           it 'should upgrade with explicit alpha channel' do
-            upgrade = subject.upgrade!(channel: 'alpha')
+            upgrade = subject.upgrade!(accessor:, channel: 'alpha')
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-alpha.1'
@@ -474,14 +475,14 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-dev.1', product:, account:) }
 
           it 'should not upgrade to the dev release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
           end
 
           it 'should upgrade with explicit dev channel' do
-            upgrade = subject.upgrade!(channel: 'dev')
+            upgrade = subject.upgrade!(accessor:, channel: 'dev')
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-dev.1'
@@ -496,7 +497,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0', product:, account:) }
 
           it 'should upgrade to the latest version' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0'
@@ -507,7 +508,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should upgrade to the rc release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-rc.1'
@@ -518,7 +519,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should not upgrade to the beta release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
@@ -529,7 +530,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should not upgrade to the alpha release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
@@ -540,7 +541,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-dev.1', product:, account:) }
 
           it 'should not upgrade to the dev release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
@@ -555,7 +556,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0', product:, account:) }
 
           it 'should upgrade to the latest version' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0'
@@ -566,7 +567,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should upgrade to the rc release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-rc.1'
@@ -577,7 +578,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should upgrade to the beta release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-beta.1'
@@ -588,7 +589,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should not upgrade to the alpha release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
@@ -599,7 +600,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-dev.1', product:, account:) }
 
           it 'should not upgrade to the dev release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
@@ -614,7 +615,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.0.3', product:, account:) }
 
           it 'should upgrade to the latest version' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.3'
@@ -625,7 +626,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should upgrade to the rc release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-rc.1'
@@ -636,7 +637,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should upgrade to the beta release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-beta.1'
@@ -647,7 +648,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should upgrade to the alpha release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-alpha.1'
@@ -661,7 +662,7 @@ describe Release, type: :model do
           end
 
           it 'should not upgrade to the dev release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.3'
@@ -676,7 +677,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0', product:, account:) }
 
           it 'should not upgrade to the latest version' do
-            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+            expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -684,7 +685,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should not upgrade to the rc release' do
-            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+            expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -692,7 +693,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should not upgrade to the beta release' do
-            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+            expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -700,7 +701,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should not upgrade to the alpha release' do
-            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+            expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -708,7 +709,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-dev.1', product:, account:) }
 
           it 'should upgrade to the dev release' do
-            upgrade = subject.upgrade!
+            upgrade = subject.upgrade!(accessor:)
             assert upgrade
 
             expect(upgrade.version).to eq '3.1.0-dev.1'
@@ -720,25 +721,25 @@ describe Release, type: :model do
         subject { create(:release, :published, version: '2.0.0', product:, account:) }
 
         it 'should raise for an invalid constraint' do
-          expect { subject.upgrade!(constraint: 'invalid') }.to raise_error Semverse::InvalidConstraintFormat
+          expect { subject.upgrade!(accessor:, constraint: 'invalid') }.to raise_error Semverse::InvalidConstraintFormat
         end
 
         it 'should upgrade to the latest v2 version' do
-          upgrade = subject.upgrade!(constraint: '2')
+          upgrade = subject.upgrade!(accessor:, constraint: '2')
           assert upgrade
 
           expect(upgrade.version).to eq '2.9.0'
         end
 
         it 'should upgrade to the latest v2.x version' do
-          upgrade = subject.upgrade!(constraint: '2.0')
+          upgrade = subject.upgrade!(accessor:, constraint: '2.0')
           assert upgrade
 
           expect(upgrade.version).to eq '2.9.0'
         end
 
         it 'should upgrade to the latest v2.0.x version' do
-          upgrade = subject.upgrade!(constraint: '2.1.0')
+          upgrade = subject.upgrade!(accessor:, constraint: '2.1.0')
           assert upgrade
 
           expect(upgrade.version).to eq '2.1.9'
@@ -754,7 +755,59 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade to the same version' do
-        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+        expect { subject.upgrade!(accessor:) }.to raise_error Keygen::Error::NotFoundError
+      end
+    end
+
+    context 'when :accessor is a user with an expired license' do
+      subject { create(:release, :published, created_at: 1.year.ago, version: '1.0.0', product:, account:) }
+
+      let(:policy) { create(:policy, product:, account:) }
+      let(:user)   { create(:user, account:) }
+
+      before do
+        create(:release, :published, created_at: 9.months.ago, version: '2.0.0', product:, account:)
+        create(:release, :published, created_at: 1.month.ago, version: '3.0.0', product:, account:)
+        create(:release, :published, created_at: 1.week.ago, version: '3.0.1', product:, account:)
+        create(:release, :published, created_at: 4.days.ago, version: '3.0.2', product:, account:)
+        create(:release, :published, created_at: 4.days.ago, version: '3.1.0', product:, account:)
+        create(:release, :yanked, created_at: 4.days.ago, version: '3.1.1', product:, account:)
+        create(:release, :published, created_at: 1.day.ago, version: '3.1.2', product:, account:)
+        create(:release, :draft, created_at: 1.hour.ago, version: '3.1.3', product:, account:)
+
+        create(:license, expiry: 3.days.ago, owner: user, policy:, account:)
+      end
+
+      it 'should scope to accessible releases' do
+        upgrade = subject.upgrade!(accessor: user)
+        assert upgrade
+
+        expect(upgrade.version).to eq '3.1.0'
+      end
+    end
+
+    context 'when :accessor is an expired license' do
+      subject { create(:release, :published, created_at: 1.year.ago, version: '1.0.0', product:, account:) }
+
+      let(:policy)  { create(:policy, product:, account:) }
+      let(:license) { create(:license, expiry: 3.days.ago, policy:, account:) }
+
+      before do
+        create(:release, :published, created_at: 9.months.ago, version: '2.0.0', product:, account:)
+        create(:release, :published, created_at: 1.month.ago, version: '3.0.0', product:, account:)
+        create(:release, :published, created_at: 1.week.ago, version: '3.0.1', product:, account:)
+        create(:release, :published, created_at: 4.days.ago, version: '3.0.2', product:, account:)
+        create(:release, :published, created_at: 4.days.ago, version: '3.1.0', product:, account:)
+        create(:release, :yanked, created_at: 4.days.ago, version: '3.1.1', product:, account:)
+        create(:release, :published, created_at: 1.day.ago, version: '3.1.2', product:, account:)
+        create(:release, :draft, created_at: 1.hour.ago, version: '3.1.3', product:, account:)
+      end
+
+      it 'should scope to accessible releases' do
+        upgrade = subject.upgrade!(accessor: license)
+        assert upgrade
+
+        expect(upgrade.version).to eq '3.1.0'
       end
     end
   end
@@ -795,7 +848,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        upgrade = subject.upgrade
+        upgrade = subject.upgrade(accessor:)
 
         expect(upgrade).to be_nil
       end
@@ -838,7 +891,7 @@ describe Release, type: :model do
       end
 
       it 'should upgrade' do
-        upgrade = subject.upgrade
+        upgrade = subject.upgrade(accessor:)
         assert upgrade
 
         expect(upgrade.version).to eq '3.0.2'

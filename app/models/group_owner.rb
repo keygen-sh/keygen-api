@@ -20,18 +20,18 @@ class GroupOwner < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin | :product)
-      self.all
+      all
     in role: Role(:environment)
-      self.for_environment(accessor.id)
+      for_environment(accessor.id)
     in role: Role(:user)
-      self.where(group_id: accessor.group_id)
-          .or(
-            where(group_id: accessor.group_ids),
-          )
+      where(group_id: accessor.group_id)
+        .or(
+          where(group_id: accessor.group_ids),
+        )
     in role: Role(:license)
-      self.where(group_id: accessor.group_id)
+      where(group_id: accessor.group_id)
     else
-      self.none
+      none
     end
   }
 end

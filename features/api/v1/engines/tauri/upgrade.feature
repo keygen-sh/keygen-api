@@ -337,7 +337,7 @@ Feature: Tauri upgrade package
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
-    Then the response status should be "403"
+    Then the response status should be "204"
 
   Scenario: License retrieves an upgrade that has entitlement constraints (has entitlements)
     Given the current account has 3 "entitlements"

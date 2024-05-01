@@ -107,9 +107,7 @@ class Product < ApplicationRecord
     joins(:licenses).where(licenses: { id: })
                     .licensed
                     .distinct
-                    .union(
-                      self.open,
-                    )
+                    .union(open)
                     .reorder(
                       created_at: DEFAULT_SORT_ORDER,
                     )

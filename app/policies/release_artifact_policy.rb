@@ -23,9 +23,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
               .published
               .uploaded
     else
-      relation.open
-              .published
-              .uploaded
+      relation.open.without_constraints
+                   .published
+                   .uploaded
     end
   end
 

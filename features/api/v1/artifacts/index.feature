@@ -1653,3 +1653,286 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the response body should be an array with 3 "artifacts"
+
+  Scenario: License retrieves their artifacts with an expired license (REVOKE_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And I am the last license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "403"
+
+  Scenario: License retrieves their artifacts with an expired license (RESTRICT_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And I am the last license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "artifacts"
+
+  Scenario: License retrieves their artifacts with an expired license (MAINTAIN_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And I am the last license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "artifacts"
+
+  Scenario: License retrieves their artifacts with an expired license (ALLOW_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "ALLOW_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And I am the last license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "artifacts"
+
+  Scenario: User retrieves their artifacts with an expired license (REVOKE_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy" and the last "user" as "owner"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 5 "artifacts"
+
+  Scenario: User retrieves their artifacts with an expired license (RESTRICT_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy" and the last "user" as "owner"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 7 "artifacts"
+
+  Scenario: User retrieves their artifacts with an expired license (MAINTAIN_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy" and the last "user" as "owner"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 7 "artifacts"
+
+  Scenario: User retrieves their artifacts with an expired license (ALLOW_ACCESS)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-01T00:00:00Z" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-02T00:00:00Z" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "ALLOW_ACCESS", "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy" and the last "user" as "owner"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-04-02T00:00:00Z" }
+      """
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the response body should be an array with 8 "artifacts"

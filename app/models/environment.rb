@@ -76,11 +76,11 @@ class Environment < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin)
-      self.all
+      all
     in role: Role(:environment)
-      self.where(id: accessor)
+      where(id: accessor)
     else
-      self.none
+      none
     end
   }
 

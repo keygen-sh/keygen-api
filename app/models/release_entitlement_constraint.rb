@@ -42,17 +42,17 @@ class ReleaseEntitlementConstraint < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin)
-      self.all
+      all
     in role: Role(:environment)
-      self.for_environment(accessor.id)
+      for_environment(accessor.id)
     in role: Role(:product)
-      self.for_product(accessor.id)
+      for_product(accessor.id)
     in role: Role(:license)
-      self.for_license(accessor.id)
+      for_license(accessor.id)
     in role: Role(:user)
-      self.for_user(accessor.id)
+      for_user(accessor.id)
     else
-      self.none
+      none
     end
   }
 
@@ -68,9 +68,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
         licenses: { id: License.for_user(user) },
       )
       .distinct
-      .union(
-        self.open
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
@@ -84,9 +82,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
         licenses: { id: license },
       )
       .distinct
-      .union(
-        self.open
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
