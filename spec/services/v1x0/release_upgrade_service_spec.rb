@@ -4,8 +4,9 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe V1x0::ReleaseUpgradeService do
-  let(:account) { create(:account) }
-  let(:product) { create(:product, account: account) }
+  let(:account)  { create(:account) }
+  let(:product)  { create(:product, account: account) }
+  let(:accessor) { create(:admin, account:) }
 
   context 'when invalid parameters are supplied to the service' do
     it 'should raise an error when account is nil' do
@@ -16,6 +17,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: 'exe',
           version: '1.0.0',
+          accessor:,
         )
       }
 
@@ -30,6 +32,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: 'exe',
           version: '1.0.0',
+          accessor:,
         )
       }
 
@@ -44,6 +47,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: 'exe',
           version: '1.0.0',
+          accessor:,
         )
       }
 
@@ -58,6 +62,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: nil,
           filetype: 'exe',
           version: '1.0.0',
+          accessor:,
         )
       }
 
@@ -72,6 +77,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: nil,
           version: '1.0.0',
+          accessor:,
         )
       }
 
@@ -86,6 +92,7 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: 'exe',
           version: nil,
+          accessor:,
         )
       }
 
@@ -101,6 +108,7 @@ describe V1x0::ReleaseUpgradeService do
           filetype: 'exe',
           version: '1.0.0',
           channel: nil,
+          accessor:,
         )
       }
 
@@ -115,7 +123,8 @@ describe V1x0::ReleaseUpgradeService do
           platform: 'win32',
           filetype: 'exe',
           version: '1.0.0',
-          constraint: 'v8.0.2.1'
+          constraint: 'v8.0.2.1',
+          accessor:,
         )
       }
 
@@ -131,6 +140,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: 'win32',
         filetype: 'exe',
         version: '1.0.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -148,6 +158,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: 'macos',
         filetype: 'dmg',
         version: '0.1.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '0.1.0'
@@ -201,6 +212,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: platform,
         filetype: filetype,
         version: '1.0.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -255,6 +267,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: 'dmg',
         version: '1.0.0',
         channel: channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -270,6 +283,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: platform,
         filetype: filetype,
         version: '0.1.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '0.1.0'
@@ -285,6 +299,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: platform,
         filetype: filetype,
         version: '1.0.1',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.1'
@@ -344,6 +359,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '1.0.0',
         channel: 'stable',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -360,6 +376,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '1.0.0',
         channel: 'rc',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -376,6 +393,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '1.0.0',
         channel: 'beta',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -392,6 +410,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '1.0.0',
         channel: 'alpha',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -408,6 +427,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '1.0.0',
         channel: 'dev',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -467,6 +487,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.1.9',
         channel: stable_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.1.9'
@@ -483,6 +504,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.1.9',
         channel: rc_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.1.9'
@@ -499,6 +521,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.1.9',
         channel: beta_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.1.9'
@@ -515,6 +538,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.1.9',
         channel: alpha_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.1.9'
@@ -531,6 +555,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.1.9',
         channel: dev_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.1.9'
@@ -590,6 +615,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.13.37',
         channel: stable_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.13.37'
@@ -606,6 +632,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.13.37',
         channel: rc_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.13.37'
@@ -622,6 +649,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.13.37',
         channel: beta_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.13.37'
@@ -638,6 +666,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.13.37',
         channel: alpha_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.13.37'
@@ -654,6 +683,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype,
         version: '2.13.37',
         channel: dev_channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '2.13.37'
@@ -713,6 +743,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype.id,
         version: '1.0.0',
         channel: stable_channel.id,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -729,6 +760,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype.id,
         version: '1.0.0',
         channel: rc_channel.id,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -745,6 +777,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype.id,
         version: '1.0.0',
         channel: beta_channel.id,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -761,6 +794,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype.id,
         version: '1.0.0',
         channel: alpha_channel.id,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -777,6 +811,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: filetype.id,
         version: '1.0.0',
         channel: dev_channel.id,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -830,6 +865,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: 'linux',
         filetype: 'tar.gz',
         version: '1.0.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -883,6 +919,7 @@ describe V1x0::ReleaseUpgradeService do
         platform: 'win32',
         filetype: 'exe',
         version: '1.0.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -937,6 +974,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: 'dmg',
         version: '1.0.0',
         channel: channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq '1.0.0'
@@ -954,6 +992,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: 'dmg',
         version: '1.0.0+build.1624288707',
         channel: channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -1011,6 +1050,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: 'tar.gz',
         version: '1.0.0',
         channel: channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -1066,6 +1106,7 @@ describe V1x0::ReleaseUpgradeService do
         filetype: 'exe',
         version: '1.0.0',
         channel: channel,
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -1153,6 +1194,7 @@ describe V1x0::ReleaseUpgradeService do
         version: '1.0.0',
         channel: channel,
         constraint: '1.0.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -1170,6 +1212,7 @@ describe V1x0::ReleaseUpgradeService do
         version: '1.0.0',
         channel: channel,
         constraint: '1.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version
@@ -1187,6 +1230,7 @@ describe V1x0::ReleaseUpgradeService do
         version: '1.0.0',
         channel: channel,
         constraint: '2.0',
+        accessor:,
       )
 
       expect(upgrade.current_version).to eq current_release.version

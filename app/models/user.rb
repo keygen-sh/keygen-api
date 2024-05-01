@@ -281,15 +281,15 @@ class User < ApplicationRecord
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin | :product) # give products the ability to read all users
-      self.all
+      all
     in role: Role(:environment)
-      self.for_environment(accessor.id)
+      for_environment(accessor.id)
     in role: Role(:user)
-      self.for_user(accessor.id)
+      for_user(accessor.id)
     in role: Role(:license)
-      self.for_license(accessor.id)
+      for_license(accessor.id)
     else
-      self.none
+      none
     end
   }
 

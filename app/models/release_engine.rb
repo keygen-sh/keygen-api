@@ -51,9 +51,7 @@ class ReleaseEngine < ApplicationRecord
         licenses: { id: License.for_user(user) },
       )
       .distinct
-      .union(
-        self.open
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
@@ -67,9 +65,7 @@ class ReleaseEngine < ApplicationRecord
         licenses: { id: license },
       )
       .distinct
-      .union(
-        self.open
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )

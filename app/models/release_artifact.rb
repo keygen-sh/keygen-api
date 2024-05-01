@@ -129,17 +129,17 @@ class ReleaseArtifact < ApplicationRecord
 
     case key
     when 'stable'
-      self.stable
+      stable
     when 'rc'
-      self.rc
+      rc
     when 'beta'
-      self.beta
+      beta
     when 'alpha'
-      self.alpha
+      alpha
     when 'dev'
-      self.dev
+      dev
     else
-      self.none
+      none
     end
   }
 
@@ -150,6 +150,27 @@ class ReleaseArtifact < ApplicationRecord
   scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
   scope :dev, -> { for_channel_key(%i(dev)) }
 
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: Role(:admin)
+      all
+    in role: Role(:environment) if respond_to?(:for_environment)
+      for_environment(accessor.id)
+    in role: Role(:product) if respond_to?(:for_product)
+      for_product(accessor.id)
+    in role: Role(:license) if respond_to?(:for_license)
+      for_license(accessor.id).published
+                              .uploaded
+    in role: Role(:user) if respond_to?(:for_user)
+      for_user(accessor.id).published
+                           .uploaded
+    else
+      open.without_constraints
+          .published
+          .uploaded
+    end
+  }
+
   scope :for_product, -> product {
     joins(:product).where(product: { id: product })
   }
@@ -159,30 +180,41 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    user = case user
-           when UUID_RE
-             User.find(user)
-           else
-             user
-           end
+    # Collect artifacts for each of the user's licenses. This is the only way
+    # we can ensure we scope to exactly what the user has access to, e.g.
+    # when taking into account expiration and distribution strategies,
+    # as well as entitlements per-license.
+    scopes = License.preload(:policy)
+                    .for_user(user)
+                    .collect do |license|
+      # Users should only be able to access artifacts with constraints
+      # intersecting their entitlements, or no constraints at all.
+      scope = within_constraints(license.entitlement_codes, strict: true)
 
-    # Users should only be able to access artifacts with constraints
-    # intersecting their entitlements, or no constraints at all.
-    entl = within_constraints(user.entitlement_codes, strict: true)
+      # Users should only be able to access artifacts within their licenses'
+      # expiration windows, i.e. not artifacts of releases published after
+      # their licenses' expiration dates.
+      scope = scope.within_expiry_for(license)
 
-    entl.joins(product: %i[licenses])
-        .reorder(created_at: DEFAULT_SORT_ORDER)
-        .where(
-          product: { distribution_strategy: ['LICENSED', nil] },
-          licenses: { id: License.for_user(user) },
-        )
-        .distinct
-        .union(
-          self.open
-        )
-        .reorder(
-          created_at: DEFAULT_SORT_ORDER,
-        )
+      scope.joins(product: %i[licenses])
+           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .where(
+             product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
+             licenses: { id: license },
+           )
+    end
+
+    # Combine all scopes into a single query via UNIONs
+    scope = scopes.reduce(&:union) || none
+
+    scope.union(
+           open.without_constraints
+               .published
+               .uploaded,
+         )
+         .reorder(
+           created_at: DEFAULT_SORT_ORDER,
+         )
   }
 
   scope :for_license, -> license {
@@ -195,19 +227,26 @@ class ReleaseArtifact < ApplicationRecord
 
     # Licenses should only be able to access artifacts with constraints
     # intersecting their entitlements, or no constraints at all.
-    entl = within_constraints(license.entitlement_codes, strict: true)
+    scope = within_constraints(license.entitlement_codes, strict: true)
 
-    entl.joins(product: %i[licenses])
-        .where(
-          product: { distribution_strategy: ['LICENSED', nil] },
-          licenses: { id: license },
-        )
-        .union(
-          self.open
-        )
-        .reorder(
-          created_at: DEFAULT_SORT_ORDER,
-        )
+    # Licenses should only be able to access artifacts within their
+    # expiration window, i.e. not artifacts of releases published
+    # after the license's expiration date.
+    scope = scope.within_expiry_for(license)
+
+    scope.joins(product: %i[licenses])
+         .where(
+           product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
+           licenses: { id: license },
+         )
+         .union(
+           open.without_constraints
+               .published
+               .uploaded,
+         )
+         .reorder(
+           created_at: DEFAULT_SORT_ORDER,
+         )
   }
 
   scope :for_engine, -> engine {
@@ -329,6 +368,23 @@ class ReleaseArtifact < ApplicationRecord
        .reorder(
          created_at: DEFAULT_SORT_ORDER,
        )
+  }
+
+  scope :within_expiry_for, -> license {
+    return none if license.nil?
+    return all  if license.expiry.nil?
+
+    case
+    when license.revoke_access?
+      license.expired? ? none : joins(:release).where(release: { created_at: ..license.expiry })
+    when license.restrict_access?,
+         license.maintain_access?
+      joins(:release).where(release: { created_at: ..license.expiry })
+    when license.allow_access?
+      all
+    else
+      none
+    end
   }
 
   scope :waiting,  -> { with_status(:WAITING) }

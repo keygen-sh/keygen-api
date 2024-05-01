@@ -59,9 +59,7 @@ class ReleasePackage < ApplicationRecord
         licenses: { id: License.for_user(user) },
       )
       .distinct
-      .union(
-        self.open,
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )
@@ -74,9 +72,7 @@ class ReleasePackage < ApplicationRecord
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: },
       )
-      .union(
-        self.open,
-      )
+      .union(open)
       .reorder(
         created_at: DEFAULT_SORT_ORDER,
       )

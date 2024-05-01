@@ -474,7 +474,7 @@ Feature: Show release
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves a LICENSED release without a license for it
     Given the current account is "test1"

@@ -261,64 +261,95 @@ class Release < ApplicationRecord
     SQL
   }
 
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: Role(:admin)
+      all
+    in role: Role(:environment) if respond_to?(:for_environment)
+      for_environment(accessor.id)
+    in role: Role(:product) if respond_to?(:for_product)
+      for_product(accessor.id)
+    in role: Role(:license) if respond_to?(:for_license)
+      for_license(accessor.id).published
+    in role: Role(:user) if respond_to?(:for_user)
+      for_user(accessor.id).published
+    else
+      open.without_constraints
+          .published
+    end
+  }
+
   scope :for_product, -> product {
     where(product: product)
   }
 
   scope :for_user, -> user {
-    user = case user
-           when UUID_RE
-             User.find(user)
-           else
-             user
-           end
+    # Collect releases for each of the user's licenses. This is the only way
+    # we can ensure we scope to exactly what the user has access to, e.g.
+    # when taking into account expiration and distribution strategies,
+    # as well as entitlements per-license.
+    scopes = License.preload(:policy)
+                    .for_user(user)
+                    .collect do |license|
+      # Users should only be able to access releases with constraints
+      # intersecting their entitlements, or no constraints at all.
+      scope = within_constraints(license.entitlement_codes, strict: true)
 
-    # Users should only be able to access releases with constraints
-    # intersecting their entitlements, or no constraints at all.
-    entl = within_constraints(user.entitlement_codes, strict: true)
+      # Users should only be able to access releases within their licenses'
+      # expiration windows, i.e. not artifacts of releases published after
+      # their licenses' expiration dates.
+      scope = scope.within_expiry_for(license)
 
-    entl.joins(product: %i[licenses])
-      .reorder(created_at: DEFAULT_SORT_ORDER)
-      .where(
-        product: {
-          distribution_strategy: ['LICENSED', nil],
-          licenses: { id: License.for_user(user) },
-        },
-      )
-      .distinct
-      .union(
-        self.open
-      )
-      .reorder(
-        created_at: DEFAULT_SORT_ORDER,
-      )
+      scope.joins(product: %i[licenses])
+           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .where(
+             product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
+             licenses: { id: license },
+           )
+    end
+
+    # Combine all scopes into a single query via UNIONs
+    scope = scopes.reduce(&:union) || none
+
+    scope.union(
+           open.without_constraints
+               .published,
+         )
+         .reorder(
+           created_at: DEFAULT_SORT_ORDER,
+         )
   }
 
   scope :for_license, -> license {
     license = case license
-              when UUID_RE
-                License.find(license)
-              else
-                license
+              in UUID_RE => id
+                License.find(id)
+              in License => lic
+                lic
               end
 
     # Licenses should only be able to access releases with constraints
     # intersecting their entitlements, or no constraints at all.
-    entl = within_constraints(license.entitlement_codes, strict: true)
+    scope = within_constraints(license.entitlement_codes, strict: true)
 
-    # Should we be applying a LIMIT to these UNION'd queries?
-    entl.joins(product: %i[licenses])
-        .reorder(created_at: DEFAULT_SORT_ORDER)
-        .where(
-          product: { distribution_strategy: ['LICENSED', nil] },
-          licenses: { id: license },
-        )
-        .union(
-          self.open
-        )
-        .reorder(
-          created_at: DEFAULT_SORT_ORDER,
-        )
+    # Licenses should only be able to access releases within their
+    # expiration window, i.e. not releases published after the
+    # license's expiration date.
+    scope = scope.within_expiry_for(license)
+
+    scope.joins(product: %i[licenses])
+         .reorder(created_at: DEFAULT_SORT_ORDER)
+         .where(
+           product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
+           licenses: { id: license },
+         )
+         .union(
+           open.without_constraints
+               .published,
+         )
+         .reorder(
+           created_at: DEFAULT_SORT_ORDER,
+         )
   }
 
   scope :for_engine, -> engine {
@@ -496,6 +527,23 @@ class Release < ApplicationRecord
        )
   }
 
+  scope :within_expiry_for, -> license {
+    return none if license.nil?
+    return all  unless license.expires?
+
+    case
+    when license.revoke_access?
+      license.expired? ? none : where(created_at: ..license.expiry)
+    when license.restrict_access?,
+         license.maintain_access?
+      where(created_at: ..license.expiry)
+    when license.allow_access?
+      all
+    else
+      none
+    end
+  }
+
   scope :published, -> { with_status(:PUBLISHED) }
   scope :drafts,    -> { with_status(:DRAFT) }
   scope :yanked,    -> { with_status(:YANKED) }
@@ -538,8 +586,9 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { checksum: })
   end
 
-  def upgrade!(package: nil, channel: nil, constraint: nil)
+  def upgrade!(accessor: Current.bearer, package: nil, channel: nil, constraint: nil)
     release = product.releases
+      .accessible_by(accessor)
       .for_package(package.presence || self.package)
       .for_channel(channel.presence || self.channel)
       .order_by_version
