@@ -60,9 +60,9 @@ class LicenseUser < ApplicationRecord
   def nullify_machines_for_user
     # TODO(ezekg) Should add a policy configuration to allow you to destroy
     #             these machines instead of nilifying. (Do async.)
-    license.machines.where(owner: user)
-                    .update_all(
-                      owner_id: nil,
-                    )
+    Machine.where(account_id:, license_id:, owner_id: user_id)
+           .update_all(
+             owner_id: nil,
+           )
   end
 end
