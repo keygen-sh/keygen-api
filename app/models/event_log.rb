@@ -2,6 +2,7 @@
 
 class EventLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[event_logs]]
+  include Denormalizable
   include Environmental
   include Accountable
   include DateRangeable
@@ -21,6 +22,9 @@ class EventLog < ApplicationRecord
 
   has_environment
   has_account
+
+  denormalizes :event, from: :event_type, prefix: :event_type
+  denormalizes :event_type_id, to: :request_log
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.
