@@ -24,6 +24,7 @@ loop do
     )
 
     sandbox = Environment.create!(
+      users_attributes: [{ email: Faker::Internet.unique.email(domain:) }],
       isolation_strategy: 'ISOLATED',
       name: 'Sandbox',
       code: 'sandbox',
@@ -90,10 +91,20 @@ loop do
                       )
                     end
 
-          rand(0..20).times do
-            version = Faker::App.unique.semantic_version
+          rand(0..2_000).times do
+            channel  = :stable
+            version  = begin
+                         Faker::App.unique.semantic_version # attempt to get a basic semver first
+                       rescue Faker::UniqueGenerator::RetryLimitExceeded
+                         channel = %i[stable rc alpha beta dev].sample
+                         version = Faker::App.semantic_version
+                         version << "-#{channel}" unless channel == :stable
+                         version << "+#{SecureRandom.hex(8)}"
+                         version
+                       end
+
             release = Release.create!(
-              channel_attributes: { key: 'stable' },
+              channel_attributes: { key: channel },
               name: "#{name} v#{version}",
               version:,
               environment:,
