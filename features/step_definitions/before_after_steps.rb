@@ -62,13 +62,12 @@ After do |scenario|
     Cucumber.wants_to_quit = true
 
     puts scenario.exception
-    puts
 
-    unless ENV.key?('NO_DUMP')
-      req_headers = last_request.env
-        .select { |k, v| k.start_with?('HTTP_') }
-        .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
+    if ENV.key?('DEBUG')
+      req_headers = last_request.env.select { |k, v| k.start_with?('HTTP_') }
+                                    .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
+      puts
       puts "dump:"
       puts
       pp(
