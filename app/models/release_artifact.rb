@@ -176,10 +176,22 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_release, -> release {
-    joins(:release).where(releases: { id: release })
-                   .or(
-                     joins(:release).where(releases: { version: release }),
-                   )
+    case release
+    in UUID_RE => release_id
+      where(release_id:)
+    in Release => release
+      where(release:)
+    in String => term
+      joins(:release).where(releases: { id: term })
+                     .or(
+                       joins(:release).where(releases: { version: term }),
+                     )
+                     .or(
+                       joins(:release).where(releases: { tag: term }),
+                     )
+    else
+      none
+    end
   }
 
   scope :for_user, -> user {
