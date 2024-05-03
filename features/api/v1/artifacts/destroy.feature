@@ -32,6 +32,105 @@ Feature: Delete artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin deletes one of their artifacts by filename (for latest release)
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | created_at           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-01-01T00:00:00Z | 1.0.0   | stable  |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-04-01T00:00:00Z | 1.1.0   | stable  |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-02-01T00:00:00Z | 2.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | created_at           | filename              | filetype | platform | status   |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 2024-01-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 2024-04-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 2024-02-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/artifacts/dir/test.tar.gz"
+    Then the response status should be "204"
+    And the current account should have 2 "artifacts"
+    And the first "artifact" should have the following attributes:
+      """
+      { "releaseId": "f14ef993-f821-44c9-b2af-62e27f37f8db" }
+      """
+    And the second "artifact" should have the following attributes:
+      """
+      { "releaseId": "a391f935-bd9b-4277-affd-16759d84d65e" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their artifacts by filename (for release by version)
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | created_at           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-01-01T00:00:00Z | 1.0.0   | stable  |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-04-01T00:00:00Z | 1.1.0   | stable  |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-02-01T00:00:00Z | 2.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | created_at           | filename              | filetype | platform | status   |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 2024-01-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 2024-04-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 2024-02-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/artifacts/dir/test.tar.gz?release=1.0.0"
+    Then the response status should be "204"
+    And the current account should have 2 "artifacts"
+    And the first "artifact" should have the following attributes:
+      """
+      { "releaseId": "306aae31-e07d-4769-a409-518d3d2a4b10" }
+      """
+    And the second "artifact" should have the following attributes:
+      """
+      { "releaseId": "a391f935-bd9b-4277-affd-16759d84d65e" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their artifacts by filename (for release by ID)
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | created_at           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-01-01T00:00:00Z | 1.0.0   | stable  |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-04-01T00:00:00Z | 1.1.0   | stable  |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2024-02-01T00:00:00Z | 2.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | created_at           | filename              | filetype | platform | status   |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 2024-01-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | a391f935-bd9b-4277-affd-16759d84d65e | 2024-04-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+      | 306aae31-e07d-4769-a409-518d3d2a4b10 | 2024-02-01T00:00:00Z | dir/test.tar.gz | tar.gz   | linux    | UPLOADED |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/artifacts/dir/test.tar.gz?release=a391f935-bd9b-4277-affd-16759d84d65e"
+    Then the response status should be "204"
+    And the current account should have 2 "artifacts"
+    And the first "artifact" should have the following attributes:
+      """
+      { "releaseId": "f14ef993-f821-44c9-b2af-62e27f37f8db" }
+      """
+    And the second "artifact" should have the following attributes:
+      """
+      { "releaseId": "306aae31-e07d-4769-a409-518d3d2a4b10" }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin deletes one of their artifacts (S3 timing out)
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
