@@ -32,6 +32,92 @@ Feature: Show release artifact
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin retrieves an artifact by filename (for release by version)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta     |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta     |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename    | filetype | platform | arch  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | Test.zip    | zip      | macos    | arm64 |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | Test.zip    | zip      | macos    | arm64 |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | Test.zip    | zip      | macos    | arm64 |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | Test.zip    | zip      | macos    | amd64 |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | Test.exe    | exe      | win32    | x86   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | Test.exe    | exe      | win32    | x86   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | Test.tar.gz | tar.gz   | linux    | x86   |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/Test.zip?release=1.2.0-beta.1"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+    And the response body should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "links": { "related": "/v1/accounts/$account/releases/fd10ab0c-c52a-412f-b34f-180eebd7325d" },
+          "data": { "type": "releases", "id": "fd10ab0c-c52a-412f-b34f-180eebd7325d" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact by filename (for release by ID)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta     |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta     |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename    | filetype | platform | arch  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | Test.zip    | zip      | macos    | arm64 |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | Test.zip    | zip      | macos    | arm64 |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | Test.zip    | zip      | macos    | arm64 |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | Test.zip    | zip      | macos    | amd64 |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | Test.exe    | exe      | win32    | x86   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | Test.exe    | exe      | win32    | x86   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | Test.tar.gz | tar.gz   | linux    | x86   |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/Test.zip?release=fd10ab0c-c52a-412f-b34f-180eebd7325d"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+    And the response body should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "links": { "related": "/v1/accounts/$account/releases/fd10ab0c-c52a-412f-b34f-180eebd7325d" },
+          "data": { "type": "releases", "id": "fd10ab0c-c52a-412f-b34f-180eebd7325d" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin retrieves an artifact for their account (prefers no-download via header)
     Given I am an admin of account "test1"
     And the current account is "test1"

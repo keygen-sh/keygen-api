@@ -175,8 +175,11 @@ class ReleaseArtifact < ApplicationRecord
     joins(:product).where(product: { id: product })
   }
 
-  scope :for_release, -> product {
-    joins(:release).where(releases: { id: product })
+  scope :for_release, -> release {
+    joins(:release).where(releases: { id: release })
+                   .or(
+                     joins(:release).where(releases: { version: release }),
+                   )
   }
 
   scope :for_user, -> user {
