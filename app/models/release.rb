@@ -265,13 +265,13 @@ class Release < ApplicationRecord
     case accessor
     in role: Role(:admin)
       all
-    in role: Role(:environment) if respond_to?(:for_environment)
+    in role: Role(:environment)
       for_environment(accessor.id)
-    in role: Role(:product) if respond_to?(:for_product)
+    in role: Role(:product)
       for_product(accessor.id)
-    in role: Role(:license) if respond_to?(:for_license)
+    in role: Role(:license)
       for_license(accessor.id).published
-    in role: Role(:user) if respond_to?(:for_user)
+    in role: Role(:user)
       for_user(accessor.id).published
     else
       open.without_constraints
