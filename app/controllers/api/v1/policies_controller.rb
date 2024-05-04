@@ -39,6 +39,7 @@ module Api::V1
           param :concurrent, type: :boolean, optional: true, if: -> { current_api_version == '1.0' || current_api_version == '1.1' }
           param :max_machines, type: :integer, allow_nil: true, optional: true
           param :max_processes, type: :integer, allow_nil: true, optional: true
+          param :max_users, type: :integer, allow_nil: true, optional: true
           param :max_cores, type: :integer, allow_nil: true, optional: true
           param :max_uses, type: :integer, allow_nil: true, optional: true
           param :fingerprint_uniqueness_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_uniqueness_strategy
@@ -126,6 +127,7 @@ module Api::V1
           param :concurrent, type: :boolean, optional: true, if: -> { current_api_version == '1.0' || current_api_version == '1.1' }
           param :max_machines, type: :integer, allow_nil: true, optional: true
           param :max_processes, type: :integer, allow_nil: true, optional: true
+          param :max_users, type: :integer, allow_nil: true, optional: true
           param :max_cores, type: :integer, allow_nil: true, optional: true
           param :max_uses, type: :integer, allow_nil: true, optional: true
           param :fingerprint_uniqueness_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3] }, as: :machine_uniqueness_strategy

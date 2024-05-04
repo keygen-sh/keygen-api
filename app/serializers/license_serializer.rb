@@ -33,6 +33,7 @@ class LicenseSerializer < BaseSerializer
   end
   attribute :max_machines
   attribute :max_processes
+  attribute :max_users
   attribute :max_cores
   attribute :max_uses
   attribute :require_heartbeat do
@@ -143,6 +144,11 @@ class LicenseSerializer < BaseSerializer
   relationship :users do
     link :related do
       @url_helpers.v1_account_license_users_path @object.account_id, @object
+    end
+    meta do
+      {
+        count: @object.users_count || 0,
+      }
     end
   end
 

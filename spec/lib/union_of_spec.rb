@@ -886,6 +886,8 @@ describe UnionOf do
           "licenses"."last_validated_checksum" AS t0_r28,
           "licenses"."last_validated_version" AS t0_r29,
           "licenses"."product_id" AS t0_r30,
+          "licenses"."max_users_override" AS t0_r31,
+          "licenses"."license_users_count" AS t0_r32,
           "users"."id" AS t1_r0,
           "users"."email" AS t1_r1,
           "users"."password_digest" AS t1_r2,

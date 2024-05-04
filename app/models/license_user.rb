@@ -7,7 +7,7 @@ class LicenseUser < ApplicationRecord
   include Orderable
   include Pageable
 
-  belongs_to :license
+  belongs_to :license, counter_cache: true
   belongs_to :user
 
   has_environment default: -> { license&.environment_id }
@@ -28,6 +28,30 @@ class LicenseUser < ApplicationRecord
       user != license.owner
 
     errors.add :user, :conflict, message: 'already exists (user is attached through owner)'
+  end
+
+  # Disallow user overages according to policy overage strategy
+  validate on: :create do
+    next unless
+      license.present? && license.max_users?
+
+    next if
+      license.always_allow_overage?
+
+    next_user_count = license.users_count + 1 # for the current license user
+    next unless
+      next_user_count > license.max_users
+
+    next if
+      license.allow_1_25x_overage? && next_user_count <= license.max_users * 1.25
+
+    next if
+      license.allow_1_5x_overage? && next_user_count <= license.max_users * 1.5
+
+    next if
+      license.allow_2x_overage? && next_user_count <= license.max_users * 2
+
+    errors.add :base, :limit_exceeded, message: "user count has exceeded maximum allowed for license (#{license.max_users})"
   end
 
   scope :active, -> {

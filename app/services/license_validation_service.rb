@@ -255,8 +255,18 @@ class LicenseValidationService < BaseService
       end
     end
 
-    # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).
-    if !license.policy.strict?
+    # Check if license has exceeded its user limit
+    if license.max_users? && license.users_count > license.max_users
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && license.users_count <= license.max_users * 1.25) ||
+                      (license.allow_1_5x_overage? && license.users_count <= license.max_users * 1.5) ||
+                      (license.allow_2x_overage? && license.users_count <= license.max_users * 2)
+
+      return [allow_overage, "has too many associated users", :TOO_MANY_USERS]
+    end
+
+    # Check if license policy is strict i.e. requires machine tracking (and exit early if not strict).
+    unless license.policy.strict?
       # Check if license is expired after checking machine requirements.
       return [license.allow_access? || license.maintain_access?, "is expired", :EXPIRED] if
         license.expired?
