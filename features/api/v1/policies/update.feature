@@ -41,6 +41,8 @@ Feature: Update policy
             "requireFingerprintScope": true,
             "requireComponentsScope": true,
             "name": "Trial",
+            "maxProcesses": 69,
+            "maxUsers": 420,
             "maxCores": 32,
             "maxUses": 3
           }
@@ -52,6 +54,8 @@ Feature: Update policy
     And the response body should be a "policy" with a requireFingerprintScope
     And the response body should be a "policy" with a requireComponentsScope
     And the response body should be a "policy" with the name "Trial"
+    And the response body should be a "policy" with the maxProcesses "69"
+    And the response body should be a "policy" with the maxUsers "420"
     And the response body should be a "policy" with the maxCores "32"
     And the response body should be a "policy" with the maxUses "3"
     And sidekiq should have 2 "webhook" jobs

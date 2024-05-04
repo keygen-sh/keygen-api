@@ -223,6 +223,10 @@ class Policy < ApplicationRecord
     numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true
 
+  validates :max_users,
+    numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true
+
   validates :overage_strategy,
     inclusion: { in: OVERAGE_STATEGIES, message: 'unsupported overage strategy' },
     allow_nil: true
@@ -239,6 +243,9 @@ class Policy < ApplicationRecord
   validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max processes value not divisible by 4)' },
     if: -> { max_processes.to_i % 4 > 0 }
 
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max users value not divisible by 4)' },
+    if: -> { max_users.to_i % 4 > 0 }
+
   validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE for node-locked policy)' },
     if: :node_locked?
 
@@ -250,6 +257,9 @@ class Policy < ApplicationRecord
 
   validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max processes value not divisible by 2)' },
     if: -> { max_processes.to_i % 2 > 0 }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max users value not divisible by 2)' },
+    if: -> { max_users.to_i % 2 > 0 }
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
