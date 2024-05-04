@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_03_211606) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -239,6 +239,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.string "last_validated_checksum"
     t.string "last_validated_version"
     t.uuid "product_id", null: false
+    t.integer "max_users_override"
+    t.integer "license_users_count", default: 0, null: false
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -422,6 +424,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_24_041244) do
     t.string "component_uniqueness_strategy"
     t.string "component_matching_strategy"
     t.string "renewal_basis"
+    t.integer "max_users"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

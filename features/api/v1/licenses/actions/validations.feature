@@ -6420,6 +6420,249 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a license that has too many users (ALWAYS_ALLOW_OVERAGE overage strategy, within overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxUsers": 3
+      }
+      """
+    And the current account has 4 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 5 "license-users" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 4 "license-user" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 5 "license-users"
+    And all "license-users" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxUsers": 2
+      }
+      """
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 2 "license-user" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxUsers": 2
+      }
+      """
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 3 "license-users"
+    And all "license-users" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxUsers": 2
+      }
+      """
+    And the current account has 4 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 3 "license-users" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license that has too many users (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxUsers": 2
+      }
+      """
+    And the current account has 5 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 4 "license-users"
+    And all "license-users" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (NO_OVERAGE overage strategy)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxUsers": 2
+      }
+      """
+    And the current account has 5 "users"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-user" for the first "user"
+    And the current account has 1 "license-user" for the second "user"
+    And the current account has 1 "license-user" for the third "user"
+    And the current account has 1 "license-user" for the fourth "user"
+    And all "license-users" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated users", "code": "TOO_MANY_USERS" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many machine cores (ALWAYS_ALLOW_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"

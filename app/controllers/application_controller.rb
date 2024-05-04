@@ -299,13 +299,41 @@ class ApplicationController < ActionController::API
         error.pointer = '/data/attributes/arch'
       in source: { pointer: %r{^/data/attributes/admins} }
         error.pointer = '/data/relationships/admins'
+      in code: /^(?:LICENSE_)?USERS?_LIMIT_EXCEEDED$/ # normalize user limit errors
+        error.pointer = '/data/relationships/users'
+        error.code    = 'USER_LIMIT_EXCEEDED'
       in code: /ACCOUNT_NOT_ALLOWED$/ # private error
         errors.delete(error)
       else
       end
 
-      # Add a helpful link to the docs when possible
-      topic = resource.class.name.parameterize.pluralize
+      # Add a helpful link to the docs when possible.
+      # FIXME(ezekg) Adjust topic to match our docs.
+      topic = case resource
+              in LicenseEntitlement | PolicyEntitlement
+                'entitlements'
+              in LicenseUser
+                'licenses'
+              in MachineComponent
+                'components'
+              in MachineProcess
+                'processes'
+              in ReleaseArtifact
+                'artifacts'
+              in ReleaseEngine
+                'engines'
+              in ReleaseChannel
+                'channels'
+              in ReleasePlatform
+                'platforms'
+              in ReleaseArch
+                'arches'
+              else
+                resource.class.name.underscore
+                                   .dasherize
+                                   .pluralize
+              end
+
       hash = "#{topic}-object".then { |s|
         case error
         in source: { pointer: %r{/relationships/([^/]+)} }

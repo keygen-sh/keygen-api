@@ -789,6 +789,26 @@ Feature: Show license
       }
       """
 
+  Scenario: Admin retrieves a license with a correct user count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "user"
+    And the current account has 2 "licenses" for the last "user" as "owner"
+    And the current account has 4 "license-users" for each "license"
+    And I use an authentication token
+    And I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "users": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/users" },
+          "meta": { "count": 5 }
+        }
+      }
+      """
+
   # Scenario: Admin requests a license with an invalid URI
   #   Given I am an admin of account "test1"
   #   And the current account is "test1"

@@ -311,6 +311,350 @@ Feature: License users relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attaches users to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, within limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-user" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, exceeds limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 2 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_25X_OVERAGE, within limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 2 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_25X_OVERAGE, exceeds limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 2 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "user count has exceeded maximum allowed for license (4)",
+        "code": "USER_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/users"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_5X_OVERAGE, within limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 3 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 2 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_5X_OVERAGE, exceeds limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxUsers": 4
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 3 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "user count has exceeded maximum allowed for license (4)",
+        "code": "USER_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/users"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_2X_OVERAGE, within limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 4 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (ALLOW_2X_OVERAGE, exceeds limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 6 "license-users" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" },
+          { "type": "user", "id": "$users[4]" }
+        ]
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "user count has exceeded maximum allowed for license (5)",
+        "code": "USER_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/users"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (NO_OVERAGE, within limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-user" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be an array with 3 "license-users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attaches users to a license with a max users limit (NO_OVERAGE, exceeds limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxUsers": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-user" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/users" with the following:
+      """
+      {
+        "data": [
+          { "type": "user", "id": "$users[1]" },
+          { "type": "user", "id": "$users[2]" },
+          { "type": "user", "id": "$users[3]" },
+          { "type": "user", "id": "$users[4]" }
+        ]
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "user count has exceeded maximum allowed for license (5)",
+        "code": "USER_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/users"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   @ee
   Scenario: Admin attaches shared users to a global license
     Given I am an admin of account "test1"

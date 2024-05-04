@@ -1543,7 +1543,7 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible core limit)
+  Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible process limits)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -1615,6 +1615,88 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max processes value not divisible by 4)",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible user limits)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_25X_OVERAGE",
+            "floating": true,
+            "maxMachines": 4,
+            "maxUsers": 4
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.25x overage strategy (non-divisible user limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_25X_OVERAGE",
+            "floating": true,
+            "maxMachines": 4,
+            "maxUsers": 2
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max users value not divisible by 4)",
         "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/overageStrategy"
@@ -1904,6 +1986,88 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max processes value not divisible by 2)",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even user limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 2,
+            "maxUsers": 2
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the name "Allow Overage Strategy"
+    And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd user limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 2,
+            "maxUsers": 3
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max users value not divisible by 2)",
         "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/overageStrategy"

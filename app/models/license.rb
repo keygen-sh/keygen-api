@@ -130,6 +130,32 @@ class License < ApplicationRecord
     errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && legacy_encrypted?
   end
 
+  # Disallow user overages according to policy overage strategy
+  validate on: :update do
+    next unless
+      owner_id? && owner_id_changed? # only run when owner is attached
+
+    next unless
+      max_users?
+
+    next if
+      always_allow_overage?
+
+    next unless
+      users_count > max_users
+
+    next if
+      allow_1_25x_overage? && users_count <= max_users * 1.25
+
+    next if
+      allow_1_5x_overage? && users_count <= max_users * 1.5
+
+    next if
+      allow_2x_overage? && users_count <= max_users * 2
+
+    errors.add :users, :limit_exceeded, message: "user count has exceeded maximum allowed for license (#{max_users})"
+  end
+
   validate on: :update do |license|
     next unless license.uses_changed?
     next if license.uses.nil? || license.max_uses.nil?
@@ -238,6 +264,11 @@ class License < ApplicationRecord
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
     if: -> { max_processes_override? }
+
+  validates :max_users,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true,
+    if: -> { max_users_override? }
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -734,6 +765,14 @@ class License < ApplicationRecord
 
     policy&.max_processes
   end
+
+  def max_users  = max_users_override? ? max_users_override : policy&.max_users
+  def max_users? = max_users.present?
+  def max_users=(value)
+    self.max_users_override = value
+  end
+
+  def users_count = license_users_count + (owner_id? ? 1 : 0)
 
   def protected?
     return policy.protected? if protected.nil?
