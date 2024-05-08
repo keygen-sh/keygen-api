@@ -202,7 +202,21 @@ Feature: List users
     Then the response status should be "200"
     And the response body should be an array with 2 "users"
 
- Scenario: Admin retrieves all active (assigned) users
+  Scenario: Admin retrieves all users scoped to a specific license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the second "user" as "owner"
+    And the current account has 1 "license" for the third "user" as "owner"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the first "license" and the fourth "user"
+    And the current account has 1 "license-user" for the third "license" and the second "user"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?license=$licenses[0]"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "users"
+
+  Scenario: Admin retrieves all active (assigned) users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 9 "users"
@@ -391,6 +405,25 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?product=$products[0]"
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
+
+  Scenario: Admin retrieves all users scoped to a specific license
+    Given the current account is "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "users"
+    And the current account has 1 "license" for the first "policy" and the second "user" as "owner"
+    And the current account has 1 "license" for the first "policy" and the third "user" as "owner"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license"
+    And the current account has 1 "license-user" for the first "license" and the fourth "user"
+    And the current account has 1 "license-user" for the third "license" and the second "user"
+    And the current account has 1 "license-user" for the fourth "license" and the second "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?license=$licenses[0]"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "users"
 
   Scenario: Admin retrieves users filtered by status (active)
     Given I am an admin of account "test1"
