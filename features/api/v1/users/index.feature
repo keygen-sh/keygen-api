@@ -406,7 +406,7 @@ Feature: List users
     Then the response status should be "200"
     And the response body should be an array with 1 "user"
 
-  Scenario: Admin retrieves all users scoped to a specific license
+  Scenario: Product retrieves all users scoped to a specific license
     Given the current account is "test1"
     And the current account is "test1"
     And the current account has 1 "product"
