@@ -345,7 +345,7 @@ Feature: Update machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine core count has exceeded maximum allowed by current policy (12)",
+        "detail": "machine core count has exceeded maximum allowed for license (12)",
         "code": "MACHINE_CORE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"

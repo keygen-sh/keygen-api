@@ -525,13 +525,25 @@ Given /^(?:the )?"([^\"]*)" (\d+)(?:\.\.(\.)?)(\d+) (?:have|has) the following a
   start_idx     = start_index.to_i
   end_idx       = end_index.to_i
 
-  resources = @account.send(resource.pluralize.underscore)
-  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
-  slice     = if exclusive_idx
-                resources[start_idx...end_idx]
+  resources = case resource.pluralize.underscore
+              when 'components'
+                @account.machine_components
+              when 'processes'
+                @account.machine_processes
+              when 'artifacts'
+                @account.release_artifacts
+              when 'packages'
+                @account.release_packages
               else
-                resources[start_idx..end_idx]
+                @account.send(resource.pluralize.underscore)
               end
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  slice = if exclusive_idx
+            resources[start_idx...end_idx]
+          else
+            resources[start_idx..end_idx]
+          end
 
   slice.each {
     _1.assign_attributes(attrs)
@@ -543,9 +555,21 @@ Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, bo
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   idx       = index.to_i
-  resources = @account.send(resource.pluralize.underscore).limit(idx + 1)
-  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
-  resource  = resources[idx]
+  resources = case resource.pluralize.underscore
+              when 'components'
+                @account.machine_components.limit(idx + 1)
+              when 'processes'
+                @account.machine_processes.limit(idx + 1)
+              when 'artifacts'
+                @account.release_artifacts.limit(idx + 1)
+              when 'packages'
+                @account.release_packages.limit(idx + 1)
+              else
+                @account.send(resource.pluralize.underscore).limit(idx + 1)
+              end
+
+  attrs    = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resource = resources[idx]
 
   resource.update!(attrs)
 end

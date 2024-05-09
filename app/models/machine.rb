@@ -124,50 +124,94 @@ class Machine < ApplicationRecord
     next if
       machine.license.max_machines.nil? || machine.license.always_allow_overage?
 
-    prev_machines_count = machine.license.machines_count || 0
-    next if
-      prev_machines_count == 0
+    case
+    when license.lease_per_machine?,
+         license.lease_per_license?
+      prev_machines_count = machine.license.machines_count || 0
+      next if
+        prev_machines_count == 0
 
-    next_machine_count = prev_machines_count + 1
-    next unless
-      next_machine_count > machine.license.max_machines
+      next_machine_count = prev_machines_count + 1
+      next unless
+        next_machine_count > machine.license.max_machines
 
-    next if
-      machine.license.allow_1_25x_overage? && next_machine_count <= machine.license.max_machines * 1.25
+      next if
+        machine.license.allow_1_25x_overage? && next_machine_count <= machine.license.max_machines * 1.25
 
-    next if
-      machine.license.allow_1_5x_overage? && next_machine_count <= machine.license.max_machines * 1.5
+      next if
+        machine.license.allow_1_5x_overage? && next_machine_count <= machine.license.max_machines * 1.5
 
-    next if
-      machine.license.allow_2x_overage? && next_machine_count <= machine.license.max_machines * 2
+      next if
+        machine.license.allow_2x_overage? && next_machine_count <= machine.license.max_machines * 2
 
-    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.license.max_machines})"
+      machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed for license (#{machine.license.max_machines})"
+    when license.lease_per_user?
+      prev_machines_count = license.machines.where(owner:) # nil owner is significant
+                                            .count
+      next if
+        prev_machines_count == 0
+
+      next_machine_count = prev_machines_count + 1
+      next unless
+        next_machine_count > machine.license.max_machines
+
+      next if
+        machine.license.allow_1_25x_overage? && next_machine_count <= machine.license.max_machines * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_machine_count <= machine.license.max_machines * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_machine_count <= machine.license.max_machines * 2
+
+      machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed for user (#{machine.license.max_machines})"
+    end
   end
 
   # Disallow machine core overages according to policy overage strategy
-  validate on: [:create, :update] do |machine|
+  validate on: %i[create update] do |machine|
     next if machine.license.nil?
     next if
       machine.license.max_cores.nil? || machine.license.always_allow_overage?
 
-    prev_core_count = machine.license.machines.where.not(id: machine.id).sum(:cores) || 0
-    next_core_count = prev_core_count + machine.cores.to_i
-    next if
-      next_core_count == 0
+    case
+    when license.lease_per_machine?,
+         license.lease_per_license?
+      prev_core_count = machine.license.machines.where.not(id: machine.id)
+                                                .sum(:cores)
+      next_core_count = prev_core_count + machine.cores.to_i
+      next unless
+        next_core_count > machine.license.max_cores
 
-    next unless
-      next_core_count > machine.license.max_cores
+      next if
+        machine.license.allow_1_25x_overage? && next_core_count <= machine.license.max_cores * 1.25
 
-    next if
-      machine.license.allow_1_25x_overage? && next_core_count <= machine.license.max_cores * 1.25
+      next if
+        machine.license.allow_1_5x_overage? && next_core_count <= machine.license.max_cores * 1.5
 
-    next if
-      machine.license.allow_1_5x_overage? && next_core_count <= machine.license.max_cores * 1.5
+      next if
+        machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
 
-    next if
-      machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
+      machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed for license (#{machine.license.max_cores})"
+    when license.lease_per_user?
+      prev_core_count = machine.license.machines.where.not(id: machine.id)
+                                                .where(owner:) # nil owner is significant
+                                                .sum(:cores)
+      next_core_count = prev_core_count + machine.cores.to_i
+      next unless
+        next_core_count > machine.license.max_cores
 
-    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.license.max_cores})"
+      next if
+        machine.license.allow_1_25x_overage? && next_core_count <= machine.license.max_cores * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_core_count <= machine.license.max_cores * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
+
+      machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed for user (#{machine.license.max_cores})"
+    end
   end
 
   # Fingerprint uniqueness on create
