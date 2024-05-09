@@ -176,14 +176,18 @@ To run Cucumber features, run:
 
 ```bash
 bundle exec rake test:cucumber
-bundle exec rake test:cucumber[features/api/v1/licenses/create.feature]
+bundle exec rake test:cucumber[features/api/v1/licenses/actions/validations.feature:369]
+bundle exec rake test:cucumber[features/api/v1/licenses/actions/validations.feature]
+bundle exec rake test:cucumber[features/api/v1/licenses]
 ```
 
 To run Rspec specs, run:
 
 ```bash
 bundle exec rake test:rspec
+bundle exec rake test:rspec[spec/models/license_spec.rb:199]
 bundle exec rake test:rspec[spec/models/license_spec.rb]
+bundle exec rake test:rspec[spec/models]
 ```
 
 ## License

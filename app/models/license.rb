@@ -161,7 +161,7 @@ class License < ApplicationRecord
     next if license.uses.nil? || license.max_uses.nil?
     next if license.uses <= license.max_uses
 
-    license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.max_uses})"
+    license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed for license (#{license.max_uses})"
   end
 
   validate on: :update do |license|
@@ -607,7 +607,7 @@ class License < ApplicationRecord
     :strict?, :pool?, :node_locked?, :floating?,
     :always_allow_overage?, :allow_overage?, :allow_1_25x_overage?, :allow_1_5x_overage?, :allow_2x_overage?, :no_overage?,
     :revoke_access?, :restrict_access?, :maintain_access?, :allow_access?,
-    :lease_per_machine?, :lease_per_license?,
+    :lease_per_machine?, :lease_per_license?, :lease_per_user?,
     :expire_from_creation?,
     :expire_from_first_validation?,
     :expire_from_first_activation?,
@@ -722,48 +722,29 @@ class License < ApplicationRecord
     end
   end
 
+
+  def max_machines  = max_machines_override? ? max_machines_override : policy&.max_machines
+  def max_machines? = max_machines.present?
   def max_machines=(value)
     self.max_machines_override = value
   end
 
-  def max_machines
-    return max_machines_override if
-      max_machines_override?
-
-    policy&.max_machines
-  end
-
+  def max_cores  = max_cores_override? ? max_cores_override : policy&.max_cores
+  def max_cores? = max_cores.present?
   def max_cores=(value)
     self.max_cores_override = value
   end
 
-  def max_cores
-    return max_cores_override if
-      max_cores_override?
-
-    policy&.max_cores
-  end
-
+  def max_uses  = max_uses_override? ? max_uses_override : policy&.max_uses
+  def max_uses? = max_uses.present?
   def max_uses=(value)
     self.max_uses_override = value
   end
 
-  def max_uses
-    return max_uses_override if
-      max_uses_override?
-
-    policy&.max_uses
-  end
-
+  def max_processes  = max_processes_override? ? max_processes_override : policy&.max_processes
+  def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
-  end
-
-  def max_processes
-    return max_processes_override if
-      max_processes_override?
-
-    policy&.max_processes
   end
 
   def max_users  = max_users_override? ? max_users_override : policy&.max_users

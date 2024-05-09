@@ -27,7 +27,7 @@ class MachineProcess < ApplicationRecord
   before_validation -> { self.last_heartbeat_at ||= Time.current },
     on: :create
 
-  delegate :leasing_strategy, :lease_per_license?, :lease_per_machine?,
+  delegate :leasing_strategy, :lease_per_license?, :lease_per_machine?, :lease_per_user?,
     :resurrect_dead?, :always_resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
@@ -89,6 +89,23 @@ class MachineProcess < ApplicationRecord
         license.allow_2x_overage? && next_process_count <= license.max_processes * 2
 
       errors.add :base, :limit_exceeded, message: "process count has exceeded maximum allowed for license (#{license.max_processes})"
+    when lease_per_user?
+      next_process_count = license.processes.left_outer_joins(:owner)
+                                            .where(owner: { id: owner }) # nil owner is significant
+                                            .count + 1
+      next unless
+        next_process_count > license.max_processes
+
+      next if
+        license.allow_1_25x_overage? && next_process_count <= license.max_processes * 1.25
+
+      next if
+        license.allow_1_5x_overage? && next_process_count <= license.max_processes * 1.5
+
+      next if
+        license.allow_2x_overage? && next_process_count <= license.max_processes * 2
+
+      errors.add :base, :limit_exceeded, message: "process count has exceeded maximum allowed for user (#{license.max_processes})"
     end
   end
 
