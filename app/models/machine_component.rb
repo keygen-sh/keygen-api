@@ -63,6 +63,15 @@ class MachineComponent < ApplicationRecord
       errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machine_components.joins(:product).exists?(fingerprint:, products: { id: machine.product })
     when unique_per_policy?
       errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machine_components.joins(:policy).exists?(fingerprint:, policies: { id: machine.policy })
+    when unique_per_user?
+      errors.add :fingerprint, :taken, message: "has already been taken for this user" if
+        account.machine_components.left_outer_joins(:owner)
+                                  .joins(:product)
+                                  .exists?(
+                                    product: { id: machine.product },
+                                    owner: { id: machine.owner },
+                                    fingerprint:,
+                                  )
     when unique_per_license?
       errors.add :fingerprint, :taken, message: "has already been taken for this license" if account.machine_components.joins(:license).exists?(fingerprint:, licenses: { id: machine.license })
     when unique_per_machine?
@@ -113,6 +122,12 @@ class MachineComponent < ApplicationRecord
     return false if machine.policy.nil?
 
     machine.policy.component_unique_per_policy?
+  end
+
+  def unique_per_user?
+    return false if machine.policy.nil?
+
+    machine.policy.component_unique_per_user?
   end
 
   def unique_per_license?

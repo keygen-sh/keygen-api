@@ -370,6 +370,162 @@ Feature: Create machine component
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a component with a fingerprint matching another component for a different owner (UNIQUE_PER_USER)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_USER" }
+      """
+    And the current account has 1 "license" for the last "policy" and the first "user" as "owner"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the first "license" and the first "user" as "owner"
+    And the current account has 1 "machine" for the second "license" and the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the first "machine" with the following:
+      """
+      { "fingerprint": "5f28e8a43bcd402082190b48d0048100" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a component with a fingerprint matching another component for the same owner (UNIQUE_PER_USER)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_USER" }
+      """
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the first "license" and the last "user" as "owner"
+    And the current account has 1 "machine" for the second "license" and the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 1 "component" for the first "machine" with the following:
+      """
+      { "fingerprint": "5f28e8a43bcd402082190b48d0048100" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this user",
+        "code": "FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/fingerprint"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a component with a fingerprint matching another component for the nil owner (UNIQUE_PER_USER)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      { "componentUniquenessStrategy": "UNIQUE_PER_USER" }
+      """
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "machine" for the first "license"
+    And the current account has 1 "machine" for the second "license"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 1 "component" for the first "machine" with the following:
+      """
+      { "fingerprint": "5f28e8a43bcd402082190b48d0048100" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/components" with the following:
+      """
+      {
+        "data": {
+          "type": "components",
+          "attributes": {
+            "fingerprint": "5f28e8a43bcd402082190b48d0048100",
+            "name": "SSD"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken for this user",
+        "code": "FINGERPRINT_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/fingerprint"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a component with a fingerprint matching another component for a different policy (UNIQUE_PER_POLICY)
     Given I am an admin of account "test1"
     And the current account is "test1"

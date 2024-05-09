@@ -91,7 +91,7 @@ Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |id, coun
   end
 end
 
-Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following:$/ do |id, count, traits, resource, body|
+Given /^the account "([^\"]*)" has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following(?: attributes)?:$/ do |id, count, traits, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
@@ -126,7 +126,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |count, trai
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following:$/ do |count, traits, resource, body|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" with the following(?: attributes)?:$/ do |count, traits, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
@@ -246,7 +246,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)" with the following:$/ do |count, traits, resource, association, body|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) (?:all|each) "([^\"]*)" with the following(?: attributes)?:$/ do |count, traits, resource, association, body|
   body   = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
   traits = traits&.split('+')&.map(&:to_sym)
@@ -375,7 +375,7 @@ Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) t
   end
 end
 
-Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)" with the following:$/ do |count, traits, resource, index, association, body|
+Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)" (?:with|for|in) the (\w+) "([^\"]*)" with the following(?: attributes)?:$/ do |count, traits, resource, index, association, body|
   body   = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   attrs  = JSON.parse(body).deep_transform_keys!(&:underscore)
   traits = traits&.split('+')&.map(&:to_sym)

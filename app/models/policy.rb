@@ -29,6 +29,7 @@ class Policy < ApplicationRecord
     UNIQUE_PER_ACCOUNT
     UNIQUE_PER_PRODUCT
     UNIQUE_PER_POLICY
+    UNIQUE_PER_USER
     UNIQUE_PER_LICENSE
   ].freeze
 
@@ -36,14 +37,16 @@ class Policy < ApplicationRecord
     UNIQUE_PER_ACCOUNT
     UNIQUE_PER_PRODUCT
     UNIQUE_PER_POLICY
+    UNIQUE_PER_USER
     UNIQUE_PER_LICENSE
     UNIQUE_PER_MACHINE
   ].freeze
 
   UNIQUENESS_STRATEGY_RANKS = {
-    UNIQUE_PER_ACCOUNT: 4,
-    UNIQUE_PER_PRODUCT: 3,
-    UNIQUE_PER_POLICY:  2,
+    UNIQUE_PER_ACCOUNT: 5,
+    UNIQUE_PER_PRODUCT: 4,
+    UNIQUE_PER_POLICY:  3,
+    UNIQUE_PER_USER:    2,
     UNIQUE_PER_LICENSE: 1,
     UNIQUE_PER_MACHINE: 0,
   }.with_indifferent_access
@@ -466,6 +469,7 @@ class Policy < ApplicationRecord
   def machine_unique_per_account? = machine_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
   def machine_unique_per_product? = machine_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
   def machine_unique_per_policy?  = machine_uniqueness_strategy == 'UNIQUE_PER_POLICY'
+  def machine_unique_per_user?    = machine_uniqueness_strategy == 'UNIQUE_PER_USER'
   def machine_unique_per_license?
     return true if machine_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
 
@@ -479,6 +483,7 @@ class Policy < ApplicationRecord
   def component_unique_per_account? = component_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
   def component_unique_per_product? = component_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
   def component_unique_per_policy?  = component_uniqueness_strategy == 'UNIQUE_PER_POLICY'
+  def component_unique_per_user?    = component_uniqueness_strategy == 'UNIQUE_PER_USER'
   def component_unique_per_license? = component_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
   def component_unique_per_machine?
     return true if component_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat

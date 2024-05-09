@@ -14,7 +14,7 @@ class Machine < ApplicationRecord
   include Dirtyable
 
   HEARTBEAT_DRIFT = 30.seconds
-  HEARTBEAT_TTL = 10.minutes
+  HEARTBEAT_TTL   = 10.minutes
 
   belongs_to :license, counter_cache: true
   belongs_to :owner,
@@ -223,6 +223,14 @@ class Machine < ApplicationRecord
       errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists?(fingerprint:, products: { id: product.id })
     when unique_per_policy?
       errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists?(fingerprint:, policies: { id: policy.id })
+    when unique_per_user?
+      errors.add :fingerprint, :taken, message: "has already been taken for this user" if
+        account.machines.joins(:product)
+                        .exists?(
+                          product: { id: product },
+                          fingerprint:,
+                          owner:,
+                        )
     when unique_per_license?
       errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists?(fingerprint:)
     end
@@ -678,6 +686,12 @@ class Machine < ApplicationRecord
     return false if policy.nil?
 
     policy.machine_unique_per_policy?
+  end
+
+  def unique_per_user?
+    return false if policy.nil?
+
+    policy.machine_unique_per_user?
   end
 
   def unique_per_license?
