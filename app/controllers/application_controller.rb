@@ -341,6 +341,7 @@ class ApplicationController < ActionController::API
         in source: { pointer: %r{/attributes/([^/]+)} }
           s << '-attrs-' << $1
         else
+          s
         end
       }
 

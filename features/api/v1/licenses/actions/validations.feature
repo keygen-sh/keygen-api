@@ -5881,6 +5881,83 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 2 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 2 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And the current account has 2 "processes" for each "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 2 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 2 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And the current account has 2 "processes" for each "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -5945,6 +6022,84 @@ Feature: License validation actions
       """
       { "machineId": "$machines[0]" }
       """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 5 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 5 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 5 "machines" for the last "license"
+    And the current account has 1 "process" for each "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 5 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 5 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 5 "machines" for the last "license"
+    And the current account has 1 "process" for each "machine"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
@@ -6035,6 +6190,85 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 6 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 6 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -6099,6 +6333,84 @@ Feature: License validation actions
       """
       { "machineId": "$machines[0]" }
       """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 3 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 3 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "process" for each "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 3 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 3 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "process" for each "machine"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
@@ -6189,6 +6501,85 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 4 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 4 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -6253,6 +6644,83 @@ Feature: License validation actions
       """
       { "machineId": "$machines[0]" }
       """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 2 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 2 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And the current account has 2 "processes" for each "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "users"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the first "license" and the first "user"
+    And the current account has 1 "license-user" for the first "license" and the second "user"
+    And the current account has 2 "machines" for the last "license" and the first "user" as "owner"
+    And the current account has 2 "machines" for the last "license" and the second "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And the current account has 2 "processes" for each "machine"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
@@ -6343,6 +6811,85 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 5 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 5 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -6407,6 +6954,85 @@ Feature: License validation actions
       """
       { "machineId": "$machines[0]" }
       """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_USER leasing strategy, with scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 3 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "user": "$users[1].email"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_USER leasing strategy, no scope)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxProcesses": 2,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"

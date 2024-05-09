@@ -3111,7 +3111,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (4)",
+        "detail": "machine count has exceeded maximum allowed for license (4)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3229,7 +3229,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (4)",
+        "detail": "machine count has exceeded maximum allowed for license (4)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3347,7 +3347,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (5)",
+        "detail": "machine count has exceeded maximum allowed for license (5)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3519,7 +3519,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (5)",
+        "detail": "machine count has exceeded maximum allowed for license (5)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3691,7 +3691,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (1)",
+        "detail": "machine count has exceeded maximum allowed for license (1)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3755,7 +3755,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has exceeded maximum allowed by current policy (1)",
+        "detail": "machine count has exceeded maximum allowed for license (1)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -3818,6 +3818,631 @@ Feature: Create machine
     And the response body should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 2 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 3 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 3 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 2 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 3 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 2 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (3)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 2 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 3 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (3)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its overage limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 5 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 6 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its overage limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 6 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 5 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its overage limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 6 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 5 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (3)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its overage limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 3,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 5 "machines" for the first "license" and the last "user" as "owner"
+    And the current account has 6 "machines" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (3)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has not reached its limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "machine" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has not reached its limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "machine" for the first "license" and the last "user" as "owner"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has exceeded its limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "machine" for the first "license" and the last "user" as "owner"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (1)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has exceeded its limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "machine" for the first "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 12
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed for user (1)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine with a fingerprint from another license's machine for a license-scoped machine uniqueness strategy
@@ -4326,7 +4951,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine core count has exceeded maximum allowed by current policy (32)",
+        "detail": "machine core count has exceeded maximum allowed for license (32)",
         "code": "MACHINE_CORE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -4567,7 +5192,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine core count has exceeded maximum allowed by current policy (32)",
+        "detail": "machine core count has exceeded maximum allowed for license (32)",
         "code": "MACHINE_CORE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -4689,7 +5314,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine core count has exceeded maximum allowed by current policy (32)",
+        "detail": "machine core count has exceeded maximum allowed for license (32)",
         "code": "MACHINE_CORE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -4799,7 +5424,345 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine core count has exceeded maximum allowed by current policy (8)",
+        "detail": "machine core count has exceeded maximum allowed for license (8)",
+        "code": "MACHINE_CORE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 10,
+        "maxCores": 32,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for each "license"
+    And all "machines" have the following attributes:
+      """
+      { "cores": 16 }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 16
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[3]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "machine" with the cores "16"
+    And the first "license" should have a correct machine core count
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that is under its core overage limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 10,
+        "maxCores": 32,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for each "license"
+    And all "machines" have the following attributes:
+      """
+      { "cores": 8 }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 16
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[3]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "machine" with the cores "16"
+    And the first "license" should have a correct machine core count
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (PER_USER leasing strategy, with owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 10,
+        "maxCores": 32,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the first "policy"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 2 "machines" for each "license"
+    And all "machines" have the following attributes:
+      """
+      { "cores": 16 }
+      """
+    And the first "machine" has the following attributes:
+      """
+      { "ownerId": "$users[1]" }
+      """
+    And the second "machine" has the following attributes:
+      """
+      { "ownerId": "$users[1]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 16
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            },
+            "owner": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine core count has exceeded maximum allowed for user (32)",
+        "code": "MACHINE_CORE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its core overage limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 10,
+        "maxCores": 32,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 4 "licenses" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for each "license"
+    And all "machines" have the following attributes:
+      """
+      { "cores": 16 }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 16
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[3]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine core count has exceeded maximum allowed for user (32)",
+        "code": "MACHINE_CORE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has not reached its core limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "maxCores": 8,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 8
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "machine" with the cores "8"
+    And the first "license" should have a correct machine core count
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has exceeded its core limit (PER_USER leasing strategy, no owner)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_USER",
+        "maxMachines": 1,
+        "maxCores": 8,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 12
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine core count has exceeded maximum allowed for user (8)",
         "code": "MACHINE_CORE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"

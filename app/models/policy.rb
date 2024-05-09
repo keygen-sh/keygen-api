@@ -118,6 +118,7 @@ class Policy < ApplicationRecord
   LEASING_STRATEGIES = %w[
     PER_LICENSE
     PER_MACHINE
+    PER_USER
   ].freeze
 
   OVERAGE_STATEGIES = %w[
@@ -601,6 +602,10 @@ class Policy < ApplicationRecord
 
   def lease_per_machine?
     leasing_strategy == 'PER_MACHINE'
+  end
+
+  def lease_per_user?
+    leasing_strategy == 'PER_USER'
   end
 
   def always_allow_overage?
