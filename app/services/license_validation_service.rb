@@ -130,9 +130,8 @@ class LicenseValidationService < BaseService
 
       # Check against fingerprint scope requirements
       if scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
-        fingerprints = Array(scope[:fingerprint] || scope[:fingerprints])
-                         .compact
-                         .uniq
+        fingerprints = Array(scope[:fingerprint] || scope[:fingerprints]).compact
+                                                                         .uniq
 
         return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if
           fingerprints.empty?
@@ -276,38 +275,92 @@ class LicenseValidationService < BaseService
 
     # Check if license policy allows floating and if not, should have single activation
     return [false, "must have exactly 1 associated machine", :NO_MACHINE] if
-      !license.policy.floating? && license.machines_count == 0
+      license.node_locked? && license.machines_count == 0
 
-    # When not floating, license's machine count should not surpass 1
-    if !license.policy.floating? && license.machines_count > 1
+    # When node-locked, license's machine count should not surpass 1
+    if license.node_locked? && license.machines_count > 1
+      machine_limit = license.max_machines || 1
+      machine_count = case
+                      when license.lease_per_user?
+                        owner = if scope.present?
+                                  license.users.where(id: scope[:user])
+                                               .or(
+                                                 license.users.where(email: scope[:user]),
+                                               )
+                                               .take
+                                end
+
+                        license.machines.where(owner:) # nil owner is significant
+                                        .count
+                      else
+                        license.machines_count
+                      end
+
       allow_overage = license.always_allow_overage? ||
-                      (license.allow_2x_overage? && license.machines_count == 2)
+                      (license.allow_2x_overage? && machine_count <= machine_limit * 2)
 
-      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES]
+      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES] if
+        machine_count > machine_limit
     end
 
     # When floating, license should have at least 1 activation
     return [false, "must have at least 1 associated machine", :NO_MACHINES] if
-      license.policy.floating? && license.machines_count == 0
+      license.floating? && license.machines_count == 0
 
     # When floating, license's machine count should not surpass what policy allows
-    if license.floating? && !license.max_machines.nil? && license.machines_count > license.max_machines
-      allow_overage = license.always_allow_overage? ||
-                      (license.allow_1_25x_overage? && license.machines_count <= license.max_machines * 1.25) ||
-                      (license.allow_1_5x_overage? && license.machines_count <= license.max_machines * 1.5) ||
-                      (license.allow_2x_overage? && license.machines_count <= license.max_machines * 2)
+    if license.floating? && license.max_machines? && license.machines_count > 1
+      machine_limit = license.max_machines
+      machine_count = case
+                      when license.lease_per_user?
+                        owner = if scope.present?
+                                  license.users.where(id: scope[:user])
+                                               .or(
+                                                 license.users.where(email: scope[:user]),
+                                               )
+                                               .take
+                                end
 
-      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES]
+                        license.machines.where(owner:) # nil owner is significant
+                                        .count
+                      else
+                        license.machines_count
+                      end
+
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && machine_count <= machine_limit * 1.25) ||
+                      (license.allow_1_5x_overage? && machine_count <= machine_limit * 1.5) ||
+                      (license.allow_2x_overage? && machine_count <= machine_limit * 2)
+
+      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES] if
+        machine_count > machine_limit
     end
 
     # Check if license has exceeded its CPU core limit
-    if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
-      allow_overage = license.always_allow_overage? ||
-                      (license.allow_1_25x_overage? && license.machines_core_count <= license.max_cores * 1.25) ||
-                      (license.allow_1_5x_overage? && license.machines_core_count <= license.max_cores * 1.5) ||
-                      (license.allow_2x_overage? && license.machines_core_count <= license.max_cores * 2)
+    if license.max_cores?
+      core_limit = license.max_cores
+      core_count = case
+                   when license.lease_per_user?
+                     owner = if scope.present?
+                               license.users.where(id: scope[:user])
+                                            .or(
+                                              license.users.where(email: scope[:user]),
+                                            )
+                                            .take
+                             end
 
-      return [allow_overage, "has too many associated machine cores", :TOO_MANY_CORES]
+                     license.machines.where(owner:) # nil owner is significant
+                                     .sum(:cores)
+                   else
+                     license.machines_core_count
+                   end
+
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && core_count <= core_limit * 1.25) ||
+                      (license.allow_1_5x_overage? && core_count <= core_limit * 1.5) ||
+                      (license.allow_2x_overage? && core_count <= core_limit * 2)
+
+      return [allow_overage, "has too many associated machine cores", :TOO_MANY_CORES] if
+        core_count > core_limit
     end
 
     # Check if license has exceeded its process limit
@@ -318,9 +371,8 @@ class LicenseValidationService < BaseService
       case
       when license.lease_per_machine? && scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
         machine = license.machines.alive.find_by(
-          fingerprint: Array(scope[:fingerprint] || scope[:fingerprints])
-                         .compact
-                         .uniq,
+          fingerprint: Array(scope[:fingerprint] || scope[:fingerprints]).compact
+                                                                         .uniq,
         )
 
         process_count = machine.processes.count
@@ -333,6 +385,19 @@ class LicenseValidationService < BaseService
       when license.lease_per_license?
         process_count = license.processes.count
         process_limit = license.max_processes
+      when license.lease_per_user?
+        owner = if scope.present?
+                  license.users.where(id: scope[:user])
+                               .or(
+                                 license.users.where(email: scope[:user]),
+                               )
+                               .take
+                end
+
+        process_limit = license.max_processes
+        process_count = license.processes.left_outer_joins(:owner)
+                                         .where(owner: { id: owner }) # nil owner is significant
+                                         .count
       end
 
       allow_overage = license.always_allow_overage? ||
