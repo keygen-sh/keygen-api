@@ -117,10 +117,9 @@ module Keygen
 
     # Set default URL options before server boots
     config.before_initialize do |app|
-      app.default_url_options = {
-        host: ENV.fetch('KEYGEN_HOST'),
-        protocol: 'https',
-      }
+      app.default_url_options = { protocol: 'https' }.tap do |options|
+        options[:host] = ENV['KEYGEN_HOST'] if ENV.key?('KEYGEN_HOST')
+      end
     end
 
     # Print env info when server boots
