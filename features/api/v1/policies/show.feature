@@ -252,6 +252,53 @@ Feature: Show policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin retrieves a policy with a process leasing strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_USER"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_USER"
+      }
+      """
+
+  Scenario: Admin retrieves a policy with a process leasing strategy (v1.6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_USER"
+      }
+      """
+    And I use an authentication token
+    And I use API version "1.6"
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "leasingStrategy": "PER_USER"
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.6" }
+      """
+
   Scenario: Admin retrieves a policy with a machine uniqueness strategy (v1.4)
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -87,7 +87,8 @@ Feature: Update policy
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
             "heartbeatBasis": "FROM_FIRST_PING",
-            "leasingStrategy": "PER_LICENSE",
+            "machineLeasingStrategy": "PER_LICENSE",
+            "processLeasingStrategy": "PER_USER",
             "overageStrategy": "NO_OVERAGE",
             "requireHeartbeat": true,
             "name": "Test"
@@ -111,7 +112,8 @@ Feature: Update policy
         "heartbeatCullStrategy": "KEEP_DEAD",
         "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
         "heartbeatBasis": "FROM_FIRST_PING",
-        "leasingStrategy": "PER_LICENSE",
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
         "requireHeartbeat": true,
         "name": "Test"

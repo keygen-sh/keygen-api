@@ -115,7 +115,12 @@ class Policy < ApplicationRecord
     FROM_FIRST_PING
   ].freeze
 
-  LEASING_STRATEGIES = %w[
+  MACHINE_LEASING_STRATEGIES = %w[
+    PER_LICENSE
+    PER_USER
+  ].freeze
+
+  PROCESS_LEASING_STRATEGIES = %w[
     PER_LICENSE
     PER_MACHINE
     PER_USER
@@ -162,7 +167,8 @@ class Policy < ApplicationRecord
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
-  before_create -> { self.leasing_strategy = 'PER_MACHINE' }, if: -> { leasing_strategy.nil? }
+  before_create -> { self.machine_leasing_strategy = 'PER_LICENSE' }, if: -> { machine_leasing_strategy.nil? }
+  before_create -> { self.process_leasing_strategy = 'PER_MACHINE' }, if: -> { process_leasing_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
   before_create :set_default_overage_strategy, unless: :overage_strategy?
@@ -216,8 +222,12 @@ class Policy < ApplicationRecord
     inclusion: { in: TRANSFER_STRATEGIES, message: 'unsupported transfer strategy' },
     allow_nil: true
 
-  validates :leasing_strategy,
-    inclusion: { in: LEASING_STRATEGIES, message: 'unsupported leasing strategy' },
+  validates :machine_leasing_strategy,
+    inclusion: { in: MACHINE_LEASING_STRATEGIES, message: 'unsupported machine leasing strategy' },
+    allow_nil: true
+
+  validates :process_leasing_strategy,
+    inclusion: { in: PROCESS_LEASING_STRATEGIES, message: 'unsupported process leasing strategy' },
     allow_nil: true
 
   validates :max_processes,
@@ -461,7 +471,8 @@ class Policy < ApplicationRecord
   end
 
   # FIXME(ezekg) Temporary until we fully migrate to renamed column
-  def machine_uniqueness_strategy = attributes['machine_uniqueness_strategy'] || attributes['fingerprint_uniqueness_strategy']
+  def machine_uniqueness_strategy  = attributes['machine_uniqueness_strategy'] || attributes['fingerprint_uniqueness_strategy']
+  def machine_uniqueness_strategy? = machine_uniqueness_strategy.present?
 
   def machine_unique_per_account? = machine_uniqueness_strategy == 'UNIQUE_PER_ACCOUNT'
   def machine_unique_per_product? = machine_uniqueness_strategy == 'UNIQUE_PER_PRODUCT'
@@ -596,16 +607,32 @@ class Policy < ApplicationRecord
     transfer_strategy == 'KEEP_EXPIRY'
   end
 
-  def lease_per_license?
-    leasing_strategy == 'PER_LICENSE'
+  # FIXME(ezekg) Temporary until we fully migrate to renamed column
+  def process_leasing_strategy  = attributes['process_leasing_strategy'] || attributes['leasing_strategy']
+  def process_leasing_strategy? = process_leasing_strategy.present?
+
+  def process_lease_per_machine?
+    return true unless process_leasing_strategy? # default
+
+    process_leasing_strategy == 'PER_MACHINE'
   end
 
-  def lease_per_machine?
-    leasing_strategy == 'PER_MACHINE'
+  def process_lease_per_license?
+    process_leasing_strategy == 'PER_LICENSE'
   end
 
-  def lease_per_user?
-    leasing_strategy == 'PER_USER'
+  def process_lease_per_user?
+    process_leasing_strategy == 'PER_USER'
+  end
+
+  def machine_lease_per_license?
+    return true unless machine_leasing_strategy? # default
+
+    machine_leasing_strategy == 'PER_LICENSE'
+  end
+
+  def machine_lease_per_user?
+    machine_leasing_strategy == 'PER_USER'
   end
 
   def always_allow_overage?

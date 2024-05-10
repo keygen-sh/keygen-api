@@ -3,7 +3,7 @@
 require_relative './logger'
 
 module Keygen
-  VERSION = '1.6.0'.freeze
+  VERSION = '1.7.0'.freeze
 
   module Version
     class << self

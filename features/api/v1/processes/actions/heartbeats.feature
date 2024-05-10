@@ -48,7 +48,7 @@ Feature: Process heartbeat actions
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_MACHINE",
+        "processLeasingStrategy": "PER_MACHINE",
         "maxProcesses": 5
       }
       """

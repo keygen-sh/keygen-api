@@ -18,6 +18,10 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.6' => %i[
+      rename_process_leasing_strategy_to_leasing_strategy_for_policies_migration
+      rename_process_leasing_strategy_to_leasing_strategy_for_policy_migration
+    ],
     '1.5' => %i[
       rename_owner_relationship_to_user_for_licenses_migration
       rename_owner_relationship_to_user_for_license_migration

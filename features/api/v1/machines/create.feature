@@ -3872,7 +3872,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -3922,7 +3922,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -3966,7 +3966,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4026,7 +4026,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4080,8 +4080,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4131,8 +4131,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4176,8 +4176,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4237,8 +4237,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 3,
         "floating": true,
         "strict": true
@@ -4292,7 +4292,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 1,
         "floating": false,
         "strict": true
@@ -4341,7 +4341,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 1,
         "floating": false,
         "strict": true
@@ -4384,7 +4384,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 1,
         "floating": false,
         "strict": true
@@ -4443,7 +4443,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 1,
         "floating": false,
         "strict": true
@@ -5487,7 +5487,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 10,
         "maxCores": 32,
         "floating": true,
@@ -5544,7 +5544,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 10,
         "maxCores": 32,
         "floating": true,
@@ -5595,7 +5595,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 10,
         "maxCores": 32,
         "floating": true,
@@ -5668,7 +5668,7 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "machineLeasingStrategy": "PER_USER",
         "maxMachines": 10,
         "maxCores": 32,
         "floating": true,
@@ -5726,8 +5726,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 1,
         "maxCores": 8,
         "floating": false,
@@ -5771,8 +5771,8 @@ Feature: Create machine
     And the current account has 1 "policy" with the following:
       """
       {
+        "machineLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxMachines": 1,
         "maxCores": 8,
         "floating": false,

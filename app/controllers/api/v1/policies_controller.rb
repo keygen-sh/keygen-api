@@ -53,7 +53,9 @@ module Api::V1
           param :renewal_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
-          param :leasing_strategy, type: :string, optional: true
+          param :leasing_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3 1.4 1.5 1.6] }, as: :process_leasing_strategy
+          param :process_leasing_strategy, type: :string, optional: true
+          param :machine_leasing_strategy, type: :string, optional: true
           param :overage_strategy, type: :string, optional: true
           param :require_product_scope, type: :boolean, optional: true
           param :require_policy_scope, type: :boolean, optional: true
@@ -141,7 +143,9 @@ module Api::V1
           param :renewal_basis, type: :string, optional: true
           param :transfer_strategy, type: :string, optional: true
           param :authentication_strategy, type: :string, optional: true
-          param :leasing_strategy, type: :string, optional: true
+          param :leasing_strategy, type: :string, optional: true, if: -> { current_api_version.in? %w[1.0 1.1 1.2 1.3 1.4 1.5 1.6] }, as: :process_leasing_strategy
+          param :process_leasing_strategy, type: :string, optional: true
+          param :machine_leasing_strategy, type: :string, optional: true
           param :overage_strategy, type: :string, optional: true
           param :require_product_scope, type: :boolean, optional: true
           param :require_policy_scope, type: :boolean, optional: true

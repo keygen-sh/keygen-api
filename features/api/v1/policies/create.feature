@@ -96,7 +96,8 @@ Feature: Create policy
         "authenticationStrategy": "TOKEN",
         "heartbeatCullStrategy": "DEACTIVATE_DEAD",
         "heartbeatResurrectionStrategy": "NO_REVIVE",
-        "leasingStrategy": "PER_MACHINE",
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "NO_OVERAGE",
         "duration": 1209600,
         "maxMachines": null,
@@ -179,7 +180,8 @@ Feature: Create policy
             "authenticationStrategy": "LICENSE",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
-            "leasingStrategy": "PER_LICENSE",
+            "machineLeasingStrategy": "PER_LICENSE",
+            "processLeasingStrategy": "PER_LICENSE",
             "maxUses": 5
           },
           "relationships": {
@@ -204,7 +206,8 @@ Feature: Create policy
         "authenticationStrategy": "LICENSE",
         "heartbeatCullStrategy": "KEEP_DEAD",
         "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
-        "leasingStrategy": "PER_LICENSE",
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "NO_OVERAGE",
         "maxUses": 5,
         "protected": true
@@ -333,6 +336,163 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a machine leasing strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "machineLeasingStrategy": "PER_LICENSE",
+            "name": "Machine Leasing Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "name": "Machine Leasing Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a process leasing strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "processLeasingStrategy": "PER_USER",
+            "name": "Process Leasing Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "processLeasingStrategy": "PER_USER",
+        "name": "Process Leasing Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a leasing strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "leasingStrategy": "PER_LICENSE",
+            "name": "Leasing Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/leasingStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a leasing strategy (v1.6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.6"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "leasingStrategy": "PER_USER",
+            "name": "Leasing Strategy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "policy" with the following attributes:
+      """
+      {
+        "leasingStrategy": "PER_USER",
+        "name": "Leasing Strategy"
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a fingerprint uniqueness strategy (v1.3)
