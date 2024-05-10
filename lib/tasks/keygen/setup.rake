@@ -21,29 +21,30 @@ namespace :keygen do
         config['ENCRYPTION_KEY_DERIVATION_SALT'] = ENV.fetch('ENCRYPTION_KEY_DERIVATION_SALT')
       end
 
+      config['KEYGEN_EDITION'] = edition
+      config['KEYGEN_MODE']    = mode
+      config['KEYGEN_HOST']    = ENV.fetch('KEYGEN_HOST') {
+        print 'Enter your domain name (e.g. licensing.example.com): '
+        gets
+      }
+
       case edition
       when 'CE'
         puts 'Setting up CE edition...'
-
-        config['KEYGEN_EDITION'] = edition
       when 'EE'
         puts 'Setting up EE edition...'
 
-        license_key = ENV.fetch('KEYGEN_LICENSE_KEY') {
+        config['KEYGEN_LICENSE_FILE_PATH'] = '/etc/keygen/ee.lic'
+        config['KEYGEN_LICENSE_KEY']       = ENV.fetch('KEYGEN_LICENSE_KEY') {
           print 'Enter your EE license key: '
           gets
         }
-
-        config['KEYGEN_LICENSE_FILE_PATH'] = '/etc/keygen/ee.lic'
-        config['KEYGEN_LICENSE_KEY']       = license_key
-        config['KEYGEN_EDITION']           = edition
       else
         abort "Invalid edition: #{edition}"
       end
 
       case mode
-      when 'singleplayer',
-          nil
+      when 'singleplayer'
         puts 'Setting up singleplayer mode...'
 
         id = ENV.fetch('KEYGEN_ACCOUNT_ID') {
@@ -69,7 +70,6 @@ namespace :keygen do
           id:,
         )
 
-        config['KEYGEN_MODE']       = 'singleplayer'
         config['KEYGEN_ACCOUNT_ID'] = account.id
       when 'multiplayer'
         puts 'Setting up multiplayer mode...'
@@ -103,8 +103,6 @@ namespace :keygen do
             redo
           end
         end
-
-        config['KEYGEN_MODE'] = 'multiplayer'
       else
         abort "Invalid mode: #{mode}"
       end
