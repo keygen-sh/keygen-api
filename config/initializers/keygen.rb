@@ -40,4 +40,8 @@ Rails.application.config.to_prepare do
       abort "Account #{account_id} does not exist (run `rake keygen:setup` to create it)"
     end
   end
+
+  unless ENV.key?('KEYGEN_HOST')
+    abort "Environment variable KEYGEN_HOST is required"
+  end
 end
