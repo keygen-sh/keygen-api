@@ -57,7 +57,7 @@ module Api::V1
           end
 
           param :owner, type: :hash, optional: true do
-            param :data, type: :hash do
+            param :data, type: :hash, allow_nil: true do
               param :type, type: :string, inclusion: { in: %w[user users] }
               param :id, type: :uuid
             end
