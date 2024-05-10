@@ -281,7 +281,7 @@ class LicenseValidationService < BaseService
     if license.node_locked? && license.machines_count > 1
       machine_limit = license.max_machines || 1
       machine_count = case
-                      when license.lease_per_user?
+                      when license.machine_lease_per_user?
                         owner = if scope.present? && scope.key?(:user)
                                   license.users.where(id: scope[:user])
                                                .or(
@@ -311,7 +311,7 @@ class LicenseValidationService < BaseService
     if license.floating? && license.max_machines? && license.machines_count > 1
       machine_limit = license.max_machines
       machine_count = case
-                      when license.lease_per_user?
+                      when license.machine_lease_per_user?
                         owner = if scope.present? && scope.key?(:user)
                                   license.users.where(id: scope[:user])
                                                .or(
@@ -339,7 +339,7 @@ class LicenseValidationService < BaseService
     if license.max_cores?
       core_limit = license.max_cores
       core_count = case
-                   when license.lease_per_user?
+                   when license.machine_lease_per_user?
                      owner = if scope.present? && scope.key?(:user)
                                license.users.where(id: scope[:user])
                                             .or(
@@ -364,12 +364,12 @@ class LicenseValidationService < BaseService
     end
 
     # Check if license has exceeded its process limit
-    if license.max_processes.present?
+    if license.max_processes?
       process_count = 0
       process_limit = 0
 
       case
-      when license.lease_per_machine? && scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
+      when license.process_lease_per_machine? && scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
         machine = license.machines.alive.find_by(
           fingerprint: Array(scope[:fingerprint] || scope[:fingerprints]).compact
                                                                          .uniq,
@@ -377,15 +377,15 @@ class LicenseValidationService < BaseService
 
         process_count = machine.processes.count
         process_limit = machine.max_processes
-      when license.lease_per_machine? && scope.present? && scope.key?(:machine)
+      when license.process_lease_per_machine? && scope.present? && scope.key?(:machine)
         machine = license.machines.alive.find_by(id: scope[:machine])
 
         process_count = machine.processes.count
         process_limit = machine.max_processes
-      when license.lease_per_license?
+      when license.process_lease_per_license?
         process_count = license.processes.count
         process_limit = license.max_processes
-      when license.lease_per_user?
+      when license.process_lease_per_user?
         owner = if scope.present? && scope.key?(:user)
                   license.users.where(id: scope[:user])
                                .or(

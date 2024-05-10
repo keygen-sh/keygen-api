@@ -122,8 +122,7 @@ Feature: Create account
         "data": {
           "type": "accounts",
           "attributes": {
-            "name": "Version 1.6",
-            "slug": "v1x6"
+            "name": "Latest Version"
           },
           "relationships": {
             "plan": {
@@ -144,11 +143,11 @@ Feature: Create account
     Then the response status should be "201"
     And the response should contain the following headers:
       """
-      { "Keygen-Version": "1.6" }
+      { "Keygen-Version": "1.7" }
       """
     And the response body should be an "account" with the following attributes:
       """
-      { "apiVersion": "1.6" }
+      { "apiVersion": "1.7" }
       """
 
   Scenario: Anonymous creates an account (specific API version)
