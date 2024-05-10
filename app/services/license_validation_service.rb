@@ -282,7 +282,7 @@ class LicenseValidationService < BaseService
       machine_limit = license.max_machines || 1
       machine_count = case
                       when license.lease_per_user?
-                        owner = if scope.present?
+                        owner = if scope.present? && scope.key?(:user)
                                   license.users.where(id: scope[:user])
                                                .or(
                                                  license.users.where(email: scope[:user]),
@@ -312,7 +312,7 @@ class LicenseValidationService < BaseService
       machine_limit = license.max_machines
       machine_count = case
                       when license.lease_per_user?
-                        owner = if scope.present?
+                        owner = if scope.present? && scope.key?(:user)
                                   license.users.where(id: scope[:user])
                                                .or(
                                                  license.users.where(email: scope[:user]),
@@ -340,7 +340,7 @@ class LicenseValidationService < BaseService
       core_limit = license.max_cores
       core_count = case
                    when license.lease_per_user?
-                     owner = if scope.present?
+                     owner = if scope.present? && scope.key?(:user)
                                license.users.where(id: scope[:user])
                                             .or(
                                               license.users.where(email: scope[:user]),
@@ -386,7 +386,7 @@ class LicenseValidationService < BaseService
         process_count = license.processes.count
         process_limit = license.max_processes
       when license.lease_per_user?
-        owner = if scope.present?
+        owner = if scope.present? && scope.key?(:user)
                   license.users.where(id: scope[:user])
                                .or(
                                  license.users.where(email: scope[:user]),
