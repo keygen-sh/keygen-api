@@ -315,6 +315,37 @@ Feature: List policies
     Then the response status should be "403"
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin retrieves policies with leasing strategies (v1.6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_MACHINE"
+      }
+      """
+    And I use an authentication token
+    And I use API version "1.6"
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "policies"
+    And the response body should be an array of 2 "policies" with the following attributes:
+      """
+      {
+        "machineLeasingStrategy": "PER_LICENSE",
+        "leasingStrategy": "PER_MACHINE"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      {
+        "Keygen-Account": "$account",
+        "Keygen-Version": "1.6"
+      }
+      """
+
   Scenario: Admin retrieves policies with machine strategies (v1.4)
     Given I am an admin of account "test1"
     And the current account is "test1"

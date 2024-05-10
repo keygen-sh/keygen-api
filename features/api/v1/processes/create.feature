@@ -401,7 +401,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_MACHINE",
+        "processLeasingStrategy": "PER_MACHINE",
         "maxProcesses": null
       }
       """
@@ -443,7 +443,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_LICENSE",
         "maxProcesses": null
       }
       """
@@ -484,7 +484,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": null
       }
       """
@@ -526,7 +526,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": null
       }
       """
@@ -569,7 +569,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_MACHINE",
+        "processLeasingStrategy": "PER_MACHINE",
         "maxProcesses": 3
       }
       """
@@ -610,7 +610,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_LICENSE",
         "maxProcesses": 8
       }
       """
@@ -651,7 +651,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -693,7 +693,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -736,7 +736,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_MACHINE",
+        "processLeasingStrategy": "PER_MACHINE",
         "maxProcesses": 10
       }
       """
@@ -778,7 +778,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_LICENSE",
         "maxProcesses": 10
       }
       """
@@ -820,7 +820,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -862,7 +862,7 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
-        "leasingStrategy": "PER_USER",
+        "processLeasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -905,7 +905,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_MACHINE",
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "NO_OVERAGE",
         "maxProcesses": 5
       }
@@ -957,7 +957,7 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
-        "leasingStrategy": "PER_LICENSE",
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "NO_OVERAGE",
         "maxProcesses": 5
       }
@@ -1010,8 +1010,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1063,8 +1063,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1117,8 +1117,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5
       }
       """
@@ -1159,8 +1159,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5
       }
       """
@@ -1202,8 +1202,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1245,8 +1245,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1289,8 +1289,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 20
       }
       """
@@ -1331,8 +1331,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 20
       }
       """
@@ -1382,8 +1382,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1435,8 +1435,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1489,8 +1489,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 6
       }
       """
@@ -1531,8 +1531,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 6
       }
       """
@@ -1582,8 +1582,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1635,8 +1635,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1689,8 +1689,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5
       }
       """
@@ -1733,8 +1733,8 @@ Feature: Spawn machine process
     And the first "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5
       }
       """
@@ -1786,8 +1786,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """
@@ -1839,8 +1839,8 @@ Feature: Spawn machine process
     And the current account has 1 floating "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 8
       }
       """

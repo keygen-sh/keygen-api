@@ -1097,8 +1097,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5432,6 +5432,170 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 4 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 4 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 5 owned "machines" for the last "license"
+    And the current account has 4 "machines" for the last "license"
+    And "machines" 0...5 have the following attributes:
+      """
+      { "ownerId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 4 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 4 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": null }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 4 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 5 owned "machines" for the last "license"
+    And "machines" 4...9 have the following attributes:
+      """
+      { "ownerId": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": null }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict floating license that has too many machines (NO_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -5564,6 +5728,156 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, with owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 1 "machine" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, with owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 3 owned "machines" for the last "license"
+    And the current account has 2 "machines" for the last "license"
+    And "machines" 0...3 have the following attributes:
+      """
+      { "ownerId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "user": "$users[1].email" }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_USER leasing strategy, no owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "machine" for the last "license" and the last "user" as "owner"
+    And the current account has 2 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_USER leasing strategy, no owner)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "machineLeasingStrategy": "PER_USER",
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 2 "machines" for the last "license" and the last "user" as "owner"
+    And the current account has 3 owned "machines" for the last "license"
+    And "machines" 2...5 have the following attributes:
+      """
+      { "ownerId": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict node-locked license that has too many machines (NO_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -5605,8 +5919,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5639,8 +5953,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5682,8 +5996,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5725,8 +6039,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5768,8 +6082,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5812,8 +6126,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5855,8 +6169,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -5888,8 +6202,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -5931,8 +6245,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -5966,8 +6280,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6009,8 +6323,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6042,8 +6356,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6086,8 +6400,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6121,8 +6435,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6164,8 +6478,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6197,8 +6511,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6241,8 +6555,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_25X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6277,8 +6591,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6320,8 +6634,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6353,8 +6667,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6397,8 +6711,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6432,8 +6746,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6475,8 +6789,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 4,
         "strict": true
       }
@@ -6508,8 +6822,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6552,8 +6866,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_1_5X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6588,8 +6902,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6631,8 +6945,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6664,8 +6978,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6707,8 +7021,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6742,8 +7056,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6785,8 +7099,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6818,8 +7132,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6862,8 +7176,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "ALLOW_2X_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -6898,8 +7212,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_MACHINE",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_MACHINE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6941,8 +7255,8 @@ Feature: License validation actions
     And the last "policy" has the following attributes:
       """
       {
+        "processLeasingStrategy": "PER_LICENSE",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_LICENSE",
         "maxProcesses": 5,
         "strict": true
       }
@@ -6974,8 +7288,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }
@@ -7018,8 +7332,8 @@ Feature: License validation actions
     And the current account has 1 "policy" with the following:
       """
       {
+        "processLeasingStrategy": "PER_USER",
         "overageStrategy": "NO_OVERAGE",
-        "leasingStrategy": "PER_USER",
         "maxProcesses": 2,
         "strict": true
       }

@@ -22,7 +22,8 @@ class PolicySerializer < BaseSerializer
   attribute :renewal_basis
   attribute :transfer_strategy
   attribute :authentication_strategy
-  attribute :leasing_strategy
+  attribute :machine_leasing_strategy
+  attribute :process_leasing_strategy
   attribute :overage_strategy
   attribute :scheme
   attribute :encrypted

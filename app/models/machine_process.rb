@@ -27,7 +27,7 @@ class MachineProcess < ApplicationRecord
   before_validation -> { self.last_heartbeat_at ||= Time.current },
     on: :create
 
-  delegate :leasing_strategy, :lease_per_license?, :lease_per_machine?, :lease_per_user?,
+  delegate :process_lease_per_license?, :process_lease_per_machine?, :process_lease_per_user?,
     :resurrect_dead?, :always_resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
@@ -204,6 +204,10 @@ class MachineProcess < ApplicationRecord
       'DEAD'
     end
   end
+
+  def lease_per_license? = process_lease_per_license?
+  def lease_per_machine? = process_lease_per_machine?
+  def lease_per_user?    = process_lease_per_user?
 
   def resurrection_period_passed?
     return false if

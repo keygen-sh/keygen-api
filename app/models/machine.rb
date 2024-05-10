@@ -128,8 +128,7 @@ class Machine < ApplicationRecord
       machine.license.max_machines?
 
     case
-    when license.lease_per_machine?,
-         license.lease_per_license?
+    when lease_per_license?
       prev_machines_count = machine.license.machines_count || 0
       next if
         prev_machines_count == 0
@@ -148,7 +147,7 @@ class Machine < ApplicationRecord
         machine.license.allow_2x_overage? && next_machine_count <= machine.license.max_machines * 2
 
       machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed for license (#{machine.license.max_machines})"
-    when license.lease_per_user?
+    when lease_per_user?
       prev_machines_count = license.machines.where(owner:) # nil owner is significant
                                             .count
       next if
@@ -181,8 +180,7 @@ class Machine < ApplicationRecord
       machine.license.max_cores?
 
     case
-    when license.lease_per_machine?,
-         license.lease_per_license?
+    when lease_per_license?
       prev_core_count = machine.license.machines.where.not(id: machine.id)
                                                 .sum(:cores)
       next_core_count = prev_core_count + machine.cores.to_i
@@ -199,7 +197,7 @@ class Machine < ApplicationRecord
         machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
 
       machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed for license (#{machine.license.max_cores})"
-    when license.lease_per_user?
+    when lease_per_user?
       prev_core_count = machine.license.machines.where.not(id: machine.id)
                                                 .where(owner:) # nil owner is significant
                                                 .sum(:cores)
@@ -552,6 +550,8 @@ class Machine < ApplicationRecord
   }
 
   delegate :heartbeat_from_creation?, :heartbeat_from_first_ping?,
+    :process_lease_per_machine?, :process_lease_per_license?, :process_lease_per_user?,
+    :machine_lease_per_license?, :machine_lease_per_user?,
     :resurrect_dead?, :always_resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
@@ -563,15 +563,10 @@ class Machine < ApplicationRecord
     group
   end
 
+  def max_processes  = max_processes_override? ? max_processes_override : license&.max_processes
+  def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
-  end
-
-  def max_processes
-    return max_processes_override if
-      max_processes_override?
-
-    license&.max_processes
   end
 
   def generate_proof(dataset: nil)
@@ -691,6 +686,9 @@ class Machine < ApplicationRecord
 
     policy.machine_unique_per_license?
   end
+
+  def lease_per_license? = machine_lease_per_license?
+  def lease_per_user?    = machine_lease_per_user?
 
   private
 
