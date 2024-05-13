@@ -48,11 +48,16 @@ begin
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
 
       if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
+        RSpec::Core::RakeTask.new(:spec) # make sure task always exists
+
         rspec = Rake::Task['spec']
 
         # FIXME(ezekg) Remove [ from GLOB_PATTERN so spec/foo_spec.rb[1:2:3:4] patterns are supported
         #              See: https://github.com/rspec/rspec-core/issues/3062
-        Rake::FileList::GLOB_PATTERN = %r{[*?\{]}
+        Rake::FileList.tap do |klass|
+          klass.send(:remove_const, :GLOB_PATTERN) # replaces const without warning
+          klass.const_set(:GLOB_PATTERN, %r{[*?\{]})
+        end
 
         ENV['SPEC'] = pattern
 
