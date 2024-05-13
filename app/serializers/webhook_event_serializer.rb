@@ -4,6 +4,7 @@ class WebhookEventSerializer < BaseSerializer
   type 'webhook-events'
 
   attribute :endpoint
+  attribute :api_version
   attribute :payload do
     if @object.respond_to?(:payload)
       @object.payload
