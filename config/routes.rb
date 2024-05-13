@@ -4,39 +4,29 @@ require 'sidekiq/web'
 require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
-  domain_constraints =
-    if !Rails.env.development?
-      {
-        domain: ENV.fetch('KEYGEN_DOMAIN') {
-          # Get host without subdomains if domain is not explicitly set
-          host    = ENV.fetch('KEYGEN_HOST')
-          domains = host.downcase.strip.split('.')[-2..-1]
-          next if
-            domains.blank?
+  domain_constraints = {
+    domain: ENV.fetch('KEYGEN_DOMAIN') {
+      # Get host without subdomains if domain is not explicitly set
+      host    = ENV.fetch('KEYGEN_HOST')
+      domains = host.downcase.strip.split('.')[-2..-1]
+      next if
+        domains.blank?
 
-          domains.join('.')
-        },
-      }
-    else
-      {}
-    end
+      domains.join('.')
+    },
+  }
 
-  subdomain_constraints =
-    if !Rails.env.development?
-      {
-        subdomain: ENV.fetch('KEYGEN_SUBDOMAIN') {
-          # Get subdomain when subdomain is not explicitly set
-          host       = ENV.fetch('KEYGEN_HOST')
-          subdomains = host.downcase.strip.split('.')[0..-3]
-          next if
-            subdomains.blank?
+  subdomain_constraints = {
+    subdomain: ENV.fetch('KEYGEN_SUBDOMAIN') {
+      # Get subdomain when subdomain is not explicitly set
+      host       = ENV.fetch('KEYGEN_HOST')
+      subdomains = host.downcase.strip.split('.')[0..-3]
+      next if
+        subdomains.blank?
 
-          subdomains.join('.')
-        },
-      }
-    else
-      { subdomain: 'api' }
-    end
+      subdomains.join('.')
+    },
+  }
 
   if ENV.key?('SIDEKIQ_WEB_USER') && ENV.key?('SIDEKIQ_WEB_PASSWORD')
     mount Sidekiq::Web, at: '/-/sidekiq'

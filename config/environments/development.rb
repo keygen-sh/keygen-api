@@ -3,14 +3,16 @@
 require 'bullet'
 
 Rails.application.configure do
+  config.host_authorization = { exclude: -> req { req.path =~ %r(^/v\d+/health) } }
+  config.hosts.concat(
+    [ENV.fetch('KEYGEN_HOST'), *ENV.fetch('KEYGEN_HOSTS', '').split(',')].then { |host|
+      host.uniq.compact_blank.map { _1.downcase.strip }
+    },
+  )
+
   # Configure 'rails notes' to inspect Cucumber files
   config.annotations.register_directories('features')
   config.annotations.register_extensions('feature') { |tag| /#\s*(#{tag}):?\s*(.*)$/ }
-
-  # Settings specified here will take precedence over those in config/application.rb.
-
-  # Allow subdomains for localhost
-  config.action_dispatch.tld_length = 0
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
