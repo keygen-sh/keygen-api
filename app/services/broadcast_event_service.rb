@@ -86,7 +86,7 @@ class BroadcastEventService < BaseService
         options.merge!(meta: meta.transform_keys { |k| k.to_s.camelize(:lower) }) unless
           meta.nil?
 
-        payload = Keygen::JSONAPI::Renderer.new(account:, context: :webhook)
+        payload = Keygen::JSONAPI::Renderer.new(account:, api_version: CURRENT_API_VERSION, context: :webhook)
                                            .render(resource, options)
                                            .to_json
 

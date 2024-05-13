@@ -37,8 +37,10 @@ describe BroadcastEventService do
     event
   end
 
-  def jsonapi_render(model, account:, **options)
-    Keygen::JSONAPI::Renderer.new(account:).render(model, options).to_json
+  def jsonapi_render(resource, account:, meta: nil, **options)
+    Keygen::JSONAPI::Renderer.new(account:, context: :webhook, **options)
+                             .render(resource, **{ meta: }.compact)
+                             .to_json
   end
 
   before do
@@ -477,6 +479,84 @@ describe BroadcastEventService do
       }
 
       create_webhook_event!(account, resource)
+    end
+  end
+
+  context 'when endpoint version is greater than account version' do
+    let(:account)  { create(:account, api_version: '1.0') }
+    let(:endpoint) { create(:webhook_endpoint, api_version: CURRENT_API_VERSION, account:) }
+    let(:resource) { create(:policy, account:) }
+
+    it 'should migrate the webhook event payload' do
+      expected = jsonapi_render(resource, account:, api_version: endpoint.api_version)
+
+      allow(WebhookWorker::Request).to(
+        receive(:post) do |url, options|
+          options => headers:, body:
+
+          api_version = headers['Keygen-Version']
+          payload     = JSON.parse(body, symbolize_names: true)
+                            .dig(
+                              :data,
+                              :attributes,
+                              :payload,
+                            )
+
+          expect(api_version).to eq CURRENT_API_VERSION
+          expect(payload).to eq expected
+
+          OpenStruct.new(
+            code: 204,
+            body: '',
+          )
+        end
+      )
+
+      event = create_webhook_event!(account, resource,
+        event: 'policy.created',
+      )
+
+      expect(event.api_version).to eq CURRENT_API_VERSION
+      expect(event.payload).to eq expected
+    end
+  end
+
+  context 'when endpoint version is less than account version' do
+    let(:account)  { create(:account, api_version: CURRENT_API_VERSION) }
+    let(:endpoint) { create(:webhook_endpoint, api_version: '1.0', account:) }
+    let(:resource) { create(:policy, account:) }
+
+    it 'should migrate the webhook event payload' do
+      expected = jsonapi_render(resource, account:, api_version: endpoint.api_version)
+
+      allow(WebhookWorker::Request).to(
+        receive(:post) do |url, options|
+          options => headers:, body:
+
+          api_version = headers['Keygen-Version']
+          payload     = JSON.parse(body, symbolize_names: true)
+                            .dig(
+                              :data,
+                              :attributes,
+                              :payload,
+                            )
+
+          expect(api_version).to eq '1.0'
+          expect(payload).to eq expected
+
+          OpenStruct.new(
+            code: 204,
+            body: '',
+          )
+        end
+      )
+
+      event = create_webhook_event!(account, resource,
+        event: 'policy.created',
+      )
+
+      expect(event.api_version).to eq '1.0'
+      expect(event.payload).to eq expected
     end
   end
 end
