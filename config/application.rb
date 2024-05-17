@@ -20,7 +20,7 @@ Bundler.require *Rails.groups
 
 module Keygen
   class Application < Rails::Application
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     config.generators do |generator|
       # Use UUIDs for table primary keys
@@ -86,6 +86,9 @@ module Keygen
     ActiveRecord::Encryption.configure(
       **config.active_record.encryption,
     )
+
+    # Show all attributes in Rails console
+    config.active_record.attributes_for_inspect = :all
 
     # Update async destroy batch size
     config.active_record.destroy_association_async_batch_size = 1_000

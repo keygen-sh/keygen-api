@@ -148,7 +148,7 @@ FactoryBot.define do
     end
 
     trait :in_isolated_environment do
-      environment { create(:environment, :isolated, account:) }
+      environment { build(:environment, :isolated, account:) }
     end
 
     trait :isolated do
@@ -156,7 +156,7 @@ FactoryBot.define do
     end
 
     trait :in_shared_environment do
-      environment { create(:environment, :shared, account:) }
+      environment { build(:environment, :shared, account:) }
     end
 
     trait :shared do

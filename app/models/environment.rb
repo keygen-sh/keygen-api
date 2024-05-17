@@ -20,7 +20,7 @@ class Environment < ApplicationRecord
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
   has_many :webhook_endpoints,  dependent: :destroy_async
-  has_many :webhook_event,      dependent: :destroy_async
+  has_many :webhook_events,     dependent: :destroy_async
   has_many :entitlements,       dependent: :destroy_async
   has_many :groups,             dependent: :destroy_async
   has_many :products,           dependent: :destroy_async

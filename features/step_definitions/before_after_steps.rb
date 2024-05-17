@@ -17,7 +17,7 @@ end
 # FIXME(ezekg) This is super hacky but there's no easy way to disable
 #              bullet outside of adding controller filters
 Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
-After("@skip/bullet") { Bullet.instance_variable_set :@enable, true }
+After("@skip/bullet")  { Bullet.instance_variable_set :@enable, true }
 
 Before do |scenario|
   # Skip CE tests if we're running in an EE env, and vice-versa

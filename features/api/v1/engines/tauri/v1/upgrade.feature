@@ -303,18 +303,15 @@ Feature: Tauri v1 upgrade application
 
   Scenario: License retrieves an upgrade for a release that has entitlement constraints (no entitlements)
     Given the current account has 3 "entitlements"
-    And the current account has 1 "release-entitlement-constraint" with the following:
+    And the current account has 1 "release-entitlement-constraint" for the first "release" with the following:
       """
-      {
-        "entitlementId": "$entitlements[0]",
-        "releaseId": "$releases[0]"
-      }
+      { "entitlementId": "$entitlements[0]" }
       """
-    And the current account has 1 "policy" for the last "product" with the following:
+    And the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
       """
-    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
@@ -322,18 +319,15 @@ Feature: Tauri v1 upgrade application
 
   Scenario: License retrieves an upgrade that has entitlement constraints (no entitlements)
     Given the current account has 3 "entitlements"
-    And the current account has 1 "release-entitlement-constraint" with the following:
+    And the current account has 1 "release-entitlement-constraint" for the second "release" with the following:
       """
-      {
-        "entitlementId": "$entitlements[0]",
-        "releaseId": "$releases[1]"
-      }
+      { "entitlementId": "$entitlements[0]" }
       """
-    And the current account has 1 "policy" for the last "product" with the following:
+    And the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
       """
-    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/tauri/app1?platform=darwin&arch=x86_64&version=1.0.0"
@@ -341,24 +335,18 @@ Feature: Tauri v1 upgrade application
 
   Scenario: License retrieves an upgrade that has entitlement constraints (has entitlements)
     Given the current account has 3 "entitlements"
-    And the current account has 1 "release-entitlement-constraint" with the following:
+    And the current account has 1 "release-entitlement-constraint" for the second "release" with the following:
       """
-      {
-        "entitlementId": "$entitlements[0]",
-        "releaseId": "$releases[1]"
-      }
+      { "entitlementId": "$entitlements[0]" }
       """
     And the current account has 1 "policy" for the last "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
       """
     And the current account has 1 "license" for the last "policy"
-    And the current account has 1 "license-entitlement" with the following:
+    And the current account has 1 "license-entitlement" for the first "license" with the following:
       """
-      {
-        "entitlementId": "$entitlements[0]",
-        "licenseId": "$licenses[0]"
-      }
+      { "entitlementId": "$entitlements[0]" }
       """
     And I am a license of account "test1"
     And I authenticate with my key

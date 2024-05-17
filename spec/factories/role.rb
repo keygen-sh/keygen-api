@@ -30,6 +30,10 @@ FactoryBot.define do
       name { :read_only }
     end
 
+    trait :environment do
+      name { :environment }
+    end
+
     trait :product do
       name { :product }
     end

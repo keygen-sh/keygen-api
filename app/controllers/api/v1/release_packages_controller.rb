@@ -129,7 +129,7 @@ module Api::V1
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages)
 
-      Current.resource = @package = FindByAliasService.call(
+      @package = Current.resource = FindByAliasService.call(
         scoped_packages,
         id: params[:id],
         aliases: :key,
