@@ -61,15 +61,18 @@ module Environmental
     #
     # Use :default to automatically configure a default environment for the model.
     # Accepts a proc that resolves into an Environment or environment ID.
-    def has_environment(default: nil)
-      belongs_to :environment,
-        optional: true
+    def has_environment(default: nil, **kwargs)
+      belongs_to :environment, optional: true, **kwargs
 
       tracks_attributes :environment_id,
                         :environment
 
       # Hook into both initialization and validation to ensure the current environment
       # is applied to new records (given no :environment was provided).
+      #
+      # We're not using belongs_to(default:) because it only adds a before_validation
+      # callback, but we want to also do it after_initialize because new children
+      # may rely on the environment being set on their parent.
       after_initialize -> { self.environment_id ||= Current.environment&.id },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { new_record? && environment.nil? }

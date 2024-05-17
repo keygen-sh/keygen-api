@@ -1,4 +1,4 @@
-@skip/bullet
+# @skip/bullet
 @api/v1
 Feature: Search
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bullet'
+# require 'bullet'
 
 Rails.application.configure do
   config.host_authorization = { exclude: -> req { req.path =~ %r(^/v\d+/health) } }
@@ -91,12 +91,12 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # Configure Bullet for performance tests
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-    Bullet.rails_logger = true
-  end
+  # # Configure Bullet for performance tests
+  # config.after_initialize do
+  #   Bullet.enable = true
+  #   Bullet.bullet_logger = true
+  #   Bullet.rails_logger = true
+  # end
 
   # Clear cache on reload when using caching (see https://github.com/rails/rails/issues/43767)
   unless config.cache_classes

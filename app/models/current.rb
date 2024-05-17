@@ -19,4 +19,10 @@ class Current < ActiveSupport::CurrentAttributes
     self.token       = nil
     self.resource    = nil
   end
+
+  def account_id     = account&.id
+  def environment_id = environment&.id
+  def bearer_id      = bearer&.id
+  def token_id       = token&.id
+  def resource_id    = resource&.id
 end

@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :release_engine, aliases: %i[engine] do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { NIL_ACCOUNT == _2 }) }
 
     sequence :key, %w[pypi tauri].cycle
 
