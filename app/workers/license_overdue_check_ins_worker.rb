@@ -2,7 +2,6 @@
 
 class LicenseOverdueCheckInsWorker < BaseWorker
   sidekiq_options queue: :critical,
-                  lock: :until_executed, lock_ttl: 30.minutes, on_conflict: :raise,
                   cronitor_disabled: false
 
   def perform

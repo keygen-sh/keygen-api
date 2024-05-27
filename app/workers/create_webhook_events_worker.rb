@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class CreateWebhookEventsWorker < BaseWorker
-  sidekiq_options queue: :webhooks,
-                  lock: :until_executed
+  sidekiq_options queue: :webhooks
 
   def perform(event, account_id, payload, environment_id = nil)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do

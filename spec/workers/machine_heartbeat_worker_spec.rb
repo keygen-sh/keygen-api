@@ -7,37 +7,6 @@ describe MachineHeartbeatWorker do
   let(:worker) { MachineHeartbeatWorker }
   let(:account) { create(:account) }
 
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    SidekiqUniqueJobs.configure { _1.enabled = true }
-  end
-
-  after do
-    SidekiqUniqueJobs.configure { _1.enabled = false }
-  end
-
-  it 'should enqueue and run the worker' do
-    machine = create :machine, last_heartbeat_at: nil, account: account
-
-    worker.perform_async machine.id
-    expect(worker.jobs.size).to eq 1
-
-    worker.drain
-    expect(worker.jobs.size).to eq 0
-  end
-
-  it 'should replace the worker on conflict' do
-    machine = create :machine, last_heartbeat_at: nil, account: account
-
-    worker.perform_async machine.id
-    worker.perform_async machine.id
-    worker.perform_async machine.id
-    expect(worker.jobs.size).to eq 1
-
-    worker.drain
-    expect(worker.jobs.size).to eq 0
-  end
-
   context 'when there is a machine that does not require heartbeats' do
     let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, account: account) }
     let(:event) { 'machine.heartbeat.pong' }

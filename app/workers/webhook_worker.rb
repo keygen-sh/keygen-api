@@ -10,7 +10,6 @@ class WebhookWorker < BaseWorker
 
   sidekiq_options queue: :webhooks,
                   retry: 15,
-                  lock: :until_executed,
                   dead: false
 
   sidekiq_retry_in do |count|
