@@ -1,6 +1,5 @@
 class VacuumAnalyzeRequestLogsWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  lock: :until_executed,
                   cronitor_disabled: false
 
   def perform

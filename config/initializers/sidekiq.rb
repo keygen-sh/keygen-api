@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'sidekiq'
-require 'sidekiq-unique-jobs'
 require 'sidekiq-cron'
 require 'sidekiq/web'
 
@@ -37,10 +36,6 @@ Sidekiq.configure_client do |config|
     write_timeout: ENV.fetch('REDIS_WRITE_TIMEOUT') { 5 }.to_i,
     read_timeout: ENV.fetch('REDIS_READ_TIMEOUT') { 5 }.to_i,
   }
-
-  config.client_middleware do |chain|
-    chain.add SidekiqUniqueJobs::Middleware::Client
-  end
 end
 
 # Configure Sidekiq server
@@ -53,23 +48,11 @@ Sidekiq.configure_server do |config|
     network_timeout: 5,
   }
 
-  config.client_middleware do |chain|
-    chain.add SidekiqUniqueJobs::Middleware::Client
-  end
-
   config.server_middleware do |chain|
-    chain.add SidekiqUniqueJobs::Middleware::Server
     unless ENV.key?('NO_CRONITOR')
       chain.add Sidekiq::Cronitor::ServerMiddleware
     end
   end
-
-  SidekiqUniqueJobs::Server.configure(config)
-end
-
-# Configure Sidekiq unique jobs
-SidekiqUniqueJobs.configure do |config|
-  config.enabled = !Rails.env.test?
 end
 
 # Enable strict args for development/test

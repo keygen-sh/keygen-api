@@ -7,14 +7,6 @@ describe LicenseExpirationsWorker do
   let(:worker) { LicenseExpirationsWorker }
   let(:account) { create(:account) }
 
-  it 'should enqueue and run the worker' do
-    worker.perform_async
-    expect(worker.jobs.size).to eq 1
-
-    worker.drain
-    expect(worker.jobs.size).to eq 0
-  end
-
   context 'when there is a license that has recently expired' do
     let(:event) { 'license.expired' }
 

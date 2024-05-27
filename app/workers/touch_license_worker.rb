@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 class TouchLicenseWorker < BaseWorker
-  sidekiq_options retry: false,
-    lock: :until_executing,
-    on_conflict: {
-      client: :replace,
-      server: :raise,
-    }
+  sidekiq_options retry: false
 
   def perform(license_id, touches)
     license = License.find(license_id)
