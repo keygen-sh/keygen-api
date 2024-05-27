@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class EventLogWorker < BaseWorker
-  sidekiq_options lock: :until_executed,
-                  queue: :logs
+  sidekiq_options queue: :logs
 
   def perform(
     event,

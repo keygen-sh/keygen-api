@@ -7,14 +7,8 @@ describe PruneRequestLogsWorker do
   let(:worker)  { PruneRequestLogsWorker }
   let(:account) { create(:account) }
 
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.inline!
-  end
-
-  after do
-    Sidekiq::Worker.clear_all
-  end
+  before { Sidekiq::Testing.inline! }
+  after  { Sidekiq::Testing.fake! }
 
   it 'should prune backlog of request logs' do
     create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 1).days.ago)

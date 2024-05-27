@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'sidekiq/web'
-require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
   domain_constraints = {

@@ -464,10 +464,6 @@ GEM
     sidekiq-cronitor (3.6.0)
       cronitor (~> 5.0)
       sidekiq (< 8)
-    sidekiq-unique-jobs (8.0.10)
-      concurrent-ruby (~> 1.0, >= 1.0.5)
-      sidekiq (>= 7.0.0, < 8.0.0)
-      thor (>= 1.0, < 3.0)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -571,7 +567,6 @@ DEPENDENCIES
   sidekiq (~> 7.2.4)
   sidekiq-cron (~> 1.12.0)
   sidekiq-cronitor (~> 3.6.0)
-  sidekiq-unique-jobs (~> 8.0.10)
   sprockets (~> 3.0)
   stackprof
   stripe (~> 5.43)

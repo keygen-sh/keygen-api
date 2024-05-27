@@ -3,7 +3,6 @@ class PruneReleaseDownloadLinksWorker < BaseWorker
   BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
 
   sidekiq_options queue: :cron,
-                  lock: :until_executed,
                   cronitor_disabled: false
 
   def perform

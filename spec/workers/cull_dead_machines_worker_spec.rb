@@ -7,14 +7,8 @@ describe CullDeadMachinesWorker do
   let(:worker)  { CullDeadMachinesWorker }
   let(:account) { create(:account) }
 
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.inline!
-  end
-
-  after do
-    Sidekiq::Worker.clear_all
-  end
+  before { Sidekiq::Testing.inline! }
+  after  { Sidekiq::Testing.fake! }
 
   context 'without a monitor' do
     let(:heartbeat_jid) { nil }

@@ -5,7 +5,6 @@ class PruneWebhookEventsWorker < BaseWorker
   SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION')              { 1 }.to_f
 
   sidekiq_options queue: :cron,
-                  lock: :until_executed,
                   cronitor_disabled: false
 
   def perform

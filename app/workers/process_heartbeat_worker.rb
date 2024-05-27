@@ -2,12 +2,7 @@
 
 class ProcessHeartbeatWorker < BaseWorker
   sidekiq_options queue: :critical,
-    retry: 1_000_000, # retry forever
-    lock: :until_executing,
-    on_conflict: {
-      client: :replace,
-      server: :raise,
-    }
+                  retry: 1_000_000 # retry forever
 
   sidekiq_retry_in { |count|
     if count in 0..60

@@ -2,7 +2,6 @@
 
 class CullDeadProcessesWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  lock: :until_executed, lock_ttl: 10.minutes, on_conflict: :raise,
                   cronitor_disabled: false
 
   def perform
