@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-def cache = Rack::Attack.cache
+RACK_ATTACK_IP_WHITELIST = ENV.fetch('RACK_ATTACK_IP_WHITELIST') { '' }
+                              .split(',')
+                              .map { IPAddr.new(_1.strip) }
+
+RACK_ATTACK_IP_BLACKLIST = ENV.fetch('RACK_ATTACK_IP_BLACKLIST') { '' }
+                              .split(',')
+                              .map { IPAddr.new(_1.strip) }
 
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   next unless Rails.env.development?
@@ -19,7 +25,7 @@ Rack::Attack.safelist("req/allow/ip") do |rack_req|
   req = ActionDispatch::Request.new(rack_req.env)
   ip  = req.remote_ip
 
-  cache.read("req/allow/ip:#{ip}").present?
+  RACK_ATTACK_IP_WHITELIST.any? { _1 === ip }
 rescue => e
   Keygen.logger.exception(e)
 
@@ -30,37 +36,7 @@ Rack::Attack.blocklist("req/block/ip") do |rack_req|
   req = ActionDispatch::Request.new(rack_req.env)
   ip  = req.remote_ip
 
-  cache.read("req/block/ip:#{ip}").present?
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.blocklist("req/block/account") do |rack_req|
-  req     = ActionDispatch::Request.new(rack_req.env)
-  matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
-  account = matches[1] unless
-    matches.nil?
-
-  next unless
-    account.present?
-
-  cache.read("req/block/account:#{account}").present?
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.blocklist("req/block/path") do |rack_req|
-  req  = ActionDispatch::Request.new(rack_req.env)
-  path = req.path
-
-  next unless
-    path.present?
-
-  cache.read("req/block/path:#{path}").present?
+  RACK_ATTACK_IP_BLACKLIST.any? { _1 === ip }
 rescue => e
   Keygen.logger.exception(e)
 
@@ -316,96 +292,6 @@ rescue => e
   Keygen.logger.exception(e)
 
   nil
-end
-
-Rack::Attack.throttle("req/limit/ip", limit: 1, period: 1.minute) do |rack_req|
-  req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.remote_ip
-
-  next unless
-    cache.read("req/limit/ip:#{ip}")
-
-  "req/limit/ip:#{ip}"
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.throttle("req/limit/account", limit: 1, period: 1.minute) do |rack_req|
-  req     = ActionDispatch::Request.new(rack_req.env)
-  ip      = req.remote_ip
-  matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
-  account = matches[1] unless
-    matches.nil?
-
-  next unless
-    account.present?
-
-  next unless
-    cache.read("req/limit/account:#{account}")
-
-  "req/limit/account:#{account}:#{ip}"
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.throttle("req/limit/path", limit: 1, period: 1.minute) do |rack_req|
-  req  = ActionDispatch::Request.new(rack_req.env)
-  ip   = req.remote_ip
-  path = req.path
-
-  next unless
-    path.present?
-
-  next unless
-    cache.read("req/limit/path:#{path}")
-
-  "req/limit/path:#{path}:#{ip}"
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.throttle("req/shed/account", limit: 30, period: 30.seconds) do |rack_req|
-  req     = ActionDispatch::Request.new(rack_req.env)
-  matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
-  account = matches[1] unless
-    matches.nil?
-
-  next unless
-    account.present?
-
-  # Only shed load when we're rate limiting the account
-  next unless
-    cache.read("req/limit/account:#{account}")
-
-  "req/shed/account:#{account}"
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.throttle("req/shed/path", limit: 30, period: 30.seconds) do |rack_req|
-  req  = ActionDispatch::Request.new(rack_req.env)
-  path = req.path
-
-  next unless
-    path.present?
-
-  # Only shed load when we're rate limiting the path
-  next unless
-    cache.read("req/limit/path:#{path}")
-
-  "req/shed/path:#{path}"
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
 end
 
 Rack::Attack.throttled_responder = -> req {
