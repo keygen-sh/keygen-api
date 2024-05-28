@@ -42,7 +42,7 @@ Rails.application.configure do
       url: ENV['REDIS_URL'],
       db: ENV['TEST_ENV_NUMBER'].to_i,
       pool: {
-        size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
+        size: ENV.fetch('REDIS_POOL_SIZE') { ENV.fetch('RAILS_MAX_THREADS', 2) }.to_i,
         timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
       },
       connect_timeout: ENV.fetch('REDIS_CONNECT_TIMEOUT') { 5 }.to_i,
