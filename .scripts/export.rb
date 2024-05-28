@@ -34,6 +34,13 @@ File.open "tmp/export-#{account.slug}.sql", 'w' do |file|
   file << to_insert_sql_for(account)
   file << ";\n"
 
+  puts "Exporting #{account.entitlements.count} tokens…"
+
+  account.tokens.find_each do |token|
+    file << to_insert_sql_for(token)
+    file << ";\n"
+  end
+
   puts "Exporting #{account.entitlements.count} entitlements…"
 
   account.entitlements.find_each do |entitlement|
