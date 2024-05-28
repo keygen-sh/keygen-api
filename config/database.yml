@@ -1,26 +1,22 @@
 default: &default
   adapter: postgresql
-  pool: 5
-  timeout: 5000
+  pool: <%= ENV['DB_POOL'] || (Sidekiq.server? ? ENV.fetch('SIDEKIQ_CONCURRENCY', 10) : ENV.fetch('RAILS_MAX_THREADS', 2)) %>
+  timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
+  prepared_statements: false
+  variables:
+    statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"] || '15s' %>
 
 development:
   <<: *default
   database: keygen_dev
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
 test: &test
   <<: *default
   database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
-  prepared_statements: false
 
 production:
   <<: *default
   url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
-  pool: <%= ENV['DB_POOL'] || ENV['RAILS_MAX_THREADS'] || 5 %>
-  timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
-  prepared_statements: false
 
 cucumber:
   <<: *test
