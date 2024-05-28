@@ -8,6 +8,9 @@ RACK_ATTACK_IP_BLACKLIST = ENV.fetch('RACK_ATTACK_IP_BLACKLIST') { '' }
                               .split(',')
                               .map { IPAddr.new(_1.strip) }
 
+RACK_ATTACK_MAX_RPS = ENV.fetch('RACK_ATTACK_MAX_RPS') { -1 }.to_i
+RACK_ATTACK_MAX_RPM = ENV.fetch('RACK_ATTACK_MAX_RPM') { -1 }.to_i
+
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   next unless Rails.env.development?
 
@@ -59,61 +62,6 @@ Rack::Attack.blocklist("req/block/bots") do |rack_req|
   end
 end
 
-req_limit_proc = lambda do |base_req_limit|
-  lambda do |rack_req|
-    req = ActionDispatch::Request.new(rack_req.env)
-
-    # Parse authentication scheme
-    auth_parts  = req.authorization.to_s.split(' ', 2)
-    auth_scheme = auth_parts.first&.downcase
-
-    token = case auth_scheme
-            when 'license',
-                 'bearer',
-                 'token'
-              auth_parts.second
-            when 'basic'
-              basic_auth = Base64.decode64(auth_parts.second.to_s)
-              user, pass = basic_auth.to_s.split(':', 2)
-              case user
-              when 'license' then pass
-              when 'token'   then pass
-              else                user.presence
-              end
-            else
-              query_auth = req.query_parameters['token'] || req.query_parameters['auth']
-              user, pass = query_auth.to_s.split(':', 2)
-              case user
-              when 'license' then pass
-              when 'token'   then pass
-              else                user.presence
-              end
-            end
-
-    return base_req_limit if
-      token.blank?
-
-    # Certain roles get to make additional RPS (e.g. admin/prod indicates server-side)
-    case
-    when token.starts_with?('admin-'),
-         token.starts_with?('admi-'),
-         token.starts_with?('prod-'),
-         token.starts_with?('sales-'),
-         token.starts_with?('dev-')
-      base_req_limit * 5
-    when token.starts_with?('activ-'),
-         token.starts_with?('user-')
-      base_req_limit * 2
-    else
-      base_req_limit
-    end
-  rescue => e
-    Keygen.logger.exception(e)
-
-    base_req_limit
-  end
-end
-
 ip_limit_proc = lambda do |rack_req|
   req = ActionDispatch::Request.new(rack_req.env)
   ip  = req.remote_ip
@@ -162,10 +110,14 @@ rescue => e
   nil
 end
 
-Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(60),    period: 30.seconds }, &ip_limit_proc)
-Rack::Attack.throttle("req/ip/burst/2m",  { limit: req_limit_proc.call(600),   period: 2.minutes },  &ip_limit_proc)
-Rack::Attack.throttle("req/ip/burst/5m",  { limit: req_limit_proc.call(1_500), period: 5.minutes },  &ip_limit_proc)
-Rack::Attack.throttle("req/ip/burst/10m", { limit: req_limit_proc.call(3_000), period: 10.minutes }, &ip_limit_proc)
+# Simple sliding window rate limiters (more complex rate limiters should be added via WAF)
+if RACK_ATTACK_MAX_RPS > 0
+  Rack::Attack.throttle("req/ip/1s", limit: RACK_ATTACK_MAX_RPS, period: 1.second, &ip_limit_proc)
+end
+
+if RACK_ATTACK_MAX_RPM > 0
+  Rack::Attack.throttle("req/ip/1m", limit: RACK_ATTACK_MAX_RPM, period: 1.minute, &ip_limit_proc)
+end
 
 # Rate limit token creation (i.e. authentication)
 Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|

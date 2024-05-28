@@ -4,10 +4,8 @@ module RateLimiting
   extend ActiveSupport::Concern
 
   PUBLIC_RATE_LIMIT_KEYS = %w[
-    req/ip/burst/30s
-    req/ip/burst/2m
-    req/ip/burst/5m
-    req/ip/burst/10m
+    req/ip/1s
+    req/ip/1m
   ]
 
   def rate_limiting_data
