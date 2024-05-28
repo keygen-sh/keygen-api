@@ -1,4 +1,4 @@
-:concurrency: 15
+:concurrency: <%= ENV['SIDEKIQ_CONCURRENCY'] || 10 %>
 :queues:
   # NOTE(ezekg) The higher the weight, the more often it is checked.
   - [critical, 10]
