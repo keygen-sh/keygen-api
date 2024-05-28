@@ -1,25 +1,36 @@
+# SECRET_KEY_BASE=$(heroku config:get SECRET_KEY_BASE) ENCRYPTION_DETERMINISTIC_KEY=$(heroku config:get ENCRYPTION_DETERMINISTIC_KEY) ENCRYPTION_PRIMARY_KEY=$(heroku config:get ENCRYPTION_PRIMARY_KEY) ENCRYPTION_KEY_DERIVATION_SALT=$(heroku config:get ENCRYPTION_KEY_DERIVATION_SALT) DATABASE_URL=$(heroku config:get DATABASE_URL) ACCOUNT_ID= rails runner .scripts/export.rb
+
 puts "Database: #{ActiveRecord::Base.connection.current_database}"
 
-def to_insert_sql_for(record)
-  values = record.send(:attributes_with_values, record.class.column_names)
-  model  = record.class
+EXPORT_AT  = Time.current
+BATCH_SIZE = 1_000
 
-  insert_manager        = Arel::InsertManager.new(model.arel_table)
-  substitutes_and_binds = values.transform_keys { model.arel_table[_1] }
-                                .transform_values { |value|
-                                  case value.type
-                                  in ActiveRecord::Encryption::EncryptedAttributeType
-                                    value.value
-                                  else
-                                    value
-                                  end
-                                }
+def to_insert_sql_for(*records, model: records.first.class, table: model.arel_table)
+  manager = Arel::InsertManager.new(table)
+  values  = []
 
-  insert_manager.insert(substitutes_and_binds)
-
-  model.connection.unprepared_statement do
-    model.connection.to_sql(insert_manager)
+  model.column_names.each do |column|
+    manager.columns << model.arel_table[column]
   end
+
+  records.each do |record|
+    attributes_with_values = record.send(:attributes_with_values, model.column_names)
+
+    values << attributes_with_values.values.collect { |attribute|
+      case attribute.type
+      in ActiveRecord::Encryption::EncryptedAttributeType
+        attribute.value # get the unencrypted value
+      else
+        attribute.value_for_database
+      end
+    }
+  end
+
+  manager.values = manager.create_values_list(
+    values,
+  )
+
+  manager.to_sql
 end
 
 account = Account.find(
@@ -29,58 +40,24 @@ account = Account.find(
 File.open "tmp/export-#{account.slug}.sql", 'w' do |file|
   file << "BEGIN;\n"
 
-  puts "Exporting account #{account.id}…"
+  file << "-- account #{account.slug} at #{EXPORT_AT}\n"
 
   file << to_insert_sql_for(account)
   file << ";\n"
 
-  puts "Exporting #{account.entitlements.count} tokens…"
+  account.class.reflect_on_all_associations(:has_many).each do |reflection|
+    next if
+      reflection.name in :webhook_events | :request_logs | :event_logs | :metrics
 
-  account.tokens.find_each do |token|
-    file << to_insert_sql_for(token)
-    file << ";\n"
-  end
+    association = account.association(reflection.name)
+    scope       = association.scope
 
-  puts "Exporting #{account.entitlements.count} entitlements…"
+    file << "-- #{scope.count} #{reflection.name}\n"
 
-  account.entitlements.find_each do |entitlement|
-    file << to_insert_sql_for(entitlement)
-    file << ";\n"
-  end
-
-  puts "Exporting #{account.products.count} products…"
-
-  account.products.find_each do |product|
-    file << to_insert_sql_for(product)
-    file << ";\n"
-  end
-
-  puts "Exporting #{account.policies.count} policies…"
-
-  account.policies.find_each do |policy|
-    file << to_insert_sql_for(policy)
-    file << ";\n"
-  end
-
-  puts "Exporting #{account.users.to_a.size} users…"
-
-  account.users.find_each do |user|
-    file << to_insert_sql_for(user)
-    file << ";\n"
-  end
-
-  puts "Exporting #{account.licenses.count} licenses…"
-
-  account.licenses.find_each do |license|
-    file << to_insert_sql_for(license)
-    file << ";\n"
-  end
-
-  puts "Exporting #{account.machines.to_a.size} machines…"
-
-  account.machines.find_each do |machine|
-    file << to_insert_sql_for(machine)
-    file << ";\n"
+    scope.in_batches(of: BATCH_SIZE) do |batch|
+      file << to_insert_sql_for(*batch)
+      file << ";\n"
+    end
   end
 
   file << "COMMIT;\n"
