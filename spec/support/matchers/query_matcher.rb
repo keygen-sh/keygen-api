@@ -10,7 +10,7 @@ def match_queries(...) = QueryMatcher.new(...)
 def match_query(...)   = match_queries(...)
 
 class QueryMatcher
-  def initialize(count: 0, &block)
+  def initialize(count: nil, &block)
     @count = count
     @block = block
   end
@@ -21,7 +21,7 @@ class QueryMatcher
   def matches?(block)
     @queries = QueryLogger.log(&block)
 
-    @queries.size == @count && (
+    (@count.nil? || @queries.size == @count) && (
       @block.nil? || @block.call(@queries)
     )
   end
