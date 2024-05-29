@@ -9,7 +9,9 @@ gem 'puma', '~> 6.4.2'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack', '~> 2.2.8.1'
 gem 'rack-timeout', require: 'rack/timeout/base'
-gem 'rack-attack', '~> 6.6'
+unless ENV.key?('NO_RACK_ATTACK')
+  gem 'rack-attack', '~> 6.6'
+end
 gem 'rack-cors'
 gem 'uri', '>= 0.12.2'
 

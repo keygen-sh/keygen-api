@@ -53,7 +53,9 @@ module Keygen
     config.middleware.use Keygen::Middleware::DefaultContentType
 
     # Protect against DDOS and other abuses
-    config.middleware.use Rack::Attack
+    unless ENV.key?('NO_RACK_ATTACK')
+      config.middleware.use Rack::Attack
+    end
 
     # See above comment about having to use this multiple
     config.middleware.use Keygen::Middleware::RequestErrorWrapper
