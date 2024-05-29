@@ -1,6 +1,7 @@
 class PruneReleaseDownloadLinksWorker < BaseWorker
-  BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
-  BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
+  STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT') { '1min' }
+  BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')        { 1_000 }.to_i
+  BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')        { 1 }.to_f
 
   sidekiq_options queue: :cron,
                   cronitor_disabled: false
@@ -24,8 +25,9 @@ class PruneReleaseDownloadLinksWorker < BaseWorker
                            .where('created_at < ?', 90.days.ago.beginning_of_day)
 
         batch += 1
-        count = downloads.limit(BATCH_SIZE)
-                         .delete_all
+        count = downloads.statement_timeout(STATEMENT_TIMEOUT) do
+          downloads.limit(BATCH_SIZE).delete_all
+        end
 
         Keygen.logger.info "[workers.prune-release-download-links] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 

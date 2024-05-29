@@ -1,6 +1,7 @@
 class PruneExpiredTokensWorker < BaseWorker
-  BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
-  BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
+  STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT') { '1min' }
+  BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')        { 1_000 }.to_i
+  BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')        { 1 }.to_f
 
   sidekiq_options queue: :cron,
                   cronitor_disabled: false
@@ -15,8 +16,9 @@ class PruneExpiredTokensWorker < BaseWorker
                     .reorder(created_at: :asc)
 
       batch += 1
-      count = tokens.limit(BATCH_SIZE)
-                    .delete_all
+      count = tokens.statement_timeout(STATEMENT_TIMEOUT) do
+        tokens.limit(BATCH_SIZE).delete_all
+      end
 
       Keygen.logger.info "[workers.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
 

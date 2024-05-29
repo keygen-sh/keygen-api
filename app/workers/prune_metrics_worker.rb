@@ -1,8 +1,9 @@
 class PruneMetricsWorker < BaseWorker
-  BACKLOG_DAYS = ENV.fetch('KEYGEN_PRUNE_METRIC_BACKLOG_DAYS') { 30 }.to_i
-  TARGET_DAYS  = ENV.fetch('KEYGEN_PRUNE_METRIC_TARGET_DAYS')  { 1 }.to_i
-  BATCH_SIZE   = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')          { 1_000 }.to_i
-  BATCH_WAIT   = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')          { 1 }.to_f
+  BACKLOG_DAYS      = ENV.fetch('KEYGEN_PRUNE_METRIC_BACKLOG_DAYS') { 30 }.to_i
+  TARGET_DAYS       = ENV.fetch('KEYGEN_PRUNE_METRIC_TARGET_DAYS')  { 1 }.to_i
+  STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT')   { '1min' }
+  BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')          { 1_000 }.to_i
+  BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')          { 1 }.to_f
 
   sidekiq_options queue: :cron,
                   cronitor_disabled: false
@@ -42,8 +43,9 @@ class PruneMetricsWorker < BaseWorker
                                  .where('created_at < ?', end_date)
 
         batch += 1
-        count = metrics.limit(BATCH_SIZE)
-                       .delete_all
+        count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
+          metrics.limit(BATCH_SIZE).delete_all
+        end
 
         Keygen.logger.info "[workers.prune-metrics] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
