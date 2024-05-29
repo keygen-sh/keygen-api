@@ -54,6 +54,11 @@ module Keygen
 
     # Protect against DDOS and other abuses
     unless ENV.key?('NO_RACK_ATTACK')
+      # Prevent duplicate middleware from being added via rack-attack's railtie.
+      #
+      # See: https://github.com/rack/rack-attack/issues/459
+      Rack::Attack::Railtie.initializers.clear rescue nil
+
       config.middleware.use Rack::Attack
     end
 
