@@ -1,8 +1,9 @@
 class PruneWebhookEventsWorker < BaseWorker
-  BACKLOG_DAYS   = ENV.fetch('KEYGEN_PRUNE_WEBHOOK_BACKLOG_DAYS') { 30 }.to_i
-  TARGET_DAYS    = ENV.fetch('KEYGEN_PRUNE_WEBHOOK_TARGET_DAYS')  { 1 }.to_i
-  BATCH_SIZE     = ENV.fetch('PRUNE_BATCH_SIZE')                  { 1_000 }.to_i
-  SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION')              { 1 }.to_f
+  BACKLOG_DAYS      = ENV.fetch('KEYGEN_PRUNE_WEBHOOK_BACKLOG_DAYS') { 30 }.to_i
+  TARGET_DAYS       = ENV.fetch('KEYGEN_PRUNE_WEBHOOK_TARGET_DAYS')  { 1 }.to_i
+  STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT')    { '1min' }
+  BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')           { 1_000 }.to_i
+  SLEEP_DURATION    = ENV.fetch('KEYGEN_PRUNE_SLEEP_DURATION')       { 1 }.to_f
 
   sidekiq_options queue: :cron,
                   cronitor_disabled: false
@@ -42,8 +43,9 @@ class PruneWebhookEventsWorker < BaseWorker
                                        .where('created_at < ?', end_date)
 
         batch += 1
-        count = events.limit(BATCH_SIZE)
-                      .delete_all
+        count = events.statement_timeout(STATEMENT_TIMEOUT) do
+          events.limit(BATCH_SIZE).delete_all
+        end
 
         Keygen.logger.info "[workers.prune-webhook-events] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 

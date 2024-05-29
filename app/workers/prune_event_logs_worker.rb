@@ -9,6 +9,10 @@ class PruneEventLogsWorker < BaseWorker
   # non-catch up workloads, this should be set to 1.
   TARGET_DAYS = ENV.fetch('KEYGEN_PRUNE_EVENT_TARGET_DAYS') { 1 }.to_i
 
+  # The statement timeout for the delete query. This may need to be
+  # raised depending on your data and batch size.
+  STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT') { '1min' }
+
   # Number of event logs to delete per batch. The larger the number,
   # the higher the impact on the database.
   BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
@@ -82,10 +86,12 @@ class PruneEventLogsWorker < BaseWorker
                               .select(:id)
 
         batch += 1
-        count = event_logs.limit(BATCH_SIZE)
-                          .delete_by(
-                            "id NOT IN (#{kept_logs.to_sql})",
-                          )
+        count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
+          event_logs.limit(BATCH_SIZE)
+                    .delete_by(
+                      "id NOT IN (#{kept_logs.to_sql})",
+                    )
+        end
 
         Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
