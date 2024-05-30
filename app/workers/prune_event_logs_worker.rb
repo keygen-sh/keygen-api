@@ -53,8 +53,8 @@ class PruneEventLogsWorker < BaseWorker
           "event_logs"
         WHERE
           "event_logs"."account_id"  = "accounts"."id" AND
-          "event_logs"."created_at" >= :start_date     AND
-          "event_logs"."created_at" <  :end_date
+          "event_logs"."created_date" >= :start_date     AND
+          "event_logs"."created_date" <  :end_date
         LIMIT
           1
       )
@@ -75,8 +75,8 @@ class PruneEventLogsWorker < BaseWorker
       loop do
         # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
         event_logs = account.event_logs.where(event_type_id: event_type_ids)
-                                       .where('created_at >= ?', start_date)
-                                       .where('created_at < ?', end_date)
+                                       .where('created_date >= ?', start_date)
+                                       .where('created_date < ?', end_date)
 
         # Keep the latest log per-resource for each day and event type (i.e. discard duplicates)
         kept_logs = event_logs.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)

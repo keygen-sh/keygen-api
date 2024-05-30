@@ -23,8 +23,8 @@ class PruneRequestLogsWorker < BaseWorker
           "request_logs"
         WHERE
           "request_logs"."account_id"  = "accounts"."id" AND
-          "request_logs"."created_at" >= :start_date     AND
-          "request_logs"."created_at" <  :end_date
+          "request_logs"."created_date" >= :start_date     AND
+          "request_logs"."created_date" <  :end_date
         LIMIT
           1
       )
@@ -39,8 +39,8 @@ class PruneRequestLogsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-request-logs] Pruning rows: account_id=#{account_id}"
 
       loop do
-        logs = account.request_logs.where('created_at >= ?', start_date)
-                                   .where('created_at < ?', end_date)
+        logs = account.request_logs.where('created_date >= ?', start_date)
+                                   .where('created_date < ?', end_date)
 
         batch += 1
         count = logs.statement_timeout(STATEMENT_TIMEOUT) do
