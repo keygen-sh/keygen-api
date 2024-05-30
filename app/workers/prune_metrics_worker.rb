@@ -23,8 +23,8 @@ class PruneMetricsWorker < BaseWorker
           "metrics"
         WHERE
           "metrics"."account_id"  = "accounts"."id" AND
-          "metrics"."created_at" >= :start_date     AND
-          "metrics"."created_at" <  :end_date
+          "metrics"."created_date" >= :start_date     AND
+          "metrics"."created_date" <  :end_date
         LIMIT
           1
       )
@@ -39,8 +39,8 @@ class PruneMetricsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-metrics] Pruning rows: account_id=#{account_id}"
 
       loop do
-        metrics = account.metrics.where('created_at >= ?', start_date)
-                                 .where('created_at < ?', end_date)
+        metrics = account.metrics.where('created_date >= ?', start_date)
+                                 .where('created_date < ?', end_date)
 
         batch += 1
         count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
