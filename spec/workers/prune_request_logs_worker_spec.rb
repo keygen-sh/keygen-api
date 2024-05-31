@@ -11,7 +11,7 @@ describe PruneRequestLogsWorker do
   after  { Sidekiq::Testing.fake! }
 
   it 'should prune backlog of request logs' do
-    create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:request_log, 50, account:, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:request_log, 50, account:)
 
     expect { worker.perform_async }.to(

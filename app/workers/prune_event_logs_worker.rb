@@ -39,44 +39,36 @@ class PruneEventLogsWorker < BaseWorker
 
   def perform
     return if
-      BACKLOG_DAYS <= 0
+      BACKLOG_DAYS <= 0 # never prune -- keep event backlog forever
 
-    end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
-    start_date = (end_date - TARGET_DAYS.day).beginning_of_day
-
-    # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
-    accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
-      EXISTS (
-        SELECT
-          1
-        FROM
-          "event_logs"
-        WHERE
-          "event_logs"."account_id"  = "accounts"."id" AND
-          "event_logs"."created_date" >= :start_date     AND
-          "event_logs"."created_date" <  :end_date
-        LIMIT
-          1
-      )
-    SQL
-
-    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count}"
+    target_date = BACKLOG_DAYS.days.ago.to_date
+    target_date = (target_date - TARGET_DAYS.days)..target_date if TARGET_DAYS > 1
 
     # We only want to prune certain high-volume event logs
     event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
                               .pluck(:id)
 
+    accounts = Account.where_assoc_exists(:event_logs,
+      created_date: target_date,
+    )
+
+    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} date=#{target_date}"
+
     accounts.find_each do |account|
       account_id = account.id
-      batch      = 0
+      event_logs = account.event_logs.where(created_date: target_date)
 
-      Keygen.logger.info "[workers.prune-event-logs] Pruning rows: account_id=#{account_id}"
+      total = event_logs.count
+      sum   = 0
+
+      batches = (total / BATCH_SIZE) + 1
+      batch   = 0
+
+      Keygen.logger.info "[workers.prune-event-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        # FIXME(ezekg) Update this to use created_date after we've backfilled old logs
         event_logs = account.event_logs.where(event_type_id: event_type_ids)
-                                       .where('created_date >= ?', start_date)
-                                       .where('created_date < ?', end_date)
+                                       .where(created_date: target_date)
 
         # Keep the latest log per-resource for each day and event type (i.e. discard duplicates)
         kept_logs = event_logs.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
@@ -85,15 +77,17 @@ class PruneEventLogsWorker < BaseWorker
                               )
                               .select(:id)
 
-        batch += 1
         count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          event_logs.limit(BATCH_SIZE)
-                    .delete_by(
-                      "id NOT IN (#{kept_logs.to_sql})",
-                    )
+          account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
+                            .delete_by(
+                              "id NOT IN (#{kept_logs.to_sql})",
+                            )
         end
 
-        Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        sum   += count
+        batch += 1
+
+        Keygen.logger.info "[workers.prune-event-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
 
         sleep BATCH_WAIT
 
