@@ -15,19 +15,19 @@ describe PruneEventLogsWorker do
     machine = create(:machine, account:)
     process = create(:process, account:)
 
-    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license)
-    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 50, :license_validation_failed, account:, resource: license)
-    create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine)
-    create_list(:event_log, 50, :process_heartbeat_ping, account:, resource: process, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 50, :process_heartbeat_ping, account:, resource: process, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 50, :process_heartbeat_ping, account:, resource: process)
-    create_list(:event_log, 5, :license_created, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 5, :license_created, account:, resource: license, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 5, :license_created, account:, resource: license)
-    create_list(:event_log, 5, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 5, :machine_created, account:, resource: machine, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 5, :machine_created, account:, resource: machine)
-    create_list(:event_log, 5, :machine_deleted, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+    create_list(:event_log, 5, :machine_deleted, account:, resource: machine, created_at: worker::BACKLOG_DAYS.days.ago)
     create_list(:event_log, 5, :machine_deleted, account:, resource: machine)
 
     expect { worker.perform_async }.to(
@@ -39,7 +39,7 @@ describe PruneEventLogsWorker do
     licenses = create_list(:license, 5, account:)
 
     licenses.each do |license|
-      (worker::BACKLOG_DAYS - 1..worker::BACKLOG_DAYS + 1).each do |i|
+      ((worker::BACKLOG_DAYS - 2)..worker::BACKLOG_DAYS).each do |i|
         create_list(:event_log, 10, :license_validation_succeeded, account:, resource: license, created_at: i.days.ago)
       end
     end
@@ -57,7 +57,7 @@ describe PruneEventLogsWorker do
     expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
       satisfy { |counts|
         counts.all? { |(id, type, event, date), count|
-          if date >= worker::BACKLOG_DAYS.days.ago.beginning_of_day
+          if date > worker::BACKLOG_DAYS.days.ago.to_date
             count == 10
           else
             count == 1
@@ -70,9 +70,7 @@ describe PruneEventLogsWorker do
   it 'should not prune high-volume event logs not in target batch' do
     license = create(:license, account:)
 
-    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + worker::TARGET_DAYS + 1).days.ago)
-    create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license)
-    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: worker::BACKLOG_DAYS.days.ago)
+    create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: (worker::BACKLOG_DAYS - 1).days.ago)
     create_list(:event_log, 50, :license_validation_failed, account:, resource: license)
 
     expect { worker.perform_async }.to_not(

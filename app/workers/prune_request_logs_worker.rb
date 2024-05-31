@@ -1,5 +1,5 @@
 class PruneRequestLogsWorker < BaseWorker
-  BACKLOG_DAYS      = ENV.fetch('KEYGEN_PRUNE_REQUEST_BACKLOG_DAYS') { 30 }.to_i
+  BACKLOG_DAYS      = ENV.fetch('KEYGEN_PRUNE_REQUEST_BACKLOG_DAYS') { 31 }.to_i
   TARGET_DAYS       = ENV.fetch('KEYGEN_PRUNE_REQUEST_TARGET_DAYS')  { 1 }.to_i
   STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT')    { '1min' }
   BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')           { 1_000 }.to_i
@@ -10,44 +10,39 @@ class PruneRequestLogsWorker < BaseWorker
 
   def perform
     return if
-      BACKLOG_DAYS <= 0
+      BACKLOG_DAYS <= 0 # never prune -- keep request backlog forever
 
-    end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
-    start_date = (end_date - TARGET_DAYS.day).beginning_of_day
+    target_date = BACKLOG_DAYS.days.ago.to_date
+    target_date = (target_date - TARGET_DAYS.days)..target_date if TARGET_DAYS > 1
 
-    accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
-      EXISTS (
-        SELECT
-          1
-        FROM
-          "request_logs"
-        WHERE
-          "request_logs"."account_id"  = "accounts"."id" AND
-          "request_logs"."created_date" >= :start_date     AND
-          "request_logs"."created_date" <  :end_date
-        LIMIT
-          1
-      )
-    SQL
+    accounts = Account.where_assoc_exists(:request_logs,
+      created_date: target_date,
+    )
 
-    Keygen.logger.info "[workers.prune-request-logs] Starting: accounts=#{accounts.count}"
+    Keygen.logger.info "[workers.prune-request-logs] Starting: accounts=#{accounts.count} date=#{target_date}"
 
     accounts.find_each do |account|
-      account_id = account.id
-      batch      = 0
+      account_id   = account.id
+      request_logs = account.request_logs.where(created_date: target_date)
 
-      Keygen.logger.info "[workers.prune-request-logs] Pruning rows: account_id=#{account_id}"
+      total = request_logs.count
+      sum   = 0
+
+      batches = (total / BATCH_SIZE) + 1
+      batch   = 0
+
+      Keygen.logger.info "[workers.prune-request-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        logs = account.request_logs.where('created_date >= ?', start_date)
-                                   .where('created_date < ?', end_date)
-
-        batch += 1
-        count = logs.statement_timeout(STATEMENT_TIMEOUT) do
-          logs.limit(BATCH_SIZE).delete_all
+        count = request_logs.statement_timeout(STATEMENT_TIMEOUT) do
+          account.request_logs.where(id: request_logs.limit(BATCH_SIZE).reorder(nil).ids)
+                              .delete_all
         end
 
-        Keygen.logger.info "[workers.prune-request-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        sum   += count
+        batch += 1
+
+        Keygen.logger.info "[workers.prune-request-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
 
         sleep BATCH_WAIT
 
