@@ -506,36 +506,28 @@ class Machine < ApplicationRecord
     idle_machines  = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: false })
     new_machines   = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
                                             .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                              machines.created_at >= ?::timestamp - (
-                                                COALESCE(policies.heartbeat_duration, ?) || ' seconds'
-                                              )::interval
+                                              machines.created_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
                                             SQL
     alive_machines = joins(license: :policy).where.not(last_heartbeat_at: nil)
                                             .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                              machines.last_heartbeat_at >= ?::timestamp - (
-                                                COALESCE(policies.heartbeat_duration, ?) || ' seconds'
-                                              )::interval
+                                              machines.last_heartbeat_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
                                             SQL
 
-    idle_machines.or(new_machines)
-                 .or(alive_machines)
+    idle_machines.union(new_machines)
+                 .union(alive_machines)
   }
 
   scope :dead, -> {
     expired_machines = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
                                               .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                                machines.created_at < ?::timestamp - (
-                                                  COALESCE(policies.heartbeat_duration, ?) || ' seconds'
-                                                )::interval
+                                                machines.created_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
                                               SQL
     dead_machines    = joins(license: :policy).where.not(last_heartbeat_at: nil)
                                               .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                                machines.last_heartbeat_at < ?::timestamp - (
-                                                  COALESCE(policies.heartbeat_duration, ?) || ' seconds'
-                                                )::interval
+                                                machines.last_heartbeat_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
                                               SQL
 
-    expired_machines.or(dead_machines)
+    expired_machines.union(dead_machines)
   }
 
   scope :with_status, -> status {
