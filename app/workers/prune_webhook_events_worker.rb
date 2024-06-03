@@ -15,39 +15,33 @@ class PruneWebhookEventsWorker < BaseWorker
     end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
     start_date = (end_date - TARGET_DAYS.day).beginning_of_day
 
-    accounts = Account.where(<<~SQL.squish, start_date:, end_date:)
-      EXISTS (
-        SELECT
-          1
-        FROM
-          "webhook_events"
-        WHERE
-          "webhook_events"."account_id"  = "accounts"."id" AND
-          "webhook_events"."created_at" >= :start_date     AND
-          "webhook_events"."created_at" <  :end_date
-        LIMIT
-          1
-      )
-    SQL
+    accounts = Account.where_assoc_exists(:webhook_events,
+      created_at: start_date...end_date,
+    )
 
     Keygen.logger.info "[workers.prune-webhook-events] Starting: accounts=#{accounts.count}"
 
     accounts.find_each do |account|
       account_id = account.id
-      batch = 0
+      events     = account.webhook_events.where(created_at: start_date...end_date)
 
-      Keygen.logger.info "[workers.prune-webhook-events] Pruning rows: account_id=#{account_id}"
+      total = events.count
+      sum   = 0
+
+      batches = (total / BATCH_SIZE) + 1
+      batch   = 0
+
+      Keygen.logger.info "[workers.prune-webhook-events] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        events = account.webhook_events.where('created_at >= ?', start_date)
-                                       .where('created_at < ?', end_date)
-
-        batch += 1
         count = events.statement_timeout(STATEMENT_TIMEOUT) do
           events.limit(BATCH_SIZE).delete_all
         end
 
-        Keygen.logger.info "[workers.prune-webhook-events] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        sum   += count
+        batch += 1
+
+        Keygen.logger.info "[workers.prune-webhook-events] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
 
         sleep SLEEP_DURATION
 

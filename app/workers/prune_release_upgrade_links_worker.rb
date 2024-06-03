@@ -7,29 +7,35 @@ class PruneReleaseUpgradeLinksWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    accounts = Account.joins(:release_upgrade_links)
-                      .where('release_upgrade_links.created_at < ?', 90.days.ago)
-                      .group('accounts.id')
-                      .having('count(release_upgrade_links.id) > 0')
+    target_time = 90.days.ago.beginning_of_day
 
-    Keygen.logger.info "[workers.prune-release-upgrade-links] Starting: accounts=#{accounts.count}"
+    accounts = Account.where_assoc_exists(:release_upgrade_links,
+      created_at: ...target_time,
+    )
+
+    Keygen.logger.info "[workers.prune-release-upgrade-links] Starting: accounts=#{accounts.count} time=#{target_time}"
 
     accounts.find_each do |account|
       account_id = account.id
-      batch = 0
+      upgrades   = account.release_upgrade_links.where('created_at < ?', target_time)
 
-      Keygen.logger.info "[workers.prune-release-upgrade-links] Pruning rows: account_id=#{account_id}"
+      total = upgrades.count
+      sum   = 0
+
+      batches = (total / BATCH_SIZE) + 1
+      batch   = 0
+
+      Keygen.logger.info "[workers.prune-release-upgrade-links] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        upgrades = account.release_upgrade_links
-                          .where('created_at < ?', 90.days.ago.beginning_of_day)
-
-        batch += 1
         count = upgrades.statement_timeout(STATEMENT_TIMEOUT) do
           upgrades.limit(BATCH_SIZE).delete_all
         end
 
-        Keygen.logger.info "[workers.prune-release-upgrade-links] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        sum   += count
+        batch += 1
+
+        Keygen.logger.info "[workers.prune-release-upgrade-links] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
 
         sleep BATCH_WAIT
 
