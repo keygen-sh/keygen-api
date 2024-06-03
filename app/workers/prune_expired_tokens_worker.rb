@@ -7,20 +7,27 @@ class PruneExpiredTokensWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    batch = 0
+    tokens = Token.where('expiry is not null and expiry < ?', 90.days.ago)
+                  .reorder(created_at: :asc)
+
+    total = tokens.count
+    sum   = 0
+
+    batches = (total / BATCH_SIZE) + 1
+    batch   = 0
 
     Keygen.logger.info "[workers.prune-expired-tokens] Starting"
+    Keygen.logger.info "[workers.prune-expired-tokens] Pruning #{total} rows: batches=#{batches}"
 
     loop do
-      tokens = Token.where('expiry is not null and expiry < ?', 90.days.ago)
-                    .reorder(created_at: :asc)
-
-      batch += 1
       count = tokens.statement_timeout(STATEMENT_TIMEOUT) do
         tokens.limit(BATCH_SIZE).delete_all
       end
 
-      Keygen.logger.info "[workers.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
+      sum   += count
+      batch += 1
+
+      Keygen.logger.info "[workers.prune-expired-tokens] Pruned #{sum}/#{total} rows: batch=#{batch}/#{batches}"
 
       sleep BATCH_WAIT
 

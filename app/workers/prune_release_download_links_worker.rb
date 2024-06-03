@@ -7,29 +7,35 @@ class PruneReleaseDownloadLinksWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    accounts = Account.joins(:release_download_links)
-                      .where('release_download_links.created_at < ?', 90.days.ago)
-                      .group('accounts.id')
-                      .having('count(release_download_links.id) > 0')
+    target_time = 90.days.ago.beginning_of_day
 
-    Keygen.logger.info "[workers.prune-release-download-links] Starting: accounts=#{accounts.count}"
+    accounts = Account.where_assoc_exists(:release_download_links,
+      created_at: ...target_time,
+    )
+
+    Keygen.logger.info "[workers.prune-release-download-links] Starting: accounts=#{accounts.count} time=#{target_time}"
 
     accounts.find_each do |account|
       account_id = account.id
-      batch = 0
+      downloads  = account.release_download_links.where('created_at < ?', target_time)
 
-      Keygen.logger.info "[workers.prune-release-download-links] Pruning rows: account_id=#{account_id}"
+      total = downloads.count
+      sum   = 0
+
+      batches = (total / BATCH_SIZE) + 1
+      batch   = 0
+
+      Keygen.logger.info "[workers.prune-release-download-links] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        downloads = account.release_download_links
-                           .where('created_at < ?', 90.days.ago.beginning_of_day)
-
-        batch += 1
         count = downloads.statement_timeout(STATEMENT_TIMEOUT) do
           downloads.limit(BATCH_SIZE).delete_all
         end
 
-        Keygen.logger.info "[workers.prune-release-download-links] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        sum   += count
+        batch += 1
+
+        Keygen.logger.info "[workers.prune-release-download-links] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
 
         sleep BATCH_WAIT
 
