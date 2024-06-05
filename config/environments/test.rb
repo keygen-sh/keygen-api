@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bullet'
+# require 'bullet'
 
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
@@ -95,18 +95,18 @@ Rails.application.configure do
   # Disable colored logs in test env
   config.colorize_logging = false
 
-  # Configure Bullet for performance tests
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
+  # # Configure Bullet for performance tests
+  # config.after_initialize do
+  #   Bullet.enable = true
+  #   Bullet.bullet_logger = true
 
-    # Raise an error if e.g. an n+1 query is detected
-    Bullet.raise = true
+  #   # Raise an error if e.g. an n+1 query is detected
+  #   Bullet.raise = true
 
-    # FIXME(ezekg) For some reason, we're seeing failures even though
-    #              we're not eager loading anything.
-    Bullet.unused_eager_loading_enable = false
-  end
+  #   # FIXME(ezekg) For some reason, we're seeing failures even though
+  #   #              we're not eager loading anything.
+  #   Bullet.unused_eager_loading_enable = false
+  # end
 end
 
 # Speed up tests by disabling the WAL.

@@ -14,10 +14,10 @@ RequestMigrations.supported_versions.each do |version|
   end
 end
 
-# FIXME(ezekg) This is super hacky but there's no easy way to disable
-#              bullet outside of adding controller filters
-Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
-After("@skip/bullet") { Bullet.instance_variable_set :@enable, true }
+# # FIXME(ezekg) This is super hacky but there's no easy way to disable
+# #              bullet outside of adding controller filters
+# Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
+# After("@skip/bullet")  { Bullet.instance_variable_set :@enable, true }
 
 Before do |scenario|
   # Skip CE tests if we're running in an EE env, and vice-versa
@@ -36,7 +36,7 @@ Before do |scenario|
   return skip_this_scenario if
     scenario.tags.any? { _1.name == '@skip' }
 
-  Bullet.start_request if Bullet.enable?
+  # Bullet.start_request if Bullet.enable?
 
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
@@ -51,8 +51,8 @@ Before do |scenario|
 end
 
 After do |scenario|
-  Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
-  Bullet.end_request if Bullet.enable?
+  # Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
+  # Bullet.end_request if Bullet.enable?
 
   Faker::UniqueGenerator.clear
   StripeHelper.stop

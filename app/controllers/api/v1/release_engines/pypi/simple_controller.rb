@@ -42,7 +42,7 @@ module Api::V1::ReleaseEngines
     attr_reader :package
 
     def set_package
-      Current.resource = @package = FindByAliasService.call(
+      @package = Current.resource = FindByAliasService.call(
         authorized_scope(current_account.release_packages.pypi),
         id: params[:package],
         aliases: :key,

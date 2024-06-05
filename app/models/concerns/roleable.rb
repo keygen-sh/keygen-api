@@ -97,6 +97,9 @@ module Roleable
       accepts_nested_attributes_for :role, update_only: true
       tracks_nested_attributes_for :role
 
+      validates :role,
+        presence: { message: 'must exist' }
+
       delegate :permissions, :permission_ids, :role_permissions,
         :role_permissions_attributes_assigned?, :role_permissions_attributes,
         allow_nil: true,
