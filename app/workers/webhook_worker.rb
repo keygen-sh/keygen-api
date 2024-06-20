@@ -186,6 +186,22 @@ class WebhookWorker < BaseWorker
       last_response_body: 'CONN_REFUSED',
       status: 'FAILED',
     )
+  rescue Errno::ECONNRESET # Stop sending requests when the connection is reset
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=CONN_RESET"
+
+    event.update!(
+      last_response_code: nil,
+      last_response_body: 'CONN_RESET',
+      status: 'FAILED',
+    )
+  rescue Errno::ENETUNREACH # Stop sending requests when the network is unreachable
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=NET_UNREACH"
+
+    event.update!(
+      last_response_code: nil,
+      last_response_body: 'NET_UNREACH',
+      status: 'FAILED',
+    )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=DNS_ERROR"
 
