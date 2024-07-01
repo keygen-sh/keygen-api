@@ -272,7 +272,7 @@ unless ENV.key?('NO_RACK_ATTACK')
       [{
         errors: [{
           title: "Too many requests",
-          detail: "Throttle limit has been reached for your IP address. Please slow down. See https://keygen.sh/docs/api/#rate-limiting for more info.",
+          detail: "Throttle limit has been reached for your IP address. Please slow down. See https://keygen.sh/docs/api/rate-limiting/ for more info.",
           code: "TOO_MANY_REQUESTS",
         }]
       }.to_json]
@@ -293,7 +293,7 @@ unless ENV.key?('NO_RACK_ATTACK')
       [{
         errors: [{
           title: "Forbidden",
-          detail: "Your IP address has been temporarily blacklisted due to abusive behavior. Please see https://keygen.sh/docs/api/#rate-limiting for more info."
+          detail: "Your IP address has been temporarily blacklisted due to abusive behavior. Please see https://keygen.sh/docs/api/rate-limiting/ for more info."
         }]
       }.to_json]
     ]
