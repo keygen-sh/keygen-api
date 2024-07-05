@@ -205,10 +205,10 @@ GEM
     erubis (2.7.0)
     et-orbi (1.2.7)
       tzinfo
-    factory_bot (6.2.1)
+    factory_bot (6.4.6)
       activesupport (>= 5.0.0)
-    factory_bot_rails (6.2.0)
-      factory_bot (~> 6.2.0)
+    factory_bot_rails (6.4.3)
+      factory_bot (~> 6.4)
       railties (>= 5.0.0)
     faker (2.20.0)
       i18n (>= 1.8.11, < 2)
@@ -526,7 +526,7 @@ DEPENDENCIES
   dotenv-rails
   ed25519
   elif (~> 0.1.0)
-  factory_bot_rails (~> 6.2)
+  factory_bot_rails (~> 6.4)
   faker (~> 2.20.0)
   haml-rails
   has_scope
