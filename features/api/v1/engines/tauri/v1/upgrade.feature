@@ -1,5 +1,5 @@
 @api/v1
-Feature: Tauri upgrade package
+Feature: Tauri v1 upgrade application
   Background:
     Given the following "accounts" exist:
       | name   | slug  |
