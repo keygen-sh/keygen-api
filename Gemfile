@@ -128,7 +128,7 @@ group :test do
   gem 'rspec-rails', '~> 6.0.3'
   gem 'rspec-expectations', '~> 3.12.1'
   gem 'anbt-sql-formatter'
-  gem 'factory_bot_rails', '~> 6.2'
+  gem 'factory_bot_rails', '~> 6.4'
   gem 'database_cleaner', '~> 2.0'
   gem 'webmock', '~> 3.14.0'
   gem 'elif', '~> 0.1.0'
