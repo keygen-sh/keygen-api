@@ -29,16 +29,26 @@ module Api::V1::ReleaseEngines
 
       artifacts = authorized_scope(upgrade.artifacts)
       artifact  = artifacts.joins(:platform, :arch, :filetype)
+                           .where.not(filetype: { key: %w[sig] })
                            .reorder(
-                             # NOTE(ezekg) Order so that NSIS always takes precedence
-                             #             over deprecated MSI on conflict.
+                             # NOTE(ezekg) Prioritize Tauri v1 update bundles over Tauri v2 for backwards
+                             #             compatibility, as v2 dropped most compressed formats. We also
+                             #             let NSIS take precedence over deprecated MSI.
+                             #
+                             #             1. For Tauri v1, `.zip` and `.gz` take precedence over uncompressed formats.
+                             #             2. For Tauri v1, `.nsis.zip` takes precedence `.msi.zip`.
+                             #             3. For Tauri v2, `.exe` takes precedence over `.msi`.
+                             #
+                             #             Since Tauri v2 no longer produces most compressed formats,
+                             #             this should be backwards compatible.
                              Arel.sql(<<~SQL.squish)
+                               release_artifacts.filename ILIKE ANY (ARRAY['%.zip', '%.gz']) DESC,
                                release_artifacts.filename ILIKE '%.nsis.zip' DESC,
+                               release_artifacts.filename ILIKE '%.exe' DESC,
                                release_artifacts.created_at DESC
                              SQL
                            )
                            .find_by!(
-                             filetype: { key: %w[gz zip] },
                              platform: { key: platform },
                              arch: { key: arch },
                            )
@@ -54,7 +64,7 @@ module Api::V1::ReleaseEngines
         },
       )
 
-      # See: https://tauri.app/v1/guides/distribution/updater
+      # See: https://v2.tauri.app/plugin/updater/#dynamic-update-server
       render json: {
         url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
         signature: artifact.signature,
