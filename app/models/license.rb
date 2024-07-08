@@ -3,6 +3,7 @@
 class License < ApplicationRecord
   include Envented::Callbacks
   include UnionOf::Macro
+  include Keygen::Exportable
   include Denormalizable
   include Environmental
   include Accountable

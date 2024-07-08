@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class MachineComponent < ApplicationRecord
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable

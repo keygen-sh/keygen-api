@@ -7,6 +7,8 @@ require_relative 'keygen/jsonapi'
 require_relative 'keygen/logger'
 require_relative 'keygen/middleware'
 require_relative 'keygen/version'
+require_relative 'keygen/export'
+require_relative 'keygen/import'
 
 module Keygen
   PUBLIC_KEY = %(\xB8\xF3\xEBL\xD2`\x13_g\xA5\tn\x8D\xC1\xC9\xB9\xDC\xB8\x1E\xE9\xFEP\xD1,\xDC\xD9A\xF6`z\x901).freeze

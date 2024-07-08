@@ -3,6 +3,7 @@
 class User < ApplicationRecord
   MINIMUM_ADMIN_COUNT = 1
 
+  include Keygen::Exportable
   include UnionOf::Macro
   include PasswordResettable
   include Environmental

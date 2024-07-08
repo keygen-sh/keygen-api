@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseFiletype < ApplicationRecord
+  include Keygen::Exportable
   include Accountable
   include Limitable
   include Orderable
