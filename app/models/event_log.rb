@@ -2,6 +2,7 @@
 
 class EventLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[event_logs]]
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include DateRangeable

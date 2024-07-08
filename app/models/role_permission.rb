@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class RolePermission < ApplicationRecord
+  include Keygen::Exportable
+
   belongs_to :role
   belongs_to :permission
 

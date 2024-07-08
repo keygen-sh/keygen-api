@@ -5,6 +5,7 @@ class Machine < ApplicationRecord
   class ResurrectionExpiredError < StandardError; end
 
   include Envented::Callbacks
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable

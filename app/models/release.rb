@@ -4,6 +4,7 @@ class Release < ApplicationRecord
   # FIXME(ezekg) Drop these columns after they're moved to artifacts
   self.ignored_columns = %w[release_platform_id release_filetype_id filename filesize signature checksum]
 
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable

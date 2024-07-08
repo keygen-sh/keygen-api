@@ -2,6 +2,7 @@
 
 class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
+  include Keygen::Exportable
   include Dirtyable
 
   USER_ROLES        = %w[user admin developer read_only sales_agent support_agent].freeze
@@ -28,6 +29,10 @@ class Role < ApplicationRecord
     dependent: :delete_all,
     inverse_of: :role,
     autosave: true
+
+  # FIXME(ezekg) roles should have an account_id foreign key
+  has_one :account,
+    through: :resource
 
   accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
   tracks_nested_attributes_for :role_permissions
