@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class LicenseEntitlement < ApplicationRecord
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable

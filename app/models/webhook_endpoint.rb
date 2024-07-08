@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class WebhookEndpoint < ApplicationRecord
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable

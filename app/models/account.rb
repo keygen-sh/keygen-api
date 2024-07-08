@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Account < ApplicationRecord
-  include ActiveModel::Validations
+  include Keygen::Exportable
+  include UnionOf::Macro
   include Welcomeable
   include Limitable
   include Orderable
@@ -45,6 +46,18 @@ class Account < ApplicationRecord
   has_many :event_logs
   has_many :groups
   has_many :group_owners
+
+  # FIXME(ezekg) roles should have an account_id foreign key
+  has_many :environment_roles, through: :environments, source: :role
+  has_many :product_roles, through: :products, source: :role
+  has_many :license_roles, through: :licenses, source: :role
+  has_many :user_roles, through: :users, source: :role
+  has_many :roles, union_of: %i[
+    environment_roles
+    product_roles
+    license_roles
+    user_roles
+  ]
 
   accepts_nested_attributes_for :users, limit: 10
   tracks_nested_attributes_for :users

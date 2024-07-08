@@ -1,4 +1,5 @@
 class GroupOwner < ApplicationRecord
+  include Keygen::Exportable
   include Environmental
   include Accountable
   include Limitable
