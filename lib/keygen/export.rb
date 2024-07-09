@@ -30,73 +30,108 @@ module Keygen
     private
 
     class Exporter
-      def initialize(account, secret_key: nil)
-        @account    = account
-        @secret_key = secret_key
+      class Serializer
+        def initialize(secret_key: nil)
+          @secret_key = secret_key
+        end
+
+        def serialize(class_name, attributes)
+          packed    = pack([class_name, attributes])
+          encrypted = encrypt(packed)
+
+          compress(encrypted)
+        end
+
+        private
+
+        attr_reader :secret_key
+
+        def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
+        def secret_key?       = secret_key.present?
+
+        def compress(data) = Zlib.deflate(data, Zlib::BEST_COMPRESSION)
+        def pack(data)     = MessagePack.pack(data)
+        def encrypt(plaintext)
+          return plaintext unless secret_key?
+
+          aes = OpenSSL::Cipher::AES256.new(:GCM)
+          aes.encrypt
+
+          key = secret_key_digest
+          iv  = aes.random_iv
+
+          aes.key = key
+          aes.iv  = iv
+
+          ciphertext = aes.update(plaintext) + aes.final
+          tag        = aes.auth_tag
+
+          iv + tag + ciphertext
+        end
       end
 
-      def export(to:)
-        eager_load!
+      class Writer
+        def initialize(io) = @io = io
 
-        version = [1].pack('C')
-        to.write(version)
+        def to_io       = @io
+        def write(data) = @io.write(data)
 
-        export_record(Account.name, @account.attributes_for_export, to:)
-        export_associations(to:)
+        def write_version
+          version = [1].pack('C')
 
-        to
+          write(version)
+        end
+
+        def write_chunk(data)
+          bytesize = [data.bytesize].pack('Q>')
+
+          write(bytesize)
+          write(data)
+        end
+      end
+
+      def initialize(account, secret_key: nil)
+        @account    = account
+        @serializer = Serializer.new(secret_key:)
+      end
+
+      def export(to: StringIO.new)
+        writer = Writer.new(to)
+        writer.write_version
+
+        export_record(account.class.name, account.attributes_for_export, writer:)
+        export_associations(writer:)
+
+        writer.to_io
       end
 
       private
 
-      def eager_load! = Zeitwerk::Loader.eager_load_all
+      attr_reader :account,
+                  :serializer
 
-      def encrypt(plaintext)
-        aes = OpenSSL::Cipher::AES256.new(:GCM)
-        aes.encrypt
+      def export_record(class_name, attributes, writer:)
+        serialized = serializer.serialize(class_name, attributes)
 
-        key = generate_key(@secret_key)
-        iv  = aes.random_iv
-
-        aes.key = key
-        aes.iv  = iv
-
-        ciphertext = aes.update(plaintext) + aes.final
-        tag        = aes.auth_tag
-
-        iv + tag + ciphertext
+        writer.write_chunk(serialized)
       end
 
-      def generate_key(secret_key)
-        OpenSSL::Digest::SHA256.digest(secret_key.to_s)
-      end
-
-      def export_records(class_name, attributes, to:)
-        packed     = MessagePack.pack([class_name, attributes])
-        encrypted  = encrypt(packed)
-        compressed = Zlib.deflate(encrypted, Zlib::BEST_COMPRESSION)
-        bytesize   = [compressed.bytesize].pack('Q>')
-
-        to.write(bytesize + compressed)
-      end
-      alias :export_record :export_records
-
-      def export_associations(to:)
+      def export_associations(writer:)
         Account.reflect_on_all_associations.each do |reflection|
-          next unless exportable?(reflection)
+          next unless exportable_reflection?(reflection)
 
           @account.association(reflection.name).scope.in_batches(of: 1_000) do |records|
             attributes = records.map(&:attributes_for_export)
 
-            export_records(reflection.klass.name, attributes, to:)
+            export_record(reflection.klass.name, attributes, writer:)
           end
         end
       end
 
-      def exportable?(reflection)
+      def exportable_reflection?(reflection)
         Keygen::Exportable.classes.include?(reflection.klass) &&
-        !reflection.polymorphic? &&
-        !reflection.union_of?
+          !reflection.polymorphic? &&
+          !reflection.union_of?
       end
     end
   end
