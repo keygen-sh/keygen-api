@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'exporter/writer'
 require_relative 'exporter/v1/exporter'
 
 module Keygen

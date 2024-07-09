@@ -21,7 +21,7 @@ module Keygen
           export_record(account.class.name, account.attributes_for_export, writer:)
           export_associations(account, writer:)
 
-          writer.to_io
+          writer.to_reader
         end
 
         private
