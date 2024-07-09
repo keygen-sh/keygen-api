@@ -28,29 +28,20 @@ module Keygen
     end
 
     class Reader
-      def initialize(io)
-        @io = io
-      end
-
-      def read(bytes)
-        @io.read(bytes)
-      end
-
-      def read_version
-        read(1).unpack1('C')
-      end
-
-      def read_chunk_size
-        chunk_size_prefix = read(8)
-        return if chunk_size_prefix.nil?
-
-        chunk_size_prefix.unpack1('Q>')
-      end
+      def initialize(io) = @io = io
+      def read(n)        = @io.read(n)
+      def read_version   = read(1).unpack1('C') # first byte is the version
+      def read_chunk     = raise NotImplementedError
     end
 
     module V1
       class Importer
+        VERSION = 1
+
         class Deserializer
+          TAG_BYTE_SIZE = 16 # 128-bit
+          IV_BYTE_SIZE  = 12 # 96-bit
+
           def initialize(secret_key: nil)
             @secret_key = secret_key
           end
@@ -75,13 +66,13 @@ module Keygen
             reader = StringIO.new(data)
             key    = secret_key_digest
 
-            iv         = reader.read(12) # 96-bit
-            tag        = reader.read(16) # 128-bit
+            tag        = reader.read(TAG_BYTE_SIZE)
+            iv         = reader.read(IV_BYTE_SIZE)
             ciphertext = reader.read
 
-            aes.key       = key
-            aes.iv        = iv
             aes.auth_tag  = tag
+            aes.iv        = iv
+            aes.key       = key
             aes.auth_data = ''
 
             aes.update(ciphertext) + aes.final
@@ -94,14 +85,26 @@ module Keygen
           def unpack(data)     = MessagePack.unpack(data)
         end
 
+        class Reader < Reader
+          def read_chunk_size = read(8)&.unpack1('Q>') || 0
+          def read_chunk
+            chunk_size = read_chunk_size
+            return if chunk_size.zero?
+
+            read(chunk_size)
+          end
+        end
+
         def initialize(account, secret_key: nil)
           @account      = account
           @deserializer = Deserializer.new(secret_key:)
         end
 
         def import(reader:)
-          while chunk_size = reader.read_chunk_size
-            process_chunk(chunk_size, reader)
+          v1_reader = Reader.new(reader)
+
+          while chunk = v1_reader.read_chunk
+            process_chunk(chunk)
           end
         end
 
@@ -109,8 +112,7 @@ module Keygen
 
         attr_reader :account, :deserializer
 
-        def process_chunk(chunk_size, reader)
-          chunk    = reader.read(chunk_size)
+        def process_chunk(chunk)
           unpacked = deserializer.deserialize(chunk)
 
           import_records(unpacked)
