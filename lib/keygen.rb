@@ -7,6 +7,7 @@ require_relative 'keygen/jsonapi'
 require_relative 'keygen/logger'
 require_relative 'keygen/middleware'
 require_relative 'keygen/version'
+require_relative 'keygen/exportable'
 require_relative 'keygen/export'
 require_relative 'keygen/import'
 
