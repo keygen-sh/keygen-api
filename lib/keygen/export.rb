@@ -60,7 +60,7 @@ module Keygen
 
           attr_reader :secret_key
 
-          def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
+          def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key)
           def secret_key?       = secret_key.present?
 
           def compress(data) = Zlib.deflate(data, Zlib::BEST_COMPRESSION)
