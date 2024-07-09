@@ -3,11 +3,8 @@
 module Keygen
   module Exporter
     module V1
-      class Writer
-        def initialize(io)    = @io = io
-        def to_io             = @io
-        def write(data)       = @io.write(data)
-        def write_version     = write([1].pack('C')) # first byte is the version
+      class Writer < Writer
+        def write_version = super(1)
         def write_chunk(data)
           bytesize = [data.bytesize].pack('Q>')
 
