@@ -6,14 +6,13 @@ namespace :keygen do
     ActiveRecord::Base.logger.silence do
       account_id = args[:account_id] || ENV.fetch('KEYGEN_ACCOUNT_ID')
       secret_key = args[:secret_key]
+      account    = Account.find(account_id)
 
-      account  = Account.find(account_id)
-      importer = Keygen::Import::Importer.new(
+      Keygen::Import.import(
         account,
+        from: STDIN,
         secret_key:,
       )
-
-      importer.import(from: STDIN)
     end
   end
 end
