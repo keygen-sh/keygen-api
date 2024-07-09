@@ -78,7 +78,7 @@ module Keygen
             aes.update(ciphertext) + aes.final
           end
 
-          def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
+          def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key)
           def secret_key?       = secret_key.present?
 
           def decompress(data) = Zlib.inflate(data)
