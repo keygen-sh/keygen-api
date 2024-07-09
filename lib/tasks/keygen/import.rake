@@ -2,21 +2,28 @@
 
 namespace :keygen do
   desc 'Import data into a Keygen account'
-  task :import, %i[account_id] => %i[silence environment] do |_, args|
+  task :import, %i[account_id secret_key] => %i[silence environment] do |_, args|
     def getn(n) = STDIN.read(n)
 
     ActiveRecord::Base.logger.silence do
       account_id = args[:account_id] || ENV.fetch('KEYGEN_ACCOUNT_ID')
-      account    = Account.find(account_id)
+      secret_key = args[:secret_key]
 
-      while prefix = getn(4)
-        bytesize   = prefix.unpack1('L>')
-        compressed = getn(bytesize)
-        packed     = Zlib.inflate(compressed)
+      account = Account.find(account_id)
+      version = getn(1).unpack1('C')
+
+      puts(version:)
+
+      while chunk_prefix = getn(8)
+        chunk_size = chunk_prefix.unpack1('Q>')
+        chunk      = getn(chunk_size)
+        packed     = Zlib.inflate(chunk)
         unpacked   = MessagePack.unpack(packed)
 
         # TODO(ezekg) import into db
-        puts(unpacked)
+        class_name, attributes = unpacked
+
+        puts(class_name => attributes)
       end
     end
   end
