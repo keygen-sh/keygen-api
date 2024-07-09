@@ -106,7 +106,7 @@ module Keygen
           writer.write_version
 
           export_record(account.class.name, account.attributes_for_export, writer:)
-          export_associations(writer:)
+          export_associations(account, writer:)
 
           writer.to_io
         end
@@ -122,11 +122,14 @@ module Keygen
         end
         alias :export_record :export_records
 
-        def export_associations(writer:)
-          Account.reflect_on_all_associations.each do |reflection|
+        def export_associations(owner, writer:)
+          owner.class.reflect_on_all_associations.each do |reflection|
             next unless exportable_reflection?(reflection)
 
-            @account.association(reflection.name).scope.in_batches(of: 1_000) do |records|
+            association = owner.association(reflection.name)
+            scope       = association.scope
+
+            scope.in_batches(of: 1_000) do |records|
               attributes = records.map(&:attributes_for_export)
 
               export_records(reflection.klass.name, attributes, writer:)
