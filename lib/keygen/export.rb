@@ -42,6 +42,8 @@ module Keygen
 
     module V1
       class Exporter
+        VERSION = 1
+
         class Serializer
           def initialize(secret_key: nil)
             @secret_key = secret_key
@@ -78,25 +80,19 @@ module Keygen
             ciphertext = aes.update(plaintext) + aes.final
             tag        = aes.auth_tag
 
-            iv + tag + ciphertext
+            tag + iv + ciphertext
           end
         end
 
         class Writer
-          def initialize(io) = @io = io
-
-          def to_io       = @io
-          def write(data) = @io.write(data)
-
-          def write_version
-            version = [1].pack('C')
-            write(version)
-          end
-
+          def initialize(io)    = @io = io
+          def to_io             = @io
+          def write(data)       = @io.write(data)
+          def write_version     = write([Exporter::VERSION].pack('C'))
           def write_chunk(data)
             bytesize = [data.bytesize].pack('Q>')
-            write(bytesize)
-            write(data)
+
+            write(bytesize + data)
           end
         end
 
