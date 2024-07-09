@@ -4,12 +4,12 @@ module Keygen
   module Import
     extend self
 
-    def import(account, from:, secret_key: nil)
+    def import(from:, secret_key: nil)
       reader  = Reader.new(from)
       version = reader.read_version
 
       importer_class = importer_class_for(version:)
-      importer       = importer_class.new(account, secret_key:)
+      importer       = importer_class.new(secret_key:)
 
       importer.import(reader:)
     rescue OpenSSL::Cipher::CipherError
@@ -95,8 +95,7 @@ module Keygen
           end
         end
 
-        def initialize(account, secret_key: nil)
-          @account      = account
+        def initialize(secret_key: nil)
           @deserializer = Deserializer.new(secret_key:)
         end
 
@@ -110,7 +109,7 @@ module Keygen
 
         private
 
-        attr_reader :account, :deserializer
+        attr_reader :deserializer
 
         def process_chunk(chunk)
           class_name, attributes = deserializer.deserialize(chunk)
