@@ -7,6 +7,8 @@ module Keygen
   module Export
     module V1
       class Exporter
+        BATCH_SIZE = 1_000
+
         def initialize(account, secret_key: nil)
           @account    = account
           @serializer = Serializer.new(secret_key:)
@@ -43,7 +45,7 @@ module Keygen
             association = owner.association(reflection.name)
             scope       = association.scope
 
-            scope.in_batches(of: 1_000) do |records|
+            scope.in_batches(of: BATCH_SIZE) do |records|
               attributes = records.map(&:attributes_for_export)
 
               export_records(reflection.klass.name, attributes, writer:)
