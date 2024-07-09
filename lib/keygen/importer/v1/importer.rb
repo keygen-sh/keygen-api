@@ -4,7 +4,7 @@ require_relative 'deserializer'
 require_relative 'reader'
 
 module Keygen
-  module Import
+  module Importer
     module V1
       class Importer
         def initialize(secret_key: nil)

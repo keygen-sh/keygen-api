@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'export/v1/exporter'
+require_relative 'exporter/v1/exporter'
 
 module Keygen
-  module Export
+  module Exporter
     class UnsupportedVersionError < StandardError; end
 
-    VERSION = 1 # the current export version format
+    # the current export version format
+    VERSION = 1
 
     extend self
 

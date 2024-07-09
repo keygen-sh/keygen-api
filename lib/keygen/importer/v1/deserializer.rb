@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Keygen
-  module Import
+  module Importer
     module V1
       class Deserializer
         TAG_BYTE_SIZE = 16 # 128-bit
