@@ -4,6 +4,8 @@ require_relative 'export/v1/exporter'
 
 module Keygen
   module Export
+    class UnsupportedVersionError < StandardError; end
+
     VERSION = 1 # the current export version format
 
     extend self
@@ -22,7 +24,7 @@ module Keygen
       when 1
         V1::Exporter
       else
-        raise "Unsupported export version: #{version}"
+        raise UnsupportedVersionError.new, "Unsupported export version: #{version}"
       end
     end
   end
