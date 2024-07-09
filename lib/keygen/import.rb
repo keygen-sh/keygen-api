@@ -5,6 +5,9 @@ require_relative 'import/v1/importer'
 
 module Keygen
   module Import
+    class UnsupportedVersionError < StandardError; end
+    class InvalidSecretKeyError < StandardError; end
+
     extend self
 
     def import(from:, secret_key: nil)
@@ -16,7 +19,7 @@ module Keygen
 
       importer.import(reader:)
     rescue OpenSSL::Cipher::CipherError
-      raise 'secret key is invalid'
+      raise InvalidSecretKeyError.new, 'Secret key is invalid'
     end
 
     private
@@ -26,7 +29,7 @@ module Keygen
       when 1
         V1::Importer
       else
-        raise "Unsupported import version: #{version}"
+        raise UnsupportedVersionError.new, "Unsupported import version: #{version}"
       end
     end
   end
