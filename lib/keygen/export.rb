@@ -115,11 +115,12 @@ module Keygen
 
         attr_reader :account, :serializer
 
-        def export_record(class_name, attributes, writer:)
+        def export_records(class_name, attributes, writer:)
           serialized = serializer.serialize(class_name, attributes)
 
           writer.write_chunk(serialized)
         end
+        alias :export_record :export_records
 
         def export_associations(writer:)
           Account.reflect_on_all_associations.each do |reflection|
@@ -128,7 +129,7 @@ module Keygen
             @account.association(reflection.name).scope.in_batches(of: 1_000) do |records|
               attributes = records.map(&:attributes_for_export)
 
-              export_record(reflection.klass.name, attributes, writer:)
+              export_records(reflection.klass.name, attributes, writer:)
             end
           end
         end
