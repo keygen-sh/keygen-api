@@ -12,21 +12,83 @@ module Keygen
     private
 
     class Importer
-      def initialize(account, secret_key: nil)
-        @account    = account
-        @secret_key = secret_key
+      class Deserializer
+        def initialize(secret_key: nil)
+          @secret_key = secret_key
+        end
+
+        def deserialize(data)
+          decompressed = decompress(data)
+          unencrypted  = decrypt(decompressed)
+
+          unpack(unencrypted)
+        end
+
+        private
+
+        attr_reader :secret_key
+
+        def decrypt(data)
+          return data unless secret_key?
+
+          aes = OpenSSL::Cipher::AES256.new(:GCM)
+          aes.decrypt
+
+          reader = StringIO.new(data)
+          key    = secret_key_digest
+
+          iv         = reader.read(12) # 96-bit
+          tag        = reader.read(16) # 128-bit
+          ciphertext = reader.read
+
+          aes.key       = key
+          aes.iv        = iv
+          aes.auth_tag  = tag
+          aes.auth_data = ''
+
+          aes.update(ciphertext) + aes.final
+        end
+
+        def secret_key_digest = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
+        def secret_key?       = secret_key.present?
+
+        def decompress(data) = Zlib.inflate(data)
+        def unpack(data)     = MessagePack.unpack(data)
       end
 
-      def import(from:)
-        version = from.read(1).unpack1('C')
+      class Reader
+        def initialize(io)
+          @io = io
+        end
 
-        case version
-        when 1
-          while prefix = from.read(8)
-            process_chunk(prefix, from:)
-          end
-        else
-          abort 'export version is unsupported'
+        def read(bytes)
+          @io.read(bytes)
+        end
+
+        def read_version
+          read(1).unpack1('C')
+        end
+
+        def read_chunk_size
+          chunk_size_prefix = read(8)
+          return nil if chunk_size_prefix.nil?
+
+          chunk_size_prefix.unpack1('Q>')
+        end
+      end
+
+      def initialize(account, secret_key: nil)
+        @account      = account
+        @deserializer = Deserializer.new(secret_key:)
+      end
+
+      def import(from: STDIN)
+        reader  = Reader.new(from)
+        version = reader.read_version
+        puts(version:)
+
+        while chunk_size = reader.read_chunk_size
+          process_chunk(chunk_size, reader)
         end
       rescue OpenSSL::Cipher::CipherError
         abort 'secret key is invalid'
@@ -34,35 +96,12 @@ module Keygen
 
       private
 
-      def decrypt(plaintext)
-        aes = OpenSSL::Cipher::AES256.new(:GCM)
-        aes.decrypt
+      attr_reader :account,
+                  :deserializer
 
-        key    = generate_key(@secret_key)
-        reader = StringIO.new(plaintext)
-
-        iv         = reader.read(12) # 96-bit
-        tag        = reader.read(16) # 128-bit
-        ciphertext = reader.read
-
-        aes.key       = key
-        aes.iv        = iv
-        aes.auth_tag  = tag
-        aes.auth_data = ''
-
-        aes.update(ciphertext) + aes.final
-      end
-
-      def generate_key(secret_key)
-        OpenSSL::Digest::SHA256.digest(secret_key.to_s)
-      end
-
-      def process_chunk(chunk_prefix, from:)
-        chunk_size  = chunk_prefix.unpack1('Q>')
-        chunk       = from.read(chunk_size)
-        encrypted   = Zlib.inflate(chunk)
-        unencrypted = decrypt(encrypted)
-        unpacked    = MessagePack.unpack(unencrypted)
+      def process_chunk(chunk_size, reader)
+        chunk    = reader.read(chunk_size)
+        unpacked = deserializer.deserialize(chunk)
 
         import_records(unpacked)
       end
