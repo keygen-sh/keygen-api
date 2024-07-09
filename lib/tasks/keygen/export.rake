@@ -3,6 +3,22 @@
 namespace :keygen do
   desc 'Export data from a Keygen account'
   task :export, %i[account_id secret_key] => %i[silence environment] do |_, args|
+    def encrypt(plaintext, secret_key:)
+      aes = OpenSSL::Cipher::AES256.new(:GCM)
+      aes.encrypt
+
+      key = OpenSSL::Digest::SHA256.digest(secret_key)
+      iv  = aes.random_iv
+
+      aes.key = key
+      aes.iv  = iv
+
+      ciphertext = aes.update(plaintext) + aes.final
+      tag        = aes.auth_tag
+
+      iv + tag + ciphertext
+    end
+
     ActiveRecord::Base.logger.silence do
       Zeitwerk::Loader.eager_load_all
 
@@ -19,7 +35,8 @@ namespace :keygen do
       # 4 bytes of the input for size=n then read the entire chunk of
       # size n, and then repeat for the next chunk.
       packed     = MessagePack.pack([Account.name, account.attributes_for_export])
-      compressed = Zlib.deflate(packed, Zlib::BEST_COMPRESSION)
+      encrypted  = encrypt(packed, secret_key:)
+      compressed = Zlib.deflate(encrypted, Zlib::BEST_COMPRESSION)
       bytesize   = [compressed.bytesize].pack('Q>')
 
       print(bytesize)
@@ -43,7 +60,8 @@ namespace :keygen do
           end
 
           packed     = MessagePack.pack([reflection.klass.name, attrs])
-          compressed = Zlib.deflate(packed, Zlib::BEST_COMPRESSION)
+          encrypted  = encrypt(packed, secret_key:)
+          compressed = Zlib.deflate(encrypted, Zlib::BEST_COMPRESSION)
           bytesize   = [compressed.bytesize].pack('Q>')
 
           print(bytesize)
