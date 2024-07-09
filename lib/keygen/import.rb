@@ -113,14 +113,12 @@ module Keygen
         attr_reader :account, :deserializer
 
         def process_chunk(chunk)
-          unpacked = deserializer.deserialize(chunk)
+          class_name, attributes = deserializer.deserialize(chunk)
 
-          import_records(unpacked)
+          import_records(class_name, attributes)
         end
 
-        def import_records(unpacked)
-          class_name, attributes = unpacked
-
+        def import_records(class_name, attributes)
           # TODO(ezekg) import into db
           puts(class_name => attributes)
         end
