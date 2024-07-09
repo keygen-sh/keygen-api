@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'import/reader'
-require_relative 'import/v1/importer'
+require_relative 'importer/reader'
+require_relative 'importer/v1/importer'
 
 module Keygen
-  module Import
+  module Importer
     class UnsupportedVersionError < StandardError; end
     class InvalidSecretKeyError < StandardError; end
 

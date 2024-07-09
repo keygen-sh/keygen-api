@@ -7,7 +7,7 @@ namespace :keygen do
   task :import, %i[secret_key] => %i[silence environment] do |_, args|
     secret_key = args[:secret_key]
 
-    Keygen::Import.import(
+    Keygen::Importer.import(
       from: STDIN,
       secret_key:,
     )

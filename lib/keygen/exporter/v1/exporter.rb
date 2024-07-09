@@ -4,7 +4,7 @@ require_relative 'serializer'
 require_relative 'writer'
 
 module Keygen
-  module Export
+  module Exporter
     module V1
       class Exporter
         BATCH_SIZE = 1_000

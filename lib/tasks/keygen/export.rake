@@ -10,7 +10,7 @@ namespace :keygen do
       account_id = ENV.fetch('KEYGEN_ACCOUNT_ID')
       account    = Account.find(account_id)
 
-      Keygen::Export.export(
+      Keygen::Exporter.export(
         account,
         to: STDOUT,
         secret_key:,
