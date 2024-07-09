@@ -7,7 +7,7 @@ namespace :keygen do
       aes = OpenSSL::Cipher::AES256.new(:GCM)
       aes.encrypt
 
-      key = OpenSSL::Digest::SHA256.digest(secret_key)
+      key = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
       iv  = aes.random_iv
 
       aes.key = key

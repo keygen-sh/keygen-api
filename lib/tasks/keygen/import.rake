@@ -8,7 +8,7 @@ namespace :keygen do
       aes = OpenSSL::Cipher::AES256.new(:GCM)
       aes.decrypt
 
-      key         = OpenSSL::Digest::SHA256.digest(secret_key)
+      key         = OpenSSL::Digest::SHA256.digest(secret_key.to_s)
       reader      = StringIO.new(plaintext)
       iv          = reader.read(12) # 96-bit
       tag         = reader.read(16) # 128-bit
