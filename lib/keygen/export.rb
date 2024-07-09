@@ -138,7 +138,7 @@ module Keygen
         end
 
         def exportable_reflection?(reflection)
-          Keygen::Exportable.classes.include?(reflection.klass) &&
+          Exportable.classes.include?(reflection.klass) &&
             !reflection.polymorphic? &&
             !reflection.union_of?
         end
