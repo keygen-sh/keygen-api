@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Keygen
-  module Import
+  module Importer
     class Reader
       def initialize(io) = @io = io
       def read(n)        = @io.read(n)

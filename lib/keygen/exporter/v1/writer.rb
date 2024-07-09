@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Keygen
-  module Export
+  module Exporter
     module V1
       class Writer
         def initialize(io)    = @io = io

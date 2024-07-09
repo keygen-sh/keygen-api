@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Keygen
-  module Import
+  module Importer
     module V1
       class Reader < Reader
         def read_chunk_size = read(8)&.unpack1('Q>') || 0
