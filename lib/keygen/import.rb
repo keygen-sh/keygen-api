@@ -119,10 +119,10 @@ module Keygen
         end
 
         def import_records(class_name, attributes)
-          # TODO(ezekg) import into db
-          puts(class_name => attributes)
+          klass = class_name.constantize
+
+          klass.insert_all(attributes)
         end
-        alias :import_record :import_records
       end
     end
   end

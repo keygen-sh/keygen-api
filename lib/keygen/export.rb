@@ -120,7 +120,10 @@ module Keygen
 
           writer.write_chunk(serialized)
         end
-        alias :export_record :export_records
+
+        def export_record(class_name, attributes, writer:)
+          export_records(class_name, [attributes], writer:)
+        end
 
         def export_associations(owner, writer:)
           owner.class.reflect_on_all_associations.each do |reflection|
