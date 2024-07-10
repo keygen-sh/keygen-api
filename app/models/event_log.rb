@@ -23,6 +23,10 @@ class EventLog < ApplicationRecord
   has_environment
   has_account
 
+  # map event type primary keys between installs
+  exports -> attrs { attrs.merge(event_type_event: EVENT_TYPES_BY_ID[attrs.delete(:event_type_id)].event) }
+  imports -> attrs { attrs.merge(event_type_id: EVENT_TYPES_BY_EVENT[attrs.delete(:event_type_event)].id) }
+
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.
   before_create -> { self.created_date ||= (created_at || Date.current) }

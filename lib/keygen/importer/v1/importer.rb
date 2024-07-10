@@ -32,7 +32,7 @@ module Keygen
         def import_records(class_name, attributes)
           klass = class_name.constantize
 
-          klass.insert_all(attributes)
+          klass.insert_all(klass.attributes_for_import(attributes))
         end
       end
     end
