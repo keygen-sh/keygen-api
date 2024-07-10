@@ -715,4 +715,12 @@ class Permission < ApplicationRecord
   ##
   # wildcard? checks if the current permission is the wildcard.
   def wildcard? = action == WILDCARD_PERMISSION
+
+  def self.lookup_id_by_action(action) = ids_by_action[action]
+  def self.lookup_action_by_id(id)     = actions_by_id[id]
+
+  private
+
+  def self.ids_by_action = @ids_by_action ||= all.index_by(&:action).transform_values(&:id)
+  def self.actions_by_id = @actions_by_id ||= all.index_by(&:id).transform_values(&:action)
 end
