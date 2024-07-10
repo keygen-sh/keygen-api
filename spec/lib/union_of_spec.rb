@@ -629,6 +629,38 @@ describe UnionOf do
     end
   end
 
+  describe 'counting' do
+    it 'should support counting a union' do
+      user           = create(:user, account:)
+      other_user     = create(:user, account:)
+      owned_license  = create(:license, account:, owner: user)
+      user_license_1 = create(:license, account:)
+      user_license_2 = create(:license, account:)
+
+      create(:license_user, account:, license: owned_license, user: other_user)
+      create(:license_user, account:, license: user_license_1, user:)
+      create(:license_user, account:, license: user_license_2, user:)
+
+      expect(owned_license.users.load.count).to eq(2)
+      expect { owned_license.users.count }.to match_queries(count: 1)
+    end
+
+    it 'should support sizing a union' do
+      user           = create(:user, account:)
+      other_user     = create(:user, account:)
+      owned_license  = create(:license, account:, owner: user)
+      user_license_1 = create(:license, account:)
+      user_license_2 = create(:license, account:)
+
+      create(:license_user, account:, license: owned_license, user: other_user)
+      create(:license_user, account:, license: user_license_1, user:)
+      create(:license_user, account:, license: user_license_2, user:)
+
+      expect(owned_license.users.load.size).to eq(2)
+      expect { owned_license.users.size }.to match_queries(count: 0)
+    end
+  end
+
   describe 'joining' do
     it 'should support joining a union' do
       user_1 = create(:user, account:)
