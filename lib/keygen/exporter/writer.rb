@@ -7,21 +7,18 @@ module Keygen
       def write(data)            = @io.write(data)
       def write_version(version) = write([version].pack('C')) # first byte is the version
       def write_chunk(data)      = raise NotImplementedError
-      def to_io                  = @io.tap { _1.rewind if seekable? }
+      def to_io                  = @io.tap do |io|
+        io.rewind if seekable?
+      end
 
       private
 
       def seekable?
-        return @seekable if defined?(@seekable)
-
-        @seekable = @io.respond_to?(:seek) && !pipe?
-      end
-
-      def pipe?
-        @io.pos
-        false
-      rescue Errno::EPIPE, Errno::ESPIPE
-        true
+        if @io.respond_to?(:stat)
+          @io.stat.file?
+        else
+          @io.respond_to?(:seek)
+        end
       end
     end
   end
