@@ -48,7 +48,7 @@ begin
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
 
       if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
-        RSpec::Core::RakeTask.new(:spec) # make sure task always exists
+        RSpec::Core::RakeTask.new(:spec) unless Rake::Task.task_defined?('spec') # make sure task always exists
 
         rspec = Rake::Task['spec']
 
