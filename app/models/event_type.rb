@@ -18,4 +18,12 @@ class EventType < ApplicationRecord
   def clear_cache!
     EventType.clear_cache! event
   end
+
+  def self.lookup_id_by_event(event) = ids_by_event[event]
+  def self.lookup_event_by_id(id)    = events_by_id[id]
+
+  private
+
+  def self.ids_by_event = @ids_by_event ||= all.index_by(&:event).transform_values(&:id)
+  def self.events_by_id = @events_by_id ||= all.index_by(&:id).transform_values(&:event)
 end

@@ -24,8 +24,8 @@ class EventLog < ApplicationRecord
   has_account
 
   # map event type primary keys between installs
-  exports -> attrs { attrs.merge(event_type_event: EVENT_TYPES_BY_ID[attrs.delete(:event_type_id)].event) }
-  imports -> attrs { attrs.merge(event_type_id: EVENT_TYPES_BY_EVENT[attrs.delete(:event_type_event)].id) }
+  exports -> attrs { attrs.merge(event_type_event: EventType.lookup_event_by_id(attrs.delete(:event_type_id))) }
+  imports -> attrs { attrs.merge(event_type_id: EventType.lookup_id_by_event(attrs.delete(:event_type_event))) }
 
   # NOTE(ezekg) Would love to add a default instead of this, but alas,
   #             the table is too big and it would break everything.
