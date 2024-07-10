@@ -57,4 +57,12 @@ describe Keygen::Exporter do
       expect { Keygen::Importer.import(from: export) }.to_not raise_error
     end
   end
+
+  context 'with stdout' do
+    it 'should export' do
+      expect { Keygen::Exporter.export(account, to: $stdout) }.to(
+        output.to_stdout,
+      )
+    end
+  end
 end
