@@ -2,14 +2,14 @@
 
 module Keygen
   module Exportable
-    CLASSES = Set.new
+    EXPORTABLE_CLASSES = Set.new
 
-    def self.classes = CLASSES
+    def self.exportable_classes = EXPORTABLE_CLASSES
     def self.included(klass)
       raise ArgumentError, "cannot be used outside of model (got #{klass.ancestors})" unless
         klass < ::ActiveRecord::Base
 
-      CLASSES << klass
+      EXPORTABLE_CLASSES << klass
     end
 
     def attributes_for_export
