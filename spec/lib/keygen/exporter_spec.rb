@@ -17,6 +17,12 @@ describe Keygen::Exporter do
   context 'with encryption' do
     let(:secret_key) { SecureRandom.hex }
 
+    it 'should export' do
+      export = Keygen::Exporter.export(account, to: StringIO.new, secret_key:)
+
+      expect(export.size).to be > 1.byte
+    end
+
     it 'should be versioned' do
       export  = Keygen::Exporter.export(account, to: StringIO.new, secret_key:)
       version = export.read(1).unpack1('C')
@@ -32,6 +38,12 @@ describe Keygen::Exporter do
   end
 
   context 'without encryption' do
+    it 'should export' do
+      export = Keygen::Exporter.export(account, to: StringIO.new)
+
+      expect(export.size).to be > 1.byte
+    end
+
     it 'should be versioned' do
       export  = Keygen::Exporter.export(account, to: StringIO.new)
       version = export.read(1).unpack1('C')
