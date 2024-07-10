@@ -52,12 +52,12 @@ class Account < ApplicationRecord
   has_many :product_roles, through: :products, source: :role
   has_many :license_roles, through: :licenses, source: :role
   has_many :user_roles, through: :users, source: :role
-  has_many :roles, union_of: %i[
-    environment_roles
-    product_roles
-    license_roles
-    user_roles
-  ]
+  has_many :environment_role_permissions, through: :environments, source: :role_permissions
+  has_many :product_role_permissions, through: :products, source: :role_permissions
+  has_many :license_role_permissions, through: :licenses, source: :role_permissions
+  has_many :user_role_permissions, through: :users, source: :role_permissions
+  has_many :token_permissions, through: :tokens
+  has_many :group_permissions, through: :groups
 
   accepts_nested_attributes_for :users, limit: 10
   tracks_nested_attributes_for :users
