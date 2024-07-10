@@ -48,6 +48,17 @@ module UnionOf
       @proxy ||= ReadonlyAssociationProxy.create(klass, self)
       @proxy.reset_scope
     end
+
+    def count_records
+      count = scope.count(:all)
+
+      if count.zero?
+        target.select!(&:new_record?)
+        loaded!
+      end
+
+      [association_scope.limit_value, count].compact.min
+    end
   end
 
   class Association < ReadonlyAssociation
