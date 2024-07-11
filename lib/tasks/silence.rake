@@ -2,5 +2,5 @@
 
 desc 'Disables all logging until environment is loaded'
 task :silence do
-  ActiveRecord::Base.logger = Rails.logger = Logger.new(nil)
+  ActiveRecord::Base.logger = Rails.logger = ActiveSupport::Logger.new(nil)
 end
