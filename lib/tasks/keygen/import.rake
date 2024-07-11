@@ -3,7 +3,7 @@
 namespace :keygen do
   # Usage: rake keygen:import[secret] < encrypted.export
   #        rake keygen:import < unencrypted.export
-  desc 'Import data into Keygen'
+  desc 'Import data into Keygen from STDIN'
   task :import, %i[secret_key] => %i[silence environment] do |_, args|
     secret_key = args[:secret_key]
 
