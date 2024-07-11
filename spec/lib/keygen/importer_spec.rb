@@ -8,16 +8,26 @@ require_dependency Rails.root / 'lib' / 'keygen'
 describe Keygen::Importer do
   let(:account)  { create(:account) }
 
-  before do
-    create_list(:user, rand(1..100), account:)
-    create_list(:license, rand(1..100), account:)
-    create_list(:machine, rand(1..100), account:)
+  it 'should not raise for valid version 1' do
+    expect { Keygen::Importer.import(from: StringIO.new(1.chr)) }
+      .to_not raise_error
+  end
+
+  it 'should raise for invalid version' do
+    expect { Keygen::Importer.import(from: StringIO.new(42.chr)) }
+      .to raise_error Keygen::Importer::UnsupportedVersionError
   end
 
   context 'with encryption' do
     let(:secret_key) { SecureRandom.hex }
 
-    it 'should import' do
+    before do
+      create_list(:user, rand(1..100), account:)
+      create_list(:license, rand(1..100), account:)
+      create_list(:machine, rand(1..100), account:)
+    end
+
+    it 'should import with valid secret key' do
       export = Keygen::Exporter.export(account, secret_key:)
 
       user_count_was    = account.users.all.delete_all
@@ -30,10 +40,23 @@ describe Keygen::Importer do
         .and change { License.count }.by(license_count_was)
         .and change { Machine.count }.by(machine_count_was)
     end
+
+    it 'should raise with invalid secret key' do
+      export = Keygen::Exporter.export(account, secret_key:)
+
+      expect { Keygen::Importer.import(from: export, secret_key: 'invalid') }
+        .to raise_error Keygen::Importer::InvalidSecretKeyError
+    end
   end
 
   context 'without encryption' do
-    it 'should import' do
+    before do
+      create_list(:user, rand(1..100), account:)
+      create_list(:license, rand(1..100), account:)
+      create_list(:machine, rand(1..100), account:)
+    end
+
+    it 'should import without secret key' do
       export = Keygen::Exporter.export(account)
 
       user_count_was    = account.users.all.delete_all
@@ -45,6 +68,13 @@ describe Keygen::Importer do
         .and change { User.count }.by(user_count_was)
         .and change { License.count }.by(license_count_was)
         .and change { Machine.count }.by(machine_count_was)
+    end
+
+    it 'should raise with secret key' do
+      export = Keygen::Exporter.export(account)
+
+      expect { Keygen::Importer.import(from: export, secret_key: 'invalid') }
+        .to raise_error Keygen::Importer::InvalidSecretKeyError
     end
   end
 end
