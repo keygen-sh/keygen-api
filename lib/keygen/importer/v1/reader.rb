@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../reader'
+
 module Keygen
   module Importer
     module V1
