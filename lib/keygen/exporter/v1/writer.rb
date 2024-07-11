@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../writer'
+
 module Keygen
   module Exporter
     module V1

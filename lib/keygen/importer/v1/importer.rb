@@ -11,10 +11,10 @@ module Keygen
           @deserializer = Deserializer.new(secret_key:)
         end
 
-        def import(reader:)
-          v1_reader = Reader.new(reader)
+        def import(from:)
+          reader = Reader.new(from)
 
-          while chunk = v1_reader.read_chunk
+          while chunk = reader.read_chunk
             process_chunk(chunk)
           end
         end
