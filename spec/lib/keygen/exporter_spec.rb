@@ -8,6 +8,16 @@ require_dependency Rails.root / 'lib' / 'keygen'
 describe Keygen::Exporter do
   let(:account) { create(:account) }
 
+  it 'should not raise for valid io', :ignore_potential_false_positives do
+    expect { Keygen::Exporter.export(account, to: StringIO.new) }
+      .to_not raise_error ArgumentError
+  end
+
+  it 'should raise for invalid io' do
+    expect { Keygen::Exporter.export(account, to: '') }
+      .to raise_error ArgumentError
+  end
+
   it 'should not raise for valid version 1' do
     expect { Keygen::Exporter.export(account, to: StringIO.new, version: 1) }
       .to_not raise_error
@@ -16,6 +26,16 @@ describe Keygen::Exporter do
   it 'should raise for invalid version' do
     expect { Keygen::Exporter.export(account, to: StringIO.new, version: 42) }
       .to raise_error Keygen::Exporter::UnsupportedVersionError
+  end
+
+  it 'should not raise for valid digest' do
+    expect { Keygen::Exporter.export(account, to: StringIO.new, digest: Digest::SHA256.new) }
+      .to_not raise_error
+  end
+
+  it 'should raise for invalid digest' do
+    expect { Keygen::Exporter.export(account, to: StringIO.new, digest: nil) }
+      .to raise_error ArgumentError
   end
 
   context 'with encryption' do
@@ -45,6 +65,16 @@ describe Keygen::Exporter do
 
       expect { Keygen::Importer.import(from: export, secret_key:) }.to_not raise_error
     end
+
+    %w[sha512 sha256 md5].each do |digest|
+      digest_class = "Digest::#{digest.upcase}".constantize
+
+      it "should calculate a valid #{digest} digest" do
+        export = Keygen::Exporter.export(account, to: StringIO.new, digest: digest_class.new, secret_key:)
+
+        expect(export.hexdigest).to eq digest_class.hexdigest(export.read)
+      end
+    end
   end
 
   context 'without encryption' do
@@ -71,6 +101,16 @@ describe Keygen::Exporter do
       export = Keygen::Exporter.export(account, to: StringIO.new)
 
       expect { Keygen::Importer.import(from: export) }.to_not raise_error
+    end
+
+    %w[sha512 sha256 md5].each do |digest|
+      digest_class = "Digest::#{digest.upcase}".constantize
+
+      it "should calculate a valid #{digest} digest" do
+        export = Keygen::Exporter.export(account, to: StringIO.new, digest: digest_class.new)
+
+        expect(export.hexdigest).to eq digest_class.hexdigest(export.read)
+      end
     end
   end
 
