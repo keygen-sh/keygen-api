@@ -40,6 +40,8 @@ Dir[Rails.root.join('spec/shared/**/*.rb')].each { |f| require(f) }
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
+  econfig = RSpec::Expectations.configuration
+
   config.include ActiveSupport::Testing::TimeHelpers
   config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
@@ -101,6 +103,14 @@ RSpec.configure do |config|
   # Make sure we're working with a prestine ENV in EE tests.
   config.around type: :ee do |example|
     with_prestine_env(&example)
+  end
+
+  config.around :each, :ignore_potential_false_positives do |example|
+    on_potential_false_positives_was, econfig.on_potential_false_positives = econfig.on_potential_false_positives, :nothing
+
+    example.run
+  ensure
+    econfig.on_potential_false_positives = on_potential_false_positives_was
   end
 
   # Reset license file and license before each EE test.

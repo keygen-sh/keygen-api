@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 require_relative 'exporter/writer'
 require_relative 'exporter/v1/exporter'
 
@@ -12,11 +14,11 @@ module Keygen
 
     extend self
 
-    def export(account, to: StringIO.new, version: VERSION, secret_key: nil)
+    def export(account, to: StringIO.new, version: VERSION, digest: Digest::SHA256.new, secret_key: nil)
       exporter_class = exporter_class_for(version:)
       exporter       = exporter_class.new(account, secret_key:)
 
-      exporter.export(to:)
+      exporter.export(to:, digest:)
     end
 
     private

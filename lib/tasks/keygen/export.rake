@@ -10,11 +10,14 @@ namespace :keygen do
       account_id = ENV.fetch('KEYGEN_ACCOUNT_ID')
       account    = Account.find(account_id)
 
-      Keygen::Exporter.export(
+      export = Keygen::Exporter.export(
         account,
+        digest: Digest::SHA256.new,
         to: STDOUT,
         secret_key:,
       )
+
+      STDERR.puts "digest: sha-256=#{export.hexdigest}"
     end
   end
 end

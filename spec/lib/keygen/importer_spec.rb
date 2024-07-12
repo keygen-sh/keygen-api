@@ -8,6 +8,16 @@ require_dependency Rails.root / 'lib' / 'keygen'
 describe Keygen::Importer do
   let(:account)  { create(:account) }
 
+  it 'should not raise for valid io', :ignore_potential_false_positives do
+    expect { Keygen::Importer.import(from: StringIO.new) }
+      .to_not raise_error ArgumentError
+  end
+
+  it 'should raise for invalid io' do
+    expect { Keygen::Importer.import(from: '') }
+      .to raise_error ArgumentError
+  end
+
   it 'should not raise for valid version 1' do
     expect { Keygen::Importer.import(from: StringIO.new(1.chr)) }
       .to_not raise_error

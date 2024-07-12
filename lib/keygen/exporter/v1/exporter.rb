@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 require_relative 'serializer'
 require_relative 'writer'
 
@@ -64,8 +66,8 @@ module Keygen
           @serializer = Serializer.new(secret_key:)
         end
 
-        def export(to: StringIO.new)
-          writer = Writer.new(to)
+        def export(to: StringIO.new, digest: Digest::SHA256.new)
+          writer = Writer.new(to, digest:)
           writer.write_version
 
           export_record(account.class.name, account.attributes_for_export, writer:)
