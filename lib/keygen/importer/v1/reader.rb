@@ -11,7 +11,13 @@ module Keygen
           chunk_size = read_chunk_size
           return if chunk_size.zero?
 
-          read(chunk_size)
+          chunk = read(chunk_size)
+
+          unless chunk.size == chunk_size
+            raise InvalidChunkError.new, 'chunk is invalid'
+          end
+
+          chunk
         end
       end
     end

@@ -16,6 +16,11 @@ module Keygen
           unencrypted  = decrypt(decompressed)
 
           unpack(unencrypted)
+        rescue MessagePack::MalformedFormatError,
+               OpenSSL::Cipher::CipherError
+          raise InvalidSecretKeyError.new, 'secret key is invalid'
+        rescue Zlib::Error
+          raise InvalidDataError.new, 'data is invalid'
         end
 
         private

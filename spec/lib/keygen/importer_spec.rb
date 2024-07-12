@@ -28,6 +28,22 @@ describe Keygen::Importer do
       .to raise_error Keygen::Importer::UnsupportedVersionError
   end
 
+  it 'should raise for invalid data' do
+    data = 'zzz'
+    size = [data.bytesize].pack('Q>')
+
+    expect { Keygen::Importer.import(from: StringIO.new(1.chr + size + data)) }
+      .to raise_error Keygen::Importer::InvalidDataError
+  end
+
+  it 'should raise for invalid chunk' do
+    data = 'zz'
+    size = ['zzz'.bytesize].pack('Q>')
+
+    expect { Keygen::Importer.import(from: StringIO.new(1.chr + size + data)) }
+      .to raise_error Keygen::Importer::InvalidChunkError
+  end
+
   context 'with encryption' do
     let(:secret_key) { SecureRandom.hex }
 
