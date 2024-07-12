@@ -28,7 +28,7 @@ module Keygen
       when 1
         V1::Exporter
       else
-        raise UnsupportedVersionError.new, "Unsupported export version: #{version}"
+        raise UnsupportedVersionError.new, "unsupported export version: #{version}"
       end
     end
   end
