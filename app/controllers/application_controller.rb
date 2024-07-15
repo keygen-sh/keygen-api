@@ -394,16 +394,19 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
+    kwargs[:links] = e.links if
+      e.links.present?
+
     # Add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED',
          'LICENSE_INVALID'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
+      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/#license-authentication') })
     when 'TOKEN_NOT_ALLOWED',
          'TOKEN_INVALID'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
+      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/#token-authentication') })
     when 'TOKEN_MISSING'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/' }
+      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/') })
     end
 
     render_unauthorized(**kwargs)

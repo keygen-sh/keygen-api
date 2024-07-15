@@ -935,7 +935,10 @@ describe UnionOf do
           "users"."stdout_last_sent_at" AS t1_r12,
           "users"."banned_at" AS t1_r13,
           "users"."group_id" AS t1_r14,
-          "users"."environment_id" AS t1_r15
+          "users"."environment_id" AS t1_r15,
+          "users"."sso_profile_id" AS t1_r16,
+          "users"."sso_idp_id" AS t1_r17,
+          "users"."session_nonce" AS t1_r18
         FROM
           "licenses"
           LEFT OUTER JOIN "license_users" ON "license_users"."license_id" = "licenses"."id"
@@ -979,6 +982,9 @@ describe UnionOf do
           "users"."banned_at" AS t0_r13,
           "users"."group_id" AS t0_r14,
           "users"."environment_id" AS t0_r15,
+          "users"."sso_profile_id" AS t0_r16,
+          "users"."sso_idp_id" AS t0_r17,
+          "users"."session_nonce" AS t0_r18,
           "machines"."id" AS t1_r0,
           "machines"."fingerprint" AS t1_r1,
           "machines"."ip" AS t1_r2,

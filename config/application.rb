@@ -34,6 +34,17 @@ module Keygen
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    # Use cookies for sessions
+    config.session_store :cookie_store, key: '_keygen_session',
+      domain: ENV.fetch('KEYGEN_PORTAL_HOST') { 'portal.keygen.sh' },
+      expire_after: 1.day,
+      httponly: true,
+      secure: true
+
+    # Re-add session middleware since we're an API-only app
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use config.session_store, config.session_options
+
     # Remove unneeded Rack middleware
     config.middleware.delete Rack::ConditionalGet
     config.middleware.delete Rack::ETag
@@ -92,6 +103,9 @@ module Keygen
 
     # FIXME(ezekg) Use 7.0 cache format until we can roll over to 7.1.
     config.active_support.cache_format_version 7.0
+
+    # Use SHA256 for signed cookies
+    config.action_dispatch.signed_cookie_digest = 'SHA256'
 
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false

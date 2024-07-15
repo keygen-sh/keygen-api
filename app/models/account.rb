@@ -289,6 +289,8 @@ class Account < ApplicationRecord
     protected
   end
 
+  def sso? = sso_organization_id?
+
   def status
     billing&.state&.upcase
   end

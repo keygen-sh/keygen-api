@@ -39,6 +39,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
     t.string "api_version"
     t.string "cname"
     t.string "backend"
+    t.string "sso_organization_id"
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
@@ -46,6 +47,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
+    t.index ["sso_organization_id"], name: "index_accounts_on_sso_organization_id", unique: true
     t.index ["subdomain"], name: "index_accounts_on_subdomain", unique: true
   end
 
@@ -794,11 +796,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
     t.datetime "banned_at", precision: nil
     t.uuid "group_id"
     t.uuid "environment_id"
+    t.string "sso_profile_id"
+    t.string "sso_idp_id"
+    t.bigint "session_nonce"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at"
+    t.index ["account_id", "sso_idp_id"], name: "index_users_on_account_id_and_sso_idp_id", unique: true
+    t.index ["account_id", "sso_profile_id"], name: "index_users_on_account_id_and_sso_profile_id", unique: true
     t.index ["banned_at"], name: "index_users_on_banned_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true

@@ -3,7 +3,7 @@
 module Api::V1::Accounts::Relationships
   class BillingsController < Api::V1::BaseController
     before_action :scope_to_current_account!
-    before_action :authenticate_with_token!
+    before_action :authenticate!
     before_action :set_billing
 
     def show

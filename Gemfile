@@ -45,6 +45,9 @@ gem 'jwt'
 # 2FA/TOTP
 gem 'rotp', '~> 6.2'
 
+# SSO
+gem 'workos'
+
 # Scopes and pagination
 gem 'has_scope'
 gem 'kaminari', '~> 1.2.0'

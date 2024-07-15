@@ -25,7 +25,7 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!
+    before_action :authenticate!
     before_action :set_license, only: %i[show update destroy]
 
     def index

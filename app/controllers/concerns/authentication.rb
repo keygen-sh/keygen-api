@@ -6,6 +6,28 @@ module Authentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
+  def authenticate!
+    case
+    when has_password_credentials?
+      authenticate_with_password!
+    when has_session_credentials?
+      authenticate_with_session!
+    else
+      authenticate_with_token!
+    end
+  end
+
+  def authenticate
+    case
+    when has_password_credentials?
+      authenticate_with_password
+    when has_session_credentials?
+      authenticate_with_session
+    else
+      authenticate_with_token
+    end
+  end
+
   def authenticate_with_token!
     case
     when has_bearer_credentials?
@@ -56,7 +78,23 @@ module Authentication
     end
   end
 
+  def authenticate_with_session!
+    authenticate_or_request_with_http_session(&method(:http_session_authenticator))
+  end
+
+  def authenticate_with_session
+    authenticate_with_http_session(&method(:http_session_authenticator))
+  end
+
   private
+
+  def authenticate_or_request_with_http_session(&auth_procedure)
+    authenticate_with_http_session(&auth_procedure) || request_http_token_authentication
+  end
+
+  def authenticate_with_http_session(&auth_procedure)
+    auth_procedure.call(session)
+  end
 
   def authenticate_or_request_with_query_token(&auth_procedure)
     authenticate_with_query_token(&auth_procedure) || request_http_token_authentication
@@ -77,6 +115,23 @@ module Authentication
     license_key = request.authorization.to_s.split(' ', 2).second
 
     auth_procedure.call(license_key)
+  end
+
+  def http_session_authenticator(session)
+    return nil if
+      current_account.nil? || session.nil?
+
+    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+                                .find_by(id: session[:user_id])
+
+    unless user.present? && user.account_id == session[:account_id] &&
+                            user.session_nonce == session[:nonce]
+      session.destroy # clear cookie
+
+      raise Keygen::Error::InvalidSessionError.new
+    end
+
+    @current_bearer = user
   end
 
   def query_token_authenticator(query_token)
@@ -101,38 +156,34 @@ module Authentication
                                 .find_by(email: "#{username}".downcase)
 
     unless user.present?
-      raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
-        header: 'Authorization',
+      raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization')
+    end
+
+    if user.single_sign_on_enabled?
+      provider = params.dig(:meta, :provider)
+      redirect = WorkOS::SSO.authorization_url(
+        redirect_uri: sso_callback_url,
+        client_id: WORKOS_CLIENT_ID,
+        organization: current_account.sso_organization_id,
+        provider:,
       )
+
+      raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end
 
     if user.second_factor_enabled?
       otp = params.dig(:meta, :otp)
       if otp.nil?
-        raise Keygen::Error::UnauthorizedError.new(
-          detail: 'second factor is required',
-          code: 'OTP_REQUIRED',
-          pointer: '/meta/otp',
-        )
+        raise Keygen::Error::SecondFactorRequiredError.new(pointer: '/meta/otp')
       end
 
       unless user.verify_second_factor(otp)
-        raise Keygen::Error::UnauthorizedError.new(
-          detail: 'second factor must be valid',
-          code: 'OTP_INVALID',
-          pointer: '/meta/otp',
-        )
+        raise Keygen::Error::InvalidSecondFactorError.new(pointer: '/meta/otp')
       end
     end
 
     unless user.password? && user.authenticate(password)
-      raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
-        header: 'Authorization',
-      )
+      raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization')
     end
 
     @current_bearer = user
@@ -281,6 +332,10 @@ module Authentication
 
   def has_license_credentials?
     authentication_scheme == 'license'
+  end
+
+  def has_session_credentials?
+    session.key?(:user_id)
   end
 
   def has_password_credentials?

@@ -8,7 +8,7 @@ module Api::V1::Policies::Relationships
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!
+    before_action :authenticate!
     before_action :set_policy
 
     authorize :policy

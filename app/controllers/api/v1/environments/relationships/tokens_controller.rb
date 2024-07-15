@@ -5,7 +5,7 @@ module Api::V1::Environments::Relationships
     before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!
+    before_action :authenticate!
     before_action :set_environment
 
     def index

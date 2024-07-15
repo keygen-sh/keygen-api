@@ -54,8 +54,12 @@ Rails.application.routes.draw do
 
   concern :tauri do
     scope module: :tauri, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
-      get ':package', to: 'upgrades#show'
+      get ':package', to: 'upgrades#show', as: :tauri_upgrade_package
     end
+  end
+
+  concern :sso do
+    get :sso, to: 'sso#callback', as: :sso_callback
   end
 
   concern :v1 do
@@ -477,6 +481,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # Subdomains for authentication (i.e. SSO)
+  scope constraints: { subdomain: 'auth' }, **domain_constraints do
+    # SSO
+    scope module: :auth do
+      concerns :sso
+    end
+  end
+
   scope module: :api do
     namespace :v1 do
       # Health checks
@@ -535,6 +547,28 @@ Rails.application.routes.draw do
       # Routes without :account_id scope i.e. singleplayer mode. This is
       # also used for CNAME routing (under multiplayer mode).
       concerns :v1
+    end
+  end
+
+  # Route helper for redirecting to Portal
+  direct :portal do |segment|
+    case segment
+    in Account => account
+      "https://portal.keygen.sh/#{account.slug}"
+    in String => path
+      "https://portal.keygen.sh/#{path}"
+    else
+      "https://portal.keygen.sh"
+    end
+  end
+
+  # Route helpers for redirecting to docs
+  direct :docs do |segment|
+    case segment
+    in String => path
+      "https://keygen.sh/#{path}"
+    else
+      "https://keygen.sh"
     end
   end
 

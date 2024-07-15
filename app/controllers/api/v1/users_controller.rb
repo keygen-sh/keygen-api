@@ -15,8 +15,8 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: %i[index create destroy]
-    before_action :authenticate_with_token!, only: %i[index show update destroy]
-    before_action :authenticate_with_token, only: %i[create]
+    before_action :authenticate!, only: %i[index show update destroy]
+    before_action :authenticate, only: %i[create]
     before_action :set_user, only: %i[show update destroy]
 
     def index

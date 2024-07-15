@@ -20,8 +20,8 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!, except: %i[index show]
-    before_action :authenticate_with_token, only: %i[index show]
+    before_action :authenticate!, except: %i[index show]
+    before_action :authenticate, only: %i[index show]
     before_action :set_release, only: %i[show update destroy]
 
     def index
