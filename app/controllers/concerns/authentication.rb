@@ -166,13 +166,7 @@ module Authentication
     end
 
     if user.single_sign_on_enabled?
-      provider = params.dig(:meta, :provider)
-      redirect = WorkOS::SSO.authorization_url(
-        redirect_uri: sso_callback_url,
-        client_id: WORKOS_CLIENT_ID,
-        organization: current_account.sso_organization_id,
-        provider:,
-      )
+      redirect = Keygen::SSO.authorization_url(account: current_account, email: user.email)
 
       raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end

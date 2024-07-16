@@ -386,10 +386,10 @@ class ApplicationController < ActionController::API
 
     render_bad_request(**kwargs)
   rescue Keygen::Error::InvalidSingleSignOnError => e
-    Keygen.logger.warn { "[sso] code=#{e.code.inspect} message=#{e.message.inspect}" }
+    Keygen.logger.warn { "[sso] error=#{e.class.inspect} code=#{e.code.inspect} message=#{e.message.inspect}" }
 
     # we want to redirect to Portal to display the SSO error message in a helpful way
-    redirect_to portal_url('/sso/error', query: { error: e.message, code: e.code })
+    redirect_to portal_url('/sso/error', query: { code: e.code }), status: :see_other, allow_other_host: true
   rescue Keygen::Error::UnauthorizedError => e
     kwargs = { code: e.code }
 

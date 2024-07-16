@@ -10,6 +10,7 @@ require_relative 'keygen/version'
 require_relative 'keygen/portable_class'
 require_relative 'keygen/exporter'
 require_relative 'keygen/importer'
+require_relative 'keygen/sso'
 require_relative 'keygen/url'
 
 module Keygen

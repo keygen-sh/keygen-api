@@ -23,27 +23,27 @@ module Keygen
     end
 
     class InvalidCredentialsError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'email and password must be valid', code: 'CREDENTIALS_INVALID', **)
+      def initialize(*, **) = super(*, detail: 'email and password must be valid', code: 'CREDENTIALS_INVALID', **)
     end
 
     class SingleSignOnRequiredError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'single sign on is required', code: 'SSO_REQUIRED', **)
+      def initialize(*, **) = super(*, detail: 'single sign on is required', code: 'SSO_REQUIRED', **)
     end
 
     class InvalidSingleSignOnError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'single sign on is invalid', code: 'SSO_INVALID', **)
+      def initialize(*, **) = super(*, detail: 'single sign on is invalid', code: 'SSO_INVALID', **)
     end
 
     class SecondFactorRequiredError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'second factor is required', code: 'OTP_REQUIRED', **)
+      def initialize(*, **) = super(*, detail: 'second factor is required', code: 'OTP_REQUIRED', **)
     end
 
     class InvalidSecondFactorError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'second factor must be valid', code: 'OTP_INVALID', **)
+      def initialize(*, **) = super(*, detail: 'second factor must be valid', code: 'OTP_INVALID', **)
     end
 
     class InvalidSessionError < UnauthorizedError
-      def initialize(*, **) = super(detail: 'session is invalid', code: 'SESSION_INVALID', **)
+      def initialize(*, **) = super(*, detail: 'session is invalid', code: 'SESSION_INVALID', **)
     end
 
     class ForbiddenError < JSONAPIError
