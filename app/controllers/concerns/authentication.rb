@@ -151,15 +151,18 @@ module Authentication
     end
   end
 
-  def http_password_authenticator(username = nil, password = nil)
-    if current_account.sso? && current_account.sso_organization_domains.any? { username.ends_with?(_1) } # for JIT-user-provisioning
-      redirect = sso_authorization_url_for(username)
+  def http_password_authenticator(email = nil, password = nil)
+    raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization') if
+      email.blank?
+
+    if current_account.sso? && current_account.sso_for?(email) # for JIT-user-provisioning
+      redirect = sso_authorization_url_for(email)
 
       raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end
 
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
-                                .find_by(email: "#{username}".downcase)
+                                .find_by(email: "#{email}".downcase)
 
     unless user.present?
       raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization')

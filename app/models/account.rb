@@ -290,6 +290,14 @@ class Account < ApplicationRecord
   end
 
   def sso? = sso_organization_id?
+  def sso_for?(email)
+    return false if email.blank?
+
+    _, domain = email.downcase.match(/([^@]+)@(.+)/)
+                              .captures
+
+    domain.in?(sso_organization_domains)
+  end
 
   def status
     billing&.state&.upcase
