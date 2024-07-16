@@ -153,7 +153,7 @@ module Authentication
 
   def http_password_authenticator(username = nil, password = nil)
     if current_account.sso? && current_account.sso_organization_domains.any? { username.ends_with?(_1) } # for JIT-user-provisioning
-      redirect = Keygen::SSO.authorization_url(account: current_account, email: username)
+      redirect = sso_authorization_url_for(username)
 
       raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end
@@ -166,7 +166,7 @@ module Authentication
     end
 
     if user.single_sign_on_enabled?
-      redirect = Keygen::SSO.authorization_url(account: current_account, email: user.email)
+      redirect = sso_authorization_url_for(user)
 
       raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end
@@ -369,5 +369,16 @@ module Authentication
     auth_value = auth_parts.second
 
     auth_value
+  end
+
+  def sso_authorization_url(email) = Keygen::SSO.authorization_url(account: current_account, provider: sso_provider, email:)
+  def sso_provider                 = request.filtered_parameters.dig(:meta, :provider)
+  def sso_authorization_url_for(user_or_email)
+    case user_or_email
+    in User => user
+      sso_authorization_url(user.email)
+    in String => email
+      sso_authorization_url(email)
+    end
   end
 end
