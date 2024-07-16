@@ -470,7 +470,7 @@ class User < ApplicationRecord
     end
   end
 
-  def single_sign_on_enabled? = account.sso?
+  def single_sign_on_enabled? = !role.user? && account.sso?
 
   def second_factor_enabled?
     second_factors.enabled.exists?
