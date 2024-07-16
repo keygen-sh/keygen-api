@@ -11,5 +11,7 @@ Rails.autoloaders.each do |autoloader|
     'sso'       => 'SSO',
     'idp'       => 'IdP',
     'sp'        => 'SP',
+    'uri'       => 'URI',
+    'url'       => 'URL',
   )
 end

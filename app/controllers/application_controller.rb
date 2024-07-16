@@ -401,12 +401,12 @@ class ApplicationController < ActionController::API
     case e.code
     when 'LICENSE_NOT_ALLOWED',
          'LICENSE_INVALID'
-      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/#license-authentication') })
+      kwargs.deep_merge(links: { about: docs_url(:authentication, anchor: 'license-authentication') })
     when 'TOKEN_NOT_ALLOWED',
          'TOKEN_INVALID'
-      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/#token-authentication') })
+      kwargs.deep_merge(links: { about: docs_url(:authentication, anchor: 'token-authentication') })
     when 'TOKEN_MISSING'
-      kwargs.deep_merge(links: { about: docs_url('/docs/api/authentication/') })
+      kwargs.deep_merge(links: { about: docs_url(:authentication) })
     end
 
     render_unauthorized(**kwargs)

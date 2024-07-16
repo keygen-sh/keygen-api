@@ -551,25 +551,13 @@ Rails.application.routes.draw do
   end
 
   # Route helper for redirecting to Portal
-  direct :portal do |segment|
-    case segment
-    in Account => account
-      "https://portal.keygen.sh/#{account.slug}"
-    in String => path
-      "https://portal.keygen.sh/#{path}"
-    else
-      "https://portal.keygen.sh"
-    end
+  direct :portal do |segment, options|
+    Keygen::URL.portal_url(segment, **options)
   end
 
   # Route helpers for redirecting to docs
-  direct :docs do |segment|
-    case segment
-    in String => path
-      "https://keygen.sh/#{path}"
-    else
-      "https://keygen.sh"
-    end
+  direct :docs do |segment, options|
+    Keygen::URL.docs_url(segment, **options)
   end
 
   %w[500 503].each do |code|
