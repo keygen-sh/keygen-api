@@ -9,5 +9,7 @@ Rails.autoloaders.each do |autoloader|
     'ldap'      => 'LDAP',
     'saml'      => 'SAML',
     'sso'       => 'SSO',
+    'idp'       => 'IdP',
+    'sp'        => 'SP',
   )
 end

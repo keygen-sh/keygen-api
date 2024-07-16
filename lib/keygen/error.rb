@@ -30,6 +30,10 @@ module Keygen
       def initialize(*, **) = super(detail: 'single sign on is required', code: 'SSO_REQUIRED', **)
     end
 
+    class InvalidSingleSignOnError < UnauthorizedError
+      def initialize(*, **) = super(detail: 'single sign on is invalid', code: 'SSO_INVALID', **)
+    end
+
     class SecondFactorRequiredError < UnauthorizedError
       def initialize(*, **) = super(detail: 'second factor is required', code: 'OTP_REQUIRED', **)
     end

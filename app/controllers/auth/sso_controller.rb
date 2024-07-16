@@ -20,20 +20,41 @@ module Auth
       # TODO(ezekg) error handling e.g. code is invalid, error callback,
       #             failure to find/create user, etc.
 
-      account = Account.find_by!(sso_organization_id: profile.organization_id)
-      user    = account.users.find_or_create_by!(email: profile.email) do |u|
-        u.sso_profile_id = profile.id
-        u.sso_idp_id     = profile.idp_id
-        u.first_name     = profile.first_name
-        u.last_name      = profile.last_name
+      account = Account.where.not(sso_organization_id: nil) # sanity-check
+                       .find_by!(
+                         sso_organization_id: profile.organization_id,
+                       )
 
-        # TODO(ezekg) eventually implement workos groups?
-        u.grant_role! :admin
+      # WorkOS recommends JIT-user-provisioning: https://workos.com/docs/sso/jit-provisioning
+      #
+      # 1. First, we attempt to find the user by their profile ID.
+      # 2. Next, we attempt to find the user by their email.
+      # 3. Otherwise, create a new user.
+      #
+      # Afterwards, we keep the user's profile up-to-date.
+      user = account.users.then do |users|
+        users.find_by(sso_profile_id: profile.id) || users.find_or_initialize_by(email: profile.email) do |u|
+          u.sso_profile_id    = profile.id
+          u.sso_connection_id = profile.connection_id
+          u.sso_idp_id        = profile.idp_id
+          u.first_name        = profile.first_name
+          u.last_name         = profile.last_name
+          u.email             = profile.email
+
+          # TODO(ezekg) eventually implement workos groups?
+          u.grant_role! :admin
+        end
       end
 
-      # Generate a nonce to assert that only 1 SSO-based session can be
-      # active for a user at any given time.
-      user.update!(session_nonce: SecureRandom.random_number(2**32))
+      user.update!(
+        # Generate a nonce to assert that only 1 SSO-based session can be
+        # active for a user at any given time.
+        session_nonce: SecureRandom.random_number(2**32),
+        # Keep the user's profile up-to-date with the IdP.
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        email: profile.email,
+      )
 
       # We use encrypted session cookies for SSO authentication because we
       # don't want to expose a token in the redirect URL, and we don't

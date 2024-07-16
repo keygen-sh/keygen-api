@@ -799,6 +799,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
     t.string "sso_profile_id"
     t.string "sso_idp_id"
     t.bigint "session_nonce"
+    t.string "sso_connection_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist

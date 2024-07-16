@@ -938,7 +938,8 @@ describe UnionOf do
           "users"."environment_id" AS t1_r15,
           "users"."sso_profile_id" AS t1_r16,
           "users"."sso_idp_id" AS t1_r17,
-          "users"."session_nonce" AS t1_r18
+          "users"."session_nonce" AS t1_r18,
+          "users"."sso_connection_id" AS t1_r19
         FROM
           "licenses"
           LEFT OUTER JOIN "license_users" ON "license_users"."license_id" = "licenses"."id"
@@ -985,6 +986,7 @@ describe UnionOf do
           "users"."sso_profile_id" AS t0_r16,
           "users"."sso_idp_id" AS t0_r17,
           "users"."session_nonce" AS t0_r18,
+          "users"."sso_connection_id" AS t0_r19,
           "machines"."id" AS t1_r0,
           "machines"."fingerprint" AS t1_r1,
           "machines"."ip" AS t1_r2,
