@@ -152,6 +152,12 @@ module Authentication
   end
 
   def http_password_authenticator(username = nil, password = nil)
+    if current_account.sso? && current_account.sso_organization_domains.any? { username.ends_with?(_1) } # for JIT-user-provisioning
+      redirect = Keygen::SSO.authorization_url(account: current_account, email: username)
+
+      raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
+    end
+
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
                                 .find_by(email: "#{username}".downcase)
 

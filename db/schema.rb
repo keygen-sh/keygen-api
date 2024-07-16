@@ -40,6 +40,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
     t.string "cname"
     t.string "backend"
     t.string "sso_organization_id"
+    t.string "sso_organization_domains", default: [], array: true
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
