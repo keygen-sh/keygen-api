@@ -9,21 +9,32 @@ module Auth
     skip_verify_authorized
 
     typed_query {
+      param :error_description, type: :string, optional: true, allow_blank: true
+      param :error, type: :string, optional: true, allow_blank: true
       param :state, type: :string, optional: true, allow_blank: true
       param :code, type: :string
     }
     def callback
+      if (error_code = sso_query[:error]).present?
+        error_message = sso_query[:error_description]
+
+        raise Keygen::Error::InvalidSingleSignOnError.new(
+          code: error_code.then { "SSO_#{_1.upcase}" unless _1.nil? },
+          detail: error_message,
+        )
+      end
+
       code, state = sso_query.values_at(:code, :state)
       profile     = WorkOS::SSO.profile_and_token(client_id: WORKOS_CLIENT_ID, code:)
                                .profile
 
-      # TODO(ezekg) error handling e.g. code is invalid, error callback,
-      #             failure to find/create user, etc.
-
       account = Account.where.not(sso_organization_id: nil) # sanity-check
-                       .find_by!(
+                       .find_by(
                          sso_organization_id: profile.organization_id,
                        )
+
+      raise Keygen::Error::InvalidSingleSignOnError.new('account is invalid') if
+        account.nil?
 
       # WorkOS recommends JIT-user-provisioning: https://workos.com/docs/sso/jit-provisioning
       #
@@ -65,6 +76,11 @@ module Auth
 
       redirect_to portal_url(account), status: :temporary_redirect,
                                        allow_other_host: true
+    rescue WorkOS::APIError => e
+      raise Keygen::Error::InvalidSingleSignOnError.new(
+        code: e.code.then { "SSO_#{_1.upcase}" unless _1.nil? },
+        detail: e.message,
+      )
     end
   end
 end
