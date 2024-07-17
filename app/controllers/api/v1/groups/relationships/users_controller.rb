@@ -10,7 +10,7 @@ module Api::V1::Groups::Relationships
     authorize :group
 
     def index
-      users = apply_pagination(authorized_scope(apply_scopes(group.users), with: Groups::UserPolicy).preload(:role))
+      users = apply_pagination(authorized_scope(apply_scopes(group.users), with: Groups::UserPolicy).preload(:role, :any_active_licenses))
       authorize! users,
         with: Groups::UserPolicy
 

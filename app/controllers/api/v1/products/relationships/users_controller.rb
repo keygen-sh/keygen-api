@@ -12,7 +12,7 @@ module Api::V1::Products::Relationships
     authorize :product
 
     def index
-      users = apply_pagination(authorized_scope(apply_scopes(product_users)).preload(:role))
+      users = apply_pagination(authorized_scope(apply_scopes(product_users)).preload(:role, :any_active_licenses))
       authorize! users,
         with: Products::UserPolicy
 
