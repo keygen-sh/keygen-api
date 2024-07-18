@@ -10,7 +10,7 @@
 
 # Keygen
 
-Keygen is an open, source-available software licensing and distribution API, built
+Keygen is a fair source software licensing and distribution API, built
 for developers, by developers. Use Keygen to add license key validation,
 entitlements, and device activation to your business's desktop apps,
 server applications, on-premise software, and other products.
@@ -20,8 +20,8 @@ server applications, on-premise software, and other products.
 Keygen comes in two editions. Keygen CE is our Community Edition, and is
 free (as in beer) to self-host for personal and commercial use. Keygen
 EE is our Enterprise Edition, and it requires a license key to use.
-Keygen EE comes with dedicated support, as well as enterprise-grade features like request logs,
-audit logs, permissions, environments, and more.
+Keygen EE comes with dedicated support, as well as enterprise-grade features
+like request logs, audit logs, permissions, environments, and more.
 
 I built Keygen to make software licensing accessible to everyone.
 
@@ -35,15 +35,15 @@ product.
 Our managed hosting can save a substantial amount of developer time and
 resources. For most businesses, this ends up being the best value
 option and the revenue goes to funding the maintenance and further
-development of Keygen. So you’ll be supporting open source software
-and getting a great service!
+development of Keygen. So you’ll be supporting [Fair Source](https://fair.io)
+software and getting a great service!
 
 ## Self hosting with Keygen CE
 
-Keygen is an open, source-available software licensing and distribution API, and
-we have a free (as in beer) [self-hosted solution][self-hosting]. Keygen Community
-Edition is exactly the same code base as our managed solution, Keygen Cloud, but with
-a less frequent release schedule (think of it as an LTS release).
+Keygen is a fair source software licensing and distribution API, and we have a
+free (as in beer) [self-hosted solution][self-hosting]. Keygen Community
+Edition is exactly the same code base as our managed solution, Keygen Cloud,
+but with a less frequent release schedule (think of it as an LTS release).
 
 Bug fixes and new features are released to Keygen Cloud several times
 per week. Features are battle-tested in Keygen Cloud which allows us to fix
@@ -92,8 +92,9 @@ to the long-term sustainability of the project.
 
 Keygen CE is a community supported project and there are **no guarantees** that
 you will receive support from the creators of Keygen to troubleshoot your
-self-hosting issues. Keygen offers **best-effort** support for Keygen CE. There is [a community-supported Discord server][discord]
-and [a forum][forum] where you can ask for help with self-hosting.
+self-hosting issues. Keygen offers **best-effort** support for Keygen CE. There
+is [a community-supported Discord server][discord] and [a forum][forum] where
+you can ask for help with self-hosting.
 
 If you do need support guantantees, consider becoming a [Keygen Cloud][keygen-cloud]
 customer, or [purchasing Keygen EE][sales].
@@ -102,7 +103,8 @@ customer, or [purchasing Keygen EE][sales].
 
 ### Secrets
 
-To generate a [secret key](https://guides.rubyonrails.org/security.html) for the application, run:
+To generate a [secret key](https://guides.rubyonrails.org/security.html) for
+the application, run:
 
 ```bash
 export SECRET_KEY_BASE="$(openssl rand -hex 64)"
@@ -192,39 +194,60 @@ bundle exec rake test:rspec[spec/models]
 
 ## License
 
-Keygen is licensed under the [Elastic License 2.0 (ELv2)](https://github.com/keygen-sh/keygen-api/blob/master/LICENSE.md) license because it provides the best balance between freedom and protection. The ELv2 license is a permissive license that allows you to use, modify, and distribute Keygen as long as you follow a few simple rules:
+Keygen is licensed under the [Fair Core License](https://fcl.dev). The Fair
+Core License, or FCL, provides the best balance between user freedom and
+developer sustainability for a project like Keygen that monetizes via SaaS and
+self-hosting. The FCL is a mostly-permissive non-compete [Fair Source](https://fair.io)
+license that eventually contributes to Open Source after 2 years.
 
-1. **You may not provide Keygen's API to others as a managed service.** For example, you _cannot_ host Keygen yourself and sell it as a cloud-based licensing service, competing with Keygen Cloud. However, you _can_ sell a product that directly exposes and utilizes Keygen's API, as long as Keygen cannot be used outside of your product for other purposes (such as your customer using an embedded Keygen EE instance to license _their_ product in addition to _your_ product).
+The 2-year timeframe applies to each software version made available, whether
+through pushing a Git commit, tagging a release on GitHub, or publishing an
+image to Docker Hub. After 2 years, the code licensed under the FCL becomes
+Open Source under the Apache 2.0 license.
 
-1. **You may not circumvent the license key functionality or remove/obscure features protected by license keys.** For example, our code contains [license gates](https://github.com/keygen-sh/keygen-api/blob/ddbeed71543627fc15d37342c937e8bb4ef97157/app/models/environment.rb#L2) that unlock functionality for Keygen EE. You _cannot_ remove or change the licensing code to, for example, unlock a Keygen EE feature in Keygen CE.
+To obtain an Open Source version of Keygen, run the following:
 
-1. You may not alter, remove, or obscure any licensing, copyright, or other notices.
+```bash
+git clone https://github.com/keygen-sh/keygen-api && cd keygen-api
+git checkout `git rev-list -n 1 --before='2 years ago' master`
+```
 
-Anything else is fair game. There's no clause that requires you to open source modifications made to Keygen or other derivative works.
+If the `LICENSE.md` file is FCL, and that code is 2 years old, you may use that
+version under the Open Source terms of the change license, which is currently
+the Apache 2.0 license.
 
-You can self-host Keygen EE to license your enterprise application.
+You can...
 
-You can embed Keygen CE in your on-premise application.
+1. self-host Keygen EE to license your enterprise applications.
+2. embed Keygen CE in your on-premise applications.
+3. run Keygen CE on a private network.
+3. modify Keygen to add additional functionality.
+4. fork Keygen into a private repo.
 
-You can run Keygen CE on a private network.
+There's no clause that requires you to Open Source modifications made to Keygen
+or other derivative works.
 
-You can fork Keygen into a private repo.
-
-If the ELv2 license doesn't work for your company, please [reach out][sales].
+If the FCL happens to not work for your company or use-case, please [reach out][sales].
 
 The license is available [here](https://keygen.sh/license/).
 
 ## Contributing
 
-If you discover an issue, or are interested in a new feature, please open an issue. If you want to contribute code, feel free to open a pull request. If the PR is substantial, it may be beneficial to open an issue beforehand to discuss.
+If you discover an issue, or are interested in a new feature, please open an
+issue. If you want to contribute code, feel free to open a pull request. If the
+PR is substantial, it may be beneficial to open an issue beforehand to discuss.
 
 The CLA is available [here](https://keygen.sh/cla/).
 
 ## Security
 
-We take security at Keygen very seriously. We perform annual pen-tests on our code base and infrastructure. In addition, we regularly perform code audits. Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/), an OSCP-certified security researcher in the Ruby and Rails community.
+We take security at Keygen very seriously. We perform annual pen-tests on our
+code base and infrastructure. In addition, we regularly perform code audits.
+Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/),
+an OSCP-certified security researcher in the Ruby and Rails community.
 
-If you believe you've found a vulnerability, please see our [`SECURITY.md`](https://github.com/keygen-sh/keygen-api/blob/master/SECURITY.md) file.
+If you believe you've found a vulnerability, please see our [`SECURITY.md`](https://github.com/keygen-sh/keygen-api/blob/master/SECURITY.md)
+file.
 
 ## Is it any good?
 
