@@ -782,6 +782,82 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_eight(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "Keygen relicenses to the FCL",
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Zeke here, founder and the man-behind-the-cogs at Keygen.
+
+        As some of you may remember: last year, Keygen went source-available under the Elastic License 2.0. This has gone great -- even better than I imagined! (All the fears I had for "flipping the switch" proved to be unwarranted.)
+
+        But over the past year, I've come to notice some problems with the ELv2 license, some i.r.t. ease-of-sale, and some i.r.t. user-freedoms. And I've also been noticing some other initiatives in the software licensing space that have had me... intrigued.
+
+        One of those initiatives was the Functional Source License by Sentry, which is a mostly-permissive non-compete Fair Source license that eventually transitions to Open Source after 2 years.
+
+        I really liked how this eventually-OSS model balanced developer-sustainability and user-freedoms, while eventually contributing to Open Source. I liked it so much that I really wanted to adopt it for Keygen.
+
+        But I couldn't safely adopt the FSL outright, because the FSL offers no protection for a project like Keygen that monetizes self-hosting. (I nixed the BUSL for the same reasons way back when.)
+
+        So I teamed up with Heather Meeker -- a prolific lawyer in the Open Source licensing space, who also helped draft both the FSL and ELv2 -- to draft a new license based on the FSL... the Fair Core License.
+
+        The FCL is a mostly-permissive non-compete Fair Source license that, like the FSL it's derived from, eventually transitions to Open Source after 2 years.
+
+        You can think of the FCL as the perfect blend of the FSL and the ELv2 -- perfect for projects monetizing both SaaS and self-hosting (e.g. Open Core).
+
+        With that -- I'm excited to announce that Keygen is relicensing from the ELv2 to the FCL! I believe this will be a big win for Keygen, its users, and ultimately for Open Source.
+
+        Under the FCL, new releases of Keygen will transition to Open Source under the Apache 2.0 change license after 2 years.
+
+        You can read the announcement post below, which hits on the above points a bit more:
+
+          https://keygen.sh/blog/keygen-is-now-fair-source/
+
+        You can read more about the FCL here:
+
+          https://fcl.dev
+
+        If you also run a project that monetizes self-hosting, consider adopting the FCL (and in doing so, become Fair Source).
+
+        In other news, we've (re)started work on Portal (yes -- *we!*). We'll have more to share soon, but I'm excited to have somebody else handling front-end at Keygen.
+
+        In other-other news, we've cut a new release of Keygen CE and EE, v1.3.0, that includes multi-user licensing. Check it out below:
+
+          https://github.com/keygen-sh/keygen-api/releases/tag/v1.3.0
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. we broke 700 stars on GitHub! Star us if you haven't already: https://github.com/keygen-sh/keygen-api
+
+        p.p.s. if you're wondering what Fair Source is, peek: https://fair.io
+      TXT
+    )
+  end
+
   private
 
   def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
