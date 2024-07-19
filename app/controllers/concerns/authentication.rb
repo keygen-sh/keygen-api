@@ -124,6 +124,8 @@ module Authentication
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
                                 .find_by(id: session[:user_id])
 
+    # Currently we only allow 1 session per-user, meaning if the session
+    # nonce doesn't match then the current session is outdated.
     unless user.present? && user.account_id == session[:account_id] &&
                             user.session_nonce == session[:nonce]
       session.destroy # clear cookie
