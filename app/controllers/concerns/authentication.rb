@@ -121,6 +121,10 @@ module Authentication
     return nil if
       current_account.nil? || session.nil?
 
+    @current_http_scheme = :session
+    @current_http_token  = nil
+    @current_token       = nil
+
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
                                 .find_by(id: session[:user_id])
 
