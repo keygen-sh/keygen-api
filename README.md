@@ -69,7 +69,8 @@ Keygen Enterprise Edition:
 - **Environments**: manage separate environments within a Keygen account, from
   test environments, to a sandbox, to QA, to production.
 - **Permissions**: enterprise-grade roles and permissions.
-- **SSO/SAML**: support for SSO/SAML coming soon.
+- **Import/export**: migrate from Keygen Cloud to Keygen EE.
+- **SSO/SAML**: support for SSO/SAML/OAuth.
 
 Keygen uses Keygen EE in production to run Keygen Cloud, which is used to
 license Keygen EE. It's ~~turtles~~ Keygens all the way down (we love
