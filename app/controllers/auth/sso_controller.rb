@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Auth
-  KEYGEN_PORTAL_HOST = ENV.fetch('KEYGEN_PORTAL_HOST') { 'portal.keygen.sh' }
-
   class SsoController < Api::V1::BaseController
     include ActionController::Cookies
 

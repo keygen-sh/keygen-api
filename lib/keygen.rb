@@ -11,9 +11,11 @@ require_relative 'keygen/portable_class'
 require_relative 'keygen/exporter'
 require_relative 'keygen/importer'
 require_relative 'keygen/sso'
-require_relative 'keygen/url'
+require_relative 'keygen/url_for'
 
 module Keygen
+  include UrlFor
+
   PUBLIC_KEY = %(\xB8\xF3\xEBL\xD2`\x13_g\xA5\tn\x8D\xC1\xC9\xB9\xDC\xB8\x1E\xE9\xFEP\xD1,\xDC\xD9A\xF6`z\x901).freeze
 
   class << self

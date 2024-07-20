@@ -552,12 +552,12 @@ Rails.application.routes.draw do
 
   # Route helper for redirecting to Portal
   direct :portal do |segment, options|
-    Keygen::URL.portal_url(segment, **options)
+    Keygen.portal_url(segment, **options)
   end
 
   # Route helpers for redirecting to docs
   direct :docs do |segment, options|
-    Keygen::URL.docs_url(segment, **options)
+    Keygen.docs_url(segment, **options)
   end
 
   %w[500 503].each do |code|

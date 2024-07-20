@@ -36,7 +36,7 @@ module Keygen
 
     # Use cookies for sessions
     config.session_store :cookie_store, key: '_keygen_session',
-      domain: ENV.fetch('KEYGEN_PORTAL_HOST') { 'portal.keygen.sh' },
+      domain: Keygen::PORTAL_HOST,
       expire_after: 1.day,
       httponly: true,
       secure: true
