@@ -99,10 +99,6 @@ module Keygen
                      .join('.')
 
         enc
-      rescue => e
-        Keygen.logger.error { "[sso.encrypt] Encrypt failed: err=#{e.message}" }
-
-        nil
       end
 
       def decrypt(ciphertext, secret_key:)
@@ -112,10 +108,6 @@ module Keygen
                           .join('--')
 
         crypt.decrypt_and_verify(enc)
-      rescue => e
-        Keygen.logger.warn { "[sso.decrypt] Decrypt failed: err=#{e.message}" }
-
-        nil
       end
 
       def derive_key(secret_key)
