@@ -123,21 +123,24 @@ class Account < ApplicationRecord
   end
 
   scope :active, -> (with_activity_from: 90.days.ago) {
-    joins(:billing)
-      .where(billings: { state: %i[subscribed trialing pending] })
-      .where(<<~SQL.squish, with_activity_from)
-        EXISTS (
-          SELECT
-            1
-          FROM
-            "event_logs"
-          WHERE
-            "event_logs"."account_id" = "accounts"."id" AND
-            "event_logs"."created_at" > ?
-          LIMIT
-            1
-        )
-      SQL
+    base = joins(:billing).where(billings: { state: %i[subscribed trialing pending] })
+
+    new_accounts  = base.where('accounts.created_at > ?', with_activity_from)
+    with_activity = base.where(<<~SQL.squish, with_activity_from)
+      EXISTS (
+        SELECT
+          1
+        FROM
+          "event_logs"
+        WHERE
+          "event_logs"."account_id" = "accounts"."id" AND
+          "event_logs"."created_at" > ?
+        LIMIT
+          1
+      )
+    SQL
+
+    new_accounts.or(with_activity)
   }
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
