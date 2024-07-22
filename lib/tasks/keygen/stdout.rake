@@ -37,7 +37,7 @@ namespace :keygen do
       end
 
       task eight: %i[environment] do
-        subscribers = User.stdout_subscribers
+        subscribers = User.stdout_subscribers(with_activity_from: 1.year.ago)
                           .where('stdout_last_sent_at IS NULL OR stdout_last_sent_at < ?', 7.days.ago)
                           .select(:id, :email, :first_name)
                           .reorder(:email, :created_at)
