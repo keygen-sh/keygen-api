@@ -506,6 +506,10 @@ class User < ApplicationRecord
       association.nil?
 
     return if
+      association.marked_for_destruction? ||
+      association.destroyed?
+
+    return if
       !has_role?(:admin) && !was_role?(:admin)
 
     other_admins = association.admins.preload(role: %i[role_permissions]).where.not(id:)

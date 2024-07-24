@@ -3,7 +3,7 @@
 namespace :keygen do
   # Usage: rake keygen:export[secret] > encrypted.export
   #        rake keygen:export > unencrypted.export
-  desc 'Export data from Keygen to STDOUT'
+  desc 'Export data from a Keygen account to STDOUT'
   task :export, %i[secret_key] => %i[silence environment] do |_, args|
     ActiveRecord::Base.logger.silence do
       secret_key = args[:secret_key]
