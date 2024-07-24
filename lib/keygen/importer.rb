@@ -10,15 +10,20 @@ module Keygen
     class InvalidSecretKeyError < StandardError; end
     class InvalidDataError < StandardError; end
     class InvalidChunkError < InvalidDataError; end
+    class InvalidRecordError < StandardError; end
+    class DuplicateRecordError < InvalidRecordError; end
 
     extend self
 
-    def import(from:, secret_key: nil)
+    def import(from:, account_id:, secret_key: nil)
       version_reader = VersionReader.new(from)
       version        = version_reader.read_version
 
       importer_class = importer_class_for(version:)
-      importer       = importer_class.new(secret_key:)
+      importer       = importer_class.new(
+        account_id:,
+        secret_key:,
+      )
 
       importer.import(from:)
     end

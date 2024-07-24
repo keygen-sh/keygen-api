@@ -12,40 +12,40 @@ class Account < ApplicationRecord
 
   belongs_to :plan, optional: true
   has_one :billing
-  has_many :environments
-  has_many :webhook_endpoints
-  has_many :webhook_events
-  has_many :request_logs
-  has_many :metrics
-  has_many :tokens
-  has_many :users, index_errors: true
-  has_many :second_factors
-  has_many :products
-  has_many :policies
-  has_many :keys
-  has_many :licenses
-  has_many :license_users
-  has_many :machines
-  has_many :machine_components
-  has_many :machine_processes
-  has_many :entitlements
-  has_many :policy_entitlements
-  has_many :license_entitlements
-  has_many :releases
-  has_many :release_engines
-  has_many :release_packages
-  has_many :release_platforms
-  has_many :release_arches
-  has_many :release_filetypes
-  has_many :release_channels
-  has_many :release_entitlement_constraints
-  has_many :release_download_links
-  has_many :release_upgrade_links
-  has_many :release_upload_links
-  has_many :release_artifacts
-  has_many :event_logs
-  has_many :groups
-  has_many :group_owners
+  has_many :environments, dependent: :destroy_async
+  has_many :webhook_endpoints, dependent: :destroy_async
+  has_many :webhook_events, dependent: :destroy_async
+  has_many :request_logs, dependent: :destroy_async
+  has_many :metrics, dependent: :destroy_async
+  has_many :tokens, dependent: :destroy_async
+  has_many :users, index_errors: true, dependent: :destroy_async
+  has_many :second_factors, dependent: :destroy_async
+  has_many :products, dependent: :destroy_async
+  has_many :policies, dependent: :destroy_async
+  has_many :keys, dependent: :destroy_async
+  has_many :licenses, dependent: :destroy_async
+  has_many :license_users, dependent: :destroy_async
+  has_many :machines, dependent: :destroy_async
+  has_many :machine_components, dependent: :destroy_async
+  has_many :machine_processes, dependent: :destroy_async
+  has_many :entitlements, dependent: :destroy_async
+  has_many :policy_entitlements, dependent: :destroy_async
+  has_many :license_entitlements, dependent: :destroy_async
+  has_many :releases, dependent: :destroy_async
+  has_many :release_engines, dependent: :destroy_async
+  has_many :release_packages, dependent: :destroy_async
+  has_many :release_platforms, dependent: :destroy_async
+  has_many :release_arches, dependent: :destroy_async
+  has_many :release_filetypes, dependent: :destroy_async
+  has_many :release_channels, dependent: :destroy_async
+  has_many :release_entitlement_constraints, dependent: :destroy_async
+  has_many :release_download_links, dependent: :destroy_async
+  has_many :release_upgrade_links, dependent: :destroy_async
+  has_many :release_upload_links, dependent: :destroy_async
+  has_many :release_artifacts, dependent: :destroy_async
+  has_many :event_logs, dependent: :destroy_async
+  has_many :groups, dependent: :destroy_async
+  has_many :group_owners, dependent: :destroy_async
 
   # FIXME(ezekg) roles should have an account_id foreign key
   has_many :environment_roles, through: :environments, source: :role
