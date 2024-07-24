@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_10_160024) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_24_204821) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -727,6 +727,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_10_160024) do
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
     t.index ["name", "created_at"], name: "index_roles_on_name_and_created_at"
     t.index ["resource_id", "resource_type", "created_at"], name: "index_roles_on_resource_id_and_resource_type_and_created_at"
+    t.index ["resource_id", "resource_type"], name: "index_roles_on_resource_id_and_resource_type", unique: true
     t.index ["resource_type", "resource_id", "name"], name: "index_roles_on_resource_type_and_resource_id_and_name"
   end
 
