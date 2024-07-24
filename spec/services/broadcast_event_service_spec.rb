@@ -237,6 +237,21 @@ describe BroadcastEventService do
     expect { create_webhook_event!(account, resource) }.to raise_error Exception
   end
 
+  it 'should disable endpoint when status is 410 Gone' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      OpenStruct.new(code: 410, body: '410 Gone')
+    }
+
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq '410 Gone'
+    expect(event.last_response_code).to eq 410
+
+    expect { endpoint.reload }.to_not raise_error
+    expect(endpoint.subscriptions).to be_empty
+  end
+
   context 'when endpoint has an environment' do
     before do
       create_list(:webhook_endpoint, 5, :in_isolated_environment, account:)

@@ -148,6 +148,14 @@ class WebhookWorker < BaseWorker
         event.update!(status: 'FAILED')
 
         return
+      in last_response_code: 410
+        Keygen.logger.warn "[webhook_worker] Disabling Gone endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+
+        # Automatically disable endpoints returning 410 Gone
+        event.update!(status: 'FAILED')
+        endpoint.disable!
+
+        return
       else
         Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
