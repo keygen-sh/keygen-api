@@ -6,7 +6,13 @@ require 'spec_helper'
 require_dependency Rails.root / 'lib' / 'keygen'
 
 describe Keygen::Exporter do
-  let(:account) { create(:account) }
+  let(:account)    { create(:account) }
+  let(:account_id) { account.id }
+
+  # run association async destroys inline
+  around do |example|
+    perform_enqueued_jobs { example.run }
+  end
 
   it 'should not raise for valid io', :ignore_potential_false_positives do
     expect { Keygen::Exporter.export(account, to: StringIO.new) }
@@ -62,8 +68,9 @@ describe Keygen::Exporter do
 
     it 'should be importable' do
       export = Keygen::Exporter.export(account, to: StringIO.new, secret_key:)
+      account.destroy!
 
-      expect { Keygen::Importer.import(from: export, secret_key:) }.to_not raise_error
+      expect { Keygen::Importer.import(from: export, account_id:, secret_key:) }.to_not raise_error
     end
 
     %w[sha512 sha256 md5].each do |digest|
@@ -99,8 +106,9 @@ describe Keygen::Exporter do
 
     it 'should be importable' do
       export = Keygen::Exporter.export(account, to: StringIO.new)
+      account.destroy!
 
-      expect { Keygen::Importer.import(from: export) }.to_not raise_error
+      expect { Keygen::Importer.import(from: export, account_id:) }.to_not raise_error
     end
 
     %w[sha512 sha256 md5].each do |digest|

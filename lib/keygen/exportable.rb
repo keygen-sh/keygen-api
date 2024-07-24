@@ -29,15 +29,29 @@ module Keygen
         def imports(callback) = import_callbacks << callback
 
         def attributes_for_export(attributes)
-          export_callbacks.reduce(attributes) do |attrs, callback|
-            attrs.map { callback.call(_1.symbolize_keys) }
+          export_callbacks.reduce(attributes.map(&:symbolize_keys)) do |attrs, callback|
+            attrs.map(&callback)
           end
         end
 
         def attributes_for_import(attributes)
-          import_callbacks.reduce(attributes) do |attrs, callback|
-            attrs.map { callback.call(_1.symbolize_keys) }
+          import_callbacks.reduce(attributes.map(&:symbolize_keys)) do |attrs, callback|
+            attrs.map(&callback)
           end
+        end
+
+        def import_all!(attributes)
+          res = insert_all!(attributes_for_import(attributes), returning: %i[id])
+          ids = res.rows.flatten
+
+          where(id: ids).to_a
+        end
+
+        def import_all(attributes)
+          res = insert_all(attributes_for_import(attributes), returning: %i[id])
+          ids = res.rows.flatten
+
+          where(id: ids).to_a
         end
       end
     end
