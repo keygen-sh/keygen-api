@@ -92,7 +92,7 @@ module Keygen
 
         def export_associations(owner, writer:)
           owner.class.reflect_on_all_associations.each do |reflection|
-            next unless exportable_reflection?(reflection)
+            next unless portable_reflection?(reflection)
 
             association = owner.association(reflection.name)
             scope       = association.scope
@@ -105,8 +105,8 @@ module Keygen
           end
         end
 
-        def exportable_reflection?(reflection)
-          Exportable.exportable_classes.include?(reflection.klass) &&
+        def portable_reflection?(reflection)
+          PortableClass.portable_classes.include?(reflection.klass) &&
             !reflection.polymorphic? &&
             !reflection.union_of?
         end

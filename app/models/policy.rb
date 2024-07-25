@@ -6,7 +6,7 @@ class Policy < ApplicationRecord
   class UnsupportedPoolError < StandardError; end
   class EmptyPoolError < StandardError; end
 
-  include Keygen::Exportable
+  include Keygen::PortableClass
   include Denormalizable
   include Environmental
   include Accountable

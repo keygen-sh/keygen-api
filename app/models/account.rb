@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Account < ApplicationRecord
-  include Keygen::Exportable
+  include Keygen::PortableClass
   include UnionOf::Macro
   include Welcomeable
   include Limitable
