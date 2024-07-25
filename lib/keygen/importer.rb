@@ -11,6 +11,7 @@ module Keygen
     class InvalidDataError < StandardError; end
     class InvalidChunkError < InvalidDataError; end
     class InvalidRecordError < StandardError; end
+    class UnsupportedRecordError < InvalidRecordError; end
     class DuplicateRecordError < InvalidRecordError; end
     class InvalidAccountError < InvalidRecordError; end
 
