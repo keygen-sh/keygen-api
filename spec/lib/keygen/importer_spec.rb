@@ -187,5 +187,21 @@ describe Keygen::Importer do
       expect { Keygen::Importer.import(from: export, account_id:) }
         .to raise_error Keygen::Importer::DuplicateRecordError
     end
+
+    it 'should raise on unsupported record' do
+      export = Keygen::Exporter.export(account)
+      account.destroy!
+
+      # splice in an unsupported record
+      chunk      = Keygen::Exporter::V1::Serializer.new.serialize(Plan.name, [{ id: SecureRandom.uuid }])
+      chunk_size = [chunk.bytesize].pack('Q>')
+
+      export.seek(0, IO::SEEK_END)
+      export.write(chunk_size + chunk)
+      export.seek(0, IO::SEEK_SET)
+
+      expect { Keygen::Importer.import(from: export, account_id:) }
+        .to raise_error Keygen::Importer::UnsupportedRecordError
+    end
   end
 end

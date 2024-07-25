@@ -35,6 +35,8 @@ module Keygen
           klass = class_name.constantize
 
           klass.transaction do
+            raise UnsupportedRecordError unless importable_class?(klass)
+
             records = klass.import_all!(attributes)
 
             validate_records!(records)
@@ -52,6 +54,10 @@ module Keygen
             # assert records are for account
             raise InvalidRecordError unless records.all? { _1.account_id == account_id }
           end
+        end
+
+        def importable_class?(klass)
+          PortableClass.portable_classes.include?(klass)
         end
       end
     end
