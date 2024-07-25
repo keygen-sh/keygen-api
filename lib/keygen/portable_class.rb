@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 module Keygen
-  module Exportable
-    EXPORTABLE_CLASSES = Set.new
+  # PortableClass defines an exportable and importable class.
+  module PortableClass
+    PORTABLE_CLASSES = Set.new
 
-    def self.exportable_classes = EXPORTABLE_CLASSES
+    def self.portable_classes = PORTABLE_CLASSES
     def self.included(klass)
       raise ArgumentError, "cannot be used outside of model (got #{klass.ancestors})" unless
         klass < ::ActiveRecord::Base
 
-      EXPORTABLE_CLASSES << klass
+      PORTABLE_CLASSES << klass
 
       klass.include(Concern)
     end

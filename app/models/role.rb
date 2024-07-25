@@ -2,7 +2,7 @@
 
 class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
-  include Keygen::Exportable
+  include Keygen::PortableClass
   include Dirtyable
 
   USER_ROLES        = %w[user admin developer read_only sales_agent support_agent].freeze
