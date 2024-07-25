@@ -12,6 +12,7 @@ module Keygen
     class InvalidChunkError < InvalidDataError; end
     class InvalidRecordError < StandardError; end
     class DuplicateRecordError < InvalidRecordError; end
+    class InvalidAccountError < InvalidRecordError; end
 
     extend self
 
