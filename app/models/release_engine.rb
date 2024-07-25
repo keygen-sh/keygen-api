@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseEngine < ApplicationRecord
-  include Keygen::Exportable
+  include Keygen::PortableClass
   include Accountable
   include Limitable
   include Orderable
