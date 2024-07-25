@@ -45,12 +45,12 @@ module Keygen
 
         def validate_records!(records)
           case records
-          in [Account => account] if account.id == account_id
-            # ok -- account is expected account
-          in [*] if records.all? { !_1.respond_to?(:account_id) || _1.account_id == account_id }
-            # ok -- records are for account
+          in [Account => account]
+            # assert account is expected account
+            raise InvalidAccountError unless account.id == account_id
           else
-            raise InvalidRecordError
+            # assert records are for account
+            raise InvalidRecordError unless records.all? { _1.account_id == account_id }
           end
         end
       end
