@@ -54,9 +54,9 @@ describe Keygen::Importer do
     let(:secret_key) { SecureRandom.hex }
 
     before do
-      create_list(:user, rand(1..100), account:)
-      create_list(:license, rand(1..100), account:)
-      create_list(:machine, rand(1..100), account:)
+      create_list(:user, 5, account:)
+      create_list(:license, 5, account:)
+      create_list(:machine, 5, account:)
     end
 
     it 'should import with valid secret key' do
@@ -84,9 +84,9 @@ describe Keygen::Importer do
 
   context 'without encryption' do
     before do
-      create_list(:user, rand(1..100), account:)
-      create_list(:license, rand(1..100), account:)
-      create_list(:machine, rand(1..100), account:)
+      create_list(:user, 5, account:)
+      create_list(:license, 5, account:)
+      create_list(:machine, 5, account:)
     end
 
     it 'should import without secret key' do
@@ -121,7 +121,7 @@ describe Keygen::Importer do
       account.destroy!
 
       expect { Keygen::Importer.import(from: export, account_id: SecureRandom.uuid) }
-        .to raise_error Keygen::Importer::InvalidRecordError
+        .to raise_error Keygen::Importer::InvalidAccountError
     end
 
     it 'should raise for duplicate account' do
@@ -145,7 +145,7 @@ describe Keygen::Importer do
       export = StringIO.new(export_a.read + export_b.read)
 
       expect { Keygen::Importer.import(from: export, account_id:) }
-        .to raise_error Keygen::Importer::InvalidRecordError
+        .to raise_error Keygen::Importer::InvalidAccountError
     end
   end
 
@@ -154,15 +154,15 @@ describe Keygen::Importer do
     let(:other_account_id) { other_account.id }
 
     before do
-      create_list(:license, rand(1..10), account: other_account)
-      create_list(:license, rand(1..10), account:)
+      create_list(:license, 5, account: other_account)
+      create_list(:license, 5, account:)
     end
 
     it 'should raise for invalid record' do
       export_a = Keygen::Exporter.export(account)
       export_b = Keygen::Exporter.export(other_account)
 
-      account.destroy! # destroy licenses
+      account.destroy! # destroy associations
       other_account.destroy!
 
       # skip version
@@ -182,9 +182,9 @@ describe Keygen::Importer do
     it 'should raise for duplicate record' do
       export = Keygen::Exporter.export(account)
 
-      account.delete # keep licenses
+      account.delete # keep associations
 
-      expect { Keygen::Importer.import(from: export, account_id: SecureRandom.uuid) }
+      expect { Keygen::Importer.import(from: export, account_id:) }
         .to raise_error Keygen::Importer::DuplicateRecordError
     end
   end

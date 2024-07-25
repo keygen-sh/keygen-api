@@ -30,9 +30,12 @@ class Role < ApplicationRecord
     inverse_of: :role,
     autosave: true
 
-  # FIXME(ezekg) roles should have an account_id foreign key
-  has_one :account,
-    through: :resource
+  # FIXME(ezekg) should have an account_id foreign key
+  delegate :account, :account_id,
+    :default_permissions, :default_permission_ids,
+    :allowed_permissions, :allowed_permission_ids,
+    allow_nil: true,
+    to: :resource
 
   accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
   tracks_nested_attributes_for :role_permissions
@@ -74,12 +77,6 @@ class Role < ApplicationRecord
       in: -> role { role.allowed_permission_ids },
       message: 'unsupported permissions',
     }
-
-  delegate :account, :account_id,
-    :default_permissions, :default_permission_ids,
-    :allowed_permissions, :allowed_permission_ids,
-    allow_nil: true,
-    to: :resource
 
   ##
   # permissions= sets the role's permissions. It does not save automatically.
