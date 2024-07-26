@@ -18,8 +18,6 @@ loop do
     domain  = Faker::Internet.unique.domain_name
     account = Account.create!(
       users_attributes: Array.new(rand(1..5)) {{ email: Faker::Internet.unique.email(domain:), password: Faker::Internet.password }},
-      billing_attributes: { state: %w[subscribed canceled].sample },
-      plan_attributes: { name: %w[Ent Std Dev].sample, price: 1 },
       name: Faker::Company.name,
     )
 
