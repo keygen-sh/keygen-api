@@ -2,6 +2,7 @@
 
 class Account < ApplicationRecord
   include Keygen::PortableClass
+  include NullAssociation::Macro
   include UnionOf::Macro
   include Welcomeable
   include Limitable
@@ -10,7 +11,7 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  belongs_to :plan, optional: true
+  belongs_to :plan, optional: true, null_object: NullPlan.name
   has_one :billing
   has_many :environments, dependent: :destroy_async
   has_many :webhook_endpoints, dependent: :destroy_async
