@@ -1,6 +1,31 @@
 # frozen_string_literal: true
 
 module NullAssociation
+  module Decorator
+    extend self
+
+    def [](association_name, null_object: nil)
+      Module.new do
+        define_method association_name do
+          super().presence || case null_object
+                              in String => class_name
+                                class_name.classify.constantize.new
+                              in Class => klass if klass < Singleton
+                                klass.instance
+                              in Singleton => singleton
+                                singleton
+                              in Class => klass
+                                klass.new
+                              in Object => instance
+                                instance
+                              else
+                                nil
+                              end
+        end
+      end
+    end
+  end
+
   module Concern
     extend ActiveSupport::Concern
 
@@ -12,40 +37,21 @@ module NullAssociation
           raise ArgumentError, 'must be :optional to use :null_object'
         end
 
+        # generate getter
         super(name, scope, **options, &extension)
 
-        define_method name do
-          super().presence || to_null_object(null_object)
-        end
+        # decorate getter
+        include Decorator[name, null_object:]
       end
 
       def has_one(name, scope = nil, null_object: nil, **options, &extension)
         return super(name, scope, **options, &extension) if null_object.nil?
 
+        # generate getter
         super(name, scope, **options, &extension)
 
-        define_method name do
-          super().presence || to_null_object(null_object)
-        end
-      end
-    end
-
-    included do
-      def to_null_object(null_object)
-        case null_object
-        in String => class_name
-          class_name.classify.constantize.new
-        in Class => klass if klass < Singleton
-          klass.instance
-        in Singleton => singleton
-          singleton
-        in Class => klass
-          klass.new
-        in Object => instance
-          instance
-        else
-          nil
-        end
+        # decorate getter
+        include Decorator[name, null_object:]
       end
     end
   end
