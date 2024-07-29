@@ -21,7 +21,7 @@ describe NullAssociation do
 
     context 'with a class' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         belongs_to :tmp_plan, optional: true, null_object: TmpNullPlan
       end
@@ -41,7 +41,7 @@ describe NullAssociation do
 
     context 'with a string' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         belongs_to :tmp_plan, optional: true, null_object: 'TmpNullPlan'
       end
@@ -65,7 +65,7 @@ describe NullAssociation do
       end
 
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         belongs_to :tmp_plan, optional: true, null_object: TmpNullPlanSingleton.instance
       end
@@ -87,7 +87,7 @@ describe NullAssociation do
       let(:tmp_null_plan) { TmpNullPlan.new }
 
       temporary_model :tmp_account do |context|
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         belongs_to :tmp_plan, optional: true, null_object: context.tmp_null_plan
       end
@@ -107,7 +107,7 @@ describe NullAssociation do
 
     context 'without :optional' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
       end
 
       it 'should raise' do
@@ -118,7 +118,7 @@ describe NullAssociation do
 
     context 'with :required' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
       end
 
       it 'should raise' do
@@ -143,7 +143,7 @@ describe NullAssociation do
 
     context 'with a class' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         has_one :tmp_billing, null_object: TmpNullBilling
       end
@@ -163,7 +163,7 @@ describe NullAssociation do
 
     context 'with a string' do
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         has_one :tmp_billing, null_object: 'TmpNullBilling'
       end
@@ -187,7 +187,7 @@ describe NullAssociation do
       end
 
       temporary_model :tmp_account do
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         has_one :tmp_billing, null_object: TmpNullBillingSingleton.instance
       end
@@ -209,7 +209,7 @@ describe NullAssociation do
       let(:tmp_null_billing) { TmpNullBilling.new }
 
       temporary_model :tmp_account do |context|
-        include NullAssociation::Macro
+        include NullAssociation::Concern
 
         has_one :tmp_billing, null_object: context.tmp_null_billing
       end

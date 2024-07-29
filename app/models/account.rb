@@ -2,7 +2,7 @@
 
 class Account < ApplicationRecord
   include Keygen::PortableClass
-  include NullAssociation::Macro
+  include NullAssociation::Concern
   include UnionOf::Macro
   include Welcomeable
   include Limitable

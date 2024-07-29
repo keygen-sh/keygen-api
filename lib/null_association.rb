@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module NullAssociation
-  module Macro
+  module Concern
     extend ActiveSupport::Concern
 
     class_methods do
