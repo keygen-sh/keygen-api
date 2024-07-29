@@ -24,14 +24,25 @@ module TemporaryTables
       def temporary_model(name, table_name: name.to_s.pluralize, base_class: ActiveRecord::Base, &extension)
         class_name = name.to_s.classify
 
-        before do
+        before do |example|
           klass = Class.new *base_class do
                     define_method(:table_name) { table_name } unless table_name.nil?
                     define_method(:name)       { class_name }
                   end
 
           unless extension.nil?
-            klass.class_eval(&extension)
+            # pass in an example context so that vars can be accessed
+            context = Class.new do
+                        define_method(:respond_to_missing?) do |method_name|
+                          example.instance_exec { respond_to?(method_name) }
+                        end
+
+                        define_method(:method_missing) do |method_name|
+                          example.instance_exec { send(method_name) }
+                        end
+                      end
+
+            klass.module_exec(context.new, &extension)
           end
 
           stub_const(class_name, klass)
