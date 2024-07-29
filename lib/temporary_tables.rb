@@ -26,8 +26,8 @@ module TemporaryTables
 
         before do |example|
           klass = Class.new *base_class do
-                    define_method(:table_name) { table_name } unless table_name.nil?
-                    define_method(:name)       { class_name }
+                    define_singleton_method(:table_name) { table_name } unless table_name.nil?
+                    define_singleton_method(:name)       { class_name }
                   end
 
           unless extension.nil?
