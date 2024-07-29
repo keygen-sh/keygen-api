@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module NullAssociation
-  class NullObject
-    def nil?                            = true # considered nil when asked
-    def respond_to_method_missing?(...) = true # respond to everything
-    def method_missing(...)             = nil
-  end
-
   module Macro
     extend ActiveSupport::Concern
 
