@@ -12,7 +12,7 @@ class Account < ApplicationRecord
   include Billable
 
   belongs_to :plan, optional: true, null_object: NullPlan.name
-  has_one :billing
+  has_one :billing, null_object: NullBilling.name
   has_many :environments, dependent: :destroy_async
   has_many :webhook_endpoints, dependent: :destroy_async
   has_many :webhook_events, dependent: :destroy_async
@@ -280,31 +280,10 @@ class Account < ApplicationRecord
     total_licensed_users
   end
 
-  def trialing_or_free?
-    return true if billing.nil?
-
-    return (billing.trialing? && billing.card.nil?) ||
-            plan.free?
-  end
-
-  def free?
-    return false if billing.nil?
-
-    plan.free?
-  end
-
-  def paid?
-    return false if billing.nil?
-
-    return (billing.active? || billing.card.present?) &&
-           plan.paid?
-  end
-
-  def ent?
-    return false if billing.nil?
-
-    return plan.ent?
-  end
+  def trialing_or_free? = (billing.trialing? && billing.card.nil?) || plan.free?
+  def paid?             = (billing.active? || billing.card.present?) && plan.paid?
+  def free?             = plan.free?
+  def ent?              = plan.ent?
 
   def protected?
     protected
