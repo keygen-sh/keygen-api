@@ -6,199 +6,188 @@ require 'spec_helper'
 require_dependency Rails.root / 'lib' / 'null_association'
 
 describe NullAssociation do
-  subject do
-    Class.new ActiveRecord::Base do
-      def self.table_name = 'accounts'
-      def self.name       = 'Account'
-
-      include NullAssociation::Macro
-    end
-  end
-
   describe '.belongs_to' do
-    let(:null_plan_class) { NullPlan }
-    let(:plan_class)      { Plan }
+    temporary_table :tmp_accounts do |t|
+      t.references :tmp_plan
+      t.string :name
+    end
+
+    temporary_table :tmp_plans do |t|
+      t.string :name
+    end
+
+    temporary_model :tmp_plan
+    temporary_model :tmp_null_plan, table_name: nil, base_class: nil
 
     context 'with a class' do
-      subject do
-        null_object = null_plan_class
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
 
-        super().tap do |klass|
-          klass.belongs_to :plan, optional: true, null_object:
-        end
+        belongs_to :tmp_plan, optional: true, null_object: TmpNullPlan
       end
 
       it 'should return a null object for a nil association' do
-        instance = subject.new(plan: nil)
+        instance = TmpAccount.new(tmp_plan: nil)
 
-        expect(instance.plan).to be_a null_plan_class
+        expect(instance.tmp_plan).to be_a TmpNullPlan
       end
 
       it 'should not return a null object for a present association' do
-        instance = subject.new(plan: plan_class.new)
+        instance = TmpAccount.new(tmp_plan: TmpPlan.new)
 
-        expect(instance.plan).to be_a plan_class
+        expect(instance.tmp_plan).to be_a TmpPlan
       end
     end
 
     context 'with a string' do
-      subject do
-        null_object = null_plan_class.name
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
 
-        super().tap do |klass|
-          klass.belongs_to :plan, optional: true, null_object:
-        end
+        belongs_to :tmp_plan, optional: true, null_object: 'TmpNullPlan'
       end
 
       it 'should return a null object for a nil association' do
-        instance = subject.new(plan: nil)
+        instance = TmpAccount.new(tmp_plan: nil)
 
-        expect(instance.plan).to be_a null_plan_class
+        expect(instance.tmp_plan).to be_a TmpNullPlan
       end
 
       it 'should not return a null object for a present association' do
-        instance = subject.new(plan: plan_class.new)
+        instance = TmpAccount.new(tmp_plan: TmpPlan.new)
 
-        expect(instance.plan).to be_a plan_class
+        expect(instance.tmp_plan).to be_a TmpPlan
       end
     end
 
     # FIXME(ezekg) implement support for singletons?
     context 'with a singleton' do
-      subject do
-        null_object = Class.new(null_plan_class) { include Singleton }
-                           .instance
+      temporary_model :tmp_null_plan_singleton, table_name: nil, base_class: nil do
+        include Singleton
+      end
 
-        super().tap do |klass|
-          klass.belongs_to :plan, optional: true, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.belongs_to :tmp_plan, optional: true, null_object: TmpNullPlanSingleton.instance }
+          .to raise_error ArgumentError
       end
     end
 
     # FIXME(ezekg) implement support for instances?
     context 'with an instance' do
-      subject do
-        null_object = null_plan_class.new
-
-        super().tap do |klass|
-          klass.belongs_to :plan, optional: true, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.belongs_to :tmp_plan, optional: true, null_object: TmpNullPlan.new }
+          .to raise_error ArgumentError
       end
     end
 
     context 'without :optional' do
-      subject do
-        null_object = null_plan_class
-
-        super().tap do |klass|
-          klass.belongs_to :plan, optional: false, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.belongs_to :tmp_plan, optional: false, null_object: TmpNullPlan }
+          .to raise_error ArgumentError
       end
     end
 
     context 'with :required' do
-      subject do
-        null_object = null_plan_class
-
-        super().tap do |klass|
-          klass.belongs_to :plan, required: true, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.belongs_to :tmp_plan, required: true, null_object: TmpNullPlan }
+          .to raise_error ArgumentError
       end
     end
   end
 
   describe '.has_one' do
-    let(:null_billing_class) { NullPlan } # FIXME(ezekg) NullBilling doesn't exist
-    let(:billing_class)      { Billing }
+    temporary_table :tmp_accounts do |t|
+      t.string :name
+    end
+
+    temporary_table :tmp_billings do |t|
+      t.references :tmp_account
+      t.string :name
+    end
+
+    temporary_model :tmp_billing
+    temporary_model :tmp_null_billing, table_name: nil, base_class: nil
 
     context 'with a class' do
-      subject do
-        null_object = null_billing_class
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
 
-        super().tap do |klass|
-          klass.has_one :billing, null_object:
-        end
+        has_one :tmp_billing, null_object: TmpNullBilling
       end
 
       it 'should return a null object for a nil association' do
-        instance = subject.new(billing: nil)
+        instance = TmpAccount.new(tmp_billing: nil)
 
-        expect(instance.billing).to be_a null_billing_class
+        expect(instance.tmp_billing).to be_a TmpNullBilling
       end
 
       it 'should not return a null object for a present association' do
-        instance = subject.new(billing: billing_class.new)
+        instance = TmpAccount.new(tmp_billing: TmpBilling.new)
 
-        expect(instance.billing).to be_a billing_class
+        expect(instance.tmp_billing).to be_a TmpBilling
       end
     end
 
     context 'with a string' do
-      subject do
-        null_object = null_billing_class.name
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
 
-        super().tap do |klass|
-          klass.has_one :billing, null_object:
-        end
+        has_one :tmp_billing, null_object: 'TmpNullBilling'
       end
 
       it 'should return a null object for a nil association' do
-        instance = subject.new(billing: nil)
+        instance = TmpAccount.new(tmp_billing: nil)
 
-        expect(instance.billing).to be_a null_billing_class
+        expect(instance.tmp_billing).to be_a TmpNullBilling
       end
 
       it 'should not return a null object for a present association' do
-        instance = subject.new(billing: billing_class.new)
+        instance = TmpAccount.new(tmp_billing: TmpBilling.new)
 
-        expect(instance.billing).to be_a billing_class
+        expect(instance.tmp_billing).to be_a TmpBilling
       end
     end
 
     # FIXME(ezekg) implement support for singletons?
     context 'with a singleton' do
-      subject do
-        null_object = Class.new(null_billing_class) { include Singleton }
-                           .instance
+      temporary_model :tmp_null_billing_singleton, table_name: nil, base_class: nil do
+        include Singleton
+      end
 
-        super().tap do |klass|
-          klass.has_one :billing, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.has_one :tmp_billing, null_object: TmpNullBillingSingleton.instance }
+          .to raise_error ArgumentError
       end
     end
 
     # FIXME(ezekg) implement support for instances?
     context 'with an instance' do
-      subject do
-        null_object = null_billing_class.new
-
-        super().tap do |klass|
-          klass.has_one :billing, null_object:
-        end
+      temporary_model :tmp_account do
+        include NullAssociation::Macro
       end
 
       it 'should raise' do
-        expect { subject }.to raise_error ArgumentError
+        expect { TmpAccount.has_one :tmp_billing, null_object: TmpNullBilling.new }
+          .to raise_error ArgumentError
       end
     end
   end

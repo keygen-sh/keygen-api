@@ -45,6 +45,7 @@ RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
+  config.include TemporaryTables::Methods
   config.include Rails.application.routes.url_helpers
   config.include AuthorizationHelper, type: :policy
   config.include ApplicationHelper
