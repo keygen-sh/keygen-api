@@ -19,12 +19,7 @@ module Billable
       delegate "#{state}",  to: :billing, allow_nil: true
     end
 
-    def active?
-       # The only time this could happen is if Stripe hasn't sent us a "customer.created" event yet
-      return true if billing.nil?
-
-      billing.active?
-    end
+    def active? = billing.active?
   end
 
   def initialize_billing
