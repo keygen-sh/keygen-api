@@ -14,17 +14,8 @@ module NullAssociation
 
         super(name, scope, **options, &extension)
 
-        null_class = case null_object
-                     in Class => klass
-                       klass
-                     in String => class_name
-                       class_name.classify.constantize
-                     else
-                       raise ArgumentError, 'invalid :null_object (expected class or string)'
-                     end
-
         define_method name do
-          super().presence || null_class.new
+          super().presence || to_null_object(null_object)
         end
       end
 
@@ -33,17 +24,27 @@ module NullAssociation
 
         super(name, scope, **options, &extension)
 
-        null_class = case null_object
-                     in Class => klass
-                       klass
-                     in String => class_name
-                       class_name.classify.constantize
-                     else
-                       raise ArgumentError, 'invalid :null_object (expected class or string)'
-                     end
-
         define_method name do
-          super().presence || null_class.new
+          super().presence || to_null_object(null_object)
+        end
+      end
+    end
+
+    included do
+      def to_null_object(null_object)
+        case null_object
+        in String => class_name
+          class_name.classify.constantize.new
+        in Class => klass if klass < Singleton
+          klass.instance
+        in Singleton => singleton
+          singleton
+        in Class => klass
+          klass.new
+        in Object => instance
+          instance
+        else
+          nil
         end
       end
     end
