@@ -87,9 +87,7 @@ namespace :keygen do
           password = getp
 
           account = Account.create!(
-            billing_attributes: { state: 'subscribed' },
             users_attributes: [{ email:, password: }],
-            plan_attributes: { name: 'Ent 0', price: 1 },
             protected: true,
             id:,
           )
