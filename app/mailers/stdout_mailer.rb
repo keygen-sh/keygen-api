@@ -846,6 +846,8 @@ class StdoutMailer < ApplicationMailer
 
           https://github.com/keygen-sh/keygen-api/releases/tag/v1.3.0
 
+        We'll cut another release soon, licensed under FCL.
+
         Until next time.
 
         --
