@@ -53,7 +53,7 @@ namespace :keygen do
           StdoutMailer.issue_eight(subscriber:)
                       .deliver_later(
                         # Fan out deliveries
-                        in: rand(1.minute..3.hours),
+                        in: rand(1.minute..8.hours),
                       )
 
           sleep 0.1
