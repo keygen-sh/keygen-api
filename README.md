@@ -224,9 +224,6 @@ You can...
 3. modify Keygen to add additional functionality.
 4. fork Keygen into a private repo.
 
-There's no clause that requires you to Open Source modifications made to Keygen
-or other derivative works.
-
 If the FCL happens to not work for your company or use-case, please [reach out][sales].
 
 The license is available [here](https://keygen.sh/license/).
