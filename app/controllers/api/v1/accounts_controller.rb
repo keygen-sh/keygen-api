@@ -3,7 +3,7 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
     before_action :scope_to_current_account!, only: %i[show update destroy]
-    before_action :authenticate_with_token!, only: %i[show update destroy]
+    before_action :authenticate!, only: %i[show update destroy]
     before_action :set_account, only: %i[show update destroy]
 
     def show

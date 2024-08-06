@@ -6,7 +6,7 @@ module Api::V1::ReleaseEngines
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token
+    before_action :authenticate
     before_action :set_package, only: %i[show]
 
     def index
