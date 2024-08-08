@@ -210,12 +210,28 @@ class WebhookWorker < BaseWorker
       last_response_body: 'NET_UNREACH',
       status: 'FAILED',
     )
+  rescue Errno::EHOSTUNREACH # Stop sending requests when the host is unreachable
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=HOST_UNREACH"
+
+    event.update!(
+      last_response_code: nil,
+      last_response_body: 'HOST_UNREACH',
+      status: 'FAILED',
+    )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=DNS_ERROR"
 
     event.update!(
       last_response_code: nil,
       last_response_body: 'DNS_ERROR',
+      status: 'FAILED',
+    )
+  rescue EOFError # Stop sending requests if endpoint is sending an EOF
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=EOF_ERROR"
+
+    event.update!(
+      last_response_code: nil,
+      last_response_body: 'EOF_ERROR',
       status: 'FAILED',
     )
   end
