@@ -12,6 +12,7 @@ class ResolveAccountService < BaseService
     case
     when Keygen.singleplayer?
       account_id = request.params[:account_id] ||
+                   request.session[:account_id] ||
                    ENV['KEYGEN_ACCOUNT_ID']
       raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
         account_id.present?
@@ -22,7 +23,7 @@ class ResolveAccountService < BaseService
 
       account
     when Keygen.multiplayer?
-      account_id   = request.params[:account_id]
+      account_id   = request.params[:account_id] || request.session[:account_id]
       account_host = request.host
 
       account = find_by_account_cname(account_host) ||

@@ -10,7 +10,7 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: %i[index regenerate regenerate_current]
     before_action :authenticate_with_password_or_token!, only: %i[generate]
-    before_action :authenticate_with_token!, except: %i[generate]
+    before_action :authenticate!, except: %i[generate]
     before_action :set_token, only: %i[show regenerate revoke]
 
     def index
@@ -64,7 +64,8 @@ module Api::V1
         end
       end
       param :meta, type: :hash, optional: true do
-        param :otp, type: :string
+        param :provider, type: :string, optional: true, inclusion: { in: %w[AppleOAuth GitHubOAuth GoogleOAUth MicrosoftOAuth] }
+        param :otp, type: :string, optional: true
       end
     }
     def generate
@@ -93,8 +94,6 @@ module Api::V1
       else
         render_unprocessable_resource token
       end
-    rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
-      render_bad_request
     end
 
     # FIXME(ezekg) Deprecate this route.

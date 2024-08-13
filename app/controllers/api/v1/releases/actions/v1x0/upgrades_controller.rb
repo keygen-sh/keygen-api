@@ -4,7 +4,7 @@ module Api::V1::Releases::Actions::V1x0
   class UpgradesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token
+    before_action :authenticate
     before_action :set_release, only: %i[check_for_upgrade_by_id]
 
     skip_verify_authorized only: %i[

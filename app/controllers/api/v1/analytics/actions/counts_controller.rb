@@ -4,7 +4,7 @@ module Api::V1::Analytics::Actions
   class CountsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!
+    before_action :authenticate!
 
     def count
       authorize! to: :show?, with: Accounts::AnalyticsPolicy

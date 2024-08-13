@@ -6,6 +6,28 @@ module Authentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
+  def authenticate!
+    case
+    when has_password_credentials?
+      authenticate_with_password!
+    when has_session_credentials?
+      authenticate_with_session!
+    else
+      authenticate_with_token!
+    end
+  end
+
+  def authenticate
+    case
+    when has_password_credentials?
+      authenticate_with_password
+    when has_session_credentials?
+      authenticate_with_session
+    else
+      authenticate_with_token
+    end
+  end
+
   def authenticate_with_token!
     case
     when has_bearer_credentials?
@@ -56,7 +78,23 @@ module Authentication
     end
   end
 
+  def authenticate_with_session!
+    authenticate_or_request_with_http_session(&method(:http_session_authenticator))
+  end
+
+  def authenticate_with_session
+    authenticate_with_http_session(&method(:http_session_authenticator))
+  end
+
   private
+
+  def authenticate_or_request_with_http_session(&auth_procedure)
+    authenticate_with_http_session(&auth_procedure) || request_http_token_authentication
+  end
+
+  def authenticate_with_http_session(&auth_procedure)
+    auth_procedure.call(session)
+  end
 
   def authenticate_or_request_with_query_token(&auth_procedure)
     authenticate_with_query_token(&auth_procedure) || request_http_token_authentication
@@ -79,6 +117,29 @@ module Authentication
     auth_procedure.call(license_key)
   end
 
+  def http_session_authenticator(session)
+    return nil if
+      current_account.nil? || session.nil?
+
+    @current_http_scheme = :session
+    @current_http_token  = nil
+    @current_token       = nil
+
+    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+                                .find_by(id: session[:user_id])
+
+    # Currently we only allow 1 session per-user, meaning if the session
+    # nonce doesn't match then the current session is outdated.
+    unless user.present? && user.account_id == session[:account_id] &&
+                            user.session_nonce == session[:nonce]
+      session.destroy # clear cookie
+
+      raise Keygen::Error::InvalidSessionError.new
+    end
+
+    @current_bearer = user
+  end
+
   def query_token_authenticator(query_token)
     return nil if
       current_account.nil? || query_token.blank?
@@ -96,43 +157,42 @@ module Authentication
     end
   end
 
-  def http_password_authenticator(username = nil, password = nil)
+  def http_password_authenticator(email = nil, password = nil)
+    raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization') if
+      email.blank?
+
+    if current_account.sso? && current_account.sso_for?(email) # for JIT-user-provisioning
+      redirect = sso_authorization_url_for(email)
+
+      raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
+    end
+
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
-                                .find_by(email: "#{username}".downcase)
+                                .find_by(email: "#{email}".downcase)
 
     unless user.present?
-      raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
-        header: 'Authorization',
-      )
+      raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization')
+    end
+
+    if user.single_sign_on_enabled?
+      redirect = sso_authorization_url_for(user)
+
+      raise Keygen::Error::SingleSignOnRequiredError.new(links: { redirect: })
     end
 
     if user.second_factor_enabled?
       otp = params.dig(:meta, :otp)
       if otp.nil?
-        raise Keygen::Error::UnauthorizedError.new(
-          detail: 'second factor is required',
-          code: 'OTP_REQUIRED',
-          pointer: '/meta/otp',
-        )
+        raise Keygen::Error::SecondFactorRequiredError.new(pointer: '/meta/otp')
       end
 
       unless user.verify_second_factor(otp)
-        raise Keygen::Error::UnauthorizedError.new(
-          detail: 'second factor must be valid',
-          code: 'OTP_INVALID',
-          pointer: '/meta/otp',
-        )
+        raise Keygen::Error::InvalidSecondFactorError.new(pointer: '/meta/otp')
       end
     end
 
     unless user.password? && user.authenticate(password)
-      raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
-        header: 'Authorization',
-      )
+      raise Keygen::Error::InvalidCredentialsError.new(header: 'Authorization')
     end
 
     @current_bearer = user
@@ -283,6 +343,10 @@ module Authentication
     authentication_scheme == 'license'
   end
 
+  def has_session_credentials?
+    session.key?(:user_id)
+  end
+
   def has_password_credentials?
     return false unless
       has_basic_credentials?
@@ -314,5 +378,16 @@ module Authentication
     auth_value = auth_parts.second
 
     auth_value
+  end
+
+  def sso_authorization_url(email) = Keygen::SSO.authorization_url(account: current_account, provider: sso_provider, email:)
+  def sso_provider                 = request.filtered_parameters.dig(:meta, :provider)
+  def sso_authorization_url_for(user_or_email)
+    case user_or_email
+    in User => user
+      sso_authorization_url(user.email)
+    in String => email
+      sso_authorization_url(email)
+    end
   end
 end

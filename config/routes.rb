@@ -54,8 +54,12 @@ Rails.application.routes.draw do
 
   concern :tauri do
     scope module: :tauri, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
-      get ':package', to: 'upgrades#show'
+      get ':package', to: 'upgrades#show', as: :tauri_upgrade_package
     end
+  end
+
+  concern :sso do
+    get :sso, to: 'sso#callback', as: :sso_callback
   end
 
   concern :v1 do
@@ -477,6 +481,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # Subdomains for authentication (i.e. SSO)
+  scope constraints: { subdomain: 'auth' }, **domain_constraints do
+    # SSO
+    scope module: :auth do
+      concerns :sso
+    end
+  end
+
   scope module: :api do
     namespace :v1 do
       # Health checks
@@ -536,6 +548,16 @@ Rails.application.routes.draw do
       # also used for CNAME routing (under multiplayer mode).
       concerns :v1
     end
+  end
+
+  # Route helper for redirecting to Portal
+  direct :portal do |segment, options|
+    Keygen.portal_url(segment, **options)
+  end
+
+  # Route helpers for redirecting to docs
+  direct :docs do |segment, options|
+    Keygen.docs_url(segment, **options)
   end
 
   %w[500 503].each do |code|
