@@ -396,11 +396,9 @@ class ApplicationController < ActionController::API
 
     # Add additional properties based on code
     case e.code
-    when 'LICENSE_NOT_ALLOWED',
-         'LICENSE_INVALID'
+    when 'LICENSE_INVALID'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
-    when 'TOKEN_NOT_ALLOWED',
-         'TOKEN_INVALID'
+    when 'TOKEN_INVALID'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
     when 'TOKEN_MISSING'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/' }
@@ -408,11 +406,23 @@ class ApplicationController < ActionController::API
 
     render_unauthorized(**kwargs)
   rescue Keygen::Error::ForbiddenError => e
-    if e.detail.present?
-      render_forbidden code: e.code, detail: e.detail
-    else
-      render_forbidden code: e.code
+    kwargs = { code: e.code }
+
+    kwargs[:detail] = e.detail if
+      e.detail.present?
+
+    kwargs[:source] = e.source if
+      e.source.present?
+
+    # Add additional properties based on code
+    case e.code
+    when 'LICENSE_NOT_ALLOWED'
+      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
+    when 'TOKEN_NOT_ALLOWED'
+      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
     end
+
+    render_forbidden(**kwargs)
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
     if e.model.present?

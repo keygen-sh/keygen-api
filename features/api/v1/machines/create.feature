@@ -6322,7 +6322,10 @@ Feature: Create machine
       {
         "title": "Access denied",
         "detail": "Token authentication is not allowed by policy",
-        "code": "TOKEN_NOT_ALLOWED"
+        "code": "TOKEN_NOT_ALLOWED",
+        "links": {
+          "about": "https://keygen.sh/docs/api/authentication/#token-authentication"
+        }
       }
       """
 
@@ -6581,7 +6584,10 @@ Feature: Create machine
       {
         "title": "Access denied",
         "detail": "License key authentication is not allowed by policy",
-        "code": "LICENSE_NOT_ALLOWED"
+        "code": "LICENSE_NOT_ALLOWED",
+        "links": {
+          "about": "https://keygen.sh/docs/api/authentication/#license-authentication"
+        }
       }
       """
 
@@ -6685,7 +6691,10 @@ Feature: Create machine
       {
         "title": "Access denied",
         "detail": "Token authentication is not allowed by policy",
-        "code": "TOKEN_NOT_ALLOWED"
+        "code": "TOKEN_NOT_ALLOWED",
+        "links": {
+          "about": "https://keygen.sh/docs/api/authentication/#token-authentication"
+        }
       }
       """
 
@@ -6725,7 +6734,10 @@ Feature: Create machine
       {
         "title": "Access denied",
         "detail": "License key authentication is not allowed by policy",
-        "code": "LICENSE_NOT_ALLOWED"
+        "code": "LICENSE_NOT_ALLOWED",
+        "links": {
+          "about": "https://keygen.sh/docs/api/authentication/#license-authentication"
+        }
       }
       """
 
