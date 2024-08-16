@@ -2,19 +2,16 @@
 
 class LicenseValidationService < BaseService
 
-  def initialize(license:, scope: nil, skip_touch: false)
+  def initialize(license:, scope: nil)
     @account    = license&.account
     @product    = license&.product
     @license    = license
     @scope      = scope
-    @skip_touch = skip_touch
     self.license.set_last_validated_attributes(last_validated_at: Time.current)
   end
 
   def call
-    res = validate!
-    touch! unless skip_touch?
-    res
+    validate!
   end
 
   private
@@ -23,8 +20,6 @@ class LicenseValidationService < BaseService
               :product,
               :license,
               :scope
-
-  def skip_touch? = !!@skip_touch
 
   def validate!
     return [false, "does not exist", :NOT_FOUND] if license.nil?
@@ -411,11 +406,5 @@ class LicenseValidationService < BaseService
 
     # All good
     return [true, "is valid", :VALID]
-  end
-
-  def touch!
-    return if skip_touch? || license.nil?
-
-    license.persist_last_validated_attributes!
   end
 end

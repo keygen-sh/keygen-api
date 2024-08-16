@@ -14,14 +14,14 @@ module Api::V1::Licenses::Actions
 
       # FIXME(ezekg) Skipping :touch on origin is not a good idea, since
       #              the origin header can be set by anybody.
-      valid, detail, code = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
+      valid, detail, code = LicenseValidationService.call(license: license, scope: false)
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
         valid:,
         detail:,
         code:,
       }
-
+      license.persist_last_validated_attributes! unless origin_is_keygen?
       Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{code}"
 
       Current.resource = license if
@@ -73,6 +73,7 @@ module Api::V1::Licenses::Actions
         detail:,
         code:,
       }
+      license.persist_last_validated_attributes!
 
       if nonce = validation_meta[:nonce]
         meta[:nonce] = nonce
@@ -155,7 +156,7 @@ module Api::V1::Licenses::Actions
         detail:,
         code:,
       }
-
+      license.persist_last_validated_attributes!
       if nonce = validation_meta[:nonce]
         meta[:nonce] = nonce
       end
@@ -190,6 +191,10 @@ module Api::V1::Licenses::Actions
       @license = FindByAliasService.call(scoped_licenses, id: params[:id], aliases: :key)
 
       Current.resource = license
+    end
+
+    def origin_is_keygen?
+      request.headers['origin'] == 'https://app.keygen.sh'
     end
   end
 end
