@@ -127,7 +127,7 @@ class Policy < ApplicationRecord
     PER_USER
   ].freeze
 
-  OVERAGE_STATEGIES = %w[
+  OVERAGE_STRATEGIES = %w[
     ALWAYS_ALLOW_OVERAGE
     ALLOW_1_25X_OVERAGE
     ALLOW_1_5X_OVERAGE
@@ -240,7 +240,7 @@ class Policy < ApplicationRecord
     allow_nil: true
 
   validates :overage_strategy,
-    inclusion: { in: OVERAGE_STATEGIES, message: 'unsupported overage strategy' },
+    inclusion: { in: OVERAGE_STRATEGIES, message: 'unsupported overage strategy' },
     allow_nil: true
 
   validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE for node-locked policy)' },
