@@ -49,7 +49,7 @@ class PolicyEntitlementSerializer < BaseSerializer
 
   relationship :policy do
     linkage always: true do
-      { type: :polices, id: @object.policy_id }
+      { type: :policies, id: @object.policy_id }
     end
     link :related do
       @url_helpers.v1_account_policy_path @object.account_id, @object.policy_id
