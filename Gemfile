@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 ruby '3.3.4'
 
-gem 'rails', '~> 7.1.3.4'
+gem 'rails', '~> 7.2.0-rc1'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.4.2'
 gem 'bcrypt', '~> 3.1.7'
@@ -52,7 +52,7 @@ gem 'kaminari', '~> 1.2.0'
 # Postgres/DB extensions
 gem 'active_record_union'
 gem 'active_record_distinct_on', '~> 1.6'
-gem 'activerecord_where_assoc', '~> 1.1.4'
+gem 'activerecord_where_assoc', '~> 1.1.5'
 gem 'ar_lazy_preload', '~> 2.0'
 gem 'strong_migrations'
 
@@ -111,7 +111,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
-  gem 'bullet', '~> 7.1.6'
+  gem 'bullet', '~> 7.2'
   gem 'parallel_tests', '~> 4.2.1'
   gem 'cuke_modeler', '~> 3.19' # for running `parallel_test --group-by scenarios`
   gem 'faker', '~> 2.20.0'

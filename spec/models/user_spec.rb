@@ -310,6 +310,9 @@ describe User, type: :model do
   end
 
   describe '#destroy' do
+    before { Sidekiq::Testing.inline! }
+    after  { Sidekiq::Testing.fake! }
+
     it 'should destroy owned machines' do
       user    = create(:user, account:)
       license = create(:license, account:)

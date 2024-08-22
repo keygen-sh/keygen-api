@@ -317,7 +317,7 @@ loop do
           request_body: method.in?(%w[POST PUT PATCH]) ? '{"data":null,"meta":{"sample":true}}' : nil,
           response_signature: SecureRandom.base64,
           response_body: '{"data":null,"errors":[],"meta":{"sample":true}}',
-          status: %w[200 201 204 303 302 307 400 401 403 404 422],
+          status: %w[200 201 204 303 302 307 400 401 403 404 422].sample,
           method:,
           url:,
           environment:,
