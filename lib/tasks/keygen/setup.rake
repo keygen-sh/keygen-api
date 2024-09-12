@@ -104,9 +104,9 @@ namespace :keygen do
       end
 
       puts <<~MSG
-        To complete setup, run the following in a shell, or add it to a shell profile:
+        To complete setup, add the following env vars in your shell or to .env:
 
-          #{config.reduce(+'') { |s, (k, v)| s << "export #{k}=#{v}\n  " }.strip.chomp}
+          #{config.reduce(+'') { |s, (k, v)| s << "#{k}=#{v}\n  " }.strip.chomp}
 
       MSG
 
@@ -122,9 +122,7 @@ namespace :keygen do
       end
 
       puts <<~MSG
-        Then run the following to start the server:
-
-          rails s
+        Then start the web and worker processes.
 
         *keygen music intensifies*
       MSG
