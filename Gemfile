@@ -22,6 +22,7 @@ gem 'redis', '~> 4.7.1'
 gem 'request_migrations', '~> 1.1'
 gem 'verbose_migrations'
 gem 'temporary_tables'
+gem 'statement_timeout'
 
 # API params
 gem 'typed_params', '~> 1.2.5'
