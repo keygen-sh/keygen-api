@@ -21,6 +21,7 @@ gem 'redis', '~> 4.7.1'
 # API migrations
 gem 'request_migrations', '~> 1.1'
 gem 'verbose_migrations'
+gem 'temporary_tables'
 
 # API params
 gem 'typed_params', '~> 1.2.5'
