@@ -256,6 +256,5 @@ file.
 [support]: mailto:support@keygen.sh
 [discord]: https://discord.gg/TRrhSaWSsN
 [forum]: https://github.com/keygen-sh/community/discussions
-[contribute]: https://keygen.sh/contrib/
 [license]: https://keygen.sh/license/
 [sales]: mailto:sales@keygen.sh
