@@ -323,6 +323,8 @@ GEM
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    null_association (1.0.0)
+      rails (>= 6.0)
     oj (3.13.23)
     openssl (3.1.0)
     parallel (1.23.0)
@@ -543,6 +545,7 @@ DEPENDENCIES
   lograge
   msgpack (~> 1.7)
   nokogiri (~> 1.16.5)
+  null_association
   oj
   openssl (~> 3.1.0)
   parallel_tests (~> 4.2.1)

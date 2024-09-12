@@ -97,6 +97,9 @@ gem 'lograge'
 gem 'aws-sdk-s3', '~> 1'
 gem 'semverse'
 
+# Misc
+gem 'null_association'
+
 group :production do
   # Monitoring/APM
   gem 'barnes'
