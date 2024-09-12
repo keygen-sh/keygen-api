@@ -1,0 +1,7 @@
+{$KEYGEN_HOST} {
+	tls {$CADDY_ACME_EMAIL:internal}
+	reverse_proxy web:3000
+}
+
+# FIXME: KEYGEN_HOSTS is comma-delimited without spaces, incompatible with Caddy's format.
+# Additional hosts must be manually configured here.
