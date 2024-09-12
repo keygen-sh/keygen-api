@@ -3,7 +3,6 @@
 class Account < ApplicationRecord
   include Keygen::PortableClass
   include NullAssociation::Concern
-  include UnionOf::Macro
   include Welcomeable
   include Limitable
   include Orderable

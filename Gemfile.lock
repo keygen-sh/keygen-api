@@ -491,6 +491,8 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uniform_notifier (1.16.0)
+    union_of (1.0.0)
+      rails (>= 7.0)
     uri (0.12.2)
     verbose_migrations (1.0.1)
       rails (>= 6.0)
@@ -579,6 +581,7 @@ DEPENDENCIES
   timecop (~> 0.9.5)
   tracer
   typed_params (~> 1.2.5)
+  union_of
   uri (>= 0.12.2)
   verbose_migrations
   webmock (~> 3.14.0)
