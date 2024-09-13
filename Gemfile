@@ -20,9 +20,6 @@ gem 'redis', '~> 4.7.1'
 
 # API migrations
 gem 'request_migrations', '~> 1.1'
-gem 'verbose_migrations'
-gem 'temporary_tables'
-gem 'statement_timeout'
 
 # API params
 gem 'typed_params', '~> 1.2.5'
@@ -58,6 +55,9 @@ gem 'active_record_distinct_on', '~> 1.6'
 gem 'activerecord_where_assoc', '~> 1.1.4'
 gem 'ar_lazy_preload', '~> 2.0'
 gem 'strong_migrations'
+gem 'verbose_migrations'
+gem 'temporary_tables'
+gem 'statement_timeout'
 gem 'union_of'
 
 # Pattern matching
