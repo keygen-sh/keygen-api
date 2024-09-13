@@ -25,7 +25,8 @@
 
 # Ignore environment files
 /.env*
-
+/keys.env*
+!.env.example
 # Ignore Redis/DB dumps
 /*.dump
 /*.rdb

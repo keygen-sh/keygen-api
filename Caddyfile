@@ -1,0 +1,3 @@
+api.keygen.localhost
+
+reverse_proxy web:3000

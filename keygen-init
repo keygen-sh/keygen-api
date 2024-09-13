@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -x
+
+echo "Checking if keys.env exists..."
+if ! [ -f /var/keygen/keys.env ]; then
+  echo "keys.env does not exist, initializing values..."
+  cat << EOF > /var/keygen/keys.env
+SECRET_KEY_BASE=$(openssl rand -hex 64)"
+ENCRYPTION_DETERMINISTIC_KEY=$(openssl rand -base64 32)"
+ENCRYPTION_PRIMARY_KEY=$(openssl rand -base64 32)"
+ENCRYPTION_KEY_DERIVATION_SALT=$(openssl rand -base64 32)"
+KEYGEN_ACCOUNT_ID=$(uuidgen)
+EOF
+
+  echo "done."
+  
+  chmod +rw /var/keygen/keys.env
+else
+  echo "keys.env exists, exiting"
+fi

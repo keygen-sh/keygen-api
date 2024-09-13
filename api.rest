@@ -1,0 +1,40 @@
+@host = {{$dotenv KEYGEN_HOST}}
+@adminUser = {{$dotenv KEYGEN_ADMIN_USER}}
+@adminPass = {{$dotenv KEYGEN_ADMIN_PASS}}
+
+# @name ping
+GET https://{{host}}/v1/ping
+
+###
+
+# @name adminlogin
+POST https://{{host}}/v1/tokens
+Authorization: Basic {{adminUser}}:{{adminPass}}
+
+### Get all tokens
+
+@adminToken = {{adminlogin.response.body.data.attributes.token}}
+POST https://{{host}}/v1/tokens
+Authorization: Bearer {{adminToken}}
+
+### Create a user
+POST https://{{host}}/v1/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/vnd.api+json
+Accept: application/vnd.api+json
+
+{
+    "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "jdoe@keygen.sh",
+            "password": "secret"
+          }
+    }
+}
+
+### Get all users
+GET https://{{host}}/v1/users
+Authorization: Bearer {{adminToken}}
