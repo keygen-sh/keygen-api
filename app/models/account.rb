@@ -2,7 +2,6 @@
 
 class Account < ApplicationRecord
   include Keygen::PortableClass
-  include NullAssociation::Concern
   include Welcomeable
   include Limitable
   include Orderable
