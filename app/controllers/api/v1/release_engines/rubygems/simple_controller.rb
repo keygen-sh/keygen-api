@@ -8,24 +8,30 @@ module Api::V1::ReleaseEngines
     before_action :set_gem_package, only: %i[show]
 
     typed_query do
-      param :constraint, type: :string, optional: true
       param :version, type: :string
     end
 
     def show
+      version = params[:version]
+      
+      if version.blank?
+        render_bad_request(title: "Bad request", detail: "is missing", source: { parameter: "version" })
+        return
+      end
+
       authorize! gem_package
 
-      version = params[:version]
-      constraint = params[:constraint]
-
-      # Fetch releases and find the one that matches the version and constraint
+      # Fetch releases and find the one that matches the version
       releases = authorized_scope(gem_package.releases)
-      release = find_compatible_release(releases, version, constraint)
+      release = releases.find_by!(version: version)
       authorize! release
 
       # Fetch artifacts
       artifacts = authorized_scope(release.artifacts)
-      artifact = artifacts.joins(:filetype).where(release_filetypes: { key: 'gem' }).first
+      artifact = artifacts.joins(:filetype)
+                  .where(release_filetypes: { key: %w[gem gz zip] })
+                  .order(created_at: :desc)
+                  .first
       authorize! artifact
 
       # Render JSON response
@@ -61,16 +67,6 @@ module Api::V1::ReleaseEngines
       url.path += "/#{pkg}"
 
       redirect_to url.to_s, status: :temporary_redirect, allow_other_host: true
-    end
-
-    # Finds the most compatible release based on the version and constraint
-    def find_compatible_release(releases, version, constraint)
-      if constraint.present?
-        # If a constraint is provided (e.g., "~> 2.0"), find the best match
-        releases.where('version ~ ?', constraint).find_by!(version: version)
-      else
-        releases.find_by!(version: version)
-      end
     end
   end
 end

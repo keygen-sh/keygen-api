@@ -93,6 +93,22 @@ Feature: Rubygems simple package files
       { "pub_date": "2024-08-15T00:00:00.000Z" }
       """
 
+  Scenario: Endpoint should return error for missing version
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "parameter": "version"
+        }
+      }
+      """
+
   Scenario: License requests versions for a licensed product
     Given the last "product" has the following attributes:
       """
@@ -235,3 +251,4 @@ Feature: Rubygems simple package files
     And I use API version "1.3"
     When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
     Then the response status should be "200"
+
