@@ -10,6 +10,7 @@ class ReleaseEngine < ApplicationRecord
   ENGINES = %w[
     pypi
     tauri
+    rubygems
   ]
 
   has_many :packages,

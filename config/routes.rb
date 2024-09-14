@@ -58,6 +58,12 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :rubygems do
+    scope module: :rubygems, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
+      get 'simple/:package', to: 'simple#show'
+    end
+  end  
+
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
@@ -424,6 +430,9 @@ Rails.application.routes.draw do
       scope :tauri do
         concerns :tauri
       end
+      scope :rubygems do
+        concerns :rubygems
+      end
     end
   end
 
@@ -473,6 +482,18 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :tauri
+      end
+    end
+
+    # Rubygems
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'rubygems.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :rubygems
+        end
+      when Keygen.singleplayer?
+        concerns :rubygems
       end
     end
   end
