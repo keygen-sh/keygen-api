@@ -92,3 +92,146 @@ Feature: Rubygems simple package files
       """
       { "pub_date": "2024-08-15T00:00:00.000Z" }
       """
+
+  Scenario: License requests versions for a licensed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "200"
+
+  Scenario: License requests versions for a closed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://rubygems.org/gems/foo" }
+      """
+
+  Scenario: License requests versions for an open product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "200"
+
+  Scenario: License requests versions for another licensed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://rubygems.org/gems/foo" }
+      """
+
+  Scenario: License requests versions for another closed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://rubygems.org/gems/foo" }
+      """
+
+  Scenario: License requests versions for another open product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "200"
+
+  Scenario: Anonymous requests versions for a licensed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://rubygems.org/gems/foo" }
+      """
+
+  Scenario: Anonymous requests versions for a closed product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "307"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://rubygems.org/gems/foo" }
+      """
+
+  Scenario: Anonymous requests versions for an open product
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "200"
+
+  Scenario: Anonymous requests versions using a previous API version
+    Given the last "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And I use API version "1.3"
+    When I send a GET request to "/accounts/test1/engines/rubygems/simple/foo?version=1.0.0"
+    Then the response status should be "200"
