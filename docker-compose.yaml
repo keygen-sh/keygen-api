@@ -80,6 +80,8 @@ services:
       - caddy_config:/config
     env_file:
       - .env
+    environment:
+      CADDY_HOSTS: "${CADDY_HOSTS:-$KEYGEN_HOST}"
     command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
     depends_on:
       - web
