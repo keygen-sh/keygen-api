@@ -23,7 +23,7 @@ EE is our Enterprise Edition, and it requires a license key to use.
 Keygen EE comes with dedicated support, as well as enterprise-grade features
 like request logs, audit logs, permissions, environments, and more.
 
-I built Keygen to make software licensing accessible to everyone.
+We built Keygen to make software licensing accessible to everyone.
 
 ## Managed hosting with Keygen Cloud
 
