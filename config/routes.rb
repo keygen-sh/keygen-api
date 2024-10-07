@@ -58,6 +58,17 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :raw do
+    scope module: :raw, defaults: { format: :binary } do
+      get ':product_id(/@:package_id)/:release_id/:id', to: 'release_artifacts#show', constraints: {
+        product_id: /[^\/]*/ ,
+        package_id: /[^\/]*/ ,
+        release_id: /[^\/]*/ ,
+        id: /.*/
+      }
+    end
+  end
+
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
@@ -424,6 +435,9 @@ Rails.application.routes.draw do
       scope :tauri do
         concerns :tauri
       end
+      scope :raw do
+        concerns :raw
+      end
     end
   end
 
@@ -473,6 +487,18 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :tauri
+      end
+    end
+
+    # Raw
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'raw.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :raw
+        end
+      when Keygen.singleplayer?
+        concerns :raw
       end
     end
   end

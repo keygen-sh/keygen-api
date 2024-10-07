@@ -10,6 +10,7 @@ class ReleaseEngine < ApplicationRecord
   ENGINES = %w[
     pypi
     tauri
+    raw
   ]
 
   has_many :packages,
