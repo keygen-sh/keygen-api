@@ -173,7 +173,16 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_product, -> product {
-    joins(:product).where(product: { id: product })
+    case product
+    in UUID_RE => product_id
+      joins(:product).where(product: { id: product_id })
+    in Product => product
+      joins(:product).where(product:)
+    in String => code
+      joins(:product).where(product: { code: })
+    else
+      none
+    end
   }
 
   scope :for_release, -> release {
@@ -183,10 +192,7 @@ class ReleaseArtifact < ApplicationRecord
     in Release => release
       where(release:)
     in String => term
-      joins(:release).where(releases: { id: term })
-                     .or(
-                       joins(:release).where(releases: { version: term }),
-                     )
+      joins(:release).where(releases: { version: term })
                      .or(
                        joins(:release).where(releases: { tag: term }),
                      )

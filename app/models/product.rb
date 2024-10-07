@@ -41,6 +41,14 @@ class Product < ApplicationRecord
 
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
 
+  validates :code,
+    exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
+    uniqueness: { case_sensitive: false, scope: :account_id },
+    length: { minimum: 1, maximum: 255 },
+    format: { without: UUID_RE },
+    allow_blank: false,
+    allow_nil: true
+
   validates :name, presence: true
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
