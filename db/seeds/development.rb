@@ -75,7 +75,7 @@ loop do
           name    = "#{product.name} #{Faker::Hacker.unique.noun.capitalize}"
           package = if rand(0..1).zero?
                       engine = if rand(0..1).zero?
-                                { engine_attributes: { key: %w[pypi tauri].sample } }
+                                { engine_attributes: { key: %w[pypi tauri raw].sample } }
                               else
                                 {}
                               end
