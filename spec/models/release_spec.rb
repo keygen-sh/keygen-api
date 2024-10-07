@@ -898,4 +898,176 @@ describe Release, type: :model do
       end
     end
   end
+
+  describe '#version=' do
+    let(:package) { create(:package, product:, account:) }
+
+    context 'when the version does not exist for the product' do
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for the product' do
+      before do
+        create(:release, version: '1.0.0', product:, account:)
+      end
+
+      it 'should not create a release' do
+        expect { create(:release, version: '1.0.0', product:, account:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'when the version does not exist for the product or package' do
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for the product but not the package' do
+      before do
+        create(:release, version: '1.0.0', product:, account:)
+      end
+
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for the package but not the product' do
+      before do
+        create(:release, version: '1.0.0', package:, product:, account:)
+      end
+
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for the package' do
+      before do
+        create(:release, version: '1.0.0', package:, product:, account:)
+      end
+
+      it 'should not create a release' do
+        expect { create(:release, version: '1.0.0', package:, product:, account:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'when the version does exist for another product' do
+      before do
+        create(:release, version: '1.0.0', product: create(:product, account:), account:)
+      end
+
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for another package' do
+      before do
+        create(:release, version: '1.0.0', package: create(:package, product:, account:), product:, account:)
+      end
+
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the version does exist for another account' do
+      before do
+        create(:release, version: '1.0.0', account: create(:account))
+      end
+
+      it 'should create a release' do
+        expect { create(:release, version: '1.0.0', package:, product:, account:) }.to_not raise_error
+      end
+    end
+  end
+
+  describe '#tag=' do
+    let(:package) { create(:package, product:, account:) }
+
+    context 'when the tag does not exist for the product' do
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for the product' do
+      before do
+        create(:release, tag: 'latest', product:, account:)
+      end
+
+      it 'should not create a tagged release' do
+        expect { create(:release, tag: 'latest', product:, account:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'when the tag does not exist for the product or package' do
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for the product but not the package' do
+      before do
+        create(:release, tag: 'latest', product:, account:)
+      end
+
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for the package but not the product' do
+      before do
+        create(:release, tag: 'latest', package:, product:, account:)
+      end
+
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for the package' do
+      before do
+        create(:release, tag: 'latest', package:, product:, account:)
+      end
+
+      it 'should not create a tagged release' do
+        expect { create(:release, tag: 'latest', package:, product:, account:) }.to raise_error ActiveRecord::RecordInvalid
+      end
+    end
+
+    context 'when the tag does exist for another product' do
+      before do
+        create(:release, tag: 'latest', product: create(:product, account:), account:)
+      end
+
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for another package' do
+      before do
+        create(:release, tag: 'latest', package: create(:package, product:, account:), product:, account:)
+      end
+
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', package:, product:, account:) }.to_not raise_error
+      end
+    end
+
+    context 'when the tag does exist for another account' do
+      before do
+        create(:release, tag: 'latest', account: create(:account))
+      end
+
+      it 'should create a tagged release' do
+        expect { create(:release, tag: 'latest', package:, product:, account:) }.to_not raise_error
+      end
+    end
+  end
 end

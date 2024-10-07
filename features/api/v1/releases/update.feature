@@ -240,11 +240,42 @@ Feature: Update release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates the tag of a release with an existing tag
+  Scenario: Admin updates the tag of a release with an existing tag (different products)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "releases"
+    And the last "release" has the following attributes:
+      """
+      { "tag": "dup-tag" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "tag": "dup-tag"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "tag": "dup-tag" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates the tag of a release with an existing tag (same product)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 2 "releases" for the last "product"
     And the last "release" has the following attributes:
       """
       { "tag": "taken-tag" }
