@@ -20,6 +20,10 @@ FactoryBot.define do
       engine { build(:engine, :tauri, account:) }
     end
 
+    trait :raw do
+      engine { build(:engine, :raw, account:) }
+    end
+
     trait :licensed do
       product { build(:product, :licensed, account:, environment:) }
     end
