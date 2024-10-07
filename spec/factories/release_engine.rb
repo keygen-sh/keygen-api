@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :release_engine, aliases: %i[engine] do
     initialize_with { new(**attributes) }
 
-    sequence :key, %w[pypi tauri].cycle
+    sequence :key, %w[pypi tauri raw].cycle
 
     account { NIL_ACCOUNT }
 
@@ -16,6 +16,11 @@ FactoryBot.define do
     trait :tauri do
       name { 'Tauri' }
       key  { 'tairi' }
+    end
+
+    trait :raw do
+      name { 'Raw' }
+      key  { 'raw' }
     end
   end
 end
