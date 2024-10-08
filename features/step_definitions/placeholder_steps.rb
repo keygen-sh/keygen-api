@@ -131,21 +131,30 @@ def parse_placeholders(str, account:, bearer:, crypt:)
       else
         model =
           if account && resource.singularize != 'account'
+            args = case index
+                   in UUID_RE => id
+                     [:find_by, id:]
+                   in nil
+                     [:sample]
+                   else
+                     [:[], index.to_i]
+                   end
+
             case resource.singularize
             when 'constraint'
-              account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.release_entitlement_constraints.all.send(*args)
             when 'component'
-              account.machine_components.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.machine_components.all.send(*args)
             when 'process'
-              account.machine_processes.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.machine_processes.all.send(*args)
             when 'artifact'
-              account.release_artifacts.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.release_artifacts.all.send(*args)
             when 'package'
-              account.release_packages.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.release_packages.all.send(*args)
             when 'engine'
-              account.release_engines.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.release_engines.all.send(*args)
             else
-              account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.send(resource.underscore).all.send(*args)
             end
           else
             resource.singularize

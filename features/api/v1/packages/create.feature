@@ -169,6 +169,56 @@ Feature: Create package
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a package with the raw engine
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/packages" with the following:
+      """
+      {
+        "data": {
+          "type": "packages",
+          "attributes": {
+            "name": "CLI",
+            "key": "cli",
+            "engine": "raw"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "package" with the following relationships:
+      """
+      {
+        "product": {
+          "links": { "related": "/v1/accounts/$account/products/$products[0]" },
+          "data": { "type": "products", "id": "$products[0]" }
+        }
+      }
+      """
+    And the response body should be a "package" with the following attributes:
+      """
+      {
+        "name": "CLI",
+        "key": "cli",
+        "engine": "raw"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a package with a nil engine
     Given the current account is "test1"
     And the current account has 4 "webhook-endpoints"

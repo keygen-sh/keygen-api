@@ -707,6 +707,124 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a duplicate release (by tag, same package)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "package" for the last "product"
+    And the current account has 1 "release" for the last "product" and the last "package"
+    And the first "release" has the following attributes:
+      """
+      { "tag": "latest" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Duplicate Tag",
+            "channel": "stable",
+            "version": "1.0.0",
+            "tag": "latest"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            },
+            "package": {
+              "data": {
+                "type": "packages",
+                "id": "$packages[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "tag already exists",
+        "code": "TAG_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/tag"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a duplicate release (by tag, different package)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 2 "packages" for the last "product"
+    And the current account has 1 "release" for the last "product" and the first "package"
+    And the first "release" has the following attributes:
+      """
+      { "tag": "latest" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Duplicate Tag",
+            "channel": "stable",
+            "version": "1.0.0",
+            "tag": "latest"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            },
+            "package": {
+              "data": {
+                "type": "packages",
+                "id": "$packages[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "release" with the following attributes:
+      """
+      {
+        "name": "Duplicate Tag",
+        "channel": "stable",
+        "tag": "latest",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        }
+      }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate release (by tag, different product)
     Given I am an admin of account "test1"
     And the current account is "test1"
