@@ -58,6 +58,18 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :rubygems do
+    scope module: :rubygems, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
+      get 'prerelease_specs.4.8.gz',               to: 'specs#prerelease_specs', as: :rubygems_prerelease_specs
+      get 'specs.4.8.gz',                          to: 'specs#specs', as: :rubygems_specs
+      get 'latest_specs.4.8.gz',                   to: 'specs#latest_specs', as: :rubygems_latest_specs
+      get 'quick/Marshal.4.8/:package.gemspec.rz', to: 'specs#quick_gemspec', as: :rubygems_quick_gemspec, constraints: { package: /[^\/]+/ }
+      get 'gems/:package.gem',                     to: 'specs#show', as: :rubygems_gem, constraints: { package: /[^\/]+/ }
+      get 'versions',                              to: 'specs#versions', as: :rubygems_versions
+      get 'info/:package',                         to: 'specs#info', as: :rubygems_info
+    end
+  end
+
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
@@ -424,6 +436,9 @@ Rails.application.routes.draw do
       scope :tauri do
         concerns :tauri
       end
+      scope :rubygems do
+        concerns :rubygems
+      end
     end
   end
 
@@ -473,6 +488,17 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :tauri
+      end
+    end
+
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'rubygems.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :rubygems
+        end
+      when Keygen.singleplayer?
+        concerns :rubygems
       end
     end
   end

@@ -19,6 +19,9 @@ class ReleasePackage < ApplicationRecord
   has_many :releases,
     inverse_of: :package,
     dependent: :destroy_async
+  has_many :ordered_releases,
+    -> { order_by_version },
+    class_name: "Release"
   has_many :artifacts,
     through: :releases,
     source: :artifacts
@@ -96,6 +99,7 @@ class ReleasePackage < ApplicationRecord
   scope :for_engine_key, -> key { joins(:engine).where(release_engines: { key: }) }
   scope :pypi,           ->     { for_engine_key('pypi') }
   scope :tauri,          ->     { for_engine_key('tauri') }
+  scope :rubygems,       ->     { for_engine_key('rubygems') }
 
   def engine_id? = release_engine_id?
   def engine_id  = release_engine_id

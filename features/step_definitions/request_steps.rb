@@ -1226,6 +1226,13 @@ Then /^the response body should be an HTML document with the following xpaths:$/
   end
 end
 
+Then /^the response should contain gziped spec file with the following content:$/ do |content|
+  gz = Zlib::GzipReader.new(StringIO.new(last_response.body))
+  uncompressed_string = gz.read
+
+  expect(content.squish.delete(' ')).to eq(Marshal.load(uncompressed_string).to_s.squish.delete(' '))
+end
+
 Given /^the JSON data should be sorted by "([^\"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')
