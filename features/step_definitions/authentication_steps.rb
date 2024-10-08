@@ -47,6 +47,19 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
   raise 'failed to find bearer' if @bearer.nil?
 end
 
+Given /^I am product "([^\"]*)" of account "([^\"]*)"$/ do |product_id, account_id|
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
+  product = FindByAliasService.call(
+    account.products,
+    id: product_id,
+    aliases: :code,
+  )
+
+  @bearer = product
+
+  raise 'failed to find bearer' if @bearer.nil?
+end
+
 Given /^I have 2FA (enabled|disabled)$/ do |second_factor_status|
   @second_factor = SecondFactor.new user: @bearer, account: @bearer.account
   @second_factor.enabled = second_factor_status == 'enabled'
