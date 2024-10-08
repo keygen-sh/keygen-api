@@ -100,6 +100,9 @@ gem 'lograge'
 gem 'aws-sdk-s3', '~> 1'
 gem 'semverse'
 
+# Rubygems release engine
+gem 'compact_index'
+
 # Misc
 gem 'null_association'
 
