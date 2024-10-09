@@ -26,6 +26,27 @@ Feature: Show product
     Then the response status should be "200"
     And the response body should be a "product"
 
+  Scenario: Admin retrieves a product by valid code
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "products"
+    And the last "product" has the following attributes:
+      """
+      { "code": "test" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/test"
+    Then the response status should be "200"
+    And the response body should be a "product"
+
+  Scenario: Admin retrieves a product by invalid code
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "products"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/invalid"
+    Then the response status should be "404"
+
   Scenario: Developer retrieves a product for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
