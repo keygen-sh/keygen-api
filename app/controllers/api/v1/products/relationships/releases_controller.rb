@@ -44,9 +44,11 @@ module Api::V1::Products::Relationships
     def set_product
       scoped_products = authorized_scope(current_account.products)
 
-      @product = scoped_products.find(params[:product_id])
-
-      Current.resource = product
+      Current.resource = @product = FindByAliasService.call(
+        scoped_products,
+        id: params[:product_id],
+        aliases: :code,
+      )
     end
   end
 end

@@ -29,13 +29,15 @@ Feature: Update product
           "type": "products",
           "id": "$products[0].id",
           "attributes": {
-            "name": "New App"
+            "name": "New App",
+            "code": "new-app"
           }
         }
       }
       """
     Then the response status should be "200"
     And the response body should be a "product" with the name "New App"
+    And the response body should be a "product" with the code "new-app"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
