@@ -37,20 +37,24 @@ namespace :keygen do
       end
 
       task eight: %i[environment] do
-        subscribers = User.stdout_subscribers(with_activity_from: 1.year.ago)
+        raise NotImplementedError, 'Stdout issue #8 has already been sent'
+      end
+
+      task nine: %i[environment] do
+        subscribers = User.stdout_subscribers
                           .where('stdout_last_sent_at IS NULL OR stdout_last_sent_at < ?', 7.days.ago)
                           .select(:id, :email, :first_name)
                           .reorder(:email, :created_at)
                           .to_a
 
-        Keygen.logger.info "Sending issue #8 to #{subscribers.size} Stdout subscribers"
+        Keygen.logger.info "Sending issue #9 to #{subscribers.size} Stdout subscribers"
 
         subscribers.each do |subscriber|
           subscriber.touch(:stdout_last_sent_at)
 
-          Keygen.logger.info "Sending issue #8 to #{subscriber.email}"
+          Keygen.logger.info "Sending issue #9 to #{subscriber.email}"
 
-          StdoutMailer.issue_eight(subscriber:)
+          StdoutMailer.issue_nine(subscriber:)
                       .deliver_later(
                         # Fan out deliveries
                         in: rand(1.minute..8.hours),
