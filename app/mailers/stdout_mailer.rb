@@ -860,6 +860,56 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_nine(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "Introducing Keygen Relay",
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Zeke here, founder of Keygen. Exciting news -- we've launched the Linux beta for Keygen Relay! Relay is a new offline-first licensing server that helps facilitate node-locked licensing in environments without internet access, like air-gapped systems -- all backed by Keygen's license files.
+
+        With Relay, you can use a simple CLI to add license files for distribution across nodes on a local network, ensuring that customers stay compliant. There's a REST API, also run on the local network, for your application to consume directly.
+
+        Relay solves the tough problem of managing node activations in places where you can't connect to the internet, avoiding complex workarounds like using mobile devices or tablets for activation using a web portal.
+
+        You can learn more about Relay, including its background and various use cases, and download the beta for Linux on GitHub here:
+
+            https://github.com/keygen-sh/keygen-relay
+
+        If you encounter any problems or have feedback, please open an issue on GitHub, or reply to this email directly.
+
+        Relay is 100% open source under the MIT license.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. we broke 800 stars on GitHub! Star us if you haven't already: https://github.com/keygen-sh/keygen-api
+      TXT
+    )
+  end
+
   private
 
   def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
