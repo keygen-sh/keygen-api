@@ -740,7 +740,7 @@ class Release < ApplicationRecord
           end
         end
 
-        # Filter pre tags if one was specified, e.g. +pkg1, +pkg2, etc.
+        # Filter build tags if one was specified, e.g. +pkg1, +pkg2, etc.
         if build.present?
           build_tags = build.scan(SEMVER_TAG_RE)
 
