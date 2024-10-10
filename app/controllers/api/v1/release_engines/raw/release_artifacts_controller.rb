@@ -10,7 +10,9 @@ module Api::V1::ReleaseEngines
     def show
       authorize! artifact
 
-      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename), status: :see_other
+      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
+        allow_other_host: true, # FIXME(ezekg) this shouldn't be needed since host is in config.hosts?
+        status: :see_other
     end
 
     private

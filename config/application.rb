@@ -108,6 +108,9 @@ module Keygen
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
 
+    # Raise on unsafe redirects
+    config.action_controller.raise_on_open_redirects = true
+
     # Include all helpers
     config.action_controller.include_all_helpers = true
 
