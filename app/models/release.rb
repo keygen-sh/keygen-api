@@ -514,7 +514,7 @@ class Release < ApplicationRecord
                .group(:id)
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
-                   where code in (:codes)
+                   where entitlements.code in (:codes)
                  )
                SQL
           else
