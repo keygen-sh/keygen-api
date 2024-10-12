@@ -13,4 +13,4 @@ AWS_CLIENT_OPTIONS = {
   secret_access_key: AWS_SECRET_ACCESS_KEY,
   region: AWS_REGION,
   endpoint: AWS_ENDPOINT_URL_S3
-}.freeze
+}.compact!.freeze
