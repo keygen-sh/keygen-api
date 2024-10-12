@@ -426,7 +426,7 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.1)
-    ruby-next-core (0.15.2)
+    ruby-next-core (1.0.3)
     ruby_http_client (3.5.5)
     ruby_parser (3.19.0)
       sexp_processor (~> 4.16)
@@ -596,7 +596,7 @@ DEPENDENCIES
   webmock (~> 3.14.0)
 
 RUBY VERSION
-   ruby 3.3.4p94
+   ruby 3.2.4p170
 
 BUNDLED WITH
    2.5.13
