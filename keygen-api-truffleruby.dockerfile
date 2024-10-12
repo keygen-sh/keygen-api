@@ -1,15 +1,15 @@
 # syntax=docker/dockerfile:1
 
-# Base image
-FROM ghcr.io/graalvm/truffleruby-community:24-debian AS base
+ARG GRAALVM_VERSION=24.1.0
+
+# Build image
+FROM ghcr.io/graalvm/truffleruby-community:${GRAALVM_VERSION}-debian AS build
+ARG GRAALVM_VERSION
 
 ENV BUNDLE_WITHOUT="development:test" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_DEPLOYMENT="1" \
     RAILS_ENV="production"
-
-# Build stage
-FROM base AS build
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -31,7 +31,7 @@ RUN \
   bundle config --global retry 5 && \
   CFLAGS="-Wno-error=implicit-function-declaration" && \
   bundle install && \
-  find /usr/local/bundle/ \
+  find /usr/local/bundle/ /opt/truffleruby-${GRAALVM_VERSION} \
     \( \
       -name "*.c" -o \
       -name "*.o" -o \
@@ -42,20 +42,39 @@ RUN \
     \) -delete && \
   chmod -R a+r "${BUNDLE_PATH}"
 
-# Final stage
-FROM base
+# Runtime Stage
+FROM debian:sid-slim
+ARG GRAALVM_VERSION
+
 LABEL maintainer="keygen.sh <oss@keygen.sh>"
 
+ENV BUNDLE_WITHOUT="development:test" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_DEPLOYMENT="1" \
+    RAILS_ENV="production" \
+    LANG=en_US.UTF-8
+
+# Runtime dependencies
 RUN apt-get update && apt-get install -y \
   postgresql-client \
-  tzdata && \
-  apt-get purge -y gcc make && \
+  tzdata \
+  ca-certificates libyaml-0-2 zlib1g libssl3t64 libc6 && \
+# Add keygen user
   groupadd -g 1000 keygen && \
   useradd -m -d /app -g keygen -u 1000 keygen && \
+# Setup gmrc for the keygen user
+  echo "gem: --no-document" > ~/.gemrc && \
+# cleanup
   apt-get autopurge -y && \
   apt-get clean && \
   rm -rf /tmp/*
 
+# Install truffleruby from the build image
+COPY --from=build /usr/lib/locale /usr/lib/locale
+COPY --from=build /opt/truffleruby-$GRAALVM_VERSION /opt/truffleruby-$GRAALVM_VERSION
+ENV PATH=/opt/truffleruby-$GRAALVM_VERSION/bin:$PATH
+
+# Copy keygen bundle
 COPY --from=build --chown=keygen:keygen \
   /usr/local/bundle/ /usr/local/bundle
 
