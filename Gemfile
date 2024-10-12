@@ -35,7 +35,7 @@ gem 'msgpack', '~> 1.7'
 gem 'stripe', '~> 5.43'
 
 # Authorization
-gem 'action_policy', '~> 0.6.3'
+gem 'action_policy', '~> 0.7.0'
 
 # Cryptography
 gem 'openssl', '~> 3.1.0'
