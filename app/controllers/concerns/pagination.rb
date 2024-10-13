@@ -9,7 +9,7 @@ module Pagination
   included do
     # Overload render method to append pagination links to JSONAPI responses
     def render(args, ...)
-      return super(args, ...) unless args in Hash(jsonapi:)
+      return super(args, ...) unless args.is_a?(Hash) && args.key?(:jsonapi)
 
       super(args.merge(links: pagination_links(jsonapi)), ...) unless performed?
     rescue => e # TODO: Let's not catch everything here
