@@ -11,7 +11,7 @@ ENV BUNDLE_WITHOUT="development:test" \
     BUNDLE_DEPLOYMENT="1" \
     RAILS_ENV="production"
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   git \
   build-essential \
   libxml2-dev \
@@ -29,7 +29,6 @@ RUN \
   bundle config --global path "${BUNDLE_PATH}" && \
   bundle config --global deployment "${BUNDLE_DEPLOYMENT}" && \
   bundle config --global retry 5 && \
-  CFLAGS="-Wno-error=implicit-function-declaration" && \
   bundle install && \
   find /usr/local/bundle/ /opt/truffleruby-${GRAALVM_VERSION} \
     \( \
@@ -55,7 +54,7 @@ ENV BUNDLE_WITHOUT="development:test" \
     LANG=en_US.UTF-8
 
 # Runtime dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   tzdata \
   ca-certificates libyaml-0-2 zlib1g libssl3t64 libc6 && \
