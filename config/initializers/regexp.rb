@@ -1,3 +1,5 @@
 # frozen_string_literal: true
 
-Regexp.timeout = 1
+if Regexp.respond_to?(:timeout)
+  Regexp.timeout = 1
+end
