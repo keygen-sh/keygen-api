@@ -82,6 +82,7 @@ class Policy < ApplicationRecord
   RENEWAL_BASES = %w[
     FROM_EXPIRY
     FROM_NOW
+    FROM_NOW_IF_EXPIRED
   ].freeze
 
   TRANSFER_STRATEGIES = %w[
@@ -572,9 +573,8 @@ class Policy < ApplicationRecord
     renewal_basis == 'FROM_EXPIRY'
   end
 
-  def renew_from_now?
-    renewal_basis == 'FROM_NOW'
-  end
+  def renew_from_now?            = renewal_basis == 'FROM_NOW'
+  def renew_from_now_if_expired? = renewal_basis == 'FROM_NOW_IF_EXPIRED'
 
   def supports_token_auth?
     # NOTE(ezekg) Backwards compat
