@@ -614,7 +614,7 @@ class License < ApplicationRecord
     :expire_from_first_activation?,
     :expire_from_first_use?,
     :expire_from_first_download?,
-    :renew_from_expiry?, :renew_from_now?,
+    :renew_from_expiry?, :renew_from_now?, :renew_from_now_if_expired?,
     :supports_token_auth?,
     :supports_license_auth?,
     :supports_mixed_auth?,
@@ -800,21 +800,18 @@ class License < ApplicationRecord
     return false unless requires_check_in?
 
     last_check_in_at < check_in_interval_count.send(check_in_interval).ago
-  rescue NoMethodError
-    nil
   end
 
   def next_check_in_at
     return nil unless requires_check_in?
 
-    last_check_in_at + check_in_interval_count.send(check_in_interval) rescue nil
+    last_check_in_at + check_in_interval_count.send(check_in_interval)
   end
 
   def check_in!
     return false unless requires_check_in?
 
-    self.last_check_in_at = Time.current
-    save
+    update!(last_check_in_at: Time.current)
   end
 
   def renew!
@@ -829,20 +826,15 @@ class License < ApplicationRecord
       self.expiry = expiry + duration
     when renew_from_now?
       self.expiry = now + duration
+    when renew_from_now_if_expired?
+      self.expiry = (expired? ? now : expiry) + duration
     end
 
-    save
+    save!
   end
 
-  def suspend!
-    self.suspended = true
-    save
-  end
-
-  def reinstate!
-    self.suspended = false
-    save
-  end
+  def suspend!   = update!(suspended: true)
+  def reinstate! = update!(suspended: false)
 
   def transfer!(new_policy)
     self.policy = new_policy
