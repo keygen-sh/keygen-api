@@ -603,6 +603,7 @@ class License < ApplicationRecord
   scope :for_license, -> id { where(id: id) }
 
   delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
+    :check_in_interval_count?, :check_in_interval?,
     :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,
     :strict?, :pool?, :node_locked?, :floating?,
     :always_allow_overage?, :allow_overage?, :allow_1_25x_overage?, :allow_1_5x_overage?, :allow_2x_overage?, :no_overage?,
@@ -797,13 +798,17 @@ class License < ApplicationRecord
   end
 
   def check_in_overdue?
-    return false unless requires_check_in?
+    return false unless
+      check_in_interval_count? && check_in_interval? &&
+      last_check_in_at? && requires_check_in?
 
     last_check_in_at < check_in_interval_count.send(check_in_interval).ago
   end
 
   def next_check_in_at
-    return nil unless requires_check_in?
+    return nil unless
+      check_in_interval_count? && check_in_interval? &&
+      last_check_in_at? && requires_check_in?
 
     last_check_in_at + check_in_interval_count.send(check_in_interval)
   end
