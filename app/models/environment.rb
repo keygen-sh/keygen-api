@@ -19,22 +19,22 @@ class Environment < ApplicationRecord
   end
 
   # TODO(ezekg) Should deleting queue up a cancelable background job?
-  has_many :webhook_endpoints,  dependent: :destroy_async
-  has_many :webhook_event,      dependent: :destroy_async
-  has_many :entitlements,       dependent: :destroy_async
-  has_many :groups,             dependent: :destroy_async
-  has_many :products,           dependent: :destroy_async
-  has_many :policies,           dependent: :destroy_async
-  has_many :licenses,           dependent: :destroy_async
-  has_many :license_users,      dependent: :destroy_async
-  has_many :machines,           dependent: :destroy_async
-  has_many :machine_processes,  dependent: :destroy_async
-  has_many :machine_components, dependent: :destroy_async
-  has_many :users,              dependent: :destroy_async
-  has_many :releases,           dependent: :destroy_async
-  has_many :release_artifacts,  dependent: :destroy_async
-  has_many :release_specifications,  dependent: :destroy_async
-  has_many :release_packages,   dependent: :destroy_async
+  has_many :webhook_endpoints,      dependent: :destroy_async
+  has_many :webhook_event,          dependent: :destroy_async
+  has_many :entitlements,           dependent: :destroy_async
+  has_many :groups,                 dependent: :destroy_async
+  has_many :products,               dependent: :destroy_async
+  has_many :policies,               dependent: :destroy_async
+  has_many :licenses,               dependent: :destroy_async
+  has_many :license_users,          dependent: :destroy_async
+  has_many :machines,               dependent: :destroy_async
+  has_many :machine_processes,      dependent: :destroy_async
+  has_many :machine_components,     dependent: :destroy_async
+  has_many :users,                  dependent: :destroy_async
+  has_many :releases,               dependent: :destroy_async
+  has_many :release_artifacts,      dependent: :destroy_async
+  has_many :release_specifications, dependent: :destroy_async
+  has_many :release_packages,       dependent: :destroy_async
 
   has_account
   has_role :environment

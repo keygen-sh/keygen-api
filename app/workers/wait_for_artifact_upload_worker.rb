@@ -49,9 +49,15 @@ class WaitForArtifactUploadWorker < BaseWorker
     in filename: /\.gem\z/, engine: { key: 'gem' } if artifact.content_length.in?(SPEC_MIN_CONTENT_LENGTH..SPEC_MAX_CONTENT_LENGTH)
       ProcessGemSpecificationWorker.perform_async(artifact.id)
     else
-      NotifyArtifactUploadWorker.perform_async(artifact.id, 'UPLOADED')
+      NotifyArtifactUploadWorker.perform_async(
+        artifact.id,
+        'UPLOADED',
+      )
     end
   rescue Aws::Waiters::Errors::WaiterFailed
-    NotifyArtifactUploadWorker.perform_async(artifact.id, 'FAILED')
+    NotifyArtifactUploadWorker.perform_async(
+      artifact.id,
+      'FAILED',
+    )
   end
 end

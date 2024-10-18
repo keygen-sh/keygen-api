@@ -2,13 +2,21 @@
 
 FactoryBot.define do
   factory :release_specification, aliases: %i[spec specification] do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     account       { NIL_ACCOUNT }
-    specification { nil }
+    environment   { NIL_ENVIRONMENT }
+    artifact      { build(:artifact, account:, environment:) }
+    release       { artifact.release }
+    specification {{ name: Faker::App.name, version: Faker::App.semantic_version }}
 
     trait :gem do
-      specification { Gem::Package.new(file_fixture('valid.gem').open).spec.as_json }
+      artifact      { build(:artifact, :gem, account:, environment:) }
+      specification {
+        gem = file_fixture('valid.gem').open
+
+        Gem::Package.new(gem).spec.as_json
+      }
     end
   end
 end
