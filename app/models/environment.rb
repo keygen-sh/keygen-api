@@ -33,6 +33,8 @@ class Environment < ApplicationRecord
   has_many :users,              dependent: :destroy_async
   has_many :releases,           dependent: :destroy_async
   has_many :release_artifacts,  dependent: :destroy_async
+  has_many :release_manifests,  dependent: :destroy_async
+  has_many :release_packages,   dependent: :destroy_async
 
   has_account
   has_role :environment

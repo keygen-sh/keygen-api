@@ -33,6 +33,7 @@ class Account < ApplicationRecord
   has_many :releases, dependent: :destroy_async
   has_many :release_engines, dependent: :destroy_async
   has_many :release_packages, dependent: :destroy_async
+  has_many :release_manifests, dependent: :destroy_async
   has_many :release_platforms, dependent: :destroy_async
   has_many :release_arches, dependent: :destroy_async
   has_many :release_filetypes, dependent: :destroy_async
