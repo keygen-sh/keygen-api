@@ -16,8 +16,24 @@ FactoryBot.define do
     filetype      { build(:filetype, key: 'dmg', account:) }
     specification { nil }
 
-    trait :gemspec do
-      specification { build(:specification, :gemspec, release:, account:, environment:) }
+    trait :gem do
+      release       { build(:release, :gem, account:, environment:) }
+      filetype      { build(:filetype, key: 'gem', account:) }
+      filename      { "#{release.name.underscore.parameterize(separator: '_')}.#{filetype.key}" }
+      filesize      { Faker::Number.between(from: 5.bytes.to_i, to: 5.megabytes.to_i) }
+      platform      { nil }
+      arch          { nil }
+    end
+
+    trait :with_specification do
+      after :create do |artifact|
+        next if artifact.engine.nil?
+
+        case
+        when artifact.engine.gem?
+          create(:specification, :gem, account: release.account, artifact:)
+        end
+      end
     end
 
     trait :darwin do

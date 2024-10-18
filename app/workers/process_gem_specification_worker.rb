@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rubygems/package'
+
 class ProcessGemSpecificationWorker < BaseWorker
   sidekiq_options queue: :critical
 
@@ -8,22 +10,38 @@ class ProcessGemSpecificationWorker < BaseWorker
     return unless
       artifact.processing?
 
-    gemspec       = client.get_object(bucket: artifact.bucket, key: artifact.key).body
-    specification = Gem::Package.new(gemspec).spec.to_json
-    release       = artifact.release
+    # download the gemspec
+    client  = artifact.client
+    gemspec = client.get_object(bucket: artifact.bucket, key: artifact.key)
+                    .body
+
+    # parse the gemspec
+    specification = Gem::Package.new(gemspec)
+                                .spec
+                                .as_json
+
+    release = artifact.release
+    package = release.package
+    engine  = package.engine
 
     ReleaseSpecification.create!(
       account_id: artifact.account_id,
       environment_id: artifact.environment_id,
       release_id: release.id,
       release_artifact_id: artifact.id,
-      release_package_id: release.release_package_id,
-      release_engine_id: release.release_engine_id,
+      release_package_id: package.id,
+      release_engine_id: engine.id,
       specification:,
     )
 
     NotifyArtifactUploadWorker.perform_async(
       artifact.id,
+      'UPLOADED',
+    )
+  rescue Gem::Package::FormatError
+    NotifyArtifactUploadWorker.perform_async(
+      artifact.id,
+      'FAILED',
     )
   end
 end

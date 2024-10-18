@@ -24,7 +24,7 @@ class ReleaseSpecification < ApplicationRecord
     class_name: 'ReleaseEngine',
     foreign_key: :release_engine_id,
     inverse_of: :specifications,
-    default: -> { release&.engine }
+    default: -> { package&.engine }
   has_one :product,
     through: :release
 
