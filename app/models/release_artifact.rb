@@ -10,6 +10,7 @@ class ReleaseArtifact < ApplicationRecord
 
   STATUSES = %w[
     WAITING
+    PROCESSING
     UPLOADED
     FAILED
     YANKED
@@ -37,6 +38,11 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
+  has_one :manifest,
+    class_name: 'ReleaseManifest',
+    foreign_key: :release_artifact_id,
+    inverse_of: :artifact,
+    dependent: :delete
   has_one :channel,
     through: :release
   has_one :product,
@@ -409,9 +415,10 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :waiting,  -> { with_status(:WAITING) }
-  scope :uploaded, -> { with_status(:UPLOADED) }
-  scope :failed,   -> { with_status(:FAILED) }
+  scope :waiting,    -> { with_status(:WAITING) }
+  scope :processing, -> { with_status(:PROCESSING) }
+  scope :uploaded,   -> { with_status(:UPLOADED) }
+  scope :failed,     -> { with_status(:FAILED) }
 
   scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
@@ -499,6 +506,10 @@ class ReleaseArtifact < ApplicationRecord
 
   def waiting?
     status == 'WAITING'
+  end
+
+  def processing?
+    status == 'PROCESSING'
   end
 
   def uploaded?

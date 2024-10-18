@@ -24,6 +24,10 @@ FactoryBot.define do
       engine { build(:engine, :raw, account:) }
     end
 
+    trait :gem do
+      engine { build(:engine, :gem, account:) }
+    end
+
     trait :licensed do
       product { build(:product, :licensed, account:, environment:) }
     end

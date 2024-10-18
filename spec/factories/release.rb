@@ -13,7 +13,7 @@ FactoryBot.define do
     product     { build(:product, account:, environment:) }
     channel     { build(:channel, key: 'stable', account:) }
     package     { nil }
-    artifacts   { [] }
+    manifest    { nil }
 
     after :build do |release, evaluator|
       # Add build tag so that there's no chance for collisions
@@ -60,6 +60,14 @@ FactoryBot.define do
       package { build(:package, :tauri, account:, product:, environment:) }
     end
 
+    trait :raw do
+      package { build(:package, :raw, account:, product:, environment:) }
+    end
+
+    trait :gem do
+      package { build(:package, :gem, account:, product:, environment:) }
+    end
+
     trait :stable do
       channel { build(:channel, :beta, account:) }
     end
@@ -99,6 +107,15 @@ FactoryBot.define do
     trait :with_constraints do
       after :create do |release|
         create_list(:release_entitlement_constraint, 10, account: release.account, release:)
+      end
+    end
+
+    trait :with_manifest do
+      after :create do |release|
+        case
+        when release.engine.gem?
+          create(:artifact, :gemspec, account: release.account, release:)
+        end
       end
     end
 

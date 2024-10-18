@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_07_171911) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -579,6 +579,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_07_171911) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
+  end
+
+  create_table "release_manifests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.uuid "release_artifact_id", null: false
+    t.uuid "release_package_id", null: false
+    t.uuid "release_engine_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
+    t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id", unique: true
+    t.index ["release_engine_id"], name: "index_release_manifests_on_release_engine_id"
+    t.index ["release_id"], name: "index_release_manifests_on_release_id", unique: true
+    t.index ["release_package_id"], name: "index_release_manifests_on_release_package_id"
   end
 
   create_table "release_packages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
