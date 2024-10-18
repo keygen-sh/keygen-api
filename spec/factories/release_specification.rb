@@ -4,15 +4,11 @@ FactoryBot.define do
   factory :release_specification, aliases: %i[spec specification] do
     initialize_with { new(**attributes) }
 
-    account { NIL_ACCOUNT }
+    account       { NIL_ACCOUNT }
+    specification { nil }
 
-    trait :gemspec do
-      # see: https://docs.ruby-lang.org/en/master/Gem/Specification.html
-      metadata {{
-        name: Faker::App.name,
-        summary: Faker::App.description,
-        version: Faker::App.semantic_version,
-      }}
+    trait :gem do
+      specification { Gem::Package.new(file_fixture('valid.gem').open).spec.as_json }
     end
   end
 end

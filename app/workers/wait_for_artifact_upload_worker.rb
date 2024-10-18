@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class WaitForArtifactUploadWorker < BaseWorker
-  MANIFEST_MAX_CONTENT_LENGTH = 5.megabytes
+  SPEC_MIN_CONTENT_LENGTH = 5.bytes     # to avoid processing empty or invalid specs
+  SPEC_MAX_CONTENT_LENGTH = 5.megabytes # to avoid downloading large specs
 
   sidekiq_options queue: :critical,
                   dead: false
@@ -38,14 +39,19 @@ class WaitForArtifactUploadWorker < BaseWorker
       status: 'PROCESSING',
     )
 
-    # check if it's a specification e.g. package.json, .gemspec, etc.
+    NotifyArtifactUploadWorker.perform_async(
+      artifact.id,
+      artifact.status,
+    )
+
+    # check if it's a specification e.g. gem package, etc.
     case artifact
-    in filename: /.gemspec\z/, content_length: ..MANIFEST_MAX_CONTENT_LENGTH
+    in filename: /\.gem\z/, engine: { key: 'gem' } if artifact.content_length.in?(SPEC_MIN_CONTENT_LENGTH..SPEC_MAX_CONTENT_LENGTH)
       ProcessGemSpecificationWorker.perform_async(artifact.id)
     else
-      NotifyArtifactUploadWorker.perform_async(artifact.id)
+      NotifyArtifactUploadWorker.perform_async(artifact.id, 'UPLOADED')
     end
   rescue Aws::Waiters::Errors::WaiterFailed
-    artifact.update!(status: 'FAILED')
+    NotifyArtifactUploadWorker.perform_async(artifact.id, 'FAILED')
   end
 end

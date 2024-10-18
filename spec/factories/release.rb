@@ -106,11 +106,11 @@ FactoryBot.define do
 
     trait :with_specification do
       after :create do |release|
-        next unless release.engine?
+        next if release.engine.nil?
 
         case
         when release.engine.gem?
-          create(:artifact, :gemspec, account: release.account, release:)
+          create(:artifact, :gem, account: release.account, release:)
         end
       end
     end
