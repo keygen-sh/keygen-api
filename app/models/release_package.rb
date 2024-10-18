@@ -22,6 +22,8 @@ class ReleasePackage < ApplicationRecord
   has_many :artifacts,
     through: :releases,
     source: :artifacts
+  has_many :specifications,
+    through: :releases
 
   has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :release_packages

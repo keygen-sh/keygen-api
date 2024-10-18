@@ -11,15 +11,19 @@ class ReleaseEngine < ApplicationRecord
     pypi
     tauri
     raw
+    gem
   ]
 
   has_many :packages,
     class_name: 'ReleasePackage',
-    inverse_of: :engine
-  has_many :releases,
-    through: :packages
+    inverse_of: :engine,
+    dependent: :destroy_async
   has_many :products,
     through: :packages
+  has_many :releases,
+    through: :packages
+  has_many :specifications,
+    through: :releases
 
   has_account inverse_of: :release_engines
 
@@ -101,4 +105,9 @@ class ReleaseEngine < ApplicationRecord
   scope :with_releases, -> {
     where_assoc_exists(:releases)
   }
+
+  def pypi?  = key == 'pypi'
+  def tauri? = key == 'tauri'
+  def raw?   = key == 'raw'
+  def gem?   = key == 'gem'
 end

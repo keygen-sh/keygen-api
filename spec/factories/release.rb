@@ -8,12 +8,12 @@ FactoryBot.define do
     version { nil }
     status  { 'PUBLISHED' }
 
-    account     { NIL_ACCOUNT }
-    environment { NIL_ENVIRONMENT }
-    product     { build(:product, account:, environment:) }
-    channel     { build(:channel, key: 'stable', account:) }
-    package     { nil }
-    artifacts   { [] }
+    account       { NIL_ACCOUNT }
+    environment   { NIL_ENVIRONMENT }
+    product       { build(:product, account:, environment:) }
+    channel       { build(:channel, key: 'stable', account:) }
+    package       { nil }
+    specification { nil }
 
     after :build do |release, evaluator|
       # Add build tag so that there's no chance for collisions
@@ -60,6 +60,14 @@ FactoryBot.define do
       package { build(:package, :tauri, account:, product:, environment:) }
     end
 
+    trait :raw do
+      package { build(:package, :raw, account:, product:, environment:) }
+    end
+
+    trait :gem do
+      package { build(:package, :gem, account:, product:, environment:) }
+    end
+
     trait :stable do
       channel { build(:channel, :beta, account:) }
     end
@@ -94,6 +102,17 @@ FactoryBot.define do
 
     trait :created_last_year do
       created_at { 1.year.ago }
+    end
+
+    trait :with_specification do
+      after :create do |release|
+        next if release.engine.nil?
+
+        case
+        when release.engine.gem?
+          create(:artifact, :gem, account: release.account, release:)
+        end
+      end
     end
 
     trait :with_constraints do

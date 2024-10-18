@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class WaitForArtifactUploadWorker < BaseWorker
+  SPEC_MIN_CONTENT_LENGTH = 5.bytes     # to avoid processing empty or invalid specs
+  SPEC_MAX_CONTENT_LENGTH = 5.megabytes # to avoid downloading large specs
+
   sidekiq_options queue: :critical,
                   dead: false
 
@@ -9,7 +12,7 @@ class WaitForArtifactUploadWorker < BaseWorker
     return unless
       artifact.waiting?
 
-    # Wait until the artifact is uploaded
+    # wait until the artifact is uploaded
     client = artifact.client
 
     client.wait_until(:object_exists, bucket: artifact.bucket, key: artifact.key) do |w|
@@ -26,22 +29,35 @@ class WaitForArtifactUploadWorker < BaseWorker
       end
     end
 
-    BroadcastEventService.call(
-      event: 'artifact.uploaded',
-      account: artifact.account,
-      resource: artifact,
-    )
-
-    # Get artifact metadata
+    # get artifact metadata
     obj = client.head_object(bucket: artifact.bucket, key: artifact.key)
 
     artifact.update!(
       content_length: obj.content_length,
       content_type: obj.content_type,
       etag: obj.etag.delete('"'),
-      status: 'UPLOADED',
+      status: 'PROCESSING',
     )
+
+    NotifyArtifactUploadWorker.perform_async(
+      artifact.id,
+      artifact.status,
+    )
+
+    # check if it's a specification e.g. gem package, etc.
+    case artifact
+    in filename: /\.gem\z/, engine: { key: 'gem' } if artifact.content_length.in?(SPEC_MIN_CONTENT_LENGTH..SPEC_MAX_CONTENT_LENGTH)
+      ProcessGemSpecificationWorker.perform_async(artifact.id)
+    else
+      NotifyArtifactUploadWorker.perform_async(
+        artifact.id,
+        'UPLOADED',
+      )
+    end
   rescue Aws::Waiters::Errors::WaiterFailed
-    artifact.update!(status: 'FAILED')
+    NotifyArtifactUploadWorker.perform_async(
+      artifact.id,
+      'FAILED',
+    )
   end
 end
