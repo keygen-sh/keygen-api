@@ -83,8 +83,8 @@ class Release < ApplicationRecord
     as: :resource
   has_one :engine,
     through: :package
-  has_one :manifest,
-    class_name: 'ReleaseManifest',
+  has_one :specification,
+    class_name: 'ReleaseSpecification',
     inverse_of: :release,
     dependent: :delete
 

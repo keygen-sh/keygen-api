@@ -38,10 +38,10 @@ class WaitForArtifactUploadWorker < BaseWorker
       status: 'PROCESSING',
     )
 
-    # check if it's a manifest e.g. package.json, .gemspec, etc.
+    # check if it's a specification e.g. package.json, .gemspec, etc.
     case artifact
     in filename: /.gemspec\z/, content_length: ..MANIFEST_MAX_CONTENT_LENGTH
-      ProcessGemSpecManifestWorker.perform_async(artifact.id)
+      ProcessGemSpecificationWorker.perform_async(artifact.id)
     else
       NotifyArtifactUploadWorker.perform_async(artifact.id)
     end

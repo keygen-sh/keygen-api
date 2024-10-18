@@ -22,8 +22,8 @@ class ReleasePackage < ApplicationRecord
   has_many :artifacts,
     through: :releases,
     source: :artifacts
-  has_many :manifests,
-    class_name: 'ReleaseManifest',
+  has_many :specifications,
+    class_name: 'ReleaseSpecification',
     inverse_of: :package,
     dependent: :destroy_async
 

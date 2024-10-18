@@ -38,8 +38,8 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
-  has_one :manifest,
-    class_name: 'ReleaseManifest',
+  has_one :specification,
+    class_name: 'ReleaseSpecification',
     foreign_key: :release_artifact_id,
     inverse_of: :artifact,
     dependent: :delete

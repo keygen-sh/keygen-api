@@ -8,12 +8,12 @@ FactoryBot.define do
     version { nil }
     status  { 'PUBLISHED' }
 
-    account     { NIL_ACCOUNT }
-    environment { NIL_ENVIRONMENT }
-    product     { build(:product, account:, environment:) }
-    channel     { build(:channel, key: 'stable', account:) }
-    package     { nil }
-    manifest    { nil }
+    account       { NIL_ACCOUNT }
+    environment   { NIL_ENVIRONMENT }
+    product       { build(:product, account:, environment:) }
+    channel       { build(:channel, key: 'stable', account:) }
+    package       { nil }
+    specification { nil }
 
     after :build do |release, evaluator|
       # Add build tag so that there's no chance for collisions
@@ -104,18 +104,20 @@ FactoryBot.define do
       created_at { 1.year.ago }
     end
 
-    trait :with_constraints do
+    trait :with_specification do
       after :create do |release|
-        create_list(:release_entitlement_constraint, 10, account: release.account, release:)
-      end
-    end
+        next unless release.engine?
 
-    trait :with_manifest do
-      after :create do |release|
         case
         when release.engine.gem?
           create(:artifact, :gemspec, account: release.account, release:)
         end
+      end
+    end
+
+    trait :with_constraints do
+      after :create do |release|
+        create_list(:release_entitlement_constraint, 10, account: release.account, release:)
       end
     end
 
