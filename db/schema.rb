@@ -581,24 +581,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
   end
 
-  create_table "release_manifests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "account_id", null: false
-    t.uuid "environment_id"
-    t.uuid "release_id", null: false
-    t.uuid "release_artifact_id", null: false
-    t.uuid "release_package_id", null: false
-    t.uuid "release_engine_id", null: false
-    t.jsonb "metadata", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
-    t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
-    t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id", unique: true
-    t.index ["release_engine_id"], name: "index_release_manifests_on_release_engine_id"
-    t.index ["release_id"], name: "index_release_manifests_on_release_id", unique: true
-    t.index ["release_package_id"], name: "index_release_manifests_on_release_package_id"
-  end
-
   create_table "release_packages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "product_id", null: false
@@ -625,6 +607,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_platforms_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
+  end
+
+  create_table "release_specifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.uuid "release_artifact_id", null: false
+    t.uuid "release_package_id", null: false
+    t.uuid "release_engine_id", null: false
+    t.jsonb "specification", default: {}, null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_release_specifications_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_specifications_on_environment_id"
+    t.index ["release_artifact_id"], name: "index_release_specifications_on_release_artifact_id", unique: true
+    t.index ["release_engine_id"], name: "index_release_specifications_on_release_engine_id"
+    t.index ["release_id"], name: "index_release_specifications_on_release_id", unique: true
+    t.index ["release_package_id"], name: "index_release_specifications_on_release_package_id"
   end
 
   create_table "release_upgrade_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

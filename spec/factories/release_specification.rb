@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :release_manifest, aliases: %i[manifest] do
+  factory :release_specification, aliases: %i[spec specification] do
     initialize_with { new(**attributes) }
 
     account { NIL_ACCOUNT }
