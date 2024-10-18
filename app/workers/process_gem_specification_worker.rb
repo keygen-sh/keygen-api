@@ -11,26 +11,20 @@ class ProcessGemSpecificationWorker < BaseWorker
       artifact.processing?
 
     # download the gemspec
-    client  = artifact.client
-    gemspec = client.get_object(bucket: artifact.bucket, key: artifact.key)
-                    .body
+    client = artifact.client
+    gem    = client.get_object(bucket: artifact.bucket, key: artifact.key)
+                   .body
 
     # parse the gemspec
-    specification = Gem::Package.new(gemspec)
+    specification = Gem::Package.new(gem)
                                 .spec
                                 .as_json
-
-    release = artifact.release
-    package = release.package
-    engine  = package.engine
 
     ReleaseSpecification.create!(
       account_id: artifact.account_id,
       environment_id: artifact.environment_id,
-      release_id: release.id,
+      release_id: artifact.release_id,
       release_artifact_id: artifact.id,
-      release_package_id: package.id,
-      release_engine_id: engine.id,
       specification:,
     )
 

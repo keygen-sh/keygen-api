@@ -18,14 +18,12 @@ class ReleaseEngine < ApplicationRecord
     class_name: 'ReleasePackage',
     inverse_of: :engine,
     dependent: :destroy_async
-  has_many :specifications,
-    class_name: 'ReleaseSpecification',
-    inverse_of: :engine,
-    dependent: :destroy_async
-  has_many :releases,
-    through: :packages
   has_many :products,
     through: :packages
+  has_many :releases,
+    through: :packages
+  has_many :specifications,
+    through: :releases
 
   has_account inverse_of: :release_engines
 

@@ -5,10 +5,8 @@ class CreateReleaseSpecifications < ActiveRecord::Migration[7.1]
       t.uuid :environment_id,      null: true
       t.uuid :release_id,          null: false
       t.uuid :release_artifact_id, null: false
-      t.uuid :release_package_id,  null: false
-      t.uuid :release_engine_id,   null: false
 
-      t.jsonb :specification, null: false, default: {}
+      t.jsonb :specification, null: false
       t.jsonb :metadata
 
       t.timestamps
@@ -16,8 +14,6 @@ class CreateReleaseSpecifications < ActiveRecord::Migration[7.1]
       t.index %i[account_id created_at], order: { created_at: :desc }
       t.index %i[environment_id]
       t.index %i[release_id],            unique: true
-      t.index %i[release_package_id]
-      t.index %i[release_engine_id]
       t.index %i[release_artifact_id],   unique: true
     end
   end
