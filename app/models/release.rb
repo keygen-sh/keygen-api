@@ -83,6 +83,10 @@ class Release < ApplicationRecord
     as: :resource
   has_one :engine,
     through: :package
+  has_one :manifest,
+    class_name: 'ReleaseManifest',
+    inverse_of: :release,
+    dependent: :delete
 
   # FIXME(ezekg) For v1.0 backwards compatibility
   has_one :artifact,

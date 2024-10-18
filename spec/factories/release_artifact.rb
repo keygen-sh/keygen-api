@@ -14,6 +14,11 @@ FactoryBot.define do
     platform    { build(:platform, key: 'darwin', account:) }
     arch        { build(:arch, key: 'amd64', account:) }
     filetype    { build(:filetype, key: 'dmg', account:) }
+    manifest    { nil }
+
+    trait :gemspec do
+      manifest { build(:manifest, :gemspec, release:, account:, environment:) }
+    end
 
     trait :darwin do
       platform { build(:platform, key: 'darwin', account:) }
@@ -41,6 +46,10 @@ FactoryBot.define do
 
     trait :waiting do
       status { 'WAITING' }
+    end
+
+    trait :processing do
+      status { 'PROCESSING' }
     end
 
     trait :uploaded do
