@@ -88,6 +88,10 @@ class Release < ApplicationRecord
   has_one :engine,
     through: :package
 
+  has_many :uploaded_artifacts, -> { uploaded },
+    class_name: 'ReleaseArtifact',
+    inverse_of: :release
+
   # FIXME(ezekg) For v1.0 backwards compatibility
   has_one :artifact,
     class_name: 'ReleaseArtifact',

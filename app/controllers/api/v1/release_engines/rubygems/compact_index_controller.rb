@@ -15,18 +15,14 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      gems = packages.preload(releases: { artifacts: %i[specification platform] }).map do |package|
-        versions = package.releases.flat_map do |release|
-          next unless release.published?
-
-          release.artifacts.map do |artifact|
-            next unless artifact.uploaded?
-            next if artifact.specification.nil?
-
-            gemspec = Gem::Specification.from_yaml(
-              artifact.specification.content,
-            )
-
+      gems = packages.joins(published_releases: { uploaded_artifacts: :specification })
+                     .eager_load(published_releases: { uploaded_artifacts: :specification }) # must exist
+                     .preload(published_releases: { uploaded_artifacts: :platform })         # may exist
+                     .distinct
+                     .map do |package|
+        versions = package.published_releases.flat_map do |release|
+          release.uploaded_artifacts.map do |artifact|
+            gemspec      = Gem::Specification.from_yaml(artifact.specification.content)
             dependencies = gemspec.dependencies.map do |dependency|
               CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
             end
@@ -43,7 +39,7 @@ module Api::V1::ReleaseEngines
           end
         end
 
-        CompactIndex::Gem.new(package.key, versions.compact.sort)
+        CompactIndex::Gem.new(package.key, versions.sort)
       end
 
       render plain: CompactIndex.versions(
@@ -55,17 +51,13 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      versions = package.releases.preload(artifacts: %i[specification platform]).flat_map do |release|
-        next unless release.published?
-
-        release.artifacts.map do |artifact|
-          next unless artifact.uploaded?
-          next if artifact.specification.nil?
-
-          gemspec = Gem::Specification.from_yaml(
-            artifact.specification.content,
-          )
-
+      versions = package.published_releases.joins(uploaded_artifacts: :specification)
+                                           .eager_load(uploaded_artifacts: :specification) # must exist
+                                           .preload(uploaded_artifacts: :platform)         # may exist
+                                           .distinct
+                                           .flat_map do |release|
+        release.uploaded_artifacts.map do |artifact|
+          gemspec      = Gem::Specification.from_yaml(artifact.specification.content)
           dependencies = gemspec.dependencies.map do |dependency|
             CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
           end
@@ -82,18 +74,21 @@ module Api::V1::ReleaseEngines
         end
       end
 
-      render plain: CompactIndex.info(versions.compact.sort)
+      render plain: CompactIndex.info(versions.sort)
     end
 
     def names
       authorize! packages,
         to: :index?
 
-      names = packages.pluck(
-        :key,
-      )
+      names = packages.joins(published_releases: { uploaded_artifacts: :specification })
+                      .reorder(key: :asc)
+                      .distinct
+                      .pluck(
+                        :key,
+                      )
 
-      render plain: CompactIndex.names(names.sort)
+      render plain: CompactIndex.names(names)
     end
 
     private
@@ -106,8 +101,14 @@ module Api::V1::ReleaseEngines
     end
 
     def set_package
+      scoped_packages = current_account.release_packages.rubygems
+                                                        .joins(
+                                                          # we want to ignore packages without any eligible versions
+                                                          published_releases: { uploaded_artifacts: :specification },
+                                                        )
+
       Current.resource = @package = FindByAliasService.call(
-        authorized_scope(current_account.release_packages.rubygems),
+        authorized_scope(scoped_packages),
         id: params[:package],
         aliases: :key,
       )
