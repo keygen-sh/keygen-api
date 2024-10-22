@@ -74,6 +74,7 @@ Rails.application.routes.draw do
       get 'versions',      to: 'compact_index#versions', as: :rubygems_compact_versions
       get 'info/:package', to: 'compact_index#info',     as: :rubygems_compact_info
       get 'names',         to: 'compact_index#names',    as: :rubygems_compact_names
+      root via: :head,     to: 'compact_index#ping',     as: :rubygems_compact_ping
     end
   end
 

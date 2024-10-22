@@ -50,6 +50,24 @@ Then /^time is unfrozen$/ do
   travel_back
 end
 
+When /^I send a HEAD request to "([^\"]*)"$/ do |path|
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+
+  case %r{/accounts/(?<account>[^?#/]+)}.match(path)
+  in account: id if Keygen.singleplayer?
+    account = FindByAliasService.call(Account, id:, aliases: :slug) rescue nil
+
+    stub_env 'KEYGEN_ACCOUNT_ID', account&.id
+  else
+  end
+
+  unless path.starts_with?('//')
+    head "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    head path
+  end
+end
+
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 

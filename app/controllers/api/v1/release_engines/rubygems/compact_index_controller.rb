@@ -10,6 +10,12 @@ module Api::V1::ReleaseEngines
     before_action :set_packages, only: %i[versions names]
     before_action :set_package, only: %i[info]
 
+    def ping
+      skip_verify_authorized!
+
+      head :ok
+    end
+
     def versions
       authorize! packages,
         to: :index?

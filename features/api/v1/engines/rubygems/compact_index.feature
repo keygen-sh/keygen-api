@@ -7,9 +7,9 @@ Feature: Rubygems simple package index
       | Test 2 | test2 |
     And the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
-      | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | Test 2 |
+      | id                                   | name   | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 | LICENSED              |
+      | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | Test 2 | LICENSED              |
     And the current account has the following "package" rows:
       | id                                   | product_id                           | engine   | key  |
       | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | foo  |
@@ -86,6 +86,10 @@ Feature: Rubygems simple package index
       """
     When I send a GET request to "/accounts/test1/engines/rubygems/versions"
     Then the response status should be "400"
+
+  Scenario: Endpoint should respond to ping
+    When I send a HEAD request to "/accounts/test1/engines/rubygems"
+    Then the response status should be "200"
 
   Scenario: Endpoint should return all gems
     Given I am an admin of account "test1"
