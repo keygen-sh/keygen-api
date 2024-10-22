@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rubygems/specification'
+
 class ReleaseSpecification < ApplicationRecord
   MIN_CONTENT_LENGTH = 5.bytes     # to avoid processing empty or invalid specs
   MAX_CONTENT_LENGTH = 5.megabytes # to avoid downloading large specs
@@ -45,32 +47,5 @@ class ReleaseSpecification < ApplicationRecord
     end
   end
 
-  # scope :waiting,    -> { joins(:artifact).where(release_artifacts: { status: 'WAITING' }) }
-  # scope :processing, -> { joins(:artifact).where(release_artifacts: { status: 'PROCESSING' }) }
-  # scope :uploaded,   -> { joins(:artifact).where(release_artifacts: { status: 'UPLOADED' }) }
-  # scope :failed,     -> { joins(:artifact).where(release_artifacts: { status: 'FAILED' }) }
-
-  # scope :draft,      -> { joins(:release).where(releases: { status: 'DRAFT' }) }
-  # scope :published,  -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
-  # scope :yanked,     -> { joins(:release).where(releases: { status: 'YANKED' }) }
-
-  # scope :for_channel_key, -> key { joins(artifact: :channel).where(release_channels: { key: }) }
-  # scope :stable, -> { for_channel_key(%i(stable)) }
-  # scope :rc, -> { for_channel_key(%i(stable rc)) }
-  # scope :beta, -> { for_channel_key(%i(stable rc beta)) }
-  # scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
-  # scope :dev, -> { for_channel_key(%i(dev)) }
-
-  # scope :order_by_version, -> {
-  #   joins(:release).reorder(<<~SQL.squish)
-  #     releases.semver_major             DESC,
-  #     releases.semver_minor             DESC NULLS LAST,
-  #     releases.semver_patch             DESC NULLS LAST,
-  #     releases.semver_pre_word          DESC NULLS FIRST,
-  #     releases.semver_pre_num           DESC NULLS LAST,
-  #     releases.semver_build_word        DESC NULLS LAST,
-  #     releases.semver_build_num         DESC NULLS LAST,
-  #     release_specifications.created_at DESC
-  #   SQL
-  # }
+  def as_gemspec = Gem::Specification.from_yaml(content)
 end
