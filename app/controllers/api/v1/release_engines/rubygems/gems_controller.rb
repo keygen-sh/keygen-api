@@ -24,7 +24,7 @@ module Api::V1::ReleaseEngines
 
       Current.resource = @artifact = FindByAliasService.call(
         scoped_artifacts,
-        id: "#{params[:package]}.gem",
+        id: "#{params[:gem]}.gem",
         aliases: :filename,
       )
     end

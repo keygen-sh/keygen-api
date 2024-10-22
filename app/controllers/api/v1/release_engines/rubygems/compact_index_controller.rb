@@ -114,7 +114,7 @@ module Api::V1::ReleaseEngines
 
       Current.resource = @package = FindByAliasService.call(
         authorized_scope(scoped_packages),
-        id: params[:package],
+        id: params[:gem],
         aliases: :key,
       )
     end
