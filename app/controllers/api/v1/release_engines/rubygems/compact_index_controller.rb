@@ -106,11 +106,11 @@ module Api::V1::ReleaseEngines
     end
 
     def set_package
-      scoped_packages = current_account.release_packages.rubygems
-                                                        .joins(
-                                                          # we want to ignore packages without any eligible versions
-                                                          published_releases: { uploaded_artifacts: :specification },
-                                                        )
+      scoped_packages = authorized_scope(current_account.release_packages.rubygems)
+                          .joins(
+                            # we want to ignore packages without any eligible gem versions
+                            published_releases: { uploaded_artifacts: :specification },
+                          )
 
       Current.resource = @package = FindByAliasService.call(
         authorized_scope(scoped_packages),
