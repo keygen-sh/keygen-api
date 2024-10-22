@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'rubygems/specification'
 require 'compact_index'
 
 module Api::V1::ReleaseEngines
@@ -22,7 +21,7 @@ module Api::V1::ReleaseEngines
                      .map do |package|
         versions = package.published_releases.flat_map do |release|
           release.uploaded_artifacts.map do |artifact|
-            gemspec      = Gem::Specification.from_yaml(artifact.specification.content)
+            gemspec      = artifact.specification.as_gemspec
             dependencies = gemspec.dependencies.map do |dependency|
               CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
             end
@@ -57,7 +56,7 @@ module Api::V1::ReleaseEngines
                                            .distinct
                                            .flat_map do |release|
         release.uploaded_artifacts.map do |artifact|
-          gemspec      = Gem::Specification.from_yaml(artifact.specification.content)
+          gemspec      = artifact.specification.as_gemspec
           dependencies = gemspec.dependencies.map do |dependency|
             CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
           end
