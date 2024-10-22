@@ -16,7 +16,7 @@ module Api::V1::ReleaseEngines
       dump    = Marshal.dump(gemspec)
       gz      = Zlib::Deflate.deflate(dump)
 
-      send_data gz, filename: "#{params[:package]}.gemspec.rz"
+      send_data gz, filename: "#{params[:gem]}.gemspec.rz"
     end
 
     private
@@ -32,7 +32,7 @@ module Api::V1::ReleaseEngines
 
       Current.resource = @artifact = FindByAliasService.call(
         scoped_artifacts,
-        id: "#{params[:package]}.gem",
+        id: "#{params[:gem]}.gem",
         aliases: :filename,
       )
     end
