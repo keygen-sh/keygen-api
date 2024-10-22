@@ -70,11 +70,19 @@ Rails.application.routes.draw do
   end
 
   concern :rubygems do
+    # see: https://github.com/rubygems/guides/blob/e0a52c4ce6a6cbfb37886c52f2a8ac1c4b9fec77/rubygems-org-compact-index-api.md
     scope module: :rubygems, constraints: MimeTypeConstraint.new(:text, raise_on_no_match: true), defaults: { format: :text } do
       get 'versions',      to: 'compact_index#versions', as: :rubygems_compact_versions
       get 'info/:package', to: 'compact_index#info',     as: :rubygems_compact_info
       get 'names',         to: 'compact_index#names',    as: :rubygems_compact_names
-      root via: :head,     to: 'compact_index#ping',     as: :rubygems_compact_ping
+
+      # signals compact index support to rubygems
+      root via: :head, to: 'compact_index#ping', as: :rubygems_compact_ping
+    end
+
+    scope module: :rubygems, defaults: { format: :binary } do
+      get 'quick/Marshal.4.8/:package.gemspec.rz', to: 'specs#quick', as: :rubygems_quick_gemspec, constraints: { package: /[^\/]+/ }
+      get 'gems/:package.gem',                     to: 'gems#show',   as: :rubygems_gem,           constraints: { package: /[^\/]+/ }
     end
   end
 

@@ -446,6 +446,8 @@ class ReleaseArtifact < ApplicationRecord
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
 
+  scope :gems, -> { for_filetype(:gem) }
+
   def key = "artifacts/#{account_id}/#{release_id}/#{filename}"
 
   def presigner = Aws::S3::Presigner.new(client:)
