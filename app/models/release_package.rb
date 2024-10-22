@@ -19,11 +19,13 @@ class ReleasePackage < ApplicationRecord
   has_many :releases,
     inverse_of: :package,
     dependent: :destroy_async
+  has_many :specifications,
+    through: :releases
   has_many :artifacts,
     through: :releases,
     source: :artifacts
-  has_many :specifications,
-    through: :releases
+  has_many :platforms,
+    through: :artifacts
 
   has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :release_packages
@@ -99,6 +101,7 @@ class ReleasePackage < ApplicationRecord
   scope :pypi,           ->     { for_engine_key('pypi') }
   scope :tauri,          ->     { for_engine_key('tauri') }
   scope :raw,            ->     { for_engine_key('raw') }
+  scope :rubygems,       ->     { for_engine_key('rubygems') }
 
   def engine_id? = release_engine_id?
   def engine_id  = release_engine_id

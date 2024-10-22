@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class WaitForArtifactUploadWorker < BaseWorker
-  SPEC_MIN_CONTENT_LENGTH = 5.bytes     # to avoid processing empty or invalid specs
-  SPEC_MAX_CONTENT_LENGTH = 5.megabytes # to avoid downloading large specs
-
   sidekiq_options queue: :critical,
                   dead: false
 
@@ -46,7 +43,8 @@ class WaitForArtifactUploadWorker < BaseWorker
 
     # check if it's a specification e.g. gem package, etc.
     case artifact
-    in filename: /\.gem\z/, engine: { key: 'gem' } if artifact.content_length.in?(SPEC_MIN_CONTENT_LENGTH..SPEC_MAX_CONTENT_LENGTH)
+    in filetype: ReleaseFiletype(:gem), engine: ReleaseEngine(:rubygems) if artifact.content_length.in?(ReleaseSpecification::MIN_CONTENT_LENGTH..ReleaseSpecification::MAX_CONTENT_LENGTH)
+      # FIXME(ezekg) reject and warn if specification filesize is unacceptable
       ProcessGemSpecificationWorker.perform_async(artifact.id)
     else
       NotifyArtifactUploadWorker.perform_async(

@@ -105,17 +105,33 @@ class ReleaseArtifact < ApplicationRecord
     :licensed?, :open?, :closed?,
     to: :release
 
-  scope :order_by_version, -> {
-    joins(:release).reorder(<<~SQL.squish)
-      releases.semver_major        DESC,
-      releases.semver_minor        DESC NULLS LAST,
-      releases.semver_patch        DESC NULLS LAST,
-      releases.semver_pre_word     DESC NULLS FIRST,
-      releases.semver_pre_num      DESC NULLS LAST,
-      releases.semver_build_word   DESC NULLS LAST,
-      releases.semver_build_num    DESC NULLS LAST,
-      release_artifacts.created_at DESC
-    SQL
+  scope :order_by_version, -> (order = :desc) {
+    sql = case order
+          in :desc
+            <<~SQL
+              releases.semver_major        DESC,
+              releases.semver_minor        DESC NULLS LAST,
+              releases.semver_patch        DESC NULLS LAST,
+              releases.semver_pre_word     DESC NULLS FIRST,
+              releases.semver_pre_num      DESC NULLS LAST,
+              releases.semver_build_word   DESC NULLS LAST,
+              releases.semver_build_num    DESC NULLS LAST,
+              release_artifacts.created_at DESC
+            SQL
+          in :asc
+            <<~SQL
+              releases.semver_major        ASC,
+              releases.semver_minor        ASC NULLS FIRST,
+              releases.semver_patch        ASC NULLS FIRST,
+              releases.semver_pre_word     ASC NULLS LAST,
+              releases.semver_pre_num      ASC NULLS FIRST,
+              releases.semver_build_word   ASC NULLS FIRST,
+              releases.semver_build_num    ASC NULLS FIRST,
+              release_artifacts.created_at ASC
+            SQL
+          end
+
+    joins(:release).reorder(sql.squish)
   }
 
   scope :for_channel, -> channel {
@@ -340,10 +356,16 @@ class ReleaseArtifact < ApplicationRecord
       joins(:filetype).where(filetype: { id: filetype })
     when nil
       where.missing(:filetype)
-    else
+    when Symbol
       joins(:filetype).where(
         filetype: { key: filetype.to_s },
       )
+    when String
+      joins(:filetype).where(
+        filetype: { key: filetype.downcase.delete_prefix('.').strip },
+      )
+    else
+      none
     end
   }
 
@@ -415,10 +437,10 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :waiting,    -> { with_status(:WAITING) }
-  scope :processing, -> { with_status(:PROCESSING) }
-  scope :uploaded,   -> { with_status(:UPLOADED) }
-  scope :failed,     -> { with_status(:FAILED) }
+  scope :waiting,    -> { with_status('WAITING') }
+  scope :processing, -> { with_status('PROCESSING') }
+  scope :uploaded,   -> { with_status('UPLOADED') }
+  scope :failed,     -> { with_status('FAILED') }
 
   scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }

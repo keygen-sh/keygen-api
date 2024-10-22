@@ -69,6 +69,14 @@ Rails.application.routes.draw do
     end
   end
 
+  concern :rubygems do
+    scope module: :rubygems, constraints: MimeTypeConstraint.new(:text, raise_on_no_match: true), defaults: { format: :text } do
+      get 'versions',      to: 'compact_index#versions', as: :rubygems_compact_versions
+      get 'info/:package', to: 'compact_index#info',     as: :rubygems_compact_info
+      get 'names',         to: 'compact_index#names',    as: :rubygems_compact_names
+    end
+  end
+
   concern :v1 do
     get :ping, to: 'health#general_ping'
 
@@ -438,6 +446,9 @@ Rails.application.routes.draw do
       scope :raw do
         concerns :raw
       end
+      scope :rubygems do
+        concerns :rubygems
+      end
     end
   end
 
@@ -466,7 +477,6 @@ Rails.application.routes.draw do
 
   # Subdomains for our supported distribution engines (i.e. package managers)
   scope constraints: { subdomain: /\.pkg$/, **domain_constraints } do
-    # PyPI
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'pypi.pkg' } do
       case
       when Keygen.multiplayer?
@@ -478,7 +488,6 @@ Rails.application.routes.draw do
       end
     end
 
-    # Tauri
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'tauri.pkg' } do
       case
       when Keygen.multiplayer?
@@ -490,7 +499,6 @@ Rails.application.routes.draw do
       end
     end
 
-    # Raw
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'raw.pkg' } do
       case
       when Keygen.multiplayer?
@@ -499,6 +507,17 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :raw
+      end
+    end
+
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'rubygems.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :rubygems
+        end
+      when Keygen.singleplayer?
+        concerns :rubygems
       end
     end
   end
