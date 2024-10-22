@@ -43,12 +43,12 @@ FactoryBot.define do
       arch          { build(:arch, key: 'arm64', account:) }
     end
 
-    trait :gem do
-      release       { build(:release, :gem, account:, environment:) }
+    trait :rubygems do
+      release       { build(:release, :rubygems, account:, environment:) }
       filename      { "#{release.name.underscore.parameterize(separator: '_')}-#{release.version}.gem" }
       filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 5.megabytes.to_i) }
       filetype      { build(:filetype, key: 'gem', account:) }
-      platform      { nil }
+      platform      { build(:platform, key: %w[ruby java jruby mswin mswin64].sample) }
       arch          { nil }
     end
 
@@ -58,7 +58,7 @@ FactoryBot.define do
 
         case
         when artifact.engine.gem?
-          create(:specification, :gem, account: release.account, artifact:)
+          create(:specification, :rubygems, account: release.account, artifact:)
         end
       end
     end

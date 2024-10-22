@@ -13,7 +13,6 @@ FactoryBot.define do
     product       { build(:product, account:, environment:) }
     channel       { build(:channel, key: 'stable', account:) }
     package       { nil }
-    specification { nil }
 
     after :build do |release, evaluator|
       # Add build tag so that there's no chance for collisions
@@ -64,8 +63,8 @@ FactoryBot.define do
       package { build(:package, :raw, account:, product:, environment:) }
     end
 
-    trait :gem do
-      package { build(:package, :gem, account:, product:, environment:) }
+    trait :rubygems do
+      package { build(:package, :rubygems, account:, product:, environment:) }
     end
 
     trait :stable do
@@ -110,7 +109,18 @@ FactoryBot.define do
 
         case
         when release.engine.gem?
-          create(:artifact, :gem, account: release.account, release:)
+          create(:artifact, :rubygems, account: release.account, release:)
+        end
+      end
+    end
+
+    trait :with_specifications do
+      after :create do |release|
+        next if release.engine.nil?
+
+        case
+        when release.engine.gem?
+          create_list(:artifact, 3, :rubygems, account: release.account, release:)
         end
       end
     end

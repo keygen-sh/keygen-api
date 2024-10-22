@@ -10,22 +10,21 @@ class ProcessGemSpecificationWorker < BaseWorker
     return unless
       artifact.processing?
 
-    # download the gemspec
+    # download the gem
     client = artifact.client
     gem    = client.get_object(bucket: artifact.bucket, key: artifact.key)
                    .body
 
-    # parse the gemspec
-    specification = Gem::Package.new(gem)
-                                .spec
-                                .as_json
+    # parse the gem
+    gemspec = Gem::Package.new(gem)
+                          .spec
 
     ReleaseSpecification.create!(
       account_id: artifact.account_id,
       environment_id: artifact.environment_id,
       release_id: artifact.release_id,
       release_artifact_id: artifact.id,
-      specification:,
+      content: gemspec.to_yaml,
     )
 
     NotifyArtifactUploadWorker.perform_async(

@@ -69,6 +69,10 @@ class Release < ApplicationRecord
     class_name: 'ReleaseUploadLink',
     inverse_of: :release,
     dependent: :delete_all
+  has_many :specifications,
+    class_name: 'ReleaseSpecification',
+    inverse_of: :release,
+    dependent: :delete_all
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
@@ -83,10 +87,6 @@ class Release < ApplicationRecord
     as: :resource
   has_one :engine,
     through: :package
-  has_one :specification,
-    class_name: 'ReleaseSpecification',
-    inverse_of: :release,
-    dependent: :delete
 
   # FIXME(ezekg) For v1.0 backwards compatibility
   has_one :artifact,
@@ -254,16 +254,31 @@ class Release < ApplicationRecord
     )
   }
 
-  scope :order_by_version, -> {
-    reorder(<<~SQL.squish)
-      releases.semver_major      DESC,
-      releases.semver_minor      DESC NULLS LAST,
-      releases.semver_patch      DESC NULLS LAST,
-      releases.semver_pre_word   DESC NULLS FIRST,
-      releases.semver_pre_num    DESC NULLS LAST,
-      releases.semver_build_word DESC NULLS LAST,
-      releases.semver_build_num  DESC NULLS LAST
-    SQL
+  scope :order_by_version, -> (order = :desc) {
+    sql = case order
+          in :desc
+            <<~SQL
+              releases.semver_major      DESC,
+              releases.semver_minor      DESC NULLS LAST,
+              releases.semver_patch      DESC NULLS LAST,
+              releases.semver_pre_word   DESC NULLS FIRST,
+              releases.semver_pre_num    DESC NULLS LAST,
+              releases.semver_build_word DESC NULLS LAST,
+              releases.semver_build_num  DESC NULLS LAST
+            SQL
+          in :asc
+            <<~SQL
+              releases.semver_major      ASC,
+              releases.semver_minor      ASC NULLS FIRST,
+              releases.semver_patch      ASC NULLS FIRST,
+              releases.semver_pre_word   ASC NULLS LAST,
+              releases.semver_pre_num    ASC NULLS FIRST,
+              releases.semver_build_word ASC NULLS FIRST,
+              releases.semver_build_num  ASC NULLS FIRST
+            SQL
+          end
+
+    reorder(sql.squish)
   }
 
   scope :accessible_by, -> accessor {

@@ -7,7 +7,7 @@ module Rendering
     included do
       include ActionController::MimeResponds
 
-      # Overload render method to automatically set content type
+      # overload render method to automatically set content type
       def render(args, ...)
         case args
         in jsonapi:
@@ -18,6 +18,8 @@ module Rendering
           response.content_type = Mime::Type.lookup_by_extension(:binary)
         in html:
           response.content_type = Mime::Type.lookup_by_extension(:html)
+        in gz:
+          response.content_type = Mime::Type.lookup_by_extension(:gzip)
         else
           # leave as-is
         end
@@ -38,8 +40,8 @@ module Rendering
   module HTML
     extend ActiveSupport::Concern
 
-    # NOTE(ezekg) This concern adds back support for rendering views since
-    #             we're using ActionController::API as our base class.
+    # NOTE(ezekg) this concern adds back support for rendering views since
+    #             we're using ActionController::API as our base class
     included do
       include ActionController::Rendering
       include ActionController::Helpers
@@ -47,7 +49,7 @@ module Rendering
       include ActionView::Layouts
       include Base
 
-      # FIXME(ezekg) Why isn't this automatically loaded?
+      # FIXME(ezekg) why isn't this automatically loaded?
       self.helpers_path = ActionController::Helpers.helpers_path
       helper :all
     end

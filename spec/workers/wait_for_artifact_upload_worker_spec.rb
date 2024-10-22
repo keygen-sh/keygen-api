@@ -74,11 +74,11 @@ describe WaitForArtifactUploadWorker do
     end
 
     context 'when artifact is a valid gem' do
-      let(:artifact)  { create(:artifact, :gem, :waiting, account:) }
+      let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
       let(:processor) { ProcessGemSpecificationWorker }
 
       before do
-        Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('valid.gem').open }]
+        Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('ping-1.0.0.gem').open }]
       end
 
       after do
@@ -114,11 +114,11 @@ describe WaitForArtifactUploadWorker do
     end
 
     context 'when artifact is an invalid gem' do
-      let(:artifact)  { create(:artifact, :gem, :waiting, account:) }
+      let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
       let(:processor) { ProcessGemSpecificationWorker }
 
       before do
-        Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('invalid.gem').open }]
+        Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('invalid-1.0.0.gem').open }]
       end
 
       after do

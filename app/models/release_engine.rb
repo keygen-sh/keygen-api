@@ -11,7 +11,7 @@ class ReleaseEngine < ApplicationRecord
     pypi
     tauri
     raw
-    gem
+    rubygems
   ]
 
   has_many :packages,
@@ -106,8 +106,15 @@ class ReleaseEngine < ApplicationRecord
     where_assoc_exists(:releases)
   }
 
-  def pypi?  = key == 'pypi'
-  def tauri? = key == 'tauri'
-  def raw?   = key == 'raw'
-  def gem?   = key == 'gem'
+  def pypi?     = key == 'pypi'
+  def tauri?    = key == 'tauri'
+  def raw?      = key == 'raw'
+  def rubygems? = key == 'rubygems'
+
+  ##
+  # deconstruct allows pattern pattern matching like:
+  #
+  #   engine in ReleaseEngine(:rubygems)
+  #
+  def deconstruct = [key.to_sym]
 end

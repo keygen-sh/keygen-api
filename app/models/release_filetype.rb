@@ -30,4 +30,11 @@ class ReleaseFiletype < ApplicationRecord
       )
       .distinct
   }
+
+  ##
+  # deconstruct allows pattern pattern matching like:
+  #
+  #   filetype in ReleaseFiletype(:gem)
+  #
+  def deconstruct = [key.to_sym]
 end
