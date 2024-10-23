@@ -1250,6 +1250,16 @@ Then /^the response body should be a text document with the following content:$/
   expect(last_response.body.strip).to eq body.strip
 end
 
+Then /^the response body should be a gemspec with the following content:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  decompressed = Zlib::Inflate.inflate(last_response.body)
+  deserialized = Marshal.load(decompressed)
+  gemspec      = deserialized.to_ruby
+
+  expect(gemspec.strip).to eq body.strip
+end
+
 Given /^the JSON data should be sorted by "([^\"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')
