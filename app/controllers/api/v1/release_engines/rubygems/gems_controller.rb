@@ -10,7 +10,17 @@ module Api::V1::ReleaseEngines
     def show
       authorize! artifact
 
-      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
+      download = artifact.download!(
+        ttl: 5.minutes,
+      )
+
+      BroadcastEventService.call(
+        event: 'artifact.downloaded',
+        account: current_account,
+        resource: artifact,
+      )
+
+      redirect_to download.url,
         allow_other_host: true,
         status: :see_other
     end
