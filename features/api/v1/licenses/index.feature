@@ -1038,6 +1038,616 @@ Feature: List license
     And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
+  Scenario: Admin retrieves licenses with activity inside the last 30 days (simple ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[inside]=30d"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity inside the last 1 day, 5 hours, 59 minutes, 59 seconds (complex ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[inside]=P1DT5H59M59S"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity outside the last 30 days (simple ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[outside]=30d"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity outside the last 1 day, 5 hours, 59 minutes, 59 seconds (complex ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[outside]=P1DT5H59M59S"
+    Then the response status should be "200"
+    And the response body should be an array with 3 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity outside the last 30 days (simple ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[outside]=30d"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity after a specific date (ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[after]=2024-04-21T00:00:00.000Z"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity after a specific date (unix)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[after]=1713657600"
+    Then the response status should be "200"
+    And the response body should be an array with 4 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity before a specific date (ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[before]=2024-04-21T00:00:00.000Z"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with activity before a specific date (unix)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[before]=1713657600"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+    And time is unfrozen
+
+  Scenario: Admin retrieves licenses with an invalid activity filter
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-22T23:59:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-09-23T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-07-22T00:00:00.000Z",
+        "lastValidatedAt": null,
+        "expiry": "2024-10-22T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-7-22T00:00:00.000Z",
+        "lastValidatedAt": "2024-10-22T00:00:00.000Z",
+        "expiry": "2024-10-21T00:00:00.000Z",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2024-10-19T20:00:00.000Z",
+        "lastCheckOutAt": "2024-10-21T00:00:00.000Z",
+        "expiry": "2023-10-23T00:00:00.000Z",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "2022-10-23T00:00:00.000Z",
+        "lastValidatedAt": "2023-10-23T00:00:00.000Z",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And time is frozen at "2024-10-23T00:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?activity[invalid]=1y"
+    Then the response status should be "200"
+    And the response body should be an array with 0 "licenses"
+    And time is unfrozen
+
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
     And the current account is "test1"

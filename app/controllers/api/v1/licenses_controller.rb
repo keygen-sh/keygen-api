@@ -13,6 +13,9 @@ module Api::V1
     has_scope(:expires, type: :hash, only: :index) { |c, s, v|
       s.expires(**v.symbolize_keys.slice(:within, :in, :before, :after))
     }
+    has_scope(:activity, type: :hash, only: :index) { |c, s, v|
+      s.activity(**v.symbolize_keys.slice(:inside, :outside, :before, :after))
+    }
     has_scope :suspended
     has_scope :expiring
     has_scope :expired

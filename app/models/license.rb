@@ -465,6 +465,36 @@ class License < ApplicationRecord
       SQL
   }
 
+  scope :activity, -> (inside: nil, outside: nil, before: nil, after: nil) {
+    begin
+      case
+      when inside.present?
+        s = inside.to_s.match?(/\A\d+\z/) ? "PT#{inside.to_s}S".upcase : "P#{inside.to_s.delete_prefix('P').upcase}"
+        d = ActiveSupport::Duration.parse(s)
+
+        active(d.ago)
+      when outside.present?
+        s = outside.to_s.match?(/\A\d+\z/) ? "PT#{outside.to_s}S".upcase : "P#{outside.to_s.delete_prefix('P').upcase}"
+        d = ActiveSupport::Duration.parse(s)
+
+        inactive(d.ago)
+      when before.present?
+        t = before.to_s.match?(/\A\d+\z/) ? Time.at(before.to_i) : before.to_time
+
+        inactive(t)
+      when after.present?
+        t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
+
+        active(t)
+      else
+        none
+      end
+    rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
+           ArgumentError # to_time raises for invalid input
+      none
+    end
+  }
+
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :assigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
