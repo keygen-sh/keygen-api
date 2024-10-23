@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'pathname'
-
-require_relative '../gems/ping/lib/ping/version'
+require_relative 'lib/ping/version'
 
 Gem::Specification.new do |spec|
   # required gem info
@@ -17,8 +15,12 @@ Gem::Specification.new do |spec|
   spec.authors  = ['Keygen']
   spec.license  = 'MIT'
 
+  # # gem platform
+  # spec.platform = 'jruby'
+
   # files included in the gem
-  spec.files = Dir.glob('../gems/ping/**/*')
+  spec.files         = ['lib/ping.rb', 'lib/ping/version.rb']
+  spec.require_paths = ['lib']
 
   # required Ruby version
   spec.required_ruby_version = '>= 3.1'
