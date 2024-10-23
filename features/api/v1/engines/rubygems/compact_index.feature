@@ -1,10 +1,10 @@
 @api/v1
-Feature: Rubygems simple package index
+Feature: Rubygems compact index
   Background:
     Given the following "accounts" exist:
-      | name   | slug  |
-      | Test 1 | test1 |
-      | Test 2 | test2 |
+      | id                                   | slug  | name   |
+      | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | test1 | Test 1 |
+      | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | test2 | Test 2 |
     And the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   | distribution_strategy |
