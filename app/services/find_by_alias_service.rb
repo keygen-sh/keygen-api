@@ -27,7 +27,7 @@ class FindByAliasService < BaseService
     raise Keygen::Error::NotFoundError.new(model:, id:) if
       id.blank?
 
-    # Strip out ID attribute if the ID doesn't resemble a UUID (pg will throw)
+    # strip out ID attribute if the ID doesn't resemble a UUID (pg will throw)
     columns = [PRIMARY_KEY, *aliases].uniq
 
     columns.reject! { _1 == PRIMARY_KEY } unless
@@ -36,7 +36,7 @@ class FindByAliasService < BaseService
     raise Keygen::Error::NotFoundError.new(model:, id:) if
       columns.empty?
 
-    # Generates a query resembling the following, while handling encrypted columns:
+    # generates a query resembling the following while handling encrypted columns:
     #
     #   SELECT
     #     "accounts".*
@@ -47,6 +47,7 @@ class FindByAliasService < BaseService
     #     "accounts"."slug" = :id
     #   LIMIT
     #     1
+    #
     primary_column, *alias_columns = columns
 
     scp = scope.where(primary_column => id)
@@ -56,8 +57,8 @@ class FindByAliasService < BaseService
       )
     end
 
-    # In case of duplicates, find the oldest one first.
-    scp = scp.reorder(created_at: :asc) if
+    # find the oldest one first in case of duplicates
+    scp = scp.reorder("#{table}.created_at ASC") if
       reorder?
 
     record = scp.limit(1)
