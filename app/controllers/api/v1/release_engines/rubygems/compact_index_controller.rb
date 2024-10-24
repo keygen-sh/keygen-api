@@ -29,7 +29,7 @@ module Api::V1::ReleaseEngines
           to: :index?
 
         versions = releases.flat_map do |release|
-          artifacts = authorized_scope(release.uploaded_artifacts)
+          artifacts = release.uploaded_artifacts
           authorize! artifacts,
             to: :index?
 
@@ -71,7 +71,7 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       versions = releases.flat_map do |release|
-        artifacts = authorized_scope(release.uploaded_artifacts)
+        artifacts = release.uploaded_artifacts
         authorize! artifacts,
           to: :index?
 
