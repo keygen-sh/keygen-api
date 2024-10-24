@@ -3,8 +3,8 @@
 require 'rubygems/specification'
 
 class ReleaseSpecification < ApplicationRecord
-  MIN_CONTENT_LENGTH = 5.bytes     # to avoid processing empty or invalid specs
-  MAX_CONTENT_LENGTH = 5.megabytes # to avoid downloading large specs
+  MIN_CONTENT_LENGTH = 5.bytes     # to avoid storing empty or invalid specs
+  MAX_CONTENT_LENGTH = 5.megabytes # to avoid storing large specs
 
   include Keygen::PortableClass
   include Environmental

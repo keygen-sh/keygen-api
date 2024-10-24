@@ -152,6 +152,86 @@ describe WaitForArtifactUploadWorker do
         expect(artifact.reload.specification).to be nil
       end
     end
+
+    context 'when artifact is too small' do
+      let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
+      let(:processor) { ProcessGemSpecificationWorker }
+
+      before do
+        Aws.config[:s3] = {
+          stub_responses: {
+            head_object: [{ content_length: 2.bytes.to_i, content_type: 'application/octet-stream', etag: '"14bfa6bb14875e45bba028a21ed38046"' }],
+            get_object: [{ body: file_fixture('ping-1.0.0.gem').open }],
+          },
+        }
+      end
+
+      after do
+        processor.clear
+      end
+
+      it 'should emit an artifact.upload.processing event' do
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: %w[artifact.upload.succeeded artifact.uploaded]) }.exactly(1).time
+
+        waiter.perform_async(artifact.id)
+        waiter.drain
+        processor.drain
+        notifier.drain
+      end
+
+      it 'should not process gem' do
+        waiter.perform_async(artifact.id)
+
+        expect { waiter.drain }.to not_change { processor.jobs.size }
+          .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+          .and change { notifier.jobs.size }
+
+        expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
+
+        expect(artifact.reload.specification).to be nil
+      end
+    end
+
+    context 'when artifact is too large' do
+      let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
+      let(:processor) { ProcessGemSpecificationWorker }
+
+      before do
+        Aws.config[:s3] = {
+          stub_responses: {
+            head_object: [{ content_length: 1.gigabyte.to_i, content_type: 'application/octet-stream', etag: '"14bfa6bb14875e45bba028a21ed38046"' }],
+            get_object: [{ body: file_fixture('ping-1.0.0.gem').open }],
+          },
+        }
+      end
+
+      after do
+        processor.clear
+      end
+
+      it 'should emit an artifact.upload.processing event' do
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: %w[artifact.upload.succeeded artifact.uploaded]) }.exactly(1).time
+
+        waiter.perform_async(artifact.id)
+        waiter.drain
+        processor.drain
+        notifier.drain
+      end
+
+      it 'should not process gem' do
+        waiter.perform_async(artifact.id)
+
+        expect { waiter.drain }.to not_change { processor.jobs.size }
+          .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+          .and change { notifier.jobs.size }
+
+        expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
+
+        expect(artifact.reload.specification).to be nil
+      end
+    end
   end
 
   context 'when an artifact is uploaded' do
