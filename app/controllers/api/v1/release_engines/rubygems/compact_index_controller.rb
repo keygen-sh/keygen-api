@@ -20,9 +20,9 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      gems = packages.joins(published_releases: { uploaded_artifacts: :specification })
-                     .eager_load(published_releases: { uploaded_artifacts: :specification }) # must exist
-                     .preload(published_releases: { uploaded_artifacts: :platform })         # may exist
+      gems = packages.joins(published_releases: { uploaded_artifacts: :specification })    # must exist
+                     .includes(published_releases: { uploaded_artifacts: :specification }) # eager load
+                     .preload(published_releases: { uploaded_artifacts: :platform })       # may exist
                      .distinct
                      .map do |package|
         versions = package.published_releases.flat_map do |release|
@@ -56,9 +56,9 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      versions = package.published_releases.joins(uploaded_artifacts: :specification)
-                                           .eager_load(uploaded_artifacts: :specification) # must exist
-                                           .preload(uploaded_artifacts: :platform)         # may exist
+      versions = package.published_releases.joins(uploaded_artifacts: :specification)    # must exist
+                                           .includes(uploaded_artifacts: :specification) # eager load
+                                           .preload(uploaded_artifacts: :platform)       # may exist
                                            .distinct
                                            .flat_map do |release|
         release.uploaded_artifacts.map do |artifact|
@@ -108,12 +108,12 @@ module Api::V1::ReleaseEngines
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.rubygems)
                           .joins(
-                            # we want to ignore packages without any eligible gem versions
+                            # we want to ignore packages without any eligible gem specs
                             published_releases: { uploaded_artifacts: :specification },
                           )
 
       Current.resource = @package = FindByAliasService.call(
-        authorized_scope(scoped_packages),
+        scoped_packages,
         id: params[:gem],
         aliases: :key,
       )
