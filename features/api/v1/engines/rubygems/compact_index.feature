@@ -6,6 +6,9 @@ Feature: Rubygems compact index
       | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | test1 | Test 1 |
       | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | test2 | Test 2 |
     And the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code  |
+      | 1740e334-9d88-43c8-8b2e-38fd98f153d2 | JRUBY |
     And the current account has the following "product" rows:
       | id                                   | code  | name   | distribution_strategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | test1 | Test 1 | LICENSED              |
@@ -20,20 +23,20 @@ Feature: Rubygems compact index
       | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw      | quxx  |
       | 3d771f82-a0ed-48fd-914a-f5ecda9b4044 | 6727d2a2-626c-4270-880c-3f7f378ea37a | rubygems | corge |
     And the current account has the following "release" rows:
-      | id                                   | product_id                           | release_package_id                   | version      | channel  | status    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | PUBLISHED |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.1        | stable   | PUBLISHED |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   | PUBLISHED |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     | PUBLISHED |
-      | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.2 | beta     | PUBLISHED |
-      | 56f66b77-f447-4300-828b-5cf92e457376 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.3 | beta     | DRAFT     |
-      | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 7b113ac2-ae81-406a-b44e-f356126e2faa | 1.0.0        | stable   | YANKED    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 7b113ac2-ae81-406a-b44e-f356126e2faa | 2.0.0        | stable   | PUBLISHED |
-      | 00c9c981-8a75-494b-9207-71a829665729 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | 1.0.0        | stable   | PUBLISHED |
-      | e00475de-edcc-4571-adec-5ef1b91ddb85 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | 1.1.0        | stable   | PUBLISHED |
-      | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.0.0        | stable   | PUBLISHED |
-      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   | PUBLISHED |
-      | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   | PUBLISHED |
+      | id                                   | product_id                           | release_package_id                   | version      | channel  | status    | entitlements |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | PUBLISHED |              |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.1        | stable   | PUBLISHED |              |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   | PUBLISHED | JRUBY        |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     | PUBLISHED |              |
+      | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.2 | beta     | PUBLISHED |              |
+      | 56f66b77-f447-4300-828b-5cf92e457376 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.3 | beta     | DRAFT     |              |
+      | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 7b113ac2-ae81-406a-b44e-f356126e2faa | 1.0.0        | stable   | YANKED    |              |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | 7b113ac2-ae81-406a-b44e-f356126e2faa | 2.0.0        | stable   | PUBLISHED |              |
+      | 00c9c981-8a75-494b-9207-71a829665729 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | 1.0.0        | stable   | PUBLISHED |              |
+      | e00475de-edcc-4571-adec-5ef1b91ddb85 | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | 1.1.0        | stable   | PUBLISHED |              |
+      | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.0.0        | stable   | PUBLISHED |              |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   | PUBLISHED |              |
+      | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   | PUBLISHED |              |
     And the current account has the following "artifact" rows:
       | id                                   | release_id                           | filename             | filetype | platform | checksum                                                         | status   |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.gem        | gem      | ruby     | 32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67 | UPLOADED |
@@ -189,7 +192,29 @@ Feature: Rubygems compact index
       """
     And time is unfrozen
 
-  Scenario: License lists available gems
+  Scenario: License lists available gems (entitled)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: License lists available gems (unentitled)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -206,11 +231,31 @@ Feature: Rubygems compact index
       ---
       bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
-      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
 
-  Scenario: License retrieves a licensed gem (same product)
+  Scenario: License retrieves a licensed gem (entitled)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
+  Scenario: License retrieves a licensed gem (unentitled)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -225,8 +270,6 @@ Feature: Rubygems compact index
       ---
       1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
       1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
-      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
-      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
       """
 
   Scenario: License retrieves a licensed gem (different product)
@@ -256,7 +299,30 @@ Feature: Rubygems compact index
       2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
       """
 
-  Scenario: User lists available gems (with owned license)
+  Scenario: User lists available gems (with entitled owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: User lists available gems (with unentitled owned license)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -274,11 +340,35 @@ Feature: Rubygems compact index
       ---
       bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
+      """
+    And time is unfrozen
+
+  Scenario: User lists available gems (with entitled license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
 
-  Scenario: User lists available gems (with license)
+  Scenario: User lists available gems (with unentitled license)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -297,7 +387,7 @@ Feature: Rubygems compact index
       ---
       bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
-      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
 
@@ -316,7 +406,28 @@ Feature: Rubygems compact index
       """
     And time is unfrozen
 
-  Scenario: User retrieves a licensed gem (with owned license)
+  Scenario: User retrieves a licensed gem (with entitled owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
+  Scenario: User retrieves a licensed gem (with unentitled owned license)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -332,11 +443,31 @@ Feature: Rubygems compact index
       ---
       1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
       1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      """
+
+  Scenario: User retrieves a licensed gem (with license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
       1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
       1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
       """
 
-  Scenario: User retrieves a licensed gem (with license)
+  Scenario: User retrieves a licensed gem (with unentitled license)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
@@ -353,8 +484,6 @@ Feature: Rubygems compact index
       ---
       1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
       1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
-      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
-      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
       """
 
   Scenario: User retrieves a licensed gem (no license)
