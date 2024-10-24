@@ -27,7 +27,7 @@ module Api::V1::ReleaseEngines
       scoped_artifacts = authorized_scope(current_account.release_artifacts.gems)
                            .joins(:specification) # must exist
                            .includes(
-                             :specification, # eager load
+                             :specification,
                            )
 
       Current.resource = @artifact = FindByAliasService.call(
