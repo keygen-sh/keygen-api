@@ -7,16 +7,18 @@ Feature: Rubygems compact index
       | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | test2 | Test 2 |
     And the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name   | distribution_strategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 | LICENSED              |
-      | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | Test 2 | LICENSED              |
+      | id                                   | code  | name   | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | test1 | Test 1 | LICENSED              |
+      | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | test2 | Test 2 | OPEN                  |
+      | 6727d2a2-626c-4270-880c-3f7f378ea37a | test3 | Test 3 | CLOSED                |
     And the current account has the following "package" rows:
-      | id                                   | product_id                           | engine   | key  |
-      | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | foo  |
-      | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | bar  |
-      | 7b113ac2-ae81-406a-b44e-f356126e2faa | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | baz  |
-      | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | qux  |
-      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw      | quxx |
+      | id                                   | product_id                           | engine   | key   |
+      | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | foo   |
+      | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | bar   |
+      | 7b113ac2-ae81-406a-b44e-f356126e2faa | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | baz   |
+      | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | qux   |
+      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw      | quxx  |
+      | 3d771f82-a0ed-48fd-914a-f5ecda9b4044 | 6727d2a2-626c-4270-880c-3f7f378ea37a | rubygems | corge |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | release_package_id                   | version      | channel  | status    |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | PUBLISHED |
@@ -33,21 +35,21 @@ Feature: Rubygems compact index
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   | PUBLISHED |
       | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   | PUBLISHED |
     And the current account has the following "artifact" rows:
-      | id                                   | release_id                           | filename             | filetype | platform | checksum                                                                                                                         | status   |
-      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.gem        | gem      | ruby     | 52ab51053cfd7ce4b831cbf035951a1f25442360c1f17cf17c22ae09cbbe8c6e0b1acf2670f5e8816838b4e6f8ccbfbb64e647ee0452ec463ac49118d4c776f0 | UPLOADED |
-      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.gem        | gem      | ruby     | a4cd4c2b4f87c4f5638f20f5d3a7adbe401a99fc83d4a5f8eb33f1ee9fa7d533f45df84d17c9c258b4033324428be6a0df0be9f98c2ba09b427aa72b6cd1f8a5 | UPLOADED |
-      | 92c38af8-7ed7-4adc-aee2-21ceb5c6511c | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-jruby.gem  | gem      | jruby    | b69abdfd1fdf7ef65eeabde6599ee704c5911ac502a1bf5f4befc679972d58748951449f2818a5f0109009ac2d828c8e6115d76d3c5cfba0281c7660aa6dce78 | UPLOADED |
-      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.gem        | gem      | ruby     | 81c57f95412fe5b2825a0636761d818605600b0afb71f32230cf37768b4fd11357b426364ff155293a0551919569c75c376c16d6b986dc8fdbd9e02065b5eebf | UPLOADED |
-      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0-beta.1.gem | gem      |          | 270d937e5b0c03e141e83160edc595830e3adfe70b611db31e16a40993b485b74477e66b5b46906c8b8bebc4be27026580ebc75eb71070cc501392e1135ae318 | UPLOADED |
-      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | bar-1.0.0-beta.2.gem | gem      |          | 96337edc760ec8f29dab326f3498d6d260798efd5699fb818ea47ea76a3589fc5b5726666a3702927ee026451840bf8bfe4d4f881b60433e6ff3ee5fa3e69bfd | UPLOADED |
-      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | bar-1.0.0-beta.3.gem | gem      |          | 10cf6e6911fc85450768121f7a5d7c5955a6fc9152c59e9053c176d5b3499a12ee2f652a2a491ed876287d3f8d6710d13900c7c7331ea20ff4641643b47ea856 | UPLOADED |
-      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.gem        | gem      |          | dfd57f7723abdd49c19929e254cbde4d80c2bdd89cc7733a2b1c5d46dec2003c420437506c3436c838aad109160c1678d4d2ef7ed3477c8183a1269672261b46 | UPLOADED |
-      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.gem        | gem      |          | dfd57f7723abdd49c19929e254cbde4d80c2bdd89cc7733a2b1c5d46dec2003c420437506c3436c838aad109160c1678d4d2ef7ed3477c8183a1269672261b46 | UPLOADED |
-      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.gem        | gem      |          | 8c9e896fd71db779dfa414be3afcef9e45afb50f6c5e9e88e7daa394d2a8cc2b8b77d27e114cc6eccdf317e4532882c586a33cc6d3dd15123d639788e8948257 | UPLOADED |
-      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.gem        | gem      | ruby     |                                                                                                                                  | WAITING  |
-      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.gem       | gem      | ruby     | f976fe01f8bb9c192e39b3ee37f84c16c52b3868b3f635c809bf70707bc120bc699e3d385085b5fb84f45456a108fa863ca03016075dbec34a530deb01d8c964 | FAILED   |
-      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.gem       | gem      | ruby     | ee5ce16c849ef08f71464e806abcd95b77d2a98599fefe1863e3321e4eca941966ba07ef1e7cca0f2e2f60fccac6bd0ba407f8b105b0b5590ecc2f2f1e5a10d5 | UPLOADED |
-      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.gem      | gem      |          |                                                                                                                                  | UPLOADED |
+      | id                                   | release_id                           | filename             | filetype | platform | checksum                                                         | status   |
+      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.gem        | gem      | ruby     | 32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67 | UPLOADED |
+      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.gem        | gem      | ruby     | 455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6 | UPLOADED |
+      | 92c38af8-7ed7-4adc-aee2-21ceb5c6511c | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-jruby.gem  | gem      | jruby    | fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793 | UPLOADED |
+      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.gem        | gem      | ruby     | 2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6 | UPLOADED |
+      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0-beta.1.gem | gem      |          | be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7 | UPLOADED |
+      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | bar-1.0.0-beta.2.gem | gem      |          | 1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7 | UPLOADED |
+      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | bar-1.0.0-beta.3.gem | gem      |          | 4a98a6ed4fe4723ca1ba18e52d4c832fb2a1f343e7d9a4c07723a1d41d62c374 | UPLOADED |
+      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.gem        | gem      |          | 5a9fe4919e0d7089020f087561fb3a1fbdcbe420cdb822039f849925aaeaddfd | UPLOADED |
+      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.gem        | gem      |          | b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707 | UPLOADED |
+      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.gem        | gem      |          | e9af40c7b7186b7b45f26990b2be4cf8acb8215abd312e7c1ccfdd66ce5ebb39 | UPLOADED |
+      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.gem        | gem      | ruby     |                                                                  | WAITING  |
+      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.gem       | gem      | ruby     | 2a69cc50ecfcbcd8812e452d6a48b4c4bec47855f527ba98c534410a52e1d772 | FAILED   |
+      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.gem       | gem      | ruby     | f200b250b74054f795c396f3981fc515090dd463a96a572375f06b5eaf15da82 | UPLOADED |
+      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.gem      | gem      |          |                                                                  | UPLOADED |
     And the current account has the following "spec" rows:
       | release_artifact_id                  | release_id                           | content                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | --- !ruby/object:Gem::Specification\nname: foo\nversion: !ruby/object:Gem::Version\n  version: 1.0.0\nplatform: ruby\nauthors: []\nautorequire: \nbindir: bin\ncert_chain: []\ndate: 2024-10-22 00:00:00.000000000 Z\ndependencies:\n- !ruby/object:Gem::Dependency\n  name: rails\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '7.0'\n  type: :runtime\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '7.0'\n- !ruby/object:Gem::Dependency\n  name: rspec-rails\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\n- !ruby/object:Gem::Dependency\n  name: temporary_tables\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.0'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.0'\n- !ruby/object:Gem::Dependency\n  name: sql_matchers\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.0'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.0'\n- !ruby/object:Gem::Dependency\n  name: sqlite3\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.4'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - "~>"\n      - !ruby/object:Gem::Version\n        version: '1.4'\n- !ruby/object:Gem::Dependency\n  name: mysql2\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\n- !ruby/object:Gem::Dependency\n  name: pg\n  requirement: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\n  type: :development\n  prerelease: false\n  version_requirements: !ruby/object:Gem::Requirement\n    requirements:\n    - - ">="\n      - !ruby/object:Gem::Version\n        version: '0'\ndescription: foo\nemail: \nexecutables: []\nextensions: []\nextra_rdoc_files: []\nfiles: []\nhomepage: \nlicenses:\n- MIT\nmetadata: {}\npost_install_message: \nrdoc_options: []\nrequire_paths:\n- lib\nrequired_ruby_version: !ruby/object:Gem::Requirement\n  requirements:\n  - - ">="\n    - !ruby/object:Gem::Version\n      version: '3.1'\nrequired_rubygems_version: !ruby/object:Gem::Requirement\n  requirements:\n  - - ">="\n    - !ruby/object:Gem::Version\n      version: '0'\nrequirements: []\nrubygems_version: 3.5.11\nsigning_key: \nspecification_version: 4\nsummary: \ntest_files: []\n  |
@@ -101,9 +103,9 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 d179e61cdc1d791d7fc4f25e17540a06
-      baz 2.0.0 917bd09a66a9af873444f313fb96d480
-      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 7c5d2be0054be8a5121b8bcef9ff9faa
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
 
@@ -115,10 +117,10 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:52ab51053cfd7ce4b831cbf035951a1f25442360c1f17cf17c22ae09cbbe8c6e0b1acf2670f5e8816838b4e6f8ccbfbb64e647ee0452ec463ac49118d4c776f0,ruby:>= 3.1
-      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:a4cd4c2b4f87c4f5638f20f5d3a7adbe401a99fc83d4a5f8eb33f1ee9fa7d533f45df84d17c9c258b4033324428be6a0df0be9f98c2ba09b427aa72b6cd1f8a5,ruby:>= 3.1
-      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:b69abdfd1fdf7ef65eeabde6599ee704c5911ac502a1bf5f4befc679972d58748951449f2818a5f0109009ac2d828c8e6115d76d3c5cfba0281c7660aa6dce78,ruby:>= 3.1
-      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:81c57f95412fe5b2825a0636761d818605600b0afb71f32230cf37768b4fd11357b426364ff155293a0551919569c75c376c16d6b986dc8fdbd9e02065b5eebf,ruby:>= 3.1
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
       """
 
   Scenario: Endpoint should return a gem without dependencies
@@ -129,14 +131,20 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      1.0.0-beta.1 |checksum:270d937e5b0c03e141e83160edc595830e3adfe70b611db31e16a40993b485b74477e66b5b46906c8b8bebc4be27026580ebc75eb71070cc501392e1135ae318
-      1.0.0-beta.2 |checksum:96337edc760ec8f29dab326f3498d6d260798efd5699fb818ea47ea76a3589fc5b5726666a3702927ee026451840bf8bfe4d4f881b60433e6ff3ee5fa3e69bfd
+      1.0.0-beta.1 |checksum:be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7
+      1.0.0-beta.2 |checksum:1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7
       """
 
-  Scenario: Endpoint should return a gem without versions
+  Scenario: Endpoint should return an error for gem without versions
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/info/qux"
+    Then the response status should be "404"
+
+  Scenario: Endpoint should return an error for missing gem
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/x"
     Then the response status should be "404"
 
   Scenario: Endpoint should return all gem names
@@ -152,3 +160,247 @@ Feature: Rubygems compact index
       foo
       """
 
+  Scenario: Product lists their gems (licensed distribution strategy)
+    Given I am product "test1" of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: Product lists their gems (open distribution strategy)
+    Given I am product "test2" of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      """
+    And time is unfrozen
+
+  Scenario: License lists available gems
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: License retrieves a licensed gem (same product)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
+  Scenario: License retrieves a licensed gem (different product)
+    Given the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "404"
+
+  Scenario: License retrieves an open gem (different product)
+    Given the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/baz"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      """
+
+  Scenario: User lists available gems (with owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: User lists available gems (with license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
+  Scenario: User lists available gems (no license)
+    Given the current account has 1 "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      """
+    And time is unfrozen
+
+  Scenario: User retrieves a licensed gem (with owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
+  Scenario: User retrieves a licensed gem (with license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
+  Scenario: User retrieves a licensed gem (no license)
+    Given the current account has 1 "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "404"
+
+  Scenario: User retrieves an open gem (no license)
+    Given the current account has 1 "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/baz"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      """
+
+  Scenario: Anon lists available gems
+    Given time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      """
+    And time is unfrozen
+
+  Scenario: Anon retrieves a closed gem
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/corge"
+    Then the response status should be "404"
+
+  Scenario: Anon retrieves a licensed gem
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "404"
+
+  Scenario: Anon retrieves an open gem
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/baz"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      """
