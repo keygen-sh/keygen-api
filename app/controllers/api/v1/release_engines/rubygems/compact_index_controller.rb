@@ -20,13 +20,20 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      gems = packages.joins(published_releases: { uploaded_artifacts: :specification })    # must exist
-                     .includes(published_releases: { uploaded_artifacts: :specification }) # eager load
-                     .preload(published_releases: { uploaded_artifacts: :platform })       # may exist
+      gems = packages.includes(published_releases: { uploaded_artifacts: %i[specification platform] })
+                     .preload(published_releases: %i[constraints entitlements])
                      .distinct
                      .map do |package|
-        versions = package.published_releases.flat_map do |release|
-          release.uploaded_artifacts.map do |artifact|
+        releases = authorized_scope(package.published_releases)
+        authorize! releases,
+          to: :index?
+
+        versions = releases.flat_map do |release|
+          artifacts = authorized_scope(release.uploaded_artifacts)
+          authorize! artifacts,
+            to: :index?
+
+          artifacts.map do |artifact|
             gemspec      = artifact.specification.as_gemspec
             dependencies = gemspec.dependencies.map do |dependency|
               CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
@@ -56,12 +63,19 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      versions = package.published_releases.joins(uploaded_artifacts: :specification)    # must exist
-                                           .includes(uploaded_artifacts: :specification) # eager load
-                                           .preload(uploaded_artifacts: :platform)       # may exist
-                                           .distinct
-                                           .flat_map do |release|
-        release.uploaded_artifacts.map do |artifact|
+      releases = authorized_scope(package.published_releases)
+                  .includes(uploaded_artifacts: %i[specification platform])
+                  .preload(:product, :constraints, :entitlements)
+                  .distinct
+      authorize! releases,
+        to: :index?
+
+      versions = releases.flat_map do |release|
+        artifacts = authorized_scope(release.uploaded_artifacts)
+        authorize! artifacts,
+          to: :index?
+
+        artifacts.map do |artifact|
           gemspec      = artifact.specification.as_gemspec
           dependencies = gemspec.dependencies.map do |dependency|
             CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
@@ -86,8 +100,7 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      names = packages.joins(published_releases: { uploaded_artifacts: :specification })
-                      .reorder(key: :asc)
+      names = packages.reorder(key: :asc)
                       .distinct
                       .pluck(
                         :key,
@@ -102,14 +115,18 @@ module Api::V1::ReleaseEngines
                 :package
 
     def set_packages
-      @packages = authorized_scope(apply_scopes(current_account.release_packages.rubygems)).preload(:product)
+      @packages = authorized_scope(apply_scopes(current_account.release_packages.rubygems))
+                    .preload(:product)
+                    .joins(
+                      # we want to ignore packages without any eligible gem specs
+                      published_releases: { uploaded_artifacts: :specification },
+                    )
     end
 
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.rubygems)
                           .joins(
-                            # we want to ignore packages without any eligible gem specs
-                            published_releases: { uploaded_artifacts: :specification },
+                            published_releases: { uploaded_artifacts: :specification }, # must exist
                           )
 
       Current.resource = @package = FindByAliasService.call(
