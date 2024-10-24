@@ -62,7 +62,7 @@ class ReleasePackage < ApplicationRecord
 
   scope :for_user, -> user {
     joins(product: %i[licenses])
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: License.for_user(user) },
@@ -70,20 +70,20 @@ class ReleasePackage < ApplicationRecord
       .distinct
       .union(open)
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 
   scope :for_license, -> id {
     joins(product: %i[licenses])
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: },
       )
       .union(open)
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 

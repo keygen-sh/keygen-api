@@ -20,7 +20,7 @@ class Product < ApplicationRecord
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, dependent: :destroy_async
   has_many :machines, through: :licenses
-  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
+  has_many :users, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses do
     def owners = where.not(licenses: { user_id: nil })
   end
   has_many :tokens, as: :bearer, dependent: :destroy_async
@@ -114,11 +114,12 @@ class Product < ApplicationRecord
 
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: })
+                    .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
                     .licensed
                     .distinct
                     .union(open)
                     .reorder(
-                      created_at: DEFAULT_SORT_ORDER,
+                      "#{table_name}.created_at": DEFAULT_SORT_ORDER,
                     )
   }
 
@@ -131,9 +132,10 @@ class Product < ApplicationRecord
                    .distinct
 
     from(products, table_name)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .union(open)
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 

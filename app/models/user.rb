@@ -24,21 +24,21 @@ class User < ApplicationRecord
   end
   # FIXME(ezekg) Not sold on this naming but I can't think of anything better.
   #              Maybe collaborators or associated_users?
-  has_many :teammates, -> user { distinct.reorder(created_at: DEFAULT_SORT_ORDER).excluding(user) },
+  has_many :teammates, -> user { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER).excluding(user) },
     through: :licenses,
     source: :users
-  has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :policies, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :license_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
-  has_many :policy_entitlements, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :products, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :policies, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :license_entitlements, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :policy_entitlements, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :owned_machines, dependent: :destroy_async, class_name: Machine.name, foreign_key: :owner_id
-  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses do
+  has_many :machines, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses do
     def owned = where(owner: proxy_association.owner)
   end
   has_many :components, through: :machines
   has_many :processes, through: :machines
   has_many :tokens, as: :bearer, dependent: :destroy_async
-  has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
+  has_many :releases, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) },
     through: :products
   has_many :event_logs,
     as: :resource
@@ -323,7 +323,7 @@ class User < ApplicationRecord
         where(id: user), # itself
       )
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
   scope :for_group, -> id { where(group: id) }
@@ -345,7 +345,7 @@ class User < ApplicationRecord
         where('users.created_at >= ?', t).unbanned,
       )
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
   scope :inactive, -> (t = 90.days.ago) {
