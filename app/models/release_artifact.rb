@@ -307,6 +307,10 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
+  scope :for_packages, -> packages {
+    joins(:package).where(package: { id: packages })
+  }
+
   scope :for_package, -> package {
     case package.presence
     when ReleasePackage,
@@ -426,10 +430,10 @@ class ReleaseArtifact < ApplicationRecord
 
     case
     when license.revoke_access?
-      license.expired? ? none : joins(:release).where(release: { created_at: ..license.expiry })
+      license.expired? ? none : joins(:release).where(releases: { created_at: ..license.expiry })
     when license.restrict_access?,
          license.maintain_access?
-      joins(:release).where(release: { created_at: ..license.expiry })
+      joins(:release).where(releases: { created_at: ..license.expiry })
     when license.allow_access?
       all
     else
@@ -445,6 +449,7 @@ class ReleaseArtifact < ApplicationRecord
   scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
+  scope :unyanked,  -> { joins(:release).where.not(releases: { status: 'YANKED' }) }
 
   scope :gems, -> { for_filetype(:gem) }
 

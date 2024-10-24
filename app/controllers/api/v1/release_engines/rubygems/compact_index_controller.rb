@@ -20,38 +20,29 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      gems = packages.includes(published_releases: { uploaded_artifacts: %i[specification platform] })
-                     .preload(published_releases: %i[constraints entitlements])
-                     .distinct
-                     .map do |package|
-        releases = authorized_scope(package.published_releases)
-        authorize! releases,
-          to: :index?
+      artifacts = authorized_scope(current_account.release_artifacts.unyanked.for_packages(packages.ids)).preload(:specification, :package, release: %i[product entitlements constraints])
+      authorize! artifacts,
+        to: :index?
 
-        versions = releases.flat_map do |release|
-          artifacts = release.uploaded_artifacts
-          authorize! artifacts,
-            to: :index?
-
-          artifacts.map do |artifact|
-            gemspec      = artifact.specification.as_gemspec
-            dependencies = gemspec.dependencies.map do |dependency|
-              CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
-            end
-
-            CompactIndex::GemVersion.new(
-              gemspec.version.to_s,
-              gemspec.platform.to_s,
-              artifact.checksum,
-              nil, # will be calculated via versions file
-              dependencies,
-              gemspec.required_ruby_version.to_s,
-              gemspec.required_rubygems_version.to_s,
-            )
+      gems = artifacts.group_by(&:package).reduce([]) do |gemset, (package, artifacts)|
+        versions = artifacts.map do |artifact|
+          gemspec      = artifact.specification.as_gemspec
+          dependencies = gemspec.dependencies.map do |dependency|
+            CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
           end
+
+          CompactIndex::GemVersion.new(
+            gemspec.version.to_s,
+            gemspec.platform.to_s,
+            artifact.checksum,
+            nil, # will be calculated via versions file
+            dependencies,
+            gemspec.required_ruby_version.to_s,
+            gemspec.required_rubygems_version.to_s,
+          )
         end
 
-        CompactIndex::Gem.new(package.key, versions.sort)
+        gemset << CompactIndex::Gem.new(package.key, versions.sort)
       end
 
       render plain: CompactIndex.versions(
@@ -63,34 +54,25 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      releases = authorized_scope(package.published_releases)
-                  .includes(uploaded_artifacts: %i[specification platform])
-                  .preload(:product, :constraints, :entitlements)
-                  .distinct
-      authorize! releases,
+      artifacts = authorized_scope(package.artifacts.unyanked).preload(:specification, release: %i[product entitlements constraints])
+      authorize! artifacts,
         to: :index?
 
-      versions = releases.flat_map do |release|
-        artifacts = release.uploaded_artifacts
-        authorize! artifacts,
-          to: :index?
-
-        artifacts.map do |artifact|
-          gemspec      = artifact.specification.as_gemspec
-          dependencies = gemspec.dependencies.map do |dependency|
-            CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
-          end
-
-          CompactIndex::GemVersion.new(
-            gemspec.version.to_s,
-            gemspec.platform.to_s,
-            artifact.checksum,
-            nil, # unused
-            dependencies,
-            gemspec.required_ruby_version.to_s,
-            gemspec.required_rubygems_version.to_s,
-          )
+      versions = artifacts.map do |artifact|
+        gemspec      = artifact.specification.as_gemspec
+        dependencies = gemspec.dependencies.map do |dependency|
+          CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
         end
+
+        CompactIndex::GemVersion.new(
+          gemspec.version.to_s,
+          gemspec.platform.to_s,
+          artifact.checksum,
+          nil, # unused
+          dependencies,
+          gemspec.required_ruby_version.to_s,
+          gemspec.required_rubygems_version.to_s,
+        )
       end
 
       render plain: CompactIndex.info(versions.sort)
@@ -119,14 +101,14 @@ module Api::V1::ReleaseEngines
                     .preload(:product)
                     .joins(
                       # we want to ignore packages without any eligible gem specs
-                      published_releases: { uploaded_artifacts: :specification },
+                      releases: { artifacts: :specification },
                     )
     end
 
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.rubygems)
                           .joins(
-                            published_releases: { uploaded_artifacts: :specification }, # must exist
+                            releases: { artifacts: :specification }, # must exist
                           )
 
       Current.resource = @package = FindByAliasService.call(

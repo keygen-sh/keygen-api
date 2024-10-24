@@ -106,7 +106,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
@@ -136,6 +136,7 @@ Feature: Rubygems compact index
       ---
       1.0.0-beta.1 |checksum:be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7
       1.0.0-beta.2 |checksum:1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7
+      1.0.0-beta.3 |checksum:4a98a6ed4fe4723ca1ba18e52d4c832fb2a1f343e7d9a4c07723a1d41d62c374
       """
 
   Scenario: Endpoint should return an error for gem without versions
@@ -173,7 +174,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen

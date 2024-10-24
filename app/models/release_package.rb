@@ -27,10 +27,6 @@ class ReleasePackage < ApplicationRecord
   has_many :platforms,
     through: :artifacts
 
-  has_many :published_releases, -> { published },
-    class_name: 'Release',
-    inverse_of: :package
-
   has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :release_packages
 
