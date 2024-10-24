@@ -98,6 +98,9 @@ class ApplicationController < ActionController::API
       format.html {
         render html: 'Forbidden', status: :forbidden
       }
+      format.text {
+        head :forbidden
+      }
     end
   end
 
@@ -120,6 +123,9 @@ class ApplicationController < ActionController::API
       format.html {
         render html: 'Unauthorized', status: :unauthorized
       }
+      format.text {
+        head :unauthorized
+      }
     end
   end
 
@@ -139,6 +145,9 @@ class ApplicationController < ActionController::API
       }
       format.html {
         render html: 'Unprocessable Entity', status: :unprocessable_entity
+      }
+      format.text {
+        head :unprocessable_entity
       }
     end
   end
@@ -161,6 +170,9 @@ class ApplicationController < ActionController::API
       format.html {
         render html: 'Not Found', status: :not_found
       }
+      format.text {
+        head :not_found
+      }
     end
   end
 
@@ -180,6 +192,9 @@ class ApplicationController < ActionController::API
       }
       format.html {
         render html: 'Bad Request', status: :bad_request
+      }
+      format.text {
+        head :bad_request
       }
     end
   end
@@ -201,6 +216,9 @@ class ApplicationController < ActionController::API
       format.html {
         render html: 'Conflict', status: :conflict
       }
+      format.text {
+        head :conflict
+      }
     end
   end
 
@@ -220,6 +238,9 @@ class ApplicationController < ActionController::API
       }
       format.html {
         render html: 'Payment Required', status: :payment_required
+      }
+      format.text {
+        head :payment_required
       }
     end
   end
@@ -241,6 +262,9 @@ class ApplicationController < ActionController::API
       format.html {
         render html: 'Internal Server Error', status: :internal_server_error
       }
+      format.text {
+        head :internal_server_error
+      }
     end
   end
 
@@ -260,6 +284,9 @@ class ApplicationController < ActionController::API
       }
       format.html {
         render html: 'Service Unavailable', status: :service_unavailable
+      }
+      format.text {
+        head :service_unavailable
       }
     end
   end

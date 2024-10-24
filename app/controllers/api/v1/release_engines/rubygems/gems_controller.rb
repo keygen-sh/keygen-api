@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Api::V1::ReleaseEngines
-  class Raw::ReleaseArtifactsController < Api::V1::BaseController
+  class Rubygems::GemsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_artifact, only: %i[show]
+    before_action :set_artifact
 
     def show
       authorize! artifact
@@ -20,16 +20,12 @@ module Api::V1::ReleaseEngines
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = authorized_scope(current_account.release_artifacts)
-        .for_product(params[:product_id])
-        .for_package(params[:package_id])
-        .for_release(params[:release_id])
+      scoped_artifacts = authorized_scope(current_account.release_artifacts.gems)
 
       Current.resource = @artifact = FindByAliasService.call(
-        scoped_artifacts.order_by_version,
-        id: params[:id],
+        scoped_artifacts,
+        id: "#{params[:gem]}.gem",
         aliases: :filename,
-        reorder: false,
       )
     end
   end

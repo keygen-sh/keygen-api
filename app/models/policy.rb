@@ -141,7 +141,7 @@ class Policy < ApplicationRecord
 
   belongs_to :product
   has_many :licenses, dependent: :destroy_async
-  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :users, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :machines, through: :licenses
   has_many :pool, class_name: "Key", dependent: :destroy_async
   has_many :policy_entitlements, dependent: :delete_all

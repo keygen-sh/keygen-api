@@ -10,6 +10,7 @@ class ReleaseArtifact < ApplicationRecord
 
   STATUSES = %w[
     WAITING
+    PROCESSING
     UPLOADED
     FAILED
     YANKED
@@ -37,6 +38,11 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
+  has_one :specification,
+    class_name: 'ReleaseSpecification',
+    foreign_key: :release_artifact_id,
+    inverse_of: :artifact,
+    dependent: :delete
   has_one :channel,
     through: :release
   has_one :product,
@@ -99,17 +105,33 @@ class ReleaseArtifact < ApplicationRecord
     :licensed?, :open?, :closed?,
     to: :release
 
-  scope :order_by_version, -> {
-    joins(:release).reorder(<<~SQL.squish)
-      releases.semver_major        DESC,
-      releases.semver_minor        DESC NULLS LAST,
-      releases.semver_patch        DESC NULLS LAST,
-      releases.semver_pre_word     DESC NULLS FIRST,
-      releases.semver_pre_num      DESC NULLS LAST,
-      releases.semver_build_word   DESC NULLS LAST,
-      releases.semver_build_num    DESC NULLS LAST,
-      release_artifacts.created_at DESC
-    SQL
+  scope :order_by_version, -> (order = :desc) {
+    sql = case order
+          in :desc
+            <<~SQL
+              releases.semver_major        DESC,
+              releases.semver_minor        DESC NULLS LAST,
+              releases.semver_patch        DESC NULLS LAST,
+              releases.semver_pre_word     DESC NULLS FIRST,
+              releases.semver_pre_num      DESC NULLS LAST,
+              releases.semver_build_word   DESC NULLS LAST,
+              releases.semver_build_num    DESC NULLS LAST,
+              release_artifacts.created_at DESC
+            SQL
+          in :asc
+            <<~SQL
+              releases.semver_major        ASC,
+              releases.semver_minor        ASC NULLS FIRST,
+              releases.semver_patch        ASC NULLS FIRST,
+              releases.semver_pre_word     ASC NULLS LAST,
+              releases.semver_pre_num      ASC NULLS FIRST,
+              releases.semver_build_word   ASC NULLS FIRST,
+              releases.semver_build_num    ASC NULLS FIRST,
+              release_artifacts.created_at ASC
+            SQL
+          end
+
+    joins(:release).reorder(sql.squish)
   }
 
   scope :for_channel, -> channel {
@@ -219,7 +241,7 @@ class ReleaseArtifact < ApplicationRecord
       scope = scope.within_expiry_for(license)
 
       scope.joins(product: %i[licenses])
-           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
            .where(
              product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
              licenses: { id: license },
@@ -235,7 +257,7 @@ class ReleaseArtifact < ApplicationRecord
                .uploaded,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -267,7 +289,7 @@ class ReleaseArtifact < ApplicationRecord
                .uploaded,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -283,6 +305,10 @@ class ReleaseArtifact < ApplicationRecord
         engine: { key: engine.to_s },
       )
     end
+  }
+
+  scope :for_packages, -> packages {
+    joins(:package).where(package: { id: packages })
   }
 
   scope :for_package, -> package {
@@ -334,10 +360,16 @@ class ReleaseArtifact < ApplicationRecord
       joins(:filetype).where(filetype: { id: filetype })
     when nil
       where.missing(:filetype)
-    else
+    when Symbol
       joins(:filetype).where(
         filetype: { key: filetype.to_s },
       )
+    when String
+      joins(:filetype).where(
+        filetype: { key: filetype.downcase.delete_prefix('.').strip },
+      )
+    else
+      none
     end
   }
 
@@ -375,7 +407,7 @@ class ReleaseArtifact < ApplicationRecord
 
     scp = joins(release: { constraints: :entitlement })
     scp = if strict
-            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+            scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
                .group(:id)
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
@@ -388,7 +420,7 @@ class ReleaseArtifact < ApplicationRecord
 
     scp.union(without_constraints)
        .reorder(
-         created_at: DEFAULT_SORT_ORDER,
+         "#{table_name}.created_at": DEFAULT_SORT_ORDER,
        )
   }
 
@@ -398,10 +430,10 @@ class ReleaseArtifact < ApplicationRecord
 
     case
     when license.revoke_access?
-      license.expired? ? none : joins(:release).where(release: { created_at: ..license.expiry })
+      license.expired? ? none : joins(:release).where(releases: { created_at: ..license.expiry })
     when license.restrict_access?,
          license.maintain_access?
-      joins(:release).where(release: { created_at: ..license.expiry })
+      joins(:release).where(releases: { created_at: ..license.expiry })
     when license.allow_access?
       all
     else
@@ -409,13 +441,17 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :waiting,  -> { with_status(:WAITING) }
-  scope :uploaded, -> { with_status(:UPLOADED) }
-  scope :failed,   -> { with_status(:FAILED) }
+  scope :waiting,    -> { with_status('WAITING') }
+  scope :processing, -> { with_status('PROCESSING') }
+  scope :uploaded,   -> { with_status('UPLOADED') }
+  scope :failed,     -> { with_status('FAILED') }
 
   scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
+  scope :unyanked,  -> { joins(:release).where.not(releases: { status: 'YANKED' }) }
+
+  scope :gems, -> { for_filetype(:gem) }
 
   def key = "artifacts/#{account_id}/#{release_id}/#{filename}"
 
@@ -499,6 +535,10 @@ class ReleaseArtifact < ApplicationRecord
 
   def waiting?
     status == 'WAITING'
+  end
+
+  def processing?
+    status == 'PROCESSING'
   end
 
   def uploaded?

@@ -8,12 +8,60 @@ FactoryBot.define do
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
     status   { 'UPLOADED' }
 
-    account     { NIL_ACCOUNT }
-    environment { NIL_ENVIRONMENT }
-    release     { build(:release, account:, environment:) }
-    platform    { build(:platform, key: 'darwin', account:) }
-    arch        { build(:arch, key: 'amd64', account:) }
-    filetype    { build(:filetype, key: 'dmg', account:) }
+    account       { NIL_ACCOUNT }
+    environment   { NIL_ENVIRONMENT }
+    release       { build(:release, account:, environment:) }
+    platform      { build(:platform, key: 'darwin', account:) }
+    arch          { build(:arch, key: 'amd64', account:) }
+    filetype      { build(:filetype, key: 'dmg', account:) }
+    specification { nil }
+
+    trait :pypi do
+      release       { build(:release, :raw, account:, environment:) }
+      filename      { "#{release.name.underscore.parameterize}-#{release.version}.whl" }
+      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype      { build(:filetype, key: 'whl', account:) }
+      platform      { nil }
+      arch          { nil }
+    end
+
+    trait :tauri do
+      release       { build(:release, :tauri, account:, environment:) }
+      filename      { "#{release.name.underscore.parameterize}.app" }
+      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype      { build(:filetype, key: 'app', account:) }
+      platform      { build(:platform, key: 'darwin', account:) }
+      arch          { build(:arch, key: 'x86_64', account:) }
+    end
+
+    trait :raw do
+      release       { build(:release, :raw, account:, environment:) }
+      filename      { "#{release.name.underscore.parameterize(separator: '_')}_linux_arm64" }
+      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype      { nil }
+      platform      { build(:platform, key: 'linux', account:) }
+      arch          { build(:arch, key: 'arm64', account:) }
+    end
+
+    trait :rubygems do
+      release       { build(:release, :rubygems, account:, environment:) }
+      filename      { "#{release.name.underscore.parameterize(separator: '_')}-#{release.version}.gem" }
+      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 5.megabytes.to_i) }
+      filetype      { build(:filetype, key: 'gem', account:) }
+      platform      { build(:platform, key: %w[ruby java jruby mswin mswin64].sample) }
+      arch          { nil }
+    end
+
+    trait :with_specification do
+      after :create do |artifact|
+        next if artifact.engine.nil?
+
+        case
+        when artifact.engine.gem?
+          create(:specification, :rubygems, account: release.account, artifact:)
+        end
+      end
+    end
 
     trait :darwin do
       platform { build(:platform, key: 'darwin', account:) }
@@ -41,6 +89,10 @@ FactoryBot.define do
 
     trait :waiting do
       status { 'WAITING' }
+    end
+
+    trait :processing do
+      status { 'PROCESSING' }
     end
 
     trait :uploaded do

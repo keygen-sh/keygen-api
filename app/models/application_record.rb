@@ -19,7 +19,8 @@ class ApplicationRecord < ActiveRecord::Base
     prepend: true
 
   default_scope -> {
-    order(created_at: DEFAULT_SORT_ORDER)
+    # FIXME(ezekg) why do we need an explciit table_name everywhere?
+    order("#{table_name}.created_at": DEFAULT_SORT_ORDER)
   }
 
   scope :without_order, -> {

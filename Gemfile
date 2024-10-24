@@ -99,6 +99,7 @@ gem 'lograge'
 # Dist
 gem 'aws-sdk-s3', '~> 1'
 gem 'semverse'
+gem 'compact_index'
 
 # Misc
 gem 'null_association'

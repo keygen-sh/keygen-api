@@ -191,6 +191,9 @@ events = %w[
   artifact.deleted
   artifact.downloaded
   artifact.updated
+  artifact.upload.failed
+  artifact.upload.processing
+  artifact.upload.uploaded
   artifact.uploaded
 
   component.created

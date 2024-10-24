@@ -34,7 +34,7 @@ class Group < ApplicationRecord
         joins(:owners).where(owners: { user_id: u })
       )
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 

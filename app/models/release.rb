@@ -69,6 +69,10 @@ class Release < ApplicationRecord
     class_name: 'ReleaseUploadLink',
     inverse_of: :release,
     dependent: :delete_all
+  has_many :specifications,
+    class_name: 'ReleaseSpecification',
+    inverse_of: :release,
+    dependent: :delete_all
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
@@ -250,16 +254,31 @@ class Release < ApplicationRecord
     )
   }
 
-  scope :order_by_version, -> {
-    reorder(<<~SQL.squish)
-      releases.semver_major      DESC,
-      releases.semver_minor      DESC NULLS LAST,
-      releases.semver_patch      DESC NULLS LAST,
-      releases.semver_pre_word   DESC NULLS FIRST,
-      releases.semver_pre_num    DESC NULLS LAST,
-      releases.semver_build_word DESC NULLS LAST,
-      releases.semver_build_num  DESC NULLS LAST
-    SQL
+  scope :order_by_version, -> (order = :desc) {
+    sql = case order
+          in :desc
+            <<~SQL
+              releases.semver_major      DESC,
+              releases.semver_minor      DESC NULLS LAST,
+              releases.semver_patch      DESC NULLS LAST,
+              releases.semver_pre_word   DESC NULLS FIRST,
+              releases.semver_pre_num    DESC NULLS LAST,
+              releases.semver_build_word DESC NULLS LAST,
+              releases.semver_build_num  DESC NULLS LAST
+            SQL
+          in :asc
+            <<~SQL
+              releases.semver_major      ASC,
+              releases.semver_minor      ASC NULLS FIRST,
+              releases.semver_patch      ASC NULLS FIRST,
+              releases.semver_pre_word   ASC NULLS LAST,
+              releases.semver_pre_num    ASC NULLS FIRST,
+              releases.semver_build_word ASC NULLS FIRST,
+              releases.semver_build_num  ASC NULLS FIRST
+            SQL
+          end
+
+    reorder(sql.squish)
   }
 
   scope :accessible_by, -> accessor {
@@ -302,7 +321,7 @@ class Release < ApplicationRecord
       scope = scope.within_expiry_for(license)
 
       scope.joins(product: %i[licenses])
-           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
            .where(
              product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
              licenses: { id: license },
@@ -317,7 +336,7 @@ class Release < ApplicationRecord
                .published,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -339,7 +358,7 @@ class Release < ApplicationRecord
     scope = scope.within_expiry_for(license)
 
     scope.joins(product: %i[licenses])
-         .reorder(created_at: DEFAULT_SORT_ORDER)
+         .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
          .where(
            product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
            licenses: { id: license },
@@ -349,7 +368,7 @@ class Release < ApplicationRecord
                .published,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -510,7 +529,7 @@ class Release < ApplicationRecord
 
     scp = joins(constraints: :entitlement)
     scp = if strict
-            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+            scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
                .group(:id)
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
@@ -524,7 +543,7 @@ class Release < ApplicationRecord
     # Union with releases without constraints as well.
     scp.union(without_constraints)
        .reorder(
-         created_at: DEFAULT_SORT_ORDER,
+         "#{table_name}.created_at": DEFAULT_SORT_ORDER,
        )
   }
 

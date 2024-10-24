@@ -22,5 +22,10 @@ FactoryBot.define do
       name { 'Raw' }
       key  { 'raw' }
     end
+
+    trait :rubygems do
+      name { 'Rubygems' }
+      key  { 'rubygems' }
+    end
   end
 end
