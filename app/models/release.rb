@@ -325,7 +325,7 @@ class Release < ApplicationRecord
       scope = scope.within_expiry_for(license)
 
       scope.joins(product: %i[licenses])
-           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
            .where(
              product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
              licenses: { id: license },
@@ -340,7 +340,7 @@ class Release < ApplicationRecord
                .published,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -362,7 +362,7 @@ class Release < ApplicationRecord
     scope = scope.within_expiry_for(license)
 
     scope.joins(product: %i[licenses])
-         .reorder(created_at: DEFAULT_SORT_ORDER)
+         .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
          .where(
            product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
            licenses: { id: license },
@@ -372,7 +372,7 @@ class Release < ApplicationRecord
                .published,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -533,7 +533,7 @@ class Release < ApplicationRecord
 
     scp = joins(constraints: :entitlement)
     scp = if strict
-            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+            scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
                .group(:id)
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
@@ -547,7 +547,7 @@ class Release < ApplicationRecord
     # Union with releases without constraints as well.
     scp.union(without_constraints)
        .reorder(
-         created_at: DEFAULT_SORT_ORDER,
+         "#{table_name}.created_at": DEFAULT_SORT_ORDER,
        )
   }
 

@@ -63,7 +63,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
 
   scope :for_user, -> user {
     joins(product: %i[licenses])
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: License.for_user(user) },
@@ -71,13 +71,13 @@ class ReleaseEntitlementConstraint < ApplicationRecord
       .distinct
       .union(open)
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 
   scope :for_license, -> license {
     joins(product: %i[licenses])
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: license },
@@ -85,27 +85,27 @@ class ReleaseEntitlementConstraint < ApplicationRecord
       .distinct
       .union(open)
       .reorder(
-        created_at: DEFAULT_SORT_ORDER,
+        "#{table_name}.created_at": DEFAULT_SORT_ORDER,
       )
   }
 
   scope :licensed, -> {
     joins(:product)
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(product: { distribution_strategy: ['LICENSED', nil] })
       .distinct
   }
 
   scope :open, -> {
     joins(:product)
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(product: { distribution_strategy: 'OPEN' })
       .distinct
   }
 
   scope :closed, -> {
     joins(:product)
-      .reorder(created_at: DEFAULT_SORT_ORDER)
+      .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(product: { distribution_strategy: 'CLOSED' })
       .distinct
   }

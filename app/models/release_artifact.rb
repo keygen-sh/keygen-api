@@ -241,7 +241,7 @@ class ReleaseArtifact < ApplicationRecord
       scope = scope.within_expiry_for(license)
 
       scope.joins(product: %i[licenses])
-           .reorder(created_at: DEFAULT_SORT_ORDER)
+           .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
            .where(
              product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
              licenses: { id: license },
@@ -257,7 +257,7 @@ class ReleaseArtifact < ApplicationRecord
                .uploaded,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -289,7 +289,7 @@ class ReleaseArtifact < ApplicationRecord
                .uploaded,
          )
          .reorder(
-           created_at: DEFAULT_SORT_ORDER,
+           "#{table_name}.created_at": DEFAULT_SORT_ORDER,
          )
   }
 
@@ -403,7 +403,7 @@ class ReleaseArtifact < ApplicationRecord
 
     scp = joins(release: { constraints: :entitlement })
     scp = if strict
-            scp.reorder(created_at: DEFAULT_SORT_ORDER)
+            scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
                .group(:id)
                .having(<<~SQL.squish, codes:)
                  count(release_entitlement_constraints) = count(entitlements) filter (
@@ -416,7 +416,7 @@ class ReleaseArtifact < ApplicationRecord
 
     scp.union(without_constraints)
        .reorder(
-         created_at: DEFAULT_SORT_ORDER,
+         "#{table_name}.created_at": DEFAULT_SORT_ORDER,
        )
   }
 
