@@ -117,6 +117,59 @@ Feature: Rubygems quick gemspec
       end
       """
 
+  Scenario: Endpoint should support etags (match)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"8d9c508dc6559d656ce798c5f27f7a55"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/quick/Marshal.4.8/foo-1.0.0.gemspec.rz"
+    Then the response status should be "304"
+
+  Scenario: Endpoint should support etags (mismatch)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"foo"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/quick/Marshal.4.8/foo-1.0.0.gemspec.rz"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Etag: W/"8d9c508dc6559d656ce798c5f27f7a55"
+      Cache-Control: max-age=86400, private
+      """
+    And the response body should be a gemspec with the following content:
+      """
+      # -*- encoding: utf-8 -*-
+      # stub: foo 1.0.0 ruby lib
+
+      Gem::Specification.new do |s|
+        s.name = "foo".freeze
+        s.version = "1.0.0".freeze
+
+        s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+        s.require_paths = ["lib".freeze]
+        s.date = "2024-10-22"
+        s.description = "foo".freeze
+        s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
+        s.rubygems_version = "3.5.11".freeze
+        s.summary = nil
+
+        s.specification_version = 4
+
+        s.add_runtime_dependency(%q<rails>.freeze, [">= 7.0".freeze])
+        s.add_development_dependency(%q<rspec-rails>.freeze, [">= 0".freeze])
+        s.add_development_dependency(%q<temporary_tables>.freeze, ["~> 1.0".freeze])
+        s.add_development_dependency(%q<sql_matchers>.freeze, ["~> 1.0".freeze])
+        s.add_development_dependency(%q<sqlite3>.freeze, ["~> 1.4".freeze])
+        s.add_development_dependency(%q<mysql2>.freeze, [">= 0".freeze])
+        s.add_development_dependency(%q<pg>.freeze, [">= 0".freeze])
+      end
+      """
+
   Scenario: Endpoint should return an error (not found)
     Given I am an admin of account "test1"
     And I use an authentication token

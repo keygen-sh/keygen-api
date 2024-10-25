@@ -18,6 +18,10 @@ module Api::V1::ReleaseEngines
         serialized,
       )
 
+      # for etag support
+      return unless
+        stale?(compressed, cache_control: { max_age: 1.day, private: true })
+
       send_data compressed, filename: "#{params[:gem]}.gemspec.rz"
     end
 
