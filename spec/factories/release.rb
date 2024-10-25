@@ -8,11 +8,11 @@ FactoryBot.define do
     version { nil }
     status  { 'PUBLISHED' }
 
-    account       { NIL_ACCOUNT }
-    environment   { NIL_ENVIRONMENT }
-    product       { build(:product, account:, environment:) }
-    channel       { build(:channel, key: 'stable', account:) }
-    package       { nil }
+    account     { NIL_ACCOUNT }
+    environment { NIL_ENVIRONMENT }
+    product     { build(:product, account:, environment:) }
+    channel     { build(:channel, key: 'stable', account:) }
+    package     { nil }
 
     after :build do |release, evaluator|
       # Add build tag so that there's no chance for collisions
