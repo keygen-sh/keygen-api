@@ -193,7 +193,7 @@ events = %w[
   artifact.updated
   artifact.upload.failed
   artifact.upload.processing
-  artifact.upload.uploaded
+  artifact.upload.succeeded
   artifact.uploaded
 
   component.created
