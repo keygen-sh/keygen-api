@@ -10,9 +10,19 @@ module Api::V1::ReleaseEngines
     def show
       authorize! artifact
 
-      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
-        allow_other_host: true,
-        status: :see_other
+      # give just enough time for even slow connections to download the gem
+      link = artifact.download!(
+        ttl: 10.minutes,
+      )
+
+      BroadcastEventService.call(
+        event: 'artifact.downloaded',
+        account: current_account,
+        resource: artifact,
+      )
+
+      # rubygems doesn't forward auth so we need to redirect directly to the backend
+      redirect_to link.url, status: :see_other, allow_other_host: true
     end
 
     private

@@ -84,10 +84,6 @@ Feature: Rubygems download gem
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/foo-1.0.0.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.gem" }
-      """
 
   Scenario: Endpoint should return an error (does not exist)
     Given I am an admin of account "test1"
@@ -112,10 +108,6 @@ Feature: Rubygems download gem
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/foo-1.1.0-jruby.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/92c38af8-7ed7-4adc-aee2-21ceb5c6511c/foo-1.1.0-jruby.gem" }
-      """
 
   Scenario: Product retrieves a gem (different product)
     Given I am product "test2" of account "test1"
@@ -133,10 +125,6 @@ Feature: Rubygems download gem
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/foo-1.1.0.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.gem" }
-      """
 
   Scenario: License retrieves a licensed gem (different product)
     Given the current account has 1 "policy" with the following:
@@ -159,10 +147,6 @@ Feature: Rubygems download gem
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/baz-2.0.0.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
-      """
 
   Scenario: User retrieves a licensed gem (with owned license)
     Given the current account has 1 "policy" for the first "product" with the following:
@@ -175,10 +159,6 @@ Feature: Rubygems download gem
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/foo-1.0.1.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.gem" }
-      """
 
   Scenario: User retrieves a licensed gem (with license)
     Given the current account has 1 "policy" for the first "product" with the following:
@@ -192,10 +172,6 @@ Feature: Rubygems download gem
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/foo-1.0.1.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.gem" }
-      """
 
   Scenario: User retrieves a licensed gem (no license)
     Given the current account has 1 "user"
@@ -210,10 +186,6 @@ Feature: Rubygems download gem
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/baz-2.0.0.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
-      """
 
   Scenario: Anon retrieves a closed gem
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/corge-1.0.0.gem"
@@ -226,7 +198,3 @@ Feature: Rubygems download gem
   Scenario: Anon retrieves an open gem
     When I send a GET request to "/accounts/test1/engines/rubygems/gems/baz-2.0.0.gem"
     Then the response status should be "303"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
-      """
