@@ -164,7 +164,7 @@ Feature: Rubygems compact index
       foo
       """
 
-  Scenario: Product lists their gems (licensed distribution strategy)
+  Scenario: Product lists available gems (licensed distribution strategy)
     Given I am product "test1" of account "test1"
     And I use an authentication token
     And time is frozen at "2024-10-22T00:00:00.000Z"
@@ -179,7 +179,7 @@ Feature: Rubygems compact index
       """
     And time is unfrozen
 
-  Scenario: Product lists their gems (open distribution strategy)
+  Scenario: Product lists available gems (open distribution strategy)
     Given I am product "test2" of account "test1"
     And I use an authentication token
     And time is frozen at "2024-10-22T00:00:00.000Z"
@@ -192,6 +192,29 @@ Feature: Rubygems compact index
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
       """
     And time is unfrozen
+
+  Scenario: Product lists available gem names (open distribution strategy)
+    Given I am product "test1" of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      foo
+      """
+
+  Scenario: Product lists available gem names (open distribution strategy)
+    Given I am product "test2" of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      baz
+      """
 
   Scenario: License lists available gems (entitled)
     Given the current account has 1 "policy" for the first "product" with the following:
@@ -235,6 +258,43 @@ Feature: Rubygems compact index
       foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
+
+  Scenario: License lists available gem names (entitled)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: License lists available gem names (unentitled)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
 
   Scenario: License retrieves a licensed gem (entitled)
     Given the current account has 1 "policy" for the first "product" with the following:
@@ -407,6 +467,98 @@ Feature: Rubygems compact index
       """
     And time is unfrozen
 
+  Scenario: User lists available gem names (with entitled owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: User lists available gem names (with unentitled owned license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: User lists available gem names (with entitled license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: User lists available gem names (with unentitled license)
+    Given the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "license-user" for the last "license" and the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: User lists available gem names (no license)
+    Given the current account has 1 "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      baz
+      """
+
   Scenario: User retrieves a licensed gem (with entitled owned license)
     Given the current account has 1 "policy" for the first "product" with the following:
       """
@@ -517,6 +669,15 @@ Feature: Rubygems compact index
       baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
       """
     And time is unfrozen
+
+  Scenario: Anon lists available gem names
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      baz
+      """
 
   Scenario: Anon retrieves a closed gem
     When I send a GET request to "/accounts/test1/engines/rubygems/info/corge"
