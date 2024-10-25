@@ -112,6 +112,43 @@ Feature: Rubygems compact index
       """
     And time is unfrozen
 
+  Scenario: Endpoint should support etags (match)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"185975872b55c5ebd3b07d355d505f1a"
+      """
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "304"
+    And time is unfrozen
+
+  Scenario: Endpoint should support etags (mismatch)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"foo"
+      """
+    And time is frozen at "2024-10-22T00:00:00.000Z"
+    When I send a GET request to "/accounts/test1/engines/rubygems/versions"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Etag: W/"185975872b55c5ebd3b07d355d505f1a"
+      Cache-Control: max-age=86400, private
+      """
+    And the response body should be a text document with the following content:
+      """
+      created_at: 2024-10-22T00:00:00Z
+      ---
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
+      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
+      """
+    And time is unfrozen
+
   Scenario: Endpoint should return a gem with dependencies
     Given I am an admin of account "test1"
     And I use an authentication token
@@ -151,11 +188,76 @@ Feature: Rubygems compact index
     When I send a GET request to "/accounts/test1/engines/rubygems/info/x"
     Then the response status should be "404"
 
+  Scenario: Endpoint should support etags (match)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"38afb98cc89d213319ac2cb928069b66"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "304"
+
+  Scenario: Endpoint should support etags (mismatch)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"foo"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/foo"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Etag: W/"38afb98cc89d213319ac2cb928069b66"
+      Cache-Control: max-age=86400, private
+      """
+    And the response body should be a text document with the following content:
+      """
+      ---
+      1.0.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67,ruby:>= 3.1
+      1.0.1 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6,ruby:>= 3.1
+      1.1.0-java rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793,ruby:>= 3.1
+      1.1.0 rails:>= 7.0,rspec-rails:>= 0,temporary_tables:~> 1.0,sql_matchers:~> 1.0,sqlite3:~> 1.4,mysql2:>= 0,pg:>= 0|checksum:2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6,ruby:>= 3.1
+      """
+
   Scenario: Endpoint should return all gem names
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/names"
     Then the response status should be "200"
+    And the response body should be a text document with the following content:
+      """
+      ---
+      bar
+      baz
+      foo
+      """
+
+  Scenario: Endpoint should support etags (match)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"2d63ca76663b18e649dee3c55bb0e0d9"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "304"
+
+  Scenario: Endpoint should support etags (mismatch)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"foo"
+      """
+    When I send a GET request to "/accounts/test1/engines/rubygems/names"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Etag: W/"2d63ca76663b18e649dee3c55bb0e0d9"
+      Cache-Control: max-age=86400, private
+      """
     And the response body should be a text document with the following content:
       """
       ---

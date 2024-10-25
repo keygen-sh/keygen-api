@@ -30,9 +30,15 @@ module Api::V1::ReleaseEngines
         arr << CompactIndex::Gem.new(package.key, versions.sort)
       end
 
-      render plain: CompactIndex.versions(
+      versions = CompactIndex.versions(
         CompactIndex::Ext::VersionsFile.new(gems.sort),
       )
+
+      # for etag support
+      return unless
+        stale?(versions, cache_control: { max_age: 1.day, private: true })
+
+      render plain: versions
     end
 
     def info
@@ -44,25 +50,32 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       versions = to_versions(artifacts)
-
-      render plain: CompactIndex.info(
+      info     = CompactIndex.info(
         versions.sort,
       )
+
+      return unless
+        stale?(info, cache_control: { max_age: 1.day, private: true })
+
+      render plain: info
     end
 
     def names
       authorize! packages,
         to: :index?
 
-      names = packages.reorder(key: :asc)
-                      .distinct
-                      .pluck(
-                        :key,
-                      )
-
-      render plain: CompactIndex.names(
-        names,
+      names = CompactIndex.names(
+        packages.reorder(key: :asc)
+                .distinct
+                .pluck(
+                  :key,
+                ),
       )
+
+      return unless
+        stale?(names, cache_control: { max_age: 1.day, private: true })
+
+      render plain: names
     end
 
     private
