@@ -24,25 +24,10 @@ module Api::V1::ReleaseEngines
       authorize! artifacts,
         to: :index?
 
-      gems = artifacts.group_by(&:package).reduce([]) do |gemset, (package, artifacts)|
-        versions = artifacts.map do |artifact|
-          gemspec      = artifact.specification.as_gemspec
-          dependencies = gemspec.dependencies.map do |dependency|
-            CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
-          end
+      gems = artifacts.group_by(&:package).reduce([]) do |arr, (package, artifacts)|
+        versions = to_versions(artifacts)
 
-          CompactIndex::GemVersion.new(
-            gemspec.version.to_s,
-            gemspec.platform.to_s,
-            artifact.checksum,
-            nil, # will be calculated via versions file
-            dependencies,
-            gemspec.required_ruby_version.to_s,
-            gemspec.required_rubygems_version.to_s,
-          )
-        end
-
-        gemset << CompactIndex::Gem.new(package.key, versions.sort)
+        arr << CompactIndex::Gem.new(package.key, versions.sort)
       end
 
       render plain: CompactIndex.versions(
@@ -58,24 +43,11 @@ module Api::V1::ReleaseEngines
       authorize! artifacts,
         to: :index?
 
-      versions = artifacts.map do |artifact|
-        gemspec      = artifact.specification.as_gemspec
-        dependencies = gemspec.dependencies.map do |dependency|
-          CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
-        end
+      versions = to_versions(artifacts)
 
-        CompactIndex::GemVersion.new(
-          gemspec.version.to_s,
-          gemspec.platform.to_s,
-          artifact.checksum,
-          nil, # unused
-          dependencies,
-          gemspec.required_ruby_version.to_s,
-          gemspec.required_rubygems_version.to_s,
-        )
-      end
-
-      render plain: CompactIndex.info(versions.sort)
+      render plain: CompactIndex.info(
+        versions.sort,
+      )
     end
 
     def names
@@ -88,13 +60,36 @@ module Api::V1::ReleaseEngines
                         :key,
                       )
 
-      render plain: CompactIndex.names(names)
+      render plain: CompactIndex.names(
+        names,
+      )
     end
 
     private
 
     attr_reader :packages,
                 :package
+
+    def to_versions(artifacts)
+      return [] unless artifacts.present?
+
+      artifacts.map do |artifact|
+        gemspec      = artifact.specification.as_gemspec
+        dependencies = gemspec.dependencies.map do |dependency|
+          CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
+        end
+
+        CompactIndex::GemVersion.new(
+          gemspec.version.to_s,
+          gemspec.platform.to_s,
+          artifact.checksum,
+          nil, # will be calculated via versions file
+          dependencies,
+          gemspec.required_ruby_version.to_s,
+          gemspec.required_rubygems_version.to_s,
+        )
+      end
+    end
 
     def set_packages
       @packages = authorized_scope(apply_scopes(current_account.release_packages.rubygems))
