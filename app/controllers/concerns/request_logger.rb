@@ -195,14 +195,22 @@ module RequestLogger
       return unless
         body.present?
 
-      return body unless
-        response.content_type&.include?('json')
+      mime_type, * = Mime::Type.parse(response.content_type.to_s)
+      filtered     = case mime_type
+                     in symbol: :jsonapi | :json
+                       filterer = ActiveSupport::ParameterFilter.new(%i[password digest token secret otp redirect auth])
+                       params   = JSON.parse(body)
 
-      params   = JSON.parse(body)
-      filterer = ActiveSupport::ParameterFilter.new(%i[password digest token secret otp redirect])
-      filtered = filterer.filter(params)
+                       filterer.filter(params).to_json
+                     in symbol: :text | :html
+                       body
+                     in symbol: :binary
+                       nil # we don't ever want to store binary
+                     else
+                       nil
+                     end
 
-      filtered.to_json
+      filtered
     rescue => e
       Keygen.logger.exception(e)
     end
