@@ -11,10 +11,12 @@ module Api::V1::ReleaseEngines
       authorize! artifact,
         to: :show?
 
-      # rubygems expects a marshalled and gzipped gemspec
+      # rubygems expects a marshalled and zlib compressed gemspec
       gemspec    = artifact.specification.as_gemspec
       serialized = Marshal.dump(gemspec)
-      compressed = Zlib::Deflate.deflate(serialized)
+      compressed = Zlib::Deflate.deflate(
+        serialized,
+      )
 
       send_data compressed, filename: "#{params[:gem]}.gemspec.rz"
     end
