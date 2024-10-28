@@ -1260,6 +1260,18 @@ Then /^the response body should be a gemspec with the following content:$/ do |b
   expect(gemspec.strip).to eq body.strip
 end
 
+Then /^the response body should be gemspecs with the following content:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  gz           = Zlib::GzipReader.new(StringIO.new(last_response.body.strip))
+  decompressed = gz.read
+  deserialized = Marshal.load(decompressed)
+  specs        = deserialized.inspect
+
+  # FIXME(ezekg) can we use prism to make this format-agnostic?
+  expect(specs).to eq body.strip
+end
+
 Given /^the JSON data should be sorted by "([^\"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')

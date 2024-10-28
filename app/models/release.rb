@@ -386,6 +386,10 @@ class Release < ApplicationRecord
     end
   }
 
+  scope :for_packages, -> packages {
+    joins(:package).where(package: { id: packages })
+  }
+
   scope :for_package, -> package {
     case package.presence
     when ReleasePackage,

@@ -172,6 +172,7 @@ class ReleaseArtifact < ApplicationRecord
   scope :beta, -> { for_channel_key(%i(stable rc beta)) }
   scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
   scope :dev, -> { for_channel_key(%i(dev)) }
+  scope :prerelease, -> { for_channel_key(%i(rc beta alpha dev)) }
 
   scope :accessible_by, -> accessor {
     case accessor
@@ -407,13 +408,14 @@ class ReleaseArtifact < ApplicationRecord
 
     scp = joins(release: { constraints: :entitlement })
     scp = if strict
-            scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
-               .group(:id)
-               .having(<<~SQL.squish, codes:)
-                 count(release_entitlement_constraints) = count(entitlements) filter (
-                   where entitlements.code in (:codes)
-                 )
-               SQL
+            agg = scp.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
+                     .group(:id)
+
+            agg.having(<<~SQL.squish, codes:)
+              count(release_entitlement_constraints) = count(entitlements) filter (
+                where entitlements.code in (:codes)
+              )
+            SQL
           else
             scp.where(entitlements: { code: codes })
           end
