@@ -81,8 +81,11 @@ Rails.application.routes.draw do
     end
 
     scope module: :rubygems, defaults: { format: :binary } do
-      get 'quick/Marshal.4.8/:gem.gemspec.rz', to: 'specs#quick', as: :rubygems_quick_gemspec, constraints: { gem: /[^\/]+/ }
-      get 'gems/:gem.gem',                     to: 'gems#show',   as: :rubygems_gem,           constraints: { gem: /[^\/]+/ }
+      get 'quick/Marshal.4.8/:gem.gemspec.rz', to: 'specs#quick_gemspec',    as: :rubygems_quick_gemspec,    constraints: { gem: /[^\/]+/ }
+      get 'specs.4.8.gz',                      to: 'specs#specs',            as: :rubygems_specs
+      get 'latest_specs.4.8.gz',               to: 'specs#latest_specs',     as: :rubygems_latest_specs
+      get 'prerelease_specs.4.8.gz',           to: 'specs#prerelease_specs', as: :rubygems_prerelease_specs
+      get 'gems/:gem.gem',                     to: 'gems#show',              as: :rubygems_gem,              constraints: { gem: /[^\/]+/ }
     end
   end
 

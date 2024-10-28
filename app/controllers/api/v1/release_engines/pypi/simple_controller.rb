@@ -58,7 +58,7 @@ module Api::V1::ReleaseEngines
       #             users to set --index-url=<keygen>, and we'll redirect non-existent
       #             packages to PyPI for fulfillment.
       #
-      # TODO(ezekg) Make this configurable?
+      # TODO(ezekg) make this configurable?
       url = URI.parse("https://pypi.org/simple")
       pkg = CGI.escape(params[:package])
 
