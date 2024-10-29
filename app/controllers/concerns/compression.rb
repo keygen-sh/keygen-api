@@ -3,12 +3,12 @@
 module Compression
   extend ActiveSupport::Concern
 
-  def deflate(data, **) = Zlib::Deflate.deflate(data, **)
-  def gzip(data, deterministic: true, **)
+  def deflate(data, level: Zlib::BEST_SPEED) = Zlib::Deflate.deflate(data, level)
+  def gzip(data, deterministic: true, level: Zlib::BEST_SPEED)
     zipped = StringIO.new
     zipped.set_encoding(Encoding::BINARY)
 
-    gz = Zlib::GzipWriter.new(zipped, Zlib::BEST_COMPRESSION)
+    gz = Zlib::GzipWriter.new(zipped, level)
     gz.mtime = 0 if deterministic
     gz.write(data)
     gz.close

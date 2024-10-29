@@ -127,7 +127,7 @@ Feature: Rubygems legacy specs index
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"8d9c508dc6559d656ce798c5f27f7a55"
+      If-None-Match: W/"7881fff6707156380bdc9236e286cf83"
       """
     When I send a GET request to "/accounts/test1/engines/rubygems/quick/Marshal.4.8/foo-1.0.0.gemspec.rz"
     Then the response status should be "304"
@@ -143,7 +143,7 @@ Feature: Rubygems legacy specs index
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"8d9c508dc6559d656ce798c5f27f7a55"
+      Etag: W/"7881fff6707156380bdc9236e286cf83"
       Cache-Control: max-age=86400, private
       """
     And the response body should be a gemspec with the following content:
@@ -511,7 +511,7 @@ Feature: Rubygems legacy specs index
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"8b42f6df6c6f86a8fb92d0a6d6d1f3f0"
+      If-None-Match: W/"697c5c065808ab67076f865ec7d72853"
       """
     When I send a GET request to "/accounts/test1/engines/rubygems/specs.4.8.gz"
     Then the response status should be "304"
@@ -527,7 +527,7 @@ Feature: Rubygems legacy specs index
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"8b42f6df6c6f86a8fb92d0a6d6d1f3f0"
+      Etag: W/"697c5c065808ab67076f865ec7d72853"
       Cache-Control: max-age=86400, private
       """
     And the response body should be gemspecs with the following content:
@@ -715,7 +715,7 @@ Feature: Rubygems legacy specs index
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"d4b09b006db58a9640fd6ef6c7fe5ef2"
+      If-None-Match: W/"bb875b8be35a27c3ad8692476c094c79"
       """
     When I send a GET request to "/accounts/test1/engines/rubygems/latest_specs.4.8.gz"
     Then the response status should be "304"
@@ -731,7 +731,7 @@ Feature: Rubygems legacy specs index
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"d4b09b006db58a9640fd6ef6c7fe5ef2"
+      Etag: W/"bb875b8be35a27c3ad8692476c094c79"
       Cache-Control: max-age=86400, private
       """
     And the response body should be gemspecs with the following content:
@@ -918,7 +918,7 @@ Feature: Rubygems legacy specs index
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"d2960385683d83987661b81ddbd74a80"
+      If-None-Match: W/"7e47b8d18320b47af2f1a03d2f75983b"
       """
     When I send a GET request to "/accounts/test1/engines/rubygems/prerelease_specs.4.8.gz"
     Then the response status should be "304"
@@ -934,7 +934,7 @@ Feature: Rubygems legacy specs index
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"d2960385683d83987661b81ddbd74a80"
+      Etag: W/"7e47b8d18320b47af2f1a03d2f75983b"
       Cache-Control: max-age=86400, private
       """
     And the response body should be gemspecs with the following content:
