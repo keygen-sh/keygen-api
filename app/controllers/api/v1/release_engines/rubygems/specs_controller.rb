@@ -31,7 +31,7 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids)).preload(:specification, release: %i[product entitlements constraints])
+      artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids).gems).preload(:specification, release: %i[product entitlements constraints])
       authorize! artifacts,
         to: :index?
 
@@ -51,7 +51,7 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       # use "distinct on" to select latest accessible version per-package and -platform
-      scoped_artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids))
+      scoped_artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids).gems)
       latest_artifacts = ReleaseArtifact.from(
                                           scoped_artifacts.order_by_version.select('releases.release_package_id, release_artifacts.*'),
                                           scoped_artifacts.table_name,
@@ -62,7 +62,10 @@ module Api::V1::ReleaseEngines
                                           :release_platform_id,
                                         )
 
-      artifacts = latest_artifacts.preload(:specification, release: %i[product entitlements constraints])
+      artifacts = latest_artifacts.where_assoc_exists(:specification) # must exist
+                                  .preload(:specification,
+                                    release: %i[product entitlements constraints],
+                                  )
       authorize! artifacts,
         to: :index?
 
@@ -80,7 +83,11 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      artifacts = authorized_scope(current_account.release_artifacts.unyanked.prerelease.for_packages(packages.ids)).preload(:specification, release: %i[product entitlements constraints])
+      artifacts = authorized_scope(current_account.release_artifacts.unyanked.prerelease.for_packages(packages.ids).gems)
+                    .where_assoc_exists(:specification) # must exist
+                    .preload(:specification,
+                      release: %i[product entitlements constraints],
+                    )
       authorize! artifacts,
         to: :index?
 
@@ -116,15 +123,15 @@ module Api::V1::ReleaseEngines
     def set_packages
       @packages = authorized_scope(apply_scopes(current_account.release_packages.rubygems))
                     .preload(:product)
-                    .joins(
+                    .where_assoc_exists(
                       # we want to ignore packages without any eligible gem specs
-                      releases: { artifacts: :specification },
+                      %i[releases artifacts specification],
                     )
     end
 
     def set_artifact
       scoped_artifacts = authorized_scope(current_account.release_artifacts.gems)
-                           .joins(:specification) # must exist
+                           .where_assoc_exists(:specification) # must exist
                            .includes(
                              :specification,
                            )
