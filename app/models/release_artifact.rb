@@ -455,7 +455,8 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :gems, -> { for_filetype(:gem) }
 
-  def key = "artifacts/#{account_id}/#{release_id}/#{filename}"
+  def key_for(path) = "artifacts/#{account_id}/#{release_id}/#{path}"
+  def key           = key_for(filename)
 
   def presigner = Aws::S3::Presigner.new(client:)
 

@@ -21,5 +21,22 @@ FactoryBot.define do
         gemspec.to_yaml
       }
     end
+
+    trait :npm do
+      artifact { build(:artifact, :npm_package, account:, environment:) }
+      content  {
+        tgz = file_fixture('hello-2.0.0.tgz').read
+        tar = Zlib::GzipReader.new(tgz)
+        pkg = nil
+
+        Gem::Package::TarReader.new(tar) do |archive|
+          archive.seek('package/package.json') do |entry|
+            pkg = entry.read
+          end
+        end
+
+        pkg
+      }
+    end
   end
 end

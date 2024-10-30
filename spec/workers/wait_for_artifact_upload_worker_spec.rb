@@ -240,6 +240,13 @@ describe WaitForArtifactUploadWorker do
       subject.drain
     end
 
+    it 'should emit no events' do
+      expect(BroadcastEventService).to receive(:call).exactly(0).times
+
+      subject.perform_async(artifact.id)
+      subject.drain
+    end
+
     it 'should do nothing' do
       subject.perform_async(artifact.id)
 
@@ -249,6 +256,13 @@ describe WaitForArtifactUploadWorker do
 
   context 'when an artifact is failed' do
     let(:artifact) { create(:artifact, :failed, account:) }
+
+    it 'should emit no events' do
+      expect(BroadcastEventService).to receive(:call).exactly(0).times
+
+      subject.perform_async(artifact.id)
+      subject.drain
+    end
 
     it 'should emit no events' do
       expect(BroadcastEventService).to receive(:call).exactly(0).times

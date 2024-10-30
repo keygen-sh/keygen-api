@@ -46,6 +46,22 @@ class WaitForArtifactUploadWorker < BaseWorker
       )
 
       ProcessRubyGemWorker.perform_async(artifact.id)
+    in filetype: ReleaseFiletype(:tar), engine: ReleaseEngine(:docker)
+      BroadcastEventService.call(
+        event: 'artifact.upload.processing',
+        account: artifact.account,
+        resource: artifact,
+      )
+
+      ProcessDockerImageWorker.perform_async(artifact.id)
+    in filetype: ReleaseFiletype(:tgz), engine: ReleaseEngine(:npm)
+      BroadcastEventService.call(
+        event: 'artifact.upload.processing',
+        account: artifact.account,
+        resource: artifact,
+      )
+
+      ProcessNpmPackageWorker.perform_async(artifact.id)
     else
       artifact.update!(status: 'UPLOADED')
 

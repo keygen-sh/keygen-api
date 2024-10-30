@@ -12,6 +12,7 @@ class ReleaseEngine < ApplicationRecord
     tauri
     raw
     rubygems
+    npm
   ]
 
   has_many :packages,
@@ -110,6 +111,7 @@ class ReleaseEngine < ApplicationRecord
   def tauri?    = key == 'tauri'
   def raw?      = key == 'raw'
   def rubygems? = key == 'rubygems'
+  def npm?      = key == 'npm'
 
   ##
   # deconstruct allows pattern pattern matching like:
