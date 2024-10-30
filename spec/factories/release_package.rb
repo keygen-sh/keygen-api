@@ -28,6 +28,10 @@ FactoryBot.define do
       engine { build(:engine, :rubygems, account:) }
     end
 
+    trait :npm do
+      engine { build(:engine, :npm, account:) }
+    end
+
     trait :licensed do
       product { build(:product, :licensed, account:, environment:) }
     end

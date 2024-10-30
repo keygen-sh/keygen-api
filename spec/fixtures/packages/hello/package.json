@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "name": "hello",
+  "type": "module",
+  "description": "Hello world and beyond.",
+  "author": {
+    "email": "oss@hello.example",
+    "name": "hellohq"
+  },
+  "keywords": [
+    "hello",
+    "world"
+  ],
+  "homepage": "https://hello.example/",
+  "bugs": "https://github.example/hellohq/hello/issues",
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src/index.js"
+  ],
+  "main": "index.js",
+  "exports": {
+    ".": "./src/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.example/hellohq/hello"
+  },
+  "engines": {
+    "node": ">=0.22.0"
+  }
+}

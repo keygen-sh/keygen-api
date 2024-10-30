@@ -67,6 +67,10 @@ FactoryBot.define do
       package { build(:package, :rubygems, account:, product:, environment:) }
     end
 
+    trait :npm do
+      package { build(:package, :npm, account:, product:, environment:) }
+    end
+
     trait :stable do
       channel { build(:channel, :beta, account:) }
     end

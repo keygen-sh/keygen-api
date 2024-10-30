@@ -52,6 +52,24 @@ FactoryBot.define do
       arch     { nil }
     end
 
+    trait :npm_package do
+      release  { build(:release, :npm, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize}-#{release.version}.tgz" }
+      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 25.megabytes.to_i) }
+      filetype { build(:filetype, key: 'tgz', account:) }
+      platform { nil }
+      arch     { nil }
+    end
+
+    trait :docker_image do
+      release  { build(:release, :npm, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize}.tar" }
+      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 1.gigabyte.to_i) }
+      filetype { build(:filetype, key: 'tar', account:) }
+      platform { nil }
+      arch     { nil }
+    end
+
     trait :with_smanifest do
       after :create do |artifact|
         next if artifact.engine.nil?

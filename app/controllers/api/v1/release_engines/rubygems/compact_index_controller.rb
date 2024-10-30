@@ -103,6 +103,7 @@ module Api::V1::ReleaseEngines
         CompactIndex::GemVersion.new(
           gemspec.version.to_s,
           gemspec.platform.to_s,
+          # FIXME(ezekg) add padding if base64 and missing (i.e. trailing =)
           artifact.checksum,
           nil, # will be calculated via versions file
           dependencies,
