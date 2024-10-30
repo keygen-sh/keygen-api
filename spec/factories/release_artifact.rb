@@ -8,13 +8,13 @@ FactoryBot.define do
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
     status   { 'UPLOADED' }
 
-    account       { NIL_ACCOUNT }
-    environment   { NIL_ENVIRONMENT }
-    release       { build(:release, account:, environment:) }
-    platform      { build(:platform, key: 'darwin', account:) }
-    arch          { build(:arch, key: 'amd64', account:) }
-    filetype      { build(:filetype, key: 'dmg', account:) }
-    specification { nil }
+    account     { NIL_ACCOUNT }
+    environment { NIL_ENVIRONMENT }
+    release     { build(:release, account:, environment:) }
+    platform    { build(:platform, key: 'darwin', account:) }
+    arch        { build(:arch, key: 'amd64', account:) }
+    filetype    { build(:filetype, key: 'dmg', account:) }
+    manifest    { nil }
 
     trait :pypi do
       release       { build(:release, :raw, account:, environment:) }
@@ -52,13 +52,13 @@ FactoryBot.define do
       arch          { nil }
     end
 
-    trait :with_specification do
+    trait :with_smanifest do
       after :create do |artifact|
         next if artifact.engine.nil?
 
         case
         when artifact.engine.gem?
-          create(:specification, :rubygems, account: release.account, artifact:)
+          create(:manifest, :rubygems, account: release.account, artifact:)
         end
       end
     end

@@ -3,7 +3,7 @@
 require 'rubygems/package'
 
 FactoryBot.define do
-  factory :release_specification, aliases: %i[spec specification] do
+  factory :release_manifest, aliases: %i[manifest] do
     initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     account     { NIL_ACCOUNT }

@@ -17,7 +17,7 @@ module Api::V1::ReleaseEngines
         to: :show?
 
       # rubygems expects marshalled and zlib compressed gemspec
-      gemspec = artifact.specification.as_gemspec
+      gemspec = artifact.manifest.as_gemspec
       dumped  = Marshal.dump(gemspec)
       zipped  = deflate(dumped)
 
@@ -31,7 +31,7 @@ module Api::V1::ReleaseEngines
       authorize! packages,
         to: :index?
 
-      artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids).gems).preload(:specification, release: %i[product entitlements constraints])
+      artifacts = authorized_scope(current_account.release_artifacts.unyanked.stable.for_packages(packages.ids).gems).preload(:manifest, release: %i[product entitlements constraints])
       authorize! artifacts,
         to: :index?
 
@@ -62,8 +62,8 @@ module Api::V1::ReleaseEngines
                                           :release_platform_id,
                                         )
 
-      artifacts = latest_artifacts.where_assoc_exists(:specification) # must exist
-                                  .preload(:specification,
+      artifacts = latest_artifacts.where_assoc_exists(:manifest) # must exist
+                                  .preload(:manifest,
                                     release: %i[product entitlements constraints],
                                   )
       authorize! artifacts,
@@ -84,8 +84,8 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       artifacts = authorized_scope(current_account.release_artifacts.unyanked.prerelease.for_packages(packages.ids).gems)
-                    .where_assoc_exists(:specification) # must exist
-                    .preload(:specification,
+                    .where_assoc_exists(:manifest) # must exist
+                    .preload(:manifest,
                       release: %i[product entitlements constraints],
                     )
       authorize! artifacts,
@@ -110,7 +110,7 @@ module Api::V1::ReleaseEngines
       return [] unless artifacts.present?
 
       specs = artifacts.map do |artifact|
-        gemspec = artifact.specification.as_gemspec
+        gemspec = artifact.manifest.as_gemspec
 
         [gemspec.name, Gem::Version.new(gemspec.version), gemspec.platform.to_s]
       end
@@ -125,15 +125,15 @@ module Api::V1::ReleaseEngines
                     .preload(:product)
                     .where_assoc_exists(
                       # we want to ignore packages without any eligible gem specs
-                      %i[releases artifacts specification],
+                      %i[releases artifacts manifest],
                     )
     end
 
     def set_artifact
       scoped_artifacts = authorized_scope(current_account.release_artifacts.gems)
-                           .where_assoc_exists(:specification) # must exist
+                           .where_assoc_exists(:manifest) # must exist
                            .includes(
-                             :specification,
+                             :manifest,
                            )
 
       Current.resource = @artifact = FindByAliasService.call(

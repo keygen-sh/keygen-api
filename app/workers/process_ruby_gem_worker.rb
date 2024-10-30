@@ -2,7 +2,7 @@
 
 require 'rubygems/package'
 
-class ProcessGemSpecificationWorker < BaseWorker
+class ProcessRubyGemWorker < BaseWorker
   sidekiq_options queue: :critical
 
   def perform(artifact_id)
@@ -19,7 +19,7 @@ class ProcessGemSpecificationWorker < BaseWorker
     gemspec = Gem::Package.new(gem)
                           .spec
 
-    ReleaseSpecification.create!(
+    ReleaseManifest.create!(
       account_id: artifact.account_id,
       environment_id: artifact.environment_id,
       release_id: artifact.release_id,

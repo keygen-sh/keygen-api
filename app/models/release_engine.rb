@@ -22,7 +22,7 @@ class ReleaseEngine < ApplicationRecord
     through: :packages
   has_many :releases,
     through: :packages
-  has_many :specifications,
+  has_many :manifests,
     through: :releases
 
   has_account inverse_of: :release_engines

@@ -75,7 +75,7 @@ describe WaitForArtifactUploadWorker do
 
     context 'when artifact is a valid gem' do
       let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
-      let(:processor) { ProcessGemSpecificationWorker }
+      let(:processor) { ProcessRubyGemWorker }
 
       before do
         Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('ping-1.0.0.gem').open }]
@@ -109,13 +109,13 @@ describe WaitForArtifactUploadWorker do
 
         expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
 
-        expect(artifact.reload.specification).to_not be nil
+        expect(artifact.reload.manifest).to_not be nil
       end
     end
 
     context 'when artifact is an invalid gem' do
       let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
-      let(:processor) { ProcessGemSpecificationWorker }
+      let(:processor) { ProcessRubyGemWorker }
 
       before do
         Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('invalid-1.0.0.gem').open }]
@@ -149,13 +149,13 @@ describe WaitForArtifactUploadWorker do
 
         expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('FAILED')
 
-        expect(artifact.reload.specification).to be nil
+        expect(artifact.reload.manifest).to be nil
       end
     end
 
     context 'when artifact is too small' do
       let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
-      let(:processor) { ProcessGemSpecificationWorker }
+      let(:processor) { ProcessRubyGemWorker }
 
       before do
         Aws.config[:s3] = {
@@ -189,13 +189,13 @@ describe WaitForArtifactUploadWorker do
 
         expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
 
-        expect(artifact.reload.specification).to be nil
+        expect(artifact.reload.manifest).to be nil
       end
     end
 
     context 'when artifact is too large' do
       let(:artifact)  { create(:artifact, :rubygems, :waiting, account:) }
-      let(:processor) { ProcessGemSpecificationWorker }
+      let(:processor) { ProcessRubyGemWorker }
 
       before do
         Aws.config[:s3] = {
@@ -229,7 +229,7 @@ describe WaitForArtifactUploadWorker do
 
         expect { notifier.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
 
-        expect(artifact.reload.specification).to be nil
+        expect(artifact.reload.manifest).to be nil
       end
     end
   end

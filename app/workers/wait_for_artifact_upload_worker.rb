@@ -44,11 +44,11 @@ class WaitForArtifactUploadWorker < BaseWorker
       artifact.status,
     )
 
-    # check if it's a specification e.g. gem package, etc.
+    # check if it's a supported package artifact e.g. gem, npm package, etc.
     case artifact
     in filetype: ReleaseFiletype(:gem), engine: ReleaseEngine(:rubygems) if artifact.content_length.in?(MIN_CONTENT_LENGTH..MAX_CONTENT_LENGTH)
-      # FIXME(ezekg) reject and warn if specification filesize is unacceptable
-      ProcessGemSpecificationWorker.perform_async(artifact.id)
+      # FIXME(ezekg) reject and warn if artifact filesize is unacceptable
+      ProcessRubyGemWorker.perform_async(artifact.id)
     else
       NotifyArtifactUploadWorker.perform_async(
         artifact.id,

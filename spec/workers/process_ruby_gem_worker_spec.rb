@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 require 'rubygems/package'
 
-describe ProcessGemSpecificationWorker do
+describe ProcessRubyGemWorker do
   let(:account)  { create(:account) }
 
   subject { described_class }
@@ -24,7 +24,7 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :waiting, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
@@ -32,9 +32,9 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :processing, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
-        expect(artifact.specification.content).to eq gemspec.to_yaml
+        expect(artifact.manifest.content).to eq gemspec.to_yaml
         expect(artifact.status).to eq 'UPLOADED'
       end
     end
@@ -43,7 +43,7 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :uploaded, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
@@ -51,7 +51,7 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :failed, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
   end
@@ -67,7 +67,7 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :waiting, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
@@ -75,9 +75,9 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :processing, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
 
-        expect(artifact.specification).to be nil
+        expect(artifact.manifest).to be nil
         expect(artifact.status).to eq 'FAILED'
       end
     end
@@ -86,7 +86,7 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :uploaded, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
@@ -94,50 +94,50 @@ describe ProcessGemSpecificationWorker do
       let(:artifact) { create(:artifact, :rubygems, :failed, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
   end
 
   context 'when artifact is not a gem' do
-    let(:gem) { SecureRandom.bytes(1.megabyte) }
+    let(:file) { SecureRandom.bytes(1.megabyte) }
 
     before do
-      Aws.config = { s3: { stub_responses: { get_object: [{ body: gem }] } } }
+      Aws.config = { s3: { stub_responses: { get_object: [{ body: file }] } } }
     end
 
     context 'when artifact is waiting' do
-      let(:artifact) { create(:artifact, :rubygems, :waiting, account:) }
+      let(:artifact) { create(:artifact, :waiting, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
     context 'when artifact is processing' do
-      let(:artifact) { create(:artifact, :rubygems, :processing, account:) }
+      let(:artifact) { create(:artifact, :processing, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
 
-        expect(artifact.specification).to be nil
+        expect(artifact.manifest).to be nil
         expect(artifact.status).to eq 'FAILED'
       end
     end
 
     context 'when artifact is uploaded' do
-      let(:artifact) { create(:artifact, :rubygems, :uploaded, account:) }
+      let(:artifact) { create(:artifact, :uploaded, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
 
     context 'when artifact is failed' do
-      let(:artifact) { create(:artifact, :rubygems, :failed, account:) }
+      let(:artifact) { create(:artifact, :failed, account:) }
 
       it 'should process gem' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.specification }
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
   end

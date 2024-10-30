@@ -103,7 +103,7 @@ FactoryBot.define do
       created_at { 1.year.ago }
     end
 
-    trait :with_specification do
+    trait :with_manifest do
       after :create do |release|
         next if release.engine.nil?
 
@@ -114,7 +114,7 @@ FactoryBot.define do
       end
     end
 
-    trait :with_specifications do
+    trait :with_manifests do
       after :create do |release|
         next if release.engine.nil?
 

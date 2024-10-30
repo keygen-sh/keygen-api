@@ -21,8 +21,8 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       artifacts = authorized_scope(current_account.release_artifacts.unyanked.for_packages(packages.ids).gems)
-                    .where_assoc_exists(:specification) # must exist
-                    .preload(:specification, :package,
+                    .where_assoc_exists(:manifest) # must exist
+                    .preload(:manifest, :package,
                       release: %i[product entitlements constraints],
                     )
       authorize! artifacts,
@@ -50,8 +50,8 @@ module Api::V1::ReleaseEngines
         to: :show?
 
       artifacts = authorized_scope(package.artifacts.unyanked.gems)
-                    .where_assoc_exists(:specification) # must exist
-                    .preload(:specification,
+                    .where_assoc_exists(:manifest) # must exist
+                    .preload(:manifest,
                       release: %i[product entitlements constraints],
                     )
       authorize! artifacts,
@@ -95,7 +95,7 @@ module Api::V1::ReleaseEngines
       return [] unless artifacts.present?
 
       artifacts.map do |artifact|
-        gemspec      = artifact.specification.as_gemspec
+        gemspec      = artifact.manifest.as_gemspec
         dependencies = gemspec.dependencies.map do |dependency|
           CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
         end
@@ -117,14 +117,14 @@ module Api::V1::ReleaseEngines
                     .preload(:product)
                     .where_assoc_exists(
                       # we want to ignore packages without any eligible gem specs
-                      %i[releases artifacts specification],
+                      %i[releases artifacts manifest],
                     )
     end
 
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.rubygems)
                           .where_assoc_exists(
-                            %i[releases artifacts specification], # must exist
+                            %i[releases artifacts manifest], # must exist
                           )
 
       Current.resource = @package = FindByAliasService.call(

@@ -1,6 +1,6 @@
-class CreateReleaseSpecifications < ActiveRecord::Migration[7.1]
+class CreateReleaseManifests < ActiveRecord::Migration[7.1]
   def change
-    create_table :release_specifications, id: :uuid, default: -> { 'uuid_generate_v4()' }, if_not_exists: true do |t|
+    create_table :release_manifests, id: :uuid, default: -> { 'uuid_generate_v4()' } do |t|
       t.uuid :account_id,          null: false
       t.uuid :environment_id,      null: true
       t.uuid :release_id,          null: false

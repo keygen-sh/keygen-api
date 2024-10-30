@@ -2,9 +2,9 @@
 
 require 'rubygems/specification'
 
-class ReleaseSpecification < ApplicationRecord
-  MIN_CONTENT_LENGTH = 5.bytes     # to avoid storing empty or invalid specs
-  MAX_CONTENT_LENGTH = 5.megabytes # to avoid storing large specs
+class ReleaseManifest < ApplicationRecord
+  MIN_CONTENT_LENGTH = 5.bytes     # to avoid storing empty or invalid manifests
+  MAX_CONTENT_LENGTH = 5.megabytes # to avoid storing large manifests
 
   include Keygen::PortableClass
   include Environmental
@@ -16,9 +16,9 @@ class ReleaseSpecification < ApplicationRecord
   belongs_to :artifact,
     class_name: 'ReleaseArtifact',
     foreign_key: :release_artifact_id,
-    inverse_of: :specification
+    inverse_of: :manifest
   belongs_to :release,
-    inverse_of: :specifications
+    inverse_of: :manifests
   has_one :product,
     through: :release
   has_one :package,

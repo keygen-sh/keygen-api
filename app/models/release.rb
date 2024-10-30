@@ -69,8 +69,8 @@ class Release < ApplicationRecord
     class_name: 'ReleaseUploadLink',
     inverse_of: :release,
     dependent: :delete_all
-  has_many :specifications,
-    class_name: 'ReleaseSpecification',
+  has_many :manifests,
+    class_name: 'ReleaseManifest',
     inverse_of: :release,
     dependent: :delete_all
   has_many :artifacts,

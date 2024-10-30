@@ -19,7 +19,7 @@ class ReleasePackage < ApplicationRecord
   has_many :releases,
     inverse_of: :package,
     dependent: :destroy_async
-  has_many :specifications,
+  has_many :manifests,
     through: :releases
   has_many :artifacts,
     through: :releases,
