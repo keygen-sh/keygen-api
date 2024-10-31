@@ -3,6 +3,9 @@
 require 'rails_helper'
 require 'spec_helper'
 
+require 'minitar'
+require 'zlib'
+
 describe ProcessNpmPackageWorker do
   let(:account) { create(:account) }
 
@@ -15,12 +18,9 @@ describe ProcessNpmPackageWorker do
     let(:package)      { file_fixture('hello-2.0.0.tgz').open }
     let(:package_json) {
       tar = Zlib::GzipReader.new(package)
-      pkg = nil
-
-      Gem::Package::TarReader.new(tar) do |archive|
-        archive.seek('package/package.json') do |entry|
-          pkg = entry.read
-        end
+      pkg = Minitar::Reader.open tar do |archive|
+        archive.find { _1.name in 'package/package.json' }
+               .read
       end
 
       pkg

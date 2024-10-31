@@ -211,6 +211,152 @@ describe WaitForArtifactUploadWorker do
         end
       end
     end
+
+    context 'when artifact is an npm package' do
+      let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
+      let(:processor) { ProcessNpmPackageWorker }
+
+      before do
+        Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('hello-2.0.0.tgz').open }]
+      end
+
+      after do
+        processor.clear
+      end
+
+      it 'should emit processing and succeeded events' do
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.succeeded') }.exactly(1).time
+
+        subject.perform_async(artifact.id)
+        subject.drain
+
+        processor.drain
+      end
+
+      it 'should process package' do
+        subject.perform_async(artifact.id)
+
+        expect { subject.drain }.to change { processor.jobs.size }.from(0).to(1)
+          .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+
+        expect { processor.drain }.to change { artifact.reload.status }.from('PROCESSING').to('UPLOADED')
+
+        expect(artifact.reload.manifest).to_not be nil
+      end
+
+      context 'when gem is invalid' do
+        let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
+        let(:processor) { ProcessNpmPackageWorker }
+
+        before do
+          Aws.config[:s3][:stub_responses][:get_object] = [{ body: file_fixture('invalid-2.0.0.tgz').open }]
+        end
+
+        after do
+          processor.clear
+        end
+
+        it 'should emit processing and failed events' do
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+
+          subject.perform_async(artifact.id)
+          subject.drain
+
+          processor.drain
+        end
+
+        it 'should fail processing package' do
+          subject.perform_async(artifact.id)
+
+          expect { subject.drain }.to change { processor.jobs.size }.from(0).to(1)
+            .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+
+          expect { processor.drain }.to change { artifact.reload.status }.from('PROCESSING').to('FAILED')
+
+          expect(artifact.reload.manifest).to be nil
+        end
+      end
+
+      context 'when gem is too small' do
+        let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
+        let(:processor) { ProcessNpmPackageWorker }
+
+        before do
+          Aws.config[:s3] = {
+            stub_responses: {
+              head_object: [{ content_length: 2.bytes.to_i, content_type: 'application/octet-stream', etag: '"14bfa6bb14875e45bba028a21ed38046"' }],
+              get_object: [{ body: file_fixture('hello-2.0.0.tgz').open }],
+            },
+          }
+        end
+
+        after do
+          processor.clear
+        end
+
+        it 'should emit processing and failed events' do
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+
+          subject.perform_async(artifact.id)
+          subject.drain
+
+          processor.drain
+        end
+
+        it 'should fail processing package' do
+          subject.perform_async(artifact.id)
+
+          expect { subject.drain }.to change { processor.jobs.size }.from(0).to(1)
+            .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+
+          expect { processor.drain }.to change { artifact.reload.status }.from('PROCESSING').to('FAILED')
+
+          expect(artifact.reload.manifest).to be nil
+        end
+      end
+
+      context 'when gem is too large' do
+        let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
+        let(:processor) { ProcessNpmPackageWorker }
+
+        before do
+          Aws.config[:s3] = {
+            stub_responses: {
+              head_object: [{ content_length: 1.gigabyte.to_i, content_type: 'application/octet-stream', etag: '"14bfa6bb14875e45bba028a21ed38046"' }],
+              get_object: [{ body: file_fixture('hello-2.0.0.tgz').open }],
+            },
+          }
+        end
+
+        after do
+          processor.clear
+        end
+
+        it 'should emit processing and succeeded events' do
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+
+          subject.perform_async(artifact.id)
+          subject.drain
+
+          processor.drain
+        end
+
+        it 'should fail processing package' do
+          subject.perform_async(artifact.id)
+
+          expect { subject.drain }.to change { processor.jobs.size }.from(0).to(1)
+            .and change { artifact.reload.status }.from('WAITING').to('PROCESSING')
+
+          expect { processor.drain }.to change { artifact.reload.status }.from('PROCESSING').to('FAILED')
+
+          expect(artifact.reload.manifest).to be nil
+        end
+      end
+    end
   end
 
   context 'when an artifact is processing' do

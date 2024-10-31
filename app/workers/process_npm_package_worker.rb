@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'rubygems/package'
+require 'minitar'
+require 'zlib'
 
 class ProcessNpmPackageWorker < BaseWorker
   MIN_TARBALL_SIZE  = 5.bytes      # to avoid processing empty or invalid tarballs
@@ -24,30 +25,40 @@ class ProcessNpmPackageWorker < BaseWorker
     tgz    = client.get_object(bucket: artifact.bucket, key: artifact.key)
                    .body
 
-    # gunzip and untar the package tarball
+    # unpack the package tarball
     tar = gunzip(tgz)
 
-    untar tar do |archive|
-      # NOTE(ezekg) npm prefixes everything in the archive with package/
-      archive.seek('package/package.json') do |entry|
-        raise PackageNotAcceptableError, 'manifest must be a package.json file' unless
-          entry.file?
+    unpack tar do |archive|
+      archive.each do |entry|
+        # NOTE(ezekg) npm prefixes everything in the archive with package/
+        case entry.name
+        in 'package/package.json'
+          raise PackageNotAcceptableError, 'manifest must be a package.json file' unless
+            entry.file?
 
-        raise PackageNotAcceptableError, 'manifest is too big' if
-          entry.size > MAX_MANIFEST_SIZE
+          raise PackageNotAcceptableError, 'manifest is too big' if
+            entry.size > MAX_MANIFEST_SIZE
 
-        # the manifest is already in json format
-        json = entry.read
+          # the manifest is already in json format
+          json = entry.read
 
-        ReleaseManifest.create!(
-          account_id: artifact.account_id,
-          environment_id: artifact.environment_id,
-          release_id: artifact.release_id,
-          release_artifact_id: artifact.id,
-          content: json,
-        )
+          ReleaseManifest.create!(
+            account_id: artifact.account_id,
+            environment_id: artifact.environment_id,
+            release_id: artifact.release_id,
+            release_artifact_id: artifact.id,
+            content: json,
+          )
+
+          # all we need
+          break
+        else
+        end
       end
     end
+
+    # not sure why GzipReader#open doesn't take an io?
+    tar.close
 
     artifact.update!(status: 'UPLOADED')
 
@@ -57,9 +68,8 @@ class ProcessNpmPackageWorker < BaseWorker
       resource: artifact,
     )
   rescue PackageNotAcceptableError,
-         Gem::Package::FormatError,
-         Zlib::GzipFile::Error,
          Zlib::Error,
+         Minitar::Error,
          IOError => e
     Keygen.logger.warn { "[workers.process-npm-package-worker] Error: #{e.class.name} - #{e.message}" }
 
@@ -75,7 +85,7 @@ class ProcessNpmPackageWorker < BaseWorker
   private
 
   def gunzip(io)    = Zlib::GzipReader.new(io)
-  def untar(io, &)  = Gem::Package::TarReader.new(io, &)
+  def unpack(io, &) = Minitar::Reader.open(io, &)
 
   class PackageNotAcceptableError < StandardError
     def backtrace = nil # silence backtrace
