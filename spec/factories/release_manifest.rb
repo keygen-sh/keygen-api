@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'rubygems/package'
+require 'minitar'
+require 'zlib'
 
 FactoryBot.define do
   factory :release_manifest, aliases: %i[manifest] do
@@ -27,12 +29,9 @@ FactoryBot.define do
       content  {
         tgz = file_fixture('hello-2.0.0.tgz').read
         tar = Zlib::GzipReader.new(tgz)
-        pkg = nil
-
-        Gem::Package::TarReader.new(tar) do |archive|
-          archive.seek('package/package.json') do |entry|
-            pkg = entry.read
-          end
+        pkg = Minitar::Reader.open tar do |archive|
+          archive.find { _1.name in 'package/package.json' }
+                 .read
         end
 
         pkg

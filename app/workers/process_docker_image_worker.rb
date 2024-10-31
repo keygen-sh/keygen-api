@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'rubygems/package'
+require 'minitar'
+require 'zlib'
 
 class ProcessDockerImageWorker < BaseWorker
   MIN_TARBALL_SIZE  = 5.bytes    # to avoid processing empty or invalid tarballs
@@ -24,12 +25,12 @@ class ProcessDockerImageWorker < BaseWorker
     tgz    = client.get_object(bucket: artifact.bucket, key: artifact.key)
                    .body
 
-    # gunzip and untar the image tarball
+    # unpack the package tarball
     tar = gunzip(tgz)
 
-    untar tar do |archive|
+    unpack tar do |archive|
       archive.each do |entry|
-        case entry.full_name
+        case entry.name
         in 'manifest.json'
           raise ImageNotAcceptableError, 'manifest must be a manifest.json file' unless
             entry.file?
@@ -48,7 +49,7 @@ class ProcessDockerImageWorker < BaseWorker
             content: json,
           )
         in %r{^blobs/sha256/} if entry.file?
-          key = artifact.key_for(entry.full_name)
+          key = artifact.key_for(entry.name)
 
           # skip if already uploaded
           next if
@@ -73,9 +74,8 @@ class ProcessDockerImageWorker < BaseWorker
       resource: artifact,
     )
   rescue ImageNotAcceptableError,
-         Gem::Package::FormatError,
-         Zlib::GzipFile::Error,
          Zlib::Error,
+         Minitar::Error,
          IOError => e
     Keygen.logger.warn { "[workers.process-docker-image-worker] Error: #{e.class.name} - #{e.message}" }
 
@@ -91,7 +91,7 @@ class ProcessDockerImageWorker < BaseWorker
   private
 
   def gunzip(io)    = Zlib::GzipReader.new(io)
-  def untar(io, &)  = Gem::Package::TarReader.new(io, &)
+  def unpack(io, &) = Minitar::Reader.open(io, &)
 
   class ImageNotAcceptableError < StandardError
     def backtrace = nil # silence backtrace

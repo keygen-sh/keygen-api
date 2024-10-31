@@ -304,6 +304,7 @@ GEM
     mime-types-data (3.2022.0105)
     mini_mime (1.1.5)
     mini_portile2 (2.8.7)
+    minitar (1.0.2)
     minitest (5.25.1)
     msgpack (1.7.2)
     multi_json (1.15.0)
@@ -551,6 +552,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (>= 3.8.0)
   lograge
+  minitar
   msgpack (~> 1.7)
   nokogiri (~> 1.16.5)
   null_association

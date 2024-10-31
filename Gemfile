@@ -100,6 +100,7 @@ gem 'lograge'
 gem 'aws-sdk-s3', '~> 1'
 gem 'semverse'
 gem 'compact_index'
+gem 'minitar'
 
 # Misc
 gem 'null_association'
