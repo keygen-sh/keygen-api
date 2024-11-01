@@ -32,6 +32,10 @@ class ReleasePackage < ApplicationRecord
 
   accepts_nested_attributes_for :engine
 
+  # see: https://peps.python.org/pep-0503/#normalized-names
+  before_save -> { self.key = key.gsub(/[-_.]+/, '-') },
+    if: -> { pypi? && key_changed? }
+
   validates :product,
     scope: { by: :account_id }
 
@@ -102,6 +106,10 @@ class ReleasePackage < ApplicationRecord
   scope :tauri,          ->     { for_engine_key('tauri') }
   scope :raw,            ->     { for_engine_key('raw') }
   scope :rubygems,       ->     { for_engine_key('rubygems') }
+
+  delegate :pypi?, :tauri?, :raw?, :rubygems?,
+    to: :engine,
+    allow_nil: true
 
   def engine_id? = release_engine_id?
   def engine_id  = release_engine_id

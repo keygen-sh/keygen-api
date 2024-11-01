@@ -51,4 +51,16 @@ describe ReleasePackage, type: :model do
       end
     end
   end
+
+  it 'should normalize key for pypi package' do
+    package = create(:package, :pypi, key: 'a_test.key', product:, account:)
+
+    expect(package.key).to eq 'a-test-key'
+  end
+
+  it 'should not normalize key for package' do
+    package = create(:package, key: 'a_test.key', product:, account:)
+
+    expect(package.key).to eq 'a_test.key'
+  end
 end
