@@ -129,6 +129,36 @@ Feature: Raw artifact download
     When I send a GET request to "/accounts/keygen/engines/raw/cli/1.0.0/install.sh"
     Then the response status should be "403"
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "keygen"
+    And I use an authentication token
+    When I send a GET request to "//raw.pkg.keygen.sh/keygen/relay/@relay/1.0.0-beta.1/install.sh"
+    Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://raw.pkg.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/c811f16c-18e5-40d6-9130-ba9ce2df0df9/install.sh" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "keygen"
+    And I use an authentication token
+    When I send a GET request to "//raw.pkg.keygen.sh/relay/@relay/1.0.0-beta.1/install.sh"
+    Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://raw.pkg.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/c811f16c-18e5-40d6-9130-ba9ce2df0df9/install.sh" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Endpoint should redirect when an artifact exists
     Given the current account has 1 "webhook-endpoint"
     And I am an admin of account "keygen"

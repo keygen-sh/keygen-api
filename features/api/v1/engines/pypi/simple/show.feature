@@ -54,6 +54,41 @@ Feature: PyPI simple package files
       { "Content-Type": "text/html; charset=utf-8" }
       """
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain (short)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//pypi.pkg.keygen.sh/test1/simple/bar"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[text()="bar-1.0.0b1-py3-none-any.whl" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/56277838-ddb5-4c54-a3d2-0fad8bdfefe1/bar-1.0.0b1-py3-none-any.whl"]
+      /html/body/a[text()="bar-1.0.0b1.tar.gz" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/fa773c2b-1c3a-4bd8-83fe-546480e92098/bar-1.0.0b1.tar.gz"]
+      """
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain (short)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//pypi.pkg.keygen.sh/simple/bar"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[text()="bar-1.0.0b1-py3-none-any.whl" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/56277838-ddb5-4c54-a3d2-0fad8bdfefe1/bar-1.0.0b1-py3-none-any.whl"]
+      /html/body/a[text()="bar-1.0.0b1.tar.gz" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/fa773c2b-1c3a-4bd8-83fe-546480e92098/bar-1.0.0b1.tar.gz"]
+      """
+
+  Scenario: Endpoint should be accessible from subdomain (long)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//pypi.pkg.keygen.sh/v1/accounts/test1/engines/pypi/simple/bar"
+    Then the response status should be "200"
+    And the response body should be an HTML document with the following xpaths:
+      """
+      /html/body/a[text()="bar-1.0.0b1-py3-none-any.whl" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/56277838-ddb5-4c54-a3d2-0fad8bdfefe1/bar-1.0.0b1-py3-none-any.whl"]
+      /html/body/a[text()="bar-1.0.0b1.tar.gz" and @href="https://pypi.pkg.keygen.sh/v1/accounts/$account/artifacts/fa773c2b-1c3a-4bd8-83fe-546480e92098/bar-1.0.0b1.tar.gz"]
+      """
+
   Scenario: Endpoint should redirect to PyPI when package does not exist
     Given I am an admin of account "test1"
     And I use an authentication token

@@ -10,8 +10,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! artifact
 
-      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
-        allow_other_host: true,
+      redirect_to vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename, host: request.host),
         status: :see_other
     end
 

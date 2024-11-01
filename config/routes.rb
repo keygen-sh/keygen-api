@@ -417,21 +417,6 @@ Rails.application.routes.draw do
       post :search, to: 'searches#search'
     end
 
-    # Artifact :show action needs to be a bit loose with the Accept header, so we're
-    # defining the route outside of the restrictive mime type constraint above.
-    scope defaults: { format: :jsonapi } do
-      resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ } do
-        member do
-          # Vanity URLs where we route by ID but also supply a filename for compatibility
-          # with the various package managers that expect a URL with an extension.
-          get ':filename', to: 'release_artifacts#show', as: :vanity, constraints: {
-            id: UUID_URL_RE,
-            filename: /.*/,
-          }
-        end
-      end
-    end
-
     # Likewise, we have a legacy endpoint that needs to accept a variety of content
     # types without failing due to legacy integrations e.g. old electron-builder
     # versions send binary even though they shouldn't. To resolve this, we'll
@@ -443,6 +428,25 @@ Rails.application.routes.draw do
     version_constraint '<=1.0' do
       scope 'releases/:release_id', as: :release, module: 'releases/relationships/v1x0', constraints: { release_id: /[^\/]*/, format: /.*/ } do
         put 'artifact', to: 'release_artifacts#create', defaults: { format: :binary }
+      end
+    end
+
+    # Artifact and engine actions needs to be a bit loose with the allowed domain and Accept
+    # header, so we're defining the route outside of any restrictive domain/subdomain
+    # and mime type constraints. Essentially, we want these routes to be able to be
+    # accessed regardless of domain or format. The domain aspect mainly is because
+    # auth isn't always forwarded during redirects e.g. when redirecting from
+    # rubygems.pkg.keygen.sh to api.keygen.sh, which breaks downloads.
+    scope defaults: { format: :jsonapi } do
+      resources :release_artifacts, only: %i[show], path: 'artifacts', constraints: { id: /.*/, format: /.*/ } do
+        member do
+          # Vanity URLs where we route by ID but also supply a filename for compatibility
+          # with the various package managers that expect a URL with an extension.
+          get ':filename', to: 'release_artifacts#show', as: :vanity, constraints: {
+            id: UUID_URL_RE,
+            filename: /.*/,
+          }
+        end
       end
     end
 
@@ -484,6 +488,71 @@ Rails.application.routes.draw do
     scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :html } do
       get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
       get 'resub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#resubscribe', as: :stdout_resubscribe
+    end
+  end
+
+  scope module: :api do
+    namespace :v1 do
+      # Health checks
+      scope :health do
+        get '/',       to: 'health#general_health'
+        get :webhooks, to: 'health#webhook_health'
+      end
+
+      constraints **domain_constraints do
+        constraints **subdomain_constraints do
+          if Keygen.multiplayer?
+            post :stripe, to: 'stripe#receive_webhook'
+
+            # Pricing
+            scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
+              resources :plans, only: %i[index show]
+            end
+          end
+
+          # Recover
+          scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
+            post :recover, to: 'recoveries#recover'
+
+            # Account
+            case
+            when Keygen.multiplayer?
+              resources :accounts, param: :account_id, only: %i[show create update destroy]
+            when Keygen.singleplayer?
+              resources :accounts, param: :account_id, only: %i[show update destroy]
+            end
+          end
+        end
+
+        # Routes with :account_id scope i.e. multiplayer mode. Most of these
+        # routes are also available in singleplayer mode for compatiblity.
+        scope 'accounts/:account_id', as: :account do
+          if Keygen.multiplayer?
+            constraints **subdomain_constraints do
+              scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
+                scope module: 'accounts/relationships' do
+                  resource :billing, only: %i[show update]
+                  resource :plan,    only: %i[show update]
+                end
+
+                scope :actions, module: 'accounts/actions' do
+                  post :manage_subscription, path: 'manage-subscription', to: 'subscription#manage'
+                  post :pause_subscription,  path: 'pause-subscription',  to: 'subscription#pause'
+                  post :resume_subscription, path: 'resume-subscription', to: 'subscription#resume'
+                  post :cancel_subscription, path: 'cancel-subscription', to: 'subscription#cancel'
+                  post :renew_subscription,  path: 'renew-subscription',  to: 'subscription#renew'
+                end
+              end
+            end
+          end
+
+          concerns :v1
+        end
+      end
+
+      # Routes without :account_id scope i.e. singleplayer mode. This is
+      # also used for CNAME routing (under multiplayer mode).
+      concerns :v1
     end
   end
 
@@ -531,67 +600,6 @@ Rails.application.routes.draw do
       when Keygen.singleplayer?
         concerns :rubygems
       end
-    end
-  end
-
-  scope module: :api do
-    namespace :v1 do
-      # Health checks
-      scope :health do
-        get '/',       to: 'health#general_health'
-        get :webhooks, to: 'health#webhook_health'
-      end
-
-      constraints **domain_constraints, **subdomain_constraints do
-        if Keygen.multiplayer?
-          post :stripe, to: 'stripe#receive_webhook'
-
-          # Pricing
-          scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
-            resources :plans, only: %i[index show]
-          end
-        end
-
-        # Recover
-        scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
-          post :recover, to: 'recoveries#recover'
-
-          # Account
-          case
-          when Keygen.multiplayer?
-            resources :accounts, param: :account_id, only: %i[show create update destroy]
-          when Keygen.singleplayer?
-            resources :accounts, param: :account_id, only: %i[show update destroy]
-          end
-        end
-
-        # Routes with :account_id scope i.e. multiplayer mode. Most of these
-        # routes are also available in singleplayer mode for compatiblity.
-        scope 'accounts/:account_id', as: :account do
-          if Keygen.multiplayer?
-            scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
-              scope module: 'accounts/relationships' do
-                resource :billing, only: %i[show update]
-                resource :plan,    only: %i[show update]
-              end
-
-              scope :actions, module: 'accounts/actions' do
-                post :manage_subscription, path: 'manage-subscription', to: 'subscription#manage'
-                post :pause_subscription,  path: 'pause-subscription',  to: 'subscription#pause'
-                post :resume_subscription, path: 'resume-subscription', to: 'subscription#resume'
-                post :cancel_subscription, path: 'cancel-subscription', to: 'subscription#cancel'
-                post :renew_subscription,  path: 'renew-subscription',  to: 'subscription#renew'
-              end
-            end
-          end
-
-          concerns :v1
-        end
-      end
-
-      # Routes without :account_id scope i.e. singleplayer mode. This is
-      # also used for CNAME routing (under multiplayer mode).
-      concerns :v1
     end
   end
 

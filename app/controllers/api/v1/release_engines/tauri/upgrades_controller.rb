@@ -66,7 +66,7 @@ module Api::V1::ReleaseEngines
 
       # See: https://v2.tauri.app/plugin/updater/#dynamic-update-server
       render json: {
-        url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename),
+        url: vanity_v1_account_release_artifact_url(artifact.account, artifact, filename: artifact.filename, host: request.host),
         signature: artifact.signature,
         version: upgrade.version,
         pub_date: upgrade.created_at.rfc3339(3),

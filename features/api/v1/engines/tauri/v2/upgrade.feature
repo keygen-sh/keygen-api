@@ -87,6 +87,38 @@ Feature: Tauri v2 upgrade application
       { "Content-Type": "application/json; charset=utf-8" }
       """
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//tauri.pkg.keygen.sh/test1/app1?platform=linux&arch=x86_64&version=1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://tauri.pkg.keygen.sh/v1/accounts/$account/artifacts/00aeec65-165c-487c-8e22-7ab454319b0f/myapp.AppImage",
+        "signature": "93pUF68vzR3QRoGSXHbTQ9XVvXNburu5ofuFFLcrm1C1ZD9C2fr5mcaG06RljftY1HUzlFrpFmk9WVEbwr18tQ==",
+        "version": "1.1.0"
+      }
+      """
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//tauri.pkg.keygen.sh/app1?platform=linux&arch=x86_64&version=1.0.0"
+    Then the response status should be "200"
+    And the response body should include the following:
+      """
+      {
+        "url": "https://tauri.pkg.keygen.sh/v1/accounts/$account/artifacts/00aeec65-165c-487c-8e22-7ab454319b0f/myapp.AppImage",
+        "signature": "93pUF68vzR3QRoGSXHbTQ9XVvXNburu5ofuFFLcrm1C1ZD9C2fr5mcaG06RljftY1HUzlFrpFmk9WVEbwr18tQ==",
+        "version": "1.1.0"
+      }
+      """
+
   Scenario: Endpoint should not return an upgrade when an upgrade is not available
     Given the current account has 1 "webhook-endpoint"
     And I am an admin of account "test1"

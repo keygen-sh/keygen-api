@@ -84,6 +84,20 @@ Feature: Rubygems legacy specs index
       { "Content-Type": "application/json; charset=utf-8" }
       """
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/test1/quick/Marshal.4.8/foo-1.0.0.gemspec.rz"
+    Then the response status should be "200"
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/quick/Marshal.4.8/foo-1.0.0.gemspec.rz"
+    Then the response status should be "200"
+
   Scenario: Endpoint should return a quick gemspec
     Given I am an admin of account "test1"
     And I use an authentication token
@@ -492,6 +506,20 @@ Feature: Rubygems legacy specs index
       { "Content-Type": "application/json; charset=utf-8" }
       """
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/test1/specs.4.8.gz"
+    Then the response status should be "200"
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/specs.4.8.gz"
+    Then the response status should be "200"
+
   Scenario: Endpoint should return stable gem specs
     Given I am an admin of account "test1"
     And I use an authentication token
@@ -696,6 +724,20 @@ Feature: Rubygems legacy specs index
       { "Content-Type": "application/json; charset=utf-8" }
       """
 
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/test1/latest_specs.4.8.gz"
+    Then the response status should be "200"
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/latest_specs.4.8.gz"
+    Then the response status should be "200"
+
   Scenario: Endpoint should return latest gem specs
     Given I am an admin of account "test1"
     And I use an authentication token
@@ -899,6 +941,21 @@ Feature: Rubygems legacy specs index
       """
       { "Content-Type": "application/json; charset=utf-8" }
       """
+
+  @mp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/test1/prerelease_specs.4.8.gz"
+    Then the response status should be "200"
+
+  @sp
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "//rubygems.pkg.keygen.sh/prerelease_specs.4.8.gz"
+    Then the response status should be "200"
+
   Scenario: Endpoint should return prerelease gem specs
     Given I am an admin of account "test1"
     And I use an authentication token

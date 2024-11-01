@@ -10,7 +10,7 @@
 - packages.each do |package|
   -# NOTE(ezekg) The nil format is required for trailing slash because
   -#             the route has a default format.
-  - url = v1_account_release_engine_pypi_simple_package_url(account, package, format: nil, trailing_slash: true)
+  - url = v1_account_release_engine_pypi_simple_package_url(account, package, format: nil, trailing_slash: true, host: request.host)
 
   = link_to(package.key, url, data: package.metadata)
   %br

@@ -54,6 +54,10 @@ end
 
 Given /^the current account is "([^\"]*)"$/ do |id|
   @account = FindByAliasService.call(Account, id:, aliases: :slug)
+
+  if Keygen.singleplayer?
+    stub_env 'KEYGEN_ACCOUNT_ID', @account.id
+  end
 end
 
 Given /^the current environment is "([^\"]*)"$/ do |id|

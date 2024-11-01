@@ -18,6 +18,17 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "403"
 
+  Scenario: Endpoint should be accessible from subdomain
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I use an authentication token
+    When I send a GET request to "//raw.pkg.keygen.sh/v1/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+
   Scenario: Admin retrieves an artifact for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

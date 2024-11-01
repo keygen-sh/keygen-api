@@ -39,6 +39,7 @@ jobs:
       KEYGEN_EDITION: ${{matrix.edition}}
       KEYGEN_MODE: ${{matrix.mode}}
       KEYGEN_HOST: api.keygen.sh
+      KEYGEN_HOSTS: rubygems.pkg.keygen.sh,raw.pkg.keygen.sh,tauri.pkg.keygen.sh,pypi.pkg.keygen.sh
       SECRET_KEY_BASE: 1b39b6912d39c7dd412d9f5795dd9cdaed7f97d7d02cf0bdac7c9878830b16462af858027e2a51e9c63ff95edd505d461536829bbbce6bfb2db69963c014597a
       ENCRYPTION_DETERMINISTIC_KEY: GZ5FU0dXHcFxJVqPVpZSihVVqiScvQNq
       ENCRYPTION_PRIMARY_KEY: r9ay7kGB1p7pEtuRQ6r1gSEZhShPonMz
