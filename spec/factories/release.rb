@@ -109,7 +109,7 @@ FactoryBot.define do
 
         case
         when release.engine.gem?
-          create(:artifact, :rubygems, account: release.account, release:)
+          create(:artifact, :gem, account: release.account, release:)
         end
       end
     end

@@ -12,8 +12,8 @@ FactoryBot.define do
     release     { artifact.release }
     content     { SecureRandom.bytes(128) }
 
-    trait :rubygems do
-      artifact { build(:artifact, :rubygems, account:, environment:) }
+    trait :gemspec do
+      artifact { build(:artifact, :gem, account:, environment:) }
       content  {
         gem     = file_fixture('ping-1.0.0.gem').read
         gemspec = Gem::Package.new(gem).spec

@@ -16,40 +16,40 @@ FactoryBot.define do
     filetype    { build(:filetype, key: 'dmg', account:) }
     manifest    { nil }
 
-    trait :pypi do
-      release       { build(:release, :raw, account:, environment:) }
-      filename      { "#{release.name.underscore.parameterize}-#{release.version}.whl" }
-      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
-      filetype      { build(:filetype, key: 'whl', account:) }
-      platform      { nil }
-      arch          { nil }
+    trait :pypi_whl do
+      release  { build(:release, :pypi, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize}-#{release.version}.whl" }
+      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype { build(:filetype, key: 'whl', account:) }
+      platform { nil }
+      arch     { nil }
     end
 
-    trait :tauri do
-      release       { build(:release, :tauri, account:, environment:) }
-      filename      { "#{release.name.underscore.parameterize}.app" }
-      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
-      filetype      { build(:filetype, key: 'app', account:) }
-      platform      { build(:platform, key: 'darwin', account:) }
-      arch          { build(:arch, key: 'x86_64', account:) }
+    trait :tauri_app do
+      release  { build(:release, :tauri, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize}.app" }
+      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype { build(:filetype, key: 'app', account:) }
+      platform { build(:platform, key: 'darwin', account:) }
+      arch     { build(:arch, key: 'x86_64', account:) }
     end
 
-    trait :raw do
-      release       { build(:release, :raw, account:, environment:) }
-      filename      { "#{release.name.underscore.parameterize(separator: '_')}_linux_arm64" }
-      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
-      filetype      { nil }
-      platform      { build(:platform, key: 'linux', account:) }
-      arch          { build(:arch, key: 'arm64', account:) }
+    trait :cli do
+      release  { build(:release, :raw, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize(separator: '_')}_linux_arm64" }
+      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filetype { nil }
+      platform { build(:platform, key: 'linux', account:) }
+      arch     { build(:arch, key: 'arm64', account:) }
     end
 
-    trait :rubygems do
-      release       { build(:release, :rubygems, account:, environment:) }
-      filename      { "#{release.name.underscore.parameterize(separator: '_')}-#{release.version}.gem" }
-      filesize      { Faker::Number.between(from: 25.bytes.to_i, to: 5.megabytes.to_i) }
-      filetype      { build(:filetype, key: 'gem', account:) }
-      platform      { build(:platform, key: %w[ruby java jruby mswin mswin64].sample) }
-      arch          { nil }
+    trait :gem do
+      release  { build(:release, :rubygems, account:, environment:) }
+      filename { "#{release.name.underscore.parameterize(separator: '_')}-#{release.version}.gem" }
+      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 25.megabytes.to_i) }
+      filetype { build(:filetype, key: 'gem', account:) }
+      platform { build(:platform, key: %w[ruby java jruby mswin mswin64].sample) }
+      arch     { nil }
     end
 
     trait :with_smanifest do
@@ -58,7 +58,7 @@ FactoryBot.define do
 
         case
         when artifact.engine.gem?
-          create(:manifest, :rubygems, account: release.account, artifact:)
+          create(:manifest, :gemspec, account: release.account, artifact:)
         end
       end
     end
@@ -92,10 +92,16 @@ FactoryBot.define do
     end
 
     trait :processing do
+      content_type   { Mime[filetype&.key].to_s.presence || 'application/octet-stream' }
+      content_length { filesize.presence || 1.megabyte }
+
       status { 'PROCESSING' }
     end
 
     trait :uploaded do
+      content_type   { Mime[filetype&.key].to_s.presence || 'application/octet-stream' }
+      content_length { filesize.presence || 1.megabyte }
+
       status { 'UPLOADED' }
     end
 

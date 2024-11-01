@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class WaitForArtifactUploadWorker < BaseWorker
-  MIN_CONTENT_LENGTH = 5.bytes      # to avoid processing empty or invalid artifacts
-  MAX_CONTENT_LENGTH = 25.megabytes # to avoid downloading large artifacts
-
   sidekiq_options queue: :critical,
                   dead: false
 
@@ -39,26 +36,34 @@ class WaitForArtifactUploadWorker < BaseWorker
       status: 'PROCESSING',
     )
 
-    NotifyArtifactUploadWorker.perform_async(
-      artifact.id,
-      artifact.status,
-    )
-
     # check if it's a supported package artifact e.g. gem, npm package, etc.
     case artifact
-    in filetype: ReleaseFiletype(:gem), engine: ReleaseEngine(:rubygems) if artifact.content_length.in?(MIN_CONTENT_LENGTH..MAX_CONTENT_LENGTH)
-      # FIXME(ezekg) reject and warn if artifact filesize is unacceptable
+    in filetype: ReleaseFiletype(:gem), engine: ReleaseEngine(:rubygems)
+      BroadcastEventService.call(
+        event: 'artifact.upload.processing',
+        account: artifact.account,
+        resource: artifact,
+      )
+
       ProcessRubyGemWorker.perform_async(artifact.id)
     else
-      NotifyArtifactUploadWorker.perform_async(
-        artifact.id,
-        'UPLOADED',
+      artifact.update!(status: 'UPLOADED')
+
+      BroadcastEventService.call(
+        event: %w[artifact.upload.succeeded artifact.uploaded], # backwards compat
+        account: artifact.account,
+        resource: artifact,
       )
     end
-  rescue Aws::Waiters::Errors::WaiterFailed
-    NotifyArtifactUploadWorker.perform_async(
-      artifact.id,
-      'FAILED',
+  rescue Aws::Waiters::Errors::WaiterFailed => e
+    Keygen.logger.warn { "[workers.wait-for-artifact-upload-worker] Error: #{e.class.name} - #{e.message}" }
+
+    artifact.update!(status: 'FAILED')
+
+    BroadcastEventService.call(
+      event: 'artifact.upload.failed',
+      account: artifact.account,
+      resource: artifact,
     )
   end
 end
