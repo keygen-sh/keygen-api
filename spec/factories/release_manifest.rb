@@ -12,7 +12,7 @@ FactoryBot.define do
     environment { NIL_ENVIRONMENT }
     artifact    { build(:artifact, account:, environment:) }
     release     { artifact.release }
-    content     { SecureRandom.bytes(128) }
+    content     { Random.bytes(128) }
 
     trait :gemspec do
       artifact { build(:artifact, :gem, account:, environment:) }
