@@ -95,8 +95,14 @@ Rails.application.routes.draw do
     # see: https://github.com/npm/registry/blob/ae49abf1bac0ec1a3f3f1fceea1cca6fe2dc00e1/docs/responses/package-metadata.md
     scope module: :npm, constraints: MimeTypeConstraint.new(:json, :npm, raise_on_no_match: true), defaults: { format: :json } do
       get ':package', to: 'package_metadata#show', as: :npm_package_metadata, constraints: {
-        package: /.*/
+        # see: https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
+        package: %r{(?:@([a-z0-9][a-z0-9-]*[a-z0-9])/)?([a-z0-9][a-z0-9._-]*[a-z0-9])}
       }
+    end
+
+    # ignore these npm requests entirely for now e.g. POST /-/npm/v1/security/advisories/bulk
+    scope module: :npm do
+      match '/-/npm/*wildcard', via: :all, to: -> env { [404, {}, []] }
     end
   end
 
