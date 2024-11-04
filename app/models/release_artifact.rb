@@ -453,7 +453,8 @@ class ReleaseArtifact < ApplicationRecord
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
   scope :unyanked,  -> { joins(:release).where.not(releases: { status: 'YANKED' }) }
 
-  scope :gems, -> { for_filetype(:gem) }
+  scope :gems,             -> { for_engine(:rubygems).for_filetype(:gem) }
+  scope :npm_package_tgz,  -> { for_engine(:npm).for_filetype(:tgz) }
 
   def key_for(path) = "artifacts/#{account_id}/#{release_id}/#{path}"
   def key           = key_for(filename)

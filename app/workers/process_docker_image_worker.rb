@@ -26,10 +26,10 @@ class ProcessDockerImageWorker < BaseWorker
                    .body
 
     # unpack the package tarball
-    io = gunzip(tgz)
+    tar = gunzip(tgz)
 
-    unpack io do |tar|
-      tar.each do |entry|
+    unpack tar do |archive|
+      archive.each do |entry|
         case entry.name
         in 'manifest.json'
           raise ImageNotAcceptableError, 'manifest must be a manifest.json file' unless
@@ -67,7 +67,7 @@ class ProcessDockerImageWorker < BaseWorker
     end
 
     # not sure why GzipReader#open doesn't take an io?
-    io.close
+    tar.close
 
     artifact.update!(status: 'UPLOADED')
 

@@ -46,6 +46,7 @@ Rails.application.routes.draw do
   end
 
   concern :pypi do
+    # see: https://peps.python.org/pep-0503/
     scope module: :pypi, constraints: MimeTypeConstraint.new(:html, raise_on_no_match: true), defaults: { format: :html } do
       get 'simple/',          to: 'simple#index', as: :pypi_simple_packages, trailing_slash: true
       get 'simple/:package/', to: 'simple#show',  as: :pypi_simple_package,  trailing_slash: true
@@ -53,6 +54,7 @@ Rails.application.routes.draw do
   end
 
   concern :tauri do
+    # see: https://v2.tauri.app/plugin/updater/#dynamic-update-server
     scope module: :tauri, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
       get ':package', to: 'upgrades#show'
     end
@@ -86,6 +88,15 @@ Rails.application.routes.draw do
       get 'latest_specs.4.8.gz',               to: 'specs#latest_specs',     as: :rubygems_latest_specs
       get 'prerelease_specs.4.8.gz',           to: 'specs#prerelease_specs', as: :rubygems_prerelease_specs
       get 'gems/:gem.gem',                     to: 'gems#show',              as: :rubygems_gem,              constraints: { gem: /[^\/]+/ }
+    end
+  end
+
+  concern :npm do
+    # see: https://github.com/npm/registry/blob/ae49abf1bac0ec1a3f3f1fceea1cca6fe2dc00e1/docs/responses/package-metadata.md
+    scope module: :npm, constraints: MimeTypeConstraint.new(:json, :npm, raise_on_no_match: true), defaults: { format: :json } do
+      get ':package', to: 'package_metadata#show', as: :npm_package_metadata, constraints: {
+        package: /.*/
+      }
     end
   end
 
@@ -465,6 +476,9 @@ Rails.application.routes.draw do
       scope :rubygems do
         concerns :rubygems
       end
+      scope :npm do
+        concerns :npm
+      end
     end
   end
 
@@ -599,6 +613,17 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :rubygems
+      end
+    end
+
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'npm.pkg' } do
+      case
+      when Keygen.multiplayer?
+        scope ':account_id', as: :account do
+          concerns :npm
+        end
+      when Keygen.singleplayer?
+        concerns :npm
       end
     end
   end

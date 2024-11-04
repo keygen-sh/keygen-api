@@ -47,5 +47,6 @@ class ReleaseManifest < ApplicationRecord
     end
   end
 
-  def as_gemspec = Gem::Specification.from_yaml(content)
+  def as_gemspec      = Gem::Specification.from_yaml(content)
+  def as_package_json = JSON.parse(content)
 end
