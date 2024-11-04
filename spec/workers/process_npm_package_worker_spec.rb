@@ -249,4 +249,23 @@ describe ProcessNpmPackageWorker do
       end
     end
   end
+
+  context 'when artifact filesize is unaccurate' do
+    let(:artifact) { create(:artifact, :processing, filesize: 1.kilobyte, account:) }
+    let(:file)     { file_fixture('large.tar.gz').open }
+
+    before do
+      Aws.config = { s3: { stub_responses: { get_object: [{ body: file }] } } }
+    end
+
+    it 'should not process file' do
+      expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
+
+      expect(artifact.status).to eq 'FAILED'
+    end
+
+    it 'should be efficient' do
+      expect { subject.perform_async(artifact.id) }.to allocate_less_than(5.megabytes)
+    end
+  end
 end

@@ -26,39 +26,35 @@ class ProcessNpmPackageWorker < BaseWorker
                    .body
 
     # unpack the package tarball
-    tar = gunzip(tgz)
+    io = gunzip(tgz)
 
-    unpack tar do |archive|
-      archive.each do |entry|
-        # NOTE(ezekg) npm prefixes everything in the archive with package/
-        case entry.name
-        in 'package/package.json'
-          raise PackageNotAcceptableError, 'manifest must be a package.json file' unless
-            entry.file?
+    unpack io do |tar|
+      # NOTE(ezekg) npm prefixes everything in the archive with package/
+      entry = tar.find { _1.name in 'package/package.json' }
 
-          raise PackageNotAcceptableError, 'manifest is too big' if
-            entry.size > MAX_MANIFEST_SIZE
+      raise PackageNotAcceptableError, 'manifest at package/package.json must exist' if
+        entry.nil?
 
-          # the manifest is already in json format
-          json = entry.read
+      raise PackageNotAcceptableError, 'manifest must be a package.json file' unless
+        entry.file?
 
-          ReleaseManifest.create!(
-            account_id: artifact.account_id,
-            environment_id: artifact.environment_id,
-            release_id: artifact.release_id,
-            release_artifact_id: artifact.id,
-            content: json,
-          )
+      raise PackageNotAcceptableError, 'manifest is too big' if
+        entry.size > MAX_MANIFEST_SIZE
 
-          # all we need
-          break
-        else
-        end
-      end
+      # the manifest is already in json format
+      json = entry.read
+
+      ReleaseManifest.create!(
+        account_id: artifact.account_id,
+        environment_id: artifact.environment_id,
+        release_id: artifact.release_id,
+        release_artifact_id: artifact.id,
+        content: json,
+      )
     end
 
     # not sure why GzipReader#open doesn't take an io?
-    tar.close
+    io.close
 
     artifact.update!(status: 'UPLOADED')
 
