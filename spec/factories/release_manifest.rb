@@ -24,7 +24,7 @@ FactoryBot.define do
       }
     end
 
-    trait :npm do
+    trait :package_json do
       artifact { build(:artifact, :npm_package, account:, environment:) }
       content  {
         tgz = file_fixture('hello-2.0.0.tgz').read
