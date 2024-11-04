@@ -116,7 +116,7 @@ describe ProcessNpmPackageWorker do
   end
 
   context 'when artifact is not a package' do
-    let(:noise) { SecureRandom.bytes(1.megabyte) }
+    let(:noise) { Random.bytes(1.megabyte) }
 
     before do
       Aws.config = { s3: { stub_responses: { get_object: [{ body: noise }] } } }
@@ -159,7 +159,7 @@ describe ProcessNpmPackageWorker do
   end
 
   context 'when artifact is too big' do
-    let(:noise) { SecureRandom.bytes(1.kilobyte) }
+    let(:noise) { Random.bytes(1.kilobyte) }
 
     before do
       Aws.config = { s3: { stub_responses: { get_object: [{ body: noise }] } } }
@@ -202,7 +202,7 @@ describe ProcessNpmPackageWorker do
   end
 
   context 'when artifact is too small' do
-    let(:noise) { SecureRandom.bytes(1.kilobyte) }
+    let(:noise) { Random.bytes(1.kilobyte) }
 
     before do
       Aws.config = { s3: { stub_responses: { get_object: [{ body: noise }] } } }

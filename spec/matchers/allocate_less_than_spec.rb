@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe :allocate_less_than do
-  let!(:stream) { StringIO.new(SecureRandom.bytes(50.megabytes)) }
+  let!(:stream) { StringIO.new(Random.bytes(50.megabytes)) }
 
   it 'should pass when allocations are under limit' do
     expect { stream.read(1.megabyte - 1.kilobyte) }.to allocate_less_than(1.megabyte)
