@@ -26,11 +26,11 @@ class ProcessNpmPackageWorker < BaseWorker
                    .body
 
     # unpack the package tarball
-    io = gunzip(tgz)
+    tar = gunzip(tgz)
 
-    unpack io do |tar|
+    unpack tar do |archive|
       # NOTE(ezekg) npm prefixes everything in the archive with package/
-      entry = tar.find { _1.name in 'package/package.json' }
+      entry = archive.find { _1.name in 'package/package.json' }
 
       raise PackageNotAcceptableError, 'manifest at package/package.json must exist' if
         entry.nil?
@@ -54,7 +54,7 @@ class ProcessNpmPackageWorker < BaseWorker
     end
 
     # not sure why GzipReader#open doesn't take an io?
-    io.close
+    tar.close
 
     artifact.update!(status: 'UPLOADED')
 
