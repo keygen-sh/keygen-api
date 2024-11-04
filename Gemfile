@@ -141,4 +141,5 @@ group :test do
   gem 'database_cleaner', '~> 2.0'
   gem 'webmock', '~> 3.14.0'
   gem 'elif', '~> 0.1.0'
+  gem 'memory_profiler'
 end

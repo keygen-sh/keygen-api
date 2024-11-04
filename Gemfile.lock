@@ -299,6 +299,7 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
+    memory_profiler (1.1.0)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2022.0105)
@@ -552,6 +553,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (>= 3.8.0)
   lograge
+  memory_profiler
   minitar
   msgpack (~> 1.7)
   nokogiri (~> 1.16.5)
