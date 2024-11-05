@@ -11,7 +11,7 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      artifacts = authorized_scope(package.artifacts.npm_package_tgz).order_by_version
+      artifacts = authorized_scope(package.artifacts.tarballs).order_by_version
         .where_assoc_exists(:manifest) # must exist
         .preload(:manifest,
           release: %i[product entitlements constraints],
