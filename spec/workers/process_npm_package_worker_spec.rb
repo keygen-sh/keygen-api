@@ -17,13 +17,18 @@ describe ProcessNpmPackageWorker do
   context 'when artifact is a valid package' do
     let(:package)      { file_fixture('hello-2.0.0.tgz').open }
     let(:package_json) {
-      tar = Zlib::GzipReader.new(package)
-      pkg = Minitar::Reader.open tar do |archive|
+      tar  = Zlib::GzipReader.new(package)
+      json = Minitar::Reader.open tar do |archive|
         archive.find { _1.name in 'package/package.json' }
                .read
       end
 
-      pkg
+      json
+    }
+
+    let(:minified_package_json) {
+      JSON.parse(package_json)
+          .to_json
     }
 
     before do
@@ -46,7 +51,7 @@ describe ProcessNpmPackageWorker do
       it 'should process package' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
-        expect(artifact.manifest.content).to eq package_json
+        expect(artifact.manifest.content).to eq minified_package_json
         expect(artifact.status).to eq 'UPLOADED'
       end
     end

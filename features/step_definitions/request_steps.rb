@@ -1250,6 +1250,15 @@ Then /^the response body should be a text document with the following content:$/
   expect(last_response.body.strip).to eq body.strip
 end
 
+Then /^the response body should be a JSON document with the following content:$/ do |body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  expected = JSON.pretty_generate(JSON.parse(body), indent: '  ')
+  actual   = JSON.pretty_generate(JSON.parse(last_response.body), indent: '  ')
+
+  expect(actual).to eq expected
+end
+
 Then /^the response body should be a gemspec with the following content:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 

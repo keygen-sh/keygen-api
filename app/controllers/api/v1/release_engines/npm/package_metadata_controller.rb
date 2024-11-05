@@ -13,7 +13,7 @@ module Api::V1::ReleaseEngines
       authorize! package,
         to: :show?
 
-      artifacts = authorized_scope(package.artifacts.npm_package_tgz.order_by_version)
+      artifacts = authorized_scope(package.artifacts.npm_package_tgz).order_by_version
         .where_assoc_exists(:manifest) # must exist
         .preload(:manifest,
           release: %i[product entitlements constraints],
@@ -21,14 +21,19 @@ module Api::V1::ReleaseEngines
       authorize! artifacts,
         to: :index?
 
-      latest   = artifacts.first
-      metadata = artifacts.reduce(name: package.name, time: {}, 'dist-tags': { latest: latest.release.version }, versions: {}) do |metadata, artifact|
+      last_modified = artifacts.maximum(:"#{artifacts.table_name}.updated_at")
+      latest        = artifacts.first
+      metadata      = artifacts.reduce(
+        name: package.key,
+        time: { created: package.created_at, modified: last_modified },
+        'dist-tags': { latest: latest.version },
+        versions: {},
+      ) do |metadata, artifact|
         package_json = artifact.manifest.as_package_json
-        release      = artifact.release
 
-        metadata[:time][release.version]     = artifact.created_at.iso8601
-        metadata[:'dist-tags'][release.tag]  = release.version if release.tag?
-        metadata[:versions][release.version] = package_json.merge(
+        metadata[:time][artifact.version]     = artifact.created_at.iso8601(3)
+        metadata[:'dist-tags'][artifact.tag]  = artifact.version if artifact.tag?
+        metadata[:versions][artifact.version] = package_json.merge(
           dist: {
             tarball: vanity_v1_account_release_artifact_url(current_account, artifact, filename: artifact.filename, host: request.host),
           },
@@ -36,6 +41,10 @@ module Api::V1::ReleaseEngines
 
         metadata
       end
+
+      # for etag support
+      return unless
+        stale?(metadata, last_modified:, cache_control: { max_age: 1.day, private: true })
 
       render json: metadata
     end

@@ -38,8 +38,9 @@ class ProcessDockerImageWorker < BaseWorker
           raise ImageNotAcceptableError, 'manifest is too big' if
             entry.size > MAX_MANIFEST_SIZE
 
-          # the manifest is already in json format
-          json = entry.read
+          # parse/validate and minify the manifest
+          json = JSON.parse(entry.read)
+                     .to_json
 
           ReleaseManifest.create!(
             account_id: artifact.account_id,
@@ -77,6 +78,7 @@ class ProcessDockerImageWorker < BaseWorker
       resource: artifact,
     )
   rescue ImageNotAcceptableError,
+         ActiveRecord::RecordInvalid,
          Zlib::Error,
          Minitar::Error,
          IOError => e
