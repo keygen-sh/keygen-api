@@ -13,6 +13,10 @@ module Api::V1::ReleaseEngines
       packages = authorized_scope(apply_scopes(current_account.release_packages.pypi))
       authorize! packages
 
+      # for etag support
+      return unless
+        stale?(packages, cache_control: { max_age: 1.day, private: true })
+
       render 'api/v1/release_engines/pypi/simple/index',
         layout: 'layouts/simple',
         locals: {
@@ -24,9 +28,14 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      artifacts = package.artifacts.order_by_version.preload(release: %i[product entitlements constraints])
+      artifacts = authorized_scope(package.artifacts).order_by_version.preload(release: %i[product entitlements constraints])
       authorize! artifacts,
         to: :index?
+
+      # FIXME(ezekg) why doesn't rails qualify the column name? unions cause an ambiguous column error
+      last_modified = artifacts.maximum(:"#{artifacts.table_name}.updated_at")
+      return unless
+        stale?(artifacts, last_modified:, cache_control: { max_age: 1.day, private: true })
 
       render 'api/v1/release_engines/pypi/simple/show',
         layout: 'layouts/simple',

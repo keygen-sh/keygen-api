@@ -2,9 +2,9 @@
 Feature: PyPI simple package files
   Background:
     Given the following "accounts" exist:
-      | name   | slug  |
-      | Test 1 | test1 |
-      | Test 2 | test2 |
+      | id                                   | slug  | name   |
+      | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | test1 | Test 1 |
+      | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | test2 | Test 2 |
     And the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name |
@@ -14,7 +14,7 @@ Feature: PyPI simple package files
       | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | pypi   | foo |
       | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 6198261a-48b5-4445-a045-9fed4afc7735 | pypi   | bar |
       | 7b113ac2-ae81-406a-b44e-f356126e2faa | 6198261a-48b5-4445-a045-9fed4afc7735 | pypi   | baz |
-      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 |        | qux |
+      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | npm    | qux |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | release_package_id                   | version      | channel  |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   |
@@ -22,21 +22,20 @@ Feature: PyPI simple package files
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.1.0        | stable   |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 1.0.0-beta.1 | beta     |
       | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 6198261a-48b5-4445-a045-9fed4afc7735 | 7b113ac2-ae81-406a-b44e-f356126e2faa | 2.0.0        | stable   |
-      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 1.1.0        | stable   |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   |
     And the current account has the following "artifact" rows:
-      | id                                   | release_id                           | filename                    | filetype |
-      | 1f63d6ec-8147-4bf0-bcd2-5d4f0e5eab8f | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tar.gz            | tar.gz   |
-      | 948f9b83-9e0d-469d-8982-e49213efe85e | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0-py3-none-any.whl  | whl      |
-      | c1f8705e-68cd-4312-b2b1-72e19df47bd1 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tar.gz            | tar.gz   |
-      | 2fd19ae7-e0cf-4de0-ad4a-1ca65db75c87 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1-py3-none-any.whl  | whl      |
-      | a8e49ea6-17df-4798-937f-e4756e331db5 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tar.gz            | tar.gz   |
-      | adce1d8b-7120-43b6-a42a-a64c24ed2a25 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-py3-none-any.whl  | whl      |
-      | fa773c2b-1c3a-4bd8-83fe-546480e92098 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1.tar.gz          | tar.gz   |
-      | 56277838-ddb5-4c54-a3d2-0fad8bdfefe1 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1-py3-none-any.whl| whl      |
-      | 1cccff81-8b49-40b2-9453-3456f2ca04ac | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tar.gz            | tar.gz   |
-      | ab3f9749-3ea7-4057-92ec-d647784ff097 | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0-py3-none-any.whl  | whl      |
-      | d7e01e53-4f9c-48a5-96cb-13207fc25cfe | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0.tar.gz            | tar.gz   |
-      | a2fd1960-54c6-4624-83d1-84f0c8dd1f1a | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0-py3-none-any.whl  | whl      |
+      | id                                   | release_id                           | filename                    | filetype | created_at               | updated_at               |
+      | 1f63d6ec-8147-4bf0-bcd2-5d4f0e5eab8f | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tar.gz            | tar.gz   | 2024-01-01T01:01:01.000Z | 2024-01-01T01:01:01.000Z |
+      | 948f9b83-9e0d-469d-8982-e49213efe85e | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0-py3-none-any.whl  | whl      | 2024-02-02T02:02:02.000Z | 2024-02-02T02:02:02.000Z |
+      | c1f8705e-68cd-4312-b2b1-72e19df47bd1 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tar.gz            | tar.gz   | 2024-03-03T03:03:03.000Z | 2024-03-03T03:03:03.000Z |
+      | 2fd19ae7-e0cf-4de0-ad4a-1ca65db75c87 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1-py3-none-any.whl  | whl      | 2024-04-04T04:04:04.000Z | 2024-04-04T04:04:04.000Z |
+      | a8e49ea6-17df-4798-937f-e4756e331db5 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tar.gz            | tar.gz   | 2024-05-05T05:05:05.000Z | 2024-05-05T05:05:05.000Z |
+      | adce1d8b-7120-43b6-a42a-a64c24ed2a25 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-py3-none-any.whl  | whl      | 2024-06-06T06:06:06.000Z | 2024-06-06T06:06:06.000Z |
+      | fa773c2b-1c3a-4bd8-83fe-546480e92098 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1.tar.gz          | tar.gz   | 2024-07-07T07:07:07.000Z | 2024-07-07T07:07:07.000Z |
+      | 56277838-ddb5-4c54-a3d2-0fad8bdfefe1 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0b1-py3-none-any.whl| whl      | 2024-08-08T08:08:08.000Z | 2024-08-08T08:08:08.000Z |
+      | 1cccff81-8b49-40b2-9453-3456f2ca04ac | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tar.gz            | tar.gz   | 2024-09-09T09:09:09.000Z | 2024-09-09T09:09:09.000Z |
+      | ab3f9749-3ea7-4057-92ec-d647784ff097 | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0-py3-none-any.whl  | whl      | 2024-10-10T10:10:10.000Z | 2024-10-10T10:10:10.000Z |
+      | d7e01e53-4f9c-48a5-96cb-13207fc25cfe | 70c40946-4b23-408c-aa1c-fa35421ff46a | qux-1.1.0.tar.gz            | tar.gz   | 2024-11-11T11:11:11.000Z | 2024-11-11T11:11:11.000Z |
     And I send the following raw headers:
       """
       User-Agent: pip/23.1.2 {"ci":null,"cpu":"x86_64","distro":{"id":"focal","libc":{"lib":"glibc","version":"2.31"},"name":"Ubuntu","version":"20.04"},"implementation":{"name":"CPython","version":"3.8.10"},"installer":{"name":"pip","version":"23.1.2"},"openssl_version":"OpenSSL 1.1.1f  31 Mar 2020","python":"3.8.10","setuptools_version":"45.2.0","system":{"name":"Linux","release":"5.15.90.1-microsoft-standard-WSL2"}}
@@ -188,6 +187,31 @@ Feature: PyPI simple package files
     And the response body should be an HTML document with the following xpaths:
       """
       /html/body/a[@href="https://api.keygen.sh/v1/accounts/$account/artifacts/1f63d6ec-8147-4bf0-bcd2-5d4f0e5eab8f/foo-1.0.0.tar.gz"]
+      """
+
+  Scenario: Endpoint should support etags (match)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"6d7793913c7e76a1b8964e1798c316ae"
+      """
+    When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
+    Then the response status should be "304"
+
+  Scenario: Endpoint should support etags (mismatch)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      If-None-Match: W/"foo"
+      """
+    When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Etag: W/"6d7793913c7e76a1b8964e1798c316ae"
+      Cache-Control: max-age=86400, private
       """
 
   Scenario: License requests versions for a licensed product
