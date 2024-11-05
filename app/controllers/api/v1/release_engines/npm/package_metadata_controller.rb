@@ -35,7 +35,9 @@ module Api::V1::ReleaseEngines
         metadata[:versions][artifact.version] = package_json.merge(
           dist: {
             tarball: vanity_v1_account_release_artifact_url(current_account, artifact, filename: artifact.filename, host: request.host),
-          },
+            # FIXME(ezekg) only include valid SHA1 checksums?
+            shasum: artifact.checksum,
+          }.compact,
         )
 
         metadata
