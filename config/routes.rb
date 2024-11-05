@@ -102,7 +102,7 @@ Rails.application.routes.draw do
 
     # ignore these npm requests entirely for now e.g. POST /-/npm/v1/security/advisories/bulk
     scope module: :npm, defaults: { format: :binary } do
-      match '/-/npm/*wildcard', via: :all, to: -> env { [404, {}, []] }
+      match '/-/npm/*wildcard', via: :all, to: -> env { [410, {}, []] }
     end
   end
 
