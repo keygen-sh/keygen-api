@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'compact_index'
-
 module Api::V1::ReleaseEngines
   class Npm::PackageMetadataController < Api::V1::BaseController
     before_action :scope_to_current_account!
