@@ -350,6 +350,7 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
+  scope :for_filetypes, -> *filetypes { joins(:filetype).where(filetype: { key: filetypes }) }
   scope :for_filetype, -> filetype {
     case filetype.presence
     when ReleaseFiletype,
@@ -449,8 +450,8 @@ class ReleaseArtifact < ApplicationRecord
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
   scope :unyanked,  -> { joins(:release).where.not(releases: { status: 'YANKED' }) }
 
-  scope :gems,             -> { for_engine(:rubygems).for_filetype(:gem) }
-  scope :npm_package_tgz,  -> { for_engine(:npm).for_filetype(:tgz) }
+  scope :gems,     -> { for_filetype(:gem) }
+  scope :tarballs, -> { for_filetypes(:tgz, :tar, :'tar.gz') }
 
   delegate :version, :semver, :channel, :tag,
     :tag?, :licensed?, :open?, :closed?,
