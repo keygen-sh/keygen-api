@@ -19,6 +19,7 @@ module Api::V1::ReleaseEngines
       authorize! artifacts,
         to: :index?
 
+      # FIXME(ezekg) https://github.com/brianhempel/active_record_union/issues/35
       last_modified = artifacts.maximum(:"#{artifacts.table_name}.updated_at")
       latest        = artifacts.first
       metadata      = artifacts.reduce(

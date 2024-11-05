@@ -32,7 +32,7 @@ module Api::V1::ReleaseEngines
       authorize! artifacts,
         to: :index?
 
-      # FIXME(ezekg) why doesn't rails qualify the column name? unions cause an ambiguous column error
+      # FIXME(ezekg) https://github.com/brianhempel/active_record_union/issues/35
       last_modified = artifacts.maximum(:"#{artifacts.table_name}.updated_at")
       return unless
         stale?(artifacts, last_modified:, cache_control: { max_age: 1.day, private: true })
