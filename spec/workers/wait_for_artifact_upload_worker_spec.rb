@@ -245,7 +245,7 @@ describe WaitForArtifactUploadWorker do
         expect(artifact.reload.manifest).to_not be nil
       end
 
-      context 'when gem is invalid' do
+      context 'when package is invalid' do
         let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
         let(:processor) { ProcessNpmPackageWorker }
 
@@ -279,7 +279,7 @@ describe WaitForArtifactUploadWorker do
         end
       end
 
-      context 'when gem is too small' do
+      context 'when package is too small' do
         let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
         let(:processor) { ProcessNpmPackageWorker }
 
@@ -318,7 +318,7 @@ describe WaitForArtifactUploadWorker do
         end
       end
 
-      context 'when gem is too large' do
+      context 'when package is too large' do
         let(:artifact)  { create(:artifact, :npm_package, :waiting, account:) }
         let(:processor) { ProcessNpmPackageWorker }
 
