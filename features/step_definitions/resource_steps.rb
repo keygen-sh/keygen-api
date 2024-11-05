@@ -146,7 +146,7 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   factory = resource.singularize.underscore.to_sym
 
   hashes.each do |hash|
-    hash.transform_values! { _1.presence }
+    hash.transform_values!(&:presence)
 
     # FIXME(ezekg) Treating releases a bit differently for convenience
     case factory

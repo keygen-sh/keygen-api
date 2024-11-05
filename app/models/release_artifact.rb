@@ -101,10 +101,6 @@ class ReleaseArtifact < ApplicationRecord
       in: STATUSES,
     }
 
-  delegate :version, :semver, :channel,
-    :licensed?, :open?, :closed?,
-    to: :release
-
   scope :order_by_version, -> (order = :desc) {
     sql = case order
           in :desc
@@ -455,6 +451,11 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :gems,             -> { for_engine(:rubygems).for_filetype(:gem) }
   scope :npm_package_tgz,  -> { for_engine(:npm).for_filetype(:tgz) }
+
+  delegate :version, :semver, :channel, :tag,
+    :tag?, :licensed?, :open?, :closed?,
+    allow_nil: true,
+    to: :release
 
   def key_for(path) = "artifacts/#{account_id}/#{release_id}/#{path}"
   def key           = key_for(filename)
