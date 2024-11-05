@@ -41,21 +41,21 @@ Feature: npm package metadata
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   |        | PUBLISHED |              |
       | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   |        | PUBLISHED |              |
     And the current account has the following "artifact" rows:
-      | id                                   | release_id                           | filename                  | filetype | checksum                                                         | status   | created_at               | updated_at               |
-      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tgz             | tgz      | 32eae8a165580f793a2fde46dd9ff218bb490ee3d1aeda368dfee7e3726ffb67 | UPLOADED | 2024-10-01T01:42:00.000Z | 2024-10-01T01:42:00.000Z |
-      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tgz             | tgz      | 455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6 | UPLOADED | 2024-10-02T01:42:00.000Z | 2024-10-02T01:42:00.000Z |
-      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tgz             | tgz      | 2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6 | UPLOADED | 2024-10-03T01:42:00.000Z | 2024-10-03T01:42:00.000Z |
-      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | test-bar-1.0.0-beta.1.tgz | tgz      | be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7 | UPLOADED | 2024-10-04T01:42:00.000Z | 2024-10-04T01:42:00.000Z |
-      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | test-bar-1.0.0-beta.2.tgz | tgz      | 1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7 | UPLOADED | 2024-10-05T01:42:00.000Z | 2024-10-05T01:42:00.000Z |
-      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | test-bar-1.0.0-beta.3.tgz | tgz      | 4a98a6ed4fe4723ca1ba18e52d4c832fb2a1f343e7d9a4c07723a1d41d62c374 | UPLOADED | 2024-10-06T01:42:00.000Z | 2024-10-06T01:42:00.000Z |
-      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.tgz             | tgz      | 5a9fe4919e0d7089020f087561fb3a1fbdcbe420cdb822039f849925aaeaddfd | UPLOADED | 2024-10-07T01:42:00.000Z | 2024-10-07T01:42:00.000Z |
-      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tgz             | tgz      | b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707 | UPLOADED | 2024-10-08T01:42:00.000Z | 2024-10-08T01:42:00.000Z |
-      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.tgz             | tgz      | e9af40c7b7186b7b45f26990b2be4cf8acb8215abd312e7c1ccfdd66ce5ebb39 | UPLOADED | 2024-10-09T01:42:00.000Z | 2024-10-09T01:42:00.000Z |
-      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.tgz             | tgz      |                                                                  | WAITING  | 2024-10-10T01:42:00.000Z | 2024-10-10T01:42:00.000Z |
-      | 200ef3e5-00f2-4eed-92fd-8f41cd19e8ed | 34c126d5-1a1f-4571-acfb-77ca33e8ddd0 | test-qux-1.0.0.tgz        | tgz      | e9af40c7b7186b7b45f26990b2be4cf8acb8215abd312e7c1ccfdd66ce5ebb39 | UPLOADED | 2024-10-11T01:42:00.000Z | 2024-10-11T01:42:00.000Z |
-      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.tgz            | tgz      | 2a69cc50ecfcbcd8812e452d6a48b4c4bec47855f527ba98c534410a52e1d772 | FAILED   | 2024-10-12T01:42:00.000Z | 2024-10-12T01:42:00.000Z |
-      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.tgz            | tgz      | f200b250b74054f795c396f3981fc515090dd463a96a572375f06b5eaf15da82 | UPLOADED | 2024-10-13T01:42:00.000Z | 2024-10-13T01:42:00.000Z |
-      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.tgz           | tgz      |                                                                  | UPLOADED | 2024-10-14T01:42:00.000Z | 2024-10-14T01:42:00.000Z |
+      | id                                   | release_id                           | filename                  | filetype | checksum                                 | status   | created_at               | updated_at               |
+      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tgz             | tgz      | ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d | UPLOADED | 2024-10-01T01:42:00.000Z | 2024-10-01T01:42:00.000Z |
+      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tgz             | tgz      | 443abe660d3283d51aae8ba2240587e95d167ab2 | UPLOADED | 2024-10-02T01:42:00.000Z | 2024-10-02T01:42:00.000Z |
+      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tgz             | tgz      | 23456f7f60af9435842657792ef7bae8d033e551 | UPLOADED | 2024-10-03T01:42:00.000Z | 2024-10-03T01:42:00.000Z |
+      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | test-bar-1.0.0-beta.1.tgz | tgz      |                                          | UPLOADED | 2024-10-04T01:42:00.000Z | 2024-10-04T01:42:00.000Z |
+      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | test-bar-1.0.0-beta.2.tgz | tgz      |                                          | UPLOADED | 2024-10-05T01:42:00.000Z | 2024-10-05T01:42:00.000Z |
+      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | test-bar-1.0.0-beta.3.tgz | tgz      |                                          | UPLOADED | 2024-10-06T01:42:00.000Z | 2024-10-06T01:42:00.000Z |
+      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.tgz             | tgz      | 8633b5884fb21b8e88cee36e37826c38f0a594bd | UPLOADED | 2024-10-07T01:42:00.000Z | 2024-10-07T01:42:00.000Z |
+      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tgz             | tgz      | a572ae9252ccd8f916185ee6a6716237fc916f2e | UPLOADED | 2024-10-08T01:42:00.000Z | 2024-10-08T01:42:00.000Z |
+      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.tgz             | tgz      | 178b4b82a108a60c2b139987263be960f2dd35e1 | UPLOADED | 2024-10-09T01:42:00.000Z | 2024-10-09T01:42:00.000Z |
+      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.tgz             | tgz      |                                          | WAITING  | 2024-10-10T01:42:00.000Z | 2024-10-10T01:42:00.000Z |
+      | 200ef3e5-00f2-4eed-92fd-8f41cd19e8ed | 34c126d5-1a1f-4571-acfb-77ca33e8ddd0 | test-qux-1.0.0.tgz        | tgz      | 40937fdb052b47c1c79fd96c769b4b8fb37cffd3 | UPLOADED | 2024-10-11T01:42:00.000Z | 2024-10-11T01:42:00.000Z |
+      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.tgz            | tgz      | 7f5fce1ecd30ec0b65dc5d9ee8768c0980421c3f | FAILED   | 2024-10-12T01:42:00.000Z | 2024-10-12T01:42:00.000Z |
+      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.tgz            | tgz      | b92b806b08a8dd817ae6205b52759fc57c4dff19 | UPLOADED | 2024-10-13T01:42:00.000Z | 2024-10-13T01:42:00.000Z |
+      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.tgz           | tgz      |                                          | UPLOADED | 2024-10-14T01:42:00.000Z | 2024-10-14T01:42:00.000Z |
     And the current account has the following "manifest" rows:
       | release_artifact_id                  | release_id                           | content                                                                                                                                                                                                                                                               |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | {"name":"foo","version":"1.0.0","description":"A basic mock package for testing","main":"index.js","author":"Test Author","license":"MIT","dependencies":{"lodash":"^4.17.21"},"scripts":{"start":"node index.js"}}                                                   |
@@ -144,7 +144,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
+              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
             }
           },
           "1.0.1": {
@@ -161,7 +162,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -178,7 +180,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -272,7 +275,7 @@ Feature: npm package metadata
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"8ebd2a605db36cec927447d435f5f325"
+      If-None-Match: W/"dd16bb3d6b70da9d8835188a634836f9"
       """
     When I send a GET request to "/accounts/test1/engines/npm/foo"
     Then the response status should be "304"
@@ -288,7 +291,7 @@ Feature: npm package metadata
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"8ebd2a605db36cec927447d435f5f325"
+      Etag: W/"dd16bb3d6b70da9d8835188a634836f9"
       Cache-Control: max-age=86400, private
       """
 
@@ -338,7 +341,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
+              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
             }
           },
           "1.0.1": {
@@ -355,7 +359,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -372,7 +377,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -507,7 +513,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
+              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
             }
           },
           "1.0.1": {
@@ -524,7 +531,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -541,7 +549,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -586,7 +595,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -603,7 +613,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -722,7 +733,8 @@ Feature: npm package metadata
               "react": "^17.0.2"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
+              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
             }
           }
         }
@@ -770,7 +782,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
+              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
             }
           },
           "1.0.1": {
@@ -787,7 +800,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -804,7 +818,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -850,7 +865,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -867,7 +883,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -984,7 +1001,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
+              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
             }
           },
           "1.0.1": {
@@ -1001,7 +1019,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -1018,7 +1037,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -1065,7 +1085,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
+              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
             }
           },
           "1.0.0": {
@@ -1082,7 +1103,8 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.tgz",
+              "shasum": "ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d"
             }
           }
         }
@@ -1195,7 +1217,8 @@ Feature: npm package metadata
               "react": "^17.0.2"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
+              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
             }
           }
         }
@@ -1237,7 +1260,8 @@ Feature: npm package metadata
               "react": "^17.0.2"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
+              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
             }
           }
         }
