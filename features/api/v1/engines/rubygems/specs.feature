@@ -120,6 +120,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -173,6 +174,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -217,6 +219,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -266,6 +269,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -320,6 +324,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "baz".freeze
+        s.licenses = [[]]
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
 
@@ -357,6 +362,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -402,6 +408,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "foo".freeze
+        s.licenses = [["MIT".freeze]]
         s.required_ruby_version = Gem::Requirement.new(">= 3.1".freeze)
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
@@ -448,6 +455,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "baz".freeze
+        s.licenses = [[]]
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
 
@@ -485,6 +493,7 @@ Feature: Rubygems legacy specs index
         s.require_paths = ["lib".freeze]
         s.date = "2024-10-22"
         s.description = "baz".freeze
+        s.licenses = [[]]
         s.rubygems_version = "3.5.11".freeze
         s.summary = nil
 
