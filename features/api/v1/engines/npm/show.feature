@@ -270,6 +270,46 @@ Feature: npm package metadata
       }
       """
 
+  Scenario: Endpoint should return scoped package metadata (encoded package)
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/npm/@test%2Fqux"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "@test/qux",
+        "time": {
+          "created": "2024-10-06T01:23:45.000Z",
+          "modified": "2024-10-11T01:42:00.000Z",
+          "1.0.0": "2024-10-11T01:42:00.000Z"
+        },
+        "dist-tags": {
+          "latest": "1.0.0"
+        },
+        "versions": {
+          "1.0.0": {
+            "name": "@test/qux",
+            "version": "1.0.0",
+            "description": "A scoped package with dependencies",
+            "main": "dist/index.js",
+            "author": "Beta Tester",
+            "license": "MIT",
+            "dependencies": {
+              "axios": "^0.21.1"
+            },
+            "scripts": {
+              "build": "webpack --config webpack.config.js"
+            },
+            "dist": {
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/200ef3e5-00f2-4eed-92fd-8f41cd19e8ed/test-qux-1.0.0.tgz",
+              "shasum": "40937fdb052b47c1c79fd96c769b4b8fb37cffd3"
+            }
+          }
+        }
+      }
+      """
+
   Scenario: Endpoint should support etags (match)
     Given I am an admin of account "test1"
     And I use an authentication token
