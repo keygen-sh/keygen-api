@@ -573,6 +573,8 @@ class ReleaseArtifact < ApplicationRecord
     in BASE64_RE then :base64
     else              nil
     end
+  rescue Encoding::CompatibilityError # invalid encoding
+    nil
   end
 
   def checksum_bytes

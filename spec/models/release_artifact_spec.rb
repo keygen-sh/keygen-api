@@ -289,7 +289,7 @@ describe ReleaseArtifact, type: :model do
     end
   end
 
-  describe 'filesize=' do
+  describe '#filesize=' do
     it 'should not raise on positive filesize' do
       expect { create(:artifact, filesize: 1, account:) }.to_not raise_error
     end
@@ -300,6 +300,134 @@ describe ReleaseArtifact, type: :model do
 
     it 'should raise on filesize > 5GB' do
       expect { create(:artifact, filesize: 5.gigabytes + 1.kilobyte, account:) }.to raise_error ActiveRecord::RecordInvalid
+    end
+  end
+
+  describe '#checksum' do
+    it 'should detect hex SHA512' do
+      artifact = build(:artifact, checksum: '8e9c74fd994a9a87be21284e80c7bc9d0ae55ed91359d5a6a2e04c232294fc5d731f86f61abe66c8a311057ebf777bc5a176e6f640108a08937be14fd4eb663b')
+
+      expect(artifact.checksum_algorithm).to eq :sha512
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 SHA512' do
+      artifact = build(:artifact, checksum: 'jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw==')
+
+      expect(artifact.checksum_algorithm).to eq :sha512
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should detect hex SHA384' do
+      artifact = build(:artifact, checksum: 'a756b1e7554598049f8af894e3e803ac1ebc0460935747eb0b57d367aecd2548ab8fdeb0e6aace985597ec9a74c9bdbb')
+
+      expect(artifact.checksum_algorithm).to eq :sha384
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 SHA384' do
+      artifact = build(:artifact, checksum: 'p1ax51VFmASfiviU4+gDrB68BGCTV0frC1fTZ67NJUirj96w5qrOmFWX7Jp0yb27')
+
+      expect(artifact.checksum_algorithm).to eq :sha384
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should detect hex SHA256' do
+      artifact = build(:artifact, checksum: 'd363c888471a1e0f6c7adadd1d27407bbecaae40f8fac3032fa6cb495ef5ee6b')
+
+      expect(artifact.checksum_algorithm).to eq :sha256
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 SHA256' do
+      artifact = build(:artifact, checksum: '02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms=')
+
+      expect(artifact.checksum_algorithm).to eq :sha256
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should detect hex SHA224' do
+      artifact = build(:artifact, checksum: '50c2dd37763f013d88783a379ef5bb50868dcec12cf81957cbaf9d22')
+
+      expect(artifact.checksum_algorithm).to eq :sha224
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 SHA224' do
+      artifact = build(:artifact, checksum: 'UMLdN3Y/AT2IeDo3nvW7UIaNzsEs+BlXy6+dIg==')
+
+      expect(artifact.checksum_algorithm).to eq :sha224
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should detect hex SHA1' do
+      artifact = build(:artifact, checksum: 'b3da0748d920641a9f47945bee04d241ddd0f5e3')
+
+      expect(artifact.checksum_algorithm).to eq :sha1
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 SHA1' do
+      artifact = build(:artifact, checksum: 's9oHSNkgZBqfR5Rb7gTSQd3Q9eM=')
+
+      expect(artifact.checksum_algorithm).to eq :sha1
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should detect hex MD5' do
+      artifact = build(:artifact, checksum: '961eb510f6327f888457c1cc3836624a')
+
+      expect(artifact.checksum_algorithm).to eq :md5
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should detect base64 MD5' do
+      artifact = build(:artifact, checksum: 'lh61EPYyf4iEV8HMODZiSg==')
+
+      expect(artifact.checksum_algorithm).to eq :md5
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should not detect hex Adler-32' do
+      artifact = build(:artifact, checksum: '124803a9')
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should not detect base64 Adler-32' do
+      artifact = build(:artifact, checksum: 'EkgDqQ==')
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should not detect unknown hex' do
+      artifact = build(:artifact, checksum: Random.hex(4))
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq :hex
+    end
+
+    it 'should not detect unknown base64' do
+      artifact = build(:artifact, checksum: Random.base64(8))
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq :base64
+    end
+
+    it 'should not detect garbage' do
+      artifact = build(:artifact, checksum: Random.bytes(4))
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq nil
+    end
+
+    it 'should not detect nil' do
+      artifact = build(:artifact, checksum: nil)
+
+      expect(artifact.checksum_algorithm).to eq nil
+      expect(artifact.checksum_encoding).to eq nil
     end
   end
 end
