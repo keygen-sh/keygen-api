@@ -596,6 +596,7 @@ class ReleaseArtifact < ApplicationRecord
     case checksum_bytesize
     in 16 then :md5
     in 20 then :sha1
+    in 28 then :sha224
     in 32 then :sha256
     in 48 then :sha384
     in 64 then :sha512
