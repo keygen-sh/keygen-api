@@ -95,7 +95,14 @@ module Api::V1::ReleaseEngines
       return [] unless artifacts.present?
 
       artifacts.map do |artifact|
-        gemspec      = artifact.manifest.as_gemspec
+        gemspec  = artifact.manifest.as_gemspec
+        checksum = case [artifact.checksum_encoding, artifact.checksum_algorithm]
+                   in [:hex | :base64, :sha256]
+                     artifact.checksum
+                   else
+                     nil
+                   end
+
         dependencies = gemspec.dependencies.map do |dependency|
           CompactIndex::Dependency.new(dependency.name.to_s, dependency.requirement.to_s)
         end
@@ -103,8 +110,7 @@ module Api::V1::ReleaseEngines
         CompactIndex::GemVersion.new(
           gemspec.version.to_s,
           gemspec.platform.to_s,
-          # FIXME(ezekg) add padding if base64 and missing (i.e. trailing =)
-          artifact.checksum,
+          checksum,
           nil, # will be calculated via versions file
           dependencies,
           gemspec.required_ruby_version.to_s,

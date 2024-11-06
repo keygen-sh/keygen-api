@@ -15,13 +15,14 @@ Feature: Rubygems compact index
       | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | test2 | Test 2 | OPEN                  |
       | 6727d2a2-626c-4270-880c-3f7f378ea37a | test3 | Test 3 | CLOSED                |
     And the current account has the following "package" rows:
-      | id                                   | product_id                           | engine   | key   |
-      | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | foo   |
-      | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | bar   |
-      | 7b113ac2-ae81-406a-b44e-f356126e2faa | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | baz   |
-      | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | qux   |
-      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw      | quxx  |
-      | 3d771f82-a0ed-48fd-914a-f5ecda9b4044 | 6727d2a2-626c-4270-880c-3f7f378ea37a | rubygems | corge |
+      | id                                   | product_id                           | engine   | key    |
+      | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | foo    |
+      | 2f8af04a-2424-4ca2-8480-6efe24318d1a | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | bar    |
+      | 7b113ac2-ae81-406a-b44e-f356126e2faa | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | baz    |
+      | cd46b4d3-60ab-43e9-b19d-87a9faf13adc | cad3c65c-b6a5-4b3d-bce6-c2280953b8b8 | rubygems | qux    |
+      | 5666d47e-936e-4d48-8dd7-382d32462b4e | 6198261a-48b5-4445-a045-9fed4afc7735 | raw      | quxx   |
+      | 3d771f82-a0ed-48fd-914a-f5ecda9b4044 | 6727d2a2-626c-4270-880c-3f7f378ea37a | rubygems | corge  |
+      | ba2d4aad-0bd5-4be2-b1e7-02c4f7194576 | 6198261a-48b5-4445-a045-9fed4afc7735 | rubygems | grault |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | release_package_id                   | version      | channel  | status    | entitlements |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 1.0.0        | stable   | PUBLISHED |              |
@@ -43,11 +44,11 @@ Feature: Rubygems compact index
       | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.gem        | gem      | ruby     | 455ec74f7da47f6dc12489c18a0c70ca097613c982751939498e334fba041fc6 | UPLOADED |
       | 92c38af8-7ed7-4adc-aee2-21ceb5c6511c | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0-jruby.gem  | gem      | jruby    | fa81b56f754533e58ef813e5ce08ad5179b9a51710bfb70082d265e720181793 | UPLOADED |
       | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.gem        | gem      | ruby     | 2202879a9f3995b0bd9572aff97713f029775e364308aa0315233d089e3c66d6 | UPLOADED |
-      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0-beta.1.gem | gem      |          | be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7 | UPLOADED |
-      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | bar-1.0.0-beta.2.gem | gem      |          | 1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7 | UPLOADED |
-      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | bar-1.0.0-beta.3.gem | gem      |          | 4a98a6ed4fe4723ca1ba18e52d4c832fb2a1f343e7d9a4c07723a1d41d62c374 | UPLOADED |
-      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.gem        | gem      |          | 5a9fe4919e0d7089020f087561fb3a1fbdcbe420cdb822039f849925aaeaddfd | UPLOADED |
-      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.gem        | gem      |          | b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707 | UPLOADED |
+      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | bar-1.0.0-beta.1.gem | gem      |          | vpdAfTvxpmpIkD9pM1EHxrv0iKzd0GuuTRLndS4JyKc=                     | UPLOADED |
+      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | bar-1.0.0-beta.2.gem | gem      |          | FQKy5b2UFLqHmNWWuEzKbHZreIHDpEk5cMyaPSCs2ec=                     | UPLOADED |
+      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | bar-1.0.0-beta.3.gem | gem      |          | Spim7U/kcjyhuhjlLUyDL7Kh80Pn2aTAdyOh1B1iw3Q=                     | UPLOADED |
+      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.gem        | gem      |          |                                                                  | UPLOADED |
+      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.gem        | gem      |          |                                                                  | UPLOADED |
       | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.gem        | gem      |          | e9af40c7b7186b7b45f26990b2be4cf8acb8215abd312e7c1ccfdd66ce5ebb39 | UPLOADED |
       | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.gem        | gem      | ruby     |                                                                  | WAITING  |
       | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.gem       | gem      | ruby     | 2a69cc50ecfcbcd8812e452d6a48b4c4bec47855f527ba98c534410a52e1d772 | FAILED   |
@@ -120,8 +121,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 d78cea0eadce195812665ae0f5ebf6cf
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -131,7 +132,7 @@ Feature: Rubygems compact index
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"185975872b55c5ebd3b07d355d505f1a"
+      If-None-Match: W/"a870c6d351550439c697733e94fae5a0"
       """
     And time is frozen at "2024-10-22T00:00:00.000Z"
     When I send a GET request to "/accounts/test1/engines/rubygems/versions"
@@ -150,15 +151,15 @@ Feature: Rubygems compact index
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"185975872b55c5ebd3b07d355d505f1a"
+      Etag: W/"a870c6d351550439c697733e94fae5a0"
       Cache-Control: max-age=86400, private
       """
     And the response body should be a text document with the following content:
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 d78cea0eadce195812665ae0f5ebf6cf
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -185,12 +186,18 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      1.0.0-beta.1 |checksum:be97407d3bf1a66a48903f69335107c6bbf488acddd06bae4d12e7752e09c8a7
-      1.0.0-beta.2 |checksum:1502b2e5bd9414ba8798d596b84cca6c766b7881c3a4493970cc9a3d20acd9e7
-      1.0.0-beta.3 |checksum:4a98a6ed4fe4723ca1ba18e52d4c832fb2a1f343e7d9a4c07723a1d41d62c374
+      1.0.0-beta.1 |checksum:vpdAfTvxpmpIkD9pM1EHxrv0iKzd0GuuTRLndS4JyKc=
+      1.0.0-beta.2 |checksum:FQKy5b2UFLqHmNWWuEzKbHZreIHDpEk5cMyaPSCs2ec=
+      1.0.0-beta.3 |checksum:Spim7U/kcjyhuhjlLUyDL7Kh80Pn2aTAdyOh1B1iw3Q=
       """
 
   Scenario: Endpoint should return an error for gem without versions
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/rubygems/info/grault"
+    Then the response status should be "404"
+
+  Scenario: Endpoint should return an error for gem a manifest
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/engines/rubygems/info/qux"
@@ -290,7 +297,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 a4615843cd8f6a13cbe0796b2d4309ee
+      bar 1.0.0-beta.1,1.0.0-beta.2,1.0.0-beta.3 d78cea0eadce195812665ae0f5ebf6cf
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -305,7 +312,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       """
     And time is unfrozen
 
@@ -348,8 +355,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -369,8 +376,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
@@ -473,7 +480,7 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      2.0.0 rack:>= 0|checksum:
       """
 
   Scenario: User lists available gems (with entitled owned license)
@@ -493,8 +500,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -515,8 +522,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
@@ -539,8 +546,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1,1.1.0-java,1.1.0 1629fd7efd26b0d9fe8a71bc82d17f70
       """
     And time is unfrozen
@@ -562,8 +569,8 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      bar 1.0.0-beta.1,1.0.0-beta.2 f71117ec6de640251e93cb8cc834838f
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      bar 1.0.0-beta.1,1.0.0-beta.2 353cd0f6cfde53123032a3227badf873
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       foo 1.0.0,1.0.1 68890f51ad4211d8ef46d47755f23ca1
       """
     And time is unfrozen
@@ -579,7 +586,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       """
     And time is unfrozen
 
@@ -771,7 +778,7 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      2.0.0 rack:>= 0|checksum:
       """
 
   Scenario: Anon lists available gems
@@ -782,7 +789,7 @@ Feature: Rubygems compact index
       """
       created_at: 2024-10-22T00:00:00Z
       ---
-      baz 2.0.0 3b77ccd76cd925a731ecc9d7054d5706
+      baz 2.0.0 ac3b851a0a6db1faa1a036a6245d27cb
       """
     And time is unfrozen
 
@@ -809,5 +816,5 @@ Feature: Rubygems compact index
     And the response body should be a text document with the following content:
       """
       ---
-      2.0.0 rack:>= 0|checksum:b6bbb379c7375cfa2bb1384b90afab001baa307e788c55c773fb9ee0d093f707
+      2.0.0 rack:>= 0|checksum:
       """
