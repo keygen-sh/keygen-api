@@ -41,21 +41,21 @@ Feature: npm package metadata
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 5666d47e-936e-4d48-8dd7-382d32462b4e | 1.1.0        | stable   |        | PUBLISHED |              |
       | 04d3d9da-4e91-4634-9aa0-41e39a23658c | 6198261a-48b5-4445-a045-9fed4afc7735 |                                      | 0.0.1        | stable   |        | PUBLISHED |              |
     And the current account has the following "artifact" rows:
-      | id                                   | release_id                           | filename                  | filetype | checksum                                 | status   | created_at               | updated_at               |
-      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tgz             | tgz      | ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d | UPLOADED | 2024-10-01T01:42:00.000Z | 2024-10-01T01:42:00.000Z |
-      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tgz             | tgz      | 443abe660d3283d51aae8ba2240587e95d167ab2 | UPLOADED | 2024-10-02T01:42:00.000Z | 2024-10-02T01:42:00.000Z |
-      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tgz             | tgz      | 23456f7f60af9435842657792ef7bae8d033e551 | UPLOADED | 2024-10-03T01:42:00.000Z | 2024-10-03T01:42:00.000Z |
-      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | test-bar-1.0.0-beta.1.tgz | tgz      |                                          | UPLOADED | 2024-10-04T01:42:00.000Z | 2024-10-04T01:42:00.000Z |
-      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | test-bar-1.0.0-beta.2.tgz | tgz      |                                          | UPLOADED | 2024-10-05T01:42:00.000Z | 2024-10-05T01:42:00.000Z |
-      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | test-bar-1.0.0-beta.3.tgz | tgz      |                                          | UPLOADED | 2024-10-06T01:42:00.000Z | 2024-10-06T01:42:00.000Z |
-      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.tgz             | tgz      | 8633b5884fb21b8e88cee36e37826c38f0a594bd | UPLOADED | 2024-10-07T01:42:00.000Z | 2024-10-07T01:42:00.000Z |
-      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tgz             | tgz      | a572ae9252ccd8f916185ee6a6716237fc916f2e | UPLOADED | 2024-10-08T01:42:00.000Z | 2024-10-08T01:42:00.000Z |
-      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.tgz             | tgz      | 178b4b82a108a60c2b139987263be960f2dd35e1 | UPLOADED | 2024-10-09T01:42:00.000Z | 2024-10-09T01:42:00.000Z |
-      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.tgz             | tgz      |                                          | WAITING  | 2024-10-10T01:42:00.000Z | 2024-10-10T01:42:00.000Z |
-      | 200ef3e5-00f2-4eed-92fd-8f41cd19e8ed | 34c126d5-1a1f-4571-acfb-77ca33e8ddd0 | test-qux-1.0.0.tgz        | tgz      | 40937fdb052b47c1c79fd96c769b4b8fb37cffd3 | UPLOADED | 2024-10-11T01:42:00.000Z | 2024-10-11T01:42:00.000Z |
-      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.tgz            | tgz      | 7f5fce1ecd30ec0b65dc5d9ee8768c0980421c3f | FAILED   | 2024-10-12T01:42:00.000Z | 2024-10-12T01:42:00.000Z |
-      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.tgz            | tgz      | b92b806b08a8dd817ae6205b52759fc57c4dff19 | UPLOADED | 2024-10-13T01:42:00.000Z | 2024-10-13T01:42:00.000Z |
-      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.tgz           | tgz      |                                          | UPLOADED | 2024-10-14T01:42:00.000Z | 2024-10-14T01:42:00.000Z |
+      | id                                   | release_id                           | filename                  | filetype | checksum                                                                                 | status   | created_at               | updated_at               |
+      | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | foo-1.0.0.tgz             | tgz      | ad4d7c2a5b16c146ff6514327e43958aa9b8cc8d                                                 | UPLOADED | 2024-10-01T01:42:00.000Z | 2024-10-01T01:42:00.000Z |
+      | ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0 | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | foo-1.0.1.tgz             | tgz      | d363c888471a1e0f6c7adadd1d27407bbecaae40f8fac3032fa6cb495ef5ee6b                         | UPLOADED | 2024-10-02T01:42:00.000Z | 2024-10-02T01:42:00.000Z |
+      | 55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8 | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | foo-1.1.0.tgz             | tgz      | jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw== | UPLOADED | 2024-10-03T01:42:00.000Z | 2024-10-03T01:42:00.000Z |
+      | 346bd7fd-79fa-4ede-ac55-3ea07ed4cab2 | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | test-bar-1.0.0-beta.1.tgz | tgz      |                                                                                          | UPLOADED | 2024-10-04T01:42:00.000Z | 2024-10-04T01:42:00.000Z |
+      | c8aa34a7-3925-479b-9785-ada9a3736867 | f36515f2-e907-40a3-ac81-2cc1042f8ec9 | test-bar-1.0.0-beta.2.tgz | tgz      | s9oHSNkgZBqfR5Rb7gTSQd3Q9eM=                                                             | UPLOADED | 2024-10-05T01:42:00.000Z | 2024-10-05T01:42:00.000Z |
+      | b95ec07b-1210-4ddc-920e-6008a5c8ed3c | 56f66b77-f447-4300-828b-5cf92e457376 | test-bar-1.0.0-beta.3.tgz | tgz      | p1ax51VFmASfiviU4+gDrB68BGCTV0frC1fTZ67NJUirj96w5qrOmFWX7Jp0yb27                         | UPLOADED | 2024-10-06T01:42:00.000Z | 2024-10-06T01:42:00.000Z |
+      | 9b0fa689-36c3-4b1f-be82-382238a2c5d0 | 0b5bb946-7346-448b-90a0-e8bbc02570e2 | baz-1.0.0.tgz             | tgz      | 8633b5884fb21b8e88cee36e37826c38f0a594bd                                                 | UPLOADED | 2024-10-07T01:42:00.000Z | 2024-10-07T01:42:00.000Z |
+      | b6049631-dac8-49b6-a923-78f022cb1dbe | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | baz-2.0.0.tgz             | tgz      | 02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms=                                             | UPLOADED | 2024-10-08T01:42:00.000Z | 2024-10-08T01:42:00.000Z |
+      | df4474cb-2a7b-4f75-8f27-2b99320e0164 | 00c9c981-8a75-494b-9207-71a829665729 | qux-1.0.0.tgz             | tgz      | 178b4b82a108a60c2b139987263be960f2dd35e1                                                 | UPLOADED | 2024-10-09T01:42:00.000Z | 2024-10-09T01:42:00.000Z |
+      | f52378c0-1d1c-45f6-bff3-3231a99dfb27 | e00475de-edcc-4571-adec-5ef1b91ddb85 | qux-1.0.1.tgz             | tgz      |                                                                                          | WAITING  | 2024-10-10T01:42:00.000Z | 2024-10-10T01:42:00.000Z |
+      | 200ef3e5-00f2-4eed-92fd-8f41cd19e8ed | 34c126d5-1a1f-4571-acfb-77ca33e8ddd0 | test-qux-1.0.0.tgz        | tgz      | 40937fdb052b47c1c79fd96c769b4b8fb37cffd3                                                 | UPLOADED | 2024-10-11T01:42:00.000Z | 2024-10-11T01:42:00.000Z |
+      | e7c08c5d-0e1a-439f-8730-3cc5ed8399b9 | d1bb5fca-0afc-4464-b321-4bd45cca8c7a | quxx-1.0.0.tgz            | tgz      | 7f5fce1ecd30ec0b65dc5d9ee8768c0980421c3f                                                 | FAILED   | 2024-10-12T01:42:00.000Z | 2024-10-12T01:42:00.000Z |
+      | 5acc0c22-0b7e-43f5-8168-8d341cccbaa6 | 70c40946-4b23-408c-aa1c-fa35421ff46a | quxx-1.1.0.tgz            | tgz      | b92b806b08a8dd817ae6205b52759fc57c4dff19                                                 | UPLOADED | 2024-10-13T01:42:00.000Z | 2024-10-13T01:42:00.000Z |
+      | 22af171a-be06-47b1-bec3-3b2f8974990a | 04d3d9da-4e91-4634-9aa0-41e39a23658c | corge-1.1.0.tgz           | tgz      |                                                                                          | UPLOADED | 2024-10-14T01:42:00.000Z | 2024-10-14T01:42:00.000Z |
     And the current account has the following "manifest" rows:
       | release_artifact_id                  | release_id                           | content                                                                                                                                                                                                                                                               |
       | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | {"name":"foo","version":"1.0.0","description":"A basic mock package for testing","main":"index.js","author":"Test Author","license":"MIT","dependencies":{"lodash":"^4.17.21"},"scripts":{"start":"node index.js"}}                                                   |
@@ -145,7 +145,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
-              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
+              "integrity": "sha512-jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw=="
             }
           },
           "1.0.1": {
@@ -162,8 +162,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -225,7 +224,8 @@ Feature: npm package metadata
               "lint": "eslint ."
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b95ec07b-1210-4ddc-920e-6008a5c8ed3c/test-bar-1.0.0-beta.3.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b95ec07b-1210-4ddc-920e-6008a5c8ed3c/test-bar-1.0.0-beta.3.tgz",
+              "integrity": "sha384-p1ax51VFmASfiviU4+gDrB68BGCTV0frC1fTZ67NJUirj96w5qrOmFWX7Jp0yb27"
             }
           },
           "1.0.0-beta.2": {
@@ -275,7 +275,7 @@ Feature: npm package metadata
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"dd16bb3d6b70da9d8835188a634836f9"
+      If-None-Match: W/"68fca08fa381b6979de4b675868cf283"
       """
     When I send a GET request to "/accounts/test1/engines/npm/foo"
     Then the response status should be "304"
@@ -291,7 +291,7 @@ Feature: npm package metadata
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"dd16bb3d6b70da9d8835188a634836f9"
+      Etag: W/"68fca08fa381b6979de4b675868cf283"
       Cache-Control: max-age=86400, private
       """
 
@@ -342,7 +342,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
-              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
+              "integrity": "sha512-jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw=="
             }
           },
           "1.0.1": {
@@ -359,8 +359,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -422,7 +421,8 @@ Feature: npm package metadata
               "lint": "eslint ."
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b95ec07b-1210-4ddc-920e-6008a5c8ed3c/test-bar-1.0.0-beta.3.tgz"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b95ec07b-1210-4ddc-920e-6008a5c8ed3c/test-bar-1.0.0-beta.3.tgz",
+              "integrity": "sha384-p1ax51VFmASfiviU4+gDrB68BGCTV0frC1fTZ67NJUirj96w5qrOmFWX7Jp0yb27"
             }
           },
           "1.0.0-beta.2": {
@@ -466,6 +466,65 @@ Feature: npm package metadata
         }
       }
       """
+
+  Scenario: Product retrieves their open package
+    Given I am product "test2" of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/npm/baz"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "baz",
+        "time": {
+          "created": "2024-10-03T01:23:45.000Z",
+          "modified": "2024-10-08T01:42:00.000Z",
+          "2.0.0": "2024-10-08T01:42:00.000Z",
+          "1.0.0": "2024-10-07T01:42:00.000Z"
+        },
+        "dist-tags": {
+          "latest": "2.0.0"
+        },
+        "versions": {
+          "2.0.0": {
+            "name": "baz",
+            "version": "2.0.0",
+            "description": "A package with peer dependencies",
+            "main": "src/index.js",
+            "author": "Test Maintainer",
+            "license": "GPL-3.0",
+            "peerDependencies": {
+              "react": "^17.0.2"
+            },
+            "dist": {
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
+              "integrity": "sha256-02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms="
+            }
+          },
+          "1.0.0": {
+            "name": "baz",
+            "version": "1.0.0",
+            "description": "A package with peer dependencies",
+            "main": "src/index.js",
+            "author": "Test Maintainer",
+            "license": "GPL-3.0",
+            "peerDependencies": {
+              "react": "^17.0.2"
+            },
+            "dist": {
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/9b0fa689-36c3-4b1f-be82-382238a2c5d0/baz-1.0.0.tgz",
+              "shasum": "8633b5884fb21b8e88cee36e37826c38f0a594bd"
+            }
+          }
+        }
+      }
+      """
+
+  Scenario: Product retrieves an open package
+    Given I am product "test1" of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/engines/npm/baz"
+    Then the response status should be "404"
 
   Scenario: Product retrieves a another product's package
     Given I am product "test1" of account "test1"
@@ -514,7 +573,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
-              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
+              "integrity": "sha512-jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw=="
             }
           },
           "1.0.1": {
@@ -531,8 +590,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -595,8 +653,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -734,7 +791,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
-              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
+              "integrity": "sha256-02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms="
             }
           }
         }
@@ -783,7 +840,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
-              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
+              "integrity": "sha512-jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw=="
             }
           },
           "1.0.1": {
@@ -800,8 +857,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -865,8 +921,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -1002,7 +1057,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.tgz",
-              "shasum": "23456f7f60af9435842657792ef7bae8d033e551"
+              "integrity": "sha512-jpx0/ZlKmoe+IShOgMe8nQrlXtkTWdWmouBMIyKU/F1zH4b2Gr5myKMRBX6/d3vFoXbm9kAQigiTe+FP1OtmOw=="
             }
           },
           "1.0.1": {
@@ -1019,8 +1074,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -1085,8 +1139,7 @@ Feature: npm package metadata
               "start": "node index.js"
             },
             "dist": {
-              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz",
-              "shasum": "443abe660d3283d51aae8ba2240587e95d167ab2"
+              "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.tgz"
             }
           },
           "1.0.0": {
@@ -1218,7 +1271,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
-              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
+              "integrity": "sha256-02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms="
             }
           }
         }
@@ -1261,7 +1314,7 @@ Feature: npm package metadata
             },
             "dist": {
               "tarball": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.tgz",
-              "shasum": "a572ae9252ccd8f916185ee6a6716237fc916f2e"
+              "integrity": "sha256-02PIiEcaHg9setrdHSdAe77KrkD4+sMDL6bLSV717ms="
             }
           }
         }
