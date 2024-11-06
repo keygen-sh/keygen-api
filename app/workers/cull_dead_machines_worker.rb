@@ -11,7 +11,8 @@ class CullDeadMachinesWorker < BaseWorker
                       .dead
 
     machines.find_each do |machine|
-      jid = MachineHeartbeatWorker.perform_async(machine.id)
+      jid = SecureRandom.hex(12) # precalc jid so we can set it on machine beforehand
+      job = MachineHeartbeatWorker.set(jid:)
 
       Keygen.logger.info {
         "[machine.heartbeat.cull] account_id=#{machine.account_id} machine_id=#{machine.id}" \
@@ -19,7 +20,13 @@ class CullDeadMachinesWorker < BaseWorker
           " machine_jid=#{jid} machine_jid_was=#{machine.heartbeat_jid}"
       }
 
-      machine.update(heartbeat_jid: jid)
+      unless machine.update(heartbeat_jid: jid)
+        Keygen.logger.warn { "[machine.heartbeat.cull] failed to attach: machine_id=#{machine.id} jid=#{jid}" }
+      end
+
+      unless job.perform_async(machine.id)
+        Keygen.logger.warn { "[machine.heartbeat.cull] failed to queue: machine_id=#{machine.id} jid=#{jid}" }
+      end
     end
   end
 end

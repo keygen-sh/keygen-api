@@ -11,7 +11,8 @@ class CullDeadProcessesWorker < BaseWorker
                               .dead
 
     processes.find_each do |process|
-      jid = ProcessHeartbeatWorker.perform_async(process.id)
+      jid = SecureRandom.hex(12) # precalc jid so we can set it on process beforehand
+      job = ProcessHeartbeatWorker.set(jid:)
 
       Keygen.logger.info {
         "[process.heartbeat.cull] account_id=#{process.account.id} process_id=#{process.id}" \
@@ -19,7 +20,13 @@ class CullDeadProcessesWorker < BaseWorker
           " process_jid=#{jid} process_jid_was=#{process.heartbeat_jid}"
       }
 
-      process.update(heartbeat_jid: jid)
+      unless process.update(heartbeat_jid: jid)
+        Keygen.logger.warn { "[process.heartbeat.cull] failed to attach: process_id=#{process.id} jid=#{jid}" }
+      end
+
+      unless job.perform_async(process.id)
+        Keygen.logger.warn { "[process.heartbeat.cull] failed to queue: process_id=#{process.id} jid=#{jid}" }
+      end
     end
   end
 end

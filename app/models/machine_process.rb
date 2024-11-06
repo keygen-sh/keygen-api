@@ -157,10 +157,7 @@ class MachineProcess < ApplicationRecord
     end
   }
 
-  def ping!
-    update!(last_heartbeat_at: Time.current)
-  end
-
+  def ping! = update!(last_heartbeat_at: Time.current, heartbeat_jid: nil)
   def resurrect!
     raise ResurrectionUnsupportedError, 'resurrection is not supported' unless
       resurrect_dead?
@@ -168,7 +165,11 @@ class MachineProcess < ApplicationRecord
     raise ResurrectionExpiredError, 'resurrection period has expired' if
       resurrection_period_passed?
 
-    update!(last_heartbeat_at: Time.current, last_death_event_sent_at: nil)
+    update!(
+      last_heartbeat_at: Time.current,
+      last_death_event_sent_at: nil,
+      heartbeat_jid: nil,
+    )
 
     self.status_override = 'RESURRECTED'
   end

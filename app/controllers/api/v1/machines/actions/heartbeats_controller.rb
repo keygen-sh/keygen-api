@@ -39,7 +39,7 @@ module Api::V1::Machines::Actions
     def reset
       authorize! with: Machines::HeartbeatPolicy
 
-      machine.update!(last_heartbeat_at: nil)
+      machine.reset!
 
       BroadcastEventService.call(
         event: 'machine.heartbeat.reset',
