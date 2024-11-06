@@ -96,7 +96,7 @@ Rails.application.routes.draw do
     scope module: :npm, constraints: MimeTypeConstraint.new(:json, raise_on_no_match: true), defaults: { format: :json } do
       get ':package', to: 'package_metadata#show', as: :npm_package_metadata, constraints: {
         # see: https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-        package: %r{(?:@([a-z0-9][a-z0-9-]*[a-z0-9])/)?([a-z0-9][a-z0-9._-]*[a-z0-9])}
+        package: %r{(?:@([a-z0-9][a-z0-9-]*[a-z0-9])(/|%2F))?([a-z0-9][a-z0-9._-]*[a-z0-9])}
       }
     end
 
