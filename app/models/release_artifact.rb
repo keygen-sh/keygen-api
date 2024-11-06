@@ -567,6 +567,42 @@ class ReleaseArtifact < ApplicationRecord
     uploaded? && !release.yanked?
   end
 
+  def checksum_encoding
+    case checksum
+    in HEX_RE    then :hex
+    in BASE64_RE then :base64
+    else              nil
+    end
+  end
+
+  def checksum_bytes
+    case checksum_encoding
+    in :base64 then Base64.decode64(checksum)
+    in :hex    then [checksum].pack('H*')
+    else            nil
+    end
+  rescue ArgumentError # invalid base64
+    nil
+  end
+
+  def checksum_bytesize
+    case checksum_bytes
+    in String then checksum_bytes.size
+    else           nil
+    end
+  end
+
+  def checksum_algorithm
+    case checksum_bytesize
+    in 16 then :md5
+    in 20 then :sha1
+    in 32 then :sha256
+    in 48 then :sha384
+    in 64 then :sha512
+    else       nil
+    end
+  end
+
   private
 
   def validate_associated_records_for_filetype

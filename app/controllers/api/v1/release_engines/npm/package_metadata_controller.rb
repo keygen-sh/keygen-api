@@ -30,14 +30,24 @@ module Api::V1::ReleaseEngines
       ) do |metadata, artifact|
         package_json = artifact.manifest.as_package_json
 
+        # TODO(ezekg) implement signatures?
+        checksums = case [artifact.checksum_encoding, artifact.checksum_algorithm]
+                    in [:base64, :sha256 | :sha384 | :sha512 => algorithm]
+                      # see: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+                      { integrity: "#{algorithm}-#{artifact.checksum}" }
+                    in [:hex, :sha1]
+                      { shasum: artifact.checksum }
+                    else
+                      {}
+                    end
+
         metadata[:time][artifact.version]     = artifact.created_at.iso8601(3)
         metadata[:'dist-tags'][artifact.tag]  = artifact.version if artifact.tag?
         metadata[:versions][artifact.version] = package_json.merge(
           dist: {
             tarball: vanity_v1_account_release_artifact_url(current_account, artifact, filename: artifact.filename, host: request.host),
-            # FIXME(ezekg) only include valid SHA1 checksums?
-            shasum: artifact.checksum,
-          }.compact,
+            **checksums,
+          },
         )
 
         metadata
