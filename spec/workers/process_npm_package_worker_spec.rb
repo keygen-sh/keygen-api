@@ -15,15 +15,16 @@ describe ProcessNpmPackageWorker do
   after  { Sidekiq::Testing.fake! }
 
   context 'when artifact is a valid package' do
-    let(:package)      { file_fixture('hello-2.0.0.tgz').open }
-    let(:package_json) {
-      tar  = Zlib::GzipReader.new(package)
-      json = Minitar::Reader.open tar do |archive|
+    let(:package_fixture) { 'hello-2.0.0.tgz' }
+    let(:package_tarball) { file_fixture(package_fixture).open }
+    let(:package_json)    {
+      tgz = file_fixture(package_fixture).open
+      tar = Zlib::GzipReader.new(tgz)
+
+      Minitar::Reader.open tar do |archive|
         archive.find { _1.file? && _1.name in 'package/package.json' }
                .read
       end
-
-      json
     }
 
     let(:minified_package_json) {
@@ -32,7 +33,7 @@ describe ProcessNpmPackageWorker do
     }
 
     before do
-      Aws.config = { s3: { stub_responses: { get_object: [{ body: package }] } } }
+      Aws.config = { s3: { stub_responses: { get_object: [{ body: package_tarball }] } } }
     end
 
     context 'when artifact is waiting' do
