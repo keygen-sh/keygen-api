@@ -20,10 +20,19 @@ class ProcessDockerImageWorker < BaseWorker
       raise ImageNotAcceptableError, 'unacceptable filesize'
     end
 
-    # download the image tarball
+    # download the image tarball in chunks to reduce memory footprint
     client = artifact.client
-    tar    = client.get_object(bucket: artifact.bucket, key: artifact.key)
-                   .body
+    enum   = Enumerator.new do |yielder|
+      client.get_object(bucket: artifact.bucket, key: artifact.key) do |chunk|
+        yielder << chunk
+      end
+    end
+
+    # wrap the enumerator to provide an IO-like interface
+    tar = EnumeratorIO.new(enum)
+
+    # keep a ref to the manifest
+    manifest = nil
 
     # unpack the package tarball
     unpack tar do |archive|
@@ -39,15 +48,15 @@ class ProcessDockerImageWorker < BaseWorker
             entry.size > MAX_MANIFEST_SIZE
 
           # parse/validate and minify the manifest
-          json = JSON.parse(entry.read)
-                     .to_json
+          content = JSON.parse(entry.read)
+                        .to_json
 
-          ReleaseManifest.create!(
+          manifest = ReleaseManifest.create!(
             account_id: artifact.account_id,
             environment_id: artifact.environment_id,
             release_id: artifact.release_id,
             release_artifact_id: artifact.id,
-            content: json,
+            content:,
           )
         in %r{^blobs/sha256/} if entry.file?
           key = artifact.key_for(entry.name)
@@ -67,6 +76,10 @@ class ProcessDockerImageWorker < BaseWorker
       end
     end
 
+    # we can assume image tarball is invalid if there's no manifest
+    raise ImageNotAcceptableError, 'manifest is missing' if
+      manifest.nil?
+
     artifact.update!(status: 'UPLOADED')
 
     BroadcastEventService.call(
@@ -76,6 +89,8 @@ class ProcessDockerImageWorker < BaseWorker
     )
   rescue ImageNotAcceptableError,
          ActiveRecord::RecordInvalid,
+         JSON::ParserError,
+         Minitar::UnexpectedEOF,
          Minitar::Error,
          IOError => e
     Keygen.logger.warn { "[workers.process-docker-image-worker] Error: #{e.class.name} - #{e.message}" }
