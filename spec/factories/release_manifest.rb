@@ -40,5 +40,21 @@ FactoryBot.define do
         pkg
       }
     end
+
+    trait :manifest_json do
+      artifact { build(:artifact, :docker_image, account:, environment:) }
+      content  {
+        tar      = file_fixture('alpine-3.20.3.tar').read
+        manifest = Minitar::Reader.open tar do |archive|
+          json = archive.find { _1.name in 'manifest.json' }
+                        .read
+
+          JSON.parse(json) # minify
+              .to_json
+        end
+
+        manifest
+      }
+    end
   end
 end

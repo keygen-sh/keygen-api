@@ -84,7 +84,11 @@ class ProcessNpmPackageWorker < BaseWorker
   private
 
   def gunzip(io)    = Zlib::GzipReader.new(io)
-  def unpack(io, &) = Minitar::Reader.open(io, &)
+  def unpack(io, &)
+    Minitar::Reader.open(io, &)
+  rescue ArgumentError => e
+    raise PackageNotAcceptableError, e.message
+  end
 
   class PackageNotAcceptableError < StandardError
     def backtrace = nil # silence backtrace
