@@ -22,15 +22,15 @@ class ProcessDockerImageWorker < BaseWorker
 
     # download the image tarball
     client = artifact.client
-    tgz    = client.get_object(bucket: artifact.bucket, key: artifact.key)
+    tar    = client.get_object(bucket: artifact.bucket, key: artifact.key)
                    .body
 
     # unpack the package tarball
-    tar = gunzip(tgz)
-
     unpack tar do |archive|
       archive.each do |entry|
         case entry.name
+        in 'index.json'
+          # TODO(ezekg) do we need this for OCI compliance or can we generate dynamically?
         in 'manifest.json'
           raise ImageNotAcceptableError, 'manifest must be a manifest.json file' unless
             entry.file?
@@ -54,7 +54,7 @@ class ProcessDockerImageWorker < BaseWorker
 
           # skip if already uploaded
           next if
-            client.head_object(bucket: artifact.bucket, key:) rescue false
+            client.head_object(bucket: artifact.bucket, key:).successful? rescue false
 
           # upload blob in chunks
           client.put_object(bucket: artifact.bucket, key:) do |writer|
@@ -67,9 +67,6 @@ class ProcessDockerImageWorker < BaseWorker
       end
     end
 
-    # not sure why GzipReader#open doesn't take an io?
-    tar.close
-
     artifact.update!(status: 'UPLOADED')
 
     BroadcastEventService.call(
@@ -79,7 +76,6 @@ class ProcessDockerImageWorker < BaseWorker
     )
   rescue ImageNotAcceptableError,
          ActiveRecord::RecordInvalid,
-         Zlib::Error,
          Minitar::Error,
          IOError => e
     Keygen.logger.warn { "[workers.process-docker-image-worker] Error: #{e.class.name} - #{e.message}" }
@@ -95,8 +91,11 @@ class ProcessDockerImageWorker < BaseWorker
 
   private
 
-  def gunzip(io)    = Zlib::GzipReader.new(io)
-  def unpack(io, &) = Minitar::Reader.open(io, &)
+  def unpack(io, &)
+    Minitar::Reader.open(io, &)
+  rescue ArgumentError => e
+    raise ImageNotAcceptableError, e.message
+  end
 
   class ImageNotAcceptableError < StandardError
     def backtrace = nil # silence backtrace

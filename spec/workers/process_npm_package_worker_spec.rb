@@ -19,7 +19,7 @@ describe ProcessNpmPackageWorker do
     let(:package_json) {
       tar  = Zlib::GzipReader.new(package)
       json = Minitar::Reader.open tar do |archive|
-        archive.find { _1.name in 'package/package.json' }
+        archive.find { _1.file? && _1.name in 'package/package.json' }
                .read
       end
 
