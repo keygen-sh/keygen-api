@@ -15,9 +15,12 @@ describe ProcessDockerImageWorker do
   after  { Sidekiq::Testing.fake! }
 
   context 'when artifact is a valid image' do
-    let(:image_tarball) { file_fixture('alpine-3.20.3.tar').open }
+    let(:image_fixture) { 'alpine-3.20.3.tar' }
+    let(:image_tarball) { file_fixture(image_fixture).open }
     let(:manifest_json) {
-      Minitar::Reader.open image_tarball do |archive|
+      tarball = file_fixture(image_fixture).open
+
+      Minitar::Reader.open tarball do |archive|
         archive.find { _1.file? && _1.name in 'manifest.json' }
                .read
       end
@@ -291,10 +294,18 @@ describe ProcessDockerImageWorker do
 
   context 'when artifact filesize is unaccurate' do
     let(:artifact) { create(:artifact, :processing, filesize: 1.kilobyte, account:) }
-    let(:file)     { file_fixture('large.tar.gz').open }
+    let(:tgz)      { file_fixture('large.tar.gz').open }
+    let(:tar)      { Zlib::GzipReader.new(tgz).read }
 
     before do
-      Aws.config = { s3: { stub_responses: { get_object: [{ body: file }] } } }
+      Aws.config = {
+        s3: {
+          stub_responses: {
+            head_object: [{ content_length: tar.size }],
+            get_object: [{ body: tar }],
+          },
+        },
+      }
     end
 
     it 'should not process file' do
