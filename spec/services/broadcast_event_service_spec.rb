@@ -43,9 +43,10 @@ describe BroadcastEventService do
                              .to_json
   end
 
-  before do
-    Sidekiq::Testing.inline!
+  before { Sidekiq::Testing.inline! }
+  after  { Sidekiq::Testing.fake! }
 
+  before do
     # FIXME(ezekg) Instantiate models so Active Record lazy loads the model's
     #              attributes otherwise the mocks below will fail
     WebhookEvent.new
@@ -61,10 +62,6 @@ describe BroadcastEventService do
     allow(WebhookWorker::Request).to receive(:post) {
       OpenStruct.new(code: 204, body: nil)
     }
-  end
-
-  after do
-    Sidekiq::Worker.clear_all
   end
 
   it 'should create a new webhook event' do

@@ -10,6 +10,9 @@ describe Keygen::Exporter do
   let(:account_id) { account.id }
 
   # run association async destroys inline
+  before { Sidekiq::Testing.inline! }
+  after  { Sidekiq::Testing.fake! }
+
   around do |example|
     perform_enqueued_jobs { example.run }
   end

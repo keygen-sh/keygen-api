@@ -138,7 +138,7 @@ module Api::V1
     def set_product
       scoped_products = authorized_scope(current_account.products)
 
-      Current.resource = @product = FindByAliasService.call(
+      @product = Current.resource = FindByAliasService.call(
         scoped_products,
         id: params[:id],
         aliases: :code,

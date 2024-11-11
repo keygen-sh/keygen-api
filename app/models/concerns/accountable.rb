@@ -29,6 +29,10 @@ module Accountable
 
       # Hook into both initialization and validation to ensure the current account
       # is applied to new records (given no :account was provided).
+      #
+      # We're not using belongs_to(default:) because it only adds a before_validation
+      # callback, but we want to also do it after_initialize because new children
+      # may rely on the account being set on their parent.
       after_initialize -> { self.account_id ||= Current.account&.id },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
         if: -> { new_record? && account_id.nil? }

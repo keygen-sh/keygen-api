@@ -75,6 +75,9 @@ describe Policy, type: :model do
     end
 
     context 'on update' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
       it 'should denormalize product to licenses' do
         product = create(:product, account:)
         policy  = create(:policy, account:, licenses: build_list(:license, 10, account:))

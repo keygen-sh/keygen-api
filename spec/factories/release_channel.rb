@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :release_channel, aliases: %i[channel] do
-    initialize_with { ReleaseChannel.find_by(key:) || new(**attributes) }
+    initialize_with { new(**attributes.reject { NIL_ACCOUNT == _2 }) }
 
     sequence :key, %w[stable rc beta alpha dev].cycle
 

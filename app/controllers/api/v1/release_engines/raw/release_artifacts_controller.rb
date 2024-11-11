@@ -24,7 +24,7 @@ module Api::V1::ReleaseEngines
         .for_package(params[:package_id])
         .for_release(params[:release_id])
 
-      Current.resource = @artifact = FindByAliasService.call(
+      @artifact = Current.resource = FindByAliasService.call(
         scoped_artifacts.order_by_version,
         id: params[:id],
         aliases: :filename,
