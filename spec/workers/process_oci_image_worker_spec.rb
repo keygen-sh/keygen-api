@@ -51,6 +51,7 @@ describe ProcessOciImageWorker do
 
     context 'when artifact is processing' do
       let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
+      let(:release)  { artifact.release }
 
       it 'should store manifest' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
@@ -64,12 +65,27 @@ describe ProcessOciImageWorker do
           Aws.config[:s3][:stub_responses][:head_object] = [Aws::S3::Errors::NotFound]
         end
 
+        it 'should store blobs' do
+          expect { subject.perform_async(artifact.id) }.to change { release.reload.artifacts }
+
+          expect(release.artifacts).to satisfy { |artifacts|
+            artifacts in [
+              *,
+              ReleaseArtifact(filename: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', status: 'UPLOADED'),
+              ReleaseArtifact(filename: 'blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', status: 'UPLOADED'),
+              ReleaseArtifact(filename: 'blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', status: 'UPLOADED'),
+              ReleaseArtifact(filename: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', status: 'UPLOADED'),
+              *
+            ]
+          }
+        end
+
         it 'should upload blobs' do
           expect { subject.perform_async(artifact.id) }.to upload(
-            { key: artifact.key_for('blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735') },
-            { key: artifact.key_for('blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170') },
-            { key: artifact.key_for('blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b') },
-            { key: artifact.key_for('blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d') },
+            { key: %r{blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735} },
+            { key: %r{blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170} },
+            { key: %r{blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b} },
+            { key: %r{blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d} },
           )
         end
       end
