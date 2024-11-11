@@ -200,4 +200,26 @@ describe :upload do
       body: 'foo',
     )
   end
+
+  it 'should match regex without block' do
+    expect {
+      client.put_object(bucket: 'foo', key: 'bar/baz.qux', body: 'quxx')
+    }.to upload(
+      bucket: /foo/,
+      key: %r{bar/baz.qux},
+      body: /quxx/,
+    )
+  end
+
+  it 'should match regex with block' do
+    expect {
+      client.put_object(bucket: 'foo', key: 'bar/baz.qux') do |writer|
+        writer.write('quxx')
+      end
+    }.to upload(
+      bucket: /foo/,
+      key: %r{bar/baz.qux},
+      body: /quxx/,
+    )
+  end
 end
