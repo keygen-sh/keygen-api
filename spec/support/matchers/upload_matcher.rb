@@ -5,7 +5,7 @@ require 'aws-sdk-s3'
 RSpec::Matchers.define :upload do |*expectations|
   supports_block_expectations
 
-  uploads = []
+  objects = []
   matches = []
 
   match do |block|
@@ -24,21 +24,21 @@ RSpec::Matchers.define :upload do |*expectations|
           end
         end
 
-        uploads << actual
+        objects << actual
       end
     )
 
     block.call
 
     # FIXME(ezekg) should this compare sizes >=?
-    expectations.empty? ? !uploads.empty? : matches.size == expectations.size
+    expectations.empty? ? !objects.empty? : matches.size == expectations.size
   end
 
   failure_message do
-    "Expected block to upload files matching #{expected.inspect}, but it wasn't uploaded: #{uploads.inspect}"
+    "Expected block to upload #{expectations.size} objects matching #{expected.inspect}, but got: #{objects.inspect}"
   end
 
   failure_message_when_negated do
-    "Expected block to not upload files matching #{expected.inspect}, but it was uploaded: #{uploads.inspect}"
+    "Expected block to not upload #{expectations.size} objects matching #{expected.inspect}, but got: #{objects.inspect}"
   end
 end
