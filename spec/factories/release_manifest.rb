@@ -56,5 +56,21 @@ FactoryBot.define do
         manifest
       }
     end
+
+    trait :index_json do
+      artifact { build(:artifact, :docker_image, account:, environment:) }
+      content  {
+        tar   = file_fixture('alpine-3.20.3.tar').read
+        index = Minitar::Reader.open tar do |archive|
+          json = archive.find { _1.name in 'index.json' }
+                        .read
+
+          JSON.parse(json) # minify
+              .to_json
+        end
+
+        index
+      }
+    end
   end
 end
