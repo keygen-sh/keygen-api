@@ -61,8 +61,8 @@ FactoryBot.define do
       arch     { nil }
     end
 
-    trait :docker_image do
-      release  { build(:release, :npm, account:, environment:) }
+    trait :oci_image do
+      release  { build(:release, :oci, account:, environment:) }
       filename { "#{release.name.underscore.parameterize}.tar" }
       filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 1.gigabyte.to_i) }
       filetype { build(:filetype, key: 'tar', account:) }

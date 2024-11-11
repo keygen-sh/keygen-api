@@ -32,5 +32,10 @@ FactoryBot.define do
       name { 'npm' }
       key  { 'npm' }
     end
+
+    trait :oci do
+      name { 'oci' }
+      key  { 'oci' }
+    end
   end
 end
