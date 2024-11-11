@@ -452,15 +452,14 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :gems,     -> { for_filetype(:gem) }
   scope :tarballs, -> { for_filetypes(:tgz, :tar, :'tar.gz') }
+  scope :blobs,    -> { where("release_artifacts.filename LIKE 'blobs/%'") } # prefixes are fast
 
   delegate :version, :semver, :channel, :tag,
     :tag?, :licensed?, :open?, :closed?,
     allow_nil: true,
     to: :release
 
-  def key_for(path) = "artifacts/#{account_id}/#{release_id}/#{path}"
-  def key           = key_for(filename)
-
+  def key       = "artifacts/#{account_id}/#{release_id}/#{filename}"
   def presigner = Aws::S3::Presigner.new(client:)
 
   def client

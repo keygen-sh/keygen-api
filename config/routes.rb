@@ -66,7 +66,7 @@ Rails.application.routes.draw do
         product_id: /[^\/]*/ ,
         package_id: /[^\/]*/ ,
         release_id: /[^\/]*/ ,
-        id: /.*/
+        id: /.*/,
       }
     end
   end
@@ -96,13 +96,33 @@ Rails.application.routes.draw do
     scope module: :npm, constraints: MimeTypeConstraint.new(:json, raise_on_no_match: true), defaults: { format: :json } do
       get ':package', to: 'package_metadata#show', as: :npm_package_metadata, constraints: {
         # see: https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-        package: %r{(?:@([a-z0-9][a-z0-9-]*[a-z0-9])(/|%2F))?([a-z0-9][a-z0-9._-]*[a-z0-9])}
+        package: /(?:@([a-z0-9][a-z0-9-]*[a-z0-9])(\/|%2F))?([a-z0-9][a-z0-9._-]*[a-z0-9])/,
       }
     end
 
     # ignore these npm requests entirely for now e.g. POST /-/npm/v1/security/advisories/bulk
     scope module: :npm, defaults: { format: :binary } do
       match '/-/npm/*wildcard', via: :all, to: -> env { [410, {}, []] }
+    end
+  end
+
+  concern :oci do
+    # NOTE(ezekg) /v2 namespace is handled outside of this because docker wants it to always be at the root...
+    scope module: :oci, defaults: { format: :binary } do
+      # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
+      match ':namespace/manifests/:reference', via: %i[head get], to: 'manifests#show', as: :oci_manifest, constraints: {
+        namespace: /[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*/,
+        reference: /[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}/,
+      }
+
+      # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-blobs
+      get ':namespace/blobs/:digest', to: 'blobs#show', as: :oci_blob, constraints: {
+        namespace: /[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*/,
+        digest: /[^\/]*/,
+      }
+
+      # ignore other requests entirely for now e.g. GET /v2/:namespace/referrers/:digest
+      match ':namespace/*wildcard', via: :all, to: -> env { [405, {}, []] }
     end
   end
 
@@ -485,6 +505,9 @@ Rails.application.routes.draw do
       scope :npm do
         concerns :npm
       end
+      scope :oci do
+        concerns :oci
+      end
     end
   end
 
@@ -630,6 +653,20 @@ Rails.application.routes.draw do
         end
       when Keygen.singleplayer?
         concerns :npm
+      end
+    end
+
+    scope module: 'api/v1/release_engines', constraints: { subdomain: 'oci.pkg' } do
+      # NOTE(ezekg) /v2 namespace is handled here because docker wants it at the root...
+      scope :v2 do
+        case
+        when Keygen.multiplayer?
+          scope ':account_id', as: :account do
+            concerns :oci
+          end
+        when Keygen.singleplayer?
+          concerns :oci
+        end
       end
     end
   end

@@ -57,18 +57,29 @@ class ProcessOciImageWorker < BaseWorker
             content:,
           )
         in %r{^blobs/sha256/} if entry.file?
-          key = artifact.key_for(entry.name)
+          blob = ReleaseArtifact.create!(
+            account_id: artifact.account_id,
+            environment_id: artifact.environment_id,
+            release_id: artifact.release_id,
+            filename: entry.name,
+            filesize: entry.size,
+          )
 
           # skip if already uploaded
           next if
-            client.head_object(bucket: artifact.bucket, key:).successful? rescue false
+            client.head_object(bucket: blob.bucket, key: blob.key).successful? rescue false
 
           # upload blob in chunks
-          client.put_object(bucket: artifact.bucket, key:) do |writer|
-            while (chunk = entry.read(16 * 1024)) # write in chunks
+          obj = client.put_object(bucket: blob.bucket, key: blob.key) do |writer|
+            while chunk = entry.read(16 * 1024) # write in chunks
               writer.write(chunk)
             end
           end
+
+          blob.update!(
+            etag: obj.etag.delete('"'),
+            status: 'UPLOADED',
+          )
         else
         end
       end
