@@ -17,17 +17,17 @@ describe ProcessDockerImageWorker do
   context 'when artifact is a valid image' do
     let(:image_fixture) { 'alpine-3.20.3.tar' }
     let(:image_tarball) { file_fixture(image_fixture).open }
-    let(:manifest_json) {
+    let(:image_index) {
       tarball = file_fixture(image_fixture).open
 
       Minitar::Reader.open tarball do |archive|
-        archive.find { _1.file? && _1.name in 'manifest.json' }
+        archive.find { _1.file? && _1.name in 'index.json' }
                .read
       end
     }
 
-    let(:minified_manifest_json) {
-      JSON.parse(manifest_json)
+    let(:minified_image_index) {
+      JSON.parse(image_index)
           .to_json
     }
 
@@ -55,7 +55,7 @@ describe ProcessDockerImageWorker do
       it 'should store manifest' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
-        expect(artifact.manifest.content).to eq minified_manifest_json
+        expect(artifact.manifest.content).to eq minified_image_index
         expect(artifact.status).to eq 'UPLOADED'
       end
 

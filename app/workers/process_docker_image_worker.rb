@@ -39,9 +39,7 @@ class ProcessDockerImageWorker < BaseWorker
       archive.each do |entry|
         case entry.name
         in 'index.json'
-          # TODO(ezekg) do we need this for OCI compliance or can we generate dynamically?
-        in 'manifest.json'
-          raise ImageNotAcceptableError, 'manifest must be a manifest.json file' unless
+          raise ImageNotAcceptableError, 'manifest must be a index.json file' unless
             entry.file?
 
           raise ImageNotAcceptableError, 'manifest is too big' if
