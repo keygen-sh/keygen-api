@@ -71,6 +71,10 @@ FactoryBot.define do
       package { build(:package, :npm, account:, product:, environment:) }
     end
 
+    trait :oci do
+      package { build(:package, :oci, account:, product:, environment:) }
+    end
+
     trait :stable do
       channel { build(:channel, :beta, account:) }
     end

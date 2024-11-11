@@ -6,7 +6,7 @@ require 'spec_helper'
 require 'minitar'
 require 'zlib'
 
-describe ProcessDockerImageWorker do
+describe ProcessOciImageWorker do
   let(:account) { create(:account) }
 
   subject { described_class }
@@ -36,7 +36,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is waiting' do
-      let(:artifact) { create(:artifact, :docker_image, :waiting, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :waiting, account:) }
 
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -50,7 +50,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is processing' do
-      let(:artifact) { create(:artifact, :docker_image, :processing, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
 
       it 'should store manifest' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
@@ -86,7 +86,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is uploaded' do
-      let(:artifact) { create(:artifact, :docker_image, :uploaded, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :uploaded, account:) }
 
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -100,7 +100,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is failed' do
-      let(:artifact) { create(:artifact, :docker_image, :failed, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :failed, account:) }
 
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -122,7 +122,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is waiting' do
-      let(:artifact) { create(:artifact, :docker_image, :waiting, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :waiting, account:) }
 
       it 'should process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -130,7 +130,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is processing' do
-      let(:artifact) { create(:artifact, :docker_image, :processing, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
 
       it 'should process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -141,7 +141,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is uploaded' do
-      let(:artifact) { create(:artifact, :docker_image, :uploaded, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :uploaded, account:) }
 
       it 'should process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
@@ -149,7 +149,7 @@ describe ProcessDockerImageWorker do
     end
 
     context 'when artifact is failed' do
-      let(:artifact) { create(:artifact, :docker_image, :failed, account:) }
+      let(:artifact) { create(:artifact, :oci_image, :failed, account:) }
 
       it 'should process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }

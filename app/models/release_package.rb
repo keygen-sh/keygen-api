@@ -107,8 +107,9 @@ class ReleasePackage < ApplicationRecord
   scope :raw,            ->     { for_engine_key('raw') }
   scope :rubygems,       ->     { for_engine_key('rubygems') }
   scope :npm,            ->     { for_engine_key('npm') }
+  scope :oci,            ->     { for_engine_key('oci') }
 
-  delegate :pypi?, :tauri?, :raw?, :rubygems?, :npm?,
+  delegate :pypi?, :tauri?, :raw?, :rubygems?, :npm?, :oci?,
     to: :engine,
     allow_nil: true
 

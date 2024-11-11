@@ -32,6 +32,10 @@ FactoryBot.define do
       engine { build(:engine, :npm, account:) }
     end
 
+    trait :oci do
+      engine { build(:engine, :oci, account:) }
+    end
+
     trait :licensed do
       product { build(:product, :licensed, account:, environment:) }
     end

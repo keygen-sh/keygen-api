@@ -3,7 +3,7 @@
 require 'minitar'
 require 'zlib'
 
-class ProcessDockerImageWorker < BaseWorker
+class ProcessOciImageWorker < BaseWorker
   MIN_TARBALL_SIZE  = 512.bytes     # to avoid processing empty or invalid tarballs
   MAX_TARBALL_SIZE  = 512.megabytes # to avoid downloading excessive tarballs
   MAX_MANIFEST_SIZE = 1.megabyte    # to avoid storing large manifests
@@ -91,7 +91,7 @@ class ProcessDockerImageWorker < BaseWorker
          Minitar::UnexpectedEOF,
          Minitar::Error,
          IOError => e
-    Keygen.logger.warn { "[workers.process-docker-image-worker] Error: #{e.class.name} - #{e.message}" }
+    Keygen.logger.warn { "[workers.process-oci-image-worker] Error: #{e.class.name} - #{e.message}" }
 
     artifact.update!(status: 'FAILED')
 
