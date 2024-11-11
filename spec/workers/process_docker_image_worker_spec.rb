@@ -292,7 +292,7 @@ describe ProcessDockerImageWorker do
     end
   end
 
-  context 'when artifact filesize is unaccurate' do
+  context 'when artifact filesize is inaccurate' do
     let(:artifact) { create(:artifact, :processing, filesize: 1.kilobyte, account:) }
     let(:tgz)      { file_fixture('large.tar.gz').open }
     let(:tar)      { Zlib::GzipReader.new(tgz).read }

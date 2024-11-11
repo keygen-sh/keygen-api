@@ -256,7 +256,7 @@ describe ProcessNpmPackageWorker do
     end
   end
 
-  context 'when artifact filesize is unaccurate' do
+  context 'when artifact filesize is inaccurate' do
     let(:artifact) { create(:artifact, :processing, filesize: 1.kilobyte, account:) }
     let(:file)     { file_fixture('large.tar.gz').open }
 
