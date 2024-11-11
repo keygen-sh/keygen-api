@@ -4,9 +4,9 @@ require 'minitar'
 require 'zlib'
 
 class ProcessDockerImageWorker < BaseWorker
-  MIN_TARBALL_SIZE  = 5.bytes    # to avoid processing empty or invalid tarballs
-  MAX_TARBALL_SIZE  = 1.gigabyte # to avoid downloading excessive tarballs
-  MAX_MANIFEST_SIZE = 1.megabyte # to avoid storing large manifests
+  MIN_TARBALL_SIZE  = 512.bytes     # to avoid processing empty or invalid tarballs
+  MAX_TARBALL_SIZE  = 512.megabytes # to avoid downloading excessive tarballs
+  MAX_MANIFEST_SIZE = 1.megabyte    # to avoid storing large manifests
 
   sidekiq_options queue: :critical
 
