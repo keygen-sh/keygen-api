@@ -27,7 +27,7 @@ module Api::V1
     def set_engine
       scoped_engines = authorized_scope(current_account.release_engines)
 
-      Current.resource = @engine = FindByAliasService.call(
+      @engine = Current.resource = FindByAliasService.call(
         scoped_engines,
         id: params[:id],
         aliases: :key,

@@ -21,7 +21,7 @@ module Api::V1::ReleaseEngines
     def set_artifact
       scoped_artifacts = authorized_scope(current_account.release_artifacts.gems)
 
-      Current.resource = @artifact = FindByAliasService.call(
+      @artifact = Current.resource = FindByAliasService.call(
         scoped_artifacts,
         id: "#{params[:gem]}.gem",
         aliases: :filename,

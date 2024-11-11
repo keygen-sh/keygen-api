@@ -70,7 +70,7 @@ module Api::V1::ReleaseEngines
                             %i[releases artifacts manifest], # must exist
                           )
 
-      Current.resource = @package = FindByAliasService.call(
+      @package = Current.resource = FindByAliasService.call(
         scoped_packages,
         id: params[:package],
         aliases: :key,

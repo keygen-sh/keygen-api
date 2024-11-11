@@ -20,7 +20,7 @@ Bundler.require *Rails.groups
 
 module Keygen
   class Application < Rails::Application
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     config.generators do |generator|
       # Use UUIDs for table primary keys
@@ -39,6 +39,9 @@ module Keygen
     config.middleware.delete Rack::ETag
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::Runtime
+
+    # remove unneeded Rails middlware
+    config.middleware.delete ActionDispatch::ShowExceptions
 
     # Ignore X-Forwarded-For header
     config.middleware.insert_before 0, Keygen::Middleware::IgnoreForwardedHost
@@ -87,6 +90,9 @@ module Keygen
       **config.active_record.encryption,
     )
 
+    # Show all attributes in Rails console
+    config.active_record.attributes_for_inspect = :all
+
     # Update async destroy batch size
     config.active_record.destroy_association_async_batch_size = 1_000
 
@@ -95,6 +101,10 @@ module Keygen
 
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
+
+    # we don't want to ever show exceptions
+    config.action_dispatch.exceptions_app  = self.routes
+    config.action_dispatch.show_exceptions = :none
 
     # Add support for trusted proxies
     config.action_dispatch.trusted_proxies =

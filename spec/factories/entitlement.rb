@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :entitlement do
     # Prevent duplicates due to cyclic entitlement codes below. Attempting
     # to insert duplicate codes would fail, and this prevents that.
-    initialize_with { Entitlement.find_by(code:) || new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
+    initialize_with { Entitlement.find_by(account:, code:) || new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
 
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }

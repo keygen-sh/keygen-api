@@ -136,7 +136,7 @@ module Api::V1::ReleaseEngines
                              :manifest,
                            )
 
-      Current.resource = @artifact = FindByAliasService.call(
+      @artifact = Current.resource = FindByAliasService.call(
         scoped_artifacts,
         id: "#{params[:gem]}.gem",
         aliases: :filename,
