@@ -10,28 +10,35 @@ RSpec::Matchers.define :upload do |*expectations|
 
   match do |block|
     allow_any_instance_of(Aws::S3::Client).to(
-      receive(:put_object) do |**actual, &writer|
+      receive(:put_object).and_wrap_original do |original, **object, &writer|
+        objects << object
+
         expectations.each do |expected|
+
           if writer.present? && expected in body:, **rest
+            matcher = RSpec::Matchers::BuiltIn::Include.new(rest)
+
             io = StringIO.new
             io.set_encoding(Encoding::BINARY)
 
             writer.call(io)
 
-            matches << true if io.string == body && actual >= rest
+            matches << expected.hash if body === io.string && matcher.matches?(object)
           else
-            matches << true if actual >= expected
+            matcher = RSpec::Matchers::BuiltIn::Include.new(expected)
+
+            matches << expected.hash if matcher.matches?(object)
           end
         end
 
-        objects << actual
+        original.call(**object, &writer)
       end
     )
 
     block.call
 
     # FIXME(ezekg) should this compare sizes >=?
-    expectations.empty? ? !objects.empty? : matches.size == expectations.size
+    expectations.empty? ? !objects.empty? : expectations.all? { matches.include?(_1.hash) }
   end
 
   failure_message do
