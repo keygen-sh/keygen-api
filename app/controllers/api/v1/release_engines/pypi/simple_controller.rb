@@ -33,7 +33,7 @@ module Api::V1::ReleaseEngines
         to: :index?
 
       # FIXME(ezekg) https://github.com/brianhempel/active_record_union/issues/35
-      last_modified = artifacts.maximum(:"#{artifacts.table_name}.updated_at")
+      last_modified = artifacts.collect(&:updated_at).max
       return unless
         stale?(artifacts, last_modified:, cache_control: { max_age: 1.day, private: true })
 
