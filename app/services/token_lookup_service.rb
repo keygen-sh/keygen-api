@@ -32,6 +32,8 @@ class TokenLookupService < BaseService
       instance = tokens.find_by(id: m[:token_id])
 
       if instance&.compare_hashed_token(:digest, token, version: 'v1')
+        Keygen.logger.warn { "[token-lookup-service] v1 tokens are deprecated and must be regenerated: bearer_type=#{instance.bearer.class.name.inspect} bearer_id=#{instance.bearer.id.inspect} token_id=#{instance.id.inspect}" }
+
         instance
       else
         nil
