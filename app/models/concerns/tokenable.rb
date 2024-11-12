@@ -28,7 +28,7 @@ module Tokenable
         # length, since the first 66 chars of our string consist of the account
         # and the bearer's UUID. This lets us use larger tokens (as seen here)
         # and avoid the nasty truncation.
-        res = BCrypt::Password.create Digest::SHA256.digest(raw)
+        res = BCrypt::Password.create Digest::SHA256.hexdigest(raw)
       when "v2"
         raw = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
         raw = yield raw if block_given?
@@ -53,6 +53,7 @@ module Tokenable
 
     a = self.send attribute
     b = nil
+    c = nil
 
     case version
     when "v1"
@@ -64,6 +65,9 @@ module Tokenable
       end
 
       b = BCrypt::Engine.hash_secret digest, bcrypt.salt
+
+      # FIXME(ezekg) support rehashing: https://github.com/bcrypt-ruby/bcrypt-ruby/pull/168
+      c = BCrypt::Engine.hash_secret Digest::SHA256.hexdigest(token), bcrypt.salt
     when "v2"
       b = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
     when "v3"
@@ -72,7 +76,11 @@ module Tokenable
       raise NotImplementedError.new "token #{version} not implemented"
     end
 
-    secure_compare a, b
+    unless c.nil?
+      secure_compare(a, b) || secure_compare(a, c)
+    else
+      secure_compare(a, b)
+    end
   rescue
     false
   end
