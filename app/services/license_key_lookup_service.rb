@@ -20,6 +20,8 @@ class LicenseKeyLookupService < BaseService
       license = licenses.find_by(id: matches[:license_id])
 
       if license&.compare_hashed_token(:key, key, version: 'v1')
+        Keygen.logger.warn { "[license-key-lookup-service] v1 keys are deprecated and must be regenerated: license_id=#{license.id.inspect}" }
+
         license
       else
         nil

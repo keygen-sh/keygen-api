@@ -530,7 +530,7 @@ DEPENDENCIES
   ar_lazy_preload (~> 2.0)
   aws-sdk-s3 (~> 1)
   barnes
-  bcrypt (~> 3.1.7)
+  bcrypt (= 3.1.17)
   bullet (~> 7.2)
   byebug
   compact_index

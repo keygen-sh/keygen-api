@@ -57,7 +57,13 @@ module Tokenable
     case version
     when "v1"
       bcrypt = BCrypt::Password.new a
-      b = BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
+      digest = Digest::SHA256.digest(token)
+
+      if digest.include?("\x00") # null byte
+        Keygen.logger.warn { "[tokenable] v1 token must be regenerated: tokenable_type=#{self.class.name.inspect} tokenable_id=#{id.inspect} tokenable_attr=#{attribute.inspect}" }
+      end
+
+      b = BCrypt::Engine.hash_secret digest, bcrypt.salt
     when "v2"
       b = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
     when "v3"

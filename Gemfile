@@ -6,7 +6,7 @@ ruby '3.3.6'
 gem 'rails', '~> 7.2.2'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.4.3'
-gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '3.1.17'
 gem 'rack', '~> 2.2.8.1'
 gem 'rack-timeout', require: 'rack/timeout/base'
 unless ENV.key?('NO_RACK_ATTACK')
