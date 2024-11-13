@@ -3,12 +3,16 @@
 require 'minitar'
 require 'zlib'
 
+require Rails.root / 'lib/oci_image_layout'
+
 class ProcessOciImageWorker < BaseWorker
   MIN_TARBALL_SIZE  = 512.bytes     # to avoid processing empty or invalid tarballs
   MAX_TARBALL_SIZE  = 512.megabytes # to avoid downloading excessive tarballs
   MAX_MANIFEST_SIZE = 1.megabyte    # to avoid storing large manifests
+  MAX_BLOB_SIZE     = 512.megabytes # to avoid storing large layers
 
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :critical,
+                  retry: false
 
   def perform(artifact_id)
     artifact = ReleaseArtifact.find(artifact_id)
@@ -31,63 +35,57 @@ class ProcessOciImageWorker < BaseWorker
     # wrap the enumerator to provide an IO-like interface
     tar = EnumeratorIO.new(enum)
 
-    # keep a ref to the manifest
-    manifest = nil
-
-    # unpack the package tarball
+    # unpack the image tarball
     unpack tar do |archive|
-      archive.each do |entry|
-        case entry.name
-        in 'index.json'
-          raise ImageNotAcceptableError, 'manifest must be a index.json file' unless
-            entry.file?
+      layout = OciImageLayout.parse(archive)
 
+      layout.each do |item|
+        next unless
+          item.exists?
+
+        case item
+        in OciImageLayout::Index => index
           raise ImageNotAcceptableError, 'manifest is too big' if
-            entry.size > MAX_MANIFEST_SIZE
+            index.size > MAX_MANIFEST_SIZE
 
-          # parse/validate and minify the manifest
-          content = JSON.parse(entry.read)
-                        .to_json
-
-          manifest = ReleaseManifest.create!(
+          ReleaseManifest.create!(
             account_id: artifact.account_id,
             environment_id: artifact.environment_id,
             release_id: artifact.release_id,
             release_artifact_id: artifact.id,
-            content:,
+            content_type: index.media_type,
+            content_digest: index.digest,
+            content_length: index.size,
+            content: index.read,
           )
-        in %r{^blobs/sha256/} if entry.file?
-          blob = ReleaseArtifact.create!(
+        in OciImageLayout::Blob => blob
+          raise ImageNotAcceptableError, 'blob is too big' if
+            blob.size > MAX_BLOB_SIZE
+
+          descriptor = ReleaseDescriptor.create!(
             account_id: artifact.account_id,
             environment_id: artifact.environment_id,
             release_id: artifact.release_id,
-            filename: entry.name,
-            filesize: entry.size,
+            release_artifact_id: artifact.id,
+            content_type: blob.media_type,
+            content_digest: blob.digest,
+            content_length: blob.size,
+            content_path: blob.path,
           )
 
-          # skip if already uploaded
+          # don't reupload if blob already exists
           next if
-            client.head_object(bucket: blob.bucket, key: blob.key).successful? rescue false
+            client.head_object(bucket: descriptor.bucket, key: descriptor.key).successful? rescue false
 
-          # upload blob in chunks
-          obj = client.put_object(bucket: blob.bucket, key: blob.key) do |writer|
-            while chunk = entry.read(16 * 1024) # write in chunks
+          # upload blob in chunks to reduce memory footprint
+          client.put_object(bucket: descriptor.bucket, key: descriptor.key, content_type: descriptor.content_type, content_length: descriptor.content_length) do |writer|
+            while chunk = blob.read(16 * 1024)
               writer.write(chunk)
             end
           end
-
-          blob.update!(
-            etag: obj.etag.delete('"'),
-            status: 'UPLOADED',
-          )
-        else
         end
       end
     end
-
-    # we can assume image tarball is invalid if there's no manifest
-    raise ImageNotAcceptableError, 'manifest is missing' if
-      manifest.nil?
 
     artifact.update!(status: 'UPLOADED')
 
@@ -97,6 +95,7 @@ class ProcessOciImageWorker < BaseWorker
       resource: artifact,
     )
   rescue ImageNotAcceptableError,
+         OciImageLayout::Error,
          ActiveRecord::RecordInvalid,
          JSON::ParserError,
          Minitar::UnexpectedEOF,

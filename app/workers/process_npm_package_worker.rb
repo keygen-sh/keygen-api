@@ -8,7 +8,8 @@ class ProcessNpmPackageWorker < BaseWorker
   MAX_TARBALL_SIZE  = 32.megabytes # to avoid downloading large tarballs
   MAX_MANIFEST_SIZE = 1.megabyte   # to avoid storing large manifests
 
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :critical,
+                  retry: false
 
   def perform(artifact_id)
     artifact = ReleaseArtifact.find(artifact_id)
@@ -60,6 +61,9 @@ class ProcessNpmPackageWorker < BaseWorker
         environment_id: artifact.environment_id,
         release_id: artifact.release_id,
         release_artifact_id: artifact.id,
+        content_digest: "sha512-#{Digest::SHA512.hexdigest(content)}",
+        content_type: 'application/vnd.npm.install-v1+json',
+        content_length: content.bytesize,
         content:,
       )
     end

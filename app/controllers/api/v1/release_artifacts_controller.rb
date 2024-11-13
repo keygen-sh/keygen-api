@@ -39,7 +39,10 @@ module Api::V1
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download = artifact.download!(ttl: release_artifact_query[:ttl])
+      download = artifact.download!(
+        filename: params.fetch(:filename) { artifact.filename },
+        ttl: release_artifact_query[:ttl],
+      )
 
       BroadcastEventService.call(
         # NOTE(ezekg) The `release.downloaded` event is for backwards compat

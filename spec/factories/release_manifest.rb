@@ -12,11 +12,16 @@ FactoryBot.define do
     environment { NIL_ENVIRONMENT }
     artifact    { build(:artifact, account:, environment:) }
     release     { artifact.release }
-    content     { Random.bytes(128) }
+
+    content_type   { 'application/octet-stream' }
+    content_digest { "sha256-#{Digest::SHA256.hexdigest(content)}" }
+    content_length { content.size }
+    content        { Random.bytes(128) }
 
     trait :gemspec do
-      artifact { build(:artifact, :gem, account:, environment:) }
-      content  {
+      artifact     { build(:artifact, :gem, account:, environment:) }
+      content_type { 'application/x-yaml' }
+      content      {
         gem     = file_fixture('ping-1.0.0.gem').read
         gemspec = Gem::Package.new(gem).spec
 
@@ -25,8 +30,10 @@ FactoryBot.define do
     end
 
     trait :package_json do
-      artifact { build(:artifact, :npm_package, account:, environment:) }
-      content  {
+      artifact       { build(:artifact, :npm_package, account:, environment:) }
+      content_digest { "sha512-#{Digest::SHA512.hexdigest(content)}" }
+      content_type   { 'application/vnd.npm.install-v1+json' }
+      content        {
         tgz = file_fixture('hello-2.0.0.tgz').read
         tar = Zlib::GzipReader.new(tgz)
         pkg = Minitar::Reader.open tar do |archive|
@@ -42,8 +49,10 @@ FactoryBot.define do
     end
 
     trait :index_json do
-      artifact { build(:artifact, :oci_image, account:, environment:) }
-      content  {
+      artifact       { build(:artifact, :oci_image, account:, environment:) }
+      content_digest { "sha256:#{Digest::SHA256.hexdigest(content)}" }
+      content_type   { 'application/vnd.oci.image.index.v1+json' }
+      content        {
         tar   = file_fixture('alpine-3.20.3.tar').read
         index = Minitar::Reader.open tar do |archive|
           json = archive.find { _1.name in 'index.json' }

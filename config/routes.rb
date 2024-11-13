@@ -62,11 +62,11 @@ Rails.application.routes.draw do
 
   concern :raw do
     scope module: :raw, defaults: { format: :binary } do
-      get ':product_id(/@:package_id)/:release_id/:id', to: 'release_artifacts#show', constraints: {
-        product_id: /[^\/]*/ ,
-        package_id: /[^\/]*/ ,
-        release_id: /[^\/]*/ ,
-        id: /.*/,
+      get ':product(/@:package)/:release/:artifact', to: 'release_artifacts#show', constraints: {
+        product: /[^\/]*/ ,
+        package: /[^\/]*/ ,
+        release: /[^\/]*/ ,
+        artifact: /.*/,
       }
     end
   end
@@ -108,21 +108,21 @@ Rails.application.routes.draw do
 
   concern :oci do
     # NOTE(ezekg) /v2 namespace is handled outside of this because docker wants it to always be at the root...
-    scope module: :oci, defaults: { format: :binary } do
+    scope module: :oci, defaults: { format: :oci } do
       # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
-      match ':namespace/manifests/:reference', via: %i[head get], to: 'manifests#show', as: :oci_manifest, constraints: {
-        namespace: /[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*/,
-        reference: /[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}/,
+      match ':package/manifests/:reference', via: %i[head get], to: 'manifests#show', as: :oci_manifest, constraints: {
+        package: /[^\/]*/,
+        reference: /[^\/]*/,
       }
 
       # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-blobs
-      get ':namespace/blobs/:digest', to: 'blobs#show', as: :oci_blob, constraints: {
-        namespace: /[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*/,
+      get ':package/blobs/:digest', to: 'blobs#show', as: :oci_blob, constraints: {
+        package: /[^\/]*/,
         digest: /[^\/]*/,
       }
 
       # ignore other requests entirely for now e.g. GET /v2/:namespace/referrers/:digest
-      match ':namespace/*wildcard', via: :all, to: -> env { [405, {}, []] }
+      match '*wildcard', via: :all, to: -> env { [405, {}, []] }
     end
   end
 

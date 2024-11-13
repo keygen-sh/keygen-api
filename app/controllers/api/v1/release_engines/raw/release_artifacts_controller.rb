@@ -20,13 +20,13 @@ module Api::V1::ReleaseEngines
 
     def set_artifact
       scoped_artifacts = authorized_scope(current_account.release_artifacts)
-        .for_product(params[:product_id])
-        .for_package(params[:package_id])
-        .for_release(params[:release_id])
+        .for_product(params[:product])
+        .for_package(params[:package])
+        .for_release(params[:release])
 
       @artifact = Current.resource = FindByAliasService.call(
         scoped_artifacts.order_by_version,
-        id: params[:id],
+        id: params[:artifact],
         aliases: :filename,
         reorder: false,
       )
