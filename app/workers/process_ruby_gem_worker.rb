@@ -7,7 +7,8 @@ class ProcessRubyGemWorker < BaseWorker
   MAX_GEM_SIZE     = 25.megabytes # to avoid downloading large gems
   MAX_GEMSPEC_SIZE = 1.megabyte   # to avoid storing large gemspecs
 
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :critical,
+                  retry: false
 
   def perform(artifact_id)
     artifact = ReleaseArtifact.find(artifact_id)
@@ -39,6 +40,9 @@ class ProcessRubyGemWorker < BaseWorker
       environment_id: artifact.environment_id,
       release_id: artifact.release_id,
       release_artifact_id: artifact.id,
+      content_digest: "sha256-#{Digest::SHA256.hexdigest(yaml)}",
+      content_type: 'application/x-yaml',
+      content_length: yaml.bytesize,
       content: yaml,
     )
 

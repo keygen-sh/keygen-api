@@ -5,31 +5,39 @@ module Api::V1::ReleaseEngines
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_artifact
+    before_action :set_package
 
     def show
-      authorize! artifact,
-        to: :show?
+      authorize! package
 
-      manifest = artifact.manifest
+      manifest = package.manifests.find_by_reference!(params[:reference])
+      authorize! manifest.artifact
 
       # for etag support
       return unless
         stale?(manifest, cache_control: { max_age: 1.day, private: true })
+
+      # docker is very particular about content types
+      response.content_type = manifest.content_type
 
       render body: manifest.content
     end
 
     private
 
-    attr_reader :artifact
+    attr_reader :package
 
-    def set_artifact
-      Current.resource = @artifact = authorized_scope(current_account.release_artifacts.tarballs)
-                                       .for_package(params[:namespace])
-                                       .for_release(params[:reference])
-                                       .order_by_version
-                                       .first!
+    def set_package
+      scoped_packages = authorized_scope(current_account.release_packages.oci)
+                          .where_assoc_exists(
+                            %i[releases artifacts manifest], # must exist
+                          )
+
+      @package = Current.resource = FindByAliasService.call(
+        scoped_packages,
+        id: params[:package],
+        aliases: :key,
+      )
     end
   end
 end

@@ -26,11 +26,6 @@ describe ProcessOciImageWorker do
       end
     }
 
-    let(:minified_image_index) {
-      JSON.parse(image_index)
-          .to_json
-    }
-
     before do
       Aws.config = { s3: { stub_responses: { get_object: [{ body: image_tarball }] } } }
     end
@@ -51,12 +46,14 @@ describe ProcessOciImageWorker do
 
     context 'when artifact is processing' do
       let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
-      let(:release)  { artifact.release }
 
       it 'should store manifest' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
-        expect(artifact.manifest.content).to eq minified_image_index
+        expect(artifact.manifest.content_digest).to eq 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b'
+        expect(artifact.manifest.content_type).to eq 'application/vnd.oci.image.index.v1+json'
+        expect(artifact.manifest.content_length).to eq 441
+        expect(artifact.manifest.content).to eq image_index
         expect(artifact.status).to eq 'UPLOADED'
       end
 
@@ -66,26 +63,26 @@ describe ProcessOciImageWorker do
         end
 
         it 'should store blobs' do
-          expect { subject.perform_async(artifact.id) }.to change { release.reload.artifacts }
+          expect { subject.perform_async(artifact.id) }.to change { artifact.reload.descriptors }
 
-          expect(release.artifacts).to satisfy { |artifacts|
-            artifacts in [
-              *,
-              ReleaseArtifact(filename: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', status: 'UPLOADED'),
-              ReleaseArtifact(filename: 'blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', status: 'UPLOADED'),
-              ReleaseArtifact(filename: 'blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', status: 'UPLOADED'),
-              ReleaseArtifact(filename: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', status: 'UPLOADED'),
-              *
+          expect(artifact.descriptors).to satisfy { |descriptors|
+            descriptors in [
+              ReleaseDescriptor(content_path: 'oci-layout',                                                                    content_type: 'application/vnd.oci.layout.header.v1+json',                 content_digest: 'sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6', content_length: 30),
+              ReleaseDescriptor(content_path: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_digest: 'sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_length: 1853),
+              ReleaseDescriptor(content_path: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_digest: 'sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_length: 528),
+              ReleaseDescriptor(content_path: 'blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_type: 'application/vnd.docker.image.rootfs.diff.tar.gzip',         content_digest: 'sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_length: 3623807),
+              ReleaseDescriptor(content_path: 'blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', content_type: 'application/vnd.docker.container.image.v1+json',            content_digest: 'sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', content_length: 1471),
             ]
           }
         end
 
         it 'should upload blobs' do
           expect { subject.perform_async(artifact.id) }.to upload(
-            { key: %r{blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735} },
-            { key: %r{blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170} },
-            { key: %r{blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b} },
-            { key: %r{blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d} },
+            { key: %r{oci-layout},                                                                    content_type: 'application/vnd.oci.layout.header.v1+json',                 content_length: 30 },
+            { key: %r{blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d}, content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_length: 1853 },
+            { key: %r{blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735}, content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_length: 528 },
+            { key: %r{blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170}, content_type: 'application/vnd.docker.image.rootfs.diff.tar.gzip',         content_length: 3623807 },
+            { key: %r{blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b}, content_type: 'application/vnd.docker.container.image.v1+json',            content_length: 1471 },
           )
         end
       end

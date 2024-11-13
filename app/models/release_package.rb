@@ -21,6 +21,8 @@ class ReleasePackage < ApplicationRecord
     dependent: :destroy_async
   has_many :manifests,
     through: :releases
+  has_many :descriptors,
+    through: :releases
   has_many :artifacts,
     through: :releases,
     source: :artifacts

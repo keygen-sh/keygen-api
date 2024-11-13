@@ -9,9 +9,6 @@ class ReleaseManifest < ApplicationRecord
   include Keygen::PortableClass
   include Environmental
   include Accountable
-  include Limitable
-  include Orderable
-  include Pageable
 
   belongs_to :artifact,
     class_name: 'ReleaseArtifact',
@@ -33,6 +30,9 @@ class ReleaseManifest < ApplicationRecord
     uniqueness: { message: 'already exists', scope: %i[release_artifact_id] },
     scope: { by: :account_id }
 
+  validates :release,
+    scope: { by: :account_id }
+
   validates :content,
     length: { minimum: MIN_CONTENT_LENGTH, maximum: MAX_CONTENT_LENGTH },
     presence: true
@@ -49,4 +49,19 @@ class ReleaseManifest < ApplicationRecord
 
   def as_gemspec      = Gem::Specification.from_yaml(content)
   def as_package_json = JSON.parse(content)
+
+  def self.find_by_reference!(reference)
+    base = joins(:release)
+
+    base.where(content_digest: reference)
+        .or(base.where(release: { version: reference }))
+        .or(base.where(release: { tag: reference }))
+        .take!
+  end
+
+  def self.find_by_reference(...)
+    find_by_reference!(...)
+  rescue ActiveRecord::RecordNotFound
+    nil
+  end
 end

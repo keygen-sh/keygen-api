@@ -8,8 +8,7 @@ module Api::V1::ReleaseEngines
     before_action :set_package
 
     def show
-      authorize! package,
-        to: :show?
+      authorize! package
 
       artifacts = authorized_scope(package.artifacts.tarballs).order_by_version
         .where_assoc_exists(:manifest) # must exist

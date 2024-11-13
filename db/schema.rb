@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_14_163421) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -534,6 +534,26 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
     t.index ["account_id", "key"], name: "index_release_channels_on_account_id_and_key", unique: true
   end
 
+  create_table "release_descriptors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.uuid "release_artifact_id", null: false
+    t.string "content_path", null: false
+    t.string "content_type", null: false
+    t.bigint "content_length", null: false
+    t.string "content_digest", null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_release_descriptors_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["environment_id"], name: "index_release_descriptors_on_environment_id"
+    t.index ["release_artifact_id", "content_digest"], name: "idx_on_release_artifact_id_content_digest_67b8ffeb3c", unique: true
+    t.index ["release_artifact_id", "content_path"], name: "idx_on_release_artifact_id_content_path_a39be97dde", unique: true
+    t.index ["release_artifact_id"], name: "index_release_descriptors_on_release_artifact_id"
+    t.index ["release_id"], name: "index_release_descriptors_on_release_id"
+  end
+
   create_table "release_download_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "release_id", null: false
@@ -590,8 +610,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "content_type"
+    t.bigint "content_length"
+    t.string "content_digest"
     t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
+    t.index ["release_artifact_id", "content_digest"], name: "idx_on_release_artifact_id_content_digest_d7f016852f", unique: true
     t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id", unique: true
     t.index ["release_id"], name: "index_release_manifests_on_release_id"
   end
@@ -862,5 +886,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_18_131452) do
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"
   end
-
 end

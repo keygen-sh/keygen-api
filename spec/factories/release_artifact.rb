@@ -19,7 +19,7 @@ FactoryBot.define do
     trait :pypi_whl do
       release  { build(:release, :pypi, account:, environment:) }
       filename { "#{release.name.underscore.parameterize}-#{release.version}.whl" }
-      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filesize { rand(25.bytes..25.megabytes) }
       filetype { build(:filetype, key: 'whl', account:) }
       platform { nil }
       arch     { nil }
@@ -28,7 +28,7 @@ FactoryBot.define do
     trait :tauri_app do
       release  { build(:release, :tauri, account:, environment:) }
       filename { "#{release.name.underscore.parameterize}.app" }
-      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filesize { rand(25.bytes..25.megabytes) }
       filetype { build(:filetype, key: 'app', account:) }
       platform { build(:platform, key: 'darwin', account:) }
       arch     { build(:arch, key: 'x86_64', account:) }
@@ -37,7 +37,7 @@ FactoryBot.define do
     trait :cli do
       release  { build(:release, :raw, account:, environment:) }
       filename { "#{release.name.underscore.parameterize(separator: '_')}_linux_arm64" }
-      filesize { Faker::Number.between(from: 25.bytes.to_i, to: 25.megabytes.to_i) }
+      filesize { rand(25.bytes..25.megabytes) }
       filetype { nil }
       platform { build(:platform, key: 'linux', account:) }
       arch     { build(:arch, key: 'arm64', account:) }
@@ -46,7 +46,7 @@ FactoryBot.define do
     trait :gem do
       release  { build(:release, :rubygems, account:, environment:) }
       filename { "#{release.name.underscore.parameterize(separator: '_')}-#{release.version}.gem" }
-      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 25.megabytes.to_i) }
+      filesize { rand(1.kilobyte..32.megabytes) }
       filetype { build(:filetype, key: 'gem', account:) }
       platform { build(:platform, key: %w[ruby java jruby mswin mswin64].sample) }
       arch     { nil }
@@ -55,7 +55,7 @@ FactoryBot.define do
     trait :npm_package do
       release  { build(:release, :npm, account:, environment:) }
       filename { "#{release.name.underscore.parameterize}-#{release.version}.tgz" }
-      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 32.megabytes.to_i) }
+      filesize { rand(1.kilobyte..32.megabytes) }
       filetype { build(:filetype, key: 'tgz', account:) }
       platform { nil }
       arch     { nil }
@@ -64,7 +64,7 @@ FactoryBot.define do
     trait :oci_image do
       release  { build(:release, :oci, account:, environment:) }
       filename { "#{release.name.underscore.parameterize}.tar" }
-      filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 512.megabytes.to_i) }
+      filesize { rand(1.megabyte..512.megabytes) }
       filetype { build(:filetype, key: 'tar', account:) }
       platform { nil }
       arch     { nil }
