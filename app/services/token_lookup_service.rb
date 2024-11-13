@@ -40,7 +40,7 @@ class TokenLookupService < BaseService
           BCrypt::Password.new(instance.digest).salt, # reuse salt
         )
         unless instance.send(:secure_compare, digest, instance.digest)
-          Keygen.logger.warn { "[license-key-lookup-service] rehashing token: token_id=#{instance.id.inspect}" }
+          Keygen.logger.warn { "[token-lookup-service] rehashing token: token_id=#{instance.id.inspect}" }
 
           instance.update!(digest:)
         end
