@@ -10,7 +10,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      manifest = package.manifests.find_by_reference!(params[:reference])
+      manifest = package.manifests.find_by_reference!(params[:reference], content_type: request.accepts.collect(&:to_s))
       authorize! manifest.artifact
 
       # for etag support

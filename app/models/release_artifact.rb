@@ -38,6 +38,12 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
+  has_many :manifests,
+    class_name: 'ReleaseManifest',
+    foreign_key: :release_artifact_id,
+    inverse_of: :artifact,
+    dependent: :delete_all
+  # NOTE(ezekg) not a strict has-one but this is a convenience
   has_one :manifest,
     class_name: 'ReleaseManifest',
     foreign_key: :release_artifact_id,

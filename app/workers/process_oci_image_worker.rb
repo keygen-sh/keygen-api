@@ -43,22 +43,29 @@ class ProcessOciImageWorker < BaseWorker
         next unless
           item.exists?
 
-        case item
-        in OciImageLayout::Index => index
+        # store manifests as a manifest for easy reference without hitting the storage provider
+        if item in OciImageLayout::Index | OciImageLayout::Manifest => manifest
           raise ImageNotAcceptableError, 'manifest is too big' if
-            index.size > MAX_MANIFEST_SIZE
+            manifest.size > MAX_MANIFEST_SIZE
 
           ReleaseManifest.create!(
             account_id: artifact.account_id,
             environment_id: artifact.environment_id,
             release_id: artifact.release_id,
             release_artifact_id: artifact.id,
-            content_type: index.media_type,
-            content_digest: index.digest,
-            content_length: index.size,
-            content: index.read,
+            content_type: manifest.media_type,
+            content_digest: manifest.digest,
+            content_length: manifest.size,
+            content_path: manifest.path,
+            content: manifest.read,
           )
-        in OciImageLayout::Blob => blob
+
+          # still need to store it as a blob
+          manifest.rewind
+        end
+
+        # store blobs as a descriptor pointing to the storage provider
+        if item in OciImageLayout::Blob => blob
           raise ImageNotAcceptableError, 'blob is too big' if
             blob.size > MAX_BLOB_SIZE
 

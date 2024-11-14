@@ -17,14 +17,6 @@ describe ProcessOciImageWorker do
   context 'when artifact is a valid image' do
     let(:image_fixture) { 'alpine-3.20.3.tar' }
     let(:image_tarball) { file_fixture(image_fixture).open }
-    let(:image_index) {
-      tarball = file_fixture(image_fixture).open
-
-      Minitar::Reader.open tarball do |archive|
-        archive.find { _1.file? && _1.name in 'index.json' }
-               .read
-      end
-    }
 
     before do
       Aws.config = { s3: { stub_responses: { get_object: [{ body: image_tarball }] } } }
@@ -33,10 +25,12 @@ describe ProcessOciImageWorker do
     context 'when artifact is waiting' do
       let(:artifact) { create(:artifact, :oci_image, :waiting, account:) }
 
+      it 'should not change artifact status' do
+        expect { subject.perform_async(artifact.id) }.to_not change { artifact.reload.status }
+      end
+
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'WAITING'
       end
 
       it 'should not upload blobs' do
@@ -47,14 +41,20 @@ describe ProcessOciImageWorker do
     context 'when artifact is processing' do
       let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
 
-      it 'should store manifest' do
-        expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
+      it 'should change artifact status' do
+        expect { subject.perform_async(artifact.id) }.to change { artifact.reload.status }.to('UPLOADED')
+      end
 
-        expect(artifact.manifest.content_digest).to eq 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b'
-        expect(artifact.manifest.content_type).to eq 'application/vnd.oci.image.index.v1+json'
-        expect(artifact.manifest.content_length).to eq 441
-        expect(artifact.manifest.content).to eq image_index
-        expect(artifact.status).to eq 'UPLOADED'
+      it 'should store manifests' do
+        expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifests }
+
+        expect(artifact.manifests).to satisfy { |manifests|
+          manifests in [
+            ReleaseManifest(content_path: 'index.json',                                                                    content_digest: 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b', content_type: 'application/vnd.oci.image.index.v1+json',                   content_length: 441,  content: String),
+            ReleaseManifest(content_path: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_digest: 'sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_length: 1853, content: String),
+            ReleaseManifest(content_path: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_digest: 'sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_length: 528,  content: String),
+          ]
+        }
       end
 
       context 'when blobs are not uploaded' do
@@ -68,6 +68,7 @@ describe ProcessOciImageWorker do
           expect(artifact.descriptors).to satisfy { |descriptors|
             descriptors in [
               ReleaseDescriptor(content_path: 'oci-layout',                                                                    content_type: 'application/vnd.oci.layout.header.v1+json',                 content_digest: 'sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6', content_length: 30),
+              ReleaseDescriptor(content_path: 'index.json',                                                                    content_type: 'application/vnd.oci.image.index.v1+json',                   content_digest: 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b', content_length: 441),
               ReleaseDescriptor(content_path: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_digest: 'sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_length: 1853),
               ReleaseDescriptor(content_path: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_digest: 'sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_length: 528),
               ReleaseDescriptor(content_path: 'blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_type: 'application/vnd.docker.image.rootfs.diff.tar.gzip',         content_digest: 'sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_length: 3623807),
@@ -79,6 +80,7 @@ describe ProcessOciImageWorker do
         it 'should upload blobs' do
           expect { subject.perform_async(artifact.id) }.to upload(
             { key: %r{oci-layout},                                                                    content_type: 'application/vnd.oci.layout.header.v1+json',                 content_length: 30 },
+            { key: %r{index.json},                                                                    content_type: 'application/vnd.oci.image.index.v1+json',                   content_length: 441 },
             { key: %r{blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d}, content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_length: 1853 },
             { key: %r{blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735}, content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_length: 528 },
             { key: %r{blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170}, content_type: 'application/vnd.docker.image.rootfs.diff.tar.gzip',         content_length: 3623807 },
@@ -92,6 +94,21 @@ describe ProcessOciImageWorker do
           Aws.config[:s3][:stub_responses][:head_object] = []
         end
 
+        it 'should store blobs' do
+          expect { subject.perform_async(artifact.id) }.to change { artifact.reload.descriptors }
+
+          expect(artifact.descriptors).to satisfy { |descriptors|
+            descriptors in [
+              ReleaseDescriptor(content_path: 'oci-layout',                                                                    content_type: 'application/vnd.oci.layout.header.v1+json',                 content_digest: 'sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6', content_length: 30),
+              ReleaseDescriptor(content_path: 'index.json',                                                                    content_type: 'application/vnd.oci.image.index.v1+json',                   content_digest: 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b', content_length: 441),
+              ReleaseDescriptor(content_path: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_digest: 'sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_length: 1853),
+              ReleaseDescriptor(content_path: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_digest: 'sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_length: 528),
+              ReleaseDescriptor(content_path: 'blobs/sha256/43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_type: 'application/vnd.docker.image.rootfs.diff.tar.gzip',         content_digest: 'sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170', content_length: 3623807),
+              ReleaseDescriptor(content_path: 'blobs/sha256/91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', content_type: 'application/vnd.docker.container.image.v1+json',            content_digest: 'sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b', content_length: 1471),
+            ]
+          }
+        end
+
         it 'should not reupload blobs' do
           expect { subject.perform_async(artifact.id) }.to_not upload
         end
@@ -101,10 +118,12 @@ describe ProcessOciImageWorker do
     context 'when artifact is uploaded' do
       let(:artifact) { create(:artifact, :oci_image, :uploaded, account:) }
 
+      it 'should not change artifact status' do
+        expect { subject.perform_async(artifact.id) }.to_not change { artifact.reload.status }
+      end
+
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'UPLOADED'
       end
 
       it 'should not upload blobs' do
@@ -115,10 +134,12 @@ describe ProcessOciImageWorker do
     context 'when artifact is failed' do
       let(:artifact) { create(:artifact, :oci_image, :failed, account:) }
 
+      it 'should not change artifact status' do
+        expect { subject.perform_async(artifact.id) }.to_not change { artifact.reload.status }
+      end
+
       it 'should not store manifest' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'FAILED'
       end
 
       it 'should not upload blobs' do

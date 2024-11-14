@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_14_163421) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -610,13 +610,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_14_163421) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "content_path"
     t.string "content_type"
     t.bigint "content_length"
     t.string "content_digest"
     t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
     t.index ["release_artifact_id", "content_digest"], name: "idx_on_release_artifact_id_content_digest_d7f016852f", unique: true
-    t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id", unique: true
+    t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id"
     t.index ["release_id"], name: "index_release_manifests_on_release_id"
   end
 
