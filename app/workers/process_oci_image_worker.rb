@@ -77,12 +77,15 @@ class ProcessOciImageWorker < BaseWorker
           next if
             client.head_object(bucket: descriptor.bucket, key: descriptor.key).successful? rescue false
 
-          # upload blob in chunks to reduce memory footprint
-          client.put_object(bucket: descriptor.bucket, key: descriptor.key, content_type: descriptor.content_type, content_length: descriptor.content_length) do |writer|
-            while chunk = blob.read(16 * 1024)
-              writer.write(chunk)
-            end
-          end
+          # TODO(ezekg) this should accept a block like get_object to support chunked writes
+          #             see: https://github.com/aws/aws-sdk-ruby/issues/3142
+          client.put_object(
+            bucket: descriptor.bucket,
+            key: descriptor.key,
+            content_length: descriptor.content_length,
+            content_type: descriptor.content_type,
+            body: blob.to_io,
+          )
         end
       end
     end
