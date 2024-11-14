@@ -10,6 +10,8 @@ class ReleaseManifest < ApplicationRecord
   include Environmental
   include Accountable
 
+  extend OrderAsSpecified
+
   belongs_to :artifact,
     class_name: 'ReleaseArtifact',
     foreign_key: :release_artifact_id,
@@ -27,7 +29,6 @@ class ReleaseManifest < ApplicationRecord
   has_account default: -> { artifact&.account_id }
 
   validates :artifact,
-    uniqueness: { message: 'already exists', scope: %i[release_artifact_id] },
     scope: { by: :account_id }
 
   validates :release,
@@ -50,13 +51,38 @@ class ReleaseManifest < ApplicationRecord
   def as_gemspec      = Gem::Specification.from_yaml(content)
   def as_package_json = JSON.parse(content)
 
-  def self.find_by_reference!(reference)
+  # find_by_reference is used for the oci engine to lookup a manifest by reference,
+  # which could be a digest, version, or tag, and also to request a specific media
+  # type in case of multiple manifests per-image.
+  def self.find_by_reference!(reference, content_type: nil)
     base = joins(:release)
 
-    base.where(content_digest: reference)
-        .or(base.where(release: { version: reference }))
-        .or(base.where(release: { tag: reference }))
-        .take!
+    manifests = base.where(content_digest: reference)
+                    .or(base.where(release: { version: reference }))
+                    .or(base.where(release: { tag: reference }))
+
+    # oci clients may want a specific media type in case of multiple manifests
+    unless content_type.blank?
+      manifests = case content_type
+                  in ['*/*', *] | '*/*' # has no preference i.e. accepts anything
+                    manifests.where.not(content_type: nil)
+                  in [*content_types, '*/*'] # has preference but accepts anything
+                    manifests.where(content_type: content_types)
+                             .or(manifests.where.not(content_type: nil))
+                             .order_as_specified(
+                               content_type: content_types,
+                             )
+                  in [*content_types] # has preferences
+                    manifests.where(content_type: content_types)
+                             .order_as_specified(
+                               content_type: content_types,
+                             )
+                  else # has preference
+                    manifests.where(content_type:)
+                  end
+    end
+
+    manifests.take!
   end
 
   def self.find_by_reference(...)

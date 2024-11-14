@@ -64,6 +64,7 @@ class ProcessNpmPackageWorker < BaseWorker
         content_digest: "sha512-#{Digest::SHA512.hexdigest(content)}",
         content_type: 'application/vnd.npm.install-v1+json',
         content_length: content.bytesize,
+        content_path: 'package.json',
         content:,
       )
     end

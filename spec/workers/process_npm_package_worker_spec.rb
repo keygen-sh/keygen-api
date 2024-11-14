@@ -52,6 +52,8 @@ describe ProcessNpmPackageWorker do
       it 'should process package' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
+        expect(artifact.manifest.content_type).to eq 'application/vnd.npm.install-v1+json'
+        expect(artifact.manifest.content_path).to eq 'package.json'
         expect(artifact.manifest.content).to eq minified_package_json
         expect(artifact.status).to eq 'UPLOADED'
       end

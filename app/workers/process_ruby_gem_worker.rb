@@ -43,6 +43,7 @@ class ProcessRubyGemWorker < BaseWorker
       content_digest: "sha256-#{Digest::SHA256.hexdigest(yaml)}",
       content_type: 'application/x-yaml',
       content_length: yaml.bytesize,
+      content_path: gemspec.file_name,
       content: yaml,
     )
 

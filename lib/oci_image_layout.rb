@@ -155,6 +155,7 @@ module OciImageLayout
 
     def exists?   = io.present?
     def read(...) = (io.read(...) if exists?)
+    def seek(...) = (io.seek(...) if exists?)
     def rewind    = (io.rewind if exists?)
     def close     = (io.close if exists?)
     def closed?   = (io.closed? if exists?)
