@@ -4,7 +4,7 @@ require 'rubygems/package'
 
 class ProcessRubyGemWorker < BaseWorker
   MIN_GEM_SIZE     = 5.bytes      # to avoid processing empty or invalid gems
-  MAX_GEM_SIZE     = 25.megabytes # to avoid downloading large gems
+  MAX_GEM_SIZE     = 32.megabytes # to avoid downloading large gems
   MAX_GEMSPEC_SIZE = 1.megabyte   # to avoid storing large gemspecs
 
   sidekiq_options queue: :critical,
