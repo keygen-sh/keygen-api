@@ -13,13 +13,15 @@ FactoryBot.define do
     artifact    { build(:artifact, account:, environment:) }
     release     { artifact.release }
 
-    content_type   { 'application/octet-stream' }
+    content_path   { Faker::File.file_name }
+    content_type   { Faker::File.mime_type }
     content_digest { "sha256-#{Digest::SHA256.hexdigest(content)}" }
     content_length { content.size }
     content        { Random.bytes(128) }
 
     trait :gemspec do
       artifact     { build(:artifact, :gem, account:, environment:) }
+      content_path { 'ping.gemspec' }
       content_type { 'application/x-yaml' }
       content      {
         gem     = file_fixture('ping-1.0.0.gem').read
@@ -31,6 +33,7 @@ FactoryBot.define do
 
     trait :package_json do
       artifact       { build(:artifact, :npm_package, account:, environment:) }
+      content_path   { 'package.json' }
       content_digest { "sha512-#{Digest::SHA512.hexdigest(content)}" }
       content_type   { 'application/vnd.npm.install-v1+json' }
       content        {
@@ -50,6 +53,7 @@ FactoryBot.define do
 
     trait :index_json do
       artifact       { build(:artifact, :oci_image, account:, environment:) }
+      content_path   { 'index.json' }
       content_digest { "sha256:#{Digest::SHA256.hexdigest(content)}" }
       content_type   { 'application/vnd.oci.image.index.v1+json' }
       content        {
@@ -64,6 +68,42 @@ FactoryBot.define do
 
         index
       }
+    end
+
+    trait :licensed do
+      artifact { build(:artifact, :licensed, account:, environment:) }
+    end
+
+    trait :open do
+      artifact { build(:artifact, :open, account:, environment:) }
+    end
+
+    trait :closed do
+      artifact { build(:artifact, :closed, account:, environment:) }
+    end
+
+    trait :in_isolated_environment do
+      environment { build(:environment, :isolated, account:) }
+    end
+
+    trait :isolated do
+      in_isolated_environment
+    end
+
+    trait :in_shared_environment do
+      environment { build(:environment, :shared, account:) }
+    end
+
+    trait :shared do
+      in_shared_environment
+    end
+
+    trait :in_nil_environment do
+      environment { nil }
+    end
+
+    trait :global do
+      in_nil_environment
     end
   end
 end

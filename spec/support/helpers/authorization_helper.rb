@@ -1297,6 +1297,168 @@ module AuthorizationHelper
       let(:record) { artifact }
     end
 
+    def accessing_manifests(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:manifests) { create_list(:manifest, 3, *manifest_traits, account: other_account) }
+      else
+        let(:manifests) { create_list(:manifest, 3, *manifest_traits, account:) }
+      end
+
+      let(:record) { manifests }
+    end
+
+    def accessing_a_manifest(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:manifest) { create(:manifest, *manifest_traits, account: other_account) }
+      else
+        let(:manifest) { create(:manifest, *manifest_traits, account:) }
+      end
+
+      let(:record) { manifest }
+    end
+
+    def accessing_its_manifests(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:manifests) { create_list(:manifest, 3, *manifest_traits, account: release.account, release:) }
+       in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)   { create(:release, *release_traits, account:, product:) }
+        let(:artifact)  { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifests) { create_list(:manifest, 3, *manifest_traits, account:, release:, artifact:) }
+      in [:as_product, :accessing_itself]
+        let(:release)   { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact)  { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifests) { create_list(:manifest, 3, *manifest_traits, account:, release:, artifact:) }
+      in [:as_product, *]
+        let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer) }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
+      in [:as_license, *]
+        let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
+      in [:as_user, *]
+        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
+      end
+
+      let(:record) { manifests }
+    end
+
+    def accessing_its_manifest(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:artifact) { create(:artifact, *artifact_traits, account: release.account, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account: release.account, release:, artifact:) }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)  { create(:release, *release_traits, account:, product:) }
+        let(:artifact) { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account:, release:, artifact:) }
+      in [:as_product, :accessing_itself]
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact) { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account:, release:, artifact:) }
+      in [:as_product, *]
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact) { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account:, release:, artifact:) }
+      in [:as_license, *]
+        let(:release)  { create(:release, *release_traits, account:, product: bearer.product) }
+        let(:artifact) { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account:, release:, artifact:) }
+      in [:as_user, *]
+        let(:release)  { create(:release, *release_traits, account:, product: bearer.licenses.take.product) }
+        let(:artifact) { create(:artifact, *artifact_traits, account:, release:) }
+        let(:manifest) { create(:manifest, *manifest_traits, account:, release:, artifact:) }
+      end
+
+      let(:record) { manifest }
+    end
+
+    def accessing_descriptors(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account: other_account) }
+      else
+        let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account:) }
+      end
+
+      let(:record) { descriptors }
+    end
+
+    def accessing_a_descriptor(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account: other_account) }
+      else
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:) }
+      end
+
+      let(:record) { descriptor }
+    end
+
+    def accessing_its_descriptors(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account: release.account, release:) }
+       in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)     { create(:release, *release_traits, account:, product:) }
+        let(:artifact)    { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_product, :accessing_itself]
+        let(:release)     { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact)    { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_product, *]
+        let(:releases)    { create_list(:release, 3, *release_traits, account:, product: bearer) }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
+      in [:as_license, *]
+        let(:releases)    { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
+      in [:as_user, *]
+        let(:releases)    { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
+      end
+
+      let(:record) { descriptors }
+    end
+
+    def accessing_its_descriptor(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:artifact)  { create(:artifact, *artifact_traits, account: release.account, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account: release.account, release:, artifact:) }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)    { create(:release, *release_traits, account:, product:) }
+        let(:artifact)   { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_product, :accessing_itself]
+        let(:release)    { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact)   { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_product, *]
+        let(:release)    { create(:release, *release_traits, account:, product: bearer) }
+        let(:artifact)   { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_license, *]
+        let(:release)    { create(:release, *release_traits, account:, product: bearer.product) }
+        let(:artifact)   { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:, release:, artifact:) }
+      in [:as_user, *]
+        let(:release)    { create(:release, *release_traits, account:, product: bearer.licenses.take.product) }
+        let(:artifact)   { create(:artifact, *artifact_traits, account:, release:) }
+        let(:descriptor) { create(:descriptor, *descriptor_traits, account:, release:, artifact:) }
+      end
+
+      let(:record) { descriptor }
+    end
+
     def accessing_engines(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
@@ -1877,6 +2039,8 @@ module AuthorizationHelper
         let(:token_traits)       { [] }
         let(:release_traits)     { [] }
         let(:artifact_traits)    { [] }
+        let(:manifest_traits)    { [] }
+        let(:descriptor_traits)  { [] }
         let(:package_traits)     { [] }
         let(:engine_traits)      { [] }
         let(:product_traits)     { [] }
@@ -1896,19 +2060,21 @@ module AuthorizationHelper
       context 'without authorization' do
         using_scenario :as_anonymous
 
-        let(:account_traits)  { [] }
-        let(:bearer_traits)   { [] }
-        let(:token_traits)    { [] }
-        let(:release_traits)  { [] }
-        let(:artifact_traits) { [] }
-        let(:package_traits)  { [] }
-        let(:engine_traits)   { [] }
-        let(:product_traits)  { [] }
-        let(:policy_traits)   { [] }
-        let(:license_traits)  { [] }
-        let(:machine_traits)  { [] }
-        let(:admin_traits)    { [] }
-        let(:user_traits)     { [] }
+        let(:account_traits)    { [] }
+        let(:bearer_traits)     { [] }
+        let(:token_traits)      { [] }
+        let(:release_traits)    { [] }
+        let(:artifact_traits)   { [] }
+        let(:manifest_traits)   { [] }
+        let(:descriptor_traits) { [] }
+        let(:package_traits)    { [] }
+        let(:engine_traits)     { [] }
+        let(:product_traits)    { [] }
+        let(:policy_traits)     { [] }
+        let(:license_traits)    { [] }
+        let(:machine_traits)    { [] }
+        let(:admin_traits)      { [] }
+        let(:user_traits)       { [] }
 
         instance_exec(&)
       end
@@ -2167,6 +2333,34 @@ module AuthorizationHelper
     ##
     # with_artifact_trait defines a trait on the artifact context.
     def with_artifact_trait(trait, &) = with_artifact_traits(*trait, &)
+
+    ##
+    # with_manifest_traits defines traits on the manifest context.
+    def with_manifest_traits(traits, &)
+      context "with manifest #{traits} traits" do
+        let(:manifest_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_manifest_trait defines a trait on the manifest context.
+    def with_manifest_trait(trait, &) = with_manifest_traits(*trait, &)
+
+    ##
+    # with_descriptor_traits defines traits on the descriptor context.
+    def with_descriptor_traits(traits, &)
+      context "with descriptor #{traits} traits" do
+        let(:descriptor_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_descriptor_trait defines a trait on the descriptor context.
+    def with_descriptor_trait(trait, &) = with_descriptor_traits(*trait, &)
 
     ##
     # with_package_traits defines traits on the package context.
