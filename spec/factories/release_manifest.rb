@@ -40,11 +40,8 @@ FactoryBot.define do
         tgz = file_fixture('hello-2.0.0.tgz').read
         tar = Zlib::GzipReader.new(tgz)
         pkg = Minitar::Reader.open tar do |archive|
-          json = archive.find { _1.name in 'package/package.json' }
-                        .read
-
-          JSON.parse(json) # minify
-              .to_json
+          archive.find { _1.name in 'package/package.json' }
+                 .read
         end
 
         pkg
@@ -59,11 +56,8 @@ FactoryBot.define do
       content        {
         tar   = file_fixture('alpine-3.20.3.tar').read
         index = Minitar::Reader.open tar do |archive|
-          json = archive.find { _1.name in 'index.json' }
-                        .read
-
-          JSON.parse(json) # minify
-              .to_json
+          archive.find { _1.name in 'index.json' }
+                 .read
         end
 
         index
