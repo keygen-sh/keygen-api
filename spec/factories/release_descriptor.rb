@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'rubygems/package'
-require 'minitar'
-require 'zlib'
-
 FactoryBot.define do
   factory :release_descriptor, aliases: %i[descriptor] do
     initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT | NIL_ENVIRONMENT }) }
