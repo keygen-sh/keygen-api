@@ -126,7 +126,7 @@ class ProcessOciImageWorker < BaseWorker
 
   def unpack(io, &)
     Minitar::Reader.open(io, &)
-  rescue ArgumentError => e
+  rescue ArgumentError => e # octal encoding error
     raise ImageNotAcceptableError, e.message
   end
 

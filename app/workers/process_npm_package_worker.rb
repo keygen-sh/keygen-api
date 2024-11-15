@@ -107,7 +107,12 @@ class ProcessNpmPackageWorker < BaseWorker
   def unpack(io, &)
     Minitar::Reader.open(io, &)
   rescue ArgumentError => e
-    raise PackageNotAcceptableError, e.message
+    case e.message
+    when /is not a valid octal string/ # octal encoding error
+      raise PackageNotAcceptableError, e.message
+    else
+      raise e
+    end
   end
 
   class PackageNotAcceptableError < StandardError
