@@ -20,7 +20,7 @@ module Api::V1::ReleaseEngines
       return unless
         stale?(manifest, cache_control: { max_age: 1.day, private: true })
 
-      # docker is very particular about content types
+      # oci spec is very particular about content/media types
       response.content_type = manifest.content_type
 
       if request.head?
