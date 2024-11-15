@@ -1318,15 +1318,15 @@ Feature: npm package metadata
       }
       """
 
-  Scenario: Anon retrieves a closed gem
+  Scenario: Anon retrieves a closed package
     When I send a GET request to "/accounts/test1/engines/npm/corge"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves a licensed gem
+  Scenario: Anon retrieves a licensed package
     When I send a GET request to "/accounts/test1/engines/npm/foo"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves an open gem
+  Scenario: Anon retrieves an open package
     When I send a GET request to "/accounts/test1/engines/npm/baz"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
