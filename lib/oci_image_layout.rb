@@ -245,7 +245,7 @@ module OciImageLayout
       @layers      = []
       @config      = nil
 
-      # some blobs may not be referenced without being present
+      # some blobs may be referenced without being present
       return unless
         exists?
 
