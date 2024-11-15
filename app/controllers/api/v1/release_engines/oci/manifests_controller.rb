@@ -10,13 +10,11 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      # NOTE(ezekg) a manifest defers to its artifact as far as authz goes
-      artifacts = authorized_scope(package.artifacts)
-      manifest  = package.manifests.for_artifacts(artifacts).find_by_reference!(
+      manifest = authorized_scope(package.manifests).find_by_reference!(
         params[:reference],
         content_type: request.accepts.collect(&:to_s),
       )
-      authorize! manifest.artifact
+      authorize! manifest
 
       # for etag support
       return unless

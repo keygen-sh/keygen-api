@@ -10,12 +10,10 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      # NOTE(ezekg) a descriptor defers to its artifact as far as authz goes
-      artifacts  = authorized_scope(package.artifacts)
-      descriptor = package.descriptors.for_artifacts(artifacts).find_by!(
+      descriptor = authorized_scope(package.descriptors).find_by!(
         content_digest: params[:digest],
       )
-      authorize! descriptor.artifact
+      authorize! descriptor
 
       if request.head?
         # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
