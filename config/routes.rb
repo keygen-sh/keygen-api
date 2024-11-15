@@ -116,7 +116,7 @@ Rails.application.routes.draw do
       }
 
       # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-blobs
-      get ':package/blobs/:digest', to: 'blobs#show', as: :oci_blob, constraints: {
+      match ':package/blobs/:digest', via: %i[head get], to: 'blobs#show', as: :oci_blob, constraints: {
         package: /[^\/]*/,
         digest: /[^\/]*/,
       }
@@ -659,6 +659,9 @@ Rails.application.routes.draw do
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'oci.pkg' } do
       # NOTE(ezekg) /v2 namespace is handled here because docker wants it at the root...
       scope :v2 do
+        # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#endpoints
+        match '/', via: %i[head get], to: -> env { [200, {}, []] }
+
         case
         when Keygen.multiplayer?
           scope ':account_id', as: :account do

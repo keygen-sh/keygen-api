@@ -2,10 +2,39 @@
 
 World Rack::Test::Methods
 
-Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, table|
-  data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
-  data.each do |attributes|
-    create(resource.singularize.underscore, attributes.transform_values(&:presence))
+Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, rows|
+  hashes  = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+  factory = resource.singularize.underscore.to_sym
+
+  hashes.each do |hash|
+    hash.transform_values!(&:presence)
+
+    # FIXME(ezekg) treating release models a bit differently for convenience
+    case factory
+    when :release
+      codes = hash.delete(:entitlements)&.split(/,\s*/)
+      if codes.present? && codes.any?
+        entitlements = codes.map {{ entitlement: Entitlement.find_by!(code: _1) }}
+
+        hash[:constraints_attributes] = entitlements
+      end
+
+      hash[:channel_attributes]  = { key: hash.delete(:channel) }
+
+      create(:release, **hash)
+    when :artifact
+      hash[:platform_attributes] = { key: hash.delete(:platform) }
+      hash[:arch_attributes]     = { key: hash.delete(:arch)     }
+      hash[:filetype_attributes] = { key: hash.delete(:filetype) }
+
+      create(:artifact, **hash)
+    when :package
+      hash[:engine_attributes] = { key: hash.delete(:engine) }
+
+      create(:package, **hash)
+    else
+      create(factory, **hash)
+    end
   end
 end
 

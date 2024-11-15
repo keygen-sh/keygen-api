@@ -10,6 +10,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
+      # FIXME(ezekg) add authorized_scope to prevent e.g. anons from accessing yanked artifacts
       manifest = package.manifests.find_by_reference!(params[:reference], content_type: request.accepts.collect(&:to_s))
       authorize! manifest.artifact
 
@@ -20,7 +21,12 @@ module Api::V1::ReleaseEngines
       # docker is very particular about content types
       response.content_type = manifest.content_type
 
-      render body: manifest.content
+      if request.head?
+        # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
+        head :ok
+      else
+        render body: manifest.content
+      end
     end
 
     private
@@ -30,7 +36,7 @@ module Api::V1::ReleaseEngines
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.oci)
                           .where_assoc_exists(
-                            %i[releases artifacts manifest], # must exist
+                            :manifests, # must exist
                           )
 
       @package = Current.resource = FindByAliasService.call(
