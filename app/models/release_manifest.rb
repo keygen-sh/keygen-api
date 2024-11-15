@@ -48,6 +48,10 @@ class ReleaseManifest < ApplicationRecord
     end
   end
 
+  scope :for_artifacts, -> artifacts {
+    joins(:artifact).where(artifact: { id: artifacts })
+  }
+
   def as_gemspec      = Gem::Specification.from_yaml(content)
   def as_package_json = JSON.parse(content)
 

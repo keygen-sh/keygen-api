@@ -10,8 +10,12 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      # FIXME(ezekg) add authorized_scope to prevent e.g. anons from accessing yanked artifacts
-      manifest = package.manifests.find_by_reference!(params[:reference], content_type: request.accepts.collect(&:to_s))
+      # NOTE(ezekg) a manifest defers to its artifact as far as authz goes
+      artifacts = authorized_scope(package.artifacts)
+      manifest  = package.manifests.for_artifacts(artifacts).find_by_reference!(
+        params[:reference],
+        content_type: request.accepts.collect(&:to_s),
+      )
       authorize! manifest.artifact
 
       # for etag support
