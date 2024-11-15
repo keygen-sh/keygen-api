@@ -27,6 +27,10 @@ class ReleaseDescriptor < ApplicationRecord
   validates :release,
     scope: { by: :account_id }
 
+  scope :for_artifacts, -> artifacts {
+    joins(:artifact).where(artifact: { id: artifacts })
+  }
+
   def client = artifact.client
   def bucket = artifact.bucket
   def key    = artifact.key_for(content_path)

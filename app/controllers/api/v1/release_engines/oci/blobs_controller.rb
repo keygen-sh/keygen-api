@@ -10,8 +10,11 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      # FIXME(ezekg) add authorized_scope to prevent e.g. users from accessing draft artifacts
-      descriptor = package.descriptors.find_by!(content_digest: params[:digest])
+      # NOTE(ezekg) a descriptor defers to its artifact as far as authz goes
+      artifacts  = authorized_scope(package.artifacts)
+      descriptor = package.descriptors.for_artifacts(artifacts).find_by!(
+        content_digest: params[:digest],
+      )
       authorize! descriptor.artifact
 
       if request.head?
