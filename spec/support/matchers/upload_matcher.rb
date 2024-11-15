@@ -14,7 +14,6 @@ RSpec::Matchers.define :upload do |*expectations|
         objects << object
 
         expectations.each do |expected|
-
           if writer.present? && expected in body:, **rest
             matcher = RSpec::Matchers::BuiltIn::Include.new(rest)
 
