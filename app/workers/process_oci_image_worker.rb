@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'minitar'
-require 'zlib'
 
 require Rails.root / 'lib/oci_image_layout'
 
