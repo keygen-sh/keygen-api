@@ -106,7 +106,7 @@ class ProcessNpmPackageWorker < BaseWorker
   def gunzip(io)    = Zlib::GzipReader.new(io)
   def unpack(io, &)
     Minitar::Reader.open(io, &)
-  rescue ArgumentError => e
+  rescue ArgumentError => e # octal encoding error
     raise PackageNotAcceptableError, e.message
   end
 
