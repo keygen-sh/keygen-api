@@ -617,6 +617,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
     t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
     t.index ["release_artifact_id", "content_digest"], name: "idx_on_release_artifact_id_content_digest_d7f016852f", unique: true
+    t.index ["release_artifact_id", "content_path"], name: "idx_on_release_artifact_id_content_path_5fce27e398", unique: true
     t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id"
     t.index ["release_id"], name: "index_release_manifests_on_release_id"
   end
