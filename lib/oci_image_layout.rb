@@ -238,7 +238,7 @@ module OciImageLayout
     def initialize(io, fs:, **)
       super(io, fs:, **)
 
-      # FIXME(ezekg) add support for annotations? e.g. auto-tagging
+      # TODO(ezekg) add support for annotations? e.g. auto-tagging
       @annotations = []
       @manifests   = []
       @layers      = []
