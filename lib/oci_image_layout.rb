@@ -4,6 +4,7 @@ require 'tempfile'
 require 'digest'
 require 'json'
 
+# see: https://github.com/opencontainers/image-spec/blob/main/image-layout.md
 module OciImageLayout
   class Error < StandardError; end
   class LayoutNotFoundError < Error; end

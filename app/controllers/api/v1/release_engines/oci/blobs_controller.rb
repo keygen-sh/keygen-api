@@ -10,11 +10,17 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
+      # FIXME(ezekg) add authorized_scope to prevent e.g. users from accessing draft artifacts
       descriptor = package.descriptors.find_by!(content_digest: params[:digest])
       authorize! descriptor.artifact
 
-      redirect_to vanity_v1_account_release_artifact_url(current_account, descriptor.artifact, filename: descriptor.content_path, host: request.host),
-        status: :see_other
+      if request.head?
+        # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
+        head :ok
+      else
+        redirect_to vanity_v1_account_release_artifact_url(current_account, descriptor.artifact, filename: descriptor.content_path, host: request.host),
+          status: :see_other
+      end
     end
 
     private
@@ -24,7 +30,7 @@ module Api::V1::ReleaseEngines
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.oci)
                           .where_assoc_exists(
-                            %i[releases artifacts manifest], # must exist
+                            :descriptors, # must exist
                           )
 
       @package = Current.resource = FindByAliasService.call(
