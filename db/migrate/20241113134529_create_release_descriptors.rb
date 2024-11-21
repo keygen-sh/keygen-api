@@ -18,8 +18,9 @@ class CreateReleaseDescriptors < ActiveRecord::Migration[7.2]
       t.index %i[environment_id]
       t.index %i[release_id]
       t.index %i[release_artifact_id]
-      t.index %i[release_artifact_id content_path],   unique: true
-      t.index %i[release_artifact_id content_digest], unique: true
+      t.index %i[content_path release_artifact_id],   unique: true
+      t.index %i[content_digest release_artifact_id], unique: true
+      t.index %i[content_type release_artifact_id]
     end
   end
 end
