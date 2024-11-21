@@ -40,7 +40,7 @@ module Api::V1
         !artifact.downloadable? || prefers?('no-download')
 
       download = artifact.download!(
-        filename: params.fetch(:filename) { artifact.filename },
+        path: params[:filename] || artifact.filename,
         ttl: release_artifact_query[:ttl],
       )
 

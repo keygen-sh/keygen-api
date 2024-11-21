@@ -523,8 +523,8 @@ class ReleaseArtifact < ApplicationRecord
     redirect_url.present?
   end
 
-  def download!(filename: self.filename, ttl: 1.hour)
-    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(filename), expires_in: ttl&.to_i)
+  def download!(path: filename, ttl: 1.hour)
+    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(path), expires_in: ttl&.to_i)
 
     release.download_links.create!(url: redirect_url, ttl:, account:)
   end
