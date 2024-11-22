@@ -35,7 +35,7 @@ module Api::V1::ReleaseEngines
       # FIXME(ezekg) https://github.com/brianhempel/active_record_union/issues/35
       last_modified = artifacts.collect(&:updated_at).max
       return unless
-        stale?(artifacts, last_modified:, cache_control: { max_age: 1.day, private: true })
+        stale?(etag: artifacts, last_modified:, cache_control: { max_age: 1.day, private: true })
 
       render 'api/v1/release_engines/pypi/simple/show',
         layout: 'layouts/simple',
