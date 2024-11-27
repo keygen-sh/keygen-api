@@ -1,5 +1,5 @@
 @api/v1
-Feature: OCI image manifests
+Feature: OCI image blobs
   Background:
     Given the following "accounts" exist:
       | id                                   | slug      | name      |
@@ -110,7 +110,7 @@ Feature: OCI image manifests
     And the account "linux" is canceled
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
     Then the response status should be "403"
     And the response should contain the following raw headers:
       """
@@ -122,814 +122,189 @@ Feature: OCI image manifests
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "//oci.pkg.keygen.sh/v2/linux/alpine/manifests/3.20.3"
-    Then the response status should be "200"
+    When I send a GET request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    Then the response status should be "303"
 
   @sp
   Scenario: Endpoint should be accessible from subdomain
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "//oci.pkg.keygen.sh/v2/alpine/manifests/3.20.3"
+    When I send a GET request to "//oci.pkg.keygen.sh/v2/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    Then the response status should be "303"
+
+  @mp
+  Scenario: Endpoint should pass blob ack
+    Given the current account is "linux"
+    And I am an admin of account "linux"
+    And I use an authentication token
+    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
     Then the response status should be "200"
 
   @mp
-  Scenario: Endpoint should pass manifest ack
+  Scenario: Endpoint should fail blob ack
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-
-  @mp
-  Scenario: Endpoint should fail manifest ack
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/manifests/0.0.0"
+    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/foo"
     Then the response status should be "404"
 
   @sp
-  Scenario: Endpoint should pass manifest ack
+  Scenario: Endpoint should pass blob ack
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/manifests/3.20.3"
+    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
     Then the response status should be "200"
 
   @sp
-  Scenario: Endpoint should fail manifest ack
+  Scenario: Endpoint should fail blob ack
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/manifests/0.0.0"
+    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/blobs/foo"
     Then the response status should be "404"
 
-  Scenario: Endpoint should respond with a matching media type
+  Scenario: Endpoint should return a layout blob by digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.oci.image.index.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
+    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/oci-layout
       """
 
-  Scenario: Endpoint should respond with any media type
+  Scenario: Endpoint should return an index blob by digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: text/html, */*
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
       """
 
-  Scenario: Endpoint should not respond with an unknown media type
+  Scenario: Endpoint should return a manifest blob by digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: text/html
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735"
+    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json; charset=utf-8
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735
       """
 
-  Scenario: Endpoint should return an image index by version
+  Scenario: Endpoint should return a layer blob by digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.oci.image.index.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170
       """
 
-  Scenario: Endpoint should return an image index by tag
+  Scenario: Endpoint should return an image blob by digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.oci.image.index.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
-    Then the response status should be "200"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
+    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b
       """
 
-  Scenario: Endpoint should return an image index by digest
+  Scenario: Endpoint not should return a blob by filename
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
-      """
-
-  Scenario: Endpoint should return an image manifest list by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.distribution.manifest.list.v2+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "manifests": [
-          {
-            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "amd64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v6"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v7"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm64",
-              "os": "linux",
-              "variant": "v8"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "386",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "riscv64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "s390x",
-              "os": "linux"
-            },
-            "size": 528
-          }
-        ],
-        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-        "schemaVersion": 2
-      }
-      """
-
-  Scenario: Endpoint should return an image manifest list by tag
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.distribution.manifest.list.v2+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "manifests": [
-          {
-            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "amd64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v6"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v7"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm64",
-              "os": "linux",
-              "variant": "v8"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "386",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "riscv64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "s390x",
-              "os": "linux"
-            },
-            "size": 528
-          }
-        ],
-        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-        "schemaVersion": 2
-      }
-      """
-
-  Scenario: Endpoint should return an image manifest list by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "manifests": [
-          {
-            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "amd64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v6"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm",
-              "os": "linux",
-              "variant": "v7"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "arm64",
-              "os": "linux",
-              "variant": "v8"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "386",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "riscv64",
-              "os": "linux"
-            },
-            "size": 528
-          },
-          {
-            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
-            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-            "platform": {
-              "architecture": "s390x",
-              "os": "linux"
-            },
-            "size": 528
-          }
-        ],
-        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-        "schemaVersion": 2
-      }
-      """
-
-   Scenario: Endpoint should return an image manifest by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.distribution.manifest.v2+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-        "config": {
-          "mediaType": "application/vnd.docker.container.image.v1+json",
-          "size": 1471,
-          "digest": "sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-        },
-        "layers": [
-          {
-            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
-            "size": 3623807,
-            "digest": "sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-          }
-        ]
-      }
-      """
-
-  Scenario: Endpoint should return an image manifest by tag
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.distribution.manifest.v2+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-        "config": {
-          "mediaType": "application/vnd.docker.container.image.v1+json",
-          "size": 1471,
-          "digest": "sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-        },
-        "layers": [
-          {
-            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
-            "size": 3623807,
-            "digest": "sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-          }
-        ]
-      }
-      """
-
-  Scenario: Endpoint should return an image manifest by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
-      """
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-        "config": {
-          "mediaType": "application/vnd.docker.container.image.v1+json",
-          "size": 1471,
-          "digest": "sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-        },
-        "layers": [
-          {
-            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
-            "size": 3623807,
-            "digest": "sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-          }
-        ]
-      }
-      """
-
-  Scenario: Endpoint should return an image config by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.container.image.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return an image config by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.container.image.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return an image layer by tag
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.image.rootfs.diff.tar.gzip
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an image config by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return an image layer by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.image.rootfs.diff.tar.gzip
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return an image config by version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.container.image.v1+json
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return an image layer by tag
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      Accept: application/vnd.docker.image.rootfs.diff.tar.gzip
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an image layer by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/oci-layout"
     Then the response status should be "404"
 
   Scenario: Endpoint should not return an invalid package
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/invalid/manifests/1.2.3"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an invalid version
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/0.0.0"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an invalid tag
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/invalid"
+    When I send a GET request to "/accounts/linux/engines/oci/invalid/blobs/sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
     Then the response status should be "404"
 
   Scenario: Endpoint should not return an invalid digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:invalid"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/invalid"
     Then the response status should be "404"
 
-  Scenario: Endpoint should support etags (match)
+  Scenario: Endpoint should not return another package's digest
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    And I send the following raw headers:
-      """
-      If-None-Match: W/"4faebb258df2c9f609a7c0817849a028"
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "304"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
+    Then the response status should be "404"
 
-  Scenario: Endpoint should support etags (mismatch)
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    And I send the following raw headers:
-      """
-      If-None-Match: W/"foo"
-      """
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response should contain the following raw headers:
-      """
-      Etag: W/"4faebb258df2c9f609a7c0817849a028"
-      Cache-Control: max-age=86400, private
-      """
-
-  Scenario: Product retrieves their licensed manifest
+  Scenario: Product retrieves their licensed blob
     Given the current account is "linux"
     And I am product "ubuntu" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/74ad090a-7cee-4227-96bc-4af939e8bfa7/index.json
       """
 
   Scenario: Product retrieves their open manifest
     Given the current account is "linux"
     And I am product "alpine" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
       """
 
   Scenario: Product retrieves another product's licensed manifest
     Given the current account is "linux"
     And I am product "alpine" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
     Then the response status should be "404"
 
   Scenario: Product retrieves another product's open manifest
     Given the current account is "linux"
     And I am product "ubuntu" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
     Then the response status should be "404"
 
   Scenario: Product retrieves another account's open manifest
     Given the current account is "keygen"
     And I am product "keygen" of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
     Then the response status should be "401"
 
-  Scenario: License retrieves a manifest for their product (unentitled)
+  # FIXME(ezekg) default sort order in test in ASC but DESC is prod
+  Scenario: Product retrieves a blob with common digest
+    Given the current account is "linux"
+    And I am product "ubuntu" of account "linux"
+    And I use an authentication token
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
+    Then the response status should be "303"
+    # FIXME(ezekg) should be artifact 74ad090a-7cee-4227-96bc-4af939e8bfa7
+    And the response should contain the following raw headers:
+      """
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/c557e7f4-80fc-4fa1-bbbc-a8fc1a37a733/oci-layout
+      """
+
+  Scenario: License retrieves a blob for their product (unentitled)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -938,10 +313,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
     Then the response status should be "404"
 
-  Scenario: License retrieves a manifest for their product (entitled)
+  Scenario: License retrieves a blob for their product (entitled)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -951,200 +326,14 @@ Feature: OCI image manifests
     And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
       """
 
-  Scenario: License retrieves a manifest for their product by version
-    Given the current account is "linux"
-    And the current account has 1 "policy" for the second "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "linux"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
-      """
-
-  Scenario: License retrieves a manifest for their product by tag
-    Given the current account is "linux"
-    And the current account has 1 "policy" for the second "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "linux"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
-      """
-
-  Scenario: License retrieves a manifest for their product by digest
-    Given the current account is "keygen"
-    And the current account has 1 "policy" for the first "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "keygen"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
-            "size": 2196,
-            "platform": {
-              "architecture": "amd64",
-              "os": "linux"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
-            "size": 2196,
-            "platform": {
-              "architecture": "arm64",
-              "os": "linux"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:5003a58c58d300b63dde62d24c40e56f0c12a23127373be0bfce904cfaf6cf46",
-            "size": 566,
-            "annotations": {
-              "vnd.docker.reference.digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
-              "vnd.docker.reference.type": "attestation-manifest"
-            },
-            "platform": {
-              "architecture": "unknown",
-              "os": "unknown"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:bec48978b2eb9496715615e4add1fa70f920c328032a370ccb90b588de4eb3de",
-            "size": 566,
-            "annotations": {
-              "vnd.docker.reference.digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
-              "vnd.docker.reference.type": "attestation-manifest"
-            },
-            "platform": {
-              "architecture": "unknown",
-              "os": "unknown"
-            }
-          }
-        ]
-      }
-      """
-
-  Scenario: License retrieves a manifest for their closed product
+  Scenario: License retrieves a blob for their closed product
     Given the current account is "microsoft"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1153,10 +342,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "microsoft"
     And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
     Then the response status should be "404"
 
-  Scenario: License retrieves a manifest for another closed product
+  Scenario: License retrieves a blob for another closed product
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1165,10 +354,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
     Then the response status should be "401"
 
-  Scenario: License retrieves a manifest for another licensed product
+  Scenario: License retrieves a blob for another licensed product
     Given the current account is "linux"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1177,10 +366,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "linux"
     And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
     Then the response status should be "404"
 
-  Scenario: License retrieves a manifest for another open product
+  Scenario: License retrieves a blob for another open product
     Given the current account is "linux"
     And the current account has 1 "policy" for the second "product" with the following:
       """
@@ -1189,29 +378,14 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "linux"
     And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
       """
 
-  Scenario: License retrieves a manifest for another account
+  Scenario: License retrieves a blob for another account
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1220,10 +394,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
     Then the response status should be "401"
 
-  Scenario: User retrieves a manifest (with unentitled owned license)
+  Scenario: User retrieves a blob (with unentitled owned license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1233,10 +407,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
     Then the response status should be "404"
 
-  Scenario: User retrieves a manifest (with entitled owned license)
+  Scenario: User retrieves a blob (with entitled owned license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1247,29 +421,14 @@ Feature: OCI image manifests
     And the current account has 1 "license-entitlement" for the first "entitlement" and the first "license"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
       """
 
-  Scenario: User retrieves a manifest (with unentitled license)
+  Scenario: User retrieves a blob (with unentitled license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1280,10 +439,10 @@ Feature: OCI image manifests
     And the current account has 1 "license-user" for the first "license" and the last "user"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
     Then the response status should be "404"
 
-  Scenario: User retrieves a manifest (with entitled license)
+  Scenario: User retrieves a blob (with entitled license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1295,203 +454,14 @@ Feature: OCI image manifests
     And the current account has 1 "license-user" for the first "license" and the last "user"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
       """
 
-  Scenario: User retrieves a manifest by version
-    Given the current account is "linux"
-    And the current account has 1 "policy" for the second "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
-    And I am the last user of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
-      """
-
-  Scenario: User retrieves a manifest by tag
-    Given the current account is "linux"
-    And the current account has 1 "policy" for the second "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
-    And I am the last user of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
-      """
-
-  Scenario: User retrieves a manifest by digest
-    Given the current account is "keygen"
-    And the current account has 1 "policy" for the first "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "user"
-    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
-    And I am the last user of account "keygen"
-    And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
-      """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
-            "size": 2196,
-            "platform": {
-              "architecture": "amd64",
-              "os": "linux"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
-            "size": 2196,
-            "platform": {
-              "architecture": "arm64",
-              "os": "linux"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:5003a58c58d300b63dde62d24c40e56f0c12a23127373be0bfce904cfaf6cf46",
-            "size": 566,
-            "annotations": {
-              "vnd.docker.reference.digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
-              "vnd.docker.reference.type": "attestation-manifest"
-            },
-            "platform": {
-              "architecture": "unknown",
-              "os": "unknown"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "digest": "sha256:bec48978b2eb9496715615e4add1fa70f920c328032a370ccb90b588de4eb3de",
-            "size": 566,
-            "annotations": {
-              "vnd.docker.reference.digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
-              "vnd.docker.reference.type": "attestation-manifest"
-            },
-            "platform": {
-              "architecture": "unknown",
-              "os": "unknown"
-            }
-          }
-        ]
-      }
-      """
-
-  Scenario: User retrieves a closed manifest (with license)
+  Scenario: User retrieves a closed blob (with license)
     Given the current account is "microsoft"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1501,79 +471,49 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "microsoft"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
     Then the response status should be "404"
 
-  Scenario: User retrieves a closed manifest (no license)
+  Scenario: User retrieves a closed blob (no license)
     Given the current account is "linux"
     And  the current account has 1 "user"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
     Then the response status should be "401"
 
-  Scenario: User retrieves a licensed manifest (no license)
+  Scenario: User retrieves a licensed blob (no license)
     Given the current account is "linux"
     And  the current account has 1 "user"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
     Then the response status should be "404"
 
-  Scenario: User retrieves an open manifest (no license)
+  Scenario: User retrieves an open blob (no license)
     Given the current account is "linux"
     And  the current account has 1 "user"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
       """
 
-  Scenario: Anon retrieves a closed manifest
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+  Scenario: Anon retrieves a closed blob
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves a licensed manifest
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.3.0"
+  Scenario: Anon retrieves a licensed blob
+    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves an open manifest
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "200"
-    And the response body should be a JSON document with the following content:
+  Scenario: Anon retrieves an open blob
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    Then the response status should be "303"
+    And the response should contain the following raw headers:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
       """
