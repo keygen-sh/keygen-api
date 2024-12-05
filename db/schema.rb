@@ -549,7 +549,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
     t.index ["account_id", "created_at"], name: "index_release_descriptors_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["content_digest", "release_artifact_id"], name: "idx_on_content_digest_release_artifact_id_ca13eb81a4", unique: true
     t.index ["content_path", "release_artifact_id"], name: "idx_on_content_path_release_artifact_id_7ec9f722af", unique: true
-    t.index ["content_type", "release_artifact_id"], name: "idx_on_content_type_release_artifact_id_039cc326e1"
+    t.index ["content_type"], name: "index_release_descriptors_on_content_type"
     t.index ["environment_id"], name: "index_release_descriptors_on_environment_id"
     t.index ["release_artifact_id"], name: "index_release_descriptors_on_release_artifact_id"
     t.index ["release_id"], name: "index_release_descriptors_on_release_id"
@@ -618,7 +618,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
     t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["content_digest", "release_artifact_id"], name: "idx_on_content_digest_release_artifact_id_cba1f00640", unique: true
     t.index ["content_path", "release_artifact_id"], name: "idx_on_content_path_release_artifact_id_f77b8efd5b", unique: true
-    t.index ["content_type", "release_artifact_id"], name: "idx_on_content_type_release_artifact_id_f442b302f3"
+    t.index ["content_type"], name: "index_release_manifests_on_content_type"
     t.index ["environment_id"], name: "index_release_manifests_on_environment_id"
     t.index ["release_artifact_id"], name: "index_release_manifests_on_release_artifact_id"
     t.index ["release_id"], name: "index_release_manifests_on_release_id"

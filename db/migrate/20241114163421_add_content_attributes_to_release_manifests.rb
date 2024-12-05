@@ -15,7 +15,7 @@ class AddContentAttributesToReleaseManifests < ActiveRecord::Migration[7.2]
       algorithm: :concurrently,
       unique: true
 
-    add_index :release_manifests, %i[content_type release_artifact_id],
+    add_index :release_manifests, :content_type,
       algorithm: :concurrently
   end
 end
