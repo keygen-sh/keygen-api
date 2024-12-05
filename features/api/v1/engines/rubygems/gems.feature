@@ -76,7 +76,7 @@ Feature: Rubygems download gem
     Then the response status should be "403"
     And the response should contain the following headers:
       """
-      { "Content-Type": "application/json; charset=utf-8" }
+      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
       """
 
   @mp

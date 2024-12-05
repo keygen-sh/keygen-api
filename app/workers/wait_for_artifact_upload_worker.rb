@@ -54,6 +54,14 @@ class WaitForArtifactUploadWorker < BaseWorker
       )
 
       ProcessNpmPackageWorker.perform_async(artifact.id)
+    in filetype: ReleaseFiletype(:tar), engine: ReleaseEngine(:oci)
+      BroadcastEventService.call(
+        event: 'artifact.upload.processing',
+        account: artifact.account,
+        resource: artifact,
+      )
+
+      ProcessOciImageWorker.perform_async(artifact.id)
     else
       artifact.update!(status: 'UPLOADED')
 

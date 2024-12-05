@@ -4,11 +4,12 @@ require 'minitar'
 require 'zlib'
 
 class ProcessNpmPackageWorker < BaseWorker
-  MIN_TARBALL_SIZE  = 5.bytes      # to avoid processing empty or invalid tarballs
-  MAX_TARBALL_SIZE  = 25.megabytes # to avoid downloading large tarballs
+  MIN_TARBALL_SIZE  = 28.bytes     # to avoid processing empty or invalid gz tarballs
+  MAX_TARBALL_SIZE  = 32.megabytes # to avoid downloading large tarballs
   MAX_MANIFEST_SIZE = 1.megabyte   # to avoid storing large manifests
 
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :critical,
+                  retry: false
 
   def perform(artifact_id)
     artifact = ReleaseArtifact.find(artifact_id)
@@ -20,14 +21,24 @@ class ProcessNpmPackageWorker < BaseWorker
       raise PackageNotAcceptableError, 'unacceptable filesize'
     end
 
-    # download the package tarball
+    # download the package tarball in chunks to reduce memory footprint
     client = artifact.client
-    tgz    = client.get_object(bucket: artifact.bucket, key: artifact.key)
-                   .body
+    enum   = Enumerator.new do |yielder|
+      client.get_object(bucket: artifact.bucket, key: artifact.key) do |chunk|
+        yielder << chunk
+      end
+    end
 
-    # unpack the package tarball
+    # wrap the enumerator to provide an IO-like interface
+    tgz = EnumeratorIO.new(enum)
+
+    # gunzip the package tarball
     tar = gunzip(tgz)
 
+    # keep a ref to the manifest
+    manifest = nil
+
+    # unpack the package tarball
     unpack tar do |archive|
       # NOTE(ezekg) npm prefixes everything in the archive with package/
       entry = archive.find { _1.name in 'package/package.json' }
@@ -42,20 +53,28 @@ class ProcessNpmPackageWorker < BaseWorker
         entry.size > MAX_MANIFEST_SIZE
 
       # parse/validate and minify the manifest
-      json = JSON.parse(entry.read)
-                 .to_json
+      content = JSON.parse(entry.read)
+                    .to_json
 
-      ReleaseManifest.create!(
+      manifest = ReleaseManifest.create!(
         account_id: artifact.account_id,
         environment_id: artifact.environment_id,
         release_id: artifact.release_id,
         release_artifact_id: artifact.id,
-        content: json,
+        content_digest: "sha512-#{Digest::SHA512.hexdigest(content)}",
+        content_type: 'application/vnd.npm.install-v1+json',
+        content_length: content.bytesize,
+        content_path: 'package.json',
+        content:,
       )
     end
 
-    # not sure why GzipReader#open doesn't take an io?
+    # not sure why GzipReader#open doesn't take an IO ala every other IO-like?
     tar.close
+
+    # we can assume package tarball is invalid if there's no manifest
+    raise PackageNotAcceptableError, 'manifest is missing' if
+      manifest.nil?
 
     artifact.update!(status: 'UPLOADED')
 
@@ -68,6 +87,7 @@ class ProcessNpmPackageWorker < BaseWorker
          ActiveRecord::RecordInvalid,
          JSON::ParserError,
          Zlib::Error,
+         Minitar::UnexpectedEOF,
          Minitar::Error,
          IOError => e
     Keygen.logger.warn { "[workers.process-npm-package-worker] Error: #{e.class.name} - #{e.message}" }
@@ -84,7 +104,11 @@ class ProcessNpmPackageWorker < BaseWorker
   private
 
   def gunzip(io)    = Zlib::GzipReader.new(io)
-  def unpack(io, &) = Minitar::Reader.open(io, &)
+  def unpack(io, &)
+    Minitar::Reader.open(io, &)
+  rescue ArgumentError => e # octal encoding error
+    raise PackageNotAcceptableError, e.message
+  end
 
   class PackageNotAcceptableError < StandardError
     def backtrace = nil # silence backtrace

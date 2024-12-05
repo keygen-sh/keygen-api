@@ -37,6 +37,8 @@ describe ProcessRubyGemWorker do
       it 'should process gem' do
         expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
 
+        expect(artifact.manifest.content_type).to eq 'application/x-yaml'
+        expect(artifact.manifest.content_path).to eq gemspec.file_name
         expect(artifact.manifest.content).to eq gemspec.to_yaml
         expect(artifact.status).to eq 'UPLOADED'
       end

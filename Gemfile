@@ -59,6 +59,7 @@ gem 'verbose_migrations'
 gem 'temporary_tables'
 gem 'statement_timeout'
 gem 'union_of'
+gem 'order_as_specified'
 
 # Pattern matching
 gem 'rails-pattern_matching'

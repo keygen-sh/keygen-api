@@ -21,6 +21,8 @@ class ReleasePackage < ApplicationRecord
     dependent: :destroy_async
   has_many :manifests,
     through: :releases
+  has_many :descriptors,
+    through: :releases
   has_many :artifacts,
     through: :releases,
     source: :artifacts
@@ -107,8 +109,9 @@ class ReleasePackage < ApplicationRecord
   scope :raw,            ->     { for_engine_key('raw') }
   scope :rubygems,       ->     { for_engine_key('rubygems') }
   scope :npm,            ->     { for_engine_key('npm') }
+  scope :oci,            ->     { for_engine_key('oci') }
 
-  delegate :pypi?, :tauri?, :raw?, :rubygems?, :npm?,
+  delegate :pypi?, :tauri?, :raw?, :rubygems?, :npm?, :oci?,
     to: :engine,
     allow_nil: true
 
