@@ -8,17 +8,24 @@ module Rendering
       include ActionController::MimeResponds
 
       # overload render method to automatically set content type
-      def render(args, ...)
-        case args
-        in jsonapi:
+      def render(options, ...)
+        mime_type, * = Mime::Type.parse(response.content_type.to_s) rescue nil
+
+        # skip if we've already set content type
+        unless mime_type.nil?
+          return super
+        end
+
+        case options
+        in jsonapi: _
           response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-        in json:
+        in json: _
           response.content_type = Mime::Type.lookup_by_extension(:json)
-        in body:
+        in body: _
           response.content_type = Mime::Type.lookup_by_extension(:binary)
-        in html:
+        in html: _
           response.content_type = Mime::Type.lookup_by_extension(:html)
-        in gz:
+        in gz: _
           response.content_type = Mime::Type.lookup_by_extension(:gzip)
         else
           # leave as-is

@@ -13,6 +13,7 @@ class ReleaseEngine < ApplicationRecord
     raw
     rubygems
     npm
+    oci
   ]
 
   has_many :packages,
@@ -112,6 +113,7 @@ class ReleaseEngine < ApplicationRecord
   def raw?      = key == 'raw'
   def rubygems? = key == 'rubygems'
   def npm?      = key == 'npm'
+  def oci?      = key == 'oci'
 
   ##
   # deconstruct allows pattern pattern matching like:

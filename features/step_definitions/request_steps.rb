@@ -97,7 +97,11 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  unless path.starts_with?('//')
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    post path
+  end
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
@@ -111,7 +115,11 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
   else
   end
 
-  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  unless path.starts_with?('//')
+    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    put path
+  end
 end
 
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
@@ -125,7 +133,11 @@ When /^I send a PATCH request to "([^\"]*)"$/ do |path|
   else
   end
 
-  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  unless path.starts_with?('//')
+    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    patch path
+  end
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
@@ -140,7 +152,11 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  unless path.starts_with?('//')
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  else
+    post path, body
+  end
 end
 
 When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
@@ -155,7 +171,11 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
   else
   end
 
-  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+  unless path.starts_with?('//')
+    post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+  else
+    post path, body.encode!('CP1252')
+  end
 end
 
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
@@ -170,7 +190,11 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
   else
   end
 
-  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  unless path.starts_with?('//')
+    patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  else
+    patch path, body
+  end
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
@@ -185,7 +209,11 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   else
   end
 
-  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  unless path.starts_with?('//')
+    put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  else
+    put path, body
+  end
 end
 
 When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, body|
@@ -200,7 +228,11 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   else
   end
 
-  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  unless path.starts_with?('//')
+    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  else
+    delete path, body
+  end
 
   drain_async_destroy_jobs
 end
@@ -216,7 +248,11 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   else
   end
 
-  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  unless path.starts_with?('//')
+    delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    delete path
+  end
 
   drain_async_destroy_jobs
 rescue Timeout::Error
@@ -810,7 +846,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
   headers = body.split(/\n/)
 
   headers.each do |raw|
-    key, value = raw.split(':')
+    key, value = raw.split(':', 2)
 
     expect(last_response.headers[key]).to eq value&.strip
   end
