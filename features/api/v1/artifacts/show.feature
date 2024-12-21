@@ -250,6 +250,42 @@ Feature: Show release artifact
     And sidekiq should have 2 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin retrieves an artifact using valid vanity filename
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "foo.zip" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0/foo.zip"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact using invalid vanity filename
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "foo.zip" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0/bar.zip"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Developer retrieves an artifact for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
