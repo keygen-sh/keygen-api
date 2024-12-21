@@ -2,8 +2,6 @@
 
 require 'digest'
 
-require_relative 'digest_io'
-
 module Keygen
   module Exporter
     class Writer
