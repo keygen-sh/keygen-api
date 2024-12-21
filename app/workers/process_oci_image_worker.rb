@@ -6,7 +6,7 @@ require Rails.root / 'lib/oci_image_layout'
 
 class ProcessOciImageWorker < BaseWorker
   MIN_TARBALL_SIZE  = 512.bytes     # to avoid processing empty or invalid tarballs
-  MAX_TARBALL_SIZE  = 512.megabytes # to avoid downloading excessive tarballs
+  MAX_TARBALL_SIZE  = 1.gigabyte    # to avoid downloading excessive tarballs
   MAX_MANIFEST_SIZE = 1.megabyte    # to avoid storing large manifests
   MAX_BLOB_SIZE     = 512.megabytes # to avoid storing large layers
 
