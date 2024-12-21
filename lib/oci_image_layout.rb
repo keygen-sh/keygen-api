@@ -185,7 +185,8 @@ module OciImageLayout
 
   class Index < Blob
     attr_reader :media_type,
-                :manifests
+                :manifests,
+                :version
 
     def initialize(io, fs:, **)
       data       = JSON.parse(io.read)
@@ -193,6 +194,7 @@ module OciImageLayout
 
       super(io, media_type:, fs:, **)
 
+      @version   = data['schemaVersion']
       @manifests = data['manifests'].map do |manifest|
         Manifest.from_json(manifest, fs:)
       end
