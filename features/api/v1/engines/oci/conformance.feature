@@ -52,7 +52,7 @@ Feature: OCI spec conformance
     Then the response status should be "405"
 
   @mp
-  Scenario: Endpoint should fail delete
+  Scenario: Endpoint should fail yank
     Given I am an admin of account "linux"
     And I use an authentication token
     When I send a DELETE request to "//oci.pkg.keygen.sh/v2/linux/alpine/manifests/3.20.2"
@@ -73,7 +73,7 @@ Feature: OCI spec conformance
     Then the response status should be "405"
 
   @sp
-  Scenario: Endpoint should fail delete
+  Scenario: Endpoint should fail yank
     Given I am an admin of account "linux"
     And I use an authentication token
     When I send a DELETE request to "//oci.pkg.keygen.sh/v2/alpine/manifests/3.20.2"
