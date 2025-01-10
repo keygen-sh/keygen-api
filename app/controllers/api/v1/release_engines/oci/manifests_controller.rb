@@ -2,6 +2,7 @@
 
 module Api::V1::ReleaseEngines
   class Oci::ManifestsController < Api::V1::BaseController
+    before_action :require_ee!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
@@ -34,6 +35,8 @@ module Api::V1::ReleaseEngines
     private
 
     attr_reader :package
+
+    def require_ee! = super(entitlements: %i[oci_engine])
 
     def set_package
       scoped_packages = authorized_scope(current_account.release_packages.oci)

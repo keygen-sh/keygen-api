@@ -1,4 +1,5 @@
 @api/v1
+@ee
 Feature: OCI image manifests
   Background:
     Given the following "accounts" exist:
