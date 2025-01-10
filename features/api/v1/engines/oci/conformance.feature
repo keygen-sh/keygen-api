@@ -1,4 +1,5 @@
 @api/v1
+@ee
 Feature: OCI spec conformance
   Background:
     Given the following "accounts" exist:
