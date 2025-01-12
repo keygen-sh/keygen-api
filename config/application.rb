@@ -43,8 +43,11 @@ module Keygen
     # remove unneeded Rails middlware
     config.middleware.delete ActionDispatch::ShowExceptions
 
-    # Ignore X-Forwarded-For header
+    # ignore X-Forwarded-For header
     config.middleware.insert_before 0, Keygen::Middleware::IgnoreForwardedHost
+
+    # rewrite * to */* Accept header
+    config.middleware.insert_before 0, Keygen::Middleware::RewriteAcceptAll
 
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and

@@ -86,8 +86,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :forbidden, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -113,8 +111,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :unauthorized, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -138,8 +134,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :unprocessable_entity, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -163,8 +157,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :not_found, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -189,8 +181,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :bad_request, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -214,8 +204,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :conflict, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -239,8 +227,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :payment_required, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -264,8 +250,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :internal_server_error, json: {
           meta: { id: request.request_id },
           errors: [{
@@ -289,8 +273,6 @@ class ApplicationController < ActionController::API
 
     respond_to do |format|
       format.any {
-        response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
-
         render status: :service_unavailable, json: {
           meta: { id: request.request_id },
           errors: [{

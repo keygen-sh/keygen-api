@@ -212,6 +212,7 @@ module Keygen
           method       = request.method
           path         = request.path
 
+          # special snowflake cases
           case { method:, path: }
           in method: 'PUT', path: %r(/artifact$)
             # electron-builder < v24.6.3 sets a JSON content-type, but it actually sends
@@ -234,14 +235,11 @@ module Keygen
             # off the bat. In theory, this would slightly improve onboarding DX.
             #
             # FIXME(ezekg) This was a terrible idea and I'd like to deprecate it.
-            if content_type.blank? ||
-               mime_type == Mime::Type.lookup_by_extension(:url_encoded_form) ||
-               mime_type == Mime::Type.lookup_by_extension(:multipart_form) ||
-               mime_type == Mime::Type.lookup_by_extension(:text)
+            if content_type.blank? || (mime_type in Mime::Type[:url_encoded_form | :multipart_form | :text])
               env['CONTENT_TYPE'] = 'application/json'
             end
           else
-            # Leave as-is
+            # leave as-is
           end
         rescue Mime::Type::InvalidMimeType
           # will be handled later
@@ -271,6 +269,16 @@ module Keygen
         #
         # See: https://github.com/rails/rails/issues/29893
         env.delete('HTTP_X_FORWARDED_HOST')
+
+        @app.call(env)
+      end
+    end
+
+    class RewriteAcceptAll
+      def initialize(app) = @app = app
+      def call(env)
+        # please lord give me strength (some real clients send * even though it's invalid)
+        env['HTTP_ACCEPT'] = '*/*' if env['HTTP_ACCEPT'] == '*'
 
         @app.call(env)
       end

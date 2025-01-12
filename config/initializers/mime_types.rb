@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Mime::Type.register 'application/octet-stream', :binary
-Mime::Type.register 'application/vnd.api+json', :jsonapi, %W[
+Mime::Type.register 'application/vnd.api+json', :jsonapi, %w[
   application/vnd.keygen+json
 ]
 
