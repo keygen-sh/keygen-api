@@ -21,7 +21,6 @@ module DefaultHeaders
     add_content_security_policy_headers
     add_rate_limiting_headers
     add_cache_control_headers
-    add_content_type_header
     add_whoami_headers
     add_environment_header
     add_license_header
@@ -62,35 +61,6 @@ module DefaultHeaders
     response.headers['X-RateLimit-Limit']     = data[:limit]
     response.headers['X-RateLimit-Remaining'] = data[:remaining]
     response.headers['X-RateLimit-Reset']     = data[:reset]
-  rescue => e
-    Keygen.logger.exception(e)
-  end
-
-  def add_content_type_header
-    # We consider both application/vnd.api+json and application/json as
-    # synonyms of the :jsonapi format, but we still want to respond
-    # with application/json if asked to do so, for compatibility
-    # with various HTTP clients, e.g. cpp-rest-sdk.
-    mime_type, * = Mime::Type.parse(response.content_type.to_s)
-    return unless
-      mime_type == :jsonapi || mime_type == :json # skip for non-JSON responses
-
-    jsonapi = Mime::Type.lookup_by_extension(:jsonapi)
-    json    = Mime::Type.lookup_by_extension(:json)
-    accepts = Mime::Type.parse(
-      request.headers['Accept'].to_s,
-    )
-
-    # NOTE(ezekg) Using content_type instead of headers['Content-Type']
-    #             allows us to retain the current charset.
-    case
-    when accepts.any? { _1 == '*/*' || _1 == jsonapi }
-      response.content_type = jsonapi.to_s
-    when accepts.any? { _1 == json }
-      response.content_type = json.to_s
-    else
-      # leave as-is
-    end
   rescue => e
     Keygen.logger.exception(e)
   end

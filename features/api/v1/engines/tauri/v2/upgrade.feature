@@ -84,7 +84,7 @@ Feature: Tauri v2 upgrade application
     Then the response status should be "403"
     And the response should contain the following headers:
       """
-      { "Content-Type": "application/vnd.api+json; charset=utf-8" }
+      { "Content-Type": "application/json; charset=utf-8" }
       """
 
   @mp
@@ -94,6 +94,10 @@ Feature: Tauri v2 upgrade application
     And I use an authentication token
     When I send a GET request to "//tauri.pkg.keygen.sh/test1/app1?platform=linux&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/json; charset=utf-8" }
+      """
     And the response body should include the following:
       """
       {
@@ -110,6 +114,10 @@ Feature: Tauri v2 upgrade application
     And I use an authentication token
     When I send a GET request to "//tauri.pkg.keygen.sh/app1?platform=linux&arch=x86_64&version=1.0.0"
     Then the response status should be "200"
+    And the response should contain the following headers:
+      """
+      { "Content-Type": "application/json; charset=utf-8" }
+      """
     And the response body should include the following:
       """
       {

@@ -7,26 +7,39 @@ module Rendering
     included do
       include ActionController::MimeResponds
 
-      # overload render method to automatically set content type
+      # overload render method to more intelligently set the content-type header, regardless
+      # of the current route default format (which is a great default but can fall short)
       def render(options, ...)
-        mime_type, * = Mime::Type.parse(response.content_type.to_s) rescue nil
-
-        # skip if we've already set content type
-        unless mime_type.nil?
-          return super
-        end
+        return super unless response.content_type.nil?
 
         case options
         in jsonapi: _
-          response.content_type = Mime::Type.lookup_by_extension(:jsonapi)
+          # NOTE(ezekg) we're using request.accepts instead of request.formats because #formats
+          #             prioritizes route default format over accept header, which isn't what
+          #             we want (i.e. we *always* want to respond in the requested format)
+          case request.accepts
+          in [*, Mime::Type[:json], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == -1 # respect priority
+            response.content_type = Mime[:json]
+          else
+            response.content_type = Mime[:jsonapi]
+          end
         in json: _
-          response.content_type = Mime::Type.lookup_by_extension(:json)
+          case request.accepts
+          in [*, Mime::Type[:jsonapi], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == 1 # respect preference
+            response.content_type = Mime[:jsonapi]
+          in [*, Mime::Type[:json], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == -1 # respect priority
+            response.content_type = Mime[:json]
+          in [*] unless request.format == :json # json is largely synonymous with jsonapi (unless the route format is json)
+            response.content_type = Mime[:jsonapi]
+          else
+            response.content_type = Mime[:json]
+          end
         in body: _
-          response.content_type = Mime::Type.lookup_by_extension(:binary)
+          response.content_type = Mime[:binary]
         in html: _
-          response.content_type = Mime::Type.lookup_by_extension(:html)
+          response.content_type = Mime[:html]
         in gz: _
-          response.content_type = Mime::Type.lookup_by_extension(:gzip)
+          response.content_type = Mime[:gzip]
         else
           # leave as-is
         end

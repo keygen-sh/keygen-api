@@ -89,13 +89,50 @@ Feature: Show license
       """
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Admin retrieves a license for their account with a wildcard accept header
+  Scenario: Admin retrieves a license for their account with a deprioritized wildcard accept header
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I send the following raw headers:
       """
       Accept: application/json, text/plain, */*
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response body should be a "license"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response should contain a valid signature header for "test1"
+
+  # FIXME(ezekg) is this a bug? feel like it should be application/vnd.api+json...
+  Scenario: Admin retrieves a license for their account with a prioritized wildcard accept header
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And I send the following raw headers:
+      """
+      Accept: */*, application/json, text/plain
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response body should be a "license"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin retrieves a license for their account with a wildcard accept header
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And I send the following raw headers:
+      """
+      Accept: */*
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
