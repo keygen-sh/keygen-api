@@ -8,31 +8,25 @@ module Rendering
       include ActionController::MimeResponds
 
       # overload render method to more intelligently set the content-type header, regardless
-      # of the current route default format (which is a great default but can fall short)
+      # of the current route default format (which is a great default but can fall short
+      # when a user accepts a content-type that differs from the route format)
       def render(options, ...)
         return super unless response.content_type.nil?
 
         case options
-        in jsonapi: _
+        in { jsonapi: _ } | { json: _ }
           # NOTE(ezekg) we're using request.accepts instead of request.formats because #formats
           #             prioritizes route default format over accept header, which isn't what
           #             we want (i.e. we *always* want to respond in the requested format)
           case request.accepts
-          in [*, Mime::Type[:json], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == -1 # respect priority
+          in [*, Mime::Type[:jsonapi], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == 1 # respect priority
+            response.content_type = Mime[:jsonapi]
+          in [*, Mime::Type[:json], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == -1
+            response.content_type = Mime[:json]
+          in [*] if request.format == :json # json is largely synonymous with jsonapi unless the route format is json
             response.content_type = Mime[:json]
           else
             response.content_type = Mime[:jsonapi]
-          end
-        in json: _
-          case request.accepts
-          in [*, Mime::Type[:jsonapi], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == 1 # respect preference
-            response.content_type = Mime[:jsonapi]
-          in [*, Mime::Type[:json], *] unless (request.accepts.index(Mime[:jsonapi]) <=> request.accepts.index(Mime[:json])) == -1 # respect priority
-            response.content_type = Mime[:json]
-          in [*] unless request.format == :json # json is largely synonymous with jsonapi (unless the route format is json)
-            response.content_type = Mime[:jsonapi]
-          else
-            response.content_type = Mime[:json]
           end
         in body: _
           response.content_type = Mime[:binary]
