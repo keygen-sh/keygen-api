@@ -1,6 +1,6 @@
 @api/v1
 @ee
-Feature: OCI image blobs
+Feature: OCI image tags
   Background:
     Given the following "accounts" exist:
       | id                                   | slug      | name      |
@@ -28,11 +28,11 @@ Feature: OCI image blobs
       | 07b67f68-c88c-4d57-897f-f443adf43be9 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 6198261a-48b5-4445-a045-9fed4afc7735 | 46e034fe-2312-40f8-bbeb-7d9957fb6fcf | 3.20.4     | stable   |          | DRAFT     |              |
       | b180e2fd-49b1-4ace-8a5f-bdea2eb188db | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 54dbf634-ba9a-44ca-9f2d-f69405bb139c | ba6a3950-4f18-468f-97af-8706f84d5bfb | 22.04.0    | stable   | jammy    | PUBLISHED |              |
       | a6a6d11d-d456-4a27-bade-90579d4cdf47 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 54dbf634-ba9a-44ca-9f2d-f69405bb139c | ba6a3950-4f18-468f-97af-8706f84d5bfb | 24.10.0    | stable   | oracular | PUBLISHED |              |
-      | 81d5e2fd-9b10-4995-802b-f54425551211 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 54dbf634-ba9a-44ca-9f2d-f69405bb139c | ba6a3950-4f18-468f-97af-8706f84d5bfb | 24.10.1    | stable   |          | DRAFT     |              |
-      | c5efaaed-f13d-411f-bf6e-4a4706ca3010 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.4.1      | stable   |          | PUBLISHED |              |
-      | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.4.0      | stable   |          | PUBLISHED | INSIDER      |
+      | 81d5e2fd-9b10-4995-802b-f54425551211 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 54dbf634-ba9a-44ca-9f2d-f69405bb139c | ba6a3950-4f18-468f-97af-8706f84d5bfb | 24.10.1    | stable   | latest   | DRAFT     |              |
+      | c5efaaed-f13d-411f-bf6e-4a4706ca3010 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.4.1      | stable   | v1.4     | PUBLISHED |              |
+      | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.4.0      | stable   | insider  | PUBLISHED | INSIDER      |
       | 743f1204-c91a-41b6-86e0-07a5fce716d3 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.3.0      | stable   | latest   | PUBLISHED |              |
-      | 7a5e615a-7814-4ca5-9163-66231d54ab73 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.2.0      | stable   |          | YANKED    |              |
+      | 7a5e615a-7814-4ca5-9163-66231d54ab73 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 1c59ac75-35ba-4752-ab69-9fd379a958b8 | a81a0707-7ef2-417e-8597-ebedba6508ac | 1.2.0      | stable   | v1.2     | YANKED    |              |
       | d08b8b81-ae2b-49f7-a9c2-442f89b327b4 | 9f3d711d-55ea-49ed-9155-9acf4e4a347b | b753b26a-836a-410f-9b3d-74a95d27dbc0 | 09b859da-d026-414e-a5c0-3ac756da706c | 26100.2314 | stable   | 24H2     | PUBLISHED |              |
     And the following "artifacts" exist:
       | id                                   | account_id                           | release_id                           | filename           | filetype | filesize | platform | arch  | checksum                                                         | status     | created_at               | updated_at               |
@@ -113,7 +113,7 @@ Feature: OCI image blobs
     And the account "linux" is canceled
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
     Then the response status should be "403"
     And the response should contain the following raw headers:
       """
@@ -125,189 +125,152 @@ Feature: OCI image blobs
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-    Then the response status should be "303"
+    When I send a GET request to "//oci.pkg.keygen.sh/v2/linux/alpine/tags/list"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json; charset=utf-8
+      """
 
   @sp
   Scenario: Endpoint should be accessible from subdomain
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "//oci.pkg.keygen.sh/v2/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-    Then the response status should be "303"
-
-  @mp
-  Scenario: Endpoint should pass blob ack
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    When I send a GET request to "//oci.pkg.keygen.sh/v2/alpine/tags/list"
     Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json; charset=utf-8
+      """
 
-  @mp
-  Scenario: Endpoint should fail blob ack
+  Scenario: Admin retrieves their licensed package's tags
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/linux/alpine/blobs/foo"
-    Then the response status should be "404"
-
-  @sp
-  Scenario: Endpoint should pass blob ack
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
     Then the response status should be "200"
-
-  @sp
-  Scenario: Endpoint should fail blob ack
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/blobs/foo"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should return a layout blob by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
-    Then the response status should be "303"
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/oci-layout
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "ubuntu",
+        "tags": [
+          "jammy",
+          "latest",
+          "oracular"
+        ]
+      }
       """
 
-  Scenario: Endpoint should return an index blob by digest
+  Scenario: Admin retrieves their open package's tags
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
       """
 
-  Scenario: Endpoint should return a manifest blob by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
+  Scenario: Product retrieves their closed package's tags
+    Given the current account is "microsoft"
+    And I am product "windows" of account "microsoft"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/tags/list"
+    Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "windows",
+        "tags": [
+          "24H2"
+        ]
+      }
       """
 
-  Scenario: Endpoint should return a layer blob by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
-      """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170
-      """
-
-  Scenario: Endpoint should return an image blob by digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
-      """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/blobs%2Fsha256%2F91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b
-      """
-
-  Scenario: Endpoint not should return a blob by filename
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/oci-layout"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an invalid package
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/invalid/blobs/sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return an invalid digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/invalid"
-    Then the response status should be "404"
-
-  Scenario: Endpoint should not return another package's digest
-    Given the current account is "linux"
-    And I am an admin of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
-    Then the response status should be "404"
-
-  Scenario: Product retrieves their licensed blob
+  Scenario: Product retrieves their licensed package's tags
     Given the current account is "linux"
     And I am product "ubuntu" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
+    Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/74ad090a-7cee-4227-96bc-4af939e8bfa7/index.json
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "ubuntu",
+        "tags": [
+          "jammy",
+          "latest",
+          "oracular"
+        ]
+      }
       """
 
-  Scenario: Product retrieves their open manifest
+  Scenario: Product retrieves their open package's tags
     Given the current account is "linux"
     And I am product "alpine" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
+      Content-Type: application/json; charset=utf-8
+      """
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
       """
 
-  Scenario: Product retrieves another product's licensed manifest
+  Scenario: Product retrieves a licensed package's tags
     Given the current account is "linux"
     And I am product "alpine" of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
     Then the response status should be "404"
-
-  Scenario: Product retrieves another product's open manifest
-    Given the current account is "linux"
-    And I am product "ubuntu" of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "404"
-
-  Scenario: Product retrieves another account's open manifest
-    Given the current account is "keygen"
-    And I am product "keygen" of account "keygen"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "401"
-
-  # FIXME(ezekg) default sort order in test in ASC but DESC is prod
-  Scenario: Product retrieves a blob with common digest
-    Given the current account is "linux"
-    And I am product "ubuntu" of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
-    Then the response status should be "303"
-    # FIXME(ezekg) should be artifact 74ad090a-7cee-4227-96bc-4af939e8bfa7
     And the response should contain the following raw headers:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/c557e7f4-80fc-4fa1-bbbc-a8fc1a37a733/oci-layout
+      Content-Type: application/json; charset=utf-8
       """
 
-  Scenario: License retrieves a blob for their product (unentitled)
+  Scenario: Product retrieves an open package's tags
+    Given the current account is "linux"
+    And I am product "ubuntu" of account "linux"
+    And I use an authentication token
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "404"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json; charset=utf-8
+      """
+
+  Scenario: License retrieves their licensed package's tags (unentitled)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -316,10 +279,20 @@ Feature: OCI image blobs
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "api",
+        "tags": [
+          "latest",
+          "v1.4"
+        ]
+      }
+      """
 
-  Scenario: License retrieves a blob for their product (entitled)
+  Scenario: License retrieves their licensed package's tags (entitled)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -329,50 +302,21 @@ Feature: OCI image blobs
     And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
+      {
+        "name": "api",
+        "tags": [
+          "insider",
+          "latest",
+          "v1.4"
+        ]
+      }
       """
 
-  Scenario: License retrieves a blob for their closed product
-    Given the current account is "microsoft"
-    And the current account has 1 "policy" for the first "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "microsoft"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
-    Then the response status should be "404"
-
-  Scenario: License retrieves a blob for another closed product
-    Given the current account is "keygen"
-    And the current account has 1 "policy" for the first "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "keygen"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
-    Then the response status should be "401"
-
-  Scenario: License retrieves a blob for another licensed product
-    Given the current account is "linux"
-    And the current account has 1 "policy" for the first "product" with the following:
-      """
-      { "authenticationStrategy": "LICENSE" }
-      """
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "linux"
-    And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
-    Then the response status should be "404"
-
-  Scenario: License retrieves a blob for another open product
+  Scenario: License retrieves their licensed package's tags
     Given the current account is "linux"
     And the current account has 1 "policy" for the second "product" with the following:
       """
@@ -381,26 +325,86 @@ Feature: OCI image blobs
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "linux"
     And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
+      {
+        "name": "ubuntu",
+        "tags": [
+          "jammy",
+          "oracular"
+        ]
+      }
       """
 
-  Scenario: License retrieves a blob for another account
-    Given the current account is "keygen"
+  Scenario: License retrieves their open package's tags
+    Given the current account is "linux"
     And the current account has 1 "policy" for the first "product" with the following:
       """
       { "authenticationStrategy": "LICENSE" }
       """
     And the current account has 1 "license" for the first "policy"
-    And I am a license of account "keygen"
+    And I am a license of account "linux"
     And I authenticate with my key
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "401"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
+      """
 
-  Scenario: User retrieves a blob (with unentitled owned license)
+  Scenario: License retrieves a closed package's tags
+    Given the current account is "microsoft"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "microsoft"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/tags/list"
+    Then the response status should be "404"
+
+  Scenario: License retrieves a licensed package's tags
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "linux"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
+    Then the response status should be "404"
+
+  Scenario: License retrieves an open package's tags
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the second "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "linux"
+    And I authenticate with my key
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
+      """
+
+  Scenario: User retrieves their licensed package's tags (with unentitled owned license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -410,10 +414,20 @@ Feature: OCI image blobs
     And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "api",
+        "tags": [
+          "latest",
+          "v1.4"
+        ]
+      }
+      """
 
-  Scenario: User retrieves a blob (with entitled owned license)
+  Scenario: User retrieves their licensed package's tags (with entitled owned license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -424,14 +438,21 @@ Feature: OCI image blobs
     And the current account has 1 "license-entitlement" for the first "entitlement" and the first "license"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
+      {
+        "name": "api",
+        "tags": [
+          "insider",
+          "latest",
+          "v1.4"
+        ]
+      }
       """
 
-  Scenario: User retrieves a blob (with unentitled license)
+  Scenario: User retrieves their licensed package's tags (with unentitled license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -442,10 +463,20 @@ Feature: OCI image blobs
     And the current account has 1 "license-user" for the first "license" and the last "user"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "api",
+        "tags": [
+          "latest",
+          "v1.4"
+        ]
+      }
+      """
 
-  Scenario: User retrieves a blob (with entitled license)
+  Scenario: User retrieves their licensed package's tags (with entitled license)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -457,14 +488,66 @@ Feature: OCI image blobs
     And the current account has 1 "license-user" for the first "license" and the last "user"
     And I am the last user of account "keygen"
     And I use an authentication token
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+    When I send a GET request to "/accounts/keygen/engines/oci/api/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/b8cd8416-6dfb-44dd-9b69-1d73ee65baed/artifacts/89d95ffe-7785-465a-bc26-2da411fe6e99/index.json
+      {
+        "name": "api",
+        "tags": [
+          "insider",
+          "latest",
+          "v1.4"
+        ]
+      }
       """
 
-  Scenario: User retrieves a closed blob (with license)
+  Scenario: User retrieves their licensed package's tags
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the second "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
+    And I am the last user of account "linux"
+    And I use an authentication token
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "ubuntu",
+        "tags": [
+          "jammy",
+          "oracular"
+        ]
+      }
+      """
+
+  Scenario: User retrieves their open package's tags
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
+    And I am the last user of account "linux"
+    And I use an authentication token
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
+      """
+
+  Scenario: User retrieves a closed package's tags
     Given the current account is "microsoft"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -474,49 +557,61 @@ Feature: OCI image blobs
     And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "microsoft"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/tags/list"
     Then the response status should be "404"
 
-  Scenario: User retrieves a closed blob (no license)
+  Scenario: User retrieves a licensed package's tags
     Given the current account is "linux"
-    And  the current account has 1 "user"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
-    Then the response status should be "401"
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
+    Then the response status should be "404"
 
-  Scenario: User retrieves a licensed blob (no license)
+  Scenario: User retrieves an open package's tags
     Given the current account is "linux"
-    And  the current account has 1 "user"
+    And the current account has 1 "policy" for the second "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/blobs/sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff"
-    Then the response status should be "404"
-
-  Scenario: User retrieves an open blob (no license)
-    Given the current account is "linux"
-    And  the current account has 1 "user"
-    And I am the last user of account "linux"
-    And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
       """
 
-  Scenario: Anon retrieves a closed blob
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/blobs/sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6"
+  Scenario: Anon retrieves a closed package's tags
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/tags/list"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves a licensed blob
-    When I send a GET request to "/accounts/keygen/engines/oci/api/blobs/sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179"
+  Scenario: Anon retrieves a licensed package's tags
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/tags/list"
     Then the response status should be "404"
 
-  Scenario: Anon retrieves an open blob
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/blobs/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
-    Then the response status should be "303"
-    And the response should contain the following raw headers:
+  Scenario: Anon retrieves an open package's tags
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/tags/list"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
       """
-      Location: https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/index.json
+      {
+        "name": "alpine",
+        "tags": [
+          "3.20"
+        ]
+      }
       """

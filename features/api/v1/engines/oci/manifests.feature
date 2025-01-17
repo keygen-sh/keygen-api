@@ -117,7 +117,7 @@ Feature: OCI image manifests
     Then the response status should be "403"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json; charset=utf-8
+      Content-Type: application/json; charset=utf-8
       """
 
   @mp
@@ -225,7 +225,7 @@ Feature: OCI image manifests
     Then the response status should be "404"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.api+json; charset=utf-8
+      Content-Type: application/json; charset=utf-8
       """
 
   Scenario: Endpoint should return an image index by version

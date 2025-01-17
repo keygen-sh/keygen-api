@@ -108,7 +108,7 @@ Rails.application.routes.draw do
 
   concern :oci do
     # NOTE(ezekg) /v2 namespace is handled outside of this because docker wants it to always be at the root...
-    scope module: :oci, defaults: { format: :binary } do
+    scope module: :oci, defaults: { format: :json } do
       # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
       match ':package/manifests/:reference', via: %i[head get], to: 'manifests#show', as: :oci_manifest, constraints: {
         package: /[^\/]*/,
@@ -119,6 +119,11 @@ Rails.application.routes.draw do
       match ':package/blobs/:digest', via: %i[head get], to: 'blobs#show', as: :oci_blob, constraints: {
         package: /[^\/]*/,
         digest: /[^\/]*/,
+      }
+
+      # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#listing-tags
+      get ':package/tags/list', to: 'tags#index', as: :oci_tags, constraints: {
+        package: /[^\/]*/,
       }
 
       # ignore other requests entirely for now e.g. GET /v2/:namespace/referrers/:digest
