@@ -27,6 +27,10 @@ class ApplicationRecord < ActiveRecord::Base
     reorder(nil)
   }
 
+  scope :unordered, -> {
+    without_order
+  }
+
   scope :without_limit, -> {
     limit(nil)
   }

@@ -48,22 +48,6 @@ FactoryBot.define do
       }
     end
 
-    trait :index_json do
-      artifact       { build(:artifact, :oci_image, account:, environment:) }
-      content_path   { 'index.json' }
-      content_digest { "sha256:#{Digest::SHA256.hexdigest(content)}" }
-      content_type   { 'application/vnd.oci.image.index.v1+json' }
-      content        {
-        tar   = file_fixture('alpine-3.20.3.tar').read
-        index = Minitar::Reader.open tar do |archive|
-          archive.find { _1.name in 'index.json' }
-                 .read
-        end
-
-        index
-      }
-    end
-
     trait :licensed do
       artifact { build(:artifact, :licensed, account:, environment:) }
     end
