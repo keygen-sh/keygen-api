@@ -232,33 +232,31 @@ class ReleaseManifest < ApplicationRecord
 
   # find_by_reference is used for the oci engine to lookup a manifest by reference,
   # which could be a digest, version, or tag, and also to request a specific media
-  # type in case of multiple manifests per-image.
-  def self.find_by_reference!(reference, content_type: nil)
-    base = joins(:release)
+  # type in case of multiple manifests per-image, and prefer certain media types,
+  # in order, in case of an ambiguous reference.
+  def self.find_by_reference!(reference, accepts: nil, prefers: nil)
+    base = unordered.joins(:release)
 
     manifests = base.where(content_digest: reference)
                     .or(base.where(releases: { version: reference }))
                     .or(base.where(releases: { tag: reference }))
 
     # oci clients may want a specific media type in case of multiple manifests
-    unless content_type.blank?
-      manifests = case content_type
+    unless accepts.blank?
+      manifests = case accepts
                   in ['*/*', *] | '*/*' # has no preference i.e. accepts anything
                     manifests.where.not(content_type: nil)
                   in [*content_types, '*/*'] # has preference but accepts anything
-                    manifests.where(content_type: content_types)
-                             .or(manifests.where.not(content_type: nil))
-                             .order_as_specified(
-                               content_type: content_types,
-                             )
+                    manifests.where(content_type: content_types).or(manifests.where.not(content_type: nil))
                   in [*content_types] # has preferences
                     manifests.where(content_type: content_types)
-                             .order_as_specified(
-                               content_type: content_types,
-                             )
                   else # has preference
-                    manifests.where(content_type:)
+                    manifests.where(content_type: accepts)
                   end
+    end
+
+    unless prefers.blank?
+      manifests = manifests.order_as_specified(content_type: prefers)
     end
 
     manifests.take!

@@ -43,25 +43,25 @@ class ProcessOciImageWorker < BaseWorker
         next unless
           item.exists?
 
-        # store manifests as a manifest for easy reference without hitting the storage provider
-        if item in OciImageLayout::Index | OciImageLayout::Manifest => manifest
+        # store indexes and manifests as a manifest for reference without hitting storage provider
+        if item in OciImageLayout::Index | OciImageLayout::Manifest => descriptor
           raise ImageNotAcceptableError, 'manifest is too big' if
-            manifest.size > MAX_MANIFEST_SIZE
+            descriptor.size > MAX_MANIFEST_SIZE
 
           ReleaseManifest.create!(
             account_id: artifact.account_id,
             environment_id: artifact.environment_id,
             release_id: artifact.release_id,
             release_artifact_id: artifact.id,
-            content_type: manifest.media_type,
-            content_digest: manifest.digest,
-            content_length: manifest.size,
-            content_path: manifest.path,
-            content: manifest.read,
+            content_type: descriptor.media_type,
+            content_digest: descriptor.digest,
+            content_length: descriptor.size,
+            content_path: descriptor.path,
+            content: descriptor.read,
           )
 
-          # still need to store it as a blob
-          manifest.rewind
+          # still need to read/store it as a blob
+          descriptor.rewind
         end
 
         # store blobs as a descriptor pointing to the storage provider
@@ -94,6 +94,10 @@ class ProcessOciImageWorker < BaseWorker
             body: blob.to_io,
           )
         end
+      rescue ActiveRecord::RecordNotUnique => e
+        # FIXME(ezekg) sometimes we get the same item more than once when
+        #              live-streaming an in-progress upload
+        Keygen.logger.warn { "[workers.process-oci-image-worker] Error: #{e.class.name} - #{e.message}" }
       end
     end
 
@@ -126,8 +130,13 @@ class ProcessOciImageWorker < BaseWorker
 
   def unpack(io, &)
     Minitar::Reader.open(io, &)
-  rescue ArgumentError => e # octal encoding error
-    raise ImageNotAcceptableError, e.message
+  rescue ArgumentError => e
+    case e.message
+    when /is not a valid octal string/ # octal encoding error
+      raise ImageNotAcceptableError, e.message
+    else
+      raise e
+    end
   end
 
   class ImageNotAcceptableError < StandardError

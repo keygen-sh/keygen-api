@@ -11,9 +11,14 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      manifest = authorized_scope(package.manifests).find_by_reference!(
-        params[:reference],
-        content_type: request.accepts.collect(&:to_s),
+      manifest = authorized_scope(package.manifests).find_by_reference!(params[:reference],
+        accepts: request.accepts.collect(&:to_s),
+        prefers: %w[
+          application/vnd.oci.image.index.v1+json
+          application/vnd.docker.distribution.manifest.list.v2+json
+          application/vnd.oci.image.manifest.v1+json
+          application/vnd.docker.distribution.manifest.v2+json
+        ],
       )
       authorize! manifest
 

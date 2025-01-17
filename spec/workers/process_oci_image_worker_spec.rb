@@ -50,7 +50,6 @@ describe ProcessOciImageWorker do
 
         expect(artifact.manifests).to satisfy { |manifests|
           manifests in [
-            ReleaseManifest(content_path: 'index.json',                                                                    content_digest: 'sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b', content_type: 'application/vnd.oci.image.index.v1+json',                   content_length: 441,  content: String),
             ReleaseManifest(content_path: 'blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_digest: 'sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d', content_type: 'application/vnd.docker.distribution.manifest.list.v2+json', content_length: 1853, content: String),
             ReleaseManifest(content_path: 'blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_digest: 'sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735', content_type: 'application/vnd.docker.distribution.manifest.v2+json',      content_length: 528,  content: String),
           ]

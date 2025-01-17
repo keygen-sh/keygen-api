@@ -22,19 +22,19 @@ module OciImageLayout
                 :index
 
     def initialize(io)
-      @fs = Reader.new(io)
+      @reader = Reader.new(io)
     end
 
     def parse
-      @layout = fs.open(LAYOUT_FILE) do |io, path, digest|
-        Layout.new(io, size: io.size, path:, digest:, fs:)
+      @layout = reader.open(LAYOUT_FILE) do |io, path, digest|
+        Layout.new(io, size: io.size, path:, digest:, reader:)
       end
 
       raise LayoutNotFoundError.new, "layout file #{LAYOUT_FILE.inspect} is required" if
         layout.nil?
 
-      @index = fs.open(INDEX_FILE) do |io, path, digest|
-        Index.new(io, size: io.size, path:, digest:, fs:)
+      @index = reader.open(INDEX_FILE) do |io, path, digest|
+        LayoutIndex.new(io, size: io.size, path:, digest:, layout:)
       end
 
       raise IndexNotFoundError.new, "index file #{INDEX_FILE.inspect} is required" if
@@ -50,7 +50,7 @@ module OciImageLayout
 
     private
 
-    attr_reader :fs
+    attr_reader :reader
   end
 
   class Reader
@@ -110,6 +110,7 @@ module OciImageLayout
     end
   end
 
+  # blob is a pointer to an opaque IO e.g. manifest, layer, etc.
   class Blob
     include Enumerable
 
@@ -118,17 +119,13 @@ module OciImageLayout
                 :size,
                 :path
 
-    def initialize(io, media_type:, digest:, size:, path:, fs:)
-      raise UnsupportedMediaTypeError, "unsupported media type: #{media_type.inspect}" unless
-        media_type.starts_with?('application/vnd.docker.') ||
-        media_type.starts_with?('application/vnd.oci.')
-
+    def initialize(io, media_type:, digest:, size:, path:, reader:)
       @io         = io
       @media_type = media_type
       @digest     = digest
       @size       = size
       @path       = path
-      @fs         = fs
+      @reader     = reader
     end
 
     def exists?   = io.present?
@@ -138,15 +135,16 @@ module OciImageLayout
     def close     = (io.close if exists?)
     def closed?   = (io.closed? if exists?)
     def to_io     = io
-    def open(&)   = fs.open(digest, &)
+    def open(&)   = reader.open(digest, &) # read self
     def each(&)   = yield_self(&)
 
     private
 
-    attr_reader :io,
-                :fs
+    attr_reader :reader,
+                :io
   end
 
+  # image layout is an oci-layout file
   class Layout < Blob
     attr_reader :version
 
@@ -158,42 +156,24 @@ module OciImageLayout
 
       io.rewind
     end
+
+    # open defers to reader so that we can open blobs in the layout
+    def open(ref, &) = reader.open(ref, &)
   end
 
-  class Index < Blob
-    attr_reader :media_type,
-                :manifests,
-                :version
-
-    def initialize(io, fs:, **)
-      data       = JSON.parse(io.read)
-      media_type = data['mediaType']
-
-      super(io, media_type:, fs:, **)
-
-      @version   = data['schemaVersion']
-      @manifests = data['manifests'].map do |manifest|
-        Manifest.from_json(manifest, fs:)
-      end
-
-      io.rewind
-    end
-
-    def each(&)
-      super
-
-      manifests.each { _1.each(&) }
-    end
-  end
-
+  # descriptor is a pointer to a JSON blob e.g. manifest, config, etc.
   class Descriptor < Blob
-    def self.from_json(descriptor, fs:)
-      media_type = descriptor['mediaType']
-      digest     = descriptor['digest']
-      size       = descriptor['size']
+    INDEX_MEDIA_TYPES    = %w[application/vnd.oci.image.index.v1+json application/vnd.docker.distribution.manifest.list.v2+json].freeze
+    MANIFEST_MEDIA_TYPES = %w[application/vnd.oci.image.manifest.v1+json application/vnd.docker.distribution.manifest.v2+json].freeze
+    CONFIG_MEDIA_TYPES   = %w[application/vnd.oci.image.config.v1+json application/vnd.docker.container.image.v1+json].freeze
+
+    def self.from_json(data, layout:, **)
+      media_type = data['mediaType']
+      digest     = data['digest']
+      size       = data['size']
       io,
       path,
-      real_digest = fs.open(digest)
+      real_digest = layout.open(digest)
 
       # NOTE(ezekg) some multi-platform images have descriptors that point to blobs that
       #             don't exist so we only want to assert this if the blob exists
@@ -202,27 +182,101 @@ module OciImageLayout
           digest == real_digest
       end
 
-      new(io, media_type:, digest:, size:, path:, fs:)
+      new(io, media_type:, digest:, size:, path:, layout:, **)
+    end
+
+    def initialize(*, layout:, **) = super(*, reader: layout, **)
+    alias :layout :reader
+
+    def index?    = media_type.in?(INDEX_MEDIA_TYPES)
+    def manifest? = media_type.in?(MANIFEST_MEDIA_TYPES)
+    def config?   = media_type.in?(CONFIG_MEDIA_TYPES)
+    def json?     = index? || manifest? || config?
+    def opaque?   = !json?
+    def layer?    = opaque? # FIXME(ezekg) not sure if we can be more accurate here?
+
+    def to_index    = Index.from_descriptor(self, layout:)
+    def to_manifest = Manifest.from_descriptor(self, layout:)
+    def to_config   = Config.from_descriptor(self, layout:)
+    def to_layer    = Layer.from_descriptor(self, layout:)
+    def to_h        = { media_type:, digest:, size:, path: }
+  end
+
+  # layout index is an index.json file
+  class LayoutIndex < Descriptor
+    attr_reader :schema_version,
+                :media_type,
+                :manifests
+
+    def initialize(io, layout:, **)
+      data       = JSON.parse(io.read)
+      media_type = data['mediaType']
+
+      super(io, media_type:, layout:, **)
+
+      @schema_version = data['schemaVersion']
+
+      # NOTE(ezekg) unreferenced blobs are NOT stored since we cannot determine their media type
+      @manifests = data['manifests'].map do |manifest|
+        descriptor = Descriptor.from_json(manifest, layout:)
+
+        case
+        when descriptor.index? # nested index
+          descriptor.to_index
+        when descriptor.manifest?
+          descriptor.to_manifest
+        else
+          descriptor
+        end
+      end
+
+      io.rewind
+    end
+
+    def each(&)
+      super
+
+      manifests.each { _1.each(&) }
     end
   end
 
-  class Config < Descriptor; end
-  class Layer < Descriptor; end
+  # index is a nested image index
+  class Index < LayoutIndex
+    def self.from_descriptor(descriptor, **)
+      raise "expected index descriptor but got #{descriptor.media_type}" unless
+        descriptor.index?
 
+      new(descriptor.to_io, **descriptor.to_h, **)
+    end
+  end
+
+  # manifest is an image manifest referenced by an image index
   class Manifest < Descriptor
     attr_reader :annotations,
+                :subject,
                 :manifests,
                 :layers,
                 :config
 
-    def initialize(io, fs:, **)
-      super(io, fs:, **)
+    def self.from_descriptor(descriptor, **)
+      raise "expected manifest descriptor but got #{descriptor.media_type}" unless
+        descriptor.manifest?
+
+      new(descriptor.to_io, **descriptor.to_h, **)
+    end
+
+    def initialize(io, layout:, **)
+      super(io, layout:, **)
 
       # TODO(ezekg) add support for annotations? e.g. auto-tagging
       @annotations = []
-      @manifests   = []
-      @layers      = []
-      @config      = nil
+
+      # TODO(ezekg) add support for subject? e.g. referrers
+      @subject = nil
+
+      @manifests = []
+      @layers    = []
+      @config    = nil
 
       # some blobs may be referenced without being present
       return unless
@@ -231,29 +285,40 @@ module OciImageLayout
       data = JSON.parse(io.read)
       io.rewind
 
-      if manifests = data['manifests']
-        manifests.each do |manifest|
-          @manifests << Manifest.from_json(manifest, fs:)
-        end
-      end
-
       if layers = data['layers']
         layers.each do |layer|
-          @layers << Layer.from_json(layer, fs:)
+          @layers << Layer.from_json(layer, layout:)
         end
       end
 
       if config = data['config']
-        @config = Config.from_json(config, fs:)
+        @config = Config.from_json(config, layout:)
       end
     end
 
     def each(&)
       super
 
-      manifests.each { _1.each(&) }
       layers.each { _1.each(&) }
       config&.each(&)
+    end
+  end
+
+  class Config < Descriptor
+    def self.from_descriptor(descriptor, **)
+      raise "expected config descriptor but got #{descriptor.media_type}" unless
+        descriptor.config?
+
+      new(descriptor.to_io, **descriptor.to_h, **)
+    end
+  end
+
+  class Layer < Descriptor
+    def self.from_descriptor(descriptor, **)
+      raise "expected layer descriptor but got #{descriptor.media_type}" unless
+        descriptor.layer?
+
+      new(descriptor.to_io, **descriptor.to_h, **)
     end
   end
 end

@@ -49,16 +49,15 @@ Feature: OCI image manifests
     And the following "manifests" exist:
       | id                                   | account_id                           | release_artifact_id                  | release_id                           | content_path                                                                  | content_type                                              | content_digest                                                          | content_length | content                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | created_at               | updated_at               |
       # alpine 3.20.3
-      | 90fa9487-49ea-487a-a47c-83e9f60d1651 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b | 441            | {"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":"application/vnd.docker.distribution.manifest.list.v2+json","digest":"sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d","size":1853,"annotations":{"containerd.io/distribution.source.docker.io":"library/alpine","io.containerd.image.name":"docker.io/library/alpine:latest","org.opencontainers.image.ref.name":"latest"}}]}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 2024-11-11T10:26:01.000Z | 2024-11-11T10:26:01.000Z |
       | 291c9d4c-01b4-4068-b97c-2ac69a6fbeb9 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | blobs/sha256/beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d | application/vnd.docker.distribution.manifest.list.v2+json | sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d | 1853           | {"manifests":[{"digest":"sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"amd64","os":"linux"},"size":528},{"digest":"sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v6"},"size":528},{"digest":"sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v7"},"size":528},{"digest":"sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm64","os":"linux","variant":"v8"},"size":528},{"digest":"sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"386","os":"linux"},"size":528},{"digest":"sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"ppc64le","os":"linux"},"size":528},{"digest":"sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"riscv64","os":"linux"},"size":528},{"digest":"sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d","mediaType":"application\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"s390x","os":"linux"},"size":528}],"mediaType":"application\/vnd.docker.distribution.manifest.list.v2+json","schemaVersion":2}                                                                                                                                                                                                                                                                                                                                                                                                                    | 2024-11-11T10:26:02.000Z | 2024-11-11T10:26:02.000Z |
-      | 763bf090-62a0-4732-83dc-cef368703a7d | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735 | application/vnd.docker.distribution.manifest.v2+json      | sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735 | 528            | {\n   "schemaVersion": 2,\n   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",\n   "config": {\n      "mediaType": "application/vnd.docker.container.image.v1+json",\n      "size": 1471,\n      "digest": "sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"\n   },\n   "layers": [\n      {\n         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",\n         "size": 3623807,\n         "digest": "sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"\n      }\n   ]\n}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 2024-11-11T10:26:03.000Z | 2024-11-11T10:26:03.000Z |
+      | 810e8078-69dd-4e02-97f8-888d78f0accd | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 5762c549-7f5b-4a73-9873-3acdb1213fe8 | 757e0a41-835e-42ad-bad8-84cabd29c72a | blobs/sha256/33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735 | application/vnd.docker.distribution.manifest.v2+json      | sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735 | 528            | {\n   "schemaVersion": 2,\n   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",\n   "config": {\n      "mediaType": "application/vnd.docker.container.image.v1+json",\n      "size": 1471,\n      "digest": "sha256:91ef0af61f39ece4d6710e465df5ed6ca12112358344fd51ae6a3b886634148b"\n   },\n   "layers": [\n      {\n         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",\n         "size": 3623807,\n         "digest": "sha256:43c4264eed91be63b206e17d93e75256a6097070ce643c5e8f0379998b44f170"\n      }\n   ]\n}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 2024-11-11T10:26:03.000Z | 2024-11-11T10:26:03.000Z |
       # ubuntu 22.04.0
       # ubuntu 24.10.0
-      | 86df6c04-35ad-45dc-933e-4d33d9e260ad | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff | 1137           | {\n  "schemaVersion": 2,\n  "mediaType": "application/vnd.oci.image.index.v1+json",\n  "manifests": [\n    {\n      "mediaType": "application/vnd.oci.image.index.v1+json",\n      "size": 7143,\n      "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",\n      "annotations": {\n        "org.opencontainers.image.ref.name": "stable-release"\n      }\n    },\n    {\n      "mediaType": "application/vnd.oci.image.manifest.v1+json",\n      "size": 7143,\n      "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",\n      "platform": {\n        "architecture": "ppc64le",\n        "os": "linux"\n      },\n      "annotations": {\n        "org.opencontainers.image.ref.name": "v1.0"\n      }\n    },\n    {\n      "mediaType": "application/xml",\n      "size": 7143,\n      "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",\n      "annotations": {\n        "org.freedesktop.specifications.metainfo.version": "1.0",\n        "org.freedesktop.specifications.metainfo.type": "AppStream"\n      }\n    }\n  ],\n  "annotations": {\n    "com.example.index.revision": "r124356"\n  }\n}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 2024-10-19T00:05:00.000Z | 2024-10-19T00:05:00.000Z |
+      | 86df6c04-35ad-45dc-933e-4d33d9e260ad | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | blobs/sha256/1ae80023cb591b3ee642fde7bef065a334c1da28fc739c148552e1c70b804616 | application/vnd.oci.image.index.v1+json                   | sha256:1ae80023cb591b3ee642fde7bef065a334c1da28fc739c148552e1c70b804616 | 21             | {"hello":"dimension"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 2024-10-19T00:05:00.000Z | 2024-10-19T00:05:00.000Z |
+      | 87e96e5d-8530-4889-b55e-e72737ff4005 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | blobs/sha256/93a23971a914e5eacbf0a8d25154cda309c3c1c72fbb9914d47c60f3cb681588 | application/vnd.oci.image.manifest.v1+json                | sha256:93a23971a914e5eacbf0a8d25154cda309c3c1c72fbb9914d47c60f3cb681588 | 17             | {"hello":"world"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       # keygen 1.4.0
-      | 22a36ef8-a557-4b5d-8a7b-3fc19373b3e5 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 89d95ffe-7785-465a-bc26-2da411fe6e99 | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179 | 415            | {"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":"application/vnd.oci.image.index.v1+json","digest":"sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1","size":1609,"annotations":{"containerd.io/distribution.source.docker.io":"keygen/api","io.containerd.image.name":"docker.io/keygen/api:latest","org.opencontainers.image.ref.name":"latest"}}]}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
+      | 22a36ef8-a557-4b5d-8a7b-3fc19373b3e5 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 89d95ffe-7785-465a-bc26-2da411fe6e99 | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | blobs/sha256/bc3e1d7a14473a77d5441941bf4ae3fde4e07128dd38978ac7d91d3ca8bfe651 | application/vnd.oci.image.index.v1+json                   | sha256:bc3e1d7a14473a77d5441941bf4ae3fde4e07128dd38978ac7d91d3ca8bfe651 | 20             | {"hello":"universe"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       # keygen 1.3.0
-      | 87e96e5d-8530-4889-b55e-e72737ff4005 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:0262f48d059aa7c5c9da8629569cb732e4a7482da063f0f2ec4abd69ec67c711 | 415            | {"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":"application/vnd.oci.image.index.v1+json","digest":"sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1","size":1609,"annotations":{"containerd.io/distribution.source.docker.io":"keygen/api","io.containerd.image.name":"docker.io/keygen/api:latest","org.opencontainers.image.ref.name":"latest"}}]}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       | 9e54ebf5-33f7-4065-80c0-b88275b3cc21 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | blobs/sha256/410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1 | application/vnd.oci.image.index.v1+json                   | sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1 | 1609           | {\n  "schemaVersion": 2,\n  "mediaType": "application/vnd.oci.image.index.v1+json",\n  "manifests": [\n    {\n      "mediaType": "application/vnd.oci.image.manifest.v1+json",\n      "digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",\n      "size": 2196,\n      "platform": {\n        "architecture": "amd64",\n        "os": "linux"\n      }\n    },\n    {\n      "mediaType": "application/vnd.oci.image.manifest.v1+json",\n      "digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",\n      "size": 2196,\n      "platform": {\n        "architecture": "arm64",\n        "os": "linux"\n      }\n    },\n    {\n      "mediaType": "application/vnd.oci.image.manifest.v1+json",\n      "digest": "sha256:5003a58c58d300b63dde62d24c40e56f0c12a23127373be0bfce904cfaf6cf46",\n      "size": 566,\n      "annotations": {\n        "vnd.docker.reference.digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",\n        "vnd.docker.reference.type": "attestation-manifest"\n      },\n      "platform": {\n        "architecture": "unknown",\n        "os": "unknown"\n      }\n    },\n    {\n      "mediaType": "application/vnd.oci.image.manifest.v1+json",\n      "digest": "sha256:bec48978b2eb9496715615e4add1fa70f920c328032a370ccb90b588de4eb3de",\n      "size": 566,\n      "annotations": {\n        "vnd.docker.reference.digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",\n        "vnd.docker.reference.type": "attestation-manifest"\n      },\n      "platform": {\n        "architecture": "unknown",\n        "os": "unknown"\n      }\n    }\n  ]\n}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       | 800df9ff-a355-4354-8291-b964dbf00bdf | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | blobs/sha256/9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd | application/vnd.oci.image.manifest.v1+json                | sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd | 2196           | {\n  "schemaVersion": 2,\n  "mediaType": "application/vnd.oci.image.manifest.v1+json",\n  "config": {\n    "mediaType": "application/vnd.oci.image.config.v1+json",\n    "digest": "sha256:9ec80051ed72131fe1d3df8d47a29f4f259295267252e9c8d89968410ed26edc",\n    "size": 8939\n  },\n  "layers": [\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:d25f557d7f31bf7acfac935859b5153da41d13c41f2b468d16f729a5b883634f",\n      "size": 3622094\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:fcb16707477d8b1e3de1322a8996261e0fe9e3b6e139a51aeccccd58afa01cf6",\n      "size": 6686032\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:453bd37d6ebb12875a716b8d83bf4fd9b0ffa419d27c545e55d28e79f47efd46",\n      "size": 193\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:8ef1e9289c27a564a5df0923c486967488442cc4ed2d2f25b130591da7073739",\n      "size": 36221419\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:3db7b584f774d489e9b5bdabf9e229a4da5af8bf3bb1ba8c2b742e6231357861",\n      "size": 140\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:f25496d407c3a3193fb44b7e6e409fc95b0503bb76ea6360656081a0cd784ff9",\n      "size": 2654933\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:bb90333d2b9cdeda9d86da6b25dd713f6449716e24d6d656bd49d0cf36493ac0",\n      "size": 46263627\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",\n      "size": 32\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:f95430b152addc49861bd4277b22df465321b40557fb687de4527bb2585811bb",\n      "size": 748940\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:b302a583196ce8ed58fab12b74e36dd9eb7e9e13e57636349aa553f5617000fb",\n      "size": 749075\n    }\n  ]\n} | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       # keygen 1.2.0
@@ -77,9 +76,12 @@ Feature: OCI image manifests
       # ubuntu 24.10.0
       | 638bee01-0158-4793-af26-7dc3a1a642c3 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:e0d9e343ab1a1deeb5de8608fd64116d20f6273ebd0ad1678eedb831bc4a22ff | 1137           | 2024-10-19T00:05:00.000Z | 2024-10-19T00:05:00.000Z |
       | 5532cd0d-ba1e-4185-8b29-e2787def7ad8 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | oci-layout                                                                    | application/vnd.oci.layout.header.v1+json                 | sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6 | 30             | 2024-10-19T00:05:00.000Z | 2024-10-19T00:05:00.000Z |
+      | 9d691418-af60-440d-8425-c7667d149d22 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | blobs/sha256/1ae80023cb591b3ee642fde7bef065a334c1da28fc739c148552e1c70b804616 | application/vnd.oci.image.index.v1+json                   | sha256:1ae80023cb591b3ee642fde7bef065a334c1da28fc739c148552e1c70b804616 | 21             | 2024-10-19T00:05:00.000Z | 2024-10-19T00:05:00.000Z |
+      | 8f1ac175-3cf3-4bcf-9f42-b582ed1d9d25 | 14c038fd-b57e-432d-8c09-f50ebcd6a7bc | 74ad090a-7cee-4227-96bc-4af939e8bfa7 | a6a6d11d-d456-4a27-bade-90579d4cdf47 | blobs/sha256/93a23971a914e5eacbf0a8d25154cda309c3c1c72fbb9914d47c60f3cb681588 | application/vnd.oci.image.index.v1+json                   | sha256:93a23971a914e5eacbf0a8d25154cda309c3c1c72fbb9914d47c60f3cb681588 | 17             | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       # keygen 1.4.0
       | 04918f24-376f-40b2-a1a1-5e72de5aac8f | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 89d95ffe-7785-465a-bc26-2da411fe6e99 | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:63179218e5dab1bc90d0580256c5a3bf3b117de72c65d1841d49b283934b2179 | 415            | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       | 3cc5d2d9-e92c-47b6-a680-0407bde2ced6 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 89d95ffe-7785-465a-bc26-2da411fe6e99 | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | oci-layout                                                                    | application/vnd.oci.layout.header.v1+json                 | sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6 | 30             | 2024-11-15T00:00:01.000Z | 2024-11-15T00:00:01.000Z |
+      | e72c7e76-2360-4149-b083-98f5fa08b789 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | 89d95ffe-7785-465a-bc26-2da411fe6e99 | ce73cc94-6d9b-4cc9-a974-3ca738b7b655 | blobs/sha256/bc3e1d7a14473a77d5441941bf4ae3fde4e07128dd38978ac7d91d3ca8bfe651 | application/vnd.oci.image.index.v1+json                   | sha256:bc3e1d7a14473a77d5441941bf4ae3fde4e07128dd38978ac7d91d3ca8bfe651 | 20             | 2024-11-15T00:00:01.000Z | 2024-11-15T00:00:01.000Z |
       # keygen 1.3.0
       | a353caf7-37ba-46a2-bf31-d6c535de4300 | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | index.json                                                                    | application/vnd.oci.image.index.v1+json                   | sha256:0262f48d059aa7c5c9da8629569cb732e4a7482da063f0f2ec4abd69ec67c711 | 415            | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       | 21e01f7a-1900-41ca-8f5f-76917ffdf84a | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | blobs/sha256/410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1 | application/vnd.oci.image.index.v1+json                   | sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1 | 1609           | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
@@ -166,19 +168,34 @@ Feature: OCI image manifests
     When I send a HEAD request to "//oci.pkg.keygen.sh/v2/alpine/manifests/0.0.0"
     Then the response status should be "404"
 
-  Scenario: Endpoint should respond with a matching media type
+  Scenario: Endpoint should respond with a matching media type (manifest list)
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
     And I send the following raw headers:
       """
-      Accept: application/vnd.oci.image.index.v1+json
+      Accept: application/vnd.docker.distribution.manifest.list.v2+json
       """
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      """
+
+  Scenario: Endpoint should respond with a matching media type (manifest)
+    Given the current account is "linux"
+    And I am an admin of account "linux"
+    And I use an authentication token
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.docker.distribution.manifest.v2+json
+      """
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
+    Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
       """
 
   Scenario: Endpoint should respond with any media type
@@ -193,7 +210,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
       """
 
   Scenario: Endpoint should not respond with an unknown media type
@@ -217,31 +234,96 @@ Feature: OCI image manifests
     And I use an authentication token
     And I send the following raw headers:
       """
-      Accept: application/vnd.oci.image.index.v1+json
+      Accept: application/vnd.docker.distribution.manifest.list.v2+json
       """
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
       """
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
@@ -251,61 +333,191 @@ Feature: OCI image manifests
     And I use an authentication token
     And I send the following raw headers:
       """
-      Accept: application/vnd.oci.image.index.v1+json
+      Accept: application/vnd.docker.distribution.manifest.list.v2+json
       """
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
       """
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
-  Scenario: Endpoint should return an image index by digest
+  Scenario: Endpoint should return an image index by digest (no redirect)
     Given the current account is "linux"
     And I am an admin of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:355eee6af939abf5ba465c9be69c3b725f8d3f19516ca9644cf2a4fb112fd83b"
+    When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.oci.image.index.v1+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
       """
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
@@ -814,7 +1026,7 @@ Feature: OCI image manifests
     And I use an authentication token
     And I send the following raw headers:
       """
-      If-None-Match: W/"4faebb258df2c9f609a7c0817849a028"
+      If-None-Match: W/"c2eab43acb840126ba7a214819e2c71a"
       """
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
     Then the response status should be "304"
@@ -831,7 +1043,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Etag: W/"4faebb258df2c9f609a7c0817849a028"
+      Etag: W/"c2eab43acb840126ba7a214819e2c71a"
       Cache-Control: max-age=86400, private
       """
 
@@ -843,44 +1055,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      { "hello": "dimension" }
       """
 
   Scenario: Product retrieves their open manifest
@@ -892,20 +1067,85 @@ Feature: OCI image manifests
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
@@ -930,6 +1170,86 @@ Feature: OCI image manifests
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
     Then the response status should be "401"
 
+  Scenario: License retrieves a manifest for their product by digest
+    Given the current account is "keygen"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "keygen"
+    And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.manifest.v1+json
+      """
+    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "schemaVersion": 2,
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "config": {
+          "mediaType": "application/vnd.oci.image.config.v1+json",
+          "digest": "sha256:9ec80051ed72131fe1d3df8d47a29f4f259295267252e9c8d89968410ed26edc",
+          "size": 8939
+        },
+        "layers": [
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:d25f557d7f31bf7acfac935859b5153da41d13c41f2b468d16f729a5b883634f",
+            "size": 3622094
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:fcb16707477d8b1e3de1322a8996261e0fe9e3b6e139a51aeccccd58afa01cf6",
+            "size": 6686032
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:453bd37d6ebb12875a716b8d83bf4fd9b0ffa419d27c545e55d28e79f47efd46",
+            "size": 193
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:8ef1e9289c27a564a5df0923c486967488442cc4ed2d2f25b130591da7073739",
+            "size": 36221419
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:3db7b584f774d489e9b5bdabf9e229a4da5af8bf3bb1ba8c2b742e6231357861",
+            "size": 140
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:f25496d407c3a3193fb44b7e6e409fc95b0503bb76ea6360656081a0cd784ff9",
+            "size": 2654933
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:bb90333d2b9cdeda9d86da6b25dd713f6449716e24d6d656bd49d0cf36493ac0",
+            "size": 46263627
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+            "size": 32
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:f95430b152addc49861bd4277b22df465321b40557fb687de4527bb2585811bb",
+            "size": 748940
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:b302a583196ce8ed58fab12b74e36dd9eb7e9e13e57636349aa553f5617000fb",
+            "size": 749075
+          }
+        ]
+      }
+      """
+
   Scenario: License retrieves a manifest for their product (unentitled)
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
@@ -939,6 +1259,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.manifest.v1+json
+      """
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
     Then the response status should be "404"
 
@@ -952,23 +1276,72 @@ Feature: OCI image manifests
     And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.manifest.v1+json
+      """
+    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.3.0"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
       {
         "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "config": {
+          "mediaType": "application/vnd.oci.image.config.v1+json",
+          "digest": "sha256:9ec80051ed72131fe1d3df8d47a29f4f259295267252e9c8d89968410ed26edc",
+          "size": 8939
+        },
+        "layers": [
           {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:d25f557d7f31bf7acfac935859b5153da41d13c41f2b468d16f729a5b883634f",
+            "size": 3622094
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:fcb16707477d8b1e3de1322a8996261e0fe9e3b6e139a51aeccccd58afa01cf6",
+            "size": 6686032
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:453bd37d6ebb12875a716b8d83bf4fd9b0ffa419d27c545e55d28e79f47efd46",
+            "size": 193
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:8ef1e9289c27a564a5df0923c486967488442cc4ed2d2f25b130591da7073739",
+            "size": 36221419
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:3db7b584f774d489e9b5bdabf9e229a4da5af8bf3bb1ba8c2b742e6231357861",
+            "size": 140
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:f25496d407c3a3193fb44b7e6e409fc95b0503bb76ea6360656081a0cd784ff9",
+            "size": 2654933
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:bb90333d2b9cdeda9d86da6b25dd713f6449716e24d6d656bd49d0cf36493ac0",
+            "size": 46263627
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+            "size": 32
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:f95430b152addc49861bd4277b22df465321b40557fb687de4527bb2585811bb",
+            "size": 748940
+          },
+          {
+            "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+            "digest": "sha256:b302a583196ce8ed58fab12b74e36dd9eb7e9e13e57636349aa553f5617000fb",
+            "size": 749075
           }
         ]
       }
@@ -983,48 +1356,15 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "linux"
     And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json
+      """
     When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      { "hello": "world" }
       """
 
   Scenario: License retrieves a manifest for their product by tag
@@ -1036,51 +1376,18 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "linux"
     And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json
+      """
     When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      { "hello": "world" }
       """
 
-  Scenario: License retrieves a manifest for their product by digest
+  Scenario: License retrieves an index for their product by digest
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1089,6 +1396,10 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.index.v1+json
+      """
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1"
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
@@ -1145,6 +1456,116 @@ Feature: OCI image manifests
       }
       """
 
+  Scenario: License retrieves an index for their product (entitled)
+    Given the current account is "keygen"
+    And the current account has 1 "policy" for the first "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license-entitlement" for the last "entitlement" and the last "license"
+    And I am a license of account "keygen"
+    And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.index.v1+json
+      """
+    When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.3.0"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      {
+        "schemaVersion": 2,
+        "mediaType": "application/vnd.oci.image.index.v1+json",
+        "manifests": [
+          {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
+            "size": 2196,
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            }
+          },
+          {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
+            "size": 2196,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          },
+          {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:5003a58c58d300b63dde62d24c40e56f0c12a23127373be0bfce904cfaf6cf46",
+            "size": 566,
+            "annotations": {
+              "vnd.docker.reference.digest": "sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd",
+              "vnd.docker.reference.type": "attestation-manifest"
+            },
+            "platform": {
+              "architecture": "unknown",
+              "os": "unknown"
+            }
+          },
+          {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:bec48978b2eb9496715615e4add1fa70f920c328032a370ccb90b588de4eb3de",
+            "size": 566,
+            "annotations": {
+              "vnd.docker.reference.digest": "sha256:415654d92c281414cda9931cb7cb13027a5dadc63f8844944c53c6a4888d23d3",
+              "vnd.docker.reference.type": "attestation-manifest"
+            },
+            "platform": {
+              "architecture": "unknown",
+              "os": "unknown"
+            }
+          }
+        ]
+      }
+      """
+
+  Scenario: License retrieves an index for their product by version
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the second "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "linux"
+    And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.index.v1+json
+      """
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      { "hello": "dimension" }
+      """
+
+  Scenario: License retrieves an index for their product by tag
+    Given the current account is "linux"
+    And the current account has 1 "policy" for the second "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "linux"
+    And I authenticate with my key
+    And I send the following raw headers:
+      """
+      Accept: application/vnd.oci.image.index.v1+json
+      """
+    When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
+    Then the response status should be "200"
+    And the response body should be a JSON document with the following content:
+      """
+      { "hello": "dimension" }
+      """
+
   Scenario: License retrieves a manifest for their closed product
     Given the current account is "microsoft"
     And the current account has 1 "policy" for the first "product" with the following:
@@ -1195,20 +1616,85 @@ Feature: OCI image manifests
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
@@ -1252,22 +1738,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      { "hello": "universe" }
       """
 
   Scenario: User retrieves a manifest (with unentitled license)
@@ -1300,22 +1771,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "digest": "sha256:410e8b41faa7b09512984829d2721110f6fbefa9be77ba80162a07e7e0039ec1",
-            "size": 1609,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "keygen/api",
-              "io.containerd.image.name": "docker.io/keygen/api:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
-          }
-        ]
-      }
+      { "hello": "universe" }
       """
 
   Scenario: User retrieves a manifest by version
@@ -1332,44 +1788,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      { "hello": "dimension" }
       """
 
   Scenario: User retrieves a manifest by tag
@@ -1386,44 +1805,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response body should be a JSON document with the following content:
       """
-      {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
-        "manifests": [
-          {
-            "mediaType": "application/vnd.oci.image.index.v1+json",
-            "size": 7143,
-            "digest": "sha256:0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
-            "annotations": {
-              "org.opencontainers.image.ref.name": "stable-release"
-            }
-          },
-          {
-            "mediaType": "application/vnd.oci.image.manifest.v1+json",
-            "size": 7143,
-            "digest": "sha256:e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
-            "platform": {
-              "architecture": "ppc64le",
-              "os": "linux"
-            },
-            "annotations": {
-              "org.opencontainers.image.ref.name": "v1.0"
-            }
-          },
-          {
-            "mediaType": "application/xml",
-            "size": 7143,
-            "digest": "sha256:b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
-            "annotations": {
-              "org.freedesktop.specifications.metainfo.version": "1.0",
-              "org.freedesktop.specifications.metainfo.type": "AppStream"
-            }
-          }
-        ],
-        "annotations": {
-          "com.example.index.revision": "r124356"
-        }
-      }
+      { "hello": "dimension" }
       """
 
   Scenario: User retrieves a manifest by digest
@@ -1531,20 +1913,85 @@ Feature: OCI image manifests
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
 
@@ -1562,19 +2009,84 @@ Feature: OCI image manifests
     And the response body should be a JSON document with the following content:
       """
       {
-        "schemaVersion": 2,
-        "mediaType": "application/vnd.oci.image.index.v1+json",
         "manifests": [
           {
-            "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-            "digest": "sha256:beefdbd8a1da6d2915566fde36db9db0b524eb737fc57cd1367effd16dc0d06d",
-            "size": 1853,
-            "annotations": {
-              "containerd.io/distribution.source.docker.io": "library/alpine",
-              "io.containerd.image.name": "docker.io/library/alpine:latest",
-              "org.opencontainers.image.ref.name": "latest"
-            }
+            "digest": "sha256:33735bd63cf84d7e388d9f6d297d348c523c044410f553bd878c6d7829612735",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "amd64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:50f635c8b04d86dde8a02bcd8d667ba287eb8b318c1c0cf547e5a48ddadea1be",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v6"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:f2f82d42495723c4dc508fd6b0978a5d7fe4efcca4282e7aae5e00bcf4057086",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm",
+              "os": "linux",
+              "variant": "v7"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:9cee2b382fe2412cd77d5d437d15a93da8de373813621f2e4d406e3df0cf0e7c",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:b3e87f642f5c48cdc7556c3e03a0d63916bd0055ba6edba7773df3cb1a76f224",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "386",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:c7a6800e3dc569a2d6e90627a2988f2a7339e6f111cdf6a0054ad1ff833e99b0",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "ppc64le",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:80cde017a10529a18a7274f70c687bb07c4969980ddfb35a1b921fda3a020e5b",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "riscv64",
+              "os": "linux"
+            },
+            "size": 528
+          },
+          {
+            "digest": "sha256:2b5b26e09ca2856f50ac88312348d26c1ac4b8af1df9f580e5cf465fd76e3d4d",
+            "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+            "platform": {
+              "architecture": "s390x",
+              "os": "linux"
+            },
+            "size": 528
           }
-        ]
+        ],
+        "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+        "schemaVersion": 2
       }
       """
