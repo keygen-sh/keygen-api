@@ -165,7 +165,6 @@ module OciImageLayout
   class Descriptor < Blob
     INDEX_MEDIA_TYPES    = %w[application/vnd.oci.image.index.v1+json application/vnd.docker.distribution.manifest.list.v2+json].freeze
     MANIFEST_MEDIA_TYPES = %w[application/vnd.oci.image.manifest.v1+json application/vnd.docker.distribution.manifest.v2+json].freeze
-    CONFIG_MEDIA_TYPES   = %w[application/vnd.oci.image.config.v1+json application/vnd.docker.container.image.v1+json].freeze
 
     def self.from_json(data, layout:, **)
       media_type = data['mediaType']
@@ -190,15 +189,9 @@ module OciImageLayout
 
     def index?    = media_type.in?(INDEX_MEDIA_TYPES)
     def manifest? = media_type.in?(MANIFEST_MEDIA_TYPES)
-    def config?   = media_type.in?(CONFIG_MEDIA_TYPES)
-    def json?     = index? || manifest? || config?
-    def opaque?   = !json?
-    def layer?    = opaque? # FIXME(ezekg) not sure if we can be more accurate here?
 
     def to_index    = Index.from_descriptor(self, layout:)
     def to_manifest = Manifest.from_descriptor(self, layout:)
-    def to_config   = Config.from_descriptor(self, layout:)
-    def to_layer    = Layer.from_descriptor(self, layout:)
     def to_h        = { media_type:, digest:, size:, path: }
   end
 
@@ -304,21 +297,6 @@ module OciImageLayout
     end
   end
 
-  class Config < Descriptor
-    def self.from_descriptor(descriptor, **)
-      raise "expected config descriptor but got #{descriptor.media_type}" unless
-        descriptor.config?
-
-      new(descriptor.to_io, **descriptor.to_h, **)
-    end
-  end
-
-  class Layer < Descriptor
-    def self.from_descriptor(descriptor, **)
-      raise "expected layer descriptor but got #{descriptor.media_type}" unless
-        descriptor.layer?
-
-      new(descriptor.to_io, **descriptor.to_h, **)
-    end
-  end
+  class Config < Descriptor; end
+  class Layer < Descriptor; end
 end
