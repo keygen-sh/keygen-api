@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base image
-FROM ruby:3.3.6-alpine as base
+FROM ruby:3.3.6-alpine AS base
 
 ENV BUNDLE_WITHOUT="development:test" \
     BUNDLE_PATH="/usr/local/bundle" \
@@ -9,7 +9,7 @@ ENV BUNDLE_WITHOUT="development:test" \
     RAILS_ENV="production"
 
 # Build stage
-FROM base as build
+FROM base AS build
 
 WORKDIR /app
 COPY ./Gemfile /app/Gemfile
