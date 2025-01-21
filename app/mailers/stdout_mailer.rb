@@ -2,6 +2,7 @@
 
 class StdoutMailer < ApplicationMailer
   default from: 'Zeke at Keygen <zeke@keygen.sh>'
+  default precedence: 'bulk'
 
   def issue_zero(subscriber:)
     return if

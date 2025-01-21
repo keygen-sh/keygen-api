@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PlaintextMailer < ApplicationMailer
-  default from: "Zeke at Keygen <zeke@keygen.sh>"
+  default from: "Zeke Gabrielse <zeke@keygen.sh>"
 
   def low_activity_lifeline(account:)
     admin = account.admins.last

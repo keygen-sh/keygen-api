@@ -5,4 +5,5 @@ class ApplicationMailer < ActionMailer::Base
                           .freeze
 
   default from: "Keygen Support <#{DEFAULT_FROM_EMAIL}>"
+  default precedence: 'normal'
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class RecoveryMailer < ApplicationMailer
+  default precedence: 'urgent'
+
   layout "recovery_mailer"
 
   def recover_accounts_for_email(email:)

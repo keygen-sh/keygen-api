@@ -2,6 +2,8 @@
 
 class UserMailer < ApplicationMailer
   default from: "Keygen <noreply@keygen.sh>"
+  default precedence: 'urgent'
+
   layout "user_mailer"
 
   def password_reset(user:, token:)
