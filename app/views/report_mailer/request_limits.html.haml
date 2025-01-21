@@ -37,19 +37,19 @@
         %span #{report.admin.full_name} / #{mail_to report.admin.email}
         %br
         %strong Requests:
-        %span(style="color: #{report.request_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+        %span(style="color: #{report.request_limit_exceeded ? '#ff0041' : '#00ce75'}")
           #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
         %br
         %strong Licenses:
-        %span(style="color: #{report.license_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+        %span(style="color: #{report.license_limit_exceeded ? '#ff0041' : '#00ce75'}")
           #{number_with_delimiter report.active_licensed_user_count} / #{number_with_delimiter report.license_limit || 'unlimited'} (total #{number_with_delimiter report.license_count} licenses)
         %br
         %strong Products:
-        %span(style="color: #{report.product_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+        %span(style="color: #{report.product_limit_exceeded ? '#ff0041' : '#00ce75'}")
           #{number_with_delimiter report.product_count} / #{number_with_delimiter report.product_limit || 'unlimited'}
         %br
         %strong Admins:
-        %span(style="color: #{report.admin_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+        %span(style="color: #{report.admin_limit_exceeded ? '#ff0041' : '#00ce75'}")
           #{number_with_delimiter report.admin_count} / #{number_with_delimiter report.admin_limit || 'unlimited'}
         %br
         %strong Plan:
