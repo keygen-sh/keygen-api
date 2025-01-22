@@ -27,6 +27,16 @@ class ReleaseDescriptor < ApplicationRecord
   validates :release,
     scope: { by: :account_id }
 
+  # assert that release matches the artifact's release
+  validate on: %i[create update] do
+    next unless
+      release_artifact_id_changed? || release_id_changed?
+
+    unless artifact.nil? || artifact.release_id == release_id
+      errors.add :release, :not_allowed, message: 'release must match artifact release'
+    end
+  end
+
   scope :accessible_by, -> accessor {
     case accessor
     in role: Role(:admin)
