@@ -220,5 +220,5 @@ class ReleaseDescriptor < ApplicationRecord
   def bucket = artifact.bucket
   def key    = artifact.key_for(content_path)
 
-  def download!(**) = artifact.download!(**, filename: content_path)
+  def download!(**) = artifact.download!(**, path: content_path)
 end
