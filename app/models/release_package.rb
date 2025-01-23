@@ -115,6 +115,10 @@ class ReleasePackage < ApplicationRecord
     to: :engine,
     allow_nil: true
 
+  delegate :open?, :closed?, :licensed?,
+    to: :product,
+    allow_nil: true
+
   def engine_id? = release_engine_id?
   def engine_id  = release_engine_id
   def engine_id=(id)

@@ -107,7 +107,16 @@ class ApplicationController < ActionController::API
   def render_unauthorized(**kwargs)
     skip_verify_authorized!
 
-    self.headers['WWW-Authenticate'] = %(Bearer realm="keygen")
+    # FIXME(ezekg) docker wants to do a jwt token dance unless we stick to a basic
+    #              auth scheme (which is fine since our basic auth scheme only
+    #              supports license keys and tokens, not passwords!)
+    default_challenge_scheme = oci? ? 'Basic' : 'Bearer'
+
+    challenge_scheme = authentication_scheme&.capitalize || default_challenge_scheme
+    challenge_realm  = 'keygen'
+    challenge        = %(#{challenge_scheme} realm="#{challenge_realm}")
+
+    response.headers['WWW-Authenticate'] = challenge
 
     respond_to do |format|
       format.any {
@@ -566,6 +575,8 @@ class ApplicationController < ActionController::API
       },
     )
   end
+
+  def oci? = request.subdomain == 'oci.pkg'
 
   def prefers?(preference)
     preferences = request.headers.fetch('Prefer') { request.query_parameters.fetch(:prefer, '').to_s }

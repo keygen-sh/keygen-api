@@ -62,6 +62,7 @@ Feature: OCI image manifests
       | 800df9ff-a355-4354-8291-b964dbf00bdf | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | b33a6df6-91af-4b0a-8c0b-a383befe1dea | 743f1204-c91a-41b6-86e0-07a5fce716d3 | blobs/sha256/9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd | application/vnd.oci.image.manifest.v1+json                | sha256:9c74df62b4d5722f86c31ce8319f047bdced5af0da2e9403fb3154d2599736cd | 2196           | {\n  "schemaVersion": 2,\n  "mediaType": "application/vnd.oci.image.manifest.v1+json",\n  "config": {\n    "mediaType": "application/vnd.oci.image.config.v1+json",\n    "digest": "sha256:9ec80051ed72131fe1d3df8d47a29f4f259295267252e9c8d89968410ed26edc",\n    "size": 8939\n  },\n  "layers": [\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:d25f557d7f31bf7acfac935859b5153da41d13c41f2b468d16f729a5b883634f",\n      "size": 3622094\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:fcb16707477d8b1e3de1322a8996261e0fe9e3b6e139a51aeccccd58afa01cf6",\n      "size": 6686032\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:453bd37d6ebb12875a716b8d83bf4fd9b0ffa419d27c545e55d28e79f47efd46",\n      "size": 193\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:8ef1e9289c27a564a5df0923c486967488442cc4ed2d2f25b130591da7073739",\n      "size": 36221419\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:3db7b584f774d489e9b5bdabf9e229a4da5af8bf3bb1ba8c2b742e6231357861",\n      "size": 140\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:f25496d407c3a3193fb44b7e6e409fc95b0503bb76ea6360656081a0cd784ff9",\n      "size": 2654933\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:bb90333d2b9cdeda9d86da6b25dd713f6449716e24d6d656bd49d0cf36493ac0",\n      "size": 46263627\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",\n      "size": 32\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:f95430b152addc49861bd4277b22df465321b40557fb687de4527bb2585811bb",\n      "size": 748940\n    },\n    {\n      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",\n      "digest": "sha256:b302a583196ce8ed58fab12b74e36dd9eb7e9e13e57636349aa553f5617000fb",\n      "size": 749075\n    }\n  ]\n} | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
       # keygen 1.2.0
       # windows 26100.2314
+      | 44f862a3-60fa-4111-a2fd-823d96c474f5 | 9f3d711d-55ea-49ed-9155-9acf4e4a347b | f789aaf5-3901-4ce4-9478-3756ad7f7500 | d08b8b81-ae2b-49f7-a9c2-442f89b327b4 | blobs/sha256/ca970908644e34be86cfd5b3196a069a365a2b715346d67bfab2a43455ddfb3a | application/vnd.oci.image.index.v1+json                   | sha256:ca970908644e34be86cfd5b3196a069a365a2b715346d67bfab2a43455ddfb3a | 19             | {"hello":"windows"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
     And the following "descriptors" exist:
       | id                                   | account_id                           | release_artifact_id                  | release_id                           | content_path                                                                  | content_type                                              | content_digest                                                          | content_length | created_at               | updated_at               |
       # alpine 3.20.3
@@ -102,6 +103,7 @@ Feature: OCI image manifests
       | 5a2c5246-cc20-49c1-a24c-bca3bf6cfe6a | b8cd8416-6dfb-44dd-9b69-1d73ee65baed | ecdefa87-85f0-49ad-bb22-be24c9872d0f | 7a5e615a-7814-4ca5-9163-66231d54ab73 | oci-layout                                                                    | application/vnd.oci.layout.header.v1+json                 | sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6 | 30             | 2024-01-20T11:11:00.000Z | 2024-01-20T11:11:00.000Z |
       # windows 26100.2314
       | aec6088d-f095-4d71-8206-ad55ef5ae03d | 9f3d711d-55ea-49ed-9155-9acf4e4a347b | f789aaf5-3901-4ce4-9478-3756ad7f7500 | d08b8b81-ae2b-49f7-a9c2-442f89b327b4 | oci-layout                                                                    | application/vnd.oci.layout.header.v1+json                 | sha256:18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6 | 30             | 2024-10-01T00:00:01.000Z | 2024-11-12T00:00:01.000Z |
+      | cd3fb54c-9e79-44ce-8f09-d10349922243 | 9f3d711d-55ea-49ed-9155-9acf4e4a347b | f789aaf5-3901-4ce4-9478-3756ad7f7500 | d08b8b81-ae2b-49f7-a9c2-442f89b327b4 | blobs/sha256/ca970908644e34be86cfd5b3196a069a365a2b715346d67bfab2a43455ddfb3a | application/vnd.oci.image.index.v1+json                   | sha256:ca970908644e34be86cfd5b3196a069a365a2b715346d67bfab2a43455ddfb3a | 19             | 2024-06-18T02:52:00.000Z | 2024-06-18T02:52:00.000Z |
     And I send the following raw headers:
       """
       User-Agent: docker/27.0.3 go/go1.21.11 git-commit/662f78c kernel/5.15.153.1-microsoft-standard-WSL2 os/linux arch/amd64 containerd-client/1.7.18+unknown storage-driver/overlayfs UpstreamClient(Docker-Client/27.0.3 \(linux\))
@@ -1154,14 +1156,22 @@ Feature: OCI image manifests
     And I am product "alpine" of account "linux"
     And I use an authentication token
     When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
-    Then the response status should be "404"
+    Then the response status should be "403"
 
   Scenario: Product retrieves another product's open manifest
     Given the current account is "linux"
     And I am product "ubuntu" of account "linux"
     And I use an authentication token
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
-    Then the response status should be "404"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request",
+        "code": "DENIED"
+      }
+      """
 
   Scenario: Product retrieves another account's open manifest
     Given the current account is "keygen"
@@ -1261,10 +1271,10 @@ Feature: OCI image manifests
     And I authenticate with my key
     And I send the following raw headers:
       """
-      Accept: application/vnd.oci.image.manifest.v1+json
+      Accept: application/vnd.oci.image.index.v1+json
       """
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "404"
+    Then the response status should be "403"
 
   Scenario: License retrieves a manifest for their product (entitled)
     Given the current account is "keygen"
@@ -1575,10 +1585,18 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "microsoft"
     And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314.0"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request",
+        "code": "DENIED"
+      }
+      """
 
-  Scenario: License retrieves a manifest for another closed product
+  Scenario: License retrieves a manifest for another account's closed product
     Given the current account is "keygen"
     And the current account has 1 "policy" for the first "product" with the following:
       """
@@ -1587,8 +1605,16 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "keygen"
     And I authenticate with my key
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314.0"
     Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request",
+        "code": "LICENSE_INVALID"
+      }
+      """
 
   Scenario: License retrieves a manifest for another licensed product
     Given the current account is "linux"
@@ -1600,7 +1626,15 @@ Feature: OCI image manifests
     And I am a license of account "linux"
     And I authenticate with my key
     When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/24.10.0"
-    Then the response status should be "404"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request",
+        "code": "DENIED"
+      }
+      """
 
   Scenario: License retrieves a manifest for another open product
     Given the current account is "linux"
@@ -1721,7 +1755,7 @@ Feature: OCI image manifests
     And I am the last user of account "keygen"
     And I use an authentication token
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "404"
+    Then the response status should be "403"
 
   Scenario: User retrieves a manifest (with entitled owned license)
     Given the current account is "keygen"
@@ -1753,7 +1787,7 @@ Feature: OCI image manifests
     And I am the last user of account "keygen"
     And I use an authentication token
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.4.0"
-    Then the response status should be "404"
+    Then the response status should be "403"
 
   Scenario: User retrieves a manifest (with entitled license)
     Given the current account is "keygen"
@@ -1884,16 +1918,24 @@ Feature: OCI image manifests
     And the current account has 1 "license" for the first "policy" and the last "user" as "owner"
     And I am the last user of account "microsoft"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/24H2"
+    Then the response status should be "403"
 
   Scenario: User retrieves a closed manifest (no license)
     Given the current account is "linux"
     And  the current account has 1 "user"
     And I am the last user of account "linux"
     And I use an authentication token
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/24H2"
     Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request",
+        "code": "TOKEN_INVALID"
+      }
+      """
 
   Scenario: User retrieves a licensed manifest (no license)
     Given the current account is "linux"
@@ -1901,7 +1943,15 @@ Feature: OCI image manifests
     And I am the last user of account "linux"
     And I use an authentication token
     When I send a GET request to "/accounts/linux/engines/oci/ubuntu/manifests/oracular"
-    Then the response status should be "404"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request",
+        "code": "DENIED"
+      }
+      """
 
   Scenario: User retrieves an open manifest (no license)
     Given the current account is "linux"
@@ -1996,12 +2046,28 @@ Feature: OCI image manifests
       """
 
   Scenario: Anon retrieves a closed manifest
-    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314"
-    Then the response status should be "404"
+    When I send a GET request to "/accounts/microsoft/engines/oci/windows/manifests/26100.2314.0"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request",
+        "code": "UNAUTHORIZED"
+      }
+      """
 
   Scenario: Anon retrieves a licensed manifest
     When I send a GET request to "/accounts/keygen/engines/oci/api/manifests/1.3.0"
-    Then the response status should be "404"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request",
+        "code": "UNAUTHORIZED"
+      }
+      """
 
   Scenario: Anon retrieves an open manifest
     When I send a GET request to "/accounts/linux/engines/oci/alpine/manifests/3.20.3"
