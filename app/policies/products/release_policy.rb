@@ -21,8 +21,10 @@ module Products
         allow? :index, record, skip_verify_permissions: true, with: ::ReleasePolicy
       in role: Role(:license) if product.open? || product == bearer.product
         allow? :index, record, skip_verify_permissions: true, with: ::ReleasePolicy
+      in nil if product.open? && record.none?(&:constraints?)
+        allow!
       else
-        product.open? && record.none?(&:constraints?)
+        deny!
       end
     end
 
@@ -41,8 +43,10 @@ module Products
         allow? :show, record, skip_verify_permissions: true, with: ::ReleasePolicy
       in role: Role(:license) if product.open? || product == bearer.product
         allow? :show, record, skip_verify_permissions: true, with: ::ReleasePolicy
+      in nil if product.open? && record.constraints.none?
+        allow!
       else
-        product.open? && record.constraints.none?
+        deny!
       end
     end
   end

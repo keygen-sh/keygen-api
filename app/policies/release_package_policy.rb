@@ -34,12 +34,14 @@ class ReleasePackagePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.all? { _1.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.product.open? || _1.product_id.in?(bearer.product_ids) }
+    in role: Role(:user) if record.all? { _1.open? || _1.licensed? && _1.product_id.in?(bearer.product_ids) }
       allow!
-    in role: Role(:license) if record.all? { _1.product.open? || _1.product == bearer.product }
+    in role: Role(:license) if record.all? { _1.open? || _1.licensed? && _1.product == bearer.product }
+      allow!
+    in nil if record.all?(&:open?)
       allow!
     else
-      record.all? { _1.product.open? }
+      deny!
     end
   end
 
@@ -54,12 +56,14 @@ class ReleasePackagePolicy < ApplicationPolicy
       allow!
     in role: Role(:product) if record.product == bearer
       allow!
-    in role: Role(:user) if record.product.open? || bearer.products.exists?(record.product_id)
+    in role: Role(:user) if record.open? || record.licensed? && bearer.products.exists?(record.product_id)
       allow!
-    in role: Role(:license) if record.product.open? || record.product == bearer.product
+    in role: Role(:license) if record.open? || record.licensed? && record.product == bearer.product
+      allow!
+    in nil if record.open?
       allow!
     else
-      record.product.open?
+      deny!
     end
   end
 

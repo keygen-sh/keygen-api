@@ -11,7 +11,7 @@ module Api::V1::ReleaseEngines
     def show
       authorize! package
 
-      descriptor = authorized_scope(package.descriptors).find_by!(
+      descriptor = package.descriptors.find_by!(
         content_digest: params[:digest],
       )
       authorize! descriptor
@@ -23,6 +23,15 @@ module Api::V1::ReleaseEngines
         redirect_to vanity_v1_account_release_artifact_url(current_account, descriptor.artifact, filename: descriptor.content_path, host: request.host),
           status: :see_other
       end
+    rescue ActionPolicy::Unauthorized
+      # FIXME(ezekg) docker expects a 401 Unauthorized response with an WWW-Authenticate
+      #              challenge, so unfortunately, we can't return a 404 here like we
+      #              usually do for unauthorized requests (so as not to leak data).
+      if current_bearer.nil?
+        render_unauthorized(code: 'UNAUTHORIZED')
+      else
+        render_forbidden(code: 'DENIED')
+      end
     end
 
     private
@@ -32,10 +41,11 @@ module Api::V1::ReleaseEngines
     def require_ee! = super(entitlements: %i[oci_engine])
 
     def set_package
-      scoped_packages = authorized_scope(current_account.release_packages.oci)
-                          .where_assoc_exists(
-                            :descriptors, # must exist
-                          )
+      # NOTE(ezekg) see above comment i.r.t. docker authentication on why we're
+      #             skipping authorized_scope here and elsewhere
+      scoped_packages = current_account.release_packages.oci.where_assoc_exists(
+                          :descriptors, # must exist
+                        )
 
       @package = Current.resource = FindByAliasService.call(
         scoped_packages,
