@@ -17,6 +17,9 @@ module Api::V1::ReleaseEngines
       authorize! descriptor
 
       if request.head?
+        response.headers['Docker-Content-Digest'] = descriptor.content_digest # oras likes these
+        response.headers['Content-Length']        = descriptor.content_length
+
         # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
         head :ok
       else
