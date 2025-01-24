@@ -664,8 +664,9 @@ Rails.application.routes.draw do
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'oci.pkg' } do
       # NOTE(ezekg) /v2 namespace is handled here because docker wants it at the root...
       scope :v2 do
+        # see: https://github.com/distribution/distribution/blob/main/docs/content/spec/api.md#api-version-check
         # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#endpoints
-        match '/', via: %i[head get], to: -> env { [200, {}, []] }
+        match '/', via: %i[head get], to: -> env { [200, {'Docker-Distribution-Api-Version': 'registry/2.0'}, []] }
 
         case
         when Keygen.multiplayer?
