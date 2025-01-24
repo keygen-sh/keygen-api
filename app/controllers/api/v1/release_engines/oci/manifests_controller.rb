@@ -30,6 +30,9 @@ module Api::V1::ReleaseEngines
       response.content_type = manifest.content_type
 
       if request.head?
+        response.headers['Docker-Content-Digest'] = manifest.content_digest # oras likes these
+        response.headers['Content-Length']        = manifest.content_length
+
         # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
         head :ok
       else
