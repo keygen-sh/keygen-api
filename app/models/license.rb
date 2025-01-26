@@ -893,7 +893,7 @@ class License < ApplicationRecord
   # Set the last validated attributes for a license. This is used to store
   # temporary changes to the license that are not persisted to the database
   # until the license has been validated.
-  # @param attrs_hash [Hash] A hash of attributes to set
+  # @param [Hash] attrs_hash A hash of attributes to set
   def set_last_validated_attributes(**attrs_hash)
     last_validated_attributes_updates.merge!(attrs_hash)
   end
