@@ -62,6 +62,11 @@ class License < ApplicationRecord
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
 
+  # Once a license has been persisted, reset the temporary changes stored in memory
+  # for last_validated_attributes
+  # @see License#set_last_validated_attributes
+  after_commit :reset_last_validated_attributes_updates
+
   # Licenses automatically inherit their owner's group ID. We're using before_validation
   # instead of before_create so that this can be run when the owner is changed as well,
   # and so that we can keep our group limit validations in play.
@@ -885,9 +890,41 @@ class License < ApplicationRecord
     save!
   end
 
+  # Set the last validated attributes for a license. This is used to store
+  # temporary changes to the license that are not persisted to the database
+  # until the license has been validated.
+  # @param attrs_hash [Hash] A hash of attributes to set
+  def set_last_validated_attributes(**attrs_hash)
+    last_validated_attributes_updates.merge!(attrs_hash)
+  end
+
+  # Persist the last validated attributes for a license to the database. Updates are persisted
+  # asynchronously to prevent blocking the request thread
+  #
+  def persist_last_validated_attributes!
+    return if last_validated_attributes_updates.empty?
+    # Attempt to store touches in database
+    TouchLicenseWorker.perform_async(id, last_validated_attributes_updates.as_json)
+    # Store in-memory for returning up-to-date information in the response body
+    assign_attributes(**last_validated_attributes_updates)
+  end
+
+  # The updates to the last validated attributes intended to be persisted to the database
+  # @return [Hash]
+  # @see License#set_last_validated_attributes
+  def last_validated_attributes_updates
+    @last_validated_attributes_updates ||= reset_last_validated_attributes_updates
+  end
+
   private
 
   attr_accessor :seed_key
+
+  attr_writer :last_validated_attributes_updates
+
+  def reset_last_validated_attributes_updates
+    self.last_validated_attributes_updates = {}
+  end
 
   def default_seed_key
     case scheme

@@ -347,4 +347,66 @@ describe License, type: :model do
       expect(License.with_status(:banned).count).to eq 3
     end
   end
+
+  describe '#set_last_validated_attributes' do
+    it 'sets #last_validated_attributes_updates' do
+      license = License.new
+      license.set_last_validated_attributes(foo:"bar")
+      expect(license.last_validated_attributes_updates).to include(foo:"bar")
+    end
+
+    it 'updates last_validated_attributes_updates' do
+      license = License.new
+      license.set_last_validated_attributes(key:"value")
+      license.set_last_validated_attributes(key:"buzz", bar:"baz")
+
+      expect(license.last_validated_attributes_updates).to eq(key:"buzz", bar:"baz")
+    end
+  end
+
+  describe '#last_validated_attributes_updates' do
+    it 'defaults to empty hash' do
+      license = License.new
+      expect(license.last_validated_attributes_updates).to eql({})
+    end
+
+    it 'resets to empty hash after persisting' do
+      license = create(:license, account:)
+      license.set_last_validated_attributes(key:"value")
+      license.save!
+
+      expect(license.last_validated_attributes_updates).to eql({})
+    end
+  end
+
+  describe '#persist_last_validated_attributes!' do
+    it 'persists the changes on the database' do
+      freeze_time do
+        timestamp = 1.day.ago
+        license = create(:license, account:)
+        license.set_last_validated_attributes(last_validated_at:timestamp)
+
+        Sidekiq::Testing.inline! do
+          license.persist_last_validated_attributes!
+
+          license.reload
+          expect(license.last_validated_at).to eql(timestamp)
+        end
+      end
+    end
+
+    it 'updates the attributes in memory' do
+      freeze_time do
+        timestamp = 1.day.ago
+        license = create(:license, account:)
+        license.set_last_validated_attributes(last_validated_at:timestamp)
+
+        Sidekiq::Testing.inline! do
+          license.persist_last_validated_attributes!
+
+          expect(license.last_validated_at).to eql(timestamp)
+        end
+      end
+    end
+  end
 end
