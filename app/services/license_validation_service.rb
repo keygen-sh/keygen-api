@@ -8,9 +8,7 @@ class LicenseValidationService < BaseService
     @license    = license
     @scope      = scope
     @skip_touch = skip_touch
-    @touches    = {
-      last_validated_at: Time.current,
-    }
+    self.license.set_last_validated_attributes(last_validated_at: Time.current)
   end
 
   def call
@@ -24,8 +22,7 @@ class LicenseValidationService < BaseService
   attr_reader :account,
               :product,
               :license,
-              :scope,
-              :touches
+              :scope
 
   def skip_touch? = !!@skip_touch
 
@@ -230,8 +227,8 @@ class LicenseValidationService < BaseService
           return [false, "checksum scope is not valid (does not match any accessible artifacts)", :CHECKSUM_SCOPE_MISMATCH]
         end
 
-        touches[:last_validated_checksum] = checksum
-        touches[:last_validated_version]  = artifact.version
+        license.set_last_validated_attributes(last_validated_checksum: checksum,
+                                              last_validated_version: artifact.version)
       else
         return [false, "checksum scope is required", :CHECKSUM_SCOPE_REQUIRED] if license.policy.require_checksum_scope?
       end
@@ -247,8 +244,7 @@ class LicenseValidationService < BaseService
         if release.nil?
           return [false, "version scope is not valid (does not match any accessible releases)", :VERSION_SCOPE_MISMATCH]
         end
-
-        touches[:last_validated_version] = release.version
+        license.set_last_validated_attributes(last_validated_version: release.version)
       else
         return [false, "version scope is required", :VERSION_SCOPE_REQUIRED] if license.policy.require_version_scope?
       end
@@ -418,13 +414,8 @@ class LicenseValidationService < BaseService
   end
 
   def touch!
-    return if
-      skip_touch? || license.nil? || touches.empty?
+    return if skip_touch? || license.nil?
 
-    # Attempt to store touches in database
-    TouchLicenseWorker.perform_async(license.id, touches.as_json)
-
-    # Store in-memory for response
-    license.assign_attributes(**touches)
+    license.persist_last_validated_attributes!
   end
 end
