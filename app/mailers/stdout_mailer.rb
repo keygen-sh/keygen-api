@@ -987,7 +987,7 @@ class StdoutMailer < ApplicationMailer
 
         ### Rubygems
 
-        Also in November, we launched support for Rubygems via our Rubygems engine, which can be used for private Rubygems.
+        Also in November, we launched support for private Ruby gems via our Rubygems engine.
 
         Docs: https://keygen.sh/docs/api/engines/#engines-rubygems
 
