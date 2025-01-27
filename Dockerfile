@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base image
-FROM ruby:3.3.6-alpine AS base
+FROM ruby:3.3.7-alpine AS base
 
 ENV BUNDLE_WITHOUT="development:test" \
     BUNDLE_PATH="/usr/local/bundle" \

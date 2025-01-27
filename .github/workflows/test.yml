@@ -62,7 +62,7 @@ jobs:
       - name: Install
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3.6'
+          ruby-version: '3.3.7'
           bundler-cache: true
       - name: Setup
         run: bundle exec rake test:setup
