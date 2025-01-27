@@ -965,7 +965,7 @@ class StdoutMailer < ApplicationMailer
 
             https://github.com/keygen-sh/keygen-api/releases/tag/v1.4.0
 
-        The OCI engine will be available next release, once we battle-test it in Keygen Cloud.
+        The OCI engine will be available next release, once battle-tested in Keygen Cloud.
 
         ## Engines
 
@@ -975,9 +975,7 @@ class StdoutMailer < ApplicationMailer
 
         The OCI engine implements the Open Container Initiative distribution specification, so tools like Docker, Skopeo, and Oras are supported.
 
-        Additional information and documentation can be found here:
-
-            https://keygen.sh/docs/api/engines/#engines-oci
+        Docs: https://keygen.sh/docs/api/engines/#engines-oci
 
         (If you didn't notice, we're dog-fooding this for Relay!)
 
@@ -985,17 +983,13 @@ class StdoutMailer < ApplicationMailer
 
         Back in November, we launched support for npm packages via our npm engine. Use this to license and distribute private npm packages.
 
-        Additional information and documentation is available here:
-
-            https://keygen.sh/docs/api/engines/#engines-npm
+        Docs: https://keygen.sh/docs/api/engines/#engines-npm
 
         ### Rubygems
 
         Also in November, we launched support for Rubygems via our Rubygems engine, which can be used for private Rubygems.
 
-        Documentation and additional information is available here:
-
-            https://keygen.sh/docs/api/engines/#engines-rubygems
+        Docs: https://keygen.sh/docs/api/engines/#engines-rubygems
 
         ---
 
