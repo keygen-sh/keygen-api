@@ -911,6 +911,106 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_ten(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "Relay goes GA, plus Docker/OCI, npm, and Rubygem engines",
+      body: <<~TXT
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Zeke here, founder of Keygen. Hope the new year is treating everybody good. We're kicking things off strong this year, so let's get right into it.
+
+        ## Keygen Relay goes GA
+
+        Keygen Relay, our answer to air-gapped node-locked licensing, has been in beta for a couple months and this week we've cut the first stable release.
+
+        If you're looking at ways to accomplish on-prem node-locked licensing, check it out here:
+
+            docker pull oci.pkg.keygen.sh/keygen/relay:latest
+
+        You can also download a pre-compiled binary here:
+
+            https://keygen.sh/docs/relay/
+
+        Let us know what you build! (Remember: it's open source -- so let's build together!)
+
+        ## Keygen CE/EE
+
+        We cut a new self-hosted release, v1.4.0. This includes the npm and Rubygem engines (covered more below), as well as a couple bug fixes.
+
+        You can upgrade via Docker pull:
+
+            docker pull keygen/api:latest
+
+        Upgrade notes are here:
+
+            https://github.com/keygen-sh/keygen-api/releases/tag/v1.4.0
+
+        The OCI engine will be available next release, once we battle-test it in Keygen Cloud.
+
+        ## Engines
+
+        ### Docker/OCI
+
+        Last week, we launched official support for Docker via our OCI registry. Use this to license and distribute private container images to users.
+
+        The OCI engine implements the Open Container Initiative distribution specification, so tools like Docker, Skopeo, and Oras are supported.
+
+        Additional information and documentation can be found here:
+
+            https://keygen.sh/docs/api/engines/#engines-oci
+
+        (If you didn't notice, we're dog-fooding this for Relay!)
+
+        ### npm
+
+        Back in November, we launched support for npm packages via our npm engine. Use this to license and distribute private npm packages.
+
+        Additional information and documentation is available here:
+
+            https://keygen.sh/docs/api/engines/#engines-npm
+
+        ### Rubygems
+
+        Also in November, we launched support for Rubygems via our Rubygems engine, which can be used for private Rubygems.
+
+        Documentation and additional information is available here:
+
+            https://keygen.sh/docs/api/engines/#engines-rubygems
+
+        ---
+
+        Let me know if you have any feedback for me on things we can do better, or things you'd like us to build.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. we broke 1k stars on GitHub! Star us if you haven't already: https://github.com/keygen-sh/keygen-api
+      TXT
+    )
+  end
+
   private
 
   def secret_key = ENV.fetch('STDOUT_SECRET_KEY')
