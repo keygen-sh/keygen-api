@@ -152,7 +152,7 @@ Feature: Rubygems compact index
     And the response should contain the following raw headers:
       """
       Etag: W/"a870c6d351550439c697733e94fae5a0"
-      Cache-Control: max-age=86400, private
+      Cache-Control: max-age=86400, private, no-transform
       """
     And the response body should be a text document with the following content:
       """
@@ -231,7 +231,7 @@ Feature: Rubygems compact index
     And the response should contain the following raw headers:
       """
       Etag: W/"38afb98cc89d213319ac2cb928069b66"
-      Cache-Control: max-age=86400, private
+      Cache-Control: max-age=86400, private, no-transform
       """
     And the response body should be a text document with the following content:
       """
@@ -277,7 +277,7 @@ Feature: Rubygems compact index
     And the response should contain the following raw headers:
       """
       Etag: W/"2d63ca76663b18e649dee3c55bb0e0d9"
-      Cache-Control: max-age=86400, private
+      Cache-Control: max-age=86400, private, no-transform
       """
     And the response body should be a text document with the following content:
       """

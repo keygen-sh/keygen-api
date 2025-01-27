@@ -49,7 +49,7 @@ module DefaultHeaders
   end
 
   def add_cache_control_headers
-    response.headers['Cache-Control'] = 'no-store, max-age=0'
+    response.headers['Cache-Control'] = 'no-transform, no-store, max-age=0'
   end
 
   def add_rate_limiting_headers

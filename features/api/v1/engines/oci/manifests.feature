@@ -209,7 +209,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
 
   Scenario: Endpoint should respond with a matching media type (manifest)
@@ -224,7 +224,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.v2+json
       """
 
   Scenario: Endpoint should respond with any media type
@@ -239,7 +239,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
 
   Scenario: Endpoint should not respond with an unknown media type
@@ -269,7 +269,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -368,7 +368,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -463,7 +463,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -562,7 +562,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -661,7 +661,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -756,7 +756,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.list.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -855,7 +855,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -889,7 +889,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -919,7 +919,7 @@ Feature: OCI image manifests
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Type: application/vnd.docker.distribution.manifest.v2+json; charset=utf-8
+      Content-Type: application/vnd.docker.distribution.manifest.v2+json
       """
     And the response body should be a JSON document with the following content:
       """
@@ -1073,7 +1073,7 @@ Feature: OCI image manifests
     And the response should contain the following raw headers:
       """
       Etag: W/"c2eab43acb840126ba7a214819e2c71a"
-      Cache-Control: max-age=86400, private
+      Cache-Control: max-age=86400, private, no-transform
       """
 
   Scenario: Product retrieves their licensed manifest

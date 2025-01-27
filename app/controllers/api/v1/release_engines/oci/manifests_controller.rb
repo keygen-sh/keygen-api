@@ -32,12 +32,12 @@ module Api::V1::ReleaseEngines
       return unless
         stale?(manifest, cache_control: { max_age: 1.day, private: true })
 
-      # oci spec is very particular about content/media types
-      response.content_type = manifest.content_type
+      # oci spec is very particular about content length and media types
+      response.headers['Content-Length'] = manifest.content_length
+      response.headers['Content-Type']   = manifest.content_type
 
       if request.head?
-        response.headers['Docker-Content-Digest'] = manifest.content_digest # oras likes these
-        response.headers['Content-Length']        = manifest.content_length
+        response.headers['Docker-Content-Digest'] = manifest.content_digest # oras likes this
 
         # see: https://github.com/opencontainers/distribution-spec/blob/main/spec.md#checking-if-content-exists-in-the-registry
         head :ok

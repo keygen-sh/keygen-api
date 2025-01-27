@@ -76,10 +76,9 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
   end
 
   response if: -> res { res.status < 400 && res.status != 204 } do |res|
-    req    = res.request
-    format = req.format
+    mime_type, * = Mime::Type.parse(res.content_type.to_s)
     next unless
-      format.jsonapi? || format.json?
+      mime_type in Mime::Type[:jsonapi | :json]
 
     next if
       res.body.blank?
