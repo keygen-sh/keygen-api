@@ -513,54 +513,56 @@ Feature: License checkout actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin performs a license checkout with a TTL that is too long (POST)
-    Given the current account is "test1"
+  Scenario: Admin performs a license checkout with a TTL that is very long (POST)
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out" with the following:
       """
-      { "meta": { "ttl": 31556953 } }
+      { "meta": { "ttl": 189341712 } }
       """
-    Then the response status should be "400"
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the response body should be a "license-file" with the following encoded certificate data:
       """
       {
-        "title": "Bad request",
-        "detail": "must be less than or equal to 31556952 (1 year)",
-        "code": "CHECKOUT_TTL_INVALID",
-        "source": {
-          "parameter": "ttl"
+        "meta": {
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2028-10-16T14:52:48.000Z",
+          "ttl": 189341712
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+    And time is unfrozen
 
-  Scenario: Admin performs a license checkout with a TTL that is too long (GET)
-    Given the current account is "test1"
+  Scenario: Admin performs a license checkout with a TTL that is very long (GET)
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?ttl=94670856"
-    Then the response status should be "400"
-    And the first error should have the following properties:
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?ttl=189341712"
+    Then the response status should be "200"
+    And the response should be a "LICENSE" certificate with the following encoded data:
       """
       {
-        "title": "Bad request",
-        "detail": "must be less than or equal to 31556952 (1 year)",
-        "code": "CHECKOUT_TTL_INVALID",
-        "source": {
-          "parameter": "ttl"
+        "meta": {
+          "issued": "2022-10-16T14:52:48.000Z",
+          "expiry": "2028-10-16T14:52:48.000Z",
+          "ttl": 189341712
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+    And time is unfrozen
 
   Scenario: Admin performs a license checkout with an owner include (POST)
     Given the current account is "test1"
