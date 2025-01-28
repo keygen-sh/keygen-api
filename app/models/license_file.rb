@@ -27,7 +27,6 @@ class LicenseFile
 
   validates_numericality_of :ttl,
     greater_than_or_equal_to: 1.hour,
-    less_than_or_equal_to: 1.year,
     allow_nil: true
 
   def persisted? = false
