@@ -9,12 +9,15 @@ module Api::V1::ReleaseEngines
     before_action :set_package
 
     def show
-      authorize! package
+      authorize! package,
+        with: ReleaseEngines::Oci::ReleasePackagePolicy
 
-      descriptor = package.descriptors.find_by!(
-        content_digest: params[:digest],
-      )
-      authorize! descriptor
+      descriptor = authorized_scope(package.descriptors, with: ReleaseEngines::Oci::ReleaseDescriptorPolicy)
+                     .find_by!(
+                       content_digest: params[:digest],
+                     )
+      authorize! descriptor,
+        with: ReleaseEngines::Oci::ReleaseDescriptorPolicy
 
       if request.head?
         response.headers['Docker-Content-Digest'] = descriptor.content_digest # oras likes these
@@ -44,11 +47,10 @@ module Api::V1::ReleaseEngines
     def require_ee! = super(entitlements: %i[oci_engine])
 
     def set_package
-      # NOTE(ezekg) see above comment i.r.t. docker authentication on why we're
-      #             skipping authorized_scope here and elsewhere
-      scoped_packages = current_account.release_packages.oci.where_assoc_exists(
-                          :descriptors, # must exist
-                        )
+      scoped_packages = authorized_scope(current_account.release_packages.oci, with: ReleaseEngines::Oci::ReleasePackagePolicy)
+                          .where_assoc_exists(
+                            :descriptors, # must exist
+                          )
 
       @package = Current.resource = FindByAliasService.call(
         scoped_packages,

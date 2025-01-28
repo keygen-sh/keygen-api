@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePackagePolicy < ApplicationPolicy
-  skip_pre_check :verify_authenticated!
+  skip_pre_check :verify_authenticated!, only: %i[index? show?]
 
   scope_for :active_record_relation do |relation|
     relation = relation.for_environment(environment, strict: environment.nil?) if

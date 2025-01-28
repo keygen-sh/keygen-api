@@ -9,18 +9,24 @@ module Api::V1::ReleaseEngines
     before_action :set_package
 
     def show
-      authorize! package
+      authorize! package,
+        with: ReleaseEngines::Oci::ReleasePackagePolicy
 
-      manifest = package.manifests.find_by_reference!(params[:reference],
-        accepts: request.accepts.collect(&:to_s),
-        prefers: %w[
-          application/vnd.oci.image.index.v1+json
-          application/vnd.docker.distribution.manifest.list.v2+json
-          application/vnd.oci.image.manifest.v1+json
-          application/vnd.docker.distribution.manifest.v2+json
-        ],
-      )
-      authorize! manifest
+      # NOIE(ezekg) because docker expects WWW-Authenticate challenges, we can't scope like
+      #             we usually do, so we'll apply some bare-minimum scoping and then do
+      #             the rest of the asserts in the controller and policy.
+      manifest = authorized_scope(package.manifests, with: ReleaseEngines::Oci::ReleaseManifestPolicy)
+                   .find_by_reference!(params[:reference],
+                     accepts: request.accepts.collect(&:to_s),
+                     prefers: %w[
+                       application/vnd.oci.image.index.v1+json
+                       application/vnd.docker.distribution.manifest.list.v2+json
+                       application/vnd.oci.image.manifest.v1+json
+                       application/vnd.docker.distribution.manifest.v2+json
+                     ],
+                   )
+      authorize! manifest,
+        with: ReleaseEngines::Oci::ReleaseManifestPolicy
 
       # for etag support
       return unless
@@ -56,11 +62,10 @@ module Api::V1::ReleaseEngines
     def require_ee! = super(entitlements: %i[oci_engine])
 
     def set_package
-      # NOTE(ezekg) see above comment i.r.t. docker authentication on why we're
-      #             skipping authorized_scope here and elsewhere
-      scoped_packages = current_account.release_packages.oci.where_assoc_exists(
-                          :manifests, # must exist
-                        )
+      scoped_packages = authorized_scope(current_account.release_packages.oci, with: ReleaseEngines::Oci::ReleasePackagePolicy)
+                          .where_assoc_exists(
+                            :manifests, # must exist
+                          )
 
       @package = Current.resource = FindByAliasService.call(
         scoped_packages,

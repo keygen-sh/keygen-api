@@ -9,10 +9,13 @@ module Api::V1::ReleaseEngines
     before_action :set_package
 
     def index
-      authorize! package, to: :show?
+      authorize! package,
+        with: ReleaseEngines::Oci::ReleasePackagePolicy,
+        to: :show?
 
-      releases = authorized_scope(package.releases).preload(:product, :constraints, :entitlements)
-      authorize! releases
+      releases = authorized_scope(package.releases, with: ReleaseEngines::Oci::ReleasePolicy).preload(:product, :constraints, :entitlements)
+      authorize! releases,
+        with: ReleaseEngines::Oci::ReleasePolicy
 
       tags = releases.where.not(tag: nil)
                      .reorder(tag: :asc)
@@ -40,9 +43,7 @@ module Api::V1::ReleaseEngines
     def require_ee! = super(entitlements: %i[oci_engine])
 
     def set_package
-      # NOTE(ezekg) see above comment i.r.t. docker authentication on why we're
-      #             skipping authorized_scope here
-      scoped_packages = current_account.release_packages.oci
+      scoped_packages = authorized_scope(current_account.release_packages.oci, with: ReleaseEngines::Oci::ReleasePackagePolicy)
 
       @package = Current.resource = FindByAliasService.call(
         scoped_packages,
