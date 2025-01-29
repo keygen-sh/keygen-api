@@ -6,7 +6,6 @@ class RequestLimitsReportWorker < BaseWorker
 
   def perform
     date = Date.yesterday
-    reports = []
 
     active_states = %w[subscribed trialing pending]
     start_date = date.beginning_of_day
@@ -23,7 +22,7 @@ class RequestLimitsReportWorker < BaseWorker
         next if request_count_for_week > 0
 
         if account.last_low_activity_lifeline_sent_at.nil?
-          Keygen.logger.info "[workers.request-limits-report] Sending low-activity lifelife email: account_id=#{account.id}"
+          Keygen.logger.info "[workers.request-limits-report] Sending low-activity lifeline email: account_id=#{account.id}"
 
           account.touch(:last_low_activity_lifeline_sent_at)
 
@@ -53,21 +52,6 @@ class RequestLimitsReportWorker < BaseWorker
       license_count = account.licenses.count
       license_limit = plan.max_licenses ||
                       plan.max_users
-
-      report = OpenStruct.new(
-        request_count: request_count,
-        request_limit: request_limit,
-        active_licensed_user_count: active_licensed_user_count,
-        license_count: license_count,
-        license_limit: license_limit,
-        product_count: product_count,
-        product_limit: product_limit,
-        admin_count: admin_count,
-        admin_limit: admin_limit,
-        account: account,
-        admin: admin,
-        plan: plan
-      )
 
       begin
         # Only send once a week to limit inbox noise for accounts that are currently
@@ -104,12 +88,6 @@ class RequestLimitsReportWorker < BaseWorker
 
         Keygen.logger.exception(e)
       end
-
-      reports << report
     end
-
-    Keygen.logger.info "[workers.request-limits-report] Sending request limit report email: date=#{date} reports=#{reports.size}"
-
-    ReportMailer.request_limits(date: date, reports: reports).deliver_now
   end
 end
