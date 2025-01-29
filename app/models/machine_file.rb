@@ -4,6 +4,15 @@ class MachineFile
   include ActiveModel::Model
   include ActiveModel::Attributes
 
+  ALGORITHMS = %w[
+    aes-256-gcm+ed25519
+    aes-256-gcm+rsa-pss-sha256
+    aes-256-gcm+rsa-sha256
+    base64+ed25519
+    base64+rsa-pss-sha256
+    base64+rsa-sha256
+  ].freeze
+
   attribute :account_id,     :uuid
   attribute :environment_id, :uuid
   attribute :license_id,     :uuid
@@ -13,6 +22,7 @@ class MachineFile
   attribute :expires_at,     :datetime
   attribute :ttl,            :integer
   attribute :includes,       :array,    default: []
+  attribute :algorithm,      :string
 
   validates :account_id,  presence: true
   validates :license_id,  presence: true
@@ -30,6 +40,9 @@ class MachineFile
   validates_numericality_of :ttl,
     greater_than_or_equal_to: 1.hour,
     allow_nil: true
+
+  validates_inclusion_of :algorithm,
+    in: ALGORITHMS
 
   def persisted? = false
   def id         = @id      ||= SecureRandom.uuid

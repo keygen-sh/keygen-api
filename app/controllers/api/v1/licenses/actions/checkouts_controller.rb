@@ -11,6 +11,7 @@ module Api::V1::Licenses::Actions
 
     typed_query {
       param :encrypt, type: :boolean, coerce: true, optional: true
+      param :algorithm, type: :string, allow_blank: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
       param :include, type: :array, coerce: true, allow_blank: true, optional: true, transform: -> key, includes {
         # FIXME(ezekg) For backwards compatibility. Replace user include with
@@ -22,6 +23,7 @@ module Api::V1::Licenses::Actions
     }
     def show
       kwargs = checkout_query.slice(
+        :algorithm,
         :include,
         :encrypt,
         :ttl,
@@ -33,6 +35,8 @@ module Api::V1::Licenses::Actions
       response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: license_file.certificate
+    rescue LicenseCheckoutService::InvalidAlgorithmError => e
+      render_bad_request detail: e.message, code: :CHECKOUT_ALGORITHM_INVALID, source: { parameter: :algorithm }
     rescue LicenseCheckoutService::InvalidIncludeError => e
       render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
     rescue LicenseCheckoutService::InvalidTTLError => e
@@ -46,6 +50,7 @@ module Api::V1::Licenses::Actions
 
       param :meta, type: :hash, optional: true do
         param :encrypt, type: :boolean, optional: true
+        param :algorithm, type: :string, allow_blank: true, allow_nil: true, optional: true
         param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
         param :include, type: :array, allow_blank: true, optional: true, transform: -> key, includes {
           includes.push('owner') if includes.delete('user')
@@ -56,6 +61,7 @@ module Api::V1::Licenses::Actions
     }
     typed_query {
       param :encrypt, type: :boolean, coerce: true, optional: true
+      param :algorithm, type: :string, allow_blank: true, optional: true
       param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
       param :include, type: :array, coerce: true, allow_blank: true, optional: true, transform: -> key, includes {
         includes.push('owner') if includes.delete('user')
@@ -66,6 +72,7 @@ module Api::V1::Licenses::Actions
     def create
       kwargs = checkout_query.merge(checkout_meta)
                              .slice(
+                               :algorithm,
                                :include,
                                :encrypt,
                                :ttl,
@@ -74,6 +81,8 @@ module Api::V1::Licenses::Actions
       license_file = checkout_license_file(**kwargs)
 
       render jsonapi: license_file
+    rescue LicenseCheckoutService::InvalidAlgorithmError => e
+      render_bad_request detail: e.message, code: :CHECKOUT_ALGORITHM_INVALID, source: { parameter: :algorithm }
     rescue LicenseCheckoutService::InvalidIncludeError => e
       render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
     rescue LicenseCheckoutService::InvalidTTLError => e

@@ -1126,6 +1126,10 @@ Then /^the response body should be a "([^\"]+)" with the following encoded certi
   res  = last_response
   json = JSON.parse(last_response.body)
   cert = json.dig('data', 'attributes', 'certificate')
+  alg  = json.dig('data', 'attributes', 'algorithm')
+
+  expect(alg).to start_with 'base64+'
+
   type = json.dig('data', 'type')
 
   expect(type).to eq resource_type.pluralize
@@ -1175,7 +1179,11 @@ Then /^the response body should be a "([^\"]+)" with the following encrypted cer
   res     = last_response
   json    = JSON.parse(last_response.body)
   cert    = json.dig('data', 'attributes', 'certificate')
-  type    = json.dig('data', 'type')
+  alg     = json.dig('data', 'attributes', 'algorithm')
+
+  expect(alg).to start_with 'aes-256-gcm+'
+
+  type = json.dig('data', 'type')
 
   expect(type).to eq resource_type.pluralize
 

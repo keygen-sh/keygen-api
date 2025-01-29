@@ -374,6 +374,161 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin performs a machine checkout with a custom algorithm (POST)
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "algorithm": "aes-256-gcm+rsa-pss-sha256" } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine-file" with a certificate signed using "rsa-pss-sha256"
+    And the response body should be a "machine-file" with the following encrypted certificate data:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin performs a machine checkout with a custom algorithm (GET)
+    Given time is frozen at "2022-10-16T14:52:48.000Z"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      { "scheme": "ED25519_SIGN" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?algorithm=base64%2Brsa-sha256"
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate signed using "rsa-sha256"
+    And the response should be a "MACHINE" certificate with the following encoded data:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
+  Scenario: Admin performs a machine checkout with an invalid encoding algorithm (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "algorithm": "foo+ed25519" } }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "invalid encoding algorithm",
+        "code": "CHECKOUT_ALGORITHM_INVALID",
+        "source": {
+          "parameter": "algorithm"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machines checkout with an invalid signing algorithm (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "algorithm": "base64+foo" } }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "invalid signing algorithm",
+        "code": "CHECKOUT_ALGORITHM_INVALID",
+        "source": {
+          "parameter": "algorithm"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with a nil algorithm (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "algorithm": null } }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine-file" with a certificate signed using "ed25519"
+    And the response body should be a "machine-file" with the following encoded certificate data:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with an empty algorithm (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?algorithm="
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate signed using "ed25519"
+    And the response should be a "MACHINE" certificate with the following encoded data:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0]"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin performs a machine checkout with a custom TTL (POST)
     Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"

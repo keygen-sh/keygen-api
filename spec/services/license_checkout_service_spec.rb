@@ -126,6 +126,50 @@ describe LicenseCheckoutService do
 
       expect { checkout.call }.to raise_error LicenseCheckoutService::InvalidTTLError
     end
+
+    it 'should raise an error when algorithm is invalid' do
+      checkout = -> {
+        LicenseCheckoutService.call(
+          algorithm: 'foo+bar',
+          account:,
+          license:,
+        )
+      }
+
+      expect { checkout.call }.to raise_error LicenseCheckoutService::InvalidAlgorithmError
+    end
+  end
+
+  %w[
+    aes-256-gcm+ed25519
+    aes-256-gcm+rsa-pss-sha256
+    aes-256-gcm+rsa-sha256
+    base64+ed25519
+    base64+rsa-pss-sha256
+    base64+rsa-sha256
+  ].each do |algorithm|
+    context "when the algorithm is #{algorithm}" do
+      let(:license) { create(:license, account:) }
+
+      it 'should have a correct algorithm' do
+        license_file = LicenseCheckoutService.call(
+          algorithm:,
+          account:,
+          license:,
+        )
+
+        cert    = license_file.certificate
+        payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                      .delete_suffix("-----END LICENSE FILE-----\n")
+
+        dec  = Base64.decode64(payload)
+        json = JSON.parse(dec)
+
+        expect(json).to include(
+          'alg' => algorithm,
+        )
+      end
+    end
   end
 
   %w[
@@ -543,11 +587,77 @@ describe LicenseCheckoutService do
     end
   end
 
+  context 'when not using encryption' do
+    it 'should return an encoded JSON payload' do
+      license_file = LicenseCheckoutService.call(
+        encrypt: false,
+        account:,
+        license:,
+      )
+
+      cert = license_file.certificate
+      dec  = nil
+      enc  = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                 .delete_suffix("-----END LICENSE FILE-----\n")
+
+      expect { dec = Base64.decode64(enc) }.to_not raise_error
+      expect(dec).to_not be_nil
+
+      json = nil
+
+      expect { json = JSON.parse(dec) }.to_not raise_error
+      expect(json).to_not be_nil
+      expect(json).to include(
+        'enc' => a_kind_of(String),
+        'sig' => a_kind_of(String),
+        'alg' => a_kind_of(String),
+      )
+    end
+
+    it 'should return an unencrypted license' do
+      license_file = LicenseCheckoutService.call(
+        encrypt: false,
+        account:,
+        license:,
+      )
+
+      cert    = license_file.certificate
+      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                    .delete_suffix("-----END LICENSE FILE-----\n")
+
+      json   = JSON.parse(Base64.decode64(payload))
+      enc    = json.fetch('enc')
+      decode = -> {
+        dec = Base64.decode64(enc)
+
+        JSON.parse(dec)
+      }
+
+      expect { decode.call }.to_not raise_error
+
+      data = decode.call
+
+      expect(data).to_not be_nil
+      expect(data).to include(
+        'meta' => include(
+          'issued' => license_file.issued_at.iso8601(3),
+          'expiry' => license_file.expires_at.iso8601(3),
+          'ttl' => license_file.ttl,
+        ),
+        'data' => include(
+          'type' => 'licenses',
+          'id' => license.id,
+        ),
+      )
+    end
+  end
+
   context 'when using encryption' do
     it 'should return an encoded JSON payload' do
       license_file = LicenseCheckoutService.call(
         account: account,
         license: license,
+        encrypt: true,
       )
 
       cert = license_file.certificate

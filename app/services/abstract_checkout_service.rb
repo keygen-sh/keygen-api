@@ -5,50 +5,52 @@ class AbstractCheckoutService < BaseService
   class InvalidAlgorithmError < StandardError; end
   class InvalidTTLError < StandardError; end
 
-  ENCRYPT_ALGORITHM  = 'aes-256-gcm'.freeze
-  ENCODE_ALGORITHM   = 'base64'.freeze
-  ALLOWED_ALGORITHMS = %w[
+  DEFAULT_ENCRYPTION_ALGORITHM = 'aes-256-gcm'.freeze
+  DEFAULT_ENCODING_ALGORITHM   = 'base64'.freeze
+  DEFAULT_SIGNING_ALGORITHM    = 'ed25519'.freeze
+
+  ENCRYPTION_ALGORITHMS = %w[aes-256-gcm].freeze
+  ENCODING_ALGORITHMS   = %w[base64].freeze
+  SIGNING_ALGORITHMS    = %w[
     ed25519
     rsa-pss-sha256
     rsa-sha256
   ].freeze
 
-  def initialize(account:, scheme: nil, encrypt: false, ttl: 1.month, include: [], api_version: nil)
-    raise InvalidAccountError, 'license must be present' unless
+  def initialize(account:, encrypt: false, sign: true, algorithm: nil, ttl: 1.month, include: [], api_version: nil)
+    raise InvalidAccountError, 'account must be present' unless
       account.present?
 
     raise InvalidTTLError, 'must be greater than or equal to 3600 (1 hour)' if
       ttl.present? && ttl < 1.hour
 
+    raise InvalidAlgorithmError, 'algorithm must be present' if
+      algorithm.present? && algorithm.blank?
+
+    @algorithm = algorithm.presence || begin
+      enc = encrypt ? DEFAULT_ENCRYPTION_ALGORITHM : DEFAULT_ENCODING_ALGORITHM
+      sig = sign == true || sign.blank? ? DEFAULT_SIGNING_ALGORITHM : sign
+
+      "#{enc}+#{sig}"
+    end
+
+    raise InvalidAlgorithmError, 'invalid encoding algorithm' unless
+      encryption_algorithm.in?(ENCRYPTION_ALGORITHMS) ||
+      encoding_algorithm.in?(ENCODING_ALGORITHMS)
+
+    raise InvalidAlgorithmError, 'invalid signing algorithm' unless
+      signing_algorithm.in?(SIGNING_ALGORITHMS)
+
     @renderer    = Keygen::JSONAPI::Renderer.new(account:, api_version:, context: :checkout)
     @account     = account
-    @encrypted   = encrypt
     @ttl         = ttl
     @includes    = include
-    @private_key = case scheme
-                   when 'RSA_2048_PKCS1_PSS_SIGN_V2',
-                        'RSA_2048_PKCS1_SIGN_V2',
-                        'RSA_2048_PKCS1_PSS_SIGN',
-                        'RSA_2048_PKCS1_SIGN',
-                        'RSA_2048_PKCS1_ENCRYPT',
-                        'RSA_2048_JWT_RS256'
-                     account.private_key
-                   else
+    @private_key = case
+                   when ed25519?
                      account.ed25519_private_key
+                   when rsa?
+                     account.private_key
                    end
-
-    @algorithm = case scheme
-                 when 'RSA_2048_PKCS1_PSS_SIGN_V2',
-                      'RSA_2048_PKCS1_PSS_SIGN'
-                   'rsa-pss-sha256'
-                 when 'RSA_2048_PKCS1_SIGN_V2',
-                      'RSA_2048_PKCS1_SIGN',
-                      'RSA_2048_PKCS1_ENCRYPT',
-                      'RSA_2048_JWT_RS256'
-                   'rsa-sha256'
-                 else
-                   'ed25519'
-                 end
   end
 
   def call
@@ -60,25 +62,23 @@ class AbstractCheckoutService < BaseService
   attr_reader :renderer,
               :private_key,
               :algorithm,
-              :encrypted,
               :ttl,
               :includes,
               :account
 
-  def encrypted?
-    !!encrypted
-  end
+  def algorithm_parts      = @algorithm_parts      ||= algorithm.split('+', 2)
+  def encryption_algorithm = @encryption_algorithm ||= algorithm_parts.first
+  def signing_algorithm    = @signing_algorithm    ||= algorithm_parts.second
+  alias :encoding_algorithm :encryption_algorithm
 
-  def encoded?
-    !encrypted?
-  end
-
-  def ttl?
-    ttl.present?
-  end
+  def encrypted? = encryption_algorithm.in?(ENCRYPTION_ALGORITHMS)
+  def encoded?   = encoding_algorithm.in?(ENCODING_ALGORITHMS)
+  def ed25519?   = signing_algorithm == 'ed25519'
+  def rsa?       = signing_algorithm.in?(%w[rsa-pss-sha256 rsa-sha256])
+  def ttl?       = ttl.present?
 
   def encrypt(value, secret:)
-    aes = OpenSSL::Cipher.new(ENCRYPT_ALGORITHM)
+    aes = OpenSSL::Cipher.new(encryption_algorithm)
     aes.encrypt
 
     key = OpenSSL::Digest::SHA256.digest(secret)
@@ -105,24 +105,21 @@ class AbstractCheckoutService < BaseService
     enc.chomp
   end
 
-  def sign(value, key:, algorithm:, prefix:)
-    raise InvalidAlgorithmError, 'algorithm is invalid' unless
-      ALLOWED_ALGORITHMS.include?(algorithm)
-
+  def sign(value, prefix:)
     data = "#{prefix}/#{value}"
 
-    case algorithm
+    case signing_algorithm
     when 'rsa-pss-sha256'
-      rsa = OpenSSL::PKey::RSA.new(key)
+      rsa = OpenSSL::PKey::RSA.new(private_key)
       sig  = rsa.sign_pss(OpenSSL::Digest::SHA256.new, data, salt_length: :max, mgf1_hash: 'SHA256')
     when 'rsa-sha256'
-      rsa = OpenSSL::PKey::RSA.new(key)
+      rsa = OpenSSL::PKey::RSA.new(private_key)
       sig = rsa.sign(OpenSSL::Digest::SHA256.new, data)
     when 'ed25519'
-      ed25519 = Ed25519::SigningKey.new([key].pack('H*'))
+      ed25519 = Ed25519::SigningKey.new([private_key].pack('H*'))
       sig     = ed25519.sign(data)
     else
-      raise InvalidAlgorithmError, 'signing scheme is not supported'
+      raise InvalidAlgorithmError, 'signing algorithm is not supported'
     end
 
     encode(sig, strict: true)

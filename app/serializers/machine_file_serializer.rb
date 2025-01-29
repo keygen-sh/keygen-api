@@ -4,6 +4,7 @@ class MachineFileSerializer < BaseSerializer
   type 'machine-files'
 
   attribute :certificate
+  attribute :algorithm
   attribute :includes
   attribute :ttl
   attribute :expiry do
