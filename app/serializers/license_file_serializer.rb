@@ -4,6 +4,7 @@ class LicenseFileSerializer < BaseSerializer
   type 'license-files'
 
   attribute :certificate
+  attribute :algorithm
   attribute :includes
   attribute :ttl
   attribute :expiry do
