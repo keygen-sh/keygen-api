@@ -8,19 +8,15 @@ module Denormalizable
   class_methods do
     cattr_accessor :denormalized_attributes, default: Set.new
 
-    # TODO(ezekg) Active Record's normalizes method accepts an array of names. Should we?
-    def denormalizes(attribute_name, with: nil, from: nil, to: nil, prefix: nil)
+    def denormalizes(*attribute_names, with: nil, from: nil, to: nil, prefix: nil)
       raise ArgumentError, 'must provide :from, :to, or :with (but not multiple)' unless
         from.present? ^ to.present? ^ with.present?
 
-      # TODO(ezekg) Should we store more information, such as :to or :from?
-      denormalized_attributes << attribute_name
-
       case
       when from.present?
-        instrument_denormalized_attribute_from(attribute_name, from:, prefix:)
+        attribute_names.each { instrument_denormalized_attribute_from(_1, from:, prefix:) }
       when to.present?
-        instrument_denormalized_attribute_to(attribute_name, to:, prefix:)
+        attribute_names.each { instrument_denormalized_attribute_to(_1, to:, prefix:) }
       when with.present?
         raise NotImplementedError, 'denormalizes :with is not supported yet'
       else
@@ -51,8 +47,10 @@ module Denormalizable
         before_validation -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :create
         before_update     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
 
-        # Make sure validation fails if our denormalized column is modified directly
+        # make sure validation fails if our denormalized column is modified directly
         validate -> { validate_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
+
+        denormalized_attributes << attribute_name
       else
         raise ArgumentError, "invalid :from association: #{from.inspect}"
       end
@@ -71,7 +69,7 @@ module Denormalizable
                                     attribute_name.to_s
                                   end
 
-        # FIXME(ezekg) Set to nil on destroy unless the association is dependent?
+        # FIXME(ezekg) set to nil on destroy unless the association is dependent?
         if reflection.collection?
           after_initialize  -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
           before_validation -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
@@ -81,6 +79,8 @@ module Denormalizable
           before_validation -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
           after_update      -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_previously_changed?"
         end
+
+        denormalized_attributes << attribute_name
       else
         raise ArgumentError, "invalid :to association: #{to.inspect}"
       end

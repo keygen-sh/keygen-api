@@ -82,7 +82,16 @@ module Api::V1
         context: { bearer: current_bearer },
         with: TokenPolicy
 
+      # TODO(ezekg) make default session expiry configurable
+      session = token.sessions.build(
+        expiry: token.expiry.presence || (1.week + 12.hours).from_now,
+        user_agent: request.user_agent,
+        ip: request.remote_ip,
+      )
+
       if token.save
+        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+
         BroadcastEventService.call(
           event: 'token.generated',
           account: current_account,
@@ -93,11 +102,9 @@ module Api::V1
       else
         render_unprocessable_resource token
       end
-    rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
-      render_bad_request
     end
 
-    # FIXME(ezekg) Deprecate this route.
+    # FIXME(ezekg) deprecate this route
     def regenerate_current
       raise Keygen::Error::NotFoundError.new(model: Token.name) unless
         current_token.present?

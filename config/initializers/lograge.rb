@@ -13,6 +13,7 @@ Rails.application.configure do
     bearer_type = controller.current_bearer&.class&.name&.underscore
     bearer_id = controller.current_bearer&.id
     token_id = controller.current_token&.id
+    session_id = controller.current_session&.id
     authn = controller.current_http_scheme
     authz = controller.current_bearer&.role&.name
     api_version = controller.current_api_version
@@ -98,6 +99,7 @@ Rails.application.configure do
       bearer_type: bearer_type || 'N/A',
       bearer_id: bearer_id || 'N/A',
       token_id: token_id || 'N/A',
+      session_id: session_id || 'N/A',
       authn: authn || 'N/A',
       authz: authz || 'N/A',
       ip: req.remote_ip,

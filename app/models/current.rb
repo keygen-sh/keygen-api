@@ -2,6 +2,7 @@ class Current < ActiveSupport::CurrentAttributes
   attribute :account,
             :environment,
             :bearer,
+            :session,
             :token,
             :resource
 
@@ -13,9 +14,10 @@ class Current < ActiveSupport::CurrentAttributes
   def account=(account)
     super
 
-    # Ensure these are always reset when account is changed
+    # ensure these are always reset when account is changed
     self.environment = nil
     self.bearer      = nil
+    self.session     = nil
     self.token       = nil
     self.resource    = nil
   end
@@ -23,6 +25,7 @@ class Current < ActiveSupport::CurrentAttributes
   def account_id     = account&.id
   def environment_id = environment&.id
   def bearer_id      = bearer&.id
+  def session_id     = session&.id
   def token_id       = token&.id
   def resource_id    = resource&.id
 end
