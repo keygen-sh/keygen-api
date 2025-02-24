@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -792,6 +792,25 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_14_214652) do
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
     t.index ["secret"], name: "index_second_factors_on_secret", unique: true
     t.index ["user_id"], name: "index_second_factors_on_user_id", unique: true
+  end
+
+  create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "token_id", null: false
+    t.string "bearer_type", null: false
+    t.uuid "bearer_id", null: false
+    t.datetime "last_used_at"
+    t.datetime "expiry", null: false
+    t.string "ip", null: false
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_sessions_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["bearer_id", "bearer_type"], name: "index_sessions_on_bearer_id_and_bearer_type"
+    t.index ["created_at", "expiry", "last_used_at"], name: "index_sessions_on_created_at_and_expiry_and_last_used_at"
+    t.index ["environment_id"], name: "index_sessions_on_environment_id"
+    t.index ["token_id"], name: "index_sessions_on_token_id"
   end
 
   create_table "token_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

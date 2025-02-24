@@ -17,6 +17,11 @@ class Token < ApplicationRecord
   belongs_to :bearer,
     polymorphic: true
 
+  # FIXME(ezekg) sessions must come before permissions otherwise autosave breaks
+  has_many :sessions,
+    dependent: :delete_all,
+    autosave: true
+
   has_many :token_permissions,
     dependent: :delete_all,
     autosave: true

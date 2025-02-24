@@ -5,6 +5,7 @@ module Authentication
 
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Basic::ControllerMethods
+  include ActionController::Cookies
 
   def authenticate_with_token!
     case
@@ -14,6 +15,8 @@ module Authentication
       authenticate_or_request_with_http_basic(&method(:http_basic_authenticator))
     when has_license_credentials?
       authenticate_or_request_with_http_license(&method(:http_license_authenticator))
+    when has_cookie_credentials?
+      authenticate_or_request_with_http_cookie(&method(:http_cookie_authenticator))
     else
       authenticate_or_request_with_query_token(&method(:query_token_authenticator))
     end
@@ -27,6 +30,8 @@ module Authentication
       authenticate_with_http_basic(&method(:http_basic_authenticator))
     when has_license_credentials?
       authenticate_with_http_license(&method(:http_license_authenticator))
+    when has_cookie_credentials?
+      authenticate_with_http_cookie(&method(:http_cookie_authenticator))
     else
       authenticate_with_query_token(&method(:query_token_authenticator))
     end
@@ -57,6 +62,14 @@ module Authentication
   end
 
   private
+
+  def authenticate_or_request_with_http_cookie(&auth_procedure)
+    authenticate_with_http_cookie(&auth_procedure) || request_http_token_authentication
+  end
+
+  def authenticate_with_http_cookie(&auth_procedure)
+    auth_procedure.call(cookies.encrypted)
+  end
 
   def authenticate_or_request_with_query_token(&auth_procedure)
     authenticate_with_query_token(&auth_procedure) || request_http_token_authentication
@@ -96,9 +109,42 @@ module Authentication
     end
   end
 
+  def http_cookie_authenticator(cookie_jar)
+    session = current_account.sessions.for_environment(current_environment, strict: current_environment.nil?)
+                                      .find_by(id: cookie_jar[:session_id])
+
+    @current_http_scheme = :session
+    @current_http_token  = nil
+
+    raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_INVALID') if
+      session.nil? || session.token.nil? || session.bearer.nil?
+
+    raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_EXPIRED', detail: 'Session is expired') if
+      session.expired?
+
+    raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
+      session.bearer.respond_to?(:banned?) && session.bearer.banned?
+
+    if session.last_used_at.nil? || session.last_used_at.before?(1.hour.ago)
+      session.update(
+        last_used_at: Time.current,
+        user_agent: request.user_agent,
+        ip: request.remote_ip,
+      )
+    end
+
+    # FIXME(ezekg) use Current everywhere instead of current ivars
+    Current.session = @current_session = session
+    Current.token   = @current_token   = session.token
+    Current.bearer  = @current_bearer  = session.bearer
+  end
+
   def http_password_authenticator(username = nil, password = nil)
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
                                 .find_by(email: "#{username}".downcase)
+
+    @current_http_scheme = :password
+    @current_http_token  = nil
 
     unless user.present?
       raise Keygen::Error::UnauthorizedError.new(
@@ -135,7 +181,7 @@ module Authentication
       )
     end
 
-    @current_bearer = user
+    Current.bearer = @current_bearer = user
   end
 
   def http_basic_authenticator(username = nil, password = nil)
@@ -270,6 +316,8 @@ module Authentication
 
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
   end
+
+  def has_cookie_credentials? = cookies.encrypted[:session_id].present?
 
   def has_bearer_credentials?
     authentication_scheme == 'bearer' || authentication_scheme == 'token'

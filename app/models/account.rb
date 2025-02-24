@@ -17,6 +17,7 @@ class Account < ApplicationRecord
   has_many :request_logs, dependent: :destroy_async
   has_many :metrics, dependent: :destroy_async
   has_many :tokens, dependent: :destroy_async
+  has_many :sessions, dependent: :destroy_async
   has_many :users, index_errors: true, dependent: :destroy_async
   has_many :second_factors, dependent: :destroy_async
   has_many :products, dependent: :destroy_async
