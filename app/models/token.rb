@@ -280,10 +280,14 @@ class Token < ApplicationRecord
     raw
   end
 
-  def regenerate!(**kwargs)
+  def regenerate!(except: Current.session, **)
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
-    generate! **kwargs
+    transaction do
+      sessions.excluding(except).delete_all # clear all sessions
+
+      generate!(**)
+    end
   end
 
   def expired?
