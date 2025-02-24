@@ -84,7 +84,7 @@ module Api::V1
 
       # TODO(ezekg) make default session expiry configurable
       session = token.sessions.build(
-        expiry: token.expiry.presence || (1.week + 12.hours).from_now,
+        expiry: token.expiry.presence || 1.week.from_now,
         user_agent: request.user_agent,
         ip: request.remote_ip,
       )
