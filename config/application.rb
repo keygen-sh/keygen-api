@@ -34,14 +34,17 @@ module Keygen
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    # Remove unneeded Rack middleware
+    # remove unneeded Rack middleware
     config.middleware.delete Rack::ConditionalGet
     config.middleware.delete Rack::ETag
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::Runtime
 
-    # remove unneeded Rails middlware
+    # remove unneeded Rails middleware
     config.middleware.delete ActionDispatch::ShowExceptions
+
+    # readd support for cookies
+    config.middleware.use ActionDispatch::Cookies
 
     # ignore X-Forwarded-For header
     config.middleware.insert_before 0, Keygen::Middleware::IgnoreForwardedHost
