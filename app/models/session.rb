@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Session < ApplicationRecord
+  MAX_AGE = 2.weeks
+
   include Denormalizable
   include Environmental
   include Accountable
@@ -15,5 +17,5 @@ class Session < ApplicationRecord
   denormalizes :bearer_type, :bearer_id,
     from: :token
 
-  def expired? = expiry < Time.current
+  def expired? = expiry < Time.current || created_at < MAX_AGE.ago
 end
