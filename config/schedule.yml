@@ -20,8 +20,12 @@ report_account_request_limits:
   status: <%= ENV['KEYGEN_MODE'] == 'multiplayer' ? 'enabled' : 'disabled' %>
 
 prune_expired_tokens:
-  cron: "0 2 * * *" # Every day at 2am (8pm CST)
+  cron: "0 1 * * *" # Every day at 1am (7pm CST)
   class: "PruneExpiredTokensWorker"
+
+prune_expired_sessions:
+  cron: "0 2 * * *" # Every day at 2am (8pm CST)
+  class: "PruneExpiredSessionsWorker"
 
 prune_release_download_links:
   cron: "15 2 * * *" # Every day at 2:15am (8:15pm CST)

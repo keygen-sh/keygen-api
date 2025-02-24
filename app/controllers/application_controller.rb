@@ -40,12 +40,14 @@ class ApplicationController < ActionController::API
   attr_accessor :current_http_token
   attr_accessor :current_account
   attr_accessor :current_environment
+  attr_accessor :current_session
   attr_accessor :current_bearer
   attr_accessor :current_token
 
   # Action policy authz contexts
   authorize :account,     through: :current_account
   authorize :environment, through: :current_environment
+  authorize :session,     through: :current_session
   authorize :bearer,      through: :current_bearer
   authorize :token,       through: :current_token
 
@@ -117,6 +119,9 @@ class ApplicationController < ActionController::API
     challenge        = %(#{challenge_scheme} realm="#{challenge_realm}")
 
     response.headers['WWW-Authenticate'] = challenge
+
+    # clear current session cookie
+    cookies.delete(:session_id)
 
     respond_to do |format|
       format.any {
@@ -450,12 +455,13 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
-    # Add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
     when 'TOKEN_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
+    when 'USER_BANNED'
+      cookies.delete(:session_id) # clear session
     end
 
     render_forbidden(**kwargs)

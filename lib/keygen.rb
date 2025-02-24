@@ -13,6 +13,27 @@ require_relative 'keygen/importer'
 
 module Keygen
   PUBLIC_KEY = %(\xB8\xF3\xEBL\xD2`\x13_g\xA5\tn\x8D\xC1\xC9\xB9\xDC\xB8\x1E\xE9\xFEP\xD1,\xDC\xD9A\xF6`z\x901).freeze
+  EDITION    = ENV['KEYGEN_EDITION']
+  MODE       = ENV['KEYGEN_MODE']
+  HOST       = ENV['KEYGEN_HOST']
+
+  # second-level domain e.g. keygen.sh
+  DOMAIN = ENV.fetch('KEYGEN_DOMAIN') {
+    domains = HOST.downcase.strip.split('.')[-2..-1]
+    next if
+      domains.blank?
+
+    domains.join('.')
+  }
+
+  # subdomain e.g. api
+  SUBDOMAIN = ENV.fetch('KEYGEN_SUBDOMAIN') {
+    subdomains = HOST.downcase.strip.split('.')[0..-3]
+    next if
+      subdomains.blank?
+
+    subdomains.join('.')
+  }
 
   class << self
     def revision = Version.revision
