@@ -17,10 +17,10 @@ class Session < ApplicationRecord
   denormalizes :bearer_type, :bearer_id,
     from: :token
 
-  validates :account, presence: true
   validates :token,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
+
   validates :bearer,
     presence: { message: 'must exist' },
     scope: { by: :account_id }

@@ -60,7 +60,6 @@ class Token < ApplicationRecord
 
   attr_reader :raw
 
-  validates :account, presence: true
   validates :bearer,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
