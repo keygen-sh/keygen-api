@@ -127,7 +127,7 @@ module Authentication
 
     if session.last_used_at.nil? || session.last_used_at.before?(1.hour.ago)
       session.update(
-        expiry: session.expiry + 12.hours, # extend expiry while in use until MAX_AGE
+        expiry: session.expiry + 1.hour, # extend expiry while in use until MAX_AGE
         last_used_at: Time.current,
         user_agent: request.user_agent,
         ip: request.remote_ip,
