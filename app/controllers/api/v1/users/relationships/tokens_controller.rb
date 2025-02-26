@@ -30,7 +30,7 @@ module Api::V1::Users::Relationships
 
       param :data, type: :hash, optional: true do
         param :type, type: :string, inclusion: { in: %w[token tokens] }
-        param :attributes, type: :hash do
+        param :attributes, type: :hash, optional: true do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
 

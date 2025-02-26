@@ -318,7 +318,7 @@ module Authentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
   end
 
-  def has_cookie_credentials? = cookies.encrypted[:session_id].present?
+  def has_cookie_credentials? = cookies[:session_id].present?
 
   def has_bearer_credentials?
     authentication_scheme == 'bearer' || authentication_scheme == 'token'

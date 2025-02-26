@@ -24,6 +24,7 @@ class Product < ApplicationRecord
     def owners = where.not(licenses: { user_id: nil })
   end
   has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :sessions, as: :bearer, dependent: :destroy_async
   has_many :releases, inverse_of: :product, dependent: :destroy_async
   has_many :release_packages, inverse_of: :product, dependent: :destroy_async
   has_many :release_engines, through: :release_packages, source: :engine
