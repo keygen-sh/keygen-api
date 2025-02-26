@@ -533,6 +533,16 @@ Feature: Token sessions
       }
       """
 
+  Scenario: License validates their key via session authentication (banned)
+    Given the current account is "test1"
+    And the current account has 1 banned "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And I am a license of account "test1"
+    And I authenticate with a session
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    Then the response status should be "403"
+
   # update
   Scenario: Product updates their license via session authentication
     Given the current account is "test1"
