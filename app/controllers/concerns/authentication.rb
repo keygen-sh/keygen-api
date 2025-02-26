@@ -111,7 +111,10 @@ module Authentication
 
   def http_cookie_authenticator(cookie_jar)
     session = current_account.sessions.for_environment(current_environment, strict: current_environment.nil?)
-                                      .find_by(id: cookie_jar[:session_id])
+                                      .preload(:token, :bearer)
+                                      .find_by(
+                                        id: cookie_jar[:session_id],
+                                      )
 
     @current_http_scheme = :session
     @current_http_token  = nil
@@ -125,11 +128,10 @@ module Authentication
     raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
       session.bearer.respond_to?(:banned?) && session.bearer.banned?
 
-    # treat session auth the same as token auth for licenses
     case
     when session.bearer.has_role?(:license)
-      raise Keygen::Error::ForbiddenError.new(code: 'SESSION_NOT_ALLOWED', detail: 'Session token authentication is not allowed by policy') unless
-        session.bearer.supports_token_auth?
+      raise Keygen::Error::ForbiddenError.new(code: 'SESSION_NOT_ALLOWED', detail: 'Session authentication is not allowed by policy') unless
+        session.bearer.supports_session_auth?
     end
 
     if session.last_used_at.nil? || session.last_used_at.before?(1.hour.ago)

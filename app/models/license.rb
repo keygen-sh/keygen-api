@@ -649,6 +649,7 @@ class License < ApplicationRecord
     :renew_from_expiry?, :renew_from_now?, :renew_from_now_if_expired?,
     :supports_token_auth?,
     :supports_license_auth?,
+    :supports_session_auth?,
     :supports_mixed_auth?,
     :supports_auth?,
     :require_heartbeat?,
