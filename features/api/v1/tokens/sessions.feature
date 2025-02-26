@@ -242,6 +242,31 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     And the current account should have 1 "session"
 
+  # expiry
+  Scenario: User reads their profile via session authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I authenticate with a session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+
+  Scenario: User reads their profile via expired session authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I authenticate with an expired session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+
+  Scenario: User creates a license via invalid session authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I authenticate with an invalid session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+
   # envs
   Scenario: License validates itself via session authentication (isolated license in isolated env)
     Given the current account is "test1"
