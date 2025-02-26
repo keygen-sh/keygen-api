@@ -120,6 +120,9 @@ module Api::V1
         resource: current_token,
       )
 
+      # expire session
+      cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
+
       render jsonapi: current_token
     end
 
@@ -134,6 +137,11 @@ module Api::V1
         resource: token,
       )
 
+      # expire session if we're regenerating the current token
+      if token == current_token
+        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
+      end
+
       render jsonapi: token
     end
 
@@ -145,6 +153,11 @@ module Api::V1
         account: current_account,
         resource: token,
       )
+
+      # expire session if we're revoking the current token
+      if token == current_token
+        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
+      end
 
       token.destroy
     end
