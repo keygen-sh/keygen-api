@@ -105,6 +105,19 @@ module Keygen
     # FIXME(ezekg) Use 7.0 cache format until we can roll over to 7.1.
     config.active_support.cache_format_version 7.0
 
+    # explicit cookie salts (fallbacks are rails defaults)
+    config.action_dispatch.authenticated_encrypted_cookie_salt = ENV.fetch('COOKIE_AUTHENTICATED_ENCRYPTED_SALT') { 'authenticated encrypted cookie' }
+    config.action_dispatch.encrypted_signed_cookie_salt        = ENV.fetch('COOKIE_ENCRYPTED_SIGNED_SALT')        { 'signed encrypted cookie' }
+    config.action_dispatch.encrypted_cookie_salt               = ENV.fetch('COOKIE_ENCRYPTED_SALT')               { 'encrypted cookie' }
+    config.action_dispatch.signed_cookie_salt                  = ENV.fetch('COOKIE_SIGNED_SALT')                  { 'signed cookie' }
+
+    # explicit cookie settings
+    config.action_dispatch.use_authenticated_cookie_encryption = true
+    config.action_dispatch.use_cookies_with_metadata           = true
+    config.action_dispatch.encrypted_cookie_cipher             = 'aes-256-gcm'
+    config.action_dispatch.signed_cookie_digest                =
+    config.action_dispatch.cookies_digest                      = 'SHA256'
+
     # We don't need this: https://guides.rubyonrails.org/security.html#unsafe-query-generation
     config.action_dispatch.perform_deep_munge = false
 

@@ -31,7 +31,7 @@ module Api::V1
 
       param :data, type: :hash, optional: true do
         param :type, type: :string, inclusion: { in: %w[token tokens] }
-        param :attributes, type: :hash do
+        param :attributes, type: :hash, optional: true do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
           Keygen.ee do |license|
@@ -90,7 +90,7 @@ module Api::V1
       )
 
       if token.save
-        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: !Rails.env.test?, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
 
         BroadcastEventService.call(
           event: 'token.generated',

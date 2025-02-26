@@ -832,7 +832,7 @@ Then /^the response body should (?:contain|be) an? "([^\"]*)" with(?: an?)? "([^
   expect(links.key?(link)).to be true
 end
 
-Then /^the response should contain the following headers:$/ do |body|
+Then /^the response(?: headers)? should contain the following(?: headers)?:$/ do |body|
   body    = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   headers = JSON.parse(body)
 
@@ -850,6 +850,28 @@ Then /^the response should contain the following raw headers:$/ do |body|
 
     expect(last_response.headers[key]).to eq value&.strip
   end
+end
+
+Then /^the response headers should contain "([^\"]+)" with an (\w+) "([^\"]+)" cookie$/ do |header_name, cookie_jar, cookie_name|
+  request = ActionDispatch::Request.new(last_request.env)
+  header  = last_response.headers[header_name]
+  cookies = Rack::Utils.parse_cookies_header(header)
+  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_h).send(cookie_jar)
+  value   = jar[cookie_name]
+
+  expect(value).to_not be_nil
+end
+
+Then /^the response headers should contain "([^\"]+)" with an (\w+) "([^\"]+)" cookie:$/ do |header_name, cookie_jar, cookie_name, cookie_value|
+  cookie_value = parse_placeholders(cookie_value, account: @account, bearer: @bearer, crypt: @crypt)
+
+  request = ActionDispatch::Request.new(last_request.env)
+  header  = last_response.headers[header_name]
+  cookies = Rack::Utils.parse_cookies_header(header)
+  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_h).send(cookie_jar)
+  value   = jar[cookie_name]
+
+  expect(value).to eq cookie_value.strip
 end
 
 Then /^the response should contain a valid(?: "([^\"]+)")? signature header for "([^\"]+)"$/ do |expected_algorithm, account_id|

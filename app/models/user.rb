@@ -38,6 +38,7 @@ class User < ApplicationRecord
   has_many :components, through: :machines
   has_many :processes, through: :machines
   has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :sessions, as: :bearer, dependent: :destroy_async
   has_many :releases, -> { distinct.reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER) },
     through: :products
   has_many :event_logs,
