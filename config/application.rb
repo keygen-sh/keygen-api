@@ -114,6 +114,7 @@ module Keygen
     # explicit cookie settings
     config.action_dispatch.use_authenticated_cookie_encryption = true
     config.action_dispatch.use_cookies_with_metadata           = true
+    config.action_dispatch.always_write_cookie                 = true
     config.action_dispatch.encrypted_cookie_cipher             = 'aes-256-gcm'
     config.action_dispatch.signed_cookie_digest                =
     config.action_dispatch.cookies_digest                      = 'SHA256'

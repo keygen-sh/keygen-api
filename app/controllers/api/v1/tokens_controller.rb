@@ -90,7 +90,7 @@ module Api::V1
       )
 
       if token.save
-        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: !Rails.env.test?, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
 
         BroadcastEventService.call(
           event: 'token.generated',
