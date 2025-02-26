@@ -86,6 +86,14 @@ class ApplicationController < ActionController::API
   def render_forbidden(**kwargs)
     skip_verify_authorized!
 
+    # expire session on certain terminal error codes
+    if kwargs in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
+      cookies.delete(:session_id,
+        domain: Keygen::DOMAIN,
+        same_site: :none,
+      )
+    end
+
     respond_to do |format|
       format.any {
         render status: :forbidden, json: {
@@ -463,8 +471,6 @@ class ApplicationController < ActionController::API
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
     when 'TOKEN_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
-    when 'USER_BANNED'
-      cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none) # expire session
     end
 
     render_forbidden(**kwargs)
@@ -493,16 +499,15 @@ class ApplicationController < ActionController::API
   rescue ActiveRecord::StatementInvalid => e
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case e.cause
-    when PG::InvalidTextRepresentation
-      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when PG::CharacterNotInRepertoire
+    when PG::InvalidTextRepresentation,
+         PG::CharacterNotInRepertoire
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when PG::UniqueViolation
       render_conflict
     else
       Keygen.logger.exception(e)
 
-      render_bad_request
+      render_internal_server_error
     end
   rescue PG::Error => e
     case e.message
