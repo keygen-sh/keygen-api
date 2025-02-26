@@ -86,7 +86,7 @@ class ApplicationController < ActionController::API
   def render_forbidden(**kwargs)
     skip_verify_authorized!
 
-    # expire session on certain terminal error codes
+    # expire session cookie on certain terminal authz error codes
     if kwargs in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
       cookies.delete(:session_id,
         domain: Keygen::DOMAIN,
@@ -128,7 +128,7 @@ class ApplicationController < ActionController::API
 
     response.headers['WWW-Authenticate'] = challenge
 
-    # expire invalid session cookie
+    # expire session cookie on invalid authn
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,
       same_site: :none,
@@ -446,7 +446,7 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
-    # Add additional properties based on code
+    # add additional properties based on code
     case e.code
     when 'LICENSE_INVALID'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
@@ -466,6 +466,7 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
+    # add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
