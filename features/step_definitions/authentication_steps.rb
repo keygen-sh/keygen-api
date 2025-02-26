@@ -150,7 +150,7 @@ end
 Given /^I use an expired authentication token$/ do
   @token = @bearer.tokens.first_or_create! account: @bearer.account
   @token.regenerate! version: TOKEN_VERSIONS.sample
-  @token.update expiry: Time.current
+  @token.update expiry: 1.minute.ago
 
   header "Authorization", "Bearer #{@token.raw}"
 end
