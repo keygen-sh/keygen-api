@@ -120,8 +120,11 @@ class ApplicationController < ActionController::API
 
     response.headers['WWW-Authenticate'] = challenge
 
-    # clear current session cookie
-    cookies.delete(:session_id)
+    # expire invalid session cookie
+    cookies.delete(:session_id,
+      domain: Keygen::DOMAIN,
+      same_site: :none,
+    )
 
     respond_to do |format|
       format.any {
@@ -461,7 +464,7 @@ class ApplicationController < ActionController::API
     when 'TOKEN_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
     when 'USER_BANNED'
-      cookies.delete(:session_id) # clear session
+      cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none) # expire session
     end
 
     render_forbidden(**kwargs)

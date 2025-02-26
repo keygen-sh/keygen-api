@@ -279,7 +279,7 @@ class Token < ApplicationRecord
     raw
   end
 
-  def regenerate!(except: Current.session, **)
+  def regenerate!(except: nil, **)
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
     transaction do

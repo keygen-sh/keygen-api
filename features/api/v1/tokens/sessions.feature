@@ -203,15 +203,46 @@ Feature: Token sessions
       """
 
   # revoke
-  Scenario: Admin revokes a session token via basic authentication
+  Scenario: Admin revokes a session token via session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
     And the current account should have 0 "sessions"
 
-  # environments
+  # regen
+  Scenario: Admin regenerates the current token via session authentication
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    When I send a PUT request to "/accounts/test1/tokens"
+    Then the response status should be "200"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the current account should have 0 "sessions"
+
+  Scenario: Admin regenerates the token via session authentication
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the current account should have 0 "sessions"
+
+  Scenario: Admin regenerates a token via session authentication
+    Given the current account is "test1"
+    And the current account has 3 "tokens"
+    And the current account has 1 "session" for the third "token"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    When I send a PUT request to "/accounts/test1/tokens/$2"
+    Then the response status should be "200"
+    And the response headers should not contain "Set-Cookie"
+    And the current account should have 1 "session"
+
+  # envs
   Scenario: License validates itself via session authentication (isolated license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -260,6 +291,7 @@ Feature: Token sessions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
     And the response headers should contain the following:
       """
       { "Keygen-Environment": "isolated" }
@@ -291,6 +323,7 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
 
   Scenario: License validates itself via session authentication (isolated license in shared env)
     Given the current account is "test1"
@@ -305,6 +338,7 @@ Feature: Token sessions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
     And the response headers should contain the following:
       """
       { "Keygen-Environment": "shared" }
@@ -318,6 +352,7 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
 
   # create
   Scenario: User creates a trial license via session authentication
@@ -405,6 +440,7 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response headers should not contain "Set-Cookie"
     And the response body should be a "license"
 
   Scenario: User validates a license key via session authentication
@@ -414,7 +450,18 @@ Feature: Token sessions
     And I am a user of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    And the response headers should not contain "Set-Cookie"
     Then the response status should be "404"
+
+  Scenario: Banned user validates a license key via session authentication
+    Given the current account is "test1"
+    And the current account has 1 banned "user"
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I authenticate with a session
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    Then the response status should be "403"
 
   # update
   Scenario: Product updates their license via session authentication
