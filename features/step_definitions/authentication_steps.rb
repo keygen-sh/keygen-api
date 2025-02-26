@@ -205,3 +205,52 @@ Given /^I authenticate with (?:a|my) session$/ do
 
   header "Cookie", %(session_id=#{esc})
 end
+
+Given /^I authenticate with an expired session$/ do
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @session = @token.sessions.create!(
+    expiry: 1.hour.ago,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+
+  app       = Rails.application
+  config    = app.config
+  keygen    = app.key_generator
+  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
+  cipher    = config.action_dispatch.encrypted_cookie_cipher
+  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
+  key       = keygen.generate_key(salt, key_len)
+  encryptor = ActiveSupport::MessageEncryptor.new(key,
+    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
+    cipher:,
+  )
+
+  dec = JSON.dump(@session.id)
+  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
+  esc = CGI.escape(enc)
+
+  header "Cookie", %(session_id=#{esc})
+end
+
+Given /^I authenticate with an invalid session$/ do
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+
+  app       = Rails.application
+  config    = app.config
+  keygen    = app.key_generator
+  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
+  cipher    = config.action_dispatch.encrypted_cookie_cipher
+  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
+  key       = keygen.generate_key(salt, key_len)
+  encryptor = ActiveSupport::MessageEncryptor.new(key,
+    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
+    cipher:,
+  )
+
+  dec = JSON.dump(SecureRandom.uuid)
+  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
+  esc = CGI.escape(enc)
+
+  header "Cookie", %(session_id=#{esc})
+end
