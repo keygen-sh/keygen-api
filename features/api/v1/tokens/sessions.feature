@@ -246,7 +246,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (isolated license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 isolated "license"
+    And the current account has 1 isolated "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     And I send the following headers:
@@ -264,7 +268,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (shared license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 shared "license"
+    And the current account has 1 shared "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 shared "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     And I send the following headers:
@@ -282,7 +290,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (global license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 global "license"
+    And the current account has 1 global "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 global "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     And I send the following headers:
@@ -300,7 +312,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (global license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 global "license"
+    And the current account has 1 global "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 global "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     And I send the following headers:
@@ -318,7 +334,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (shared license in global env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
-    And the current account has 1 shared "license"
+    And the current account has 1 shared "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 shared "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
@@ -329,7 +349,11 @@ Feature: Token sessions
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 shared "environment"
-    And the current account has 1 isolated "license"
+    And the current account has 1 isolated "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     And I send the following headers:
@@ -347,7 +371,11 @@ Feature: Token sessions
   Scenario: License validates itself via session authentication (isolated license in global env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 isolated "license"
+    And the current account has 1 isolated "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 isolated "license" for the last "policy"
     And I am a license of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
@@ -463,6 +491,41 @@ Feature: Token sessions
     And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
     Then the response status should be "403"
 
+  Scenario: License validates their key via session authentication (session auth strategy)
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "SESSION" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with a session
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response headers should not contain "Set-Cookie"
+    And the response body should be a "license"
+
+  Scenario: License validates their key via session authentication (token auth strategy)
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "TOKEN" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I authenticate with a session
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "403"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "Session authentication is not allowed by policy",
+        "code": "SESSION_NOT_ALLOWED"
+      }
+      """
+
   Scenario: License validates their key via session authentication (license auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
@@ -479,24 +542,10 @@ Feature: Token sessions
       """
       {
         "title": "Access denied",
-        "detail": "Session token authentication is not allowed by policy",
+        "detail": "Session authentication is not allowed by policy",
         "code": "SESSION_NOT_ALLOWED"
       }
       """
-
-  Scenario: License validates their key via session authentication (token auth strategy)
-    Given the current account is "test1"
-    And the current account has 1 "policy" with the following:
-      """
-      { "authenticationStrategy": "TOKEN" }
-      """
-    And the current account has 1 "license" for the last "policy"
-    And I am a license of account "test1"
-    And I authenticate with a session
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
-    Then the response status should be "200"
-    And the response headers should not contain "Set-Cookie"
-    And the response body should be a "license"
 
   Scenario: License validates a key via session authentication (mixed auth strategy)
     Given the current account is "test1"
@@ -528,7 +577,7 @@ Feature: Token sessions
       """
       {
         "title": "Access denied",
-        "detail": "Session token authentication is not allowed by policy",
+        "detail": "Session authentication is not allowed by policy",
         "code": "SESSION_NOT_ALLOWED"
       }
       """
