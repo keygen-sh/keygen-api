@@ -475,6 +475,14 @@ Feature: Token sessions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
     And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "Session token authentication is not allowed by policy",
+        "code": "SESSION_NOT_ALLOWED"
+      }
+      """
 
   Scenario: License validates their key via session authentication (token auth strategy)
     Given the current account is "test1"
@@ -516,6 +524,14 @@ Feature: Token sessions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
     And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "Session token authentication is not allowed by policy",
+        "code": "SESSION_NOT_ALLOWED"
+      }
+      """
 
   # update
   Scenario: Product updates their license via session authentication
