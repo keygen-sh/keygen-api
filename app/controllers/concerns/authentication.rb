@@ -67,7 +67,9 @@ module Authentication
   end
 
   def authenticate_with_http_cookie(&auth_procedure)
-    auth_procedure.call(cookies.encrypted)
+    session_id = cookies.encrypted[:session_id]
+
+    auth_procedure.call(session_id)
   end
 
   def authenticate_or_request_with_query_token(&auth_procedure)
@@ -108,11 +110,11 @@ module Authentication
     end
   end
 
-  def http_cookie_authenticator(cookie_jar)
+  def http_cookie_authenticator(session_id)
     session = current_account.sessions.for_environment(current_environment, strict: current_environment.nil?)
                                       .preload(:token, :bearer)
                                       .find_by(
-                                        id: cookie_jar[:session_id],
+                                        id: session_id,
                                       )
 
     @current_http_scheme = :session
