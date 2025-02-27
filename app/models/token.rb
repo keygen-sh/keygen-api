@@ -274,18 +274,28 @@ class Token < ApplicationRecord
     end
 
     self.digest = enc
-    save!
 
-    raw
+    save!
   end
 
-  def regenerate!(except: nil, **)
+  def regenerate!(session: nil, **)
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
     transaction do
-      sessions.excluding(except).delete_all # clear all sessions
+      sessions.delete_all # expire all of the token's sessions
+
+      # rebuild the session if its token matches the regenerated token
+      sesh = if session.present? && session.token == self
+               sessions.build(
+                 expiry: session.expiry, # don't implicitly extend session
+                 user_agent: session.user_agent,
+                 ip: session.ip,
+               )
+             end
 
       generate!(**)
+
+      sesh
     end
   end
 
