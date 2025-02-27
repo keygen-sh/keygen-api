@@ -56,7 +56,6 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
-      DEBUG_BACKTRACE: 250
       DEBUG: 1
     steps:
       - name: Checkout
@@ -71,6 +70,10 @@ jobs:
       - name: Test
         run: bundle exec rake test
       - name: Debug
+        uses: actions/upload-artifact@v4
         if: ${{failure()}}
-        run: |
-          tail -n $DEBUG_BACKTRACE log/test.log
+        with:
+          path: ${{github.workspace}}/log/test.log
+          name: test-${{github.run_id}}-log
+          if-no-files-found: ignore
+          retention-days: 1
