@@ -5,8 +5,6 @@ module Api::V1
     include CurrentAccountConstraints
     include CurrentAccountScope
     include CurrentEnvironmentScope
-    include Authentication
-    include Authorization
     include Pagination
   end
 end

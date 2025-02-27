@@ -90,7 +90,7 @@ module Api::V1
       )
 
       if token.save
-        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+        set_session_id_cookie(session)
 
         BroadcastEventService.call(
           event: 'token.generated',
@@ -113,7 +113,7 @@ module Api::V1
         to: :regenerate?
 
       if session = current_token.regenerate!(session: current_session)
-        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+        set_session_id_cookie(session)
       end
 
       BroadcastEventService.call(
@@ -130,7 +130,7 @@ module Api::V1
 
       # expire current session and generate a new one if we're revoking its token
       if session = token.regenerate!(session: current_session)
-        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+        set_session_id_cookie(session)
       end
 
       BroadcastEventService.call(
@@ -153,7 +153,7 @@ module Api::V1
 
       # expire current session if we're revoking its token
       unless current_session.nil?
-        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none) if current_session.token == token
+        reset_session_id_cookie if current_session.token == token
       end
 
       token.destroy
