@@ -144,6 +144,7 @@ Feature: Token sessions
       }
       """
 
+  @ee
   Scenario: Environment generates a new session token (isolated)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -173,6 +174,7 @@ Feature: Token sessions
       }
       """
 
+  @ee
   Scenario: Environment creates a new session token (shared)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
@@ -268,6 +270,7 @@ Feature: Token sessions
     Then the response status should be "401"
 
   # envs
+  @ee
   Scenario: License validates itself via session authentication (isolated license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -290,6 +293,7 @@ Feature: Token sessions
       { "Keygen-Environment": "isolated" }
       """
 
+  @ee
   Scenario: License validates itself via session authentication (shared license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
@@ -312,6 +316,7 @@ Feature: Token sessions
       { "Keygen-Environment": "shared" }
       """
 
+  @ee
   Scenario: License validates itself via session authentication (global license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -334,6 +339,7 @@ Feature: Token sessions
       { "Keygen-Environment": "isolated" }
       """
 
+  @ee
   Scenario: License validates itself via session authentication (global license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
@@ -356,6 +362,7 @@ Feature: Token sessions
       { "Keygen-Environment": "shared" }
       """
 
+  @ee
   Scenario: License validates itself via session authentication (shared license in global env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
@@ -370,6 +377,7 @@ Feature: Token sessions
     Then the response status should be "401"
     And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
 
+  @ee
   Scenario: License validates itself via session authentication (isolated license in shared env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
@@ -393,6 +401,7 @@ Feature: Token sessions
       { "Keygen-Environment": "shared" }
       """
 
+  @ee
   Scenario: License validates itself via session authentication (isolated license in global env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
