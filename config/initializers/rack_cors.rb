@@ -17,6 +17,15 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     keygen-account-id
     keygen-bearer-id
     keygen-token-id
+    keygen-account
+    keygen-bearer
+    keygen-token
+    keygen-environment
+    keygen-license
+    keygen-edition
+    keygen-mode
+    keygen-revision
+    keygen-version
     x-ratelimit-window
     x-ratelimit-count
     x-ratelimit-limit

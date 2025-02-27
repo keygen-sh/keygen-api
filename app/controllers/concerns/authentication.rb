@@ -328,7 +328,11 @@ module Authentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
   end
 
-  def has_cookie_credentials? = cookies[:session_id].present?
+  # we only support cookie authn from same- or sub-origins (i.e. subdomains)
+  def has_cookie_credentials?
+    (request.origin.nil? || request.origin.ends_with?(Keygen::DOMAIN)) &&
+      cookies[:session_id].present?
+  end
 
   def has_bearer_credentials?
     authentication_scheme == 'bearer' || authentication_scheme == 'token'

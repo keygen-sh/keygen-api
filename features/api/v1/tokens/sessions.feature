@@ -286,6 +286,7 @@ Feature: Token sessions
     And I authenticate with an expired session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
 
   Scenario: User creates a license via invalid session authentication
     Given the current account is "test1"
@@ -294,6 +295,59 @@ Feature: Token sessions
     And I authenticate with an invalid session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"
+
+  # origins
+  Scenario: User reads their profile via session authentication (no origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+
+  Scenario: User reads their profile via session authentication (same-origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    And I send the following headers:
+      """
+      { "Origin": "https://api.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+
+  Scenario: User reads their profile via session authentication (child origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    And I send the following headers:
+      """
+      { "Origin": "https://portal.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+
+  Scenario: User reads their profile via session authentication (parent origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    And I send the following headers:
+      """
+      { "Origin": "https://keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+
+  Scenario: User reads their profile via session authentication (cross-origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    And I send the following headers:
+      """
+      { "Origin": "https://evil.example" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
 
   # envs
   @ee

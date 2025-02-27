@@ -7,6 +7,8 @@ module Cookies
 
   def set_session_id_cookie(session)
     return unless session in Session # nice
+    return unless
+      request.origin.nil? || request.origin.ends_with?(Keygen::DOMAIN)
 
     cookies.encrypted[:session_id] = {
       value: session.id,
@@ -20,6 +22,9 @@ module Cookies
   end
 
   def reset_session_id_cookie
+    return unless
+      request.origin.nil? || request.origin.ends_with?(Keygen::DOMAIN)
+
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,
       same_site: :none,
