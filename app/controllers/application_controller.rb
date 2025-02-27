@@ -500,10 +500,11 @@ class ApplicationController < ActionController::API
   rescue ActiveRecord::StatementInvalid => e
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case e.cause
-    when PG::InvalidTextRepresentation,
-         PG::CharacterNotInRepertoire
+    in PG::InvalidTextRepresentation | PG::CharacterNotInRepertoire
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when PG::UniqueViolation
+    in PG::Error if e.message in /incomplete multibyte character/ | /invalid multibyte character/
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
+    in PG::UniqueViolation
       render_conflict
     else
       Keygen.logger.exception(e)
@@ -512,8 +513,9 @@ class ApplicationController < ActionController::API
     end
   rescue PG::Error => e
     case e.message
-    when /incomplete multibyte character/
-      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding))', code: 'ENCODING_INVALID'
+    when /incomplete multibyte character/,
+         /invalid multibyte character/
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     else
       Keygen.logger.exception(e)
 
@@ -532,7 +534,8 @@ class ApplicationController < ActionController::API
          ArgumentError => e
     case e.message
     when /invalid byte sequence in UTF-8/,
-         /incomplete multibyte character/
+         /incomplete multibyte character/,
+         /invalid multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when /string contains null byte/
       render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
