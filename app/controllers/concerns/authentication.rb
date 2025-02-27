@@ -3,8 +3,7 @@
 module Authentication
   extend ActiveSupport::Concern
 
-  include ActionController::HttpAuthentication::Token::ControllerMethods
-  include ActionController::HttpAuthentication::Basic::ControllerMethods
+  include ActionController::HttpAuthentication::Token::ControllerMethods, ActionController::HttpAuthentication::Basic::ControllerMethods
   include ActionController::Cookies
 
   def authenticate_with_token!
