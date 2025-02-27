@@ -127,7 +127,7 @@ Given /^I send the following raw headers:$/ do |body|
   end
 end
 
-Given /^I use an authentication token$/ do
+Given /^I (?:use (?:an|my) authentication|authenticate with (?:a|my)) token$/ do
   @token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
 
   # Randomly pick a token version to test. We're doing it this way so
@@ -147,7 +147,7 @@ Given /^I use an authentication token$/ do
   end
 end
 
-Given /^I use an expired authentication token$/ do
+Given /^I (?:use an expired authentication|authenticate with an expired) token$/ do
   @token = @bearer.tokens.first_or_create! account: @bearer.account
   @token.regenerate! version: TOKEN_VERSIONS.sample
   @token.update expiry: 1.minute.ago
@@ -155,7 +155,7 @@ Given /^I use an expired authentication token$/ do
   header "Authorization", "Bearer #{@token.raw}"
 end
 
-Given /^I authenticate with my(?: license)? key$/ do
+Given /^I authenticate with (?:a|my)(?: license)? key$/ do
   if rand(0..1).zero?
     http_key = @bearer.key
 

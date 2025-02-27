@@ -205,7 +205,7 @@ Feature: Token sessions
       """
 
   # revoke
-  Scenario: Admin revokes a session token via session authentication
+  Scenario: Admin revokes their session token via session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
@@ -214,6 +214,26 @@ Feature: Token sessions
     And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
     And the current account should have 0 "sessions"
 
+  Scenario: Admin revokes their session token via token authentication
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should be "204"
+    And the response headers should not contain "Set-Cookie"
+    And the current account should have 0 "sessions"
+
+  Scenario: Admin revokes a session token via session authentication
+    Given the current account is "test1"
+    And the current account has 3 "tokens"
+    And the current account has 1 "session" for the third "token"
+    And I am an admin of account "test1"
+    And I authenticate with a session
+    When I send a DELETE request to "/accounts/test1/tokens/$2"
+    Then the response status should be "204"
+    And the response headers should not contain "Set-Cookie"
+    And the current account should have 1 "session"
+
   # regen
   Scenario: Admin regenerates the current token via session authentication
     Given the current account is "test1"
@@ -221,17 +241,23 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
-    And the current account should have 0 "sessions"
+    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+      """
+      $sessions[0]
+      """
+    And the current account should have 1 "session"
 
-  Scenario: Admin regenerates the token via session authentication
+  Scenario: Admin regenerates their token via session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
-    And the current account should have 0 "sessions"
+    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+      """
+      $sessions[0]
+      """
+    And the current account should have 1 "session"
 
   Scenario: Admin regenerates a token via session authentication
     Given the current account is "test1"
