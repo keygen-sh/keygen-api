@@ -12,7 +12,7 @@ module Cookies
       value: session.id,
       expires: session.expiry,
       domain: Keygen::DOMAIN,
-      same_site: :none,
+      same_site: :lax,
       httponly: true,
       secure: true,
     }
@@ -21,7 +21,7 @@ module Cookies
   def reset_session_id_cookie
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,
-      same_site: :none,
+      same_site: :lax,
     )
   end
 end

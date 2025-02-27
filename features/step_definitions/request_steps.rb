@@ -858,7 +858,7 @@ Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed
   cookie  = Rack::Utils.parse_cookies_header(header)
   jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h).send(cookie_jar)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to include('SameSite' => 'Lax', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
   expect(cookie).to have_key('expires')
@@ -878,7 +878,7 @@ Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed
   cookie  = Rack::Utils.parse_cookies_header(header)
   jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h).send(cookie_jar)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to include('SameSite' => 'Lax', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
   expect(cookie).to have_key('expires')
@@ -896,7 +896,7 @@ Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie
   cookie  = Rack::Utils.parse_cookies_header(header)
   jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to include('SameSite' => 'Lax', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
   expect(cookie).to have_key('expires')
@@ -916,7 +916,7 @@ Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie
   cookie  = Rack::Utils.parse_cookies_header(header)
   jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to include('SameSite' => 'Lax', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
   expect(cookie).to have_key('expires')
@@ -936,7 +936,7 @@ Then /^the response headers should contain "([^\"]+)" with an expired "([^\"]+)"
   value   = jar[cookie_name]
 
   # NOTE(ezekg) httponly and secure aren't required when invalidating a session
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to include('SameSite' => 'Lax', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])
