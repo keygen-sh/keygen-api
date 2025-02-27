@@ -7,6 +7,9 @@ class ApplicationController < ActionController::API
   include RateLimiting
   include TypedParams::Controller
   include ActionPolicy::Controller
+  include Authentication
+  include Authorization
+  include Cookies
 
   # NOTE(ezekg) The remaining concerns use around_action, so the order
   #             here is very explicit.
@@ -40,12 +43,14 @@ class ApplicationController < ActionController::API
   attr_accessor :current_http_token
   attr_accessor :current_account
   attr_accessor :current_environment
+  attr_accessor :current_session
   attr_accessor :current_bearer
   attr_accessor :current_token
 
   # Action policy authz contexts
   authorize :account,     through: :current_account
   authorize :environment, through: :current_environment
+  authorize :session,     through: :current_session
   authorize :bearer,      through: :current_bearer
   authorize :token,       through: :current_token
 
@@ -84,6 +89,11 @@ class ApplicationController < ActionController::API
   def render_forbidden(**kwargs)
     skip_verify_authorized!
 
+    # expire session cookie on certain terminal authz error codes
+    if kwargs in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
+      reset_session_id_cookie
+    end
+
     respond_to do |format|
       format.any {
         render status: :forbidden, json: {
@@ -117,6 +127,9 @@ class ApplicationController < ActionController::API
     challenge        = %(#{challenge_scheme} realm="#{challenge_realm}")
 
     response.headers['WWW-Authenticate'] = challenge
+
+    # expire session cookie on invalid authn
+    reset_session_id_cookie
 
     respond_to do |format|
       format.any {
@@ -430,7 +443,7 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
-    # Add additional properties based on code
+    # add additional properties based on code
     case e.code
     when 'LICENSE_INVALID'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
@@ -450,7 +463,7 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
-    # Add additional properties based on code
+    # add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
@@ -484,21 +497,22 @@ class ApplicationController < ActionController::API
   rescue ActiveRecord::StatementInvalid => e
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case e.cause
-    when PG::InvalidTextRepresentation
+    in PG::InvalidTextRepresentation | PG::CharacterNotInRepertoire
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when PG::CharacterNotInRepertoire
+    in PG::Error if e.message in /incomplete multibyte character/ | /invalid multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when PG::UniqueViolation
+    in PG::UniqueViolation
       render_conflict
     else
       Keygen.logger.exception(e)
 
-      render_bad_request
+      render_internal_server_error
     end
   rescue PG::Error => e
     case e.message
-    when /incomplete multibyte character/
-      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding))', code: 'ENCODING_INVALID'
+    when /incomplete multibyte character/,
+         /invalid multibyte character/
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     else
       Keygen.logger.exception(e)
 
@@ -517,7 +531,8 @@ class ApplicationController < ActionController::API
          ArgumentError => e
     case e.message
     when /invalid byte sequence in UTF-8/,
-         /incomplete multibyte character/
+         /incomplete multibyte character/,
+         /invalid multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when /string contains null byte/
       render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'

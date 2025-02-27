@@ -30,7 +30,7 @@ Rails.application.configure do
   }
 
   # Disable logging in test environment unless explicitly enabled.
-  unless ENV.key?('RAILS_LOG')
+  unless ENV.key?('TEST_LOG') || ENV.key?('DEBUG')
     config.logger    = Logger.new(nil)
     config.log_level = :fatal
   end

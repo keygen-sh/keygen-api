@@ -214,7 +214,7 @@ module Keygen
 
           # special snowflake cases
           case { method:, path: }
-          in method: 'PUT', path: %r(/artifact$)
+          in method: 'PUT', path: %r(/artifact$) if user_agent.present?
             # electron-builder < v24.6.3 sets a JSON content-type, but it actually sends
             # binary data. This ends up exploding on our end because Rails attempts to
             # parse the request as JSON, and rightfully so, but it's actually an app

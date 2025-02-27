@@ -30,6 +30,7 @@ class License < ApplicationRecord
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy_async
+  has_many :sessions, as: :bearer, dependent: :destroy_async
   has_many :machines, dependent: :destroy_async
   has_many :components, through: :machines
   has_many :processes, through: :machines
@@ -648,6 +649,7 @@ class License < ApplicationRecord
     :renew_from_expiry?, :renew_from_now?, :renew_from_now_if_expired?,
     :supports_token_auth?,
     :supports_license_auth?,
+    :supports_session_auth?,
     :supports_mixed_auth?,
     :supports_auth?,
     :require_heartbeat?,

@@ -17,6 +17,11 @@ class Token < ApplicationRecord
   belongs_to :bearer,
     polymorphic: true
 
+  # FIXME(ezekg) sessions must come before permissions otherwise autosave breaks
+  has_many :sessions,
+    dependent: :delete_all,
+    autosave: true
+
   has_many :token_permissions,
     dependent: :delete_all,
     autosave: true
@@ -55,7 +60,6 @@ class Token < ApplicationRecord
 
   attr_reader :raw
 
-  validates :account, presence: true
   validates :bearer,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
@@ -270,15 +274,29 @@ class Token < ApplicationRecord
     end
 
     self.digest = enc
-    save!
 
-    raw
+    save!
   end
 
-  def regenerate!(**kwargs)
+  def regenerate!(session: nil, **)
     self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
-    generate! **kwargs
+    transaction do
+      sessions.delete_all # expire all of the token's sessions
+
+      # rebuild the session if its token matches the regenerated token
+      sesh = if session.present? && session.token == self
+               sessions.build(
+                 expiry: session.expiry, # don't implicitly extend session
+                 user_agent: session.user_agent,
+                 ip: session.ip,
+               )
+             end
+
+      generate!(**)
+
+      sesh
+    end
   end
 
   def expired?

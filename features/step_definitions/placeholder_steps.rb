@@ -60,6 +60,7 @@ PLACEHOLDERS = %w[
   group
   group_owner
   owner
+  session
 ]
 
 # Matches:

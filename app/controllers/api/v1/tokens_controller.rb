@@ -31,7 +31,7 @@ module Api::V1
 
       param :data, type: :hash, optional: true do
         param :type, type: :string, inclusion: { in: %w[token tokens] }
-        param :attributes, type: :hash do
+        param :attributes, type: :hash, optional: true do
           param :expiry, type: :time, allow_nil: true, optional: true, coerce: true
           param :name, type: :string, allow_nil: true, optional: true
           Keygen.ee do |license|
@@ -82,7 +82,16 @@ module Api::V1
         context: { bearer: current_bearer },
         with: TokenPolicy
 
+      # TODO(ezekg) make default session expiry configurable
+      session = token.sessions.build(
+        expiry: token.expiry.presence || 1.week.from_now,
+        user_agent: request.user_agent,
+        ip: request.remote_ip,
+      )
+
       if token.save
+        set_session_id_cookie(session)
+
         BroadcastEventService.call(
           event: 'token.generated',
           account: current_account,
@@ -93,11 +102,9 @@ module Api::V1
       else
         render_unprocessable_resource token
       end
-    rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
-      render_bad_request
     end
 
-    # FIXME(ezekg) Deprecate this route.
+    # FIXME(ezekg) deprecate this route
     def regenerate_current
       raise Keygen::Error::NotFoundError.new(model: Token.name) unless
         current_token.present?
@@ -105,7 +112,9 @@ module Api::V1
       authorize! current_token,
         to: :regenerate?
 
-      current_token.regenerate!
+      if session = current_token.regenerate!(session: current_session)
+        set_session_id_cookie(session)
+      end
 
       BroadcastEventService.call(
         event: 'token.regenerated',
@@ -119,7 +128,10 @@ module Api::V1
     def regenerate
       authorize! token
 
-      token.regenerate!
+      # expire current session and generate a new one if we're revoking its token
+      if session = token.regenerate!(session: current_session)
+        set_session_id_cookie(session)
+      end
 
       BroadcastEventService.call(
         event: 'token.regenerated',
@@ -138,6 +150,11 @@ module Api::V1
         account: current_account,
         resource: token,
       )
+
+      # expire current session if we're revoking its token
+      unless current_session.nil?
+        reset_session_id_cookie if current_session.token == token
+      end
 
       token.destroy
     end

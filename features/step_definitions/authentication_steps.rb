@@ -127,7 +127,7 @@ Given /^I send the following raw headers:$/ do |body|
   end
 end
 
-Given /^I use an authentication token$/ do
+Given /^I (?:use (?:an|my) authentication|authenticate with (?:a|my)) token$/ do
   @token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
 
   # Randomly pick a token version to test. We're doing it this way so
@@ -147,15 +147,15 @@ Given /^I use an authentication token$/ do
   end
 end
 
-Given /^I use an expired authentication token$/ do
+Given /^I (?:use an expired authentication|authenticate with an expired) token$/ do
   @token = @bearer.tokens.first_or_create! account: @bearer.account
   @token.regenerate! version: TOKEN_VERSIONS.sample
-  @token.update expiry: Time.current
+  @token.update expiry: 1.minute.ago
 
   header "Authorization", "Bearer #{@token.raw}"
 end
 
-Given /^I authenticate with my(?: license)? key$/ do
+Given /^I authenticate with (?:a|my)(?: license)? key$/ do
   if rand(0..1).zero?
     http_key = @bearer.key
 
@@ -177,4 +177,80 @@ Given /^I authenticate with an invalid key$/ do
 
     header "Authorization", "Basic #{http_basic}"
   end
+end
+
+Given /^I authenticate with (?:a|my) session$/ do
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @session = @token.sessions.create!(
+    expiry: 10.minutes.from_now,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+
+  app       = Rails.application
+  config    = app.config
+  keygen    = app.key_generator
+  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
+  cipher    = config.action_dispatch.encrypted_cookie_cipher
+  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
+  key       = keygen.generate_key(salt, key_len)
+  encryptor = ActiveSupport::MessageEncryptor.new(key,
+    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
+    cipher:,
+  )
+
+  dec = JSON.dump(@session.id)
+  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
+  esc = CGI.escape(enc)
+
+  header "Cookie", %(session_id=#{esc})
+end
+
+Given /^I authenticate with an expired session$/ do
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @session = @token.sessions.create!(
+    expiry: 1.hour.ago,
+    user_agent: 'keygen/test',
+    ip: '127.0.0.1',
+  )
+
+  app       = Rails.application
+  config    = app.config
+  keygen    = app.key_generator
+  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
+  cipher    = config.action_dispatch.encrypted_cookie_cipher
+  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
+  key       = keygen.generate_key(salt, key_len)
+  encryptor = ActiveSupport::MessageEncryptor.new(key,
+    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
+    cipher:,
+  )
+
+  dec = JSON.dump(@session.id)
+  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
+  esc = CGI.escape(enc)
+
+  header "Cookie", %(session_id=#{esc})
+end
+
+Given /^I authenticate with an invalid session$/ do
+  @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+
+  app       = Rails.application
+  config    = app.config
+  keygen    = app.key_generator
+  salt      = config.action_dispatch.authenticated_encrypted_cookie_salt
+  cipher    = config.action_dispatch.encrypted_cookie_cipher
+  key_len   = ActiveSupport::MessageEncryptor.key_len(cipher)
+  key       = keygen.generate_key(salt, key_len)
+  encryptor = ActiveSupport::MessageEncryptor.new(key,
+    serializer: ActiveSupport::MessageEncryptor::NullSerializer,
+    cipher:,
+  )
+
+  dec = JSON.dump(SecureRandom.uuid)
+  enc = encryptor.encrypt_and_sign(dec, purpose: 'cookie.session_id')
+  esc = CGI.escape(enc)
+
+  header "Cookie", %(session_id=#{esc})
 end

@@ -18,6 +18,10 @@ class Environment < ApplicationRecord
     def owned = where(bearer: proxy_association.owner)
   end
 
+  has_many :sessions, dependent: :destroy_async do
+    def owned = where(bearer: proxy_association.owner)
+  end
+
   # TODO(ezekg) Should deleting queue up a cancelable background job?
   has_many :webhook_endpoints,   dependent: :destroy_async
   has_many :webhook_events,      dependent: :destroy_async
