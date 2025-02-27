@@ -112,7 +112,9 @@ module Api::V1
       authorize! current_token,
         to: :regenerate?
 
-      current_token.regenerate!
+      if session = current_token.regenerate!(session: current_session)
+        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+      end
 
       BroadcastEventService.call(
         event: 'token.regenerated',
@@ -120,27 +122,22 @@ module Api::V1
         resource: current_token,
       )
 
-      # expire session
-      cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
-
       render jsonapi: current_token
     end
 
     def regenerate
       authorize! token
 
-      token.regenerate!
+      # expire current session and generate a new one if we're revoking its token
+      if session = token.regenerate!(session: current_session)
+        cookies.encrypted[:session_id] = { value: session.id, httponly: true, secure: true, same_site: :none, expires: session.expiry, domain: Keygen::DOMAIN }
+      end
 
       BroadcastEventService.call(
         event: 'token.regenerated',
         account: current_account,
         resource: token,
       )
-
-      # expire session if we're regenerating the current token
-      if token == current_token
-        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
-      end
 
       render jsonapi: token
     end
@@ -154,9 +151,9 @@ module Api::V1
         resource: token,
       )
 
-      # expire session if we're revoking the current token
-      if token == current_token
-        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none)
+      # expire current session if we're revoking its token
+      unless current_session.nil?
+        cookies.delete(:session_id, domain: Keygen::DOMAIN, same_site: :none) if current_session.token == token
       end
 
       token.destroy
