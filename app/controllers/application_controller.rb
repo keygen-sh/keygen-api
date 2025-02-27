@@ -7,6 +7,9 @@ class ApplicationController < ActionController::API
   include RateLimiting
   include TypedParams::Controller
   include ActionPolicy::Controller
+  include Authentication
+  include Authorization
+  include Cookies
 
   # NOTE(ezekg) The remaining concerns use around_action, so the order
   #             here is very explicit.
@@ -88,10 +91,7 @@ class ApplicationController < ActionController::API
 
     # expire session cookie on certain terminal authz error codes
     if kwargs in code: 'SESSION_NOT_ALLOWED' | 'USER_BANNED'
-      cookies.delete(:session_id,
-        domain: Keygen::DOMAIN,
-        same_site: :none,
-      )
+      reset_session_id_cookie
     end
 
     respond_to do |format|
@@ -129,10 +129,7 @@ class ApplicationController < ActionController::API
     response.headers['WWW-Authenticate'] = challenge
 
     # expire session cookie on invalid authn
-    cookies.delete(:session_id,
-      domain: Keygen::DOMAIN,
-      same_site: :none,
-    )
+    reset_session_id_cookie
 
     respond_to do |format|
       format.any {
