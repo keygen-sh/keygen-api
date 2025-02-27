@@ -266,5 +266,21 @@ module Keygen
         @app.call(env)
       end
     end
+
+    # NOTE(ezekg) see: https://github.com/rack/rack/issues/2130
+    class PartitionedCookies
+      def initialize(app) = @app = app
+      def call(env)
+        status, headers, body = @app.call(env)
+
+        # add support for partitioned cookies
+        cookie = headers['Set-Cookie']
+        if cookie in /samesite=None/i
+          cookie.gsub!(/samesite=None/i, 'samesite=None; partitioned')
+        end
+
+        [status, headers, body]
+      end
+    end
   end
 end

@@ -52,6 +52,9 @@ module Keygen
     # rewrite * to */* Accept header
     config.middleware.insert_before 0, Keygen::Middleware::RewriteAcceptAll
 
+    # add partitioned cookie support
+    config.middleware.insert_before 0, Keygen::Middleware::PartitionedCookies
+
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and
     #              emits errors at multiple layers in the stack, resulting
