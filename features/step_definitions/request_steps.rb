@@ -861,6 +861,7 @@ Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed
   expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
+  expect(cookie).to have_key('partitioned')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])
@@ -881,6 +882,7 @@ Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed
   expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
+  expect(cookie).to have_key('partitioned')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])
@@ -899,6 +901,7 @@ Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie
   expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
+  expect(cookie).to have_key('partitioned')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])
@@ -919,6 +922,7 @@ Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie
   expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
   expect(cookie).to have_key('HttpOnly')
   expect(cookie).to have_key('secure')
+  expect(cookie).to have_key('partitioned')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])
@@ -937,6 +941,7 @@ Then /^the response headers should contain "([^\"]+)" with an expired "([^\"]+)"
 
   # NOTE(ezekg) httponly and secure aren't required when invalidating a session
   expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
+  expect(cookie).to have_key('partitioned')
   expect(cookie).to have_key('expires')
 
   expiry = Time.parse(cookie['expires'])

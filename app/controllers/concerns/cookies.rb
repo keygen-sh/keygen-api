@@ -13,6 +13,7 @@ module Cookies
       expires: session.expiry,
       domain: Keygen::DOMAIN,
       same_site: :none,
+      partitioned: true, # not supported by rack 2 but we have a middleware shim
       httponly: true,
       secure: true,
     }
@@ -22,6 +23,7 @@ module Cookies
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,
       same_site: :none,
+      partitioned: true,
     )
   end
 end
