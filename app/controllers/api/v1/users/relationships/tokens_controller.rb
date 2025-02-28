@@ -59,14 +59,7 @@ module Api::V1::Users::Relationships
       end
     }
     def create
-      kwargs = token_params.slice(
-        :environment_id,
-        :permissions,
-        :expiry,
-        :name,
-      )
-
-      token = current_account.tokens.new(bearer: user, **kwargs)
+      token = current_account.tokens.new(bearer: user, **token_params)
       authorize! token,
         with: Users::TokenPolicy
 

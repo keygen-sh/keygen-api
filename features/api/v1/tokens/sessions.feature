@@ -5,17 +5,21 @@ Feature: Token sessions
       | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
+    And I send the following headers:
+      """
+      { "Origin": "https://portal.keygen.sh" }
+      """
     And I send and accept JSON
 
   # generate
-  Scenario: Admin generates a new session token via basic authentication
+  Scenario: Admin generates a new session token with basic authentication
     Given the current account is "test1"
+    And time is frozen at "2025-02-28T00:00:00.000Z"
     And I am an admin of account "test1"
     And I send the following headers:
       """
       { "Authorization": "Basic \"$users[0].email:password\"" }
       """
-    And time is frozen at "2025-02-28T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
@@ -33,8 +37,9 @@ Feature: Token sessions
       """
     And time is unfrozen
 
-  Scenario: Admin generates a new session token via token authentication
+  Scenario: Admin generates a new session token with token authentication
     Given the current account is "test1"
+    And time is frozen at "2025-02-28T00:00:00.000Z"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/tokens"
@@ -42,7 +47,7 @@ Feature: Token sessions
     And the response body should be a "token"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0];
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Fri, 07 Mar 2025 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the first "session" should have the following attributes:
       """
@@ -52,6 +57,7 @@ Feature: Token sessions
         "tokenId": "$tokens[1]"
       }
       """
+    And time is unfrozen
 
   Scenario: Admin generates a new session token for an environment
     Given the current account is "test1"
@@ -219,7 +225,7 @@ Feature: Token sessions
       """
     And the current account should have 0 "sessions"
 
-  Scenario: Admin revokes their session token via token authentication
+  Scenario: Admin revokes their session token with token authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a token
@@ -284,7 +290,7 @@ Feature: Token sessions
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile via expired session authentication
+  Scenario: User reads their profile with an expired session
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -296,7 +302,7 @@ Feature: Token sessions
       session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
       """
 
-  Scenario: User creates a license via invalid session authentication
+  Scenario: User creates a license with an invalid session
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -309,19 +315,25 @@ Feature: Token sessions
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a valid session
+    And I send the following headers:
+      """
+      { "Origin": null }
+      """
     When I send a GET request to "/accounts/test1/me"
-    Then the response status should be "200"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
 
   Scenario: User reads their profile with an invalid session (no origin)
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": null }
+      """
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with a cookie:
-      """
-      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
-      """
+    And the response headers should not contain "Set-Cookie"
 
   Scenario: User reads their profile with a valid session (same-origin)
     Given the current account is "test1"

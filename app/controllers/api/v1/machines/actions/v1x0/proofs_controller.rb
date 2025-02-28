@@ -19,7 +19,7 @@ module Api::V1::Machines::Actions::V1x0
     def create
       authorize! with: Machines::V1x0::ProofPolicy
 
-      dataset = proof_params.dig(:meta, :dataset)
+      dataset = proof_meta[:dataset]
       proof   = machine.generate_proof(dataset:)
       meta    = { proof: }
 

@@ -68,29 +68,23 @@ module Api::V1
       end
     }
     def generate
-      kwargs = token_params.slice(
-        :environment_id,
-        :bearer_type,
-        :bearer_id,
-        :permissions,
-        :expiry,
-        :name,
-      )
-
-      token = current_account.tokens.new(bearer: current_bearer, **kwargs)
+      token = current_account.tokens.new(bearer: current_bearer, **token_params)
       authorize! token,
         context: { bearer: current_bearer },
         with: TokenPolicy
 
-      # TODO(ezekg) make default session expiry configurable
-      session = token.sessions.build(
-        expiry: token.expiry.presence || 1.week.from_now,
-        user_agent: request.user_agent,
-        ip: request.remote_ip,
-      )
+      # NOTE(ezekg) we only support session/cookie authn from portal origin
+      session = if request.origin&.ends_with?(Keygen::Portal::HOST)
+                  # TODO(ezekg) make default session expiry configurable
+                  token.sessions.build(
+                    expiry: token.expiry.presence || 1.week.from_now,
+                    user_agent: request.user_agent,
+                    ip: request.remote_ip,
+                  )
+                end
 
       if token.save
-        set_session_id_cookie(session)
+        set_session_id_cookie(session) if session in Session # lol nice
 
         BroadcastEventService.call(
           event: 'token.generated',
