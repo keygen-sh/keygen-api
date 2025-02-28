@@ -6,7 +6,7 @@ module Cookies
   include ActionController::Cookies
 
   def set_session_id_cookie(session)
-    return unless session in Session # nice
+    return unless session in Session # lol nice
     return unless
       request.origin.nil? || request.origin.ends_with?(Keygen::DOMAIN)
 

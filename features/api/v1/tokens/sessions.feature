@@ -15,12 +15,13 @@ Feature: Token sessions
       """
       { "Authorization": "Basic \"$users[0].email:password\"" }
       """
+    And time is frozen at "2025-02-28T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Fri, 07 Mar 2025 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the first "session" should have the following attributes:
       """
@@ -30,6 +31,7 @@ Feature: Token sessions
         "tokenId": "$tokens[0]"
       }
       """
+    And time is unfrozen
 
   Scenario: Admin generates a new session token via token authentication
     Given the current account is "test1"
@@ -38,9 +40,9 @@ Feature: Token sessions
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the first "session" should have the following attributes:
       """
@@ -131,9 +133,9 @@ Feature: Token sessions
       """
     Then the response status should be "201"
     And the response body should be a "token"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the first "session" should have the following attributes:
       """
@@ -157,9 +159,9 @@ Feature: Token sessions
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the response headers should contain the following:
       """
@@ -187,9 +189,9 @@ Feature: Token sessions
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the response headers should contain the following:
       """
@@ -205,13 +207,16 @@ Feature: Token sessions
       """
 
   # revoke
-  Scenario: Admin revokes their session token via session authentication
+  Scenario: Admin revokes their session token with session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the current account should have 0 "sessions"
 
   Scenario: Admin revokes their session token via token authentication
@@ -223,7 +228,7 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     And the current account should have 0 "sessions"
 
-  Scenario: Admin revokes a session token via session authentication
+  Scenario: Admin revokes a session token with session authentication
     Given the current account is "test1"
     And the current account has 3 "tokens"
     And the current account has 1 "session" for the third "token"
@@ -235,31 +240,31 @@ Feature: Token sessions
     And the current account should have 1 "session"
 
   # regen
-  Scenario: Admin regenerates the current token via session authentication
+  Scenario: Admin regenerates the current token with session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the current account should have 1 "session"
 
-  Scenario: Admin regenerates their token via session authentication
+  Scenario: Admin regenerates their token with session authentication
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a session
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the response headers should contain "Set-Cookie" with an encrypted "session_id" cookie:
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      $sessions[0]
+      session_id=$sessions[0];
       """
     And the current account should have 1 "session"
 
-  Scenario: Admin regenerates a token via session authentication
+  Scenario: Admin regenerates a token with session authentication
     Given the current account is "test1"
     And the current account has 3 "tokens"
     And the current account has 1 "session" for the third "token"
@@ -271,7 +276,7 @@ Feature: Token sessions
     And the current account should have 1 "session"
 
   # expiry
-  Scenario: User reads their profile via session authentication
+  Scenario: User reads their profile with session authentication
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -286,7 +291,10 @@ Feature: Token sessions
     And I authenticate with an expired session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
 
   Scenario: User creates a license via invalid session authentication
     Given the current account is "test1"
@@ -297,17 +305,28 @@ Feature: Token sessions
     Then the response status should be "401"
 
   # origins
-  Scenario: User reads their profile via session authentication (no origin)
+  Scenario: User reads their profile with a valid session (no origin)
     Given the current account is "test1"
     And I am an admin of account "test1"
-    And I authenticate with a session
+    And I authenticate with a valid session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile via session authentication (same-origin)
+  Scenario: User reads their profile with an invalid session (no origin)
     Given the current account is "test1"
     And I am an admin of account "test1"
-    And I authenticate with a session
+    And I authenticate with an invalid session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
+
+  Scenario: User reads their profile with a valid session (same-origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
     And I send the following headers:
       """
       { "Origin": "https://api.keygen.sh" }
@@ -315,10 +334,25 @@ Feature: Token sessions
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile via session authentication (child origin)
+  Scenario: User reads their profile with an invalid session (same-origin)
     Given the current account is "test1"
     And I am an admin of account "test1"
-    And I authenticate with a session
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "https://api.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
+
+  Scenario: User reads their profile with a valid session (same-site)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
     And I send the following headers:
       """
       { "Origin": "https://portal.keygen.sh" }
@@ -326,10 +360,25 @@ Feature: Token sessions
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile via session authentication (parent origin)
+  Scenario: User reads their profile with an invalid session (same-site)
     Given the current account is "test1"
     And I am an admin of account "test1"
-    And I authenticate with a session
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "https://portal.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
+
+  Scenario: User reads their profile with a valid session (eltd+1)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
     And I send the following headers:
       """
       { "Origin": "https://keygen.sh" }
@@ -337,10 +386,37 @@ Feature: Token sessions
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile via session authentication (cross-origin)
+  Scenario: User reads their profile with an invalid session (eltd+1)
     Given the current account is "test1"
     And I am an admin of account "test1"
-    And I authenticate with a session
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "https://keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
+
+  Scenario: User reads their profile with a valid session (cross-origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
+    And I send the following headers:
+      """
+      { "Origin": "https://evil.example" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with an invalid session (cross-origin)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with an invalid session
     And I send the following headers:
       """
       { "Origin": "https://evil.example" }
@@ -351,7 +427,7 @@ Feature: Token sessions
 
   # envs
   @ee
-  Scenario: License validates itself via session authentication (isolated license in isolated env)
+  Scenario: License validates itself with session authentication (isolated license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "policy" with the following:
@@ -374,7 +450,7 @@ Feature: Token sessions
       """
 
   @ee
-  Scenario: License validates itself via session authentication (shared license in shared env)
+  Scenario: License validates itself with session authentication (shared license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "policy" with the following:
@@ -397,7 +473,7 @@ Feature: Token sessions
       """
 
   @ee
-  Scenario: License validates itself via session authentication (global license in isolated env)
+  Scenario: License validates itself with session authentication (global license in isolated env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 global "policy" with the following:
@@ -413,14 +489,17 @@ Feature: Token sessions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the response headers should contain the following:
       """
       { "Keygen-Environment": "isolated" }
       """
 
   @ee
-  Scenario: License validates itself via session authentication (global license in shared env)
+  Scenario: License validates itself with session authentication (global license in shared env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 global "policy" with the following:
@@ -443,7 +522,7 @@ Feature: Token sessions
       """
 
   @ee
-  Scenario: License validates itself via session authentication (shared license in global env)
+  Scenario: License validates itself with session authentication (shared license in global env)
     Given the current account is "test1"
     And the current account has 1 shared "environment"
     And the current account has 1 shared "policy" with the following:
@@ -455,10 +534,13 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
 
   @ee
-  Scenario: License validates itself via session authentication (isolated license in shared env)
+  Scenario: License validates itself with session authentication (isolated license in shared env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 shared "environment"
@@ -475,14 +557,17 @@ Feature: Token sessions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the response headers should contain the following:
       """
       { "Keygen-Environment": "shared" }
       """
 
   @ee
-  Scenario: License validates itself via session authentication (isolated license in global env)
+  Scenario: License validates itself with session authentication (isolated license in global env)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "policy" with the following:
@@ -494,10 +579,13 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
 
   # create
-  Scenario: User creates a trial license via session authentication
+  Scenario: User creates a trial license with session authentication
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -525,7 +613,7 @@ Feature: Token sessions
     Then the response status should be "201"
     And the response body should be a "license"
 
-  Scenario: User creates a pro license via session authentication
+  Scenario: User creates a pro license with session authentication
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -552,7 +640,7 @@ Feature: Token sessions
       """
     Then the response status should be "403"
 
-  Scenario: User creates a license via session authentication
+  Scenario: User creates a license with session authentication
     Given the current account is "test1"
     And the current account has 1 "policy"
     And the current account has 1 "user"
@@ -574,7 +662,7 @@ Feature: Token sessions
     Then the response status should be "403"
 
   # read
-  Scenario: User validates their license key via session authentication
+  Scenario: User validates their license key with session authentication
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user" as "owner"
@@ -585,7 +673,7 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     And the response body should be a "license"
 
-  Scenario: User validates a license key via session authentication
+  Scenario: User validates a license key with session authentication
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -595,17 +683,20 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     Then the response status should be "404"
 
-  Scenario: User validates a license key via session authentication (banned)
+  Scenario: User validates a license key with session authentication (banned)
     Given the current account is "test1"
     And the current account has 1 banned "user"
     And the current account has 1 "license"
     And I am a user of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     Then the response status should be "403"
 
-  Scenario: License validates their key via session authentication (session auth strategy)
+  Scenario: License validates their key with session authentication (session auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -619,7 +710,7 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     And the response body should be a "license"
 
-  Scenario: License validates their key via session authentication (token auth strategy)
+  Scenario: License validates their key with session authentication (token auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -630,7 +721,10 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the first error should have the following properties:
       """
       {
@@ -640,7 +734,7 @@ Feature: Token sessions
       }
       """
 
-  Scenario: License validates their key via session authentication (license auth strategy)
+  Scenario: License validates their key with session authentication (license auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -651,7 +745,10 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the first error should have the following properties:
       """
       {
@@ -661,7 +758,7 @@ Feature: Token sessions
       }
       """
 
-  Scenario: License validates a key via session authentication (mixed auth strategy)
+  Scenario: License validates a key with session authentication (mixed auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -675,7 +772,7 @@ Feature: Token sessions
     And the response headers should not contain "Set-Cookie"
     And the response body should be a "license"
 
-  Scenario: License validates their key via session authentication (none auth strategy)
+  Scenario: License validates their key with session authentication (none auth strategy)
     Given the current account is "test1"
     And the current account has 1 "policy" with the following:
       """
@@ -686,7 +783,10 @@ Feature: Token sessions
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     And the first error should have the following properties:
       """
       {
@@ -696,18 +796,21 @@ Feature: Token sessions
       }
       """
 
-  Scenario: License validates their key via session authentication (banned)
+  Scenario: License validates their key with session authentication (banned)
     Given the current account is "test1"
     And the current account has 1 banned "user"
     And the current account has 1 "license" for the last "user" as "owner"
     And I am a license of account "test1"
     And I authenticate with a session
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
-    And the response headers should contain "Set-Cookie" with an expired "session_id" cookie
+    And the response headers should contain "Set-Cookie" with a cookie:
+      """
+      session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
+      """
     Then the response status should be "403"
 
   # update
-  Scenario: Product updates their license via session authentication
+  Scenario: Product updates their license with session authentication
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -726,7 +829,7 @@ Feature: Token sessions
     Then the response status should be "200"
     And the response body should be a "license" with the name "Updated"
 
-  Scenario: Product updates a license via session authentication
+  Scenario: Product updates a license with session authentication
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "license"
@@ -744,7 +847,7 @@ Feature: Token sessions
     Then the response status should be "404"
 
   # delete
-  Scenario: Product deletes their license via session authentication
+  Scenario: Product deletes their license with session authentication
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -754,7 +857,7 @@ Feature: Token sessions
     When I send a DELETE request to "/accounts/test1/licenses/$0"
     Then the response status should be "204"
 
-  Scenario: Product deletes a license via session authentication
+  Scenario: Product deletes a license with session authentication
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "license"

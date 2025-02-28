@@ -23,6 +23,7 @@ module RequestLogger
     Accept
     Content-Length
     Content-Type
+    Origin
     Host
   ]
 

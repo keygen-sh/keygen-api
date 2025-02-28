@@ -52,6 +52,7 @@ module Keygen
     # rewrite * to */* Accept header
     config.middleware.insert_before 0, Keygen::Middleware::RewriteAcceptAll
 
+    # FIXME(ezekg) partitioned cookies do not have wide browser support yet
     # add partitioned cookie support
     config.middleware.insert_before 0, Keygen::Middleware::PartitionedCookies
 

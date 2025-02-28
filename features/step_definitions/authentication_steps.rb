@@ -179,7 +179,7 @@ Given /^I authenticate with an invalid key$/ do
   end
 end
 
-Given /^I authenticate with (?:a|my) session$/ do
+Given /^I authenticate with (?:a|my)(?: valid)? session$/ do
   @token   = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
   @session = @token.sessions.create!(
     expiry: 10.minutes.from_now,
