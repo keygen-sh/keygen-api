@@ -6,9 +6,8 @@ module Cookies
   include ActionController::Cookies
 
   def set_session_id_cookie(session)
-    return unless session in Session # lol nice
     return unless
-      request.origin.nil? || request.origin.ends_with?(Keygen::Portal::HOST)
+      request.origin&.ends_with?(Keygen::Portal::HOST)
 
     cookies.encrypted[:session_id] = {
       value: session.id,
@@ -23,7 +22,7 @@ module Cookies
 
   def reset_session_id_cookie
     return unless
-      request.origin.nil? || request.origin.ends_with?(Keygen::Portal::HOST)
+      request.origin&.ends_with?(Keygen::Portal::HOST)
 
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,

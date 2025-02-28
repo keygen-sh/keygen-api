@@ -332,7 +332,7 @@ module Authentication
   #
   #             see: https://scotthelme.co.uk/csrf-is-dead/
   def has_cookie_credentials?
-    (request.origin.nil? || request.origin.ends_with?(Keygen::Portal::HOST)) &&
+    (request.origin&.ends_with?(Keygen::Portal::HOST)) &&
       cookies.key?(:session_id)
   end
 

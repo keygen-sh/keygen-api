@@ -13,8 +13,8 @@ module Api::V1
       end
     }
     def recover
-      case recovery_params
-      in meta: { type: 'account', email: }
+      case recovery_meta
+      in type: 'account', email:
         mailer = RecoveryMailer.recover_accounts_for_email(email:)
         mailer.deliver_later
       end

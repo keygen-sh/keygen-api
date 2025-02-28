@@ -61,16 +61,7 @@ module Api::V1::Licenses::Relationships
       end
     }
     def create
-      kwargs = token_params.slice(
-        :environment_id,
-        :max_activations,
-        :max_deactivations,
-        :permissions,
-        :expiry,
-        :name,
-      )
-
-      token = current_account.tokens.new(bearer: license, **kwargs)
+      token = current_account.tokens.new(bearer: license, **token_params)
       authorize! token,
         with: Licenses::TokenPolicy
 
