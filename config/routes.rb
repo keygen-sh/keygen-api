@@ -3,9 +3,6 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
-  domain_constraints    = { domain: Keygen::DOMAIN }
-  subdomain_constraints = { subdomain: Keygen::SUBDOMAIN }
-
   if ENV.key?('SIDEKIQ_WEB_USER') && ENV.key?('SIDEKIQ_WEB_PASSWORD')
     mount Sidekiq::Web, at: '/-/sidekiq'
   end
@@ -497,7 +494,7 @@ Rails.application.routes.draw do
 
   if Keygen.multiplayer?
     # Simplified short URLs for artifact distribution
-    scope module: :bin, constraints: { subdomain: %w[bin get], **domain_constraints, format: :jsonapi } do
+    scope module: :bin, constraints: { domain: Keygen::DOMAIN, subdomain: %w[bin get], format: :jsonapi } do
       version_constraint '<=1.0' do
         scope module: :v1x0 do
           get ':account_id',     constraints: { account_id: /[^\/]*/ },           to: 'release_artifacts#index', as: :bin_artifacts
@@ -512,7 +509,7 @@ Rails.application.routes.draw do
     end
 
     # Routes for Stdout (e.g. unsubscribe, resubscribe)
-    scope module: :stdout, constraints: { subdomain: 'stdout', **domain_constraints, format: :html } do
+    scope module: :stdout, constraints: { domain: Keygen::DOMAIN, subdomain: 'stdout', format: :html } do
       get 'unsub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#unsubscribe', as: :stdout_unsubscribe
       get 'resub/:ciphertext', constraints: { ciphertext: /.*/ }, to: 'subscribers#resubscribe', as: :stdout_resubscribe
     end
@@ -526,8 +523,8 @@ Rails.application.routes.draw do
         get :webhooks, to: 'health#webhook_health'
       end
 
-      constraints **domain_constraints do
-        constraints **subdomain_constraints do
+      constraints domain: Keygen::DOMAIN do
+        constraints subdomain: Keygen::SUBDOMAIN do
           if Keygen.multiplayer?
             post :stripe, to: 'stripe#receive_webhook'
 
@@ -552,10 +549,10 @@ Rails.application.routes.draw do
         end
 
         # Routes with :account_id scope i.e. multiplayer mode. Most of these
-        # routes are also available in singleplayer mode for compatiblity.
+        # routes are also available in singleplayer mode for compatibility.
         scope 'accounts/:account_id', as: :account do
           if Keygen.multiplayer?
-            constraints **subdomain_constraints do
+            constraints subdomain: Keygen::SUBDOMAIN do
               scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
                 scope module: 'accounts/relationships' do
                   resource :billing, only: %i[show update]
@@ -584,7 +581,7 @@ Rails.application.routes.draw do
   end
 
   # Subdomains for our supported distribution engines (i.e. package managers)
-  scope constraints: { subdomain: /\.pkg$/, **domain_constraints } do
+  scope constraints: { domain: Keygen::DOMAIN, subdomain: /\.pkg$/ } do
     scope module: 'api/v1/release_engines', constraints: { subdomain: 'pypi.pkg' } do
       case
       when Keygen.multiplayer?
