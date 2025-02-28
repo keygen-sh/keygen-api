@@ -17,7 +17,7 @@ module Keygen
   MODE       = ENV['KEYGEN_MODE']
   HOST       = ENV['KEYGEN_HOST']
 
-  # second-level domain e.g. keygen.sh
+  # effective top-level domain + 1 e.g. keygen.sh
   DOMAIN = ENV.fetch('KEYGEN_DOMAIN') {
     domains = HOST.downcase.strip.split('.')[-2..-1]
     next if

@@ -104,7 +104,7 @@ Rails.application.configure do
       authz: authz || 'N/A',
       ip: req.remote_ip,
       user_agent: req.user_agent || 'N/A',
-      origin: req.headers['origin'] || 'N/A',
+      origin: req.origin || 'N/A',
       time: Time.current,
       code: code || 'N/A',
       encoded_response: enc_res || 'N/A',

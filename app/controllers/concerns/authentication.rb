@@ -328,10 +328,12 @@ module Authentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
   end
 
-  # we only support cookie authn from same- or sub-origins (i.e. subdomains)
+  # NOTE(ezekg) we only support cookie authn from same-site origins (e.g. subdomains) to prevent CSRF
+  #
+  #             see: https://scotthelme.co.uk/csrf-is-dead/
   def has_cookie_credentials?
     (request.origin.nil? || request.origin.ends_with?(Keygen::DOMAIN)) &&
-      cookies[:session_id].present?
+      cookies.key?(:session_id)
   end
 
   def has_bearer_credentials?

@@ -852,103 +852,33 @@ Then /^the response should contain the following raw headers:$/ do |body|
   end
 end
 
-Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed) "([^\"]+)" cookie$/ do |header_name, cookie_jar, cookie_name|
-  request = ActionDispatch::Request.new(last_request.env)
-  header  = last_response.headers[header_name]
-  cookie  = Rack::Utils.parse_cookies_header(header)
-  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h).send(cookie_jar)
-
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
-  expect(cookie).to have_key('HttpOnly')
-  expect(cookie).to have_key('secure')
-  expect(cookie).to have_key('partitioned')
-  expect(cookie).to have_key('expires')
-
-  expiry = Time.parse(cookie['expires'])
-  expect(expiry).to be_after Time.current
-
-  value = jar[cookie_name]
-  expect(value).to_not be_nil
-end
-
-Then /^the response headers should contain "([^\"]+)" with an? (encrypted|signed) "([^\"]+)" cookie:$/ do |header_name, cookie_jar, cookie_name, cookie_value|
+Then /^the response headers should contain "([^\"]+)" with (?:an?|the) (encrypted|signed) cookie:$/ do |header_name, cookie_jar_name, cookie_value|
   cookie_value = parse_placeholders(cookie_value, account: @account, bearer: @bearer, crypt: @crypt)
+  header_value = last_response.headers[header_name]
 
-  request = ActionDispatch::Request.new(last_request.env)
-  header  = last_response.headers[header_name]
-  cookie  = Rack::Utils.parse_cookies_header(header)
-  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h).send(cookie_jar)
+  expected = Rack::Utils.parse_cookies_header(cookie_value).transform_keys(&:downcase)
+  actual   = Rack::Utils.parse_cookies_header(header_value).transform_keys(&:downcase)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
-  expect(cookie).to have_key('HttpOnly')
-  expect(cookie).to have_key('secure')
-  expect(cookie).to have_key('partitioned')
-  expect(cookie).to have_key('expires')
+  # decrypt response cookie values
+  request    = ActionDispatch::Request.new(last_request.env)
+  cookie_jar = ActionDispatch::Cookies::CookieJar.build(request, actual.to_h).send(cookie_jar_name)
+  cookies    = last_response.cookies.to_h
 
-  expiry = Time.parse(cookie['expires'])
-  expect(expiry).to be_after Time.current
+  cookies.each do |key, *|
+    actual[key] = cookie_jar[key]
+  end
 
-  value = jar[cookie_name]
-  expect(value).to eq cookie_value.strip
+  expect(actual).to include expected
 end
 
-Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie$/ do |header_name, cookie_name|
-  request = ActionDispatch::Request.new(last_request.env)
-  header  = last_response.headers[header_name]
-  cookie  = Rack::Utils.parse_cookies_header(header)
-  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h)
-
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
-  expect(cookie).to have_key('HttpOnly')
-  expect(cookie).to have_key('secure')
-  expect(cookie).to have_key('partitioned')
-  expect(cookie).to have_key('expires')
-
-  expiry = Time.parse(cookie['expires'])
-  expect(expiry).to be_after Time.current
-
-  value = jar[cookie_name]
-  expect(value).to_not be_nil
-end
-
-Then /^the response headers should contain "([^\"]+)" with an? "([^\"]+)" cookie:$/ do |header_name, cookie_name, cookie_value|
+Then /^the response headers should contain "([^\"]+)" with (?:a|the) cookie:$/ do |header_name, cookie_value|
   cookie_value = parse_placeholders(cookie_value, account: @account, bearer: @bearer, crypt: @crypt)
+  header_value = last_response.headers[header_name]
 
-  request = ActionDispatch::Request.new(last_request.env)
-  header  = last_response.headers[header_name]
-  cookie  = Rack::Utils.parse_cookies_header(header)
-  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h)
+  expected = Rack::Utils.parse_cookies_header(cookie_value).transform_keys(&:downcase)
+  actual   = Rack::Utils.parse_cookies_header(header_value).transform_keys(&:downcase)
 
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
-  expect(cookie).to have_key('HttpOnly')
-  expect(cookie).to have_key('secure')
-  expect(cookie).to have_key('partitioned')
-  expect(cookie).to have_key('expires')
-
-  expiry = Time.parse(cookie['expires'])
-  expect(expiry).to be_after Time.current
-
-  value = jar[cookie_name]
-  expect(value).to eq cookie_value.strip
-end
-
-Then /^the response headers should contain "([^\"]+)" with an expired "([^\"]+)" cookie$/ do |header_name, cookie_name|
-  request = ActionDispatch::Request.new(last_request.env)
-  header  = last_response.headers[header_name]
-  cookie  = Rack::Utils.parse_cookies_header(header)
-  jar     = ActionDispatch::Cookies::CookieJar.build(request, cookie.to_h)
-  value   = jar[cookie_name]
-
-  # NOTE(ezekg) httponly and secure aren't required when invalidating a session
-  expect(cookie).to include('SameSite' => 'None', 'domain' => Keygen::DOMAIN, 'path' => '/')
-  expect(cookie).to have_key('partitioned')
-  expect(cookie).to have_key('expires')
-
-  expiry = Time.parse(cookie['expires'])
-  expect(expiry).to be_before Time.current
-
-  value = jar[cookie_name]
-  expect(value).to be_empty
+  expect(actual).to include expected
 end
 
 Then /^the response headers should not contain "([^\"]+)"$/ do |header_name|
