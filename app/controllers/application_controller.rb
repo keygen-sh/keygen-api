@@ -25,8 +25,19 @@ class ApplicationController < ActionController::API
   # 3. Responses are signed after migrations and errors.
   include SignatureHeaders
 
-  # 4. Migrations are run after errors have been caught.
+  # 4a. Migrations are run after errors have been caught.
   include RequestMigrations::Controller::Migrations
+
+  # 4b. Rescue invalid versions outside of below error handler via around action.
+  rescue_from RequestMigrations::UnsupportedVersionError, with: -> {
+    render_bad_request(
+      detail: 'unsupported API version requested',
+      code: 'INVALID_API_VERSION',
+      links: {
+        about: 'https://keygen.sh/docs/api/versioning/',
+      },
+    )
+  }
 
   # NOTE(ezekg) We're using an around_action here so that our request
   #             logger concern can log the resulting response body.
@@ -581,14 +592,6 @@ class ApplicationController < ActionController::API
              end
 
     render_forbidden(detail:)
-  rescue RequestMigrations::UnsupportedVersionError
-    render_bad_request(
-      detail: 'unsupported API version requested',
-      code: 'INVALID_API_VERSION',
-      links: {
-        about: 'https://keygen.sh/docs/api/versioning/',
-      },
-    )
   end
 
   def oci? = request.subdomain == 'oci.pkg'
