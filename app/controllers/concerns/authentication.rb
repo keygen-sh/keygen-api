@@ -4,7 +4,7 @@ module Authentication
   extend ActiveSupport::Concern
 
   include ActionController::HttpAuthentication::Token::ControllerMethods, ActionController::HttpAuthentication::Basic::ControllerMethods
-  include ActionController::Cookies
+  include Cookies
 
   def authenticate_with_token!
     case
@@ -136,12 +136,14 @@ module Authentication
     end
 
     if session.last_used_at.nil? || session.last_used_at.before?(1.hour.ago)
+      session.expiry += 1.hour if session.expires_in?(1.hour) # extend expiry while in use until MAX_AGE
       session.update(
-        expiry: session.expiry + 1.hour, # extend expiry while in use until MAX_AGE
         last_used_at: Time.current,
         user_agent: request.user_agent,
         ip: request.remote_ip,
       )
+
+      set_session_id_cookie(session) if session.expiry_previously_changed?
     end
 
     # FIXME(ezekg) use Current everywhere instead of current ivars

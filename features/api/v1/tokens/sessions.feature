@@ -282,13 +282,31 @@ Feature: Token sessions
     And the current account should have 1 "session"
 
   # expiry
-  Scenario: User reads their profile with session authentication
+  Scenario: User reads their profile with a valid session
     Given the current account is "test1"
+    And time is frozen at "2025-02-28T00:00:00.000Z"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I authenticate with a session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
+    And the response headers should not contain "Set-Cookie"
+    And time is unfrozen
+
+  # should extend session expiry while it's in use until max age
+  Scenario: User reads their profile with an expiring session
+    Given the current account is "test1"
+    And time is frozen at "2025-03-03T00:00:00.000Z"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I authenticate with an expiring session
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "200"
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
+      """
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 03 Mar 2025 01:10:00 GMT; secure; httponly; samesite=None; partitioned;
+      """
+    And time is unfrozen
 
   Scenario: User reads their profile with an expired session
     Given the current account is "test1"
