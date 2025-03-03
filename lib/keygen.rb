@@ -85,6 +85,7 @@ module Keygen
   end
 
   class Portal
-    HOST = ENV.fetch('KEYGEN_PORTAL_HOST') { "portal.#{DOMAIN}" }
+    HOST   = ENV.fetch('KEYGEN_PORTAL_HOST') { "portal.#{DOMAIN}" }
+    ORIGIN = "https://#{HOST}"
   end
 end
