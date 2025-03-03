@@ -853,6 +853,8 @@ Then /^the response should contain the following raw headers:$/ do |body|
 end
 
 Then /^the response headers should contain "([^\"]+)" with (?:an?|the) (encrypted|signed) cookie:$/ do |header_name, cookie_jar_name, cookie_value|
+  expect(last_response.headers).to have_key header_name
+
   cookie_value = parse_placeholders(cookie_value, account: @account, bearer: @bearer, crypt: @crypt)
   header_value = last_response.headers[header_name]
 
@@ -872,6 +874,8 @@ Then /^the response headers should contain "([^\"]+)" with (?:an?|the) (encrypte
 end
 
 Then /^the response headers should contain "([^\"]+)" with (?:a|the) cookie:$/ do |header_name, cookie_value|
+  expect(last_response.headers).to have_key header_name
+
   cookie_value = parse_placeholders(cookie_value, account: @account, bearer: @bearer, crypt: @crypt)
   header_value = last_response.headers[header_name]
 

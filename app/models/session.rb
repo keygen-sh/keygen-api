@@ -35,5 +35,6 @@ class Session < ApplicationRecord
     end
   end
 
-  def expired? = expiry < Time.current || created_at < MAX_AGE.ago
+  def expires_in?(dt) = expiry - dt < Time.current
+  def expired?        = expiry < Time.current || created_at < MAX_AGE.ago
 end
