@@ -7,7 +7,7 @@ module Cookies
 
   def set_session_id_cookie(session)
     return unless
-      request.origin&.ends_with?(Keygen::Portal::HOST)
+      request.origin == Keygen::Portal::ORIGIN
 
     cookies.encrypted[:session_id] = {
       value: session.id,
@@ -22,7 +22,7 @@ module Cookies
 
   def reset_session_id_cookie
     return unless
-      request.origin&.ends_with?(Keygen::Portal::HOST)
+      request.origin == Keygen::Portal::ORIGIN
 
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,

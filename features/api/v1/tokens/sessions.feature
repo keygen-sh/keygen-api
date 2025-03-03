@@ -377,7 +377,7 @@ Feature: Token sessions
     Then the response status should be "401"
     And the response headers should not contain "Set-Cookie"
 
-  Scenario: User reads their profile with a valid session (allowed same-site)
+  Scenario: User reads their profile with a valid session (secure same-site portal)
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a valid session
@@ -388,7 +388,7 @@ Feature: Token sessions
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
 
-  Scenario: User reads their profile with an invalid session (allowed same-site)
+  Scenario: User reads their profile with an invalid session (secure same-site portal)
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with an invalid session
@@ -403,7 +403,31 @@ Feature: Token sessions
       session_id=; domain=keygen.sh; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=None; partitioned;
       """
 
-  Scenario: User reads their profile with a valid session (blocked same-site)
+  Scenario: User reads their profile with a valid session (insecure same-site portal)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
+    And I send the following headers:
+      """
+      { "Origin": "http://portal.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with an invalid session (insecure same-site portal)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "http://portal.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with a valid session (blocked same-site status)
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with a valid session
@@ -415,13 +439,37 @@ Feature: Token sessions
     Then the response status should be "401"
     And the response headers should not contain "Set-Cookie"
 
-  Scenario: User reads their profile with an invalid session (blocked same-site)
+  Scenario: User reads their profile with an invalid session (blocked same-site status)
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I authenticate with an invalid session
     And I send the following headers:
       """
       { "Origin": "https://status.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with a valid session (blocked same-site app)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
+    And I send the following headers:
+      """
+      { "Origin": "https://app.keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with an invalid session (blocked same-site app)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "https://app.keygen.sh" }
       """
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"
@@ -470,6 +518,30 @@ Feature: Token sessions
     And I send the following headers:
       """
       { "Origin": "https://evil.example" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with a valid session (cross-origin suffix bypass)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with a valid session
+    And I send the following headers:
+      """
+      { "Origin": "https://evil-keygen.sh" }
+      """
+    When I send a GET request to "/accounts/test1/me"
+    Then the response status should be "401"
+    And the response headers should not contain "Set-Cookie"
+
+  Scenario: User reads their profile with an invalid session (cross-origin suffix bypass)
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I authenticate with an invalid session
+    And I send the following headers:
+      """
+      { "Origin": "https://evil-keygen.sh" }
       """
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "401"

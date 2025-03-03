@@ -74,7 +74,7 @@ module Api::V1
         with: TokenPolicy
 
       # NOTE(ezekg) we only support session/cookie authn from portal origin
-      session = if request.origin&.ends_with?(Keygen::Portal::HOST)
+      session = if request.origin == Keygen::Portal::ORIGIN
                   # TODO(ezekg) make default session expiry configurable
                   token.sessions.build(
                     expiry: token.expiry.presence || 1.week.from_now,
