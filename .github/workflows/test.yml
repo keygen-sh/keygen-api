@@ -56,7 +56,6 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
-      DEBUG: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
