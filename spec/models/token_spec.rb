@@ -226,4 +226,101 @@ describe Token, type: :model do
       expect(actions).to match_array %w[license.validate license.read]
     end
   end
+
+  describe '#generate!' do
+    let(:bearer) { create(:user, account:) }
+    let(:token)  { create(:token, bearer:, account:) }
+
+    it 'should generate an implicit v3 token' do
+      token.generate!
+
+      expect(token.persisted?).to be true
+      expect(token.digest).to_not eq token.raw
+      expect(token.digest.size).to eq 64
+
+      expect(token.raw).to start_with 'user-'
+      expect(token.raw).to end_with 'v3'
+      expect(token.raw.size).to eq 5 + 64 + 2
+    end
+
+    it 'should generate an explicit v3 token' do
+      token.generate!(version: 'v3')
+
+      expect(token.raw).to start_with 'user-'
+      expect(token.raw).to end_with 'v3'
+      expect(token.raw.size).to eq 5 + 64 + 2
+    end
+
+    it 'should generate an explicit v2 token' do
+      token.generate!(version: 'v2')
+
+      expect(token.raw).to start_with 'user-'
+      expect(token.raw).to end_with 'v2'
+      expect(token.raw.size).to eq 5 + 64
+    end
+
+    it 'should generate an explicit v1 token' do
+      token.generate!(version: 'v1')
+
+      expect(token.raw).to start_with token.account_id.delete('-') + '.'
+      expect(token.raw).to end_with 'v1'
+      expect(token.raw.size).to eq 32 + 1 + 32 + 1 + 64
+    end
+  end
+
+  describe '#regenerate!' do
+    let(:token) { create(:token, account:) }
+
+    it 'should call #generate!' do
+      expect(token).to receive(:generate!).with(version: 'v3')
+
+      token.regenerate!(version: 'v3')
+    end
+
+    it 'should regenerate token' do
+      digest_was = token.digest
+      raw_was    = token.raw
+
+      token.regenerate!
+
+      expect(token.digest).to_not eq digest_was
+      expect(token.digest.size).to eq 64
+
+      expect(token.raw).to_not eq raw_was
+      expect(token.raw).to start_with 'user-'
+      expect(token.raw).to end_with 'v3'
+      expect(token.raw.size).to eq 5 + 64 + 2
+    end
+
+    it 'should clear sessions' do
+      token.sessions = create_list(:session, 3, token:)
+
+      expect(token.sessions).to_not be_empty
+
+      token.regenerate!
+
+      expect(token.sessions).to be_empty
+    end
+
+    it 'should regenerate session' do
+      old_session = create(:session, token:)
+      new_session = token.regenerate!(
+        session: old_session,
+      )
+
+      expect(new_session).to_not eq old_session
+      expect(token.sessions).to_not include old_session
+      expect(token.sessions).to include new_session
+    end
+
+    it 'should not regenerate session' do
+      other_session = create(:session, account:)
+      new_session   = token.regenerate!(
+        session: other_session,
+      )
+
+      expect(new_session).to be_nil
+      expect(token.sessions).to be_empty
+    end
+  end
 end
