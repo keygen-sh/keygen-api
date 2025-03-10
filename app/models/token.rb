@@ -262,7 +262,8 @@ class Token < ApplicationRecord
         32
       end
 
-    @raw, enc = generate_hashed_token :digest, length: length, version: version do |token|
+    # store ephemeral raw value and persist digest value
+    @raw, digest = generate_hashed_token :digest, length: length, version: version do |token|
       case version
       when "v1"
         "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
@@ -273,7 +274,7 @@ class Token < ApplicationRecord
       end
     end
 
-    self.digest = enc
+    self.digest = digest
 
     save!
   end
