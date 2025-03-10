@@ -6,7 +6,8 @@ FactoryBot.define do
 
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
-    token       { build(:token, account:, environment:) }
+    token       { build(:token, bearer:, account:, environment:) }
+    bearer      { build(:admin, account:, environment:) }
 
     expiry     { 2.weeks.from_now }
     user_agent { Faker::Internet.user_agent }
