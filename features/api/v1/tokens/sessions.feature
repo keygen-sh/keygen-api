@@ -18,7 +18,10 @@ Feature: Token sessions
     And I am an admin of account "test1"
     And I send the following headers:
       """
-      { "Authorization": "Basic \"$users[0].email:password\"" }
+      {
+        "Authorization": "Basic \"$users[0].email:password\"",
+        "User-Agent": "acme/1.0"
+      }
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
@@ -32,7 +35,10 @@ Feature: Token sessions
       {
         "bearerType": "User",
         "bearerId": "$users[0]",
-        "tokenId": "$tokens[0]"
+        "tokenId": "$tokens[0]",
+        "userAgent": "acme/1.0",
+        "ip": "127.0.0.1",
+        "lastUsedAt": null
       }
       """
     And time is unfrozen
@@ -716,6 +722,11 @@ Feature: Token sessions
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I authenticate with a session
+    And I send the following headers:
+      """
+      { "User-Agent": "acme/1.1" }
+      """
+    And time is frozen at "2025-03-10T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       {
@@ -734,6 +745,18 @@ Feature: Token sessions
       """
     Then the response status should be "201"
     And the response body should be a "license"
+    And the first "session" should have the following attributes:
+      """
+      {
+        "bearerType": "User",
+        "bearerId": "$users[1]",
+        "tokenId": "$tokens[0]",
+        "lastUsedAt": "2025-03-10T00:00:00.000Z",
+        "userAgent": "acme/1.1",
+        "ip": "127.0.0.1"
+      }
+      """
+    And time is unfrozen
 
   Scenario: User creates a pro license with session authentication
     Given the current account is "test1"
