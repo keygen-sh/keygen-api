@@ -111,6 +111,9 @@ module Authentication
   end
 
   def http_cookie_authenticator(session_id)
+    return nil if
+      current_account.nil? || session_id.blank?
+
     session = current_account.sessions.for_environment(current_environment, strict: current_environment.nil?)
                                       .preload(:token, :bearer)
                                       .find_by(
@@ -153,6 +156,9 @@ module Authentication
   end
 
   def http_password_authenticator(username = nil, password = nil)
+    return nil if
+      current_account.nil? || username.blank? || password.blank?
+
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
                                 .find_by(email: "#{username}".downcase)
 
