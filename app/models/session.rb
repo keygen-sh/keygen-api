@@ -28,7 +28,7 @@ class Session < ApplicationRecord
   # assert that bearer matches the token's bearer
   validate on: %i[create update] do
     next unless
-      token_id_changed? || bearer_id_changed?
+      token_id_changed? || bearer_type_changed? || bearer_id_changed?
 
     unless token.nil? || bearer_type == token.bearer_type && bearer_id == token.bearer_id
       errors.add :bearer, :not_allowed, message: 'bearer must match token bearer'
