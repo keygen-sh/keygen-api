@@ -14,7 +14,7 @@ Feature: Token sessions
   # generate
   Scenario: Admin generates a new session token with basic authentication
     Given the current account is "test1"
-    And time is frozen at "2025-02-28T00:00:00.000Z"
+    And time is frozen at "2552-02-28T00:00:00.000Z"
     And I am an admin of account "test1"
     And I send the following headers:
       """
@@ -28,7 +28,7 @@ Feature: Token sessions
     And the response body should be a "token"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Fri, 07 Mar 2025 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 06 Mar 2552 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the first "session" should have the following attributes:
       """
@@ -45,15 +45,15 @@ Feature: Token sessions
 
   Scenario: Admin generates a new session token with token authentication
     Given the current account is "test1"
-    And time is frozen at "2025-02-28T00:00:00.000Z"
     And I am an admin of account "test1"
     And I use an authentication token
+    And time is frozen at "2552-02-28T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the response body should be a "token"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Fri, 07 Mar 2025 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 06 Mar 2552 00:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And the first "session" should have the following attributes:
       """
@@ -290,8 +290,8 @@ Feature: Token sessions
   # expiry
   Scenario: User reads their profile with a valid session
     Given the current account is "test1"
-    And time is frozen at "2025-02-28T00:00:00.000Z"
     And the current account has 1 "user"
+    And time is frozen at "2552-02-28T00:00:00.000Z"
     And I am a user of account "test1"
     And I authenticate with a session
     When I send a GET request to "/accounts/test1/me"
@@ -302,15 +302,15 @@ Feature: Token sessions
   # should extend session expiry while it's in use until max age
   Scenario: User reads their profile with an expiring session
     Given the current account is "test1"
-    And time is frozen at "2025-03-03T00:00:00.000Z"
     And the current account has 1 "user"
+    And time is frozen at "2552-03-03T00:00:00.000Z"
     And I am a user of account "test1"
     And I authenticate with an expiring session
     When I send a GET request to "/accounts/test1/me"
     Then the response status should be "200"
     And the response headers should contain "Set-Cookie" with an encrypted cookie:
       """
-      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 03 Mar 2025 01:10:00 GMT; secure; httponly; samesite=None; partitioned;
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Fri, 03 Mar 2552 01:10:00 GMT; secure; httponly; samesite=None; partitioned;
       """
     And time is unfrozen
 
@@ -720,13 +720,13 @@ Feature: Token sessions
       { "name": "Trial", "protected": false }
       """
     And the current account has 1 "user"
+    And time is frozen at "2552-03-10T00:00:00.000Z"
     And I am a user of account "test1"
     And I authenticate with a session
     And I send the following headers:
       """
       { "User-Agent": "acme/1.1" }
       """
-    And time is frozen at "2025-03-10T00:00:00.000Z"
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       {
@@ -751,7 +751,7 @@ Feature: Token sessions
         "bearerType": "User",
         "bearerId": "$users[1]",
         "tokenId": "$tokens[0]",
-        "lastUsedAt": "2025-03-10T00:00:00.000Z",
+        "lastUsedAt": "2552-03-10T00:00:00.000Z",
         "userAgent": "acme/1.1",
         "ip": "127.0.0.1"
       }
