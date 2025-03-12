@@ -1775,7 +1775,86 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token but fails to authenticate
+  Scenario: User attempts to generate a new token with an invalid email
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"foo@bar.example:secret\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email must be valid",
+        "code": "EMAIL_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+
+  Scenario: User attempts to generate a new token with an invalid email (v1.8)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"foo@bar.example:secret\"" }
+      """
+    And I use API version "1.8"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email must be valid",
+        "code": "EMAIL_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.8" }
+      """
+
+  Scenario: User attempts to generate a new token with an invalid email (v1.7)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"foo@bar.example:secret\"" }
+      """
+    And I use API version "1.7"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email and password must be valid",
+        "code": "CREDENTIALS_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.7" }
+      """
+
+  Scenario: User attempts to generate a new token with an invalid password
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -1790,12 +1869,68 @@ Feature: Generate authentication token
       """
       {
         "title": "Unauthorized",
+        "detail": "password must be valid",
+        "code": "PASSWORD_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+
+  Scenario: User attempts to generate a new token with an invalid password (v1.8)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:someBadPassword\"" }
+      """
+    And I use API version "1.8"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password must be valid",
+        "code": "PASSWORD_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.8" }
+      """
+
+  Scenario: User attempts to generate a new token with an invalid password (v1.7)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:someBadPassword\"" }
+      """
+    And I use API version "1.7"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
         "detail": "email and password must be valid",
         "code": "CREDENTIALS_INVALID",
         "source": {
           "header": "Authorization"
         }
       }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.7" }
       """
 
   Scenario: User attempts to generate a new token without authentication
@@ -1840,18 +1975,67 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token without a password set
+  Scenario: User attempts to generate a new token without a password
     Given the current account is "test1"
     And the current account has 1 "user"
-    And the last "user" has the following attributes:
-      """
-      { "passwordDigest": null }
-      """
     And I am a user of account "test1"
     And I send the following headers:
       """
-      { "Authorization": "Basic \"$users[1].email:secret\"" }
+      { "Authorization": "Basic \"$users[1].email:\"" }
       """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password is required",
+        "code": "PASSWORD_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (v1.8)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:\"" }
+      """
+    And I use API version "1.8"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password is required",
+        "code": "PASSWORD_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.8" }
+      """
+
+  Scenario: User attempts to generate a new token without a password (v1.7)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:\"" }
+      """
+    And I use API version "1.7"
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "401"
     And the first error should have the following properties:
@@ -1865,18 +2049,137 @@ Feature: Generate authentication token
         }
       }
       """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.7" }
+      """
+
+  Scenario: User attempts to generate a new token for a passwordless user
+    Given the current account is "test1"
+    And the current account has 1 passwordless "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:secret\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password is unsupported",
+        "code": "PASSWORD_NOT_SUPPORTED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous attempts to send a null byte within the auth header
+  Scenario: User attempts to generate a new token for a passwordless user (v1.8)
     Given the current account is "test1"
+    And the current account has 1 passwordless "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:secret\"" }
+      """
+    And I use API version "1.8"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password is unsupported",
+        "code": "PASSWORD_NOT_SUPPORTED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.8" }
+      """
+
+  Scenario: User attempts to generate a new token for a passwordless user (v1.7)
+    Given the current account is "test1"
+    And the current account has 1 passwordless "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:secret\"" }
+      """
+    And I use API version "1.7"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email and password must be valid",
+        "code": "CREDENTIALS_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.7" }
+      """
+
+   Scenario: Anonymous attempts to send a null byte within the email
+    Given the current account is "test1"
+    And the current account has 1 "user" with the following:
+      """
+      { "email": "foo@bar.example" }
+      """
     And I send the following raw headers:
       """
-      Authorization: Basic dABlAHMAdABAAHQAZQBzAHQALgBjAG8AbQA6AFAAYQBzAHMAdwBvMA=
+      Authorization: Basic Zm9vQGJhAHIuZXhhbXBsZTpiYXo=
       """
     When I send a POST request to "/accounts/test1/tokens"
-    Then the response status should be "400"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email is required",
+        "code": "EMAIL_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+
+  Scenario: Anonymous attempts to send a null byte within the password
+    Given the current account is "test1"
+    And the current account has 1 "user" with the following:
+      """
+      { "email": "foo@bar.example" }
+      """
+    And I send the following raw headers:
+      """
+      Authorization: Basic Zm9vQGJhci5leGFtcGxlOmJhAHo=
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password must be valid",
+        "code": "PASSWORD_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
 
   Scenario: Anonymous attempts to send a badly encoded email address
     Given the current account is "test1"

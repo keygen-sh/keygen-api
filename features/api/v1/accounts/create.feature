@@ -143,11 +143,11 @@ Feature: Create account
     Then the response status should be "201"
     And the response should contain the following headers:
       """
-      { "Keygen-Version": "1.7" }
+      { "Keygen-Version": "1.8" }
       """
     And the response body should be an "account" with the following attributes:
       """
-      { "apiVersion": "1.7" }
+      { "apiVersion": "1.8" }
       """
 
   Scenario: Anonymous creates an account (specific API version)

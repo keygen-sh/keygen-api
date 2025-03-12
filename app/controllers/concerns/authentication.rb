@@ -157,22 +157,53 @@ module Authentication
 
   def http_password_authenticator(username = nil, password = nil)
     return nil if
-      current_account.nil? || username.blank? || password.blank?
+      current_account.nil?
 
-    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
-                                .find_by(email: "#{username}".downcase)
-
-    @current_http_scheme = :password
-    @current_http_token  = nil
-
-    unless user.present?
+    # save a query in case the email isn't valid
+    unless username in EMAIL_RE
       raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
+        detail: 'email is required',
+        code: 'EMAIL_REQUIRED',
         header: 'Authorization',
       )
     end
 
+    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+                                .find_by(email: username.downcase)
+
+    @current_http_scheme = :password
+    @current_http_token  = nil
+
+    # see below comment i.r.t. leaking user existence being a requirement for determining authn flow
+    unless user.present?
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'email must be valid',
+        code: 'EMAIL_INVALID',
+        header: 'Authorization',
+      )
+    end
+
+    # verify password only if the user has one set i.e. they're not a managed user
+    unless user.password?
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'password is unsupported',
+        code: 'PASSWORD_NOT_SUPPORTED',
+        header: 'Authorization',
+      )
+    end
+
+    # NOTE(ezekg) yes, this leaks existence of a user... but we send this so that we can
+    #             eventually determine authn flow for a given email e.g. password vs
+    #             single-sign-on
+    if user.password? && password.blank?
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'password is required',
+        code: 'PASSWORD_REQUIRED',
+        header: 'Authorization',
+      )
+    end
+
+    # verify second factor before password so that we don't leak correctness
     if user.second_factor_enabled?
       otp = params.dig(:meta, :otp)
       if otp.nil?
@@ -192,10 +223,10 @@ module Authentication
       end
     end
 
-    unless user.password? && user.authenticate(password)
+    unless user.authenticate(password)
       raise Keygen::Error::UnauthorizedError.new(
-        detail: 'email and password must be valid',
-        code: 'CREDENTIALS_INVALID',
+        detail: 'password must be valid',
+        code: 'PASSWORD_INVALID',
         header: 'Authorization',
       )
     end
@@ -362,7 +393,7 @@ module Authentication
     username, password = Base64.decode64(authentication_value.to_s)
                                .split(':', 2)
 
-    # FIXME(ezekg) This will break if tokens ever include the @ symbol
+    # FIXME(ezekg) this will break if tokens ever include the @ symbol
     username in /@/ and password in String
   end
 
