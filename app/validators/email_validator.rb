@@ -9,8 +9,6 @@ class EmailValidator < ActiveModel::EachValidator
   def self.valid?(value)
     return false if value.nil?
 
-    m = value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
-
-    !m.nil?
+    value in EMAIL_RE
   end
 end

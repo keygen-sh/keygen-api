@@ -140,10 +140,14 @@ unless ENV.key?('NO_RACK_ATTACK')
     next unless
       auth.present? && auth.starts_with?('Basic ')
 
-    dec   = Base64.decode64(auth.remove('Basic '))
-    email = dec.split(':', 2).first
+    dec      = Base64.decode64(auth.delete_prefix('Basic '))
+    email,
+    password = dec.split(':', 2)
+
+    # NOTE(ezekg) we're only rate limiting real authn attempts i.e. with a password
     next unless
-      email.present? && email.include?('@')
+      email.present? && email.include?('@') &&
+      password.present?
 
     hash = Digest::SHA2.hexdigest(email.to_s.downcase)
 

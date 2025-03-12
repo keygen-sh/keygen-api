@@ -90,7 +90,7 @@ Given /^I send the following headers:$/ do |body|
 
   # Base64 encode basic credentials
   if headers["Authorization"]&.starts_with? "Basic"
-    /Basic "([.@\w\d]+):(.+)"/ =~ headers["Authorization"]
+    /Basic "([.@\w\d]+):(.*)"/ =~ headers["Authorization"]
     credentials = Base64.encode64 "#{$1}:#{$2}"
     headers["Authorization"] = "Basic \"#{credentials}\""
   end
@@ -106,7 +106,7 @@ Given /^I send the following badly encoded headers:$/ do |body|
 
   # Base64 encode basic credentials
   if headers.key? "Authorization"
-    /Basic "([.@\w\d]+):(.+)"/ =~ headers["Authorization"]
+    /Basic "([.@\w\d]+):(.*)"/ =~ headers["Authorization"]
     credentials = Base64.encode64 "#{128.chr + $1}:#{128.chr + $2}"
     headers["Authorization"] = "Basic \"#{credentials}\""
   end

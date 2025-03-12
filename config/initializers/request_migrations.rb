@@ -18,6 +18,9 @@ RequestMigrations.configure do |config|
 
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
+    '1.7' => %i[
+      rename_credential_error_codes_for_token_migration
+    ],
     '1.6' => %i[
       rename_process_leasing_strategy_to_leasing_strategy_for_policies_migration
       rename_process_leasing_strategy_to_leasing_strategy_for_policy_migration
