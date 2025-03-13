@@ -889,6 +889,10 @@ Then /^the response headers should not contain "([^\"]+)"$/ do |header_name|
   expect(last_response.headers).to_not have_key(header_name)
 end
 
+Then /^the response headers should contain "([^\"]+)" with "([^\"]+)"$/ do |header_name, header_value|
+  expect(last_response.headers).to include(header_name => header_value)
+end
+
 Then /^the response should contain a valid(?: "([^\"]+)")? signature header for "([^\"]+)"$/ do |expected_algorithm, account_id|
   account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
   req     = last_request

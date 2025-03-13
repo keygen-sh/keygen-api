@@ -445,6 +445,11 @@ class ApplicationController < ActionController::API
       e.code.present?
 
     render_bad_request(**kwargs)
+  rescue Keygen::Error::InvalidSingleSignOnError => e
+    Keygen.logger.warn { "[sso] error=#{e.class.inspect} code=#{e.code.inspect} message=#{e.message.inspect}" }
+
+    # we want to redirect to Portal to display the SSO error message in a helpful way
+    redirect_to portal_url('/sso/error', query: { code: e.code }), status: :see_other, allow_other_host: true
   rescue Keygen::Error::UnauthorizedError => e
     kwargs = { code: e.code }
 
@@ -454,14 +459,20 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
+    kwargs[:links] = e.links if
+      e.links.present?
+
     # add additional properties based on code
     case e.code
-    when 'LICENSE_INVALID'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
-    when 'TOKEN_INVALID'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
+    when 'LICENSE_NOT_ALLOWED',
+         'LICENSE_INVALID'
+      kwargs.deep_merge!(links: { about: docs_url(:authentication, anchor: 'license-authentication') })
+    when 'TOKEN_NOT_ALLOWED',
+         'TOKEN_INVALID',
+         'TOKEN_FORMAT_INVALID'
+      kwargs.deep_merge!(links: { about: docs_url(:authentication, anchor: 'token-authentication') })
     when 'TOKEN_MISSING'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/' }
+      kwargs.deep_merge!(links: { about: docs_url(:authentication) })
     end
 
     render_unauthorized(**kwargs)
@@ -474,12 +485,15 @@ class ApplicationController < ActionController::API
     kwargs[:source] = e.source if
       e.source.present?
 
+    kwargs[:links] = e.links if
+      e.links.present?
+
     # add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
+      kwargs.deep_merge!(links: { about: docs_url(:authentication, anchor: 'license-authentication') })
     when 'TOKEN_NOT_ALLOWED'
-      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
+      kwargs.deep_merge!(links: { about: docs_url(:authentication, anchor: 'token-authentication') })
     end
 
     render_forbidden(**kwargs)

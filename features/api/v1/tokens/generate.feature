@@ -2054,6 +2054,170 @@ Feature: Generate authentication token
       { "Keygen-Version": "1.7" }
       """
 
+  Scenario: User attempts to generate a new token without a password (configured SSO, matched email, existing admin)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And the current account has 1 "admin" with the following:
+      """
+      { "email": "zeke@keygen.example" }
+      """
+    And I am an admin of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@keygen.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "single sign on is required",
+        "code": "SSO_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (configured SSO, matched email, existing user)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And the current account has 1 "user" with the following:
+      """
+      { "email": "zeke@keygen.example" }
+      """
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@keygen.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "single sign on is required",
+        "code": "SSO_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (configured SSO, matched email, new user)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@keygen.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "single sign on is required",
+        "code": "SSO_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, existing admin)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And the current account has 1 "admin" with the following:
+      """
+      { "email": "zeke@acme.example" }
+      """
+    And I am an admin of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@acme.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "single sign on is required",
+        "code": "SSO_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, existing user)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And the current account has 1 "user" with the following:
+      """
+      { "email": "zeke@acme.example" }
+      """
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@acme.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "password is required",
+        "code": "PASSWORD_REQUIRED",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token without a password (configured SSO, mismatched email, new user)
+    Given the current account is "test1"
+    And the current account has SSO configured for "keygen.example"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"zeke@acme.example:\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "email must be valid",
+        "code": "EMAIL_INVALID",
+        "source": {
+          "header": "Authorization"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User attempts to generate a new token for a passwordless user
     Given the current account is "test1"
     And the current account has 1 passwordless "user"

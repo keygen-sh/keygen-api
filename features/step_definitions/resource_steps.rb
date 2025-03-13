@@ -11,6 +11,13 @@ Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, rows|
 
     # FIXME(ezekg) treating release models a bit differently for convenience
     case factory
+    when :account
+      domains = hash.delete(:sso_organization_domains)&.split(/,\s*/)
+      if domains.present? && domains.any?
+        hash[:sso_organization_domains] = domains
+      end
+
+      create(:account, **hash)
     when :release
       codes = hash.delete(:entitlements)&.split(/,\s*/)
       if codes.present? && codes.any?
@@ -149,6 +156,13 @@ Given /^the current account has the following attributes:$/ do |body|
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
   @account.update!(attributes)
+end
+
+Given /^the current account has SSO configured for "([^\"]*)"$/ do |domain|
+  @account.update!(
+    sso_organization_id: "test_org_#{SecureRandom.hex}",
+    sso_organization_domains: [domain],
+  )
 end
 
 Given /^the current account has (\d+) (?:([\w+]+) )?"([^\"]*)"$/ do |count, traits, resource|
@@ -833,10 +847,9 @@ Given /^AWS S3 is (responding with a 200 status|responding with a 404 status|tim
   }
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:for|of) account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   account = FindByAliasService.call(Account, id:, aliases: :slug)
+  body    = parse_placeholders(body, bearer: @bearer, crypt: @crypt, account:)
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -845,8 +858,9 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eighth"   => 7,
-    "ninth"   => 8
+    "eighth"  => 7,
+    "ninth"   => 8,
+    "last"    => -1,
   }
 
   m = account.send(resource.pluralize.underscore).all.send(:[], numbers[i])
@@ -858,10 +872,9 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
   m.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:for|of) account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
   account = FindByAliasService.call(Account, id:, aliases: :slug)
+  body    = parse_placeholders(body, bearer: @bearer, crypt: @crypt, account:)
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -870,8 +883,9 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eighth"   => 7,
-    "ninth"   => 8
+    "eighth"  => 7,
+    "ninth"   => 8,
+    "last"    => -1,
   }
 
   m = account.send(resource.pluralize.underscore).all.send(:[], numbers[i])
@@ -991,8 +1005,9 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "li
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eighth"   => 7,
-    "ninth"   => 8
+    "eighth"  => 7,
+    "ninth"   => 8,
+    "last"    => -1,
   }
   index = numbers[word_index]
   model = @account.licenses.all[index]
@@ -1072,10 +1087,9 @@ Then /^the (?!account)(\w+) "([^\"]*)" should have (\w+) "([^\"]+)"$/ do |index_
   expect(count).to eq(expected_count.to_i)
 end
 
-Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" (?:for|of) account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
+  body    = parse_placeholders(body, bearer: @bearer, crypt: @crypt, account:)
   model   = account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
 
@@ -1139,4 +1153,10 @@ Given /^the (first|second|third|fourth|fifth|last) "release" should (be|not be) 
   expected = named_scenario == 'be'
 
   expect(release.yanked_at.present?).to be expected
+end
+
+Given /^there should be (\d+) "([^\"]*)"$/ do |count, model_name|
+  model = model_name.singularize.classify.constantize
+
+  expect(model.count).to eq count.to_i
 end

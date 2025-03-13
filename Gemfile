@@ -34,6 +34,10 @@ gem 'msgpack', '~> 1.7'
 # Billing and subscriptions
 gem 'stripe', '~> 5.43'
 
+# Authentication
+gem 'rotp', '~> 6.2'
+gem 'workos'
+
 # Authorization
 gem 'action_policy', '~> 0.6.3'
 
@@ -41,9 +45,6 @@ gem 'action_policy', '~> 0.6.3'
 gem 'openssl', '~> 3.1.0'
 gem 'ed25519'
 gem 'jwt'
-
-# 2FA/TOTP
-gem 'rotp', '~> 6.2'
 
 # Scopes and pagination
 gem 'has_scope'
