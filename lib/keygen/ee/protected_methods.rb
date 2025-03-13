@@ -252,6 +252,9 @@ module Keygen
             Keygen.console?
 
           define_singleton_method :included do |klass|
+            # NOTE(ezekg) make sure all attr methods are defined since we can't hook them via method_added
+            klass.define_attribute_methods if klass.respond_to?(:define_attribute_methods)
+
             klass.extend MethodBouncer
 
             klass.instrument_protected_methods!(

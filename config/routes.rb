@@ -32,13 +32,13 @@ Rails.application.routes.draw do
   concern :tauri do
     # see: https://v2.tauri.app/plugin/updater/#dynamic-update-server
     scope module: :tauri, constraints: MimeTypeConstraint.new(:binary, :json, raise_on_no_match: true), defaults: { format: :json } do
-      get ':package', to: 'upgrades#show'
+      get ':package', to: 'upgrades#show', as: :tauri_upgrade_package
     end
   end
 
   concern :raw do
     scope module: :raw, defaults: { format: :binary } do
-      get ':product(/@:package)/:release/:artifact', to: 'release_artifacts#show', constraints: {
+      get ':product(/@:package)/:release/:artifact', to: 'release_artifacts#show', as: :raw_download_artifact, constraints: {
         product: /[^\/]*/ ,
         package: /[^\/]*/ ,
         release: /[^\/]*/ ,
@@ -105,6 +105,10 @@ Rails.application.routes.draw do
       # ignore other requests entirely for now e.g. GET /v2/:namespace/referrers/:digest
       match '*wildcard', via: :all, to: -> env { [405, {}, []] }
     end
+  end
+
+  concern :sso do
+    get :sso, to: 'sso#callback', as: :sso_callback
   end
 
   concern :v1 do
@@ -654,6 +658,23 @@ Rails.application.routes.draw do
         end
       end
     end
+  end
+
+  # subdomains for authentication e.g. SSO
+  scope constraints: { domain: Keygen::DOMAIN, subdomain: 'auth' } do
+    scope module: :auth do
+      concerns :sso
+    end
+  end
+
+  # route helpers for redirecting to Portal
+  direct :portal do |segment, options|
+    Keygen::Portal.url_for(segment, **options)
+  end
+
+  # route helpers for redirecting to docs
+  direct :docs do |segment, options|
+    Keygen::Docs.url_for(segment, **options)
   end
 
   %w[500 503].each do |code|

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_13_155620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -39,6 +39,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
     t.string "api_version"
     t.string "cname"
     t.string "backend"
+    t.string "sso_organization_id"
+    t.string "sso_organization_domains", default: [], array: true
+    t.integer "sso_session_duration"
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
@@ -46,6 +49,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
+    t.index ["sso_organization_domains"], name: "index_accounts_on_sso_organization_domains", using: :gin
+    t.index ["sso_organization_id"], name: "index_accounts_on_sso_organization_id", unique: true
     t.index ["subdomain"], name: "index_accounts_on_subdomain", unique: true
   end
 
@@ -797,7 +802,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "environment_id"
-    t.uuid "token_id", null: false
+    t.uuid "token_id"
     t.string "bearer_type", null: false
     t.uuid "bearer_id", null: false
     t.datetime "last_used_at"
@@ -860,11 +865,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_153323) do
     t.datetime "banned_at", precision: nil
     t.uuid "group_id"
     t.uuid "environment_id"
+    t.string "sso_profile_id"
+    t.string "sso_idp_id"
+    t.string "sso_connection_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at"
+    t.index ["account_id", "sso_profile_id"], name: "index_users_on_account_id_and_sso_profile_id", unique: true
     t.index ["banned_at"], name: "index_users_on_banned_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true
