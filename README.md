@@ -42,24 +42,25 @@ software and getting a great service!
 
 Keygen is a fair source software licensing and distribution API, and we have a
 free (as in beer) [self-hosted solution][self-hosting]. Keygen Community
-Edition is exactly the same code base as our managed solution, Keygen Cloud,
-but with a less frequent release schedule (think of it as an LTS release).
+Edition (CE) is exactly the same code base as our managed solution, Keygen
+Cloud, but with a less frequent release schedule (think of it as an LTS
+release).
 
 Bug fixes and new features are released to Keygen Cloud several times
-per week. Features are battle-tested in Keygen Cloud which allows us to fix
-any bugs before the general self-hosted release. Every 6 months, we
+per week. Features are battle-tested in Keygen Cloud, which allows us to fix
+any bugs before the general self-hosted release. Every 6 months or so, we
 combine all the changes into a new self-hosted release.
 
-Keygen CE does lack a few features from Keygen Cloud, which are available
-in Keygen EE.
+Keygen CE does lack a few features from Keygen Cloud, most of which are
+available in Keygen EE.
 
 Interested in self-hosting Keygen? Take a look at our [self-hosting docs][self-hosting].
 
 ## Self hosting with Keygen EE
 
-Keygen is also enterprise-grade, battle-tested in Keygen Cloud with some of
+Keygen is also enterprise-grade, and battle-tested in Keygen Cloud with some of
 the best brands in the world. The following features are available in
-Keygen Enterprise Edition:
+Keygen Enterprise Edition (EE):
 
 - **Request logs**: keep a historical record of API requests, along with who
   made the request, the request body, response body, status code, IP address,
@@ -69,7 +70,13 @@ Keygen Enterprise Edition:
 - **Environments**: manage separate environments within a Keygen account, from
   test environments, to a sandbox, to QA, to production.
 - **Permissions**: enterprise-grade roles and permissions.
-- **SSO/SAML**: support for SSO/SAML coming soon.
+- **Import/export**: migrate from Keygen Cloud to Keygen EE (and vice-versa).
+- **OCI/Docker**: license and distribute private container images via Keygen's
+  license-gated, OCI-compliant container registry.
+- **SSO/SAML**: support for SSO/SAML.
+
+In addition, Keygen EE customers are entitled to dedicated self-hosting
+support. We're here to make sure you're successful.
 
 Keygen uses Keygen EE in production to run Keygen Cloud, which is used to
 license Keygen EE. It's ~~turtles~~ Keygens all the way down (we love
