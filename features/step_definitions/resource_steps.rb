@@ -8,6 +8,7 @@ Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, rows|
 
   hashes.each do |hash|
     hash.transform_values!(&:presence)
+        .compact!
 
     # FIXME(ezekg) treating release models a bit differently for convenience
     case factory
