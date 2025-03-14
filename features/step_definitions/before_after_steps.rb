@@ -57,6 +57,8 @@ After do |scenario|
   Faker::UniqueGenerator.clear
   StripeHelper.stop
 
+  unfreeze_time
+
   # Tell Cucumber to quit if a scenario fails
   if scenario.failed?
     Cucumber.wants_to_quit = true

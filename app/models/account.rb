@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Account < ApplicationRecord
+  include Keygen::EE::ProtectedMethods[:sso_organization_id=, :sso_organization_domains=, entitlements: %i[sso]]
   include Keygen::PortableClass
   include Welcomeable
   include Limitable
@@ -291,6 +292,16 @@ class Account < ApplicationRecord
 
   def protected?
     protected
+  end
+
+  def sso? = sso_organization_id?
+  def sso_for?(email)
+    return false if email.blank?
+
+    _, domain = email.downcase.match(/([^@]+)@(.+)/)
+                              .captures
+
+    domain.in?(sso_organization_domains)
   end
 
   def status

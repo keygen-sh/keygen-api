@@ -7,23 +7,28 @@ class Session < ApplicationRecord
   include Environmental
   include Accountable
 
-  belongs_to :token
+  belongs_to :token, optional: true
   belongs_to :bearer,
     polymorphic: true
 
-  has_environment default: -> { token&.environment_id }
-  has_account default: -> { token&.account_id }, inverse_of: :sessions
+  has_environment default: -> { bearer&.environment_id }
+  has_account default: -> { bearer&.account_id }, inverse_of: :sessions
 
   denormalizes :bearer_type, :bearer_id,
     from: :token
 
   validates :token,
     presence: { message: 'must exist' },
-    scope: { by: :account_id }
+    scope: { by: :account_id },
+    unless: -> {
+      token_id_before_type_cast.nil?
+    }
 
   validates :bearer,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
+
+  validates :ip, presence: true
 
   # assert that bearer matches the token's bearer
   validate on: %i[create update] do

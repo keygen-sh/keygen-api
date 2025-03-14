@@ -5,12 +5,14 @@ module Keygen
     class JSONAPIError < StandardError
       attr_reader :code,
                   :detail,
-                  :source
+                  :source,
+                  :links
 
-      def initialize(message, code: nil, detail: nil, parameter: nil, pointer: nil, header: nil)
+      def initialize(message, code: nil, detail: nil, parameter: nil, pointer: nil, header: nil, links: nil)
         @code   = code
         @detail = detail
         @source = { parameter:, pointer:, header: }.compact
+        @links  = links
 
         super(message)
       end
@@ -48,6 +50,20 @@ module Keygen
       def initialize(message: nil, model: nil, primary_key: nil, id: nil)
         super message, model, primary_key, id
       end
+    end
+
+    class CodedError < StandardError
+      attr_reader :code
+
+      def initialize(message, code: nil)
+        @code = code
+
+        super(message)
+      end
+    end
+
+    class InvalidSingleSignOnError < CodedError
+      def initialize(message, code: 'SSO_INVALID') = super(message, code:)
     end
 
     class InvalidAccountDomainError < StandardError; end

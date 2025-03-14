@@ -5,9 +5,9 @@ module Cookies
 
   include ActionController::Cookies
 
-  def set_session_id_cookie(session)
+  def set_session_id_cookie(session, skip_verify_origin: false)
     return unless
-      request.origin == Keygen::Portal::ORIGIN
+      skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
 
     cookies.encrypted[:session_id] = {
       value: session.id,
@@ -20,9 +20,9 @@ module Cookies
     }
   end
 
-  def reset_session_id_cookie
+  def reset_session_id_cookie(skip_verify_origin: false)
     return unless
-      request.origin == Keygen::Portal::ORIGIN
+      skip_verify_origin || request.origin == Keygen::Portal::ORIGIN
 
     cookies.delete(:session_id,
       domain: Keygen::DOMAIN,

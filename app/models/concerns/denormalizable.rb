@@ -43,9 +43,10 @@ module Denormalizable
           raise ArgumentError, "must be a singular association: #{association_name.inspect}"
         end
 
-        after_initialize  -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, unless: :persisted?
+        # FIXME(ezekg) after_initialize ignores prepend: false
+        set_callback :initialize, :after, -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, unless: :persisted?, prepend: false
         before_validation -> { write_denormalized_attribute_from_schrodingers_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }, on: :create
-        before_update     -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) },   if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
+        before_update -> { write_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: -> { send(:"#{reflection.foreign_key}_changed?") || send(:"#{reflection.name}_changed?") }
 
         # make sure validation fails if our denormalized column is modified directly
         validate -> { validate_denormalized_attribute_from_persisted_record(association_name, attribute_name, prefixed_attribute_name) }, if: :"#{prefixed_attribute_name}_changed?", on: :update
@@ -71,13 +72,13 @@ module Denormalizable
 
         # FIXME(ezekg) set to nil on destroy unless the association is dependent?
         if reflection.collection?
-          after_initialize  -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
+          after_initialize -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
           before_validation -> { write_denormalized_attribute_to_unpersisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-          after_update      -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_previously_changed?"
+          after_update -> { write_denormalized_attribute_to_persisted_relation(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
         else
-          after_initialize  -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
+          after_initialize -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", unless: :persisted?
           before_validation -> { write_denormalized_attribute_to_unpersisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_changed?", on: :create
-          after_update      -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) },   if: :"#{attribute_name}_previously_changed?"
+          after_update -> { write_denormalized_attribute_to_persisted_record(association_name, prefixed_attribute_name, attribute_name) }, if: :"#{attribute_name}_previously_changed?"
         end
 
         denormalized_attributes << attribute_name

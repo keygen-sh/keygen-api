@@ -435,6 +435,9 @@ class User < ApplicationRecord
     }
   end
 
+  def single_sign_on_enabled? = !role.user? && account.sso?
+  alias :sso_enabled? :single_sign_on_enabled?
+
   def password?
     password_digest?
   end

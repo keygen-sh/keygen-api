@@ -124,7 +124,7 @@ module Authentication
     @current_http_token  = nil
 
     raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_INVALID') if
-      session.nil? || session.token.nil? || session.bearer.nil?
+      session.nil? || session.bearer.nil?
 
     raise Keygen::Error::UnauthorizedError.new(code: 'SESSION_EXPIRED', detail: 'Session is expired') if
       session.expired?
@@ -159,8 +159,8 @@ module Authentication
     return nil if
       current_account.nil?
 
-    # save a query in case the email isn't valid
-    unless username in EMAIL_RE
+    # save a query in case the username isn't a valid email
+    unless username in EMAIL_RE => email
       raise Keygen::Error::UnauthorizedError.new(
         detail: 'email is required',
         code: 'EMAIL_REQUIRED',
@@ -168,8 +168,28 @@ module Authentication
       )
     end
 
+    # single-sign-on is checked before the user lookup to support jit-provisioning
+    if current_account.sso? && current_account.sso_for?(email)
+      redirect = sso_redirect_url_for(email)
+
+      unless redirect.present?
+        raise Keygen::Error::UnauthorizedError.new(
+          detail: 'single sign on is unsupported',
+          code: 'SSO_NOT_SUPPORTED',
+          header: 'Authorization',
+        )
+      end
+
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'single sign on is required',
+        code: 'SSO_REQUIRED',
+        header: 'Authorization',
+        links: { redirect: },
+      )
+    end
+
     user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
-                                .find_by(email: username.downcase)
+                                .find_by(email: email.downcase)
 
     @current_http_scheme = :password
     @current_http_token  = nil
@@ -183,6 +203,26 @@ module Authentication
       )
     end
 
+    # assert single-sign-on even for users not matching account's domains e.g. third-party admins
+    if user.single_sign_on_enabled?
+      redirect = sso_redirect_url_for(user)
+
+      unless redirect.present?
+        raise Keygen::Error::UnauthorizedError.new(
+          detail: 'single sign on is unsupported',
+          code: 'SSO_NOT_SUPPORTED',
+          header: 'Authorization',
+        )
+      end
+
+      raise Keygen::Error::UnauthorizedError.new(
+        detail: 'single sign on is required',
+        code: 'SSO_REQUIRED',
+        header: 'Authorization',
+        links: { redirect: },
+      )
+    end
+
     # verify password only if the user has one set i.e. they're not a managed user
     unless user.password?
       raise Keygen::Error::UnauthorizedError.new(
@@ -193,8 +233,7 @@ module Authentication
     end
 
     # NOTE(ezekg) yes, this leaks existence of a user... but we send this so that we can
-    #             eventually determine authn flow for a given email e.g. password vs
-    #             single-sign-on
+    #             determine authn flow for an email e.g. password vs single-sign-on
     if user.password? && password.blank?
       raise Keygen::Error::UnauthorizedError.new(
         detail: 'password is required',
@@ -417,5 +456,17 @@ module Authentication
     auth_value = auth_parts.second
 
     auth_value
+  end
+
+  def sso_redirect_url(email) = Keygen::EE::SSO.redirect_url(account: current_account, callback_url: sso_callback_url, email:)
+  def sso_redirect_url_for(user_or_email)
+    case user_or_email
+    in User => user
+      sso_redirect_url(user.email)
+    in String => email
+      sso_redirect_url(email)
+    else
+      nil
+    end
   end
 end

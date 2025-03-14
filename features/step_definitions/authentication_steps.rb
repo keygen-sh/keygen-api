@@ -4,7 +4,7 @@ TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq
 
 World Rack::Test::Methods
 
-Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:of|for) account "([^\"]*)"$/ do |named_idx, role, id|
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:for|of) account "([^\"]*)"$/ do |named_idx, role, id|
   named_idx ||= :first
 
   account = FindByAliasService.call(Account, id:, aliases: :slug)
@@ -26,7 +26,7 @@ Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|sup
   raise 'failed to find bearer' if @bearer.nil?
 end
 
-Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:of|for) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license|environment) (?:for|of) the (\w+) "account"$/ do |named_role_idx, role, named_account_idx|
   named_role_idx ||= :first
 
   account = Account.send(named_account_idx)
@@ -280,4 +280,22 @@ Given /^I authenticate with an invalid session$/ do
   esc = CGI.escape(enc)
 
   header "Cookie", %(session_id=#{esc})
+end
+
+Given /^the SSO callback code "([^\"]*)" returns the following profile:$/ do |code, body|
+  profile           = double(JSON.parse(body))
+  profile_and_token = double(
+    access_token: "test_token_#{SecureRandom.hex}",
+    profile:,
+  )
+
+  allow(WorkOS::SSO).to receive(:profile_and_token).with(hash_including(code:)).and_return(
+    profile_and_token,
+  )
+end
+
+Given /^the SSO callback code "([^\"]*)" returns an? "([^\"]*)" error$/ do |code, error|
+  allow(WorkOS::SSO).to receive(:profile_and_token).with(hash_including(code:)).and_raise(
+    WorkOS::APIError.new(error:),
+  )
 end

@@ -5,6 +5,7 @@ require_relative 'ee/license'
 require_relative 'ee/protected_methods'
 require_relative 'ee/protected_class'
 require_relative 'ee/router'
+require_relative 'ee/sso'
 
 module Keygen
   module EE
