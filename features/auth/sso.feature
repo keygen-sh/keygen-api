@@ -2,11 +2,11 @@
 Feature: SSO
   Background:
     Given the following "accounts" exist:
-      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning |
-      | Keygen           | keygen-sh     |                                       |                          |                      |                      |
-      | Example          | example-com   |                                       |                          |                      |                      |
-      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                |
-      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 |
+      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning | sso_external_authn |
+      | Keygen           | keygen-sh     |                                       |                          |                      |                      |                    |
+      | Example          | example-com   |                                       |                          |                      |                      |                    |
+      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                | true               |
+      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 | false              |
 
   Scenario: We receive a successful callback for an existing admin
     Given time is frozen at "2552-02-28T00:00:00.000Z"
@@ -184,15 +184,19 @@ Feature: SSO
     And the account "ecorp-example" should have 0 "sessions"
     And time is unfrozen
 
-  Scenario: We receive a successful callback for an outside user
+  Scenario: We receive a successful callback for an external user (external auth enabled)
     Given time is frozen at "2552-02-28T00:00:00.000Z"
+    And the account "ecorp-example" has 1 "user" with the following:
+      """
+      { "email": "mr@fsociety.example" }
+      """
     And the SSO callback code "test_123" returns the following profile:
       """
       {
-        "id": "test_prof_3c21855edd1ca17939dc98e0da3e",
+        "id": "test_prof_81f49904d5dab08b383227991dad",
         "organization_id": "test_org_59f4ac10f7b6acbf3304f3fc2211",
-        "connection_id": "test_conn_cf35b523d7089a392774e9c7995e",
-        "idp_id": "test_idp_ad1759c92a6a9207a6a44da4aa9e",
+        "connection_id": "test_conn_350787fce355b6205b5e6a20e675",
+        "idp_id": "test_idp_ee679133e84194c147486ec5cea9",
         "email": "mr@fsociety.example",
         "first_name": "Mr",
         "last_name": "Robot"
@@ -201,10 +205,59 @@ Feature: SSO
     And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
     When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
     Then the response status should be "303"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example"
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
+      """
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      """
+    And the account "ecorp-example" should have 1 "admin"
+    And the account "ecorp-example" should have 1 "user"
+    And the last "user" of account "ecorp-example" should have the following attributes:
+      """
+      {
+        "sso_profile_id": "test_prof_81f49904d5dab08b383227991dad",
+        "sso_connection_id": "test_conn_350787fce355b6205b5e6a20e675",
+        "sso_idp_id": "test_idp_ee679133e84194c147486ec5cea9",
+        "email": "mr@fsociety.example",
+        "first_name": "Mr",
+        "last_name": "Robot"
+      }
+      """
+    And the account "ecorp-example" should have 1 "session"
+    And the last "session" of account "ecorp-example" should have the following attributes:
+      """
+      {
+        "bearer_type": "User",
+        "bearer_id": "$users[1]",
+        "token_id": null,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
+        "ip": "127.0.0.1",
+        "last_used_at": null
+      }
+      """
+    And time is unfrozen
+
+  Scenario: We receive a successful callback for an external user (external authn disabled)
+    Given time is frozen at "2552-02-28T00:00:00.000Z"
+    And the SSO callback code "test_123" returns the following profile:
+      """
+      {
+        "id": "test_prof_b2c45c1af54f9cad85edf6104091",
+        "organization_id": "test_org_669aa06c521982d5c12b3eb74bf0",
+        "connection_id": "test_conn_6ca55425d9b4842cdd3ba3f1ea9c",
+        "idp_id": "test_idp_34d99d8985608b3d0297183a1265",
+        "email": "cobel@mail.example",
+        "first_name": "Harmony",
+        "last_name": "Cobel"
+      }
+      """
+    And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
+    Then the response status should be "303"
     And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_INVALID_DOMAIN"
     And the response headers should not contain "Set-Cookie"
-    And the account "ecorp-example" should have 1 "admin"
-    And the account "ecorp-example" should have 0 "sessions"
+    And the account "lumon-example" should have 1 "admin"
+    And the account "lumon-example" should have 0 "sessions"
     And time is unfrozen
 
   Scenario: We receive a callback for an unrecognized organization

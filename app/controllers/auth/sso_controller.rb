@@ -28,8 +28,9 @@ module Auth
         raise Keygen::Error::InvalidSingleSignOnError.new('failed to find account', code: 'SSO_INVALID_ACCOUNT')
       end
 
-      # verify the user's email domain matches one of the account's domains
-      unless account.sso_for?(profile.email)
+      # verify that either the user's email domain matches one of the account's domains
+      # or that the account allows external authn e.g. for third-party admins
+      unless account.sso_for?(profile.email) || account.sso_external_authn?
         Keygen.logger.warn { "[sso] email is not allowed: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
 
         raise Keygen::Error::InvalidSingleSignOnError.new('email is not allowed', code: 'SSO_INVALID_DOMAIN')
