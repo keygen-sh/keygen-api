@@ -44,6 +44,12 @@ module Auth
       # lastly, we keep the user's attributes up-to-date.
       user = account.users.then do |users|
         users.find_by(sso_profile_id: profile.id) || users.find_or_initialize_by(email: profile.email) do |u|
+          unless account.sso_jit_provisioning?
+            Keygen.logger.warn { "[sso] user is not allowed: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
+
+            raise Keygen::Error::InvalidSingleSignOnError.new('user is not allowed', code: 'SSO_INVALID_USER')
+          end
+
           u.sso_profile_id    = profile.id
           u.sso_connection_id = profile.connection_id
           u.sso_idp_id        = profile.idp_id

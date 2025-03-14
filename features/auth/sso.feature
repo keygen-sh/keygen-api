@@ -2,11 +2,11 @@
 Feature: SSO
   Background:
     Given the following "accounts" exist:
-      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration |
-      | Keygen           | keygen-sh     |                                       |                          |                      |
-      | Example          | example-com   |                                       |                          |                      |
-      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                |
-      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      |
+      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning |
+      | Keygen           | keygen-sh     |                                       |                          |                      |                      |
+      | Example          | example-com   |                                       |                          |                      |                      |
+      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                |
+      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 |
 
   Scenario: We receive a successful callback for an existing admin
     Given time is frozen at "2552-02-28T00:00:00.000Z"
@@ -113,7 +113,7 @@ Feature: SSO
       """
     And time is unfrozen
 
-  Scenario: We receive a successful callback for a new user
+  Scenario: We receive a successful callback for a new user (jit-provisioning enabled)
     Given time is frozen at "2552-02-28T00:00:00.000Z"
     And the SSO callback code "test_123" returns the following profile:
       """
@@ -159,6 +159,29 @@ Feature: SSO
         "last_used_at": null
       }
       """
+    And time is unfrozen
+
+  Scenario: We receive a successful callback for a new user (jit-provisioning disabled)
+    Given time is frozen at "2552-02-28T00:00:00.000Z"
+    And the SSO callback code "test_123" returns the following profile:
+      """
+      {
+        "id": "test_prof_817ecc3d254abf20003c3b65de62",
+        "organization_id": "test_org_59f4ac10f7b6acbf3304f3fc2211",
+        "connection_id": "test_conn_4fe0dc9ef9fc9b97c9a61ffb2c53",
+        "idp_id": "test_idp_e6da15dff602b7bb39e16e9a8f86",
+        "email": "tyrell@ecorp.example",
+        "first_name": "Tyrell",
+        "last_name": "Wellick"
+      }
+      """
+    And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
+    Then the response status should be "303"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_INVALID_USER"
+    And the response headers should not contain "Set-Cookie"
+    And the account "ecorp-example" should have 1 "admin"
+    And the account "ecorp-example" should have 0 "sessions"
     And time is unfrozen
 
   Scenario: We receive a successful callback for an outside user
