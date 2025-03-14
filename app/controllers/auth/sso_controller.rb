@@ -23,17 +23,17 @@ module Auth
                              )
 
       unless account.present?
-        Keygen.logger.warn { "[sso] failed to find account: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect}" }
+        Keygen.logger.warn { "[sso] account was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect}" }
 
-        raise Keygen::Error::InvalidSingleSignOnError.new('failed to find account', code: 'SSO_INVALID_ACCOUNT')
+        raise Keygen::Error::InvalidSingleSignOnError.new('account was not found', code: 'SSO_ACCOUNT_NOT_FOUND')
       end
 
       # verify that either the user's email domain matches one of the account's domains
       # or that the account allows external authn e.g. for third-party admins
       unless account.sso_for?(profile.email) || account.sso_external_authn?
-        Keygen.logger.warn { "[sso] email is not allowed: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
+        Keygen.logger.warn { "[sso] user is not allowed: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
 
-        raise Keygen::Error::InvalidSingleSignOnError.new('email is not allowed', code: 'SSO_INVALID_DOMAIN')
+        raise Keygen::Error::InvalidSingleSignOnError.new('user is not allowed', code: 'SSO_USER_NOT_ALLOWED')
       end
 
       # workos recommends jit-provisioning: https://workos.com/docs/sso/jit-provisioning
@@ -46,9 +46,9 @@ module Auth
       user = account.users.then do |users|
         users.find_by(sso_profile_id: profile.id) || users.find_or_initialize_by(email: profile.email) do |u|
           unless account.sso_jit_provisioning?
-            Keygen.logger.warn { "[sso] user is not allowed: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
+            Keygen.logger.warn { "[sso] user was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
 
-            raise Keygen::Error::InvalidSingleSignOnError.new('user is not allowed', code: 'SSO_INVALID_USER')
+            raise Keygen::Error::InvalidSingleSignOnError.new('user was not found', code: 'SSO_USER_NOT_FOUND')
           end
 
           u.sso_profile_id    = profile.id
@@ -74,9 +74,9 @@ module Auth
       )
 
       unless user.errors.empty?
-        Keygen.logger.warn { "[sso] failed to update user: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} error_messages=#{user.errors.messages.inspect}" }
+        Keygen.logger.warn { "[sso] user is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} error_messages=#{user.errors.messages.inspect}" }
 
-        raise Keygen::Error::InvalidSingleSignOnError.new('failed to update user', code: 'SSO_INVALID_USER')
+        raise Keygen::Error::InvalidSingleSignOnError.new('user is not valid', code: 'SSO_USER_INVALID')
       end
 
       session = user.transaction do
@@ -90,9 +90,9 @@ module Auth
       end
 
       unless session.errors.empty?
-        Keygen.logger.warn { "[sso] failed to generate session: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} session_id=#{session.id.inspect} error_messages=#{session.errors.messages.inspect}" }
+        Keygen.logger.warn { "[sso] session is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} session_id=#{session.id.inspect} error_messages=#{session.errors.messages.inspect}" }
 
-        raise Keygen::Error::InvalidSingleSignOnError.new('failed to generate session', code: 'SSO_INVALID_SESSION')
+        raise Keygen::Error::InvalidSingleSignOnError.new('session is not valid', code: 'SSO_SESSION_INVALID')
       end
 
       set_session_id_cookie(session,
