@@ -59,7 +59,7 @@ module Auth
           u.email             = profile.email
 
           # TODO(ezekg) eventually implement workos groups/roles? https://workos.com/docs/sso/identity-provider-role-assignment
-          u.grant_role! :admin
+          u.grant_role! :read_only
         end
       end
 

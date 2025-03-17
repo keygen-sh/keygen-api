@@ -135,8 +135,9 @@ Feature: SSO
       """
       session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 08:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
-    And the account "lumon-example" should have 2 "admins"
-    And the last "admin" of account "lumon-example" should have the following attributes:
+    And the account "lumon-example" should have 1 "admin"
+    And the account "lumon-example" should have 1 "read-only" admin
+    And the last "read-only" admin of account "lumon-example" should have the following attributes:
       """
       {
         "sso_profile_id": "test_prof_b2c45c1af54f9cad85edf6104091",

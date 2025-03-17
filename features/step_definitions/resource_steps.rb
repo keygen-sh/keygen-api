@@ -1097,6 +1097,55 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" (?:for|of) account 
   expect(model.attributes).to include attrs
 end
 
+Then /^the current account should have (\d+) "([^\"]*)" admins?$/ do |count, role|
+  scope = case role
+          in /^developer$/
+            @account.users.with_role(:developer)
+          in /^sales(?:[-_]agent)?$/
+            @account.users.with_role(:sales_agent)
+          in /^support(?:[-_]agent)?$/
+            @account.users.with_role(:support_agent)
+          in /^read[-_]?only$/
+            @account.users.with_role(:read_only)
+          end
+
+  expect(scope.count).to eq count.to_i
+end
+
+Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)" admins?$/ do |id, count, role|
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
+  scope   = case role
+            in /^developer$/
+              account.users.with_role(:developer)
+            in /^sales(?:[-_]agent)?$/
+              account.users.with_role(:sales_agent)
+            in /^support(?:[-_]agent)?$/
+              account.users.with_role(:support_agent)
+            in /^read[-_]?only$/
+              account.users.with_role(:read_only)
+            end
+
+  expect(scope.count).to eq count.to_i
+end
+
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" admin (?:for|of) account "([^\"]*)" should have the following attributes:$/ do |index_in_words, role, account_id, body|
+  account = FindByAliasService.call(Account, id: account_id, aliases: :slug)
+  body    = parse_placeholders(body, bearer: @bearer, crypt: @crypt, account:)
+  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+  record  = case role
+            in /^developer$/
+              account.users.with_role(:developer).send(index_in_words)
+            in /^sales(?:[-_]agent)?$/
+              account.users.with_role(:sales_agent).send(index_in_words)
+            in /^support(?:[-_]agent)?$/
+              account.users.with_role(:support_agent).send(index_in_words)
+            in /^read[-_]?only$/
+              account.users.with_role(:read_only).send(index_in_words)
+            end
+
+  expect(record.attributes).to include attrs
+end
+
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, body|
   body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   model =
