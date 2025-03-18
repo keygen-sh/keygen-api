@@ -58,8 +58,11 @@ module Auth
           u.last_name         = profile.last_name
           u.email             = profile.email
 
-          # TODO(ezekg) eventually implement workos groups/roles? https://workos.com/docs/sso/identity-provider-role-assignment
-          u.grant_role! :read_only
+          if profile.role in { slug: String => name }
+            u.assign_role name.underscore.to_sym
+          else
+            u.assign_role :user # principle of least privilege
+          end
         end
       end
 
@@ -72,6 +75,15 @@ module Auth
         last_name: profile.last_name,
         email: profile.email,
       )
+
+      # keep the user's role up-to-date with the IdP
+      if profile.role in { slug: String => name }
+        role = name.underscore.to_sym # pattern matching expects a symbol
+
+        unless user.role in Role(^role)
+          user.change_role role
+        end
+      end
 
       unless user.errors.empty?
         Keygen.logger.warn { "[sso] user is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} error_messages=#{user.errors.messages.inspect}" }

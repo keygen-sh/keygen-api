@@ -4,7 +4,7 @@ module Roleable
   extend ActiveSupport::Concern
 
   included do
-    def grant_role!(name)
+    def assign_role(name)
       errors.add :role, :not_allowed, message: 'role already exists' if
         persisted?
 
@@ -18,6 +18,12 @@ module Roleable
       update!(role_attributes: { name: })
     end
 
+    def change_role(name)
+      change_role!(name)
+    rescue ActiveRecord::RecordInvalid
+      nil
+    end
+
     def revoke_role!(name)
       raise RoleInvalid, 'role is missing' unless
         role.present?
@@ -26,6 +32,13 @@ module Roleable
         name.to_s == role.name.to_s
 
       role.destroy!
+    end
+
+    def revoke_role(name)
+      revoke_role!(name)
+    rescue ActiveRecord::RecordNotDestroyed,
+           RoleInvalid
+      nil
     end
 
     def role_changed?
@@ -67,7 +80,7 @@ module Roleable
       define_roleable_association_and_delgate
 
       # Set default role for new objects unless already set
-      after_initialize -> { grant_role!(name) },
+      after_initialize -> { assign_role(name) },
         unless: -> { persisted? || role? }
     end
 
@@ -75,7 +88,7 @@ module Roleable
       define_roleable_association_and_delgate
 
       # Set role for new objects
-      after_initialize -> { grant_role!(name) },
+      after_initialize -> { assign_role(name) },
         unless: :persisted?
     end
 
