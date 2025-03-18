@@ -283,7 +283,7 @@ Given /^I authenticate with an invalid session$/ do
 end
 
 Given /^the SSO callback code "([^\"]*)" returns the following profile:$/ do |code, body|
-  profile           = double(JSON.parse(body))
+  profile           = double(JSON.parse(body, symbolize_names: true))
   profile_and_token = double(
     access_token: "test_token_#{SecureRandom.hex}",
     profile:,
