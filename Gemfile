@@ -36,7 +36,7 @@ gem 'stripe', '~> 5.43'
 
 # Authentication
 gem 'rotp', '~> 6.2'
-gem 'workos'
+gem 'workos', '~> 5.15'
 
 # Authorization
 gem 'action_policy', '~> 0.6.3'
