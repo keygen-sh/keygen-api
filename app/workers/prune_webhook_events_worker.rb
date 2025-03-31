@@ -13,7 +13,7 @@ class PruneWebhookEventsWorker < BaseWorker
       BACKLOG_DAYS <= 0
 
     end_date   = BACKLOG_DAYS.days.ago.beginning_of_day
-    start_date = (end_date - TARGET_DAYS.day).beginning_of_day
+    start_date = (end_date - TARGET_DAYS.days).beginning_of_day
 
     accounts = Account.where_assoc_exists(:webhook_events,
       created_at: start_date...end_date,
