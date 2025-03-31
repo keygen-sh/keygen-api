@@ -2076,6 +2076,9 @@ Feature: Generate authentication token
         "code": "SSO_REQUIRED",
         "source": {
           "header": "Authorization"
+        },
+        "links": {
+          "redirect": "https://api.workos.test/sso/authorize"
         }
       }
       """
