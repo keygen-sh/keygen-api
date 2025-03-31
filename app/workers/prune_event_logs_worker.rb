@@ -20,7 +20,7 @@ class PruneEventLogsWorker < BaseWorker
   # Number of seconds to wait in between batches.
   BATCH_WAIT = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT') { 1 }.to_f
 
-  # High volume events elligible for pruning. Essentially, this
+  # High volume events eligible for pruning. Essentially, this
   # reduces the storage burden for noisy events. For example,
   # a license could be validated hundreds of times a day, or
   # a machine could send thousands of heartbeat pings every
