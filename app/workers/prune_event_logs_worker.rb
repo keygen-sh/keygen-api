@@ -44,7 +44,7 @@ class PruneEventLogsWorker < BaseWorker
     target_date = BACKLOG_DAYS.days.ago.to_date
     target_date = (target_date - TARGET_DAYS.days)..target_date if TARGET_DAYS > 1
 
-    # We only want to prune certain high-volume event logs
+    # we only want to prune certain high-volume event logs for ent accounts
     event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
                               .pluck(:id)
 
@@ -67,21 +67,29 @@ class PruneEventLogsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-event-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
-        event_logs = account.event_logs.where(event_type_id: event_type_ids)
-                                       .where(created_date: target_date)
-
-        # Keep the latest log per-resource for each day and event type (i.e. discard duplicates)
-        kept_logs = event_logs.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
-                              .reorder(:resource_id, :resource_type, :event_type_id,
-                                created_date: :desc,
-                              )
-                              .select(:id)
-
         count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
-                            .delete_by(
-                              "id NOT IN (#{kept_logs.to_sql})",
-                            )
+          prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
+
+          # for ent accounts, we keep event backlog into perpetuity except for dup high-volume events.
+          # for std accounts, we prune everything outside the event backlog retention period.
+          if account.ent?
+            prune = prune.where(event_type_id: event_type_ids)
+
+            # for high-volume events, we keep one event per-day per-event per-resource since some of these can
+            # be very high-volume, e.g. thousands and thousands of validations and heartbeats per-day.
+            keep = prune.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
+                        .reorder(:resource_id, :resource_type, :event_type_id,
+                          created_date: :desc,
+                        )
+                        .select(
+                          :id,
+                        )
+
+            # FIXME(ezekg) would be better to somehow rollup this data vs deduping
+            prune.delete_by("id NOT IN (#{keep.to_sql})")
+          else
+            prune.delete_all
+          end
         end
 
         sum   += count
