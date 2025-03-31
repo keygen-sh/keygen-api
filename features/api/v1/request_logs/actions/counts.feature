@@ -79,7 +79,7 @@ Feature: Request log counts
     And the current account has 3 global "request-logs"
     And I am an environment of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/request-logs/actions/count?environment=isolated"
+    When I send a GET request to "/accounts/test1/request-logs/actions/count?environment=shared"
     Then the response status should be "200"
     And the response body should contain meta with the following:
       """
