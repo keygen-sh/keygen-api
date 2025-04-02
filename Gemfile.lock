@@ -512,6 +512,8 @@ GEM
       rails (>= 7.0)
     uri (0.12.2)
     useragent (0.16.11)
+    uuid7 (0.2.0)
+      zeitwerk (~> 2.4)
     verbose_migrations (1.0.1)
       rails (>= 6.0)
     webmock (3.14.0)
@@ -612,6 +614,7 @@ DEPENDENCIES
   typed_params (~> 1.2.7)
   union_of
   uri (>= 0.12.2)
+  uuid7
   verbose_migrations
   webmock (~> 3.14.0)
   workos (~> 5.15)
