@@ -3,13 +3,7 @@ class PruneEventLogsWorker < BaseWorker
   # all event logs into perpetuity, i.e. to disable pruning.
   BACKLOG_DAYS = ENV.fetch('KEYGEN_PRUNE_EVENT_BACKLOG_DAYS') { 90 }.to_i
 
-  # Number of days from backlog to target for pruning. The lower the
-  # number, the better the performance. Use a higher number for e.g.
-  # catching up going from a backlog of 90 days to 30. For normal
-  # non-catch up workloads, this should be set to 1.
-  TARGET_DAYS = ENV.fetch('KEYGEN_PRUNE_EVENT_TARGET_DAYS') { 1 }.to_i
-
-  # The statement timeout for the delete query. This may need to be
+  # The statement timeout for the delete queries. This may need to be
   # raised depending on your data and batch size.
   STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT') { '1min' }
 
@@ -41,22 +35,23 @@ class PruneEventLogsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep event backlog forever
 
-    target_date = BACKLOG_DAYS.days.ago.to_date
-    target_date = (target_date - TARGET_DAYS.days)..target_date if TARGET_DAYS > 1
+    cutoff_date = BACKLOG_DAYS.days.ago.to_date
 
     # we only want to prune certain high-volume event logs for ent accounts
-    event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
-                              .pluck(:id)
+    hi_vol_event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
+                                     .ids
 
-    accounts = Account.where_assoc_exists(:event_logs,
-      created_date: target_date,
+    # FIXME(ezekg) should we iterate each day separately to improve performance?
+    accounts = Account.preload(:plan).where_assoc_exists(:event_logs,
+      created_date: ...cutoff_date,
     )
 
-    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} date=#{target_date}"
+    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} date=#{cutoff_date}"
 
     accounts.find_each do |account|
       account_id = account.id
-      event_logs = account.event_logs.where(created_date: target_date)
+      event_logs = account.event_logs.where(created_date: ...cutoff_date)
+      plan       = account.plan
 
       total = event_logs.count
       sum   = 0
@@ -70,26 +65,33 @@ class PruneEventLogsWorker < BaseWorker
         count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
           prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
 
-          # for ent accounts, we keep event backlog into perpetuity except for dup high-volume events.
-          # for std accounts, we prune everything outside the event backlog retention period.
-          if account.ent?
-            prune = prune.where(event_type_id: event_type_ids)
+          # for ent accounts, we keep the event backlog for the retention period except dup high-volume events.
+          # for std accounts, we prune everything in the event backlog.
+          if plan.ent?
+            hi_vol = prune.where(event_type_id: hi_vol_event_type_ids) # dedup even in retention period
+
+            # apply the account's log retention policy if there is one
+            if plan.event_log_retention_duration?
+              retention_cutoff_date = plan.event_log_retention_duration.seconds.ago.to_date
+
+              prune = prune.where(created_date: ...retention_cutoff_date)
+            end
 
             # for high-volume events, we keep one event per-day per-event per-resource since some of these can
             # be very high-volume, e.g. thousands and thousands of validations and heartbeats per-day.
-            keep = prune.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
-                        .reorder(:resource_id, :resource_type, :event_type_id,
-                          created_date: :desc,
-                        )
-                        .select(
-                          :id,
-                        )
+            keep = hi_vol.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
+                         .reorder(:resource_id, :resource_type, :event_type_id,
+                           created_date: :desc,
+                         )
+                         .select(
+                           :id,
+                         )
 
             # FIXME(ezekg) would be better to somehow rollup this data vs deduping
-            prune.delete_by("id NOT IN (#{keep.to_sql})")
-          else
-            prune.delete_all
+            hi_vol.delete_by("id NOT IN (#{keep.to_sql})")
           end
+
+          prune.delete_all
         end
 
         sum   += count

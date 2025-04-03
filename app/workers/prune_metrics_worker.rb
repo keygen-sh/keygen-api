@@ -1,6 +1,5 @@
 class PruneMetricsWorker < BaseWorker
   BACKLOG_DAYS      = ENV.fetch('KEYGEN_PRUNE_METRIC_BACKLOG_DAYS') { 31 }.to_i
-  TARGET_DAYS       = ENV.fetch('KEYGEN_PRUNE_METRIC_TARGET_DAYS')  { 1 }.to_i
   STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT')   { '1min' }
   BATCH_SIZE        = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE')          { 1_000 }.to_i
   BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')          { 1 }.to_f
@@ -12,18 +11,17 @@ class PruneMetricsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep metrics backlog forever
 
-    target_date = BACKLOG_DAYS.days.ago.to_date
-    target_date = (target_date - TARGET_DAYS.days)..target_date if TARGET_DAYS > 1
+    cutoff_date = BACKLOG_DAYS.days.ago.to_date
 
     accounts = Account.where_assoc_exists(:metrics,
-      created_date: target_date,
+      created_date: ...cutoff_date,
     )
 
-    Keygen.logger.info "[workers.prune-metrics] Starting: accounts=#{accounts.count} date=#{target_date}"
+    Keygen.logger.info "[workers.prune-metrics] Starting: accounts=#{accounts.count} date=#{cutoff_date}"
 
     accounts.find_each do |account|
       account_id = account.id
-      metrics    = account.metrics.where(created_date: target_date)
+      metrics    = account.metrics.where(created_date: ...cutoff_date)
 
       total = metrics.count
       sum   = 0

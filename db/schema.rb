@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_14_195615) do
+ActiveRecord::Schema[7.2].define(version: 2025_04_03_140401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -375,6 +375,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_14_195615) do
     t.integer "max_reqs"
     t.integer "max_admins"
     t.string "interval"
+    t.integer "request_log_retention_duration"
+    t.integer "event_log_retention_duration"
+    t.bigint "max_storage"
+    t.bigint "max_transfer"
+    t.bigint "max_upload"
     t.index ["created_at"], name: "index_plans_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_plans_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_plans_on_plan_id_and_created_at"
