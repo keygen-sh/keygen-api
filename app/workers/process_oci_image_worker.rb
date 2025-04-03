@@ -18,9 +18,10 @@ class ProcessOciImageWorker < BaseWorker
     return unless
       artifact.processing?
 
-    # TODO(ezekg) add a max_upload attr to plans so Ent tiers can upload larger images
     # sanity check the image tarball
-    unless artifact.content_length.in?(MIN_TARBALL_SIZE..MAX_TARBALL_SIZE)
+    min_filesize, max_filesize = MIN_TARBALL_SIZE, artifact.account.max_upload.presence || MAX_TARBALL_SIZE
+
+    unless artifact.content_length.in?(min_filesize..max_filesize)
       raise ImageNotAcceptableError, 'unacceptable filesize'
     end
 

@@ -145,6 +145,46 @@ describe ProcessOciImageWorker do
         expect { subject.perform_async(artifact.id) }.to_not upload
       end
     end
+
+    context 'when artifact is too big' do
+      context 'when account has a high max upload' do
+        let(:account)  { create(:account, plan: build(:plan, :ent, max_upload: 2.gigabytes)) }
+        let(:artifact) { create(:artifact, :processing, filesize: 1.gigabyte, account:) }
+
+        it 'should process image' do
+          expect { subject.perform_async(artifact.id) }.to change { artifact.reload.manifest }
+
+          expect(artifact.manifests.count).to be 2
+          expect(artifact.descriptors.count).to be 6
+          expect(artifact.status).to eq 'UPLOADED'
+        end
+      end
+
+      context 'when account has a low max upload' do
+        let(:account)  { create(:account, plan: build(:plan, :std, max_upload: 250.megabytes)) }
+        let(:artifact) { create(:artifact, :processing, filesize: 1.gigabyte, account:) }
+
+        it 'should not process image' do
+          expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
+
+          expect(artifact.manifests.count).to be 0
+          expect(artifact.descriptors.count).to be 0
+          expect(artifact.status).to eq 'FAILED'
+        end
+      end
+    end
+
+    context 'when artifact is too small' do
+      let(:artifact) { create(:artifact, :processing, filesize: 1.byte, account:) }
+
+      it 'should not process image' do
+        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
+
+        expect(artifact.manifests.count).to be 0
+        expect(artifact.descriptors.count).to be 0
+        expect(artifact.status).to eq 'FAILED'
+      end
+    end
   end
 
   context 'when artifact is an invalid image' do
@@ -157,7 +197,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is waiting' do
       let(:artifact) { create(:artifact, :oci_image, :waiting, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
@@ -165,7 +205,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is processing' do
       let(:artifact) { create(:artifact, :oci_image, :processing, account:) }
 
-      it 'should process image' do
+      it 'should notprocess image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
 
         expect(artifact.manifest).to be nil
@@ -176,7 +216,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is uploaded' do
       let(:artifact) { create(:artifact, :oci_image, :uploaded, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
@@ -184,7 +224,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is failed' do
       let(:artifact) { create(:artifact, :oci_image, :failed, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
@@ -200,7 +240,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is waiting' do
       let(:artifact) { create(:artifact, :waiting, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
@@ -208,7 +248,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is processing' do
       let(:artifact) { create(:artifact, :processing, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
 
         expect(artifact.manifest).to be nil
@@ -219,7 +259,7 @@ describe ProcessOciImageWorker do
     context 'when artifact is uploaded' do
       let(:artifact) { create(:artifact, :uploaded, account:) }
 
-      it 'should process image' do
+      it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
       end
     end
@@ -227,100 +267,8 @@ describe ProcessOciImageWorker do
     context 'when artifact is failed' do
       let(:artifact) { create(:artifact, :failed, account:) }
 
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-      end
-    end
-  end
-
-  context 'when artifact is too big' do
-    let(:noise) { Random.bytes(1.kilobyte) }
-
-    before do
-      Aws.config = { s3: { stub_responses: { get_object: [{ body: noise }] } } }
-    end
-
-    context 'when artifact is waiting' do
-      let(:artifact) { create(:artifact, :waiting, filesize: 1.gigabyte, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-      end
-    end
-
-    context 'when artifact is processing' do
-      let(:artifact) { create(:artifact, :processing, filesize: 1.gigabyte, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.manifest).to be nil
-        expect(artifact.status).to eq 'FAILED'
-      end
-    end
-
-    context 'when artifact is uploaded' do
-      let(:artifact) { create(:artifact, :uploaded, filesize: 1.gigabyte, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-      end
-    end
-
-    context 'when artifact is failed' do
-      let(:artifact) { create(:artifact, :failed, filesize: 1.gigabyte, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-      end
-    end
-  end
-
-  context 'when artifact is too small' do
-    let(:noise) { Random.bytes(1.kilobyte) }
-
-    before do
-      Aws.config = { s3: { stub_responses: { get_object: [{ body: noise }] } } }
-    end
-
-    context 'when artifact is waiting' do
-      let(:artifact) { create(:artifact, :waiting, content_length: 0, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'WAITING'
-      end
-    end
-
-    context 'when artifact is processing' do
-      let(:artifact) { create(:artifact, :processing, content_length: 0, account:) }
-
-      it 'should process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.manifest).to be nil
-        expect(artifact.status).to eq 'FAILED'
-      end
-    end
-
-    context 'when artifact is uploaded' do
-      let(:artifact) { create(:artifact, :uploaded, content_length: 0, account:) }
-
       it 'should not process image' do
         expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'UPLOADED'
-      end
-    end
-
-    context 'when artifact is failed' do
-      let(:artifact) { create(:artifact, :failed, content_length: 0, account:) }
-
-      it 'should not process image' do
-        expect { subject.perform_async(artifact.id) }.to not_change { artifact.reload.manifest }
-
-        expect(artifact.status).to eq 'FAILED'
       end
     end
   end
