@@ -5,7 +5,8 @@ class PruneMetricsWorker < BaseWorker
   BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')          { 1 }.to_f
 
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_disabled: false,
+                  retry: 5
 
   def perform
     return if

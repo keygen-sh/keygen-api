@@ -29,7 +29,8 @@ class PruneEventLogsWorker < BaseWorker
   ].freeze
 
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_disabled: false,
+                  retry: 5
 
   def perform
     return if
