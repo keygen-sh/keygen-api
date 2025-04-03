@@ -12,6 +12,12 @@ FactoryBot.define do
     max_licenses { Faker::Number.between from: 50, to: 5000 }
     max_products { Faker::Number.between from: 50, to: 5000 }
     max_reqs     { Faker::Number.between from: 50, to: 5000 }
+    max_storage  { 1.terabyte}
+    max_transfer { 50.gigabytes }
+    max_upload   { 1.gigabyte }
+
+    request_log_retention_duration { nil }
+    event_log_retention_duration   { nil }
 
     transient do
       stripe_plan do
@@ -28,11 +34,14 @@ FactoryBot.define do
     end
 
     trait :std do
-      name { "Standard Test" }
+      name { 'Std 1' }
     end
 
     trait :ent do
-      name { "Ent Test" }
+      request_log_retention_duration { 31.days }
+      event_log_retention_duration   { 1.year }
+
+      name { 'Ent 1' }
     end
   end
 end
