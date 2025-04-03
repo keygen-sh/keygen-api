@@ -153,6 +153,12 @@ class Account < ApplicationRecord
   after_commit :clear_cache!,
     on: %i[update destroy]
 
+  delegate :max_users, :max_policies, :max_licenses, :max_products, :max_reqs, :max_admins,
+    :request_log_retention_duration, :event_log_retention_duration,
+    :max_storage, :max_transfer, :max_upload,
+    to: :plan,
+    allow_nil: true
+
   def billing!
     raise Keygen::Error::NotFoundError.new(model: Billing.name) unless
       billing.present?
