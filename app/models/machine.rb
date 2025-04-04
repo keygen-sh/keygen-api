@@ -6,6 +6,7 @@ class Machine < ApplicationRecord
 
   include Envented::Callbacks
   include Keygen::PortableClass
+  include Denormalizable
   include Environmental
   include Accountable
   include Limitable
@@ -23,8 +24,8 @@ class Machine < ApplicationRecord
     optional: true
   belongs_to :group,
     optional: true
-  has_one :product, through: :license
-  has_one :policy, through: :license
+  belongs_to :policy
+  has_one :product, through: :policy
   has_many :users, through: :license
   has_many :processes,
     class_name: 'MachineProcess',
@@ -41,6 +42,8 @@ class Machine < ApplicationRecord
 
   has_environment default: -> { license&.environment_id }
   has_account default: -> { license&.account_id }
+
+  denormalizes :policy_id, from: :license
 
   accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
   tracks_nested_attributes_for :components
@@ -504,31 +507,35 @@ class Machine < ApplicationRecord
   scope :for_group, -> id { where(group: id) }
 
   scope :alive, -> {
-    idle_machines  = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: false })
-    new_machines   = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
-                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                              machines.created_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
-                                            SQL
-    alive_machines = joins(license: :policy).where.not(last_heartbeat_at: nil)
-                                            .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                              machines.last_heartbeat_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
-                                            SQL
+    scp = joins(:policy)
 
-    idle_machines.union(new_machines)
-                 .union(alive_machines)
+    unmonitored_machines = scp.where(last_heartbeat_at: nil, policies: { require_heartbeat: false })
+    new_machines         = scp.where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
+                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
+                                machines.created_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
+                              SQL
+    alive_machines = scp.where.not(last_heartbeat_at: nil)
+                        .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
+                          machines.last_heartbeat_at >= ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
+                        SQL
+
+    unmonitored_machines.union(new_machines)
+                        .union(alive_machines)
   }
 
   scope :dead, -> {
-    expired_machines = joins(license: :policy).where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
-                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                                machines.created_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
-                                              SQL
-    dead_machines    = joins(license: :policy).where.not(last_heartbeat_at: nil)
-                                              .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
-                                                machines.last_heartbeat_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
-                                              SQL
+    scp = joins(:policy)
 
-    expired_machines.union(dead_machines)
+    idle_machines = scp.where(last_heartbeat_at: nil, policies: { require_heartbeat: true })
+                       .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
+                         machines.created_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
+                       SQL
+    dead_machines = scp.where.not(last_heartbeat_at: nil)
+                       .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL.to_i)
+                         machines.last_heartbeat_at < ?::timestamp - INTERVAL '1 second' * COALESCE(policies.heartbeat_duration, ?)
+                       SQL
+
+    idle_machines.union(dead_machines)
   }
 
   scope :with_status, -> status {

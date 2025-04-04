@@ -10,7 +10,7 @@ module Api::V1::Groups::Relationships
     authorize :group
 
     def index
-      machines = apply_pagination(authorized_scope(apply_scopes(group.machines), with: Groups::MachinePolicy).preload(:product, :policy, :owner, license: %i[owner]))
+      machines = apply_pagination(authorized_scope(apply_scopes(group.machines), with: Groups::MachinePolicy).preload(:product, :policy, :owner, license: %i[policy owner]))
       authorize! machines,
         with: Groups::MachinePolicy
 
