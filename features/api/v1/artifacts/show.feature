@@ -72,6 +72,10 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/Test.zip?release=1.2.0-beta.1"
     Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://s3.aws.test/artifacts/$account/fd10ab0c-c52a-412f-b34f-180eebd7325d/Test.zip" }
+      """
     And the response body should be an "artifact"
     And the response body should be an "artifact" with the following relationships:
       """
@@ -263,6 +267,10 @@ Feature: Show release artifact
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0/foo.zip"
     Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://s3.aws.test/artifacts/$account/$releases[0]/foo.zip" }
+      """
     And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 2 "metric" jobs

@@ -17,4 +17,8 @@ end
 
 def stub_s3!
   Aws.config[:s3] = { stub_responses: { delete_object: [], head_object: [] } }
+
+  allow_any_instance_of(Aws::S3::Presigner).to receive(:presigned_url).and_wrap_original do |*, key:, **|
+    "https://s3.aws.test/#{key}"
+  end
 end

@@ -160,7 +160,9 @@ Given /^the current account has the following attributes:$/ do |body|
 end
 
 Given /^the current account has SSO configured for "([^\"]*)"$/ do |domain|
-  allow(WorkOS::SSO).to receive(:authorization_url).and_return("https://api.workos.test/sso/authorize")
+  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, **|
+    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}"
+  end
 
   @account.update!(
     sso_organization_id: "test_org_#{SecureRandom.hex}",

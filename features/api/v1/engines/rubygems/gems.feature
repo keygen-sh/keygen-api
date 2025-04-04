@@ -87,7 +87,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://rubygems.pkg.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/757e0a41-835e-42ad-bad8-84cabd29c72a/foo-1.0.0.gem" }
       """
 
   @sp
@@ -98,7 +98,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://rubygems.pkg.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/757e0a41-835e-42ad-bad8-84cabd29c72a/foo-1.0.0.gem" }
       """
 
   Scenario: Endpoint should redirect to gem download
@@ -108,7 +108,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/5762c549-7f5b-4a73-9873-3acdb1213fe8/foo-1.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/757e0a41-835e-42ad-bad8-84cabd29c72a/foo-1.0.0.gem" }
       """
 
   Scenario: Endpoint should return an error (does not exist)
@@ -136,7 +136,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/92c38af8-7ed7-4adc-aee2-21ceb5c6511c/foo-1.1.0-jruby.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/028a38a2-0d17-4871-acb8-c5e6f040fc12/foo-1.1.0-jruby.gem" }
       """
 
   Scenario: Product retrieves a gem (different product)
@@ -157,7 +157,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/55bba4f4-6494-4a2d-a14e-6b4d6d2d00e8/foo-1.1.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/028a38a2-0d17-4871-acb8-c5e6f040fc12/foo-1.1.0.gem" }
       """
 
   Scenario: License retrieves a licensed gem (different product)
@@ -183,7 +183,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/28a6e16d-c2a6-4be7-8578-e236182ee5c3/baz-2.0.0.gem" }
       """
 
   Scenario: User retrieves a licensed gem (with owned license)
@@ -199,7 +199,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/3ff04fc6-9f10-4b84-b548-eb40f92ea331/foo-1.0.1.gem" }
       """
 
   Scenario: User retrieves a licensed gem (with license)
@@ -216,7 +216,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/ec49b6bd-a73a-47a3-bd05-f0ecab3b90c0/foo-1.0.1.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/3ff04fc6-9f10-4b84-b548-eb40f92ea331/foo-1.0.1.gem" }
       """
 
   Scenario: User retrieves a licensed gem (no license)
@@ -234,7 +234,7 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/28a6e16d-c2a6-4be7-8578-e236182ee5c3/baz-2.0.0.gem" }
       """
 
   Scenario: Anon retrieves a closed gem
@@ -250,5 +250,5 @@ Feature: Rubygems download gem
     Then the response status should be "303"
     And the response should contain the following headers:
       """
-      { "Location": "https://api.keygen.sh/v1/accounts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/artifacts/b6049631-dac8-49b6-a923-78f022cb1dbe/baz-2.0.0.gem" }
+      { "Location": "https://s3.aws.test/artifacts/14c038fd-b57e-432d-8c09-f50ebcd6a7bc/28a6e16d-c2a6-4be7-8578-e236182ee5c3/baz-2.0.0.gem" }
       """
