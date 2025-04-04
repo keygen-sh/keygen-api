@@ -21,7 +21,7 @@ module Api::V1
     before_action :set_machine, only: [:show, :update, :destroy]
 
     def index
-      machines = apply_pagination(authorized_scope(apply_scopes(current_account.machines)).preload(:product, :policy, :owner, license: %i[owner]))
+      machines = apply_pagination(authorized_scope(apply_scopes(current_account.machines)).preload(:product, :policy, :owner, license: %i[policy owner]))
       authorize! machines
 
       render jsonapi: machines

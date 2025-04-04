@@ -50,6 +50,8 @@ class License < ApplicationRecord
     ]
 
   denormalizes :product_id, from: :policy
+  denormalizes :policy_id, to: :machines
+
   encrypts :key,
     deterministic: true
 
