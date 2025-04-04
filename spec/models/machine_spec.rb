@@ -51,6 +51,55 @@ describe Machine, type: :model do
     end
   end
 
+  describe '#license=' do
+    context 'on build' do
+      it 'should denormalize policy from unpersisted license' do
+        policy  = build(:policy, account:)
+        license = build(:license, policy:, account:)
+        machine = build(:machine, license:, account:)
+
+        expect(machine.policy_id).to be_nil
+        expect(machine.policy).to eq policy
+      end
+
+      it 'should denormalize policy from persisted license' do
+        license = create(:license, account:)
+        machine = build(:machine, license:, account:)
+
+        expect(machine.policy_id).to eq license.policy_id
+      end
+    end
+
+    context 'on create' do
+      it 'should denormalize policy from unpersisted license' do
+        policy  = build(:policy, account:)
+        license = build(:license, policy:, account:)
+        machine = create(:machine, license:, account:)
+
+        expect(machine.policy_id).to eq policy.id
+        expect(machine.policy).to eq policy
+      end
+
+      it 'should denormalize policy from persisted license' do
+        license = create(:license, account:)
+        machine = create(:machine, license:, account:)
+
+        expect(machine.policy_id).to eq license.policy_id
+      end
+    end
+
+    context 'on update' do
+      it 'should denormalize policy from license' do
+        license = create(:license, account:)
+        machine = create(:machine, account:)
+
+        machine.update!(license:)
+
+        expect(machine.policy_id).to eq license.policy_id
+      end
+    end
+  end
+
   describe '#owner=' do
     context 'on create' do
       it "should not raise when owner matches the license's owner" do
@@ -168,34 +217,35 @@ describe Machine, type: :model do
 
   describe '#status' do
     context 'when policy does not require heartbeats' do
-      let(:policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+      let(:policy)  { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+      let(:license) { create(:license, policy:, account:) }
 
       it 'should provide status when idle' do
-        machine = create(:machine, :idle, account:, policy:)
+        machine = create(:machine, :idle, account:, license:)
 
         expect(machine.status).to eq 'NOT_STARTED'
       end
 
       it 'should provide status when idle but expired' do
-        machine = create(:machine, :idle, account:, policy:, created_at: 11.minutes.ago)
+        machine = create(:machine, :idle, account:, license:, created_at: 11.minutes.ago)
 
         expect(machine.status).to eq 'NOT_STARTED'
       end
 
       it 'should provide status when alive' do
-        machine = create(:machine, :alive, account:, policy:)
+        machine = create(:machine, :alive, account:, license:)
 
         expect(machine.status).to eq 'ALIVE'
       end
 
       it 'should provide status when dead' do
-        machine = create(:machine, :dead, account:, policy:)
+        machine = create(:machine, :dead, account:, license:)
 
         expect(machine.status).to eq 'DEAD'
       end
 
       it 'should provide status when resurrected' do
-        machine = create(:machine, :dead, account:, policy:)
+        machine = create(:machine, :dead, account:, license:)
         machine.resurrect!
 
         expect(machine.status).to eq 'RESURRECTED'
@@ -203,34 +253,35 @@ describe Machine, type: :model do
     end
 
     context 'when policy does require heartbeats' do
-      let(:policy) { create(:policy, account:, require_heartbeat: true, heartbeat_duration: 10.minutes, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+      let(:policy)  { create(:policy, account:, require_heartbeat: true, heartbeat_duration: 10.minutes, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', heartbeat_basis: 'FROM_FIRST_PING') }
+      let(:license) { create(:license, policy:, account:) }
 
       it 'should provide status when idle' do
-        machine = create(:machine, :idle, account:, policy:)
+        machine = create(:machine, :idle, account:, license:)
 
         expect(machine.status).to eq 'NOT_STARTED'
       end
 
       it 'should provide status when idle but expired' do
-        machine = create(:machine, :idle, account:, policy:, created_at: 11.minutes.ago)
+        machine = create(:machine, :idle, account:, license:, created_at: 11.minutes.ago)
 
         expect(machine.status).to eq 'DEAD'
       end
 
       it 'should provide status when alive' do
-        machine = create(:machine, :alive, account:, policy:)
+        machine = create(:machine, :alive, account:, license:)
 
         expect(machine.status).to eq 'ALIVE'
       end
 
       it 'should provide status when dead' do
-        machine = create(:machine, :dead, account:, policy:)
+        machine = create(:machine, :dead, account:, license:)
 
         expect(machine.status).to eq 'DEAD'
       end
 
       it 'should provide status when resurrected' do
-        machine = create(:machine, :dead, account:, policy:)
+        machine = create(:machine, :dead, account:, license:)
         machine.resurrect!
 
         expect(machine.status).to eq 'RESURRECTED'
@@ -242,14 +293,14 @@ describe Machine, type: :model do
     let(:no_heartbeat_policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil) }
     let(:heartbeat_policy)    { create(:policy, account:, require_heartbeat: true,  heartbeat_duration: 10.minutes, heartbeat_basis: 'FROM_FIRST_PING') }
     let(:machines) {
-      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy, created_at: 1.hour.ago)
-      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :alive, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :dead, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy, created_at: 1.hour.ago)
-      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy)
-      create_list(:machine, 5, :alive, account:, policy: heartbeat_policy)
-      create_list(:machine, 5, :dead, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :idle, account:, license: create(:license, policy: no_heartbeat_policy), created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, license: create(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :alive, account:, license: build(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :dead, account:, license: create(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :idle, account:, license: build(:license, policy: heartbeat_policy), created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, license: build(:license, policy: heartbeat_policy))
+      create_list(:machine, 5, :alive, account:, license: build(:license, policy: heartbeat_policy))
+      create_list(:machine, 5, :dead, account:, license: create(:license, policy: heartbeat_policy))
 
       account.machines
     }
@@ -263,14 +314,14 @@ describe Machine, type: :model do
     let(:no_heartbeat_policy) { create(:policy, account:, require_heartbeat: false, heartbeat_duration: nil) }
     let(:heartbeat_policy)    { create(:policy, account:, require_heartbeat: true,  heartbeat_duration: 10.minutes, heartbeat_basis: 'FROM_FIRST_PING') }
     let(:machines) {
-      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy, created_at: 1.hour.ago)
-      create_list(:machine, 5, :idle, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :alive, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :dead, account:, policy: no_heartbeat_policy)
-      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy, created_at: 1.hour.ago)
-      create_list(:machine, 5, :idle, account:, policy: heartbeat_policy)
-      create_list(:machine, 5, :alive, account:, policy: heartbeat_policy)
-      create_list(:machine, 5, :dead, account:, policy: heartbeat_policy)
+      create_list(:machine, 5, :idle, account:, license: build(:license, policy: no_heartbeat_policy), created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, license: create(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :alive, account:, license: create(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :dead, account:, license: build(:license, policy: no_heartbeat_policy))
+      create_list(:machine, 5, :idle, account:, license: build(:license, policy: heartbeat_policy), created_at: 1.hour.ago)
+      create_list(:machine, 5, :idle, account:, license: create(:license, policy: heartbeat_policy))
+      create_list(:machine, 5, :alive, account:, license: create(:license, policy: heartbeat_policy))
+      create_list(:machine, 5, :dead, account:, license: build(:license, policy: heartbeat_policy))
 
       account.machines
     }

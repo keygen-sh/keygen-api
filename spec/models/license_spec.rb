@@ -98,6 +98,15 @@ describe License, type: :model do
 
         expect(license.product_id).to eq policy.product_id
       end
+
+      it 'should denormalize policy to machines' do
+        policy  = create(:policy, account:)
+        license = build(:license, policy:, account:, machines: build_list(:machine, 10, account:))
+
+        license.machines.each do |machine|
+          expect(machine.policy_id).to eq license.policy_id
+        end
+      end
     end
 
     context 'on create' do
@@ -116,9 +125,21 @@ describe License, type: :model do
 
         expect(license.product_id).to eq policy.product_id
       end
+
+      it 'should denormalize policy to machines' do
+        policy  = create(:policy, account:)
+        license = create(:license, policy:, account:, machines: build_list(:machine, 10, account:))
+
+        license.machines.each do |machine|
+          expect(machine.policy_id).to eq license.policy_id
+        end
+      end
     end
 
     context 'on update' do
+      before { Sidekiq::Testing.inline! }
+      after  { Sidekiq::Testing.fake! }
+
       it 'should denormalize product from policy' do
         policy  = create(:policy, account:)
         license = create(:license, account:)
@@ -126,6 +147,19 @@ describe License, type: :model do
         license.update!(policy:)
 
         expect(license.product_id).to eq policy.product_id
+      end
+
+      it 'should denormalize policy to machines' do
+        policy  = create(:policy, account:)
+        license = create(:license, account:, machines: build_list(:machine, 10, account:))
+
+        perform_enqueued_jobs only: Denormalizable::DenormalizeAssociationAsyncJob do
+          license.update!(policy:)
+        end
+
+        license.reload.machines.each do |machine|
+          expect(machine.policy_id).to eq license.policy_id
+        end
       end
     end
   end
