@@ -217,5 +217,20 @@ describe PruneEventLogsWorker do
         )
       end
     end
+
+    it 'should pause after execution timeout' do
+      resource = create(:license, account:)
+
+      create_list(:event_log, 50, :license_validation_succeeded, account:, resource:, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+
+      t  = Time.current.iso8601
+      dt = (worker::EXEC_TIMEOUT + 1).seconds
+
+      travel dt do
+        expect { worker.perform_async(t) }.to_not(
+          change { account.event_logs.count },
+        )
+      end
+    end
   end
 end

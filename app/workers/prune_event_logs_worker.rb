@@ -7,6 +7,10 @@ class PruneEventLogsWorker < BaseWorker
   # raised depending on your data and batch size.
   STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_STATEMENT_TIMEOUT') { '1min' }
 
+  # The timeout for total job execution. This may need to be raised
+  # depending on how much pruning needs to be done.
+  EXEC_TIMEOUT = ENV.fetch('KEYGEN_PRUNE_EXEC_TIMEOUT') { 1.hour.to_i }.to_f
+
   # Number of event logs to delete per batch. The larger the number,
   # the higher the impact on the database.
   BATCH_SIZE = ENV.fetch('KEYGEN_PRUNE_BATCH_SIZE') { 1_000 }.to_i
@@ -32,11 +36,12 @@ class PruneEventLogsWorker < BaseWorker
                   cronitor_disabled: false,
                   retry: 5
 
-  def perform
+  def perform(ts = Time.current.iso8601)
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep event backlog forever
 
     cutoff_date = BACKLOG_DAYS.days.ago.to_date
+    start_time  = Time.parse(ts)
 
     # we only want to prune certain high-volume event logs for ent accounts
     hi_vol_event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
@@ -47,7 +52,7 @@ class PruneEventLogsWorker < BaseWorker
       created_date: ...cutoff_date,
     )
 
-    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} date=#{cutoff_date}"
+    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
 
     accounts.find_each do |account|
       account_id = account.id
@@ -63,6 +68,12 @@ class PruneEventLogsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-event-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
 
       loop do
+        unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
+          Keygen.logger.info "[workers.prune-event-logs] Pausing: start=#{start_time} end=#{t}"
+
+          return # we'll pick up on the next cron
+        end
+
         count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
           prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
 
