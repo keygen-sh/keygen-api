@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_04_04_171451) do
+ActiveRecord::Schema[7.2].define(version: 2025_04_07_173652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -447,8 +447,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_04_04_171451) do
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_policies_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_policies_on_environment_id"
+    t.index ["heartbeat_cull_strategy"], name: "index_policies_on_heartbeat_cull_strategy"
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at"
+    t.index ["require_heartbeat"], name: "index_policies_on_require_heartbeat"
   end
 
   create_table "policy_entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
