@@ -62,7 +62,7 @@ module Denormalizable
       in Symbol => association_name if reflection = reflect_on_association(association_name)
         prefixed_attribute_name = case prefix
                                   when true
-                                    "#{name}_#{attribute_name}"
+                                    "#{association_name}_#{attribute_name}"
                                   when Symbol,
                                        String
                                     "#{prefix}_#{attribute_name}"
@@ -101,14 +101,16 @@ module Denormalizable
     end
 
     def write_denormalized_attribute_to_persisted_relation(target_association_name, target_attribute_name, source_attribute_name)
-      relation = send(target_association_name)
+      source_attribute_value_was = send("#{source_attribute_name}_previously_was")
+      target_association         = send(target_association_name)
 
-      relation.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
+      target_association.ids.each_slice(DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE) do |ids|
         DenormalizeAssociationAsyncJob.perform_later(
           source_class_name: self.class.name,
           source_id: id,
           source_attribute_name:,
-          target_class_name: relation.klass.name,
+          source_attribute_value_was:,
+          target_class_name: target_association.klass.name,
           target_ids: ids,
           target_attribute_name:,
         )
@@ -177,6 +179,8 @@ module Denormalizable
   private
 
   class DenormalizeAssociationAsyncJob < ActiveJob::Base
+    NOT_PROVIDED = Class.new
+
     queue_as { ActiveRecord.queues[:denormalize] }
 
     discard_on ActiveJob::DeserializationError
@@ -185,6 +189,7 @@ module Denormalizable
       source_class_name:,
       source_id:,
       source_attribute_name:,
+      source_attribute_value_was: NOT_PROVIDED, # FIXME(ezekg) remove once old jobs are processed
       target_class_name:,
       target_ids:,
       target_attribute_name:
@@ -195,6 +200,10 @@ module Denormalizable
       unless source.nil?
         target_class = target_class_name.constantize
         target       = target_class.where(target_class.primary_key.to_sym => target_ids)
+
+        unless source_attribute_value_was == NOT_PROVIDED
+          target = target.where(target_attribute_name => source_attribute_value_was)
+        end
 
         target.update_all(
           target_attribute_name => source.read_attribute(source_attribute_name),
