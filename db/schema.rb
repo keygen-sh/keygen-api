@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_04_07_173652) do
+ActiveRecord::Schema[7.2].define(version: 2025_04_08_141534) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -320,7 +320,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_04_07_173652) do
     t.uuid "environment_id"
     t.string "heartbeat_jid"
     t.uuid "owner_id"
-    t.uuid "policy_id"
+    t.uuid "policy_id", null: false
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
