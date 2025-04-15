@@ -25,7 +25,8 @@ RUN apk add --no-cache \
   tzdata \
   openssl \
   postgresql-dev \
-  libc6-compat && \
+  libc6-compat \
+  libstdc++ && \
   bundle config --global without "${BUNDLE_WITHOUT}"  && \
   bundle config --global path "${BUNDLE_PATH}" && \
   bundle config --global deployment "${BUNDLE_DEPLOYMENT}" && \
@@ -50,7 +51,8 @@ RUN apk add --no-cache \
   bash \
   postgresql-client \
   tzdata \
-  libc6-compat && \
+  libc6-compat \
+  libstdc++ && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen
 
 COPY --from=build --chown=keygen:keygen \
