@@ -21,6 +21,7 @@ RUN apk add --no-cache \
   build-base \
   libxml2-dev \
   libxslt-dev \
+  yaml-dev \
   tzdata \
   openssl \
   postgresql-dev \
