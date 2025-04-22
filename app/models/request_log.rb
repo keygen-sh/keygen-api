@@ -37,12 +37,6 @@ class RequestLog < ApplicationRecord
     where(created_at: date_start..date_end)
   }
 
-  scope :for_event_type, -> event {
-    joins(:event_log).where(
-      event_logs: { event_type_id: EventType.where(event:) }
-    )
-  }
-
   scope :search_id, -> (term) {
     id = term.to_s
     return none if
