@@ -91,10 +91,10 @@ class EventLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        if @object.resource == @object.account # event subject could be the account
-          @url_helpers.polymorphic_path [:v1, @object.account]
-        else
+        if @object.resource in Accountable # event subject could be e.g. the account
           @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
+        else
+          @url_helpers.polymorphic_path [:v1, @object.resource]
         end
       end
     end

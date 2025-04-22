@@ -3,23 +3,14 @@
 Feature: Show event logs
   Background:
     Given the following "plan" rows exist:
-      | id                                   | name       |
-      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
-      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+      | id                                   | name  |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Std 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1 |
     Given the following "account" rows exist:
-      | name     | slug     | plan_id                              |
-      | Standard | standard | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
-      | Ent      | ent      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
+      | name | slug | plan_id                              |
+      | Std  | std  | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent  | ent  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
-
-  Scenario: Endpoint should be inaccessible when account is not on Ent tier
-    Given the account "standard" is canceled
-    Given I am an admin of account "standard"
-    And the current account is "standard"
-    And the current account has 2 "event-logs"
-    And I use an authentication token
-    When I send a GET request to "/accounts/standard/event-logs/$0"
-    Then the response status should be "403"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "ent" is canceled
@@ -30,7 +21,16 @@ Feature: Show event logs
     When I send a GET request to "/accounts/ent/event-logs/$0"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves a log for their account
+  Scenario: Admin retrieves a log for their Std account
+    Given I am an admin of account "std"
+    And the current account is "std"
+    And the current account has 3 "event-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/std/event-logs/$1"
+    Then the response status should be "200"
+    And the response body should be a "event-log"
+
+  Scenario: Admin retrieves a log for their Ent account
     Given I am an admin of account "ent"
     And the current account is "ent"
     And the current account has 3 "event-logs"
@@ -55,7 +55,7 @@ Feature: Show event logs
       """
 
   Scenario: Admin attempts to retrieve a log for another account
-    Given I am an admin of account "standard"
+    Given I am an admin of account "std"
     But the current account is "ent"
     And the account "ent" has 3 "event-logs"
     And I use an authentication token

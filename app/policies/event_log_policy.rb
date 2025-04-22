@@ -7,9 +7,6 @@ class EventLogPolicy < ApplicationPolicy
       strict: false,
     )
 
-    deny! unless
-      account.ent?
-
     case bearer
     in role: Role(:admin | :developer | :read_only | :environment)
       allow!
@@ -23,9 +20,6 @@ class EventLogPolicy < ApplicationPolicy
     verify_environment!(
       strict: false,
     )
-
-    deny! unless
-      account.ent?
 
     case bearer
     in role: Role(:admin | :developer | :read_only | :environment)
