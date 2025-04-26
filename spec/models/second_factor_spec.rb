@@ -10,7 +10,7 @@ describe SecondFactor, type: :model do
   it_behaves_like :accountable
   it_behaves_like :encryptable
 
-  describe '#environment=' do
+  describe '#environment=', only: :ee do
     context 'on create' do
       it 'should apply default environment matching user' do
         environment = create(:environment, account:)

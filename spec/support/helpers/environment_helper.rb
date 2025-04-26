@@ -9,7 +9,7 @@ NIL_ENVIRONMENT = Environment.new(id: nil, account: nil, code: 'FOR_TEST_EYES_ON
 module EnvironmentHelper
   module ScenarioMethods
     def within_environment(code, &)
-      context "when in the #{code.inspect} environment" do
+      context "when in the #{code.inspect} environment", only: :ee do
         let(:environment) {
           case code
           in :self

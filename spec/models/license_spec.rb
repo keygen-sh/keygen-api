@@ -11,7 +11,7 @@ describe License, type: :model do
   it_behaves_like :encryptable
   it_behaves_like :dirtyable
 
-  describe '#environment=' do
+  describe '#environment=', only: :ee do
     context 'on create' do
       it 'should apply default environment matching policy' do
         environment = create(:environment, account:)

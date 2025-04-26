@@ -3,11 +3,11 @@
 require 'rails_helper'
 require 'spec_helper'
 
-shared_examples :environmental do
+shared_examples :environmental, only: :ee do
   let(:factory) { described_class.name.demodulize.underscore }
   let(:account) { create(:account) }
 
-  describe '#environment=' do
+  describe '#environment=', only: :ee do
     context 'on create' do
       it 'should not raise when environment exists' do
         environment = create(:environment, account:)

@@ -82,6 +82,9 @@ RSpec.configure do |config|
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
 
+  # skip logging pending/skipped examples
+  config.pending_failure_output = :skip
+
   # Stub keygens
   config.before { stub_account_keygens! }
 
@@ -106,6 +109,72 @@ RSpec.configure do |config|
     with_prestine_env(&example)
   end
 
+  # hooks to run/skip tests for a certain edition
+  config.around skip: :ce do |example|
+    if Keygen.ce?
+      skip 'skipped in CE'
+    else
+      example.run
+    end
+  end
+
+  config.around skip: :ee do |example|
+    if Keygen.ee?
+      skip 'skipped in EE'
+    else
+      example.run
+    end
+  end
+
+  config.around only: :ce do |example|
+    if Keygen.ce?
+      example.run
+    else
+      skip 'skipped in EE'
+    end
+  end
+
+  config.around only: :ee do |example|
+    if Keygen.ee?
+      example.run
+    else
+      skip 'skipped in CE'
+    end
+  end
+
+  config.around :each, :skip_ce do |example|
+    if Keygen.ce?
+      skip 'skipped in CE'
+    else
+      example.run
+    end
+  end
+
+  config.around :each, :skip_ee do |example|
+    if Keygen.ee?
+      skip 'skipped in EE'
+    else
+      example.run
+    end
+  end
+
+  config.around :each, :only_ce do |example|
+    if Keygen.ce?
+      example.run
+    else
+      skip 'skipped in EE'
+    end
+  end
+
+  config.around :each, :only_ee do |example|
+    if Keygen.ee?
+      example.run
+    else
+      skip 'skipped in CE'
+    end
+  end
+
+  # ignore false positives e.g. to_not raise_error SomeError
   config.around :each, :ignore_potential_false_positives do |example|
     on_potential_false_positives_was, econfig.on_potential_false_positives = econfig.on_potential_false_positives, :nothing
 

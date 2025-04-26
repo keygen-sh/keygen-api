@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Environmental, type: :concern do
+describe Environmental, type: :concern, only: :ee do
   let(:account) { create(:account) }
 
   describe '.has_environment' do

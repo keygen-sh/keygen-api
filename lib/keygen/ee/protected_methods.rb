@@ -249,7 +249,7 @@ module Keygen
 
         Module.new do
           next unless
-            Keygen.console?
+            Keygen.console? # we only want to run protections in console
 
           define_singleton_method :included do |klass|
             # NOTE(ezekg) make sure all attr methods are defined since we can't hook them via method_added

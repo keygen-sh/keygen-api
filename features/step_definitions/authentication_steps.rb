@@ -128,7 +128,11 @@ Given /^I send the following raw headers:$/ do |body|
 end
 
 Given /^I (?:use (?:an|my) authentication|authenticate with (?:a|my)) token$/ do
-  @token = @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+  @token = if @bearer.respond_to?(:environment)
+             @bearer.tokens.first_or_create!(account: @bearer.account, environment: @bearer.environment, bearer: @bearer)
+           else
+             @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
+           end
 
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to

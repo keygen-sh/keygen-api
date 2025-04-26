@@ -73,13 +73,15 @@ module Environmental
       # We're not using belongs_to(default:) because it only adds a before_validation
       # callback, but we want to also do it after_initialize because new children
       # may rely on the environment being set on their parent.
-      after_initialize -> { self.environment_id ||= Current.environment&.id },
+      #
+      # This is only applicable in EE, since current env is always nil in CE.
+      after_initialize -> { self.environment_id ||= Current.environment_id },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-        if: -> { new_record? && environment.nil? }
+        if: -> { Keygen.ee? && new_record? && environment.nil? }
 
-      before_validation -> { self.environment_id ||= Current.environment&.id },
+      before_validation -> { self.environment_id ||= Current.environment_id },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-        if: -> { new_record? && environment.nil? },
+        if: -> { Keygen.ee? && new_record? && environment.nil? },
         on: %i[create]
 
       # Validate the association only if we've been given an environment (because it's optional).
@@ -99,7 +101,7 @@ module Environmental
       end
 
       unless default.nil?
-        # NOTE(ezekg) These default hooks are in addition to the default hooks above.
+        # NOTE(ezekg) These default hooks are in addition to the current hooks above.
         fn = -> {
           value = case default.arity
                   when 1
@@ -121,12 +123,14 @@ module Environmental
         }
 
         # Again, we want to make absolutely sure our default is applied.
+        #
+        # These are skipped in CE since it only supports the nil env.
         after_initialize unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-          if: -> { new_record? && environment.nil? },
+          if: -> { Keygen.ee? && new_record? && environment.nil? },
           &fn
 
         before_validation unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
-          if: -> { new_record? && environment.nil? },
+          if: -> { Keygen.ee? && new_record? && environment.nil? },
           on: %i[create],
           &fn
       end
