@@ -149,6 +149,42 @@ module AuthorizationHelper
       let(:record) { account.plan }
     end
 
+    def accessing_its_settings(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:settings) { create_list(:setting, 2, account:) }
+      end
+
+      let(:record) { account.settings }
+    end
+
+    def accessing_its_setting(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:setting) { create(:setting, account:) }
+      end
+
+      let(:record) { setting }
+    end
+
+    def accessing_settings(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:settings) { create_list(:setting, 2, account: create(:account)) }
+      end
+
+      let(:record) { settings }
+    end
+
+    def accessing_setting(scenarios)
+      case scenarios
+      in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:setting) { create(:setting, account: create(:account)) }
+      end
+
+      let(:record) { setting }
+    end
+
     def accessing_analytics(scenarios)
       case scenarios
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]

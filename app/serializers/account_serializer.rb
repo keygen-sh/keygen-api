@@ -35,6 +35,12 @@ class AccountSerializer < BaseSerializer
     end
   end
 
+  relationship :settings do
+    link :related do
+      @url_helpers.v1_account_settings_path @object
+    end
+  end
+
   relationship :webhook_endpoints do
     link :related do
       @url_helpers.v1_account_webhook_endpoints_path @object

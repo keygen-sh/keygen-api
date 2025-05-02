@@ -12,6 +12,11 @@ class Account < ApplicationRecord
 
   belongs_to :plan, optional: true, null_object: NullPlan.name
   has_one :billing, null_object: NullBilling.name
+  has_many :settings, class_name: 'AccountSetting' do
+    def default_license_permissions = find_by(key: :default_license_permissions)&.value
+    def default_user_permissions    = find_by(key: :default_user_permissions)&.value
+  end
+
   has_many :environments, dependent: :destroy_async
   has_many :webhook_endpoints, dependent: :destroy_async
   has_many :webhook_events, dependent: :destroy_async

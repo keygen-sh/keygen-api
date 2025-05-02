@@ -555,9 +555,9 @@ Rails.application.routes.draw do
         # Routes with :account_id scope i.e. multiplayer mode. Most of these
         # routes are also available in singleplayer mode for compatibility.
         scope 'accounts/:account_id', as: :account do
-          if Keygen.multiplayer?
+          scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
             constraints subdomain: Keygen::SUBDOMAIN do
-              scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
+              if Keygen.multiplayer?
                 scope module: 'accounts/relationships' do
                   resource :billing, only: %i[show update]
                   resource :plan,    only: %i[show update]
@@ -570,6 +570,10 @@ Rails.application.routes.draw do
                   post :cancel_subscription, path: 'cancel-subscription', to: 'subscription#cancel'
                   post :renew_subscription,  path: 'renew-subscription',  to: 'subscription#renew'
                 end
+              end
+
+              scope module: 'accounts/relationships' do
+                resources :settings
               end
             end
           end

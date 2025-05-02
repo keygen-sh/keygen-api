@@ -42,12 +42,23 @@ class License < ApplicationRecord
   has_account default: -> { policy&.account_id }, inverse_of: :licenses
   has_role :license
   has_permissions Permission::LICENSE_PERMISSIONS,
-    default: Permission::LICENSE_PERMISSIONS - %w[
-      account.read
-      product.read
-      policy.read
-      user.read
-    ]
+    default: -> license {
+      default_permissions = if license.present?
+                              license.account.settings.default_license_permissions
+                            else
+                              nil
+                            end
+
+      default_permissions.presence || (
+        # we're omitting some for backwards compatibility
+        Permission::LICENSE_PERMISSIONS - %w[
+          account.read
+          product.read
+          policy.read
+          user.read
+        ]
+      )
+  }
 
   denormalizes :product_id, from: :policy
   denormalizes :policy_id, to: :machines
