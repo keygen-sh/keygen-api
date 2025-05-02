@@ -9,7 +9,7 @@ class ProductSerializer < BaseSerializer
   attribute :url
   attribute :platforms
   ee do
-    attribute :permissions, if: -> { @account.ent? } do
+    attribute :permissions do
       @object.permissions.actions
     end
   end

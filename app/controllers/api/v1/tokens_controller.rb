@@ -38,7 +38,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? } do
+            param :permissions, type: :array, optional: true do
               items type: :string
             end
           end

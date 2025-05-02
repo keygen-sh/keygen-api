@@ -12,7 +12,7 @@ class UserSerializer < BaseSerializer
     @object.role&.name&.dasherize
   end
   ee do
-    attribute :permissions, if: -> { @account.ent? } do
+    attribute :permissions do
       @object.permissions.actions
     end
   end

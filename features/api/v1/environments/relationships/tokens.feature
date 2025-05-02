@@ -497,20 +497,22 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 errors
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the response body should be a "token" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.read",
+          "license.suspend",
+          "license.validate",
+          "machine.create",
+          "machine.read",
+          "machine.update"
+        ]
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with custom permissions (ent tier, EE)
@@ -596,15 +598,19 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
@@ -690,15 +696,19 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
@@ -770,15 +780,19 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
@@ -864,20 +878,26 @@ Feature: Generate authentication token for environment
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 errors
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the response body should be a "token" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.create",
+          "license.read",
+          "license.suspend",
+          "license.validate",
+          "machine.create",
+          "machine.read",
+          "machine.update",
+          "policy.create",
+          "policy.read",
+          "policy.update"
+        ]
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates an environment token with permissions for environment with wildcard permission (ent tier)

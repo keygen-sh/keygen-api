@@ -1039,9 +1039,8 @@ Feature: Generate authentication token for license
       """
       { "Keygen-Environment": "shared" }
       """
-
-  @ee
-  Scenario: Product generates a license token with custom permissions (standard tier)
+  @ce
+  Scenario: Product generates a license token with custom permissions (standard tier, ECEE)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -1075,8 +1074,76 @@ Feature: Generate authentication token for license
       }
       """
 
+  @ce
+  Scenario: Product generates a license token with custom permissions (ent tier, CE)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.read",
+              "license.validate"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted parameter",
+        "source": {
+          "pointer": "/data/attributes/permissions"
+        }
+      }
+      """
+
   @ee
-  Scenario: Product generates a license token with custom permissions (ent tier)
+  Scenario: Product generates a license token with custom permissions (standard tier, EE)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.read",
+              "license.validate"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "token" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
+      }
+      """
+
+  @ee
+  Scenario: Product generates a license token with custom permissions (ent tier, EE)
     Given the current account is "ent1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -1137,18 +1204,25 @@ Feature: Generate authentication token for license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a license token with permissions that exceed the license's permissions (ent tier)
@@ -1218,18 +1292,25 @@ Feature: Generate authentication token for license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a license token with unsupported permissions (ent tier)
@@ -1289,18 +1370,25 @@ Feature: Generate authentication token for license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a license token with invalid permissions (ent tier)
@@ -1370,18 +1458,22 @@ Feature: Generate authentication token for license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the response body should be a "token" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.delete",
+          "machine.read"
+        ]
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a license token with permissions for a license with wildcard permission (ent tier)

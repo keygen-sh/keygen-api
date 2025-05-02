@@ -31,89 +31,58 @@ describe User, type: :model do
     end
 
     context 'on role change' do
-      context 'for standard accounts' do
-        let(:account) { create(:account, :std) }
+      it 'should intersect permissions when upgraded to admin role' do
+        user = create(:user, account:)
+        user.change_role!(:admin)
 
-        it 'should reset permissions when upgraded to admin role' do
-          user = create(:user, account:)
-          user.change_role!(:admin)
+        admin   = user.reload
+        actions = admin.permissions.actions
+        role    = admin.role
 
-          admin   = user.reload
-          actions = admin.permissions.actions
-          role    = admin.role
-
-          expect(actions).to match_array admin.default_permissions
-          expect(role.admin?).to be true
-        end
-
-        it 'should reset permissions when downgraded to user role' do
-          admin = create(:admin, account:)
-          admin.change_role!(:user)
-
-          user    = admin.reload
-          actions = user.permissions.actions
-          role    = user.role
-
-          expect(actions).to match_array user.default_permissions
-          expect(role.user?).to be true
-        end
+        expect(actions).to match_array User.default_permissions
+        expect(role.admin?).to be true
       end
 
-      context 'for ent accounts' do
-        let(:account) { create(:account, :ent) }
+      it 'should intersect permissions when downgraded to user role' do
+        admin = create(:admin, account:)
+        admin.change_role!(:user)
 
-        it 'should intersect permissions when upgraded to admin role' do
-          user = create(:user, account:)
-          user.change_role!(:admin)
+        user    = admin.reload
+        actions = user.permissions.actions
+        role    = user.role
 
-          admin   = user.reload
-          actions = admin.permissions.actions
-          role    = admin.role
+        expect(actions).to match_array User.default_permissions
+        expect(role.user?).to be true
+      end
 
-          expect(actions).to match_array User.default_permissions
-          expect(role.admin?).to be true
-        end
+      it 'should intersect custom permissions when changing role' do
+        user = create(:user, account:, permissions: %w[license.validate license.read])
+        user.change_role!(:admin)
 
-        it 'should intersect permissions when downgraded to user role' do
-          admin = create(:admin, account:)
-          admin.change_role!(:user)
+        # oops! change back!
+        user.change_role!(:user)
 
-          user    = admin.reload
-          actions = user.permissions.actions
-          role    = user.role
+        actions = user.permissions.actions
+        role    = user.role
 
-          expect(actions).to match_array User.default_permissions
-          expect(role.user?).to be true
-        end
+        expect(actions).to match_array %w[license.validate license.read]
+        expect(role.user?).to be true
+      end
 
-        it 'should intersect custom permissions when changing role' do
-          user = create(:user, account:, permissions: %w[license.validate license.read])
-          user.change_role!(:admin)
-          # Oops! Change back!
-          user.change_role!(:user)
+      it 'should maintain wildcard permissions when changing roles' do
+        user = create(:user, account:, permissions: %w[*])
 
-          actions = user.permissions.actions
-          role    = user.role
+        user.change_role!(:admin)
+        admin = user.reload
 
-          expect(actions).to match_array %w[license.validate license.read]
-          expect(role.user?).to be true
-        end
+        expect(admin.permissions.actions).to match_array %w[*]
+        expect(admin.admin?).to be true
 
-        it 'should maintain wildcard permissions when changing roles' do
-          user = create(:user, account:, permissions: %w[*])
+        admin.change_role!(:user)
+        user = admin.reload
 
-          user.change_role!(:admin)
-          admin = user.reload
-
-          expect(admin.permissions.actions).to match_array %w[*]
-          expect(admin.admin?).to be true
-
-          admin.change_role!(:user)
-          user = admin.reload
-
-          expect(user.permissions.actions).to match_array %w[*]
-          expect(user.user?).to be true
-        end
+        expect(user.permissions.actions).to match_array %w[*]
+        expect(user.user?).to be true
       end
 
       it 'should revoke tokens' do

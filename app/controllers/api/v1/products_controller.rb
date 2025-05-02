@@ -39,7 +39,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer, :environment) } do
+            param :permissions, type: :array, optional: true do
               items type: :string
             end
           end
@@ -96,7 +96,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :developer, :environment) } do
+            param :permissions, type: :array, optional: true do
               items type: :string
             end
           end
