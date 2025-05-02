@@ -1012,19 +1012,15 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    And the response body should be a "token" with the following attributes:
       """
-      {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
-      }
+      { "permissions": ["license.validate"] }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a user token with custom permissions (ent tier, EE)
@@ -1081,19 +1077,26 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response should contain a valid signature header for "test1"
-    And the response body should be an array of 1 error
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a user token with permissions that exceed the user's permissions (ent tier)
@@ -1161,19 +1164,26 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response should contain a valid signature header for "test1"
-    And the response body should be an array of 1 error
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a user token with unsupported permissions (ent tier)
@@ -1232,19 +1242,26 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the response should contain a valid signature header for "test1"
-    And the response body should be an array of 1 error
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
+        "title": "Unprocessable resource",
+        "detail": "unsupported permissions",
+        "code": "PERMISSIONS_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/permissions"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a user token with invalid permissions (ent tier)
@@ -1312,19 +1329,22 @@ Feature: User tokens relationship
         }
       }
       """
-    Then the response status should be "400"
-    And the response should contain a valid signature header for "test1"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the response body should be a "token" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.delete",
+          "machine.read"
+        ]
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product generates a user token with permissions for a user with wildcard permission (ent tier)

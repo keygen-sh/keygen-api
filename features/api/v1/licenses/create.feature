@@ -5125,18 +5125,20 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
       }
       """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product creates a license with custom permissions (ent tier, EE)
@@ -5226,18 +5228,19 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
       }
       """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   @ee
   Scenario: Product creates a user license with custom permissions (ent tier)
@@ -5326,18 +5329,25 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/licenses/#licenses-object-attrs-permissions"
+          }
         }
-      }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product creates a license with unsupported permissions (ent tier)
@@ -5417,18 +5427,25 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/licenses/#licenses-object-attrs-permissions"
+          }
         }
-      }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   @ee
   Scenario: Product creates a license with invalid permissions (ent tier)

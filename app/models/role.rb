@@ -150,20 +150,16 @@ class Role < ApplicationRecord
   def name=(...)
     super(...)
 
-    # Reset permissions on role change, and for Ent accounts, using the
-    # intersection of our current role's permissions and the new role's
-    # default permisisons. This helps prevent prevents accidental
-    # privilege escalation, e.g. for user => admin => user.
+    # Reset permissions on role change by using the intersection of our
+    # current role's permissions and the new role's default permisisons.
+    # This helps prevent prevents accidental privilege escalation, e.g.
+    # for user => admin => user.
     #
     # Only run when role is persisted, i.e. on updates.
     return unless
       persisted?
 
-    if account.ent?
-      self.permissions = permission_ids & (default_permission_ids << Permission.wildcard_id)
-    else
-      self.reset_permissions
-    end
+    self.permissions = permission_ids & (default_permission_ids << Permission.wildcard_id)
   end
 
   ##

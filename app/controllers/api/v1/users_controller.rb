@@ -56,7 +56,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product, :environment) } do
+              param :permissions, type: :array, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) } do
               items type: :string
             end
           end
@@ -110,7 +110,7 @@ module Api::V1
           param :first_name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :email, type: :string, optional: true
-          param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :product, :environment) }
+          param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :product, :environment) }
           param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent read-only] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
@@ -122,7 +122,7 @@ module Api::V1
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true, if: -> { current_account.ent? && current_bearer&.has_role?(:admin, :product, :environment) } do
+            param :permissions, type: :array, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) } do
               items type: :string
             end
           end

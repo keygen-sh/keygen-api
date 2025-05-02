@@ -1107,16 +1107,12 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the response body should be a "user" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": ["license.validate"],
+        "role": "user"
       }
       """
 
@@ -1163,16 +1159,12 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "400"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
+     Then the response status should be "200"
+    And the response body should be a "user" with the following attributes:
       """
       {
-        "title": "Bad request",
-        "detail": "unpermitted parameter",
-        "source": {
-          "pointer": "/data/attributes/permissions"
-        }
+        "permissions": [],
+        "role": "user"
       }
       """
 
@@ -1233,6 +1225,10 @@ Feature: Update user
     Given I am an admin of account "ent1"
     And the current account is "ent1"
     And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["admin.update", "admin.read", "user.update", "user.read", "license.read", "license.validate", "machine.read"]
+      """
     And I use an authentication token
     When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
       """
