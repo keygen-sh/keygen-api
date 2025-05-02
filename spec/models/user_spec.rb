@@ -111,6 +111,17 @@ describe User, type: :model do
 
         expect(actions).to match_array %w[license.read license.validate]
       end
+
+      context 'with default user permissions override' do
+        before { create(:setting, key: :default_user_permissions, value: %w[license.validate license.read user.read], account:) }
+
+        it 'should set default permissions' do
+          user    = create(:user, account:)
+          actions = user.permissions.actions
+
+          expect(actions).to match_array account.settings.default_user_permissions
+        end
+      end
     end
 
     context 'on update' do

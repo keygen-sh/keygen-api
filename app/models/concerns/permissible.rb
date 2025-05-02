@@ -138,10 +138,21 @@ module Permissible
       #             like the permissions arg and :default kwarg.
       module_eval do
         define_singleton_method :allowed_permissions do
-          perms = resolver.call(self, permissions)
+          perms = resolver.call(nil, permissions)
 
           # Wildcards are always allowed.
           perms << Permission::WILDCARD_PERMISSION
+
+          perms.freeze
+        end
+
+        define_singleton_method :default_permissions do
+          perms = resolver.call(nil, default)
+
+          # When no defaults are provided, default to allowed minus wildcard.
+          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
+                                  .freeze if
+            perms.empty?
 
           perms.freeze
         end
@@ -151,17 +162,6 @@ module Permissible
 
           # Wildcards are always allowed.
           perms << Permission::WILDCARD_PERMISSION
-
-          perms.freeze
-        end
-
-        define_singleton_method :default_permissions do
-          perms = resolver.call(self, default)
-
-          # When no defaults are provided, default to allowed minus wildcard.
-          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
-                                  .freeze if
-            perms.empty?
 
           perms.freeze
         end

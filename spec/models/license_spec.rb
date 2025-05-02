@@ -256,6 +256,17 @@ describe License, type: :model do
           expect(actions).to match_array %w[license.read license.validate]
         end
       end
+
+      context 'with default license permissions override' do
+        before { create(:setting, key: :default_license_permissions, value: %w[license.validate machine.create], account:) }
+
+        it 'should set default permissions' do
+          license = create(:license, account:)
+          actions = license.permissions.actions
+
+          expect(actions).to match_array account.settings.default_license_permissions
+        end
+      end
     end
 
     context 'on update' do

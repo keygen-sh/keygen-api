@@ -65,7 +65,7 @@ class User < ApplicationRecord
   has_account inverse_of: :users
   has_default_role :user
   has_permissions -> user {
-      role = if user.respond_to?(:role)
+      role = if user.present?
                user.role
              else
                nil
@@ -81,7 +81,7 @@ class User < ApplicationRecord
       end
     },
     default: -> user {
-      role = if user.respond_to?(:role)
+      role = if user.present?
                user.role
              else
                nil
@@ -97,13 +97,22 @@ class User < ApplicationRecord
       in Role(:read_only)
         Permission::READ_ONLY_PERMISSIONS
       else
-        Permission::USER_PERMISSIONS - %w[
-          account.read
-          license.users.attach
-          license.users.detach
-          policy.read
-          product.read
-        ]
+        default_permissions = if user.present?
+                                user.account.settings.default_user_permissions
+                              else
+                                nil
+                              end
+
+        default_permissions.presence || (
+          # we're omitting some for backwards compatibility
+          Permission::USER_PERMISSIONS - %w[
+            account.read
+            license.users.attach
+            license.users.detach
+            policy.read
+            product.read
+          ]
+        )
       end
     }
 

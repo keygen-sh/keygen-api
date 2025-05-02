@@ -5301,6 +5301,131 @@ Feature: Create license
     And sidekiq should have 1 "request-log" job
 
   @ee
+  Scenario: Product creates a user license with default permissions (without override)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license" with the following attributes:
+      """
+      {
+        "permissions": [
+          "arch.read",
+          "artifact.read",
+          "channel.read",
+          "component.create",
+          "component.delete",
+          "component.read",
+          "component.update",
+          "constraint.read",
+          "engine.read",
+          "entitlement.read",
+          "group.owners.read",
+          "group.read",
+          "license.check-in",
+          "license.check-out",
+          "license.read",
+          "license.usage.increment",
+          "license.validate",
+          "machine.check-out",
+          "machine.create",
+          "machine.delete",
+          "machine.heartbeat.ping",
+          "machine.proofs.generate",
+          "machine.read",
+          "machine.update",
+          "package.read",
+          "platform.read",
+          "process.create",
+          "process.delete",
+          "process.heartbeat.ping",
+          "process.read",
+          "process.update",
+          "release.download",
+          "release.read",
+          "release.upgrade",
+          "token.read",
+          "token.regenerate",
+          "token.revoke"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  @ee
+  Scenario: Product creates a user license with default permissions (with override)
+    Given the current account is "ent1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+     And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value":  [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.read"
+        ]
+      }
+      """
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.read"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  @ee
   Scenario: Product creates a license with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -5597,6 +5722,67 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  @ee
+  Scenario: User creates a license with default permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 unprotected "policy"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value": [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.read",
+          "user.read"
+        ]
+      }
+      """
+    And I am a user of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the response body should be a "license" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate",
+          "machine.create",
+          "machine.read",
+          "user.read"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
 
   Scenario: User creates a license using an unprotected policy
     Given the current account is "test1"
