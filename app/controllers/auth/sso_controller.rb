@@ -11,7 +11,7 @@ module Auth
     skip_verify_authorized
 
     def callback
-      code = request.query_parameters[:code]
+      code, enc = request.query_parameters.values_at(:code, :state)
 
       # redeem the callback authentication code for a user profile
       profile = Keygen::EE::SSO.redeem_code(code:)
@@ -36,6 +36,28 @@ module Auth
         raise Keygen::Error::InvalidSingleSignOnError.new('user is not allowed', code: 'SSO_USER_NOT_ALLOWED')
       end
 
+      # decrypt and verify state
+      state = Keygen::EE::SSO.decrypt_state(enc, secret_key: account.secret_key)
+
+      unless state.present? && state.email == profile.email
+        Keygen.logger.warn { "[sso] state is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} enc=#{enc.inspect}" }
+
+        raise Keygen::Error::InvalidSingleSignOnError.new('state is not valid', code: 'SSO_STATE_INVALID')
+      end
+
+      # lookup and assert the environment matches our authentication state
+      environment = unless state.environment_id.nil?
+                      account.environments.find_by_alias(state.environment_id,
+                        aliases: %i[code],
+                      )
+                    end
+
+      unless state.environment_id == environment&.id
+        Keygen.logger.warn { "[sso] environment was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} environment_id=#{state.environment_id.inspect}" }
+
+        raise Keygen::Error::InvalidSingleSignOnError.new('environment was not found', code: 'SSO_ENVIRONMENT_NOT_FOUND')
+      end
+
       # workos recommends jit-provisioning: https://workos.com/docs/sso/jit-provisioning
       #
       # 1. first, we attempt to lookup the user by their workos profile.
@@ -43,7 +65,7 @@ module Auth
       # 3. otherwise, initialize a new user.
       #
       # lastly, we keep the user's attributes up-to-date.
-      user = account.users.then do |users|
+      user = account.users.for_environment(environment).then do |users|
         users.find_by(sso_profile_id: profile.id) || users.find_or_initialize_by(email: profile.email) do |u|
           unless account.sso_jit_provisioning?
             Keygen.logger.warn { "[sso] user was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
@@ -98,6 +120,7 @@ module Auth
           expiry: (account.sso_session_duration.presence || DEFAULT_SESSION_DURATION).seconds.from_now,
           user_agent: request.user_agent,
           ip: request.remote_ip,
+          environment:,
         )
       end
 
@@ -111,7 +134,9 @@ module Auth
         skip_verify_origin: true, # i.e. allow cookie to be set from outside Portal origin
       )
 
-      redirect_to portal_url(account), status: :see_other, allow_other_host: true
+      redirect_to portal_url(account, query: { env: environment&.code }.compact),
+        allow_other_host: true,
+        status: :see_other
     end
 
     private

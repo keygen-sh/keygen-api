@@ -3,7 +3,7 @@
 module ReleaseEngines::Oci
   class ReleasePackagePolicy < ::ReleasePackagePolicy
     scope_for :active_record_relation do |relation|
-      relation = relation.for_environment(environment, strict: environment.nil?)
+      relation = relation.for_environment(environment)
 
       # FIXME(ezekg) docker expects a 401 Unauthorized response with an WWW-Authenticate
       #              challenge, so unfortunately, we can't scope relations like we

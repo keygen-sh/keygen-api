@@ -114,7 +114,7 @@ module Authentication
     return nil if
       current_account.nil? || session_id.blank?
 
-    session = current_account.sessions.for_environment(current_environment, strict: current_environment.nil?)
+    session = current_account.sessions.for_environment(current_environment)
                                       .preload(:token, :bearer)
                                       .find_by(
                                         id: session_id,
@@ -188,7 +188,7 @@ module Authentication
       )
     end
 
-    user = current_account.users.for_environment(current_environment, strict: current_environment.nil?)
+    user = current_account.users.for_environment(current_environment)
                                 .find_by(email: email.downcase)
 
     @current_http_scheme = :password
@@ -458,7 +458,7 @@ module Authentication
     auth_value
   end
 
-  def sso_redirect_url(email) = Keygen::EE::SSO.redirect_url(account: current_account, callback_url: sso_callback_url, email:)
+  def sso_redirect_url(email) = Keygen::EE::SSO.redirect_url(account: current_account, environment: current_environment, callback_url: sso_callback_url, email:)
   def sso_redirect_url_for(user_or_email)
     case user_or_email
     in User => user

@@ -8,6 +8,7 @@ class Environment < ApplicationRecord
   include Pageable
   include Roleable
   include Diffable
+  include Aliasable
 
   ISOLATION_STRATEGIES = %w[
     ISOLATED

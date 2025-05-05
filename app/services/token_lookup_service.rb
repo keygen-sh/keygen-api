@@ -69,5 +69,5 @@ class TokenLookupService < BaseService
   # NOTE(ezekg) When we're in the global (nil) environment, we want to enable strict mode
   #             so that we can't authenticate with a token from another environment,
   #             even if we have access to that environment's tokens.
-  def tokens = account.tokens.for_environment(environment, strict: environment.nil?)
+  def tokens = account.tokens.for_environment(environment)
 end
