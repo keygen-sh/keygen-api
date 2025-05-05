@@ -27,7 +27,7 @@ module Environmental
     # the global environment will include resources from all environments. To
     # scope to a specific environment without others bleeding into the
     # results, enable :strict mode.
-    scope :for_environment, -> environment, strict: false {
+    scope :for_environment, -> environment, strict: environment.nil? {
       environment = case environment
                     in String => code unless code in UUID_RE
                       return none # We do not currently support filtering via environment codes.

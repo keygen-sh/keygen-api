@@ -390,10 +390,8 @@ class Account < ApplicationRecord
     self.slug = autogen_slug
   end
 
-  def generate_secret_key!
-    self.secret_key = SecureRandom.hex 64
-  end
-  alias_method :regenerate_secret_key!, :generate_secret_key!
+  def generate_secret_key!   = self.secret_key ||= SecureRandom.hex(64)
+  def regenerate_secret_key! = self.secret_key = SecureRandom.hex(64)
 
   def generate_rsa_keys!
     priv = if private_key.nil?
@@ -410,12 +408,11 @@ class Account < ApplicationRecord
   alias_method :regenerate_rsa_keys!, :generate_rsa_keys!
 
   def generate_ed25519_keys!
-    priv =
-      if ed25519_private_key.present?
-        Ed25519::SigningKey.new([ed25519_private_key].pack("H*"))
-      else
-        Ed25519::SigningKey.generate
-      end
+    priv = if ed25519_private_key.present?
+             Ed25519::SigningKey.new([ed25519_private_key].pack("H*"))
+           else
+             Ed25519::SigningKey.generate
+           end
     pub = priv.verify_key
 
     self.ed25519_private_key = priv.to_bytes.unpack1("H*")

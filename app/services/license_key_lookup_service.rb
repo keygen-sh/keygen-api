@@ -54,5 +54,5 @@ class LicenseKeyLookupService < BaseService
   # NOTE(ezekg) When we're in the global (nil) environment, we want to enable strict mode
   #             so that we can't authenticate with a license from another environment,
   #             even if we have access to that environment's licenses.
-  def licenses = account.licenses.for_environment(environment, strict: environment.nil?)
+  def licenses = account.licenses.for_environment(environment)
 end

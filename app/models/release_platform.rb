@@ -23,7 +23,7 @@ class ReleasePlatform < ApplicationRecord
 
   before_create -> { self.key = key&.downcase&.strip }
 
-  scope :for_environment, -> environment, strict: false {
+  scope :for_environment, -> environment, strict: environment.nil? {
     joins(:artifacts)
       .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(

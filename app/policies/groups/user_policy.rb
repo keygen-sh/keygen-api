@@ -5,7 +5,7 @@ module Groups
     authorize :group
 
     scope_for :active_record_relation do |relation|
-      relation = relation.for_environment(environment, strict: environment.nil?) if
+      relation = relation.for_environment(environment) if
         relation.respond_to?(:for_environment)
 
       case bearer

@@ -34,7 +34,7 @@ class ReleaseEngine < ApplicationRecord
     uniqueness: { message: 'already exists', scope: :account_id },
     inclusion: { in: ENGINES }
 
-  scope :for_environment, -> environment, strict: false {
+  scope :for_environment, -> environment, strict: environment.nil? {
     joins(:packages)
       .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
       .where(
