@@ -96,6 +96,122 @@ Feature: Account settings
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 1 "event-log" job
 
+  Scenario: Admin creates a default license permission account setting with duplicates
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/settings" with the following:
+      """
+      {
+        "data": {
+          "type": "settings",
+          "attributes": {
+            "key": "default_license_permissions",
+            "value": [
+              "license.validate",
+              "license.validate",
+              "machine.read",
+              "machine.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be an array of valid license permissions",
+        "code": "VALUE_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/value"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin creates a default license permission account setting with nils
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/settings" with the following:
+      """
+      {
+        "data": {
+          "type": "settings",
+          "attributes": {
+            "key": "default_user_permissions",
+            "value": [
+              "license.validate",
+              "license.read",
+              null,
+              "user.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be an array of valid user permissions",
+        "code": "VALUE_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/value"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin creates a default license permission account setting with unknowns
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/settings" with the following:
+      """
+      {
+        "data": {
+          "type": "settings",
+          "attributes": {
+            "key": "default_user_permissions",
+            "value": [
+              "license.validate",
+              "license.read",
+              "foo.bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be an array of valid user permissions",
+        "code": "VALUE_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/value"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
   Scenario: Admin creates a duplicate default license permission account setting
     Given I am an admin of account "test1"
     And the current account is "test1"
