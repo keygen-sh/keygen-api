@@ -12,6 +12,8 @@ class AccountSetting < ApplicationRecord
 
   belongs_to :account
 
+  has_aliases :key
+
   validates :key, presence: true, uniqueness: { scope: :account_id }, inclusion: { in: VALID_KEYS, message: "must be one of: #{VALID_KEYS.join(', ')}" }
   validate on: %i[create update] do
     case self
