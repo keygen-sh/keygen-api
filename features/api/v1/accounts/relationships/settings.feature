@@ -96,6 +96,57 @@ Feature: Account settings
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 1 "event-log" job
 
+  Scenario: Admin creates a duplicate default license permission account setting
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value": [
+          "license.validate",
+          "license.read"
+        ]
+      }
+      """
+    When I send a POST request to "/accounts/test1/settings" with the following:
+      """
+      {
+        "data": {
+          "type": "settings",
+          "attributes": {
+            "key": "default_license_permissions",
+            "value": [
+              "product.read",
+              "policy.read",
+              "license.read",
+              "license.validate",
+              "machine.read",
+              "machine.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "has already been taken",
+        "code": "KEY_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
   Scenario: Admin creates an invalid default user permission account setting
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -122,7 +173,10 @@ Feature: Account settings
       {
         "title": "Unprocessable resource",
         "detail": "must be a valid setting",
-        "code": "VALUE_NOT_ALLOWED"
+        "code": "VALUE_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/value"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -153,7 +207,10 @@ Feature: Account settings
       {
         "title": "Unprocessable resource",
         "detail": "must be one of: default_license_permissions, default_user_permissions",
-        "code": "KEY_NOT_ALLOWED"
+        "code": "KEY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
       }
       """
      And the second error should have the following properties:
@@ -161,7 +218,10 @@ Feature: Account settings
       {
         "title": "Unprocessable resource",
         "detail": "must be a valid setting",
-        "code": "VALUE_NOT_ALLOWED"
+        "code": "VALUE_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/value"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
