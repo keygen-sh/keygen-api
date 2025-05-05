@@ -2,10 +2,8 @@
 
 class AccountSetting < ApplicationRecord
   include Keygen::PortableClass
-  include Limitable
-  include Orderable
-  include Dirtyable
-  include Pageable
+  include Limitable, Orderable, Pageable
+  include Aliasable, Dirtyable
 
   VALID_KEYS = %w[
     default_license_permissions

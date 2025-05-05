@@ -201,7 +201,50 @@ Feature: Account settings
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Admin retrieves an account setting
+  Scenario: Admin retrieves an account setting by key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value": [
+          "license.validate",
+          "license.read"
+        ]
+      }
+      """
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_user_permissions",
+        "value": [
+          "license.validate",
+          "license.read",
+          "user.read"
+        ]
+      }
+      """
+    When I send a GET request to "/accounts/test1/settings/default_user_permissions"
+    Then the response status should be "200"
+    And the response body should be a "setting" with the following attributes:
+      """
+      {
+        "key": "default_user_permissions",
+        "value": [
+          "license.validate",
+          "license.read",
+          "user.read"
+        ]
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin retrieves an account setting by ID
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token

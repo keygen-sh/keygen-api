@@ -98,7 +98,7 @@ module Api::V1::Accounts::Relationships
     def set_setting
       scoped_settings = authorized_scope(current_account.settings)
 
-      @setting = scoped_settings.find(params[:id])
+      @setting = scoped_settings.find_by_alias(params[:id], aliases: %i[key])
 
       Current.resource = current_account
     end
