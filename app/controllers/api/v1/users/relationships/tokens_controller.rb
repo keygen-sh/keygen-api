@@ -38,7 +38,7 @@ module Api::V1::Users::Relationships
             next unless
               license.entitled?(:permissions)
 
-            param :permissions, type: :array, optional: true do
+            param :permissions, type: :array, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :product, :environment) } do
               items type: :string
             end
           end
