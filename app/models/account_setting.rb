@@ -3,15 +3,14 @@
 class AccountSetting < ApplicationRecord
   include Keygen::PortableClass
   include Limitable, Orderable, Pageable
-  include Aliasable, Dirtyable
+  include Accountable, Dirtyable, Aliasable
 
   VALID_KEYS = %w[
     default_license_permissions
     default_user_permissions
   ]
 
-  belongs_to :account
-
+  has_account touch: true
   has_aliases :key
 
   validates :key, presence: true, uniqueness: { scope: :account_id }, inclusion: { in: VALID_KEYS, message: "must be one of: #{VALID_KEYS.join(', ')}" }
