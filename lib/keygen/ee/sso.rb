@@ -45,6 +45,7 @@ module Keygen
                           .join('--')
 
         dec = crypt.decrypt_and_verify(enc)
+        return nil if dec.blank?
 
         State.new(**dec.symbolize_keys)
       rescue ActiveSupport::MessageEncryptor::InvalidMessage

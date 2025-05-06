@@ -791,6 +791,31 @@ Feature: SSO
     And there should be 0 "sessions"
     And time is unfrozen
 
+  Scenario: We receive a callback with expired state
+    Given the SSO callback code "test_123" returns the following profile:
+      """
+      {
+        "id": "test_prof_4feac6c06830a47bf740628c9038",
+        "organization_id": "test_org_669aa06c521982d5c12b3eb74bf0",
+        "connection_id": "test_conn_6ca55425d9b4842cdd3ba3f1ea9c",
+        "idp_id": "test_idp_34d99d8985608b3d0297183a1265",
+        "email": "milkshake@lumon.example",
+        "first_name": "Seth",
+        "last_name": "Milchick",
+        "role": {
+          "slug": "admin"
+        }
+      }
+      """
+    And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+    And time is frozen at "2552-02-28T00:00:00.000Z"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123&state=vE_aR_Yo4LznQ030504ZNDartFen77pvvDX05d5PJIMtWKbwVBdqgSYIwJGRBdUYc1UR9EsXZOCc7x8J09gLLIcwzELAatnPmnY_HzacQMxM8Mtml081c7zQzw-gK2n81WYdGXzx7qizLwnvqhk.eHPuRpXNN3GIpegz.dGFivEgj7PTiuNvw72P_RA"
+    Then the response status should be "303"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_STATE_INVALID"
+    And the response headers should not contain "Set-Cookie"
+    And there should be 0 "sessions"
+    And time is unfrozen
+
   Scenario: We receive a callback with invalid state
     Given the SSO callback code "test_123" returns the following profile:
       """
