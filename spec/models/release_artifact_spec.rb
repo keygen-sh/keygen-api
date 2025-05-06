@@ -417,7 +417,7 @@ describe ReleaseArtifact, type: :model do
     end
 
     it 'should not detect garbage' do
-      artifact = build(:artifact, checksum: Random.bytes(4))
+      artifact = build(:artifact, checksum: Random.bytes(32))
 
       expect(artifact.checksum_algorithm).to eq nil
       expect(artifact.checksum_encoding).to eq nil
