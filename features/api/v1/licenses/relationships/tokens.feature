@@ -1040,7 +1040,7 @@ Feature: Generate authentication token for license
       { "Keygen-Environment": "shared" }
       """
   @ce
-  Scenario: Product generates a license token with custom permissions (standard tier, ECEE)
+  Scenario: Product generates a license token with custom permissions (standard tier, CE)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
