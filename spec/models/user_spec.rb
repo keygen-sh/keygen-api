@@ -115,11 +115,18 @@ describe User, type: :model do
       context 'with default user permissions override' do
         before { create(:setting, key: :default_user_permissions, value: %w[license.validate license.read user.read], account:) }
 
-        it 'should set default permissions' do
+        it 'should override default user permissions' do
           user    = create(:user, account:)
           actions = user.permissions.actions
 
           expect(actions).to match_array account.settings.default_user_permissions
+        end
+
+        it 'should not override default admin permissions' do
+          admin   = create(:user, :admin, account:)
+          actions = admin.permissions.actions
+
+          expect(actions).to match_array Permission::ADMIN_PERMISSIONS
         end
       end
     end
