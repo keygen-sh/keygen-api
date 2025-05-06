@@ -2766,7 +2766,7 @@ Feature: Create user
     And sidekiq should have 1 "request-log" job
 
   @ee
-  Scenario: Anonymous creates a user with default permissions (without override)
+  Scenario: Anonymous creates a user with default permissions (with override)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
@@ -2819,7 +2819,7 @@ Feature: Create user
     And sidekiq should have 1 "event-log" job
 
   @ee
-  Scenario: Anonymous creates a user with default permissions (with override)
+  Scenario: Anonymous creates a user with custom permissions (with override)
     Given the current account is "ent1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
