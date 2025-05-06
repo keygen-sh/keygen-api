@@ -260,7 +260,7 @@ describe License, type: :model do
       context 'with default license permissions override' do
         before { create(:setting, key: :default_license_permissions, value: %w[license.validate machine.create], account:) }
 
-        it 'should set default permissions' do
+        it 'should override default permissions' do
           license = create(:license, account:)
           actions = license.permissions.actions
 
