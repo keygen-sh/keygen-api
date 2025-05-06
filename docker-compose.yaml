@@ -31,6 +31,16 @@ services:
     tty: true
     stdin_open: true
 
+  migrate:
+    profiles: [ "migrate" ]
+    image: keygen/api:latest
+    environment:
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+    env_file:
+      - .env
+    command: bundle exec rails db:migrate
+    depends_on: [ postgres ]
+
   postgres:
     image: postgres:9.6
     ports:
