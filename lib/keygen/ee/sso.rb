@@ -65,14 +65,14 @@ module Keygen
 
       def strict64_to_urlsafe64(enc)
         Base64.urlsafe_encode64(Base64.strict_decode64(enc), padding: false)
-      rescue ArgumentError
-        nil
+      rescue ArgumentError => e
+        raise ActiveSupport::MessageEncryptor::InvalidMessage, "bad encoding: #{e.message}"
       end
 
       def urlsafe64_to_strict64(enc)
         Base64.strict_encode64(Base64.urlsafe_decode64(enc))
-      rescue ArgumentError
-        nil
+      rescue ArgumentError => e
+        raise ActiveSupport::MessageEncryptor::InvalidMessage, "bad encoding: #{e.message}"
       end
 
       def derive_key(secret_key)
