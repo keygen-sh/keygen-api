@@ -9,7 +9,7 @@ module Keygen
 
       extend self
 
-      def redirect_url(account:, environment:, callback_url:, email: nil)
+      def redirect_url(account:, environment:, callback_url:, email: nil, expires_in: 5.minutes)
         WorkOS::SSO.authorization_url(
           client_id: WORKOS_CLIENT_ID,
           organization: account.sso_organization_id,
@@ -17,8 +17,9 @@ module Keygen
           domain_hint: account.sso_organization_domains.first,
           login_hint: email,
           state: encrypt_state(
-            { email:, environment_id: environment&.id, }, # email acts as a salt
+            { email:, environment_id: environment&.id }, # email acts as a salt
             secret_key: account.secret_key,
+            expires_in:,
           ),
         )
       end
@@ -33,16 +34,6 @@ module Keygen
         res.profile
       rescue WorkOS::APIError => e
         raise Keygen::Error::InvalidSingleSignOnError.new(e.message, code: "SSO_#{e.error.upcase}")
-      end
-
-      def encrypt_state(state, secret_key:)
-        crypt = ActiveSupport::MessageEncryptor.new(derive_key(secret_key), serializer: JSON)
-        enc   = crypt.encrypt_and_sign(state)
-                     .split('--')
-                     .map { strict64_to_urlsafe64(_1) }
-                     .join('.')
-
-        enc
       end
 
       def decrypt_state(ciphertext, secret_key:)
@@ -61,6 +52,16 @@ module Keygen
       end
 
       private
+
+      def encrypt_state(state, secret_key:, expires_in: nil)
+        crypt = ActiveSupport::MessageEncryptor.new(derive_key(secret_key), serializer: JSON)
+        enc   = crypt.encrypt_and_sign(state, expires_in:)
+                     .split('--')
+                     .map { strict64_to_urlsafe64(_1) }
+                     .join('.')
+
+        enc
+      end
 
       def strict64_to_urlsafe64(enc)
         Base64.urlsafe_encode64(Base64.strict_decode64(enc), padding: false)
