@@ -117,20 +117,14 @@ describe Accounts::SettingPolicy, type: :policy do
       with_scenarios %i[accessing_its_setting] do
         with_token_authentication do
           with_permissions %w[account.read] do
-            without_token_permissions { denies :show }
-
             denies :show
           end
 
           with_wildcard_permissions do
-            without_token_permissions { denies :show, :create, :update, :destroy }
-
             denies :show, :create, :update, :destroy
           end
 
           with_default_permissions do
-            without_token_permissions { denies :show, :create, :update, :destroy }
-
             denies :show, :create, :update, :destroy
           end
 
@@ -182,20 +176,14 @@ describe Accounts::SettingPolicy, type: :policy do
     with_scenarios %i[accessing_its_setting] do
       with_token_authentication do
         with_permissions %w[account.read] do
-          without_token_permissions { denies :show }
-
           denies :show
         end
 
         with_wildcard_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
@@ -250,20 +238,14 @@ describe Accounts::SettingPolicy, type: :policy do
 
       with_token_authentication do
         with_permissions %w[account.read] do
-          without_token_permissions { denies :show }
-
           denies :show
         end
 
         with_wildcard_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
@@ -290,20 +272,14 @@ describe Accounts::SettingPolicy, type: :policy do
     with_scenarios %i[accessing_its_setting] do
       with_token_authentication do
         with_permissions %w[account.read] do
-          without_token_permissions { denies :show }
-
           denies :show
         end
 
         with_wildcard_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show, :create, :update, :destroy }
-
           denies :show, :create, :update, :destroy
         end
 
