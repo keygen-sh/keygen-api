@@ -65,12 +65,8 @@ class LicenseUser < ApplicationRecord
     return unless account.trialing_or_free?
 
     active_licensed_user_count = account.active_licensed_user_count
-    active_licensed_user_limit =
-      if account.trialing? && account.billing.card.present?
-        account.plan.max_licenses || account.plan.max_users
-      else
-        50
-      end
+    active_licensed_user_limit = account.plan.max_licenses ||
+                                 account.plan.max_users
 
     return if active_licensed_user_count.nil? ||
               active_licensed_user_limit.nil?
