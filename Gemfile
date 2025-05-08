@@ -7,7 +7,7 @@ gem 'rails', '~> 7.2.2.1'
 gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 6.4.3'
 gem 'bcrypt', '3.1.17'
-gem 'rack', '~> 2.2.13'
+gem 'rack', '~> 2.2.14'
 gem 'rack-timeout', require: 'rack/timeout/base'
 unless ENV.key?('NO_RACK_ATTACK')
   gem 'rack-attack', '~> 6.6'
