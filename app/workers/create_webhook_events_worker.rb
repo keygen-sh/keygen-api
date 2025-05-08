@@ -8,6 +8,10 @@ class CreateWebhookEventsWorker < BaseWorker
       Account.find(account_id)
     end
 
+    event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
+      EventType.find_or_create_by!(event:)
+    end
+
     webhook_endpoints = account.webhook_endpoints.for_environment(
       environment_id,
       strict: true,
@@ -16,10 +20,6 @@ class CreateWebhookEventsWorker < BaseWorker
     webhook_endpoints.find_each do |webhook_endpoint|
       next unless
         webhook_endpoint.subscribed?(event)
-
-      event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
-        EventType.find_or_create_by! event: event
-      end
 
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create!(
