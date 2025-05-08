@@ -26,7 +26,8 @@ Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session
 
 # Configure Sidekiq client
 Sidekiq.configure_client do |config|
-  config.logger = Rails.logger if Rails.env.test?
+  config.logger       = Rails.logger if Rails.env.test?
+  config.logger.level = Rails.logger.level
   config.redis  = {
     ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
     size: ENV.fetch('REDIS_POOL_SIZE') { ENV.fetch('RAILS_MAX_THREADS', 2) }.to_i,
@@ -40,6 +41,11 @@ end
 
 # Configure Sidekiq server
 Sidekiq.configure_server do |config|
+  PerformBulk.bulk_fetch!(config,
+    batch_size: ENV.fetch('PERFORM_BULK_BATCH_SIZE', 100),
+  )
+
+  config.logger.level = Rails.logger.level
   config.redis = {
     ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
     size: ENV.fetch('REDIS_POOL_SIZE') { ENV.fetch('SIDEKIQ_CONCURRENCY', 10) }.to_i,

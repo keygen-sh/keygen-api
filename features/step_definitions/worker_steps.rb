@@ -43,6 +43,10 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
 
   # Drain certain queues before count
   case worker_name
+  when "request_log_worker",
+       "event_log_worker"
+    PerformBulk::Processor.drain # process and queue bulk jobs
+    PerformBulk::Runner.drain
   when "webhook_worker"
     CreateWebhookEventsWorker.drain
   end
@@ -59,8 +63,6 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     InitializeBillingWorker.drain
   when "event_notification_worker"
     EventNotificationWorker.drain
-  when "event_log_worker"
-    EventLogWorker.drain
   when "touch_license_worker"
     TouchLicenseWorker.drain
   end
