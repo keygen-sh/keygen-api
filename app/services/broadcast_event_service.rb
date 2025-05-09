@@ -16,6 +16,10 @@ class BroadcastEventService < BaseService
         Keygen.logger.exception(e)
       end
 
+      event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
+        EventType.find_or_create_by!(event:)
+      end
+
       # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
       #             generated via a background job like MachineHeartbeatWorker.
       account_id      = Current.account&.id || account.id
@@ -26,6 +30,7 @@ class BroadcastEventService < BaseService
       bearer_id       = Current.bearer&.id
       request_id      = Current.request_id
       idempotency_key = SecureRandom.hex
+      event_type_id   = event_type.id
 
       begin
         Keygen.ee do |license|
@@ -53,16 +58,18 @@ class BroadcastEventService < BaseService
             end
 
           EventLogWorker.perform_async(
-            event,
-            account_id,
-            resource_type,
-            resource_id,
-            bearer_type,
-            bearer_id,
-            request_id,
-            idempotency_key,
-            metadata.to_json,
-            environment_id,
+            'event_type_id' => event_type_id,
+            'account_id' => account_id,
+            'environment_id' => environment_id,
+            'idempotency_key' => idempotency_key,
+            'created_date' => Date.today.iso8601,
+            'created_at' => Time.current.iso8601(6),
+            'resource_type' => resource_type,
+            'resource_id' => resource_id,
+            'whodunnit_type' => bearer_type,
+            'whodunnit_id' => bearer_id,
+            'request_log_id' => request_id,
+            'metadata' => metadata.to_json,
           )
         end
 
