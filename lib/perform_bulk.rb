@@ -6,9 +6,11 @@ require 'sidekiq/capsule'
 require 'sidekiq/fetch'
 
 module PerformBulk
+  LOG_PREFIX    = :perform_bulk
   QUEUE_PREFIX  = 'perform_bulk:'
   QUEUE_INGRESS = QUEUE_PREFIX + 'ingress' # the queue used for unbatched bulk jobs
   QUEUE_EGRESS  = QUEUE_PREFIX + 'egress'  # the queue used for batched bulk jobs
+  QUEUE_DEFAULT = 'default'                # the default sidekiq queue
 
   # including PerformBulk::Job allows a Sidekiq::Job to opt into bulk processing,
   # where the bulk fetcher dequeues multiple jobs and batches them into a
@@ -38,13 +40,13 @@ module PerformBulk
   #     end
   #   end
   #
-  # we can queue jobs normally, but during times of high writes, they'll be
-  # batched up and executed accordingly:
+  # we can queue jobs normally, but during times of high throughput, they'll
+  # be batched up according to job class and executed in bulk:
   #
   #   25.times { AuditLogJob.perform_async(...) }
   #
-  # the above will result in a single job execution, where logs is equal to
-  # the args of the 25 batched jobs.
+  # the above will result in a single job execution, where the *logs job args
+  # are equal to the args of the 25 batched jobs.
   module Job
     def self.included(klass)
       raise ArgumentError, "cannot be used outside of Sidekiq job (got #{klass.ancestors})" unless
@@ -54,7 +56,7 @@ module PerformBulk
 
       # NB(ezekg) swap the bulk job's queue over to our capsule's ingress queue in
       #           case our job doesn't ever call .sidekiq_options
-      klass.sidekiq_options queue: PerformBulk::QUEUE_INGRESS
+      klass.sidekiq_options queue: QUEUE_INGRESS
     end
 
     module ClassMethods
@@ -64,9 +66,14 @@ module PerformBulk
 
         # hijack bulk job to push new jobs to our capsule's ingress queue, and
         # then we'll push to the expected egress queue after batching.
-        unless opts['queue'] == PerformBulk::QUEUE_INGRESS
-          opts['queue_was'] = opts.delete('queue')
-          opts['queue']     = PerformBulk::QUEUE_INGRESS
+        unless opts['queue'] == QUEUE_INGRESS
+          queue_was  = opts.delete('queue') || QUEUE_DEFAULT
+          queue      = QUEUE_INGRESS
+
+          Logger.instance.debug(trace: :job) { "hijacking #{name.inspect} from #{queue_was.inspect} to #{queue.inspect}" }
+
+          opts['queue_was'] = queue_was
+          opts['queue']     = queue
         end
 
         opts
@@ -74,12 +81,65 @@ module PerformBulk
     end
   end
 
+  class Logger
+    include Singleton
+
+    %i[debug info warn error fatal].each do |level|
+      define_method(level) do |*msgs, **tags, &block|
+        log(level, *msgs, **tags, &block)
+      end
+    end
+
+    private
+
+    def log(level, *msgs, **tags, &block)
+      Sidekiq::Context.with(trace: [LOG_PREFIX, tags.delete(:trace)].compact.join("."), **tags) do
+        Sidekiq.logger.send(level, *msgs, &block)
+      end
+    end
+  end
+
+  module Logging
+    class Chain
+      def initialize(**tags) = @default_tags = tags.freeze
+
+      %i[debug info warn error fatal].each do |level|
+        define_method(level) do |*msgs, **tags, &block|
+          Logger.instance.send(level, *msgs, **default_tags.merge(tags), &block)
+        end
+      end
+
+      private
+
+      attr_reader :default_tags
+    end
+
+    def self.[](trace, **)
+      Module.new do
+        include Logging
+
+        define_method :logger do
+          @_logger ||= Logging::Chain.new(**, trace:)
+        end
+
+        private :logger
+      end
+    end
+
+    private
+
+    def logger = Logger.instance
+  end
+
   class Processor
     include Sidekiq::Job
+    include Logging[:processor]
 
     def perform(*batch)
       batch.group_by { _1['class'] }.each do |class_name, job_hashes|
         args = job_hashes.collect { _1['args'] }.reduce(&:concat) # batch args
+
+        logger.debug { "batching #{job_hashes.size} #{class_name.inspect} jobs" }
 
         Runner.perform_async(class_name, args)
       end
@@ -88,21 +148,24 @@ module PerformBulk
 
   class Runner
     include Sidekiq::Job
+    include Logging[:runner]
 
     def perform(class_name, args)
       klass = Object.const_get(class_name)
-      queue = klass.sidekiq_options_hash['queue_was'] || 'default'
+      queue = klass.sidekiq_options_hash['queue_was'] || QUEUE_DEFAULT
+
+      logger.debug { "executing batch of #{args.size} jobs on queue: #{queue.inspect}" }
 
       klass.set(queue:).perform_async(*args)
     end
   end
 
   # NB(ezekg) this conforms to the interface of Sidekiq's UnitOfWork struct
-  UnitOfWork = Struct.new(:queue, :batch, :config) do
+  UnitOfWork = Struct.new(:queue, :jobs, :config) do
     def queue_name  = queue.delete_prefix('queue:')
     def acknowledge = nil # nothing to do
 
-    # jit-compute underlying egress job
+    # jit-compute underlying egress batch job
     def job = @job ||= begin
       now = Process.clock_gettime(Process::CLOCK_REALTIME, :millisecond)
 
@@ -110,7 +173,7 @@ module PerformBulk
         'class' => PerformBulk::Processor.name,
         'jid' => SecureRandom.hex(12),
         'queue' => QUEUE_EGRESS,
-        'args' => Sidekiq.load_json('[' + batch.join(',') + ']'), # NB(ezekg) optimized single-pass parse
+        'args' => Sidekiq.load_json('[' + jobs.join(',') + ']'), # NB(ezekg) optimized single-pass parse
         'created_at' => now,
         'enqueued_at' => now,
         'retry' => true,
@@ -118,11 +181,13 @@ module PerformBulk
     end
 
     def requeue
-      config.redis { |conn| conn.rpush(queue, *batch) }
+      config.redis { _1.rpush(queue, *jobs) }
     end
   end
 
   class BulkFetch < Sidekiq::BasicFetch
+    include Logging[:bulk_fetch]
+
     attr_reader :batch_size
 
     def initialize(capsule)
@@ -132,24 +197,28 @@ module PerformBulk
     end
 
     def retrieve_work
-      batch = Sidekiq.redis { _1.rpop("queue:#{QUEUE_INGRESS}", batch_size) }
+      batch = config.redis { _1.rpop("queue:#{QUEUE_INGRESS}", batch_size) }
       if batch.blank?
-        Sidekiq.logger.debug { "no work - sleeping for #{TIMEOUT}" }
+        logger.debug { "no bulk work - sleeping for #{TIMEOUT}..." }
 
         sleep TIMEOUT
 
         return nil
       end
 
-      Sidekiq.logger.debug { "batch - #{batch}" }
+      logger.debug { "batching #{batch.size} bulk jobs: #{batch}" }
 
-      UnitOfWork.new("queue:#{QUEUE_EGRESS}", batch, config)
+      UnitOfWork.new(
+        queue: "queue:#{QUEUE_EGRESS}",
+        jobs: batch,
+        config:,
+      )
     end
 
     def bulk_requeue(processing)
       return if processing.empty?
 
-      Sidekiq.logger.debug { "requeueing terminated bulk jobs - #{processing}" }
+      logger.debug { "requeueing #{processing.size} terminated bulk jobs: #{processing}" }
 
       batches_to_requeue = {}
 
@@ -166,9 +235,9 @@ module PerformBulk
         end
       end
 
-      Sidekiq.logger.info { "pushed #{processing.size} bulk jobs back to redis" }
+      logger.info { "pushed #{processing.size} bulk jobs back to redis" }
     rescue => e
-      Sidekiq.logger.warn { "failed to requeue #{processing.size} bulk jobs: #{e.message}" }
+      logger.warn { "failed to requeue #{processing.size} bulk jobs: #{e.message}" }
     end
   end
 
@@ -196,5 +265,6 @@ module PerformBulk
     end
   end
 
+  # FIXME(ezekg) replace this with cap[:fetch_class]?
   Sidekiq::Capsule.prepend(CapsuleExtension)
 end
