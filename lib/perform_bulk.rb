@@ -140,7 +140,12 @@ module PerformBulk
 
     def perform(*batch)
       batch.group_by { _1['class'] }.each do |class_name, job_hashes|
-        args = job_hashes.collect { _1['args'] }.reduce(&:concat) # batch args
+        args = job_hashes.collect { _1['args'] }
+
+        # NB(ezekg) for a better DX we'll unwrap jobs with a singular arg
+        if args.all?(&:one?)
+          args = args.reduce(&:concat)
+        end
 
         logger.debug { "batching #{job_hashes.size} #{class_name.inspect} jobs" }
 
@@ -192,6 +197,8 @@ module PerformBulk
   end
 
   class BulkFetch < Sidekiq::BasicFetch
+    DEFAULT_BATCH_SIZE = 100
+
     include Logging[:bulk_fetch]
 
     attr_reader :batch_size
@@ -199,7 +206,7 @@ module PerformBulk
     def initialize(capsule)
       super(capsule)
 
-      @batch_size = capsule.config[:bulk_batch_size]
+      @batch_size = capsule.config[:bulk_batch_size] || DEFAULT_BATCH_SIZE
     end
 
     def retrieve_work
