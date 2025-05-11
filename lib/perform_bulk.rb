@@ -211,7 +211,7 @@ module PerformBulk
 
     def retrieve_work
       queue = "queue:#{QUEUE_WAITING}"
-      batch = config.redis { _1.rpop(queue, batch_size) }
+      batch = config.redis { _1.rpop(queue, batch_size) } # TODO(ezekg) make reliable?
 
       if batch.blank?
         logger.debug { "no bulk work - sleeping for #{TIMEOUT}..." }
