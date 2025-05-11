@@ -263,13 +263,11 @@ module PerformBulk
     end
 
     config.capsule('perform_bulk/processing') do |cap|
-      cap.queues      = [QUEUE_PROCESSING]
-      cap.concurrency = concurrency
+      cap.queues = [QUEUE_PROCESSING]
     end
 
     config.capsule('perform_bulk/running') do |cap|
-      cap.queues      = [QUEUE_RUNNING]
-      cap.concurrency = concurrency
+      cap.queues = [QUEUE_RUNNING]
     end
   end
 
