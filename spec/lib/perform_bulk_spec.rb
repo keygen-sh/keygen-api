@@ -125,6 +125,7 @@ describe PerformBulk do
       expect(unit_of_work).to respond_to :queue_name
       expect(unit_of_work).to respond_to :config
       expect(unit_of_work).to respond_to :job
+      expect(unit_of_work).to respond_to :requeue
     end
 
     it 'should queue into processing' do
