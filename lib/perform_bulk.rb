@@ -71,7 +71,7 @@ module PerformBulk
           queue_was  = opts.delete('queue') || QUEUE_DEFAULT
           queue      = QUEUE_WAITING
 
-          Logger.instance.debug(trace: :job) { "hijacking #{name.inspect} from #{queue_was.inspect} to #{queue.inspect}" }
+          Logger.instance.debug(src: :job) { "hijacking #{name.inspect} from #{queue_was.inspect} to #{queue.inspect}" }
 
           opts['queue_was'] = queue_was
           opts['queue']     = queue
@@ -94,7 +94,7 @@ module PerformBulk
     private
 
     def log(level, *msgs, **tags, &block)
-      Sidekiq::Context.with(trace: [LOG_PREFIX, tags.delete(:trace)].compact.join('.'), **tags) do
+      Sidekiq::Context.with(src: [LOG_PREFIX, tags.delete(:src)].compact.join('.'), **tags) do
         Sidekiq.logger.send(level, *msgs, &block)
       end
     end
@@ -115,12 +115,12 @@ module PerformBulk
       attr_reader :default_tags
     end
 
-    def self.[](trace, **)
+    def self.[](src, **)
       Module.new do
         include Logging
 
         define_method :logger do
-          @_logger ||= Logging::Chain.new(**, trace:)
+          @_logger ||= Logging::Chain.new(**, src:)
         end
 
         private :logger
@@ -149,7 +149,8 @@ module PerformBulk
 
         logger.debug { "batching #{job_hashes.size} #{class_name.inspect} jobs" }
 
-        Runner.perform_async(class_name, args)
+        Runner.set(display_class: "#{Runner.name}[#{class_name}, #{args.size}]")
+              .perform_async(class_name, args)
       end
     end
   end
@@ -167,7 +168,8 @@ module PerformBulk
 
       logger.debug { "executing batch of #{args.size} jobs on queue: #{queue.inspect}" }
 
-      klass.set(queue:).perform_async(*args)
+      klass.set(queue:, display_class: "#{class_name}[#{args.size}]")
+           .perform_async(*args)
     end
   end
 
@@ -178,10 +180,12 @@ module PerformBulk
 
     # jit-compute singular egress batch job
     def job = @job ||= begin
-      now = Process.clock_gettime(Process::CLOCK_REALTIME, :millisecond)
+      now        = Process.clock_gettime(Process::CLOCK_REALTIME, :millisecond)
+      class_name = PerformBulk::Processor.name
 
       Sidekiq.dump_json(
-        'class' => PerformBulk::Processor.name,
+        'display_class' => "#{class_name}[#{jobs.size}]",
+        'class' => class_name,
         'jid' => SecureRandom.hex(12),
         'queue' => QUEUE_PROCESSING,
         'args' => Sidekiq.load_json('[' + jobs.join(',') + ']'), # NB(ezekg) optimized single-pass parse
