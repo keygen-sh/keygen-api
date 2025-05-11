@@ -3,10 +3,7 @@
 # Base image
 FROM ruby:3.3.8-slim AS base
 
-ENV BUNDLE_WITHOUT="development:test" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_DEPLOYMENT="1" \
-    RAILS_ENV="production"
+ENV BUNDLE_PATH="/usr/local/bundle"
 
 # Build base
 FROM base AS build-base
@@ -31,6 +28,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM build-base AS build
 WORKDIR /app
 
+ENV BUNDLE_WITHOUT="development:test" \
+  BUNDLE_DEPLOYMENT="1" \
+  RAILS_ENV="production"
+ 
 COPY ./Gemfile /app/Gemfile
 COPY ./Gemfile.lock /app/Gemfile.lock  
 RUN \
@@ -49,6 +50,10 @@ RUN \
 # Final stage
 FROM base AS production
 LABEL maintainer="keygen.sh <oss@keygen.sh>"
+
+ENV BUNDLE_WITHOUT="development:test" \
+  BUNDLE_DEPLOYMENT="1" \
+  RAILS_ENV="production"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
