@@ -255,12 +255,12 @@ module PerformBulk
     end
   end
 
-  def self.bulk_fetch!(config, concurrency: 1, batch_size: 100)
+  def self.bulk_fetch!(config, fetch_concurrency: 1, batch_size: 100)
     config.capsule('perform_bulk/waiting') do |cap|
       cap.config[:bulk_batch_size] = batch_size
 
       cap.queues      = [QUEUE_WAITING] # TODO(ezekg) would be nice to have per-job queues
-      cap.concurrency = concurrency
+      cap.concurrency = fetch_concurrency
 
       # FIXME(ezekg) sidekiq does not support capsule-local config like cap.config[:fetch_class] = BulkFetch
       cap.fetcher = BulkFetch.new(cap)
