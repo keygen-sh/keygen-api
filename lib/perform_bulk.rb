@@ -258,7 +258,7 @@ module PerformBulk
   end
 
   def self.bulk_fetch!(config, fetch_concurrency: 1, batch_size: 100)
-    config.capsule('perform_bulk/waiting') do |cap|
+    config.capsule(QUEUE_WAITING) do |cap|
       cap.config[:bulk_batch_size] = batch_size
 
       cap.queues      = [QUEUE_WAITING] # TODO(ezekg) would be nice to have per-job queues
@@ -268,11 +268,11 @@ module PerformBulk
       cap.fetcher = BulkFetch.new(cap)
     end
 
-    config.capsule('perform_bulk/processing') do |cap|
+    config.capsule(QUEUE_PROCESSING) do |cap|
       cap.queues = [QUEUE_PROCESSING]
     end
 
-    config.capsule('perform_bulk/running') do |cap|
+    config.capsule(QUEUE_RUNNING) do |cap|
       cap.queues = [QUEUE_RUNNING]
     end
   end

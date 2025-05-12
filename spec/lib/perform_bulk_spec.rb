@@ -9,6 +9,22 @@ require 'spec_helper'
 require_dependency Rails.root / 'lib' / 'perform_bulk'
 
 module PerformBulk::Testing
+  module PatternMatching
+    refine Sidekiq::Capsule do
+      def deconstruct_keys(keys) = keys.reduce({}) do |h, key|
+        h[key] = public_send(key)
+        h
+      end
+    end
+
+    refine Sidekiq::Config do
+      def deconstruct_keys(keys) = keys.reduce({}) do |h, key|
+        h[key] = public_send(key)
+        h
+      end
+    end
+  end
+
   module QueueDrain
     refine Sidekiq::Queue do
       def drain
@@ -38,6 +54,7 @@ module PerformBulk::Testing
 end
 
 describe PerformBulk do
+  using PerformBulk::Testing::PatternMatching
   using PerformBulk::Testing::QueueDrain
   using PerformBulk::Testing::QueuePush
 
@@ -59,8 +76,55 @@ describe PerformBulk do
     [wait_queue, process_queue, run_queue, default_queue, test_queue].each(&:clear)
   end
 
+  it 'should not use bulk fetch by default' do
+    expect(config.capsules).to be_empty
+  end
+
+  it 'should use bulk fetch' do
+    PerformBulk.bulk_fetch!(config)
+
+    expect(config.capsules).to satisfy do |caps|
+      wait_cap_name    = wait_queue.name
+      process_cap_name = process_queue.name
+      run_cap_name     = run_queue.name
+
+      caps.to_a in [
+        [^wait_cap_name, Sidekiq::Capsule(concurrency: 1)],
+        [^process_cap_name, Sidekiq::Capsule],
+        [^run_cap_name, Sidekiq::Capsule],
+      ]
+    end
+  end
+
+  it 'should configure fetch concurrency' do
+    PerformBulk.bulk_fetch!(config, fetch_concurrency: 3)
+
+    expect(config.capsules).to satisfy do |caps|
+      wait_cap_name = wait_queue.name
+
+      caps.to_a in [
+        [^wait_cap_name, Sidekiq::Capsule(concurrency: 3)],
+        *
+      ]
+    end
+  end
+
+  it 'should configure batch size' do
+    PerformBulk.bulk_fetch!(config, batch_size: 1_000)
+
+    expect(config[:bulk_batch_size]).to eq 1_000
+  end
+
   describe PerformBulk::BulkFetch do
     let(:fetcher) { PerformBulk::BulkFetch }
+
+    it 'should use batch size configuration' do
+      capsule.config[:bulk_batch_size] = 1_000
+
+      fetch = fetcher.new(capsule)
+
+      expect(fetch.batch_size).to eq 1_000
+    end
 
     it 'should bulk fetch from waiting queue' do
       capsule.config[:bulk_batch_size] = 2
