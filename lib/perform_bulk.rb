@@ -13,7 +13,7 @@ module PerformBulk
   QUEUE_RUNNING    = QUEUE_PREFIX + 'running'    # the queue used for executing bulk jobs
   QUEUE_DEFAULT    = 'default'                   # the default sidekiq queue
 
-  # including PerformBulk::Job allows a Sidekiq::Job to opt into bulk processing,
+  # Including PerformBulk::Job allows a Sidekiq::Job to opt into bulk processing,
   # where the bulk fetcher dequeues multiple jobs and batches them into a
   # single job execution, where the job accepts a splat of args.
   #
@@ -22,32 +22,34 @@ module PerformBulk
   #   class AuditLogJob
   #     include Sidekiq::Job
   #
-  #     def perform(log)
-  #       AuditLog.create(log)
+  #     def perform(log_attributes)
+  #       AuditLog.create(log_attributes)
   #     end
   #   end
   #
-  # but after awhile, this job has high throughput, and we'd greatly benefit
+  # But after awhile, this job has high throughput, and we'd greatly benefit
   # from bulk inserting such simple log rows.
   #
-  # we can modify it to be a bulk job:
+  # We can modify it to be a bulk job:
   #
   #   class AuditLogJob
   #     include Sidekiq::Job
   #     include PerformBulk::Job
   #
-  #     def perform(*logs)
-  #       AuditLog.insert_all(logs)
+  #     def perform(*logs_attributes)
+  #       AuditLog.insert_all(logs_attributes)
   #     end
   #   end
   #
-  # we can queue jobs normally, but during times of high throughput, they'll
+  # We can queue jobs normally, but during times of high throughput, they'll
   # be batched up according to job class and executed in bulk:
   #
-  #   25.times { AuditLogJob.perform_async(...) }
+  #   25.times do
+  #     AuditLogJob.perform_async('id' => ...)
+  #   end
   #
-  # the above will result in a single job execution, where the *logs job args
-  # are equal to the args of the 25 batched jobs.
+  # The above will result in a single job execution, where the splat of job
+  # args are the combined args of the 25 batched jobs.
   module Job
     def self.included(klass)
       raise ArgumentError, "cannot be used outside of Sidekiq job (got #{klass.ancestors})" unless
