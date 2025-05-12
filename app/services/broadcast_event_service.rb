@@ -57,7 +57,7 @@ class BroadcastEventService < BaseService
               nil
             end
 
-          EventLogWorker.perform_async(
+          EventLogWorker2.perform_async(
             'event_type_id' => event_type_id,
             'account_id' => account_id,
             'environment_id' => environment_id,

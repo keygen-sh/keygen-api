@@ -85,7 +85,7 @@ module RequestLogger
       return unless
         log_request?
 
-      RequestLogWorker.perform_async(
+      RequestLogWorker2.perform_async(
         'id' => Current.request_id,
         'account_id' => Current.account.id,
         'environment_id' => Current.environment&.id,

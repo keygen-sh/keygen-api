@@ -24,9 +24,9 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     when "metric"
       "record_metric_worker" # We renamed this worker
     when "request-log"
-      "request_log_worker"
+      "request_log_worker2"
     when "event-log"
-      "event_log_worker"
+      "event_log_worker2"
     when "event-notification"
       "event_notification_worker"
     when "machine-heartbeat"
@@ -39,12 +39,12 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
 
   # Skip request and event log assertions for CE
   next if
-    Keygen.ce? && worker_name.in?(%w[request_log_worker event_log_worker])
+    Keygen.ce? && worker_name.in?(%w[request_log_worker2 event_log_worker2])
 
   # Drain certain queues before count
   case worker_name
-  when "request_log_worker",
-       "event_log_worker"
+  when "request_log_worker2",
+       "event_log_worker2"
     PerformBulk::Processor.drain # process and queue bulk jobs
     PerformBulk::Runner.drain
   when "webhook_worker"
