@@ -6,7 +6,7 @@ class EventLogWorker < BaseWorker
 
   sidekiq_options queue: :logs
 
-  def perform(*event_logs)
-    EventLog.insert_all(event_logs)
+  def perform(*event_logs_attributes)
+    EventLog.insert_all(event_logs_attributes)
   end
 end

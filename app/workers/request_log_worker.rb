@@ -6,7 +6,7 @@ class RequestLogWorker < BaseWorker
 
   sidekiq_options queue: :logs
 
-  def perform(*request_logs)
-    RequestLog.insert_all(request_logs)
+  def perform(*request_logs_attributes)
+    RequestLog.insert_all(request_logs_attributes)
   end
 end
