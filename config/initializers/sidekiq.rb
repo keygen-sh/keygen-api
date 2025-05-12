@@ -42,7 +42,8 @@ end
 # Configure Sidekiq server
 Sidekiq.configure_server do |config|
   PerformBulk.bulk_fetch!(config,
-    batch_size: ENV.fetch('PERFORM_BULK_BATCH_SIZE', 100),
+    concurrency: ENV.fetch('PERFORM_BULK_CONCURRENCY', 1).to_i,
+    batch_size: ENV.fetch('PERFORM_BULK_BATCH_SIZE', 100).to_i,
   )
 
   config.logger.level = Rails.logger.level
