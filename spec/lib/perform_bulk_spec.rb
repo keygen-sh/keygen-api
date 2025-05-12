@@ -8,7 +8,7 @@ require 'spec_helper'
 
 require_dependency Rails.root / 'lib' / 'perform_bulk'
 
-module Sidekiq
+module PerformBulk::Testing
   module QueueDrain
     refine Sidekiq::Queue do
       def drain
@@ -38,8 +38,8 @@ module Sidekiq
 end
 
 describe PerformBulk do
-  using Sidekiq::QueueDrain
-  using Sidekiq::QueuePush
+  using PerformBulk::Testing::QueueDrain
+  using PerformBulk::Testing::QueuePush
 
   let(:wait_queue)    { Sidekiq::Queue.new(PerformBulk::QUEUE_WAITING) }
   let(:process_queue) { Sidekiq::Queue.new(PerformBulk::QUEUE_PROCESSING) }
