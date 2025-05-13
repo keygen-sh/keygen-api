@@ -23,7 +23,7 @@ module Api::V1
       # We're applying scopes and preloading after the policy scope because
       # our policy scope may include a UNION, and scopes/preloading need to
       # be applied after the UNION query has been performed.
-      users = apply_pagination(authorized_scope(apply_scopes(current_account.users)).preload(:role, :any_active_licenses))
+      users = apply_pagination(authorized_scope(apply_scopes(current_account.users)).preload(:any_active_licenses, role: :permissions))
       authorize! users
 
       render jsonapi: users

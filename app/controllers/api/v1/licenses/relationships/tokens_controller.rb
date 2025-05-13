@@ -10,7 +10,7 @@ module Api::V1::Licenses::Relationships
     authorize :license
 
     def index
-      tokens = apply_pagination(authorized_scope(apply_scopes(license.tokens)).preload(:account, bearer: %i[role]))
+      tokens = apply_pagination(authorized_scope(apply_scopes(license.tokens)).preload(:account, :permissions, bearer: { role: :permissions, owner: :permissions }))
       authorize! tokens,
         with: Licenses::TokenPolicy
 

@@ -669,6 +669,7 @@ class License < ApplicationRecord
     to: :policy,
     allow_nil: true
 
+  # override permissions reader to intersect with owner's permissions
   def permissions
     return Permission.none unless
       role.present?
@@ -678,30 +679,15 @@ class License < ApplicationRecord
 
     # When license has wildcard permissions, defer to owner.
     return owner.permissions if
-      role.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
+      role.permissions.include?(Permission.wildcard)
 
     # When owner has wildcard permissions, defer to license.
     return role.permissions if
-      owner.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
+      owner.permissions.include?(Permission.wildcard)
 
-    # A license's permission set is the intersection of its owner's role
+    # A license's permission set is the intersection of its owner's
     # permissions and its own permissions.
-    conn = Permission.connection
-
-    # NOTE(ezekg) Rails doesn't support multiple joins on the same table,
-    #             so we have to jump down and do this.
-    Permission.distinct
-              .joins(<<~SQL.squish)
-                INNER JOIN role_permissions license_role_permissions ON
-                  license_role_permissions.role_id       = #{conn.quote role.id} AND
-                  license_role_permissions.permission_id = permissions.id
-              SQL
-              .joins(<<~SQL.squish)
-                INNER JOIN role_permissions user_role_permissions ON
-                  user_role_permissions.role_id       = #{conn.quote owner.role.id} AND
-                  user_role_permissions.permission_id = permissions.id
-              SQL
-              .reorder(nil)
+    Permission.wrap(owner.permissions & role.permissions)
   end
 
   # FIXME(ezekg) Should we eventually rename the user_id column?

@@ -26,6 +26,10 @@ class Token < ApplicationRecord
     dependent: :delete_all,
     autosave: true
 
+  has_many :permissions, through: :token_permissions do
+    def actions = loaded? ? collect(&:action) : super
+  end
+
   has_environment default: -> {
     case bearer
     in Environment(id: environment_id)
@@ -203,33 +207,24 @@ class Token < ApplicationRecord
     )
   end
 
+  # override permissions reader to intersect with bearer's permissions
   def permissions
     return pending_permissions if
       token_permissions_attributes_assigned?
 
-    # When the token has a wildcard permission, defer to role.
-    return role.permissions if
-      token_permissions.joins(:permission)
-                       .exists?(permission: {
-                         action: Permission::WILDCARD_PERMISSION,
-                       })
+    perms = super
 
-    # When the role has a wildcard permission, defer to token.
-    return Permission.distinct.joins(:token_permissions).where(token_permissions: { token_id: id }).reorder(nil) if
-      role_permissions.joins(:permission)
-                      .exists?(permission: {
-                        action: Permission::WILDCARD_PERMISSION,
-                      })
+    # When the token has a wildcard permission, defer to bearer.
+    return bearer.permissions if
+      perms.include?(Permission.wildcard)
 
-    # A token's permission set is the intersection of its bearer's role
+    # When the bearer has a wildcard permission, defer to token.
+    return perms if
+      bearer.permissions.include?(Permission.wildcard)
+
+    # A token's permission set is the intersection of its bearer's
     # permissions and its own token permissions.
-    Permission.distinct
-              .joins(:role_permissions, :token_permissions)
-              .where(
-                role_permissions: { role_id: role.id },
-                token_permissions: { token_id: id },
-              )
-              .reorder(nil)
+    Permission.wrap(bearer.permissions & perms)
   end
 
   def pending_permissions

@@ -345,6 +345,8 @@ class ApplicationController < ActionController::API
          code: /^ROLE_PERMISSION_IDS_(.+)/
         error.pointer = '/data/attributes/permissions'
         error.code    = "PERMISSIONS_#{$1}"
+      in source: { pointer: %r{^/data/relationships/permissions}i }
+        error.pointer = '/data/attributes/permissions'
       in source: { pointer: %r{^/data/relationships/role} }
         error.pointer = '/data/attributes/role'
       in source: { pointer: %r{^/data/relationships/filetype} }

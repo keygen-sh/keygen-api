@@ -10,7 +10,7 @@ module Api::V1::Licenses::Relationships
     authorize :license
 
     def index
-      users = apply_pagination(authorized_scope(apply_scopes(license.users)).preload(:role, :any_active_licenses))
+      users = apply_pagination(authorized_scope(apply_scopes(license.users)).preload(:any_active_licenses, role: :permissions))
       authorize! users,
         with: Licenses::UserPolicy
 
