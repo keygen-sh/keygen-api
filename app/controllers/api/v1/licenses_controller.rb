@@ -32,7 +32,7 @@ module Api::V1
     before_action :set_license, only: %i[show update destroy]
 
     def index
-      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :product, :policy, owner: %i[role]))
+      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:product, :policy, role: :permissions, owner: { role: :permissions }))
       authorize! licenses
 
       render jsonapi: licenses

@@ -10,7 +10,7 @@ module Api::V1::Groups::Relationships
     authorize :group
 
     def index
-      licenses = apply_pagination(authorized_scope(apply_scopes(group.licenses), with: Groups::LicensePolicy).preload(:role, :policy, :product, owner: %i[role]))
+      licenses = apply_pagination(authorized_scope(apply_scopes(group.licenses), with: Groups::LicensePolicy).preload(:policy, :product, role: :permissions, owner: { role: :permissions }))
       authorize! licenses,
         with: Groups::LicensePolicy
 

@@ -30,6 +30,10 @@ class Role < ApplicationRecord
     inverse_of: :role,
     autosave: true
 
+  has_many :permissions, through: :role_permissions do
+    def actions = loaded? ? collect(&:action) : super
+  end
+
   # FIXME(ezekg) should have an account_id foreign key
   delegate :account, :account_id,
     :default_permissions, :default_permission_ids,
@@ -97,16 +101,12 @@ class Role < ApplicationRecord
   end
 
   ##
-  # permissions returns an array of the role's permissions, including pending
-  # any changes to the role's permissions.
+  # permissions overrides association reader to include pending permission changes
   def permissions
     return pending_permissions if
       role_permissions_attributes_assigned?
 
-    Permission.joins(:role_permissions)
-              .where(
-                role_permissions: { role_id: id },
-              )
+    super
   end
 
   ##

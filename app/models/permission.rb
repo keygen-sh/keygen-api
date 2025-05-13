@@ -690,16 +690,27 @@ class Permission < ApplicationRecord
   ].freeze
 
   ##
+  # wrap returns a preloaded relation for permissions that may or may not be an array
+  def self.wrap(permissions)
+    relation = all.where(id: permissions)
+
+    # NB(ezekg) mark as already loaded
+    relation.send(:load_records, permissions)
+
+    relation
+  end
+
+  ##
   # actions returns the actions of the permissions.
   def self.actions = reorder(action: :asc).pluck(:action)
 
   ##
   # wildcard returns the wildcard permission record.
-  def self.wildcard = where(action: WILDCARD_PERMISSION).take
+  def self.wildcard = @wildcard ||= where(action: WILDCARD_PERMISSION).take
 
   ##
   # wildcard_id returns the wildcard permission ID.
-  def self.wildcard_id = where(action: WILDCARD_PERMISSION).pick(:id)
+  def self.wildcard_id = @wildcard_id ||= where(action: WILDCARD_PERMISSION).pick(:id)
 
   ##
   # wildcard? checks if any of the given IDs are the wildcard permission.

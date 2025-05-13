@@ -14,7 +14,7 @@ module Api::V1
     before_action :set_token, only: %i[show regenerate revoke]
 
     def index
-      tokens = apply_pagination(authorized_scope(apply_scopes(current_account.tokens)).preload(:account, bearer: %i[role]))
+      tokens = apply_pagination(authorized_scope(apply_scopes(current_account.tokens)).preload(:account, :permissions, bearer: { role: :permissions, owner: :permissions }))
       authorize! tokens
 
       render jsonapi: tokens
