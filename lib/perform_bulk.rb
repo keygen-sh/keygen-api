@@ -138,7 +138,7 @@ module PerformBulk
     include Sidekiq::Job
     include Logging[:processor]
 
-    sidekiq_options queue: QUEUE_PROCESSING
+    sidekiq_options queue: QUEUE_PROCESSING, cronitor_disabled: true
 
     def perform(*batch)
       batch.group_by { _1['class'] }.each do |class_name, job_hashes|
@@ -161,7 +161,7 @@ module PerformBulk
     include Sidekiq::Job
     include Logging[:runner]
 
-    sidekiq_options queue: QUEUE_RUNNING
+    sidekiq_options queue: QUEUE_RUNNING, cronitor_disabled: true
 
     def perform(class_name, args)
       klass   = Object.const_get(class_name)
