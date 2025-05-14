@@ -70,7 +70,7 @@ class BroadcastEventService < BaseService
             'whodunnit_type' => bearer_type,
             'whodunnit_id' => bearer_id,
             'request_log_id' => request_id,
-            'metadata' => metadata.to_json,
+            'metadata' => metadata.as_json,
           )
         end
 
