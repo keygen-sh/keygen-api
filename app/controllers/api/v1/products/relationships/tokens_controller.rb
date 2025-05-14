@@ -10,7 +10,7 @@ module Api::V1::Products::Relationships
     authorize :product
 
     def index
-      tokens = apply_pagination(authorized_scope(apply_scopes(product.tokens)).preload(:account, :permissions, bearer: { role: :permissions, owner: :permissions }))
+      tokens = apply_pagination(authorized_scope(apply_scopes(product.tokens)).preload(:account, :permissions, bearer: { role: :permissions, owner: { role: :permissions } }))
       authorize! tokens,
         with: Products::TokenPolicy
 
