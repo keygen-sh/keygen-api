@@ -13,6 +13,10 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
+  # default to UUIDv7 primary keys so that batch operations are more performant
+  before_create :generate_uuid_v7_primary_key,
+    if: :uuid_primary_key?
+
   # FIXME(ezekg) Not sure why this isn't already happening by Rails?
   #              We could also do def destroying? = _destroy.
   before_destroy :mark_for_destruction,
@@ -40,7 +44,12 @@ class ApplicationRecord < ActiveRecord::Base
 
   # This is a preventative measure to assert we never accidentally serialize
   # a model outside of our JSONAPI serializers
-  def serializable_hash(...)
-    raise NotImplementedError
-  end
+  def serializable_hash(...) = raise NotImplementedError
+
+  private
+
+  def generate_uuid_v7_primary_key = self.id ||= UUID7.generate
+
+  def self.uuid_primary_key? = attribute_types["id"].type == :uuid
+  def uuid_primary_key?      = self.class.uuid_primary_key?
 end
