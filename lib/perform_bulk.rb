@@ -257,7 +257,7 @@ module PerformBulk
     end
   end
 
-  def self.bulk_fetch!(config, fetch_concurrency: 1, batch_size: 100)
+  def self.bulk_fetch!(config, fetch_concurrency: 1, work_concurrency: 5, batch_size: 100)
     config.capsule(QUEUE_WAITING) do |cap|
       cap.config[:bulk_batch_size] = batch_size
 
@@ -269,11 +269,13 @@ module PerformBulk
     end
 
     config.capsule(QUEUE_PROCESSING) do |cap|
-      cap.queues = [QUEUE_PROCESSING]
+      cap.queues      = [QUEUE_PROCESSING]
+      cap.concurrency = work_concurrency
     end
 
     config.capsule(QUEUE_RUNNING) do |cap|
-      cap.queues = [QUEUE_RUNNING]
+      cap.queues      = [QUEUE_RUNNING]
+      cap.concurrency = work_concurrency
     end
   end
 

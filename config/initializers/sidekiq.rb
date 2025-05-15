@@ -43,6 +43,7 @@ end
 Sidekiq.configure_server do |config|
   PerformBulk.bulk_fetch!(config,
     fetch_concurrency: ENV.fetch('PERFORM_BULK_FETCH_CONCURRENCY', 1).to_i,
+    work_concurrency: ENV.fetch('PERFORM_BULK_WORK_CONCURRENCY', 5).to_i,
     batch_size: ENV.fetch('PERFORM_BULK_BATCH_SIZE', 100).to_i,
   )
 

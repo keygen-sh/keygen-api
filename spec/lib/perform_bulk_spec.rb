@@ -109,6 +109,21 @@ describe PerformBulk do
     end
   end
 
+  it 'should configure work concurrency' do
+    PerformBulk.bulk_fetch!(config, work_concurrency: 3)
+
+    expect(config.capsules).to satisfy do |caps|
+      process_cap_name = process_queue.name
+      run_cap_name     = run_queue.name
+
+      caps.to_a in [
+        *,
+        [^process_cap_name, Sidekiq::Capsule(concurrency: 3)],
+        [^run_cap_name, Sidekiq::Capsule(concurrency: 3)]
+      ]
+    end
+  end
+
   it 'should configure batch size' do
     PerformBulk.bulk_fetch!(config, batch_size: 1_000)
 
