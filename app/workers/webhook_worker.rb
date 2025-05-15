@@ -45,7 +45,7 @@ class WebhookWorker < BaseWorker
     return unless
       endpoint.subscribed?(event_type.event)
 
-    # Migrate event payload
+    # migrate event payload in case anything has changed e.g. endpoint API version
     current_version = event.api_version || CURRENT_API_VERSION
     target_version  = endpoint.api_version || account.api_version
     migrator        = RequestMigrations::Migrator.new(

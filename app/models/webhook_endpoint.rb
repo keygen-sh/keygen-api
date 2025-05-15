@@ -8,13 +8,15 @@ class WebhookEndpoint < ApplicationRecord
   include Orderable
   include Pageable
 
+  belongs_to :product, optional: true
+
   has_environment
   has_account
 
   before_create -> { self.api_version ||= account.api_version }
-  before_save -> { self.subscriptions = subscriptions.uniq }
+  before_save -> { self.subscriptions = subscriptions.uniq }, if: :subscriptions?
 
-  validates :subscriptions, length: { minimum: 1, message: "must have at least 1 webhook event subscription" }
+  validates :subscriptions, length: { minimum: 1, message: 'must have at least 1 webhook event subscription' }
   validates :url, url: { protocols: %w[https] }, presence: true
   validates :signature_algorithm,
     inclusion: { in: %w[ed25519 rsa-pss-sha256 rsa-sha256], message: 'unsupported signature algorithm' },
@@ -34,7 +36,7 @@ class WebhookEndpoint < ApplicationRecord
     event_types = EventType.pluck(:event)
 
     if (subscriptions - event_types).any?
-      errors.add :subscriptions, :not_allowed, message: "unsupported webhook event type for subscription"
+      errors.add :subscriptions, :not_allowed, message: 'unsupported webhook event type for subscription'
     end
   end
 

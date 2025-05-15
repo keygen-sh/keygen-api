@@ -269,12 +269,12 @@ describe WebhookEndpointPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_webhook_endpoints] do
+    with_scenarios %i[accessing_its_webhook_endpoints] do
       with_token_authentication do
         with_permissions %w[webhook-endpoint.read] do
-          without_token_permissions { denies :show }
+          without_token_permissions { denies :index }
 
-          allows :show
+          allows :index
         end
 
         with_wildcard_permissions { allows :index }
@@ -283,7 +283,7 @@ describe WebhookEndpointPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_webhook_endpoint] do
+    with_scenarios %i[accessing_its_webhook_endpoint] do
       with_token_authentication do
         with_permissions %w[webhook-endpoint.read] do
           without_token_permissions { denies :show }
@@ -323,6 +323,50 @@ describe WebhookEndpointPolicy, type: :policy do
           end
 
           allows :show, :create, :update, :destroy
+        end
+
+        without_permissions do
+          denies :show, :create, :update, :destroy
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_webhook_endpoints] do
+      with_token_authentication do
+        with_permissions %w[webhook-endpoint.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_webhook_endpoint] do
+      with_token_authentication do
+        with_permissions %w[webhook-endpoint.read] do
+          denies :show
+        end
+
+        with_permissions %w[webhook-endpoint.create] do
+          denies :create
+        end
+
+        with_permissions %w[webhook-endpoint.update] do
+          denies :update
+        end
+
+        with_permissions %w[webhook-endpoint.delete] do
+          denies :destroy
+        end
+
+        with_wildcard_permissions do
+          denies :show, :create, :update, :destroy
+        end
+
+        with_default_permissions do
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do

@@ -571,4 +571,31 @@ describe BroadcastEventService do
       expect(event.payload).to eq expected
     end
   end
+
+  context 'when endpoint is scoped to a product' do
+    let(:product)  { create(:product, account:)}
+    let(:endpoint) { create(:webhook_endpoint, product:, account:) }
+
+    it 'should emit events relevant to the product' do
+      policy  = create(:policy, product:, account:)
+      license = create(:license, policy:, account:)
+
+      event = create_webhook_event!(account, license,
+        event: 'license.created',
+      )
+
+      expect(event).to_not be nil
+      expect(event.product).to eq product
+    end
+
+    it 'should not emit events irrelevant to the product' do
+      license = create(:license, account:)
+
+      event = create_webhook_event!(account, license,
+        event: 'license.created',
+      )
+
+      expect(event).to be nil
+    end
+  end
 end

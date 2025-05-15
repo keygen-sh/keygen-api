@@ -68,6 +68,70 @@ Feature: Update webhook endpoint
       }
       """
 
+  Scenario: Admin updates a webhook endpoint's product
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "webhook-endpoint" for the first "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "webhook-endpoint"
+    And the response body should be a "webhook-endpoint" with the following relationships:
+      """
+      {
+        "product": {
+          "links": { "related": "/v1/accounts/$account/products/$products[1]" },
+          "data": { "type": "products", "id": "$products[1]" }
+        }
+      }
+      """
+
+  Scenario: Admin removes a webhook endpoint's product
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "webhook-endpoint" for the last "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "relationships": {
+            "product": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "webhook-endpoint"
+    And the response body should be a "webhook-endpoint" with the following relationships:
+      """
+      {
+        "product": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
+
   Scenario: Admin updates a webhook endpoint's API version to v1.0
     Given I am an admin of account "test1"
     And the current account is "test1"

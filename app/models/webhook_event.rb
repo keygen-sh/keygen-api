@@ -9,6 +9,9 @@ class WebhookEvent < ApplicationRecord
   include Pageable
 
   belongs_to :event_type
+  belongs_to :webhook_endpoint, optional: true
+  has_one :product,
+    through: :webhook_endpoint
 
   has_environment
   has_account
@@ -24,7 +27,7 @@ class WebhookEvent < ApplicationRecord
 
   scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
 
-  # FIXME(ezekg) Products should only be able to read events that are
-  #              associated with the given product
-  scope :for_product, -> id { self }
+  scope :for_product, -> id {
+    joins(:product).where(products: { id: })
+  }
 end

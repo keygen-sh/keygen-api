@@ -910,3 +910,28 @@ Feature: Create entitlements
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  # product-specific webhook smoke tests
+  Scenario: Admin creates an entitlement and generates authorized webhooks
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "webhook-endpoints" for each "product"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I authenticate with a token
+    When I send a POST request to "/accounts/test1/entitlements" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlement",
+          "attributes": {
+            "name": "Product Feature",
+            "code": "PRODUCT_FEATURE"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 5 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

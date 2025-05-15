@@ -10,6 +10,8 @@ class PolicyEntitlement < ApplicationRecord
 
   belongs_to :policy
   belongs_to :entitlement
+  has_one :product,
+    through: :policy
 
   has_environment default: -> { policy&.environment_id }
   has_account default: -> { policy&.account_id }

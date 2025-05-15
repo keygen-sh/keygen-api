@@ -37,6 +37,18 @@ Feature: Delete webhook event
     When I send a DELETE request to "/accounts/test1/webhook-events/$1?environment=isolated"
     Then the response status should be "204"
 
+  Scenario: Product attempts to delete their webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "webhook-endpoint" for the last "product"
+    And the current account has 3 "webhook-events" for the last "webhook-endpoint"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/webhook-events/$1"
+    Then the response status should be "403"
+    And the response body should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: Product attempts to delete a webhook event for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
@@ -44,9 +56,7 @@ Feature: Delete webhook event
     And I am a product of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
-    And the current account should have 3 "webhook-events"
+    Then the response status should be "404"
 
   Scenario: License attempts to delete a webhook event for their account
     Given the current account is "test1"

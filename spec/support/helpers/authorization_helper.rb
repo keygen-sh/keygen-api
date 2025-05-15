@@ -246,6 +246,32 @@ module AuthorizationHelper
       let(:record) { event_log }
     end
 
+    def accessing_its_webhook_endpoints(scenarios)
+      case scenarios
+      in [:as_admin, *]
+        let(:webhook_endpoints) { create_list(:webhook_endpoint, 3, account:) }
+      in [:as_environment, *]
+        let(:webhook_endpoints) { create_list(:webhook_endpoint, 3, account:, environment: bearer) }
+      in [:as_product, *]
+        let(:webhook_endpoints) { create_list(:webhook_endpoint, 3, account:, product: bearer) }
+      end
+
+      let(:record) { webhook_endpoints }
+    end
+
+    def accessing_its_webhook_endpoint(scenarios)
+      case scenarios
+      in [:as_admin, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, account:) }
+      in [:as_environment, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, account:, environment: bearer) }
+      in [:as_product, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, account:, product: bearer) }
+      end
+
+      let(:record) { webhook_endpoint }
+    end
+
     def accessing_webhook_endpoints(scenarios)
       case scenarios
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user | :as_anonymous, *]
@@ -262,6 +288,34 @@ module AuthorizationHelper
       end
 
       let(:record) { webhook_endpoint }
+    end
+
+    def accessing_its_webhook_events(scenarios)
+      case scenarios
+      in [:as_admin, *]
+        let(:webhook_events) { create_list(:webhook_event, 3, account:) }
+      in [:as_environment, *]
+        let(:webhook_events) { create_list(:webhook_event, 3, account:, environment: bearer) }
+      in [:as_product, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, product: bearer, account:) }
+        let(:webhook_events)   { create_list(:webhook_event, 3, account:, webhook_endpoint:) }
+      end
+
+      let(:record) { webhook_events }
+    end
+
+    def accessing_its_webhook_event(scenarios)
+      case scenarios
+      in [:as_admin, *]
+        let(:webhook_event) { create(:webhook_event, account:) }
+      in [:as_environment, *]
+        let(:webhook_event) { create(:webhook_event, account:, environment: bearer) }
+      in [:as_product, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, product: bearer, account:) }
+        let(:webhook_event)    { create(:webhook_event, account:, webhook_endpoint:) }
+      end
+
+      let(:record) { webhook_event }
     end
 
     def accessing_webhook_events(scenarios)

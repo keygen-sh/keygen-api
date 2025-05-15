@@ -1543,15 +1543,7 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Access denied",
-        "detail": "You do not have permission to complete the request (product lacks permission to perform action)"
-      }
-      """
+    Then the response status should be "404"
 
   @ee
   Scenario: Product escalates a user's permissions

@@ -24,8 +24,10 @@ class Current < ActiveSupport::CurrentAttributes
 
   def account_id     = account&.id
   def environment_id = environment&.id
+  def bearer_type    = bearer&.class&.name
   def bearer_id      = bearer&.id
   def session_id     = session&.id
   def token_id       = token&.id
+  def resource_type  = resource&.class&.name
   def resource_id    = resource&.id
 end

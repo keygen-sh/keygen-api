@@ -14,7 +14,7 @@ class ApplicationPolicy
   authorize :account
   authorize :environment, allow_nil: true, optional: true
   authorize :bearer,      allow_nil: true
-  authorize :token,       allow_nil: true
+  authorize :token,       allow_nil: true, optional: true
 
   scope_matcher :active_record_relation, ActiveRecord::Relation
   scope_for :active_record_relation do |relation|

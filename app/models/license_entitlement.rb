@@ -10,6 +10,8 @@ class LicenseEntitlement < ApplicationRecord
 
   belongs_to :license
   belongs_to :entitlement
+  has_one :product,
+    through: :license
   has_one :policy,
     through: :license
 

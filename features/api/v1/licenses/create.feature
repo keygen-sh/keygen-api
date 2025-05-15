@@ -7389,3 +7389,29 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  # product-specific webhook smoke tests
+  Scenario: Product creates a license and generates authorized webhooks for its product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "webhook-endpoints" for each "product"
+    And the current account has 1 "policy" for each "product"
+    And I am the first product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

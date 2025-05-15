@@ -38,6 +38,15 @@ Feature: Create webhook endpoint
       """
       ["*"]
       """
+    And the response body should be a "webhook-endpoint" with the following relationships:
+      """
+      {
+        "product": {
+          "links": { "related": null },
+          "data": null
+        }
+      }
+      """
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account that subscribes to certain events
@@ -335,6 +344,41 @@ Feature: Create webhook endpoint
       """
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin creates a webhook endpoint for a product
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "subscriptions": ["*"]
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "webhook-endpoint"
+    And the response body should be a "webhook-endpoint" with the following relationships:
+      """
+      {
+        "product": {
+          "links": { "related": "/v1/accounts/$account/products/$products[0]" },
+          "data": { "type": "products", "id": "$products[0]" }
+        }
+      }
+      """
+
   Scenario: Admin creates a webhook endpoint for their account that subscribes to non-existent events
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -561,6 +605,77 @@ Feature: Create webhook endpoint
       """
     And the response should contain a valid signature header for "test1"
 
+  @ee
+  Scenario: Environment creates an isolated webhook endpoint for an isolated product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://isolated.example"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+
+  @ee
+  Scenario: Environment creates an isolated webhook endpoint for a global product
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 global "product"
+    And I am an environment of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "keygen-environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://isolated.example"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be compatible with product environment",
+        "code": "ENVIRONMENT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/relationships/environment"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+
   Scenario: Product creates a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -584,6 +699,54 @@ Feature: Create webhook endpoint
       """
       ["*"]
       """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Product creates a webhook endpoint for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://app.example"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Product creates a webhook endpoint for another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://app.example"
+          },
+          "relationships": {
+            "product": {
+              "data": { "type": "product", "id": "$products[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
 
   Scenario: License creates a webhook endpoint for their account
