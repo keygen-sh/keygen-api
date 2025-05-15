@@ -8,14 +8,18 @@ class RetryWebhookEventService < BaseService
   def call
     account = event.account
 
-    # FIXME(ezekg) Add an association so we don't have to do this stupid lookup
-    endpoint = account.webhook_endpoints.find_by(url: event.endpoint)
+    # FIXME(ezekg) eventually remove the fallback lookup
+    endpoint = event.webhook_endpoint || account.webhook_endpoints.for_environment(event.environment)
+                                                                  .find_by(
+                                                                    url: event.endpoint,
+                                                                  )
     return if
       endpoint.nil?
 
     new_event = account.webhook_events.create(
       idempotency_token: event.idempotency_token,
       api_version: event.api_version,
+      webhook_endpoint: endpoint,
       endpoint: event.endpoint,
       payload: event.payload,
       environment_id: event.environment_id,

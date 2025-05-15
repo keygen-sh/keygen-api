@@ -8,8 +8,9 @@ FactoryBot.define do
     payload  { '{}' }
     jid      { SecureRandom.hex }
 
-    account     { NIL_ACCOUNT }
-    environment { NIL_ENVIRONMENT }
+    account          { NIL_ACCOUNT }
+    environment      { NIL_ENVIRONMENT }
+    webhook_endpoint { build(:webhook_endpoint, url: endpoint, account:, environment:) }
     event_type
 
     trait :in_isolated_environment do

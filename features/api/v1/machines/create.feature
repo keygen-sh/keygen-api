@@ -6871,3 +6871,40 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
+
+  # product-specific webhook smoke tests
+  Scenario: License creates a machine and generates authorized webhooks for its product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "webhook-endpoints" for each "product"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" for the last "product" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And I am the last license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "57:1f:d2:13:38:54:08:c2:4f:0e:d5:a4:5d:4b:00:61"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

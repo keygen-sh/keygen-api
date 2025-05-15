@@ -3172,3 +3172,25 @@ Feature: Create user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
+
+  # product-specific webhook smoke tests
+  Scenario: Anonymous creates a user and generates authorized webhooks for all products
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "webhook-endpoints" for each "product"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "xkcd-936@keygen.example",
+            "password": "correcthorsebatterystaple"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_endpoint, only: [:show, :update, :destroy]
 
     def index
-      endpoints = apply_pagination(authorized_scope(apply_scopes(current_account.webhook_endpoints)))
+      endpoints = apply_pagination(authorized_scope(apply_scopes(current_account.webhook_endpoints)).preload(:product))
       authorize! endpoints
 
       render jsonapi: endpoints
@@ -44,11 +44,17 @@ module Api::V1
               end
             end
           end
+          param :product, type: :hash, optional: true do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[product products] }
+              param :id, type: :uuid
+            end
+          end
         end
       end
     }
     def create
-      endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, **webhook_endpoint_params)
+      endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, product_id: current_product_id, **webhook_endpoint_params)
       authorize! endpoint
 
       if endpoint.save
@@ -64,13 +70,21 @@ module Api::V1
       param :data, type: :hash do
         param :type, type: :string, inclusion: { in: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints] }
         param :id, type: :string, optional: true, noop: true
-        param :attributes, type: :hash do
+        param :attributes, type: :hash, optional: true do
           param :url, type: :string, optional: true
           param :subscriptions, type: :array, optional: true do
             items type: :string
           end
           param :api_version, type: :string, inclusion: { in: RequestMigrations.supported_versions }, optional: true
           param :signature_algorithm, type: :string, optional: true
+        end
+        param :relationships, type: :hash, optional: true do
+          param :product, type: :hash, optional: true do
+            param :data, type: :hash, allow_nil: true do
+              param :type, type: :string, inclusion: { in: %w[product products] }
+              param :id, type: :uuid
+            end
+          end
         end
       end
     }
@@ -101,5 +115,11 @@ module Api::V1
 
       Current.resource = endpoint
     end
+
+    # FIXME(ezekg) this is a workaround for older versions of zapier not
+    #              supplying product relationship linkage
+    #
+    #              remove once everybody's upgraded!
+    def current_product_id = (current_bearer.id if current_bearer in Product)
   end
 end

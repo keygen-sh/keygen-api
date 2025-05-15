@@ -8,6 +8,7 @@ FactoryBot.define do
 
     account     { NIL_ACCOUNT }
     environment { NIL_ENVIRONMENT }
+    product     { nil }
 
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }

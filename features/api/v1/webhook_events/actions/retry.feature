@@ -102,6 +102,18 @@ Feature: Retry webhook events
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "201"
 
+  Scenario: Product retries their webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "webhook-endpoint" for the last "product"
+    And the current account has 3 "webhook-events" for the last "webhook-endpoint"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "403"
+    And the response body should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: Product retries a webhook event for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -110,9 +122,7 @@ Feature: Retry webhook events
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
-    Then the response status should be "403"
-    And the response body should be an array of 1 error
-    And the current account should have 3 "webhook-events"
+    Then the response status should be "404"
 
   Scenario: License retries a webhook event for their account
     Given the current account is "test1"

@@ -253,15 +253,21 @@ describe WebhookEventPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_webhook_events] do
+    with_scenarios %i[accessing_its_webhook_events] do
       with_token_authentication do
+        with_permissions %w[webhook-event.read] do
+          without_token_permissions { denies :index }
+
+          allows :index
+        end
+
         with_wildcard_permissions { allows :index }
         with_default_permissions  { allows :index }
         without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[accessing_a_webhook_event] do
+    with_scenarios %i[accessing_its_webhook_event] do
       with_token_authentication do
         with_permissions %w[webhook-event.read] do
           without_token_permissions { denies :show }
@@ -270,17 +276,53 @@ describe WebhookEventPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          without_token_permissions { denies :show, :destroy, :retry }
+          without_token_permissions do
+            denies :show, :destroy, :retry
+          end
 
           denies :destroy, :retry
           allows :show
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show, :destroy, :retry }
+          without_token_permissions do
+            denies :show, :destroy, :retry
+          end
 
           denies :destroy, :retry
           allows :show
+        end
+
+        without_permissions do
+          denies :show, :destroy, :retry
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_webhook_events] do
+      with_token_authentication do
+        with_permissions %w[webhook-event.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_a_webhook_event] do
+      with_token_authentication do
+        with_permissions %w[webhook-event.read] do
+          denies :show
+        end
+
+        with_wildcard_permissions do
+          denies :show, :destroy, :retry
+        end
+
+        with_default_permissions do
+          denies :show, :destroy, :retry
         end
 
         without_permissions do

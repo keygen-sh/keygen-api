@@ -62,6 +62,17 @@ Feature: Show webhook event
     Then the response status should be "200"
     And the response body should be a "webhook-event"
 
+  Scenario: Product retrieves a webhook event for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "webhook-endpoint" for the last "product"
+    And the current account has 3 "webhook-events" for the last "webhook-endpoint"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events/$0"
+    Then the response status should be "200"
+    And the response body should be a "webhook-event"
+
   Scenario: Product retrieves a webhook event for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
@@ -69,8 +80,7 @@ Feature: Show webhook event
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events/$0"
-    Then the response status should be "200"
-    And the response body should be a "webhook-event"
+    Then the response status should be "404"
 
   Scenario: License retrieves a webhook event for their account
     Given the current account is "test1"

@@ -14452,3 +14452,29 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  # product-specific webhook smoke tests
+  Scenario: Anonymous validates a license and generates authorized webhooks for its product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "webhook-endpoints" for each "product"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

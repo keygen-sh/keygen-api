@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_02_170156) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_15_152529) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -912,10 +912,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_02_170156) do
     t.string "signature_algorithm", default: "ed25519"
     t.string "api_version"
     t.uuid "environment_id"
+    t.uuid "product_id"
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_webhook_endpoints_on_environment_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_endpoints_on_id_and_created_at_and_account_id", unique: true
+    t.index ["product_id"], name: "index_webhook_endpoints_on_product_id"
   end
 
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -932,11 +934,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_02_170156) do
     t.string "status"
     t.string "api_version"
     t.uuid "environment_id"
+    t.uuid "webhook_endpoint_id"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_webhook_events_on_environment_id"
     t.index ["event_type_id"], name: "index_webhook_events_on_event_type_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"
+    t.index ["webhook_endpoint_id"], name: "index_webhook_events_on_webhook_endpoint_id"
   end
 end

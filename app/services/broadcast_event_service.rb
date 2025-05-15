@@ -20,19 +20,24 @@ class BroadcastEventService < BaseService
         EventType.find_or_create_by!(event:)
       end
 
-      # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
-      #             generated via a background job like MachineHeartbeatWorker.
-      account_id      = Current.account&.id || account.id
-      environment_id  = Current.environment&.id || (resource.environment&.id if resource.respond_to?(:environment))
-      resource_type   = Current.resource&.class&.name || resource.class.name
-      resource_id     = Current.resource&.id || resource.id
-      bearer_type     = Current.bearer&.class&.name
-      bearer_id       = Current.bearer&.id
-      request_id      = Current.request_id
-      idempotency_key = SecureRandom.hex
-      event_type_id   = event_type.id
+      # NB(ezekg) use the current environment when available, otherwise fallback
+      #           to the resource's environment
+      environment = Current.environment || (resource.environment if resource.respond_to?(:environment))
 
       begin
+        idempotency_key = SecureRandom.hex
+        event_type_id   = event_type.id
+        account_id      = account.id
+        environment_id  = environment&.id
+        resource_type   = resource.class.name
+        resource_id     = resource.id
+
+        # NB(ezekg) these current attributes could be nil if e.g. the event is being
+        #           generated via a background job like MachineHeartbeatWorker
+        bearer_type     = Current.bearer_type
+        bearer_id       = Current.bearer_id
+        request_id      = Current.request_id
+
         Keygen.ee do |license|
           next unless
             license.entitled?(:event_logs)
@@ -87,28 +92,14 @@ class BroadcastEventService < BaseService
         Keygen.logger.exception(e)
       end
 
-      # Append meta to options for resource payload and serialize
-      # for the async event creation worker
-      begin
-        options = {}
-        options.merge!(meta: meta.transform_keys { |k| k.to_s.camelize(:lower) }) unless
-          meta.nil?
-
-        payload = Keygen::JSONAPI::Renderer.new(account:, api_version: CURRENT_API_VERSION, context: :webhook)
-                                           .render(resource, options)
-                                           .to_json
-
-        CreateWebhookEventsWorker.perform_async(
-          event,
-          account_id,
-          payload,
-          environment_id,
-        )
-      rescue => e
-        Keygen.logger.exception(e)
-
-        raise e
-      end
+      # broadcast the event to all relevant endpoints
+      BroadcastWebhookService.call(
+        event:,
+        account:,
+        environment:,
+        resource:,
+        meta:,
+      )
     end
   end
 

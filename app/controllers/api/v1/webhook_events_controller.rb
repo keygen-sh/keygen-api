@@ -10,7 +10,7 @@ module Api::V1
     before_action :set_event, only: [:show, :destroy]
 
     def index
-      events = apply_pagination(authorized_scope(apply_scopes(current_account.webhook_events)).preload(:event_type))
+      events = apply_pagination(authorized_scope(apply_scopes(current_account.webhook_events)).preload(:event_type, :product))
       authorize! events
 
       render jsonapi: events

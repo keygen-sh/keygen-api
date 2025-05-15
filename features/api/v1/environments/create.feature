@@ -455,3 +455,29 @@ Feature: Create environments
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  # product-specific webhook smoke tests
+  Scenario: Admin creates an environment and generates authorized webhooks
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "webhook-endpoints" for each "product"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I authenticate with a token
+    When I send a POST request to "/accounts/test1/environments" with the following:
+      """
+      {
+        "data": {
+          "type": "environment",
+          "attributes": {
+            "isolationStrategy": "SHARED",
+            "name": "Staging",
+            "code": "staging"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
