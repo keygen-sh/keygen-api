@@ -63,7 +63,7 @@ class BroadcastEventService < BaseService
             end
 
           EventLogWorker2.perform_async(
-            'id' => UUID7.generate,
+            'id' => SecureRandom.uuid_v7,
             'event_type_id' => event_type_id,
             'account_id' => account_id,
             'environment_id' => environment_id,
