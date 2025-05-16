@@ -26,11 +26,11 @@ class BroadcastEventService < BaseService
 
       begin
         idempotency_key = SecureRandom.hex
+        account_id      = Current.account_id || account.id
+        environment_id  = Current.environment_id || environment&.id
+        resource_type   = Current.resource_type || resource.class.name
+        resource_id     = Current.resource_id || resource.id
         event_type_id   = event_type.id
-        account_id      = account.id
-        environment_id  = environment&.id
-        resource_type   = resource.class.name
-        resource_id     = resource.id
 
         # NB(ezekg) these current attributes could be nil if e.g. the event is being
         #           generated via a background job like MachineHeartbeatWorker
