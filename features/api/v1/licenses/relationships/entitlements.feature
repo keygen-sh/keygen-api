@@ -206,6 +206,7 @@ Feature: License entitlements relationship
   Scenario: Admin attaches entitlements to a license
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "entitlements"
     And the current account has 1 "license"
     And I use an authentication token
@@ -224,9 +225,9 @@ Feature: License entitlements relationship
     And the current account should have 3 "license-entitlements"
     And the current account should have 0 "policy-entitlements"
     And the current account should have 3 "entitlements"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
 
   @ee
   Scenario: Admin attaches shared entitlements to a global license
