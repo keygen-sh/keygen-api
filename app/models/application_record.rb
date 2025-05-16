@@ -48,7 +48,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   private
 
-  def generate_uuid_v7_primary_key = self.id ||= UUID7.generate
+  def generate_uuid_v7_primary_key = self.id ||= SecureRandom.uuid_v7
 
   def self.uuid_primary_key? = attribute_types["id"].type == :uuid
   def uuid_primary_key?      = self.class.uuid_primary_key?

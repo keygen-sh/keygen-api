@@ -40,7 +40,7 @@ class RecordMetricWorker < BaseWorker
       end
 
     account.metrics.insert!({
-      id: UUID7.generate,
+      id: SecureRandom.uuid_v7,
       event_type_id: event_type.id,
       created_date: recorded_at,
       created_at: recorded_at,

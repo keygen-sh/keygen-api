@@ -22,7 +22,7 @@ class EventLogWorker < BaseWorker
     metadata   = JSON.parse(metadata) if metadata.present?
     event_type = fetch_event_type_by_event(event)
     event_log  = EventLog.create!(
-      id: UUID7.generate,
+      id: SecureRandom.uuid_v7,
       event_type_id: event_type.id,
       idempotency_key:,
       account_id:,
