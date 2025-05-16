@@ -18,9 +18,9 @@ class SeedWebhookEndpointForWebhookEvents < ActiveRecord::Migration[7.2]
           FROM
             webhook_events
           INNER JOIN
-            webhook_endpoints ON webhook_endpoints.account_id     = webhook_events.account_id     AND
-                                 webhook_endpoints.environment_id = webhook_events.environment_id AND
-                                 webhook_endpoints.url            = webhook_events.endpoint
+            webhook_endpoints ON webhook_endpoints.account_id = webhook_events.account_id AND
+                                 webhook_endpoints.environment_id IS NOT DISTINCT FROM webhook_events.environment_id AND
+                                 webhook_endpoints.url = webhook_events.endpoint
           WHERE
             webhook_events.webhook_endpoint_id IS NULL
           LIMIT
