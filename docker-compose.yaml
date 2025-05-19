@@ -42,7 +42,7 @@ services:
     depends_on: [ postgres ]
 
   postgres:
-    image: postgres:9.6
+    image: postgres:17.5
     ports:
       - "5432:5432"
     environment:
