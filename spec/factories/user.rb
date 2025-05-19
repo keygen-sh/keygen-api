@@ -66,6 +66,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_user_license do
+      after :create do |user|
+        create(:license_user, account: user.account, environment: user.environment, user:)
+      end
+    end
+
     trait :with_licenses do
       with_user_licenses
       with_owned_license

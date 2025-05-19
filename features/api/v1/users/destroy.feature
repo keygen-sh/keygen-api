@@ -131,19 +131,100 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product attempts to delete one of their users
+  Scenario: Product attempts to delete their user (one product)
     Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "product"
+    And the current account has 1 "policy" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And I am the second product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "204"
+    And the current account should have 0 "users"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Product attempts to delete a user (one product)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "product"
+    And the current account has 1 "policy" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And I am the first product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (user cannot belong to another product)"
+      }
+      """
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Product attempts to delete their user (many products)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "product"
+    And the current account has 1 "policy" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license-user" for the first "license" and the last "user"
+    And the current account has 1 "license-user" for the second "license" and the last "user"
+    And I am the first product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+    And the response body should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (user cannot belong to another product)"
+      }
+      """
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Product attempts to delete a user (no products)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "204"
+    And the current account should have 0 "users"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Product attempts to delete an admin
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 3 "users"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$3"
-    Then the response status should be "403"
-    And the current account should have 3 "users"
+    When I send a DELETE request to "/accounts/test1/users/$0"
+    Then the response status should be "404"
+    And the current account should have 1 "admin"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "event-log" jobs
 
   Scenario: License attempts to delete their user
     Given the current account is "test1"

@@ -87,6 +87,12 @@ class UserPolicy < ApplicationPolicy
       allow!
     in role: Role(:environment) if record.user?
       allow!
+    in role: Role(:product) if record.user?
+      deny! 'user cannot belong to another product' unless
+        record.products == [bearer] ||
+        record.products.empty?
+
+      allow!
     else
       deny!
     end
