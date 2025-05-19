@@ -877,6 +877,10 @@ describe UserPolicy, type: :policy do
           denies :update
         end
 
+        with_permissions %w[user.delete] do
+          denies :destroy
+        end
+
         with_permissions %w[user.ban] do
           denies :ban
         end
@@ -933,6 +937,20 @@ describe UserPolicy, type: :policy do
           allows :update
         end
 
+        with_permissions %w[user.delete] do
+          without_token_permissions { denies :destroy }
+
+          with_user_traits :with_owned_license do
+            denies :destroy
+          end
+
+          with_user_traits :with_user_license do
+            denies :destroy
+          end
+
+          allows :destroy
+        end
+
         with_permissions %w[user.ban] do
           without_token_permissions { denies :ban }
 
@@ -950,8 +968,13 @@ describe UserPolicy, type: :policy do
             denies :show, :create, :update, :destroy, :invite, :ban, :unban
           end
 
-          allows :show, :create, :update, :ban, :unban
-          denies :destroy, :invite
+          with_user_traits :with_licenses do
+            allows :show, :create, :update, :ban, :unban
+            denies :destroy, :invite
+          end
+
+          allows :show, :create, :update, :destroy, :ban, :unban
+          denies :invite
         end
 
         with_default_permissions do
@@ -959,8 +982,13 @@ describe UserPolicy, type: :policy do
             denies :show, :create, :update, :destroy, :invite, :ban, :unban
           end
 
-          allows :show, :create, :update, :ban, :unban
-          denies :destroy, :invite
+          with_user_traits :with_licenses do
+            allows :show, :create, :update, :ban, :unban
+            denies :destroy, :invite
+          end
+
+          allows :show, :create, :update, :destroy, :ban, :unban
+          denies :invite
         end
 
         without_permissions do
@@ -1001,6 +1029,20 @@ describe UserPolicy, type: :policy do
           allows :update
         end
 
+        with_permissions %w[user.delete] do
+          without_token_permissions { denies :destroy }
+
+          with_user_traits :with_owned_license do
+            denies :destroy
+          end
+
+          with_user_traits :with_user_license do
+            denies :destroy
+          end
+
+          allows :destroy
+        end
+
         with_permissions %w[user.ban] do
           without_token_permissions { denies :ban }
 
@@ -1018,8 +1060,13 @@ describe UserPolicy, type: :policy do
             denies :show, :create, :update, :destroy, :invite, :ban, :unban
           end
 
-          allows :show, :create, :update, :ban, :unban
-          denies :destroy, :invite
+          with_user_traits :with_licenses do
+            allows :show, :create, :update, :ban, :unban
+            denies :destroy, :invite
+          end
+
+          allows :show, :create, :update, :destroy, :ban, :unban
+          denies :invite
         end
 
         with_default_permissions do
@@ -1027,8 +1074,13 @@ describe UserPolicy, type: :policy do
             denies :show, :create, :update, :destroy, :invite, :ban, :unban
           end
 
-          allows :show, :create, :update, :ban, :unban
-          denies :destroy, :invite
+          with_user_traits :with_licenses do
+            allows :show, :create, :update, :ban, :unban
+            denies :destroy, :invite
+          end
+
+          allows :show, :create, :update, :destroy, :ban, :unban
+          denies :invite
         end
 
         without_permissions do
