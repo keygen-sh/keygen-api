@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PlaintextMailerPreview < ActionMailer::Preview
-
   def low_activity_lifeline
     PlaintextMailer.low_activity_lifeline account: account
   end
@@ -30,17 +29,7 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.prompt_for_first_impression account: account
   end
 
-  def price_increase_notice
-    PlaintextMailer.price_increase_notice account: account
-  end
-
-  def price_increase_reminder
-    PlaintextMailer.price_increase_reminder account: account
-  end
-
   private
 
-  def account
-    @account ||= Account.first
-  end
+  def account = @account ||= Account.first
 end
