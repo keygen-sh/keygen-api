@@ -91,6 +91,8 @@ class PlaintextMailer < ApplicationMailer
 
         --
         Zeke, Founder <https://keygen.sh>
+
+        p.s. Use Slack? Let me know your org and I'll set up a 1-1 channel with us and y'all!
       TXT
     )
   end
@@ -170,100 +172,8 @@ class PlaintextMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. You can bookmark this link to quickly log into your account: https://app.keygen.sh/login?account=#{account.slug}
+        p.s. Use Slack? Let me know your org and I'll set up a 1-1 channel so you can ask questions as they come!
       TXT
     )
-  end
-
-  def price_increase_notice(account:)
-    return if
-      account.ent?
-
-    account.admins.each do |admin|
-      mail(
-        content_type: "text/plain",
-        to: admin.email,
-        subject: "Attention: price increase starting May 1st, 2022",
-        body: <<~TXT
-          Hey team,
-
-          (You're receiving this email because you're an admin of Keygen account `#{account.slug}`.)
-
-          Honestly, this is an email that I really hate writing. And I want to start off with some thanks -- thanks to all of our current and past customers, for supporting Keygen over the years, and for being such great people. Keygen has been growing non-stop and I can't wait to see what the future brings. We have some awesome stuff in store for 2022!
-
-          But due to increased operating costs, we're going to be increasing prices across the board on May 1st, 2022. In our nearly 7 years in business, we've never raised prices for our customers -- we've *always* grandfathered in existing customers when making any pricing changes. But with these increased operating costs and the additional value we've added to the service over the years, we feel that a price increase is necessary.
-
-          If you'd like to lock yourself into your current pricing for the next year, please upgrade to a yearly plan before May 1st, 2022. If you're already on a yearly plan, these changes will come into effect upon renewal.
-
-          Below are the new prices, going into effect on May 1st, 2022. Your account will automatically be upgraded, unless canceled (and we'd hate that -- so please reach out if that's the case.)
-
-          - Tier 0: $19 to $29/mo ($290/yr, discontinued)
-          - Tier 1: $39 to $49/mo ($490/yr)
-          - Tier 2: $59 to $79/mo ($790/yr)
-          - Tier 3: $99 to $129/mo ($1,290/yr)
-          - Tier 4: $159 to $199/mo ($1,990/yr)
-          - Tier 5: $319 to $399/mo ($3,990/yr)
-          - Tier 6: $639 to $799/mo ($7,990/yr)
-          - Ent 1: $1,279 to $1,599 ($15,990/yr)
-          - Ent 2: $2,559 to $3,199 ($31,990/yr)
-          - Ent 3: $4,919 to $6,149 ($61,490/yr)
-
-          If you're on an even older plan than these (thanks for sticking with us!), we ask that you upgrade to one of the new plans. If you're on the free tier, you will continue to stay on the free tier. You can choose a yearly plan before May 1st to be locked into our current pricing as of this email.
-
-          You can upgrade your plan from your billing dashboard: https://app.keygen.sh/billing (if you don't see your desired yearly plan listed -- let me know and I'll get it squared away for you.)
-
-          We don't make these changes lightly, and we hope that you understand. Please let me know if you have any questions or concerns.
-
-          --
-          Zeke, Founder <https://keygen.sh>
-
-          p.s. We just launched Groups, so be sure to peek our changelog and check that out. I know it's been a highly-requested feature!
-        TXT
-      )
-    end
-  end
-
-  def price_increase_reminder(account:)
-    return if
-      account.ent?
-
-    account.admins.each do |admin|
-      mail(
-        content_type: "text/plain",
-        to: admin.email,
-        subject: "Re: price increase starting May 1st, 2022",
-        body: <<~TXT
-          Hey team,
-
-          (You're receiving this email because you're an admin of Keygen account `#{account.slug}`.)
-
-          Quick reminder that we'll be increasing our prices soon. Again, this is the first time we've ever increased prices for our customers, and we don't take this event lightly. We'll be increasing prices across the board due to increased operating costs.
-
-          Below are the new prices, going into effect on May 1st, 2022 (less than 2 weeks). Your account will automatically be upgraded, unless you're on a free tier or you cancel (and we'd really hate that -- so please reach out).
-
-          - Dev 0: no changes (i.e. it's still free)
-          - Tier 0: $19 to $29/mo ($290/yr)
-          - Tier 1: $39 to $49/mo ($490/yr)
-          - Tier 2: $59 to $79/mo ($790/yr)
-          - Tier 3: $99 to $129/mo ($1,290/yr)
-          - Tier 4: $159 to $199/mo ($1,990/yr)
-          - Tier 5: $319 to $399/mo ($3,990/yr)
-          - More: https://keygen.sh/pricing/
-
-          If you'd like to lock yourself into your current rate for the next 12 months, please upgrade to a yearly plan before May 1st, 2022. If you're already on a yearly plan, these changes will automatically come into effect upon renewal.
-
-          Please reach out if you'd like me to switch you over to a yearly subscription at your current rate and I can get that handled for you.
-
-          For low volume accounts, we also have a free tier called Dev 0 which you can downgrade to at anytime.
-
-          Thanks again for your understanding and continued business. Let me know if you have any questions or concerns.
-
-          --
-          Zeke, Founder <https://keygen.sh>
-
-          p.s. We just rolled out "processes", a great way to control application concurrency on machines. (More: https://keygen.sh/docs/api/processes/)
-        TXT
-      )
-    end
   end
 end
