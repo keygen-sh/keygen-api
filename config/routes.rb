@@ -529,8 +529,10 @@ Rails.application.routes.draw do
 
       constraints domain: Keygen::DOMAIN do
         constraints subdomain: Keygen::SUBDOMAIN do
+          # FIXME(ezekg) these are only applicable to cloud i.e. not other multiplayer instances
           if Keygen.multiplayer?
-            post :stripe, to: 'stripe#receive_webhook'
+            post :stripe, to: 'stripe#callback', as: :stripe_callback
+            post :slack,  to: 'slack#callback',  as: :slack_callback
 
             # Pricing
             scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do

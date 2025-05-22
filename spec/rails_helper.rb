@@ -86,7 +86,7 @@ RSpec.configure do |config|
   config.pending_failure_output = :skip
 
   # Stub keygens
-  config.before { stub_account_keygens! }
+  config.before { stub_everything! }
 
   # Setup Sidekiq, Stripe, etc.
   config.before :each do

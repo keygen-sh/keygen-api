@@ -1193,7 +1193,7 @@ Feature: Create user
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be a valid email",
+        "detail": "is invalid",
         "code": "EMAIL_INVALID",
         "source": {
           "pointer": "/data/attributes/email"

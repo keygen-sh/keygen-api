@@ -15,7 +15,7 @@ module Billings
 
       Billings::Customer.create(
         description: "#{account.name} (#{account.slug})",
-        email: account.admins.first.email,
+        email: account.admins.last.email,
         metadata: data,
       )
     rescue Billings::Error => e

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_15_152529) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_22_115706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -54,11 +54,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_15_152529) do
     t.integer "sso_session_duration"
     t.boolean "sso_jit_provisioning", default: false, null: false
     t.boolean "sso_external_authn", default: false, null: false
+    t.datetime "slack_invited_at"
+    t.datetime "slack_accepted_at"
+    t.string "slack_team_id"
+    t.string "slack_channel_id"
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"
+    t.index ["slack_channel_id"], name: "index_accounts_on_slack_channel_id", unique: true
+    t.index ["slack_team_id"], name: "index_accounts_on_slack_team_id", unique: true
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
     t.index ["sso_organization_domains"], name: "index_accounts_on_sso_organization_domains", using: :gin

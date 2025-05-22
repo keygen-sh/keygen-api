@@ -6,6 +6,12 @@ class PlaintextMailer < ApplicationMailer
   def low_activity_lifeline(account:)
     admin = account.admins.last
 
+    call_to_action = if admin.free_or_disposable_email?
+                       %(Just want to make sure you aren't stuck on anything. As the founder, it's easy for me to overlook roadblocks for new users.)
+                     else
+                       %(If your team uses Slack, let's connect! We've already set up a 1-1 channel: https://app.keygen.sh/chat)
+                     end
+
     mail(
       content_type: "text/plain",
       to: admin.email,
@@ -13,7 +19,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         I noticed that you created a Keygen account but there hasn't been much API activity on it lately. Is there anything I can do to help get things kickstarted?
 
-        Just want to make sure you aren't stuck on anything. As a technical founder, it's easy for me to overlook roadblocks for new users. :)
+        #{call_to_action}
 
         --
         Zeke, Founder <https://keygen.sh>
@@ -78,6 +84,7 @@ class PlaintextMailer < ApplicationMailer
       %(How did you hear about us?),
       %(Where did you find us?),
       %(Has Keygen helped you meet your licensing goals?),
+      %(What's one thing you'd like us to add?),
     ]
 
     mail(
@@ -92,7 +99,7 @@ class PlaintextMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. Use Slack? Let me know your org and I'll set up a 1-1 channel with us and y'all!
+        p.s. Use Slack? Let's connect! We've set up a 1-1 channel in case you ever need anything.
       TXT
     )
   end
@@ -172,7 +179,7 @@ class PlaintextMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. Use Slack? Let me know your org and I'll set up a 1-1 channel so you can ask questions as they come!
+        p.s. Use Slack? Let's connect! We've already set up a 1-1 channel for your team.
       TXT
     )
   end

@@ -4,8 +4,8 @@ module Api::V1
   class StripeController < Api::V1::BaseController
     skip_verify_authorized
 
-    def receive_webhook
-      # Let external service know that we received the webhook
+    def callback
+      # let stripe know that we received the webhook
       head :accepted
 
       event = Billings::RetrieveEventService.call(event: params[:id])

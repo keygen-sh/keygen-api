@@ -130,12 +130,22 @@ class AccountSerializer < BaseSerializer
     ed25519_key = Base64.strict_encode64(@object.ed25519_public_key)
     rsa2048_key = Base64.strict_encode64(@object.public_key)
 
-    {
-      publicKey: rsa2048_key,
+    meta = {
+      public_key: rsa2048_key,
       keys: {
         ed25519: ed25519_key,
         rsa2048: rsa2048_key,
       }
     }
+
+    if Keygen.multiplayer? && @object.slack_accepted_at?
+      meta = {
+        slack_deeplink: "https://slack.com/app_redirect?channel=#{@object.slack_channel_id}&team=#{@object.slack_team_id}",
+        **meta,
+      }
+    end
+
+    # FIXME(ezekg) base serializer should handle this
+    meta.transform_keys { _1.to_s.camelize(:lower) }
   end
 end

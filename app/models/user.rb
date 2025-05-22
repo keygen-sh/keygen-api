@@ -375,6 +375,8 @@ class User < ApplicationRecord
     end
   }
 
+  def self.emails = reorder(email: :asc).pluck(:email)
+
   # FIXME(ezekg) The :teammates association isn't the most efficient for large accounts,
   #              so we're going to use an optimized version of the ids reader.
   def teammate_ids
@@ -435,15 +437,13 @@ class User < ApplicationRecord
     [first_name, last_name].join " "
   end
 
-  def parsed_email
-    return nil if email.nil?
+  def email_parts = email.match(EMAIL_PARTS_RE)&.named_captures&.with_indifferent_access
+  def email_user  = email_parts[:user]
+  def email_host  = email_parts[:host]
 
-    user, host = email.downcase.match(/([^@]+)@(.+)/).captures
-
-    {
-      user: user,
-      host: host,
-    }
+  def email_checker = EmailCheck::EmailAddress.new(email)
+  def free_or_disposable_email?
+    email_checker.free_email_provider? || email_checker.disposable?
   end
 
   def single_sign_on_enabled? = !role.user? && account.sso?
