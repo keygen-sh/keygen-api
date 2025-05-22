@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :account do
-    initialize_with { new(**attributes) }
+    initialize_with { new(skip_slack_invite: true, skip_welcome_email: true, **attributes) }
 
     slug { "#{Faker::Internet.domain_name.parameterize}-#{SecureRandom.hex(4)}" }
     name { Faker::Company.name }

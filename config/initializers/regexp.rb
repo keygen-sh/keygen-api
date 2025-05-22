@@ -22,3 +22,6 @@ HEX_RE = /\A(0x)?\p{Hex_Digit}+\z/
 
 # used to check if a value is an email
 EMAIL_RE = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+
+# used to deconstruct an email
+EMAIL_PARTS_RE = /\A(?<user>[^@]+)@(?<host>.+)\z/i

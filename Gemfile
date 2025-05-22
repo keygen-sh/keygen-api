@@ -107,6 +107,8 @@ gem 'minitar'
 
 # Misc
 gem 'null_association'
+gem 'email_check'
+gem 'haikunator'
 
 group :production do
   # Monitoring/APM
