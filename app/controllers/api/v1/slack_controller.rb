@@ -28,7 +28,7 @@ module Api::V1
       in type: 'url_verification'
         # ack
       else
-        head :unprocessable_content and return
+        head :unprocessable_entity and return
       end
 
       render plain: params[:challenge]
