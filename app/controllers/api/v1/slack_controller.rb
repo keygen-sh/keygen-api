@@ -8,7 +8,7 @@ module Api::V1
       Slack::Event.verify_signature!(request, signing_secret: SLACK_SIGNING_SECRET)
 
       case request.request_parameters.deep_symbolize_keys
-      in type: 'shared_channel_invite_accepted', channel: { id: channel_id }, accepting_user: { team_id: }
+      in type: 'event_callback', event: { type: 'shared_channel_invite_accepted', channel: { id: channel_id }, accepting_user: { team_id: } }
         account = Account.find_by(slack_channel_id: channel_id)
         return if
           account.nil?
