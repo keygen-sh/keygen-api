@@ -20,7 +20,7 @@ module Slack
 
     def create_channel(name:)
       res = post('/conversations.create',
-        default_options.merge(query: { is_private: true, name: }),
+        default_options.merge(query: { name: }),
       )
 
       res['channel']['id']
