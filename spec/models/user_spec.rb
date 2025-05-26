@@ -313,4 +313,28 @@ describe User, type: :model do
       end
     end
   end
+
+  describe '#email' do
+    it 'should be a work email' do
+      expect(build(:user, email: 'zeke@keygen.sh').free_or_disposable_email?).to be false
+      expect(build(:user, email: 'zeke@x.com').free_or_disposable_email?).to be false
+    end
+
+    it 'should be a free email' do
+      expect(build(:user, email: 'zeke@gmail.com').free_or_disposable_email?).to be true
+      expect(build(:user, email: 'zeke@qq.com').free_or_disposable_email?).to be true
+    end
+
+    it 'should be a disposable email' do
+      expect(build(:user, email: 'zeke@mailinator.com').free_or_disposable_email?).to be true
+      expect(build(:user, email: 'zeke@temp-mail.org').free_or_disposable_email?).to be true
+    end
+
+    it 'should be an edu email' do
+      expect(build(:user, email: 'zeke@mit.edu').free_or_disposable_email?).to be true
+      expect(build(:user, email: 'zeke@unimelb.edu.au').free_or_disposable_email?).to be true
+      expect(build(:user, email: 'zeke@ox.ac.uk').free_or_disposable_email?).to be true
+      expect(build(:user, email: 'zeke@u-tokyo.ac.jp').free_or_disposable_email?).to be true
+    end
+  end
 end

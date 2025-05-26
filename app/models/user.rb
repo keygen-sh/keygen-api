@@ -443,7 +443,7 @@ class User < ApplicationRecord
 
   def email_checker = EmailCheck::EmailAddress.new(email)
   def free_or_disposable_email?
-    email_checker.free_email_provider? || email_checker.disposable?
+    email_checker.free_email_provider? || email_checker.disposable? || email_checker.educational?
   end
 
   def single_sign_on_enabled? = !role.user? && account.sso?
