@@ -441,7 +441,9 @@ class User < ApplicationRecord
   def email_user  = email_parts[:user]
   def email_host  = email_parts[:host]
 
-  def email_checker = EmailCheck::EmailAddress.new(email)
+  def email_checker        = @email_checker ||= EmailCheck::EmailAddress.new(email)
+  def email_domain_has_mx? = @email_mx      ||= email_checker.domain_has_mx?
+
   def free_or_disposable_email?
     email_checker.free_email_provider? || email_checker.disposable? || email_checker.educational?
   end

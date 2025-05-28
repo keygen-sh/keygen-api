@@ -10,7 +10,7 @@ class SlackInviteWorker < BaseWorker
 
     admin = account.admins.last
     return if
-      admin.free_or_disposable_email?
+      admin.email_domain_has_mx?
 
     # create a private channel
     channel_prefix = admin.email_host.split('.').first # second-level domain e.g. keygen.sh -> keygen, slack.com -> slack
