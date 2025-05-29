@@ -248,7 +248,7 @@ class ReleaseArtifact < ApplicationRecord
       # their licenses' expiration dates.
       scope = scope.within_expiry_for(license)
 
-      scope.joins(product: %i[licenses])
+      scope.joins(release: { product: %i[licenses] })
            .reorder("#{table_name}.created_at": DEFAULT_SORT_ORDER)
            .where(
              product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
@@ -286,7 +286,7 @@ class ReleaseArtifact < ApplicationRecord
     # after the license's expiration date.
     scope = scope.within_expiry_for(license)
 
-    scope.joins(product: %i[licenses])
+    scope.joins(release: { product: %i[licenses] })
          .where(
            product: { distribution_strategy: ['LICENSED', 'OPEN', nil] },
            licenses: { id: license },
@@ -382,9 +382,9 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
-  scope :open,     -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
-  scope :closed,   -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
+  scope :licensed, -> { joins(release: :product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
+  scope :open,     -> { joins(release: :product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed,   -> { joins(release: :product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
