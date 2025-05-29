@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_22_115706) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_29_131947) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -741,6 +741,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_22_115706) do
     t.string "tag"
     t.uuid "environment_id"
     t.uuid "release_package_id"
+    t.datetime "backdated_to", precision: nil
+    t.index ["account_id", "created_at", "backdated_to"], name: "index_releases_on_account_id_and_created_at_and_backdated_to", order: { created_at: :desc, backdated_to: :desc }
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
     t.index ["environment_id"], name: "index_releases_on_environment_id"

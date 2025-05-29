@@ -31,6 +31,9 @@ class ReleaseSerializer < BaseSerializer
   attribute :updated do
     @object.updated_at
   end
+  attribute :backdated do
+    @object.backdated_to
+  end
   attribute :yanked do
     @object.yanked_at
   end

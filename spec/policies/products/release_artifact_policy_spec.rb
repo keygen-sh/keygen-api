@@ -313,6 +313,24 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
           end
         end
 
+        with_release_traits %i[backdated] do
+          with_bearer_traits %i[expired restrict_access_expiration_strategy] do
+            allows :show
+          end
+
+          with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+            denies :show
+          end
+
+          with_bearer_traits %i[expired maintain_access_expiration_strategy] do
+            allows :show
+          end
+
+          with_bearer_traits %i[expired allow_access_expiration_strategy] do
+            allows :show
+          end
+        end
+
         with_release_traits %i[with_constraints] do
           with_bearer_traits %i[with_entitlements] do
             allows :show

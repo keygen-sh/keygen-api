@@ -1379,7 +1379,7 @@ Feature: List releases
   Scenario: License retrieves their releases with an expired license (REVOKE_ACCESS)
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "releases" for the last "product"
+    And the current account has 4 "releases" for the last "product"
     And the first "release" has the following attributes:
       """
       { "createdAt": "2024-04-01T00:00:00Z" }
@@ -1391,6 +1391,13 @@ Feature: List releases
     And the third "release" has the following attributes:
       """
       { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the fourth "release" has the following attributes:
+      """
+      {
+        "backdatedTo": "2024-04-01T00:00:00Z",
+        "createdAt": "2024-04-03T00:00:00Z"
+      }
       """
     And the current account has 1 "policy" for the last "product"
     And the last "policy" has the following attributes:
@@ -1410,7 +1417,7 @@ Feature: List releases
   Scenario: License retrieves their releases with an expired license (RESTRICT_ACCESS)
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "releases" for the last "product"
+    And the current account has 4 "releases" for the last "product"
     And the first "release" has the following attributes:
       """
       { "createdAt": "2024-04-01T00:00:00Z" }
@@ -1422,6 +1429,13 @@ Feature: List releases
     And the third "release" has the following attributes:
       """
       { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the fourth "release" has the following attributes:
+      """
+      {
+        "backdatedTo": "2024-04-01T00:00:00Z",
+        "createdAt": "2024-04-03T00:00:00Z"
+      }
       """
     And the current account has 1 "policy" for the last "product"
     And the last "policy" has the following attributes:
@@ -1437,12 +1451,12 @@ Feature: List releases
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the response body should be an array with 2 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: License retrieves their releases with an expired license (MAINTAIN_ACCESS)
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "releases" for the last "product"
+    And the current account has 4 "releases" for the last "product"
     And the first "release" has the following attributes:
       """
       { "createdAt": "2024-04-01T00:00:00Z" }
@@ -1454,6 +1468,13 @@ Feature: List releases
     And the third "release" has the following attributes:
       """
       { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the fourth "release" has the following attributes:
+      """
+      {
+        "backdatedTo": "2024-04-01T00:00:00Z",
+        "createdAt": "2024-04-03T00:00:00Z"
+      }
       """
     And the current account has 1 "policy" for the last "product"
     And the last "policy" has the following attributes:
@@ -1469,12 +1490,12 @@ Feature: List releases
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the response body should be an array with 2 "releases"
+    And the response body should be an array with 3 "releases"
 
   Scenario: License retrieves their releases with an expired license (ALLOW_ACCESS)
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "releases" for the last "product"
+    And the current account has 4 "releases" for the last "product"
     And the first "release" has the following attributes:
       """
       { "createdAt": "2024-04-01T00:00:00Z" }
@@ -1486,6 +1507,13 @@ Feature: List releases
     And the third "release" has the following attributes:
       """
       { "createdAt": "2024-04-03T00:00:00Z" }
+      """
+    And the fourth "release" has the following attributes:
+      """
+      {
+        "backdatedTo": "2024-04-01T00:00:00Z",
+        "createdAt": "2024-04-03T00:00:00Z"
+      }
       """
     And the current account has 1 "policy" for the last "product"
     And the last "policy" has the following attributes:
@@ -1501,7 +1529,7 @@ Feature: List releases
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the response body should be an array with 3 "releases"
+    And the response body should be an array with 4 "releases"
 
   Scenario: User retrieves their releases with an expired license (REVOKE_ACCESS)
     Given the current account is "test1"

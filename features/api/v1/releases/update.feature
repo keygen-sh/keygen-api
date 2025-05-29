@@ -309,6 +309,62 @@ Feature: Update release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin backdates a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "backdated": "2016-09-05T22:53:37.000Z"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "backdated": "2016-09-05T22:53:37.000Z" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes the backdate of a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And the first "release" has the following attributes:
+      """
+      { "backdatedTo": "2016-09-05T22:53:37.000Z" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "backdated": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "backdated": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attempts to change the version of a release
     Given I am an admin of account "test1"
     And the current account is "test1"

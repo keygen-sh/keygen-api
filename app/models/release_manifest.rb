@@ -209,7 +209,9 @@ class ReleaseManifest < ApplicationRecord
       license.expired? ? none : joins(:release).where(releases: { created_at: ..license.expiry })
     when license.restrict_access?,
          license.maintain_access?
-      joins(:release).where(releases: { created_at: ..license.expiry })
+      joins(:release).where(releases: { created_at: ..license.expiry }).or(
+        joins(:release).where(releases: { backdated_to: ..license.expiry }),
+      )
     when license.allow_access?
       all
     else
