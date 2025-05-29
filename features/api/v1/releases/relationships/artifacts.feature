@@ -496,6 +496,105 @@ Feature: Release artifacts relationship
     Then the response status should be "303"
     And the response body should be an "artifact"
 
+  Scenario: License retrieves the artifact for a release of their product (expired before release, backdated, revoke access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS" }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "backdatedTo": "$time.3.months.ago" }
+      """
+    And the current account has 1 "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves the artifact for a release of their product (expired before release, backdated, restrict access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "backdatedTo": "$time.3.months.ago" }
+      """
+    And the current account has 1 "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+
+  Scenario: License retrieves the artifact for a release of their product (expired before release, backdated, maintain access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS" }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "backdatedTo": "$time.3.months.ago" }
+      """
+    And the current account has 1 "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+
+  Scenario: License retrieves the artifact for a release of their product (expired before release, backdated, allow access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "ALLOW_ACCESS" }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "backdatedTo": "$time.3.months.ago" }
+      """
+    And the current account has 1 "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "303"
+    And the response body should be an "artifact"
+
   Scenario: License retrieves the artifact for a release of their product (suspended)
     Given the current account is "test1"
     And the current account has 1 "product"

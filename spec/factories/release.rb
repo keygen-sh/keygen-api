@@ -47,6 +47,10 @@ FactoryBot.define do
       status    { 'YANKED' }
     end
 
+    trait :backdated do
+      backdated_to { 2.months.ago }
+    end
+
     trait :packaged do
       package { build(:package, account:, product:, environment:) }
     end

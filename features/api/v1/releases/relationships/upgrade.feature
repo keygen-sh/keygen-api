@@ -330,6 +330,46 @@ Feature: Upgrade release
       }
       """
 
+  Scenario: License retrieves an upgrade for a release of their product (expired, out of date, backdated, but access restricted)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | created_at           | version      | channel | backdated_to         |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-01-01T00:00:00Z | 1.0.0        | stable  |                      |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-03-01T00:00:00Z | 1.2.0        | stable  |                      |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-01-02T00:00:00Z | 1.0.1        | stable  |                      |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-02-01T00:00:00Z | 1.1.0        | stable  |                      |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-04-01T00:00:00Z | 1.3.0        | stable  |                      |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-05-01T00:00:00Z | 2.0.0-beta.1 | beta    |                      |
+      | 40432355-6af5-4978-a509-b8c24f879844 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-06-01T00:00:00Z | 1.2.1        | stable  | 2024-01-01T00:00:00Z |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-03-02T00:00:00Z" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.1.0/upgrade"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "1.2.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.0",
+        "next": "1.2.1"
+      }
+      """
+
   Scenario: License retrieves an upgrade for a release of their product (expired, up to date, but access restricted)
     Given the current account is "test1"
     And the current account has the following "product" rows:
@@ -390,6 +430,46 @@ Feature: Upgrade release
       {
         "current": "1.0.1",
         "next": "1.2.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of their product (expired, out of date, backdated, but access maintained)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | created_at           | version      | channel | backdated_to         |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-01-01T00:00:00Z | 1.0.0        | stable  |                      |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-03-01T00:00:00Z | 1.2.0        | stable  |                      |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-01-02T00:00:00Z | 1.0.1        | stable  |                      |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-02-01T00:00:00Z | 1.1.0        | stable  |                      |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-04-01T00:00:00Z | 1.3.0        | stable  |                      |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-05-01T00:00:00Z | 2.0.0-beta.1 | beta    |                      |
+      | 40432355-6af5-4978-a509-b8c24f879844 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2024-06-01T00:00:00Z | 1.2.1        | stable  | 2024-01-01T00:00:00Z |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2024-03-01T00:00:00Z" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.1/upgrade"
+    Then the response status should be "200"
+    And the response body should be a "release" with the following attributes:
+      """
+      { "version": "1.2.1" }
+      """
+    And the response body should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1",
+        "next": "1.2.1"
       }
       """
 

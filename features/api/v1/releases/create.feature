@@ -397,6 +397,49 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a new backdated release for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 14 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Patch Release",
+            "channel": "stable",
+            "version": "1.9.99",
+            "backdated": "2016-09-05T22:53:37.000Z"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "release" with the following attributes:
+      """
+      {
+        "name": "Patch Release",
+        "channel": "stable",
+        "version": "1.9.99",
+        "backdated": "2016-09-05T22:53:37.000Z"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
   Scenario: Admin creates a new release for their account (free tier, limit not reached)
     Given the account "test1" is on a free tier
     And the account "test1" is subscribed

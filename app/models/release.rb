@@ -564,7 +564,9 @@ class Release < ApplicationRecord
       license.expired? ? none : where(created_at: ..license.expiry)
     when license.restrict_access?,
          license.maintain_access?
-      where(created_at: ..license.expiry)
+      where(created_at: ..license.expiry).or(
+        where(backdated_to: ..license.expiry),
+      )
     when license.allow_access?
       all
     else
@@ -810,7 +812,7 @@ class Release < ApplicationRecord
   end
 
   def yank!
-    update!(status: 'YANKED')
+    update!(status: 'YANKED', yanked_at: Time.current)
   end
 
   def draft?
