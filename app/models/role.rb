@@ -22,6 +22,12 @@ class Role < ApplicationRecord
   }.with_indifferent_access
    .freeze
 
+  # FIXME(ezekg) replace this with has_account() after we backfill existing data
+  belongs_to :account, optional: true, validate: false,
+    default: -> {
+      Current.account || resource&.account
+    }
+
   belongs_to :resource,
     polymorphic: true,
     inverse_of: :role
@@ -34,7 +40,7 @@ class Role < ApplicationRecord
     def actions = loaded? ? collect(&:action) : super
   end
 
-  # FIXME(ezekg) should have an account_id foreign key
+  # FIXME(ezekg) replace with accountable concern i.e. an association
   delegate :account, :account_id,
     :default_permissions, :default_permission_ids,
     :allowed_permissions, :allowed_permission_ids,
