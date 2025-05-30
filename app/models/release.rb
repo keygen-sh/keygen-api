@@ -561,7 +561,7 @@ class Release < ApplicationRecord
 
     case
     when license.revoke_access?
-      license.expired? ? none : where(created_at: ..license.expiry)
+      license.expired? ? none : all
     when license.restrict_access?,
          license.maintain_access?
       where(created_at: ..license.expiry).or(

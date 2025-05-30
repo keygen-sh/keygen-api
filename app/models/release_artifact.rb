@@ -436,11 +436,11 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :within_expiry_for, -> license {
     return none if license.nil?
-    return all  if license.expiry.nil?
+    return all  unless license.expires?
 
     case
     when license.revoke_access?
-      license.expired? ? none : joins(:release).where(releases: { created_at: ..license.expiry })
+      license.expired? ? none : all
     when license.restrict_access?,
          license.maintain_access?
       joins(:release).where(releases: { created_at: ..license.expiry }).or(
