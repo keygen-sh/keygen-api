@@ -136,7 +136,10 @@ class ApplicationPolicy
         when environment.nil?
           bearer_environment_id.nil?
         when environment.isolated?
-          bearer_environment_id == environment.id
+          bearer_environment_id == environment.id || (
+            # NB(ezekg) allow global admins to escape environment isolation
+            bearer in role: Role(:admin), environment_id: nil
+          )
         when environment.shared?
           bearer_environment_id == environment.id || bearer_environment_id.nil?
         end
