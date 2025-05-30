@@ -122,21 +122,18 @@ Feature: Create environments
         }
       }
       """
-    Then the response status should be "422"
-    And the response body should be an array of 1 errors
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the response body should be an "environment" with the following attributes:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "environment must have at least 1 admin user",
-        "code": "ADMINS_REQUIRED",
-        "source": {
-          "pointer": "/data/relationships/admins"
-        }
+        "isolationStrategy": "ISOLATED",
+        "name": "Isolated Environment",
+        "code": "ISOLATED"
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And the current account should have 1 "admin"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a shared environment for their account (with admins)

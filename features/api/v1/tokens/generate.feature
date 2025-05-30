@@ -473,11 +473,10 @@ Feature: Generate authentication token
   Scenario: Global admin generates a token for an isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    And the current account has 1 global "admin"
     And I send the following headers:
       """
       {
-        "Authorization": "Basic \"$users[-1].email:password\"",
+        "Authorization": "Basic \"$users[0].email:password\"",
         "Keygen-Environment": "isolated"
       }
       """
@@ -492,15 +491,28 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "401"
+    Then the response status should be "201"
+    And the response body should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        },
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[0]" },
+          "data": { "type": "users", "id": "$users[0]" }
+        }
+      }
+      """
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
 
   @ee
   Scenario: Shared admin generates a token for an shared environment
@@ -771,7 +783,7 @@ Feature: Generate authentication token
     And I send the following headers:
       """
       {
-        "Authorization": "Basic \"$users[2].email:password\"",
+        "Authorization": "Basic \"$users[1].email:password\"",
         "Keygen-Environment": "shared"
       }
       """
@@ -950,7 +962,7 @@ Feature: Generate authentication token
     And I send the following headers:
       """
       {
-        "Authorization": "Basic \"$users[2].email:password\"",
+        "Authorization": "Basic \"$users[1].email:password\"",
         "Keygen-Environment": "isolated"
       }
       """
@@ -970,7 +982,14 @@ Feature: Generate authentication token
         }
       }
       """
-    Then the response status should be "401"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (record environment is not compatible with the current environment)"
+      }
+      """
     And the response should contain a valid signature header for "test1"
     And the response should contain the following headers:
       """

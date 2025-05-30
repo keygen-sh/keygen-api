@@ -818,8 +818,7 @@ Feature: Create license
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the current account has 1 global "user"
-    And the current account has 1 "admin"
-    And I am the last admin of account "ent1"
+    And I am an admin of account "ent1"
     And I use an authentication token
     And I send the following headers:
       """
@@ -841,7 +840,7 @@ Feature: Create license
               "data": { "type": "policies", "id": "$policies[0]" }
             },
             "user": {
-              "data": { "type": "users", "id": "$users[2]" }
+              "data": { "type": "users", "id": "$users[1]" }
             }
           }
         }

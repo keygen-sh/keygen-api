@@ -121,9 +121,6 @@ class User < ApplicationRecord
   before_destroy :enforce_admin_minimums_on_account!
   before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
 
-  before_destroy :enforce_admin_minimums_on_environment!
-  before_update :enforce_admin_minimums_on_environment!, if: -> { role.present? && role.changed? }
-
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
     if: -> { role&.name_changed? }
@@ -514,8 +511,7 @@ class User < ApplicationRecord
     nil
   end
 
-  def enforce_admin_minimums_on_account!     = enforce_admin_minimums_for(:account,     abort_on_error: true)
-  def enforce_admin_minimums_on_environment! = enforce_admin_minimums_for(:environment, abort_on_error: true)
+  def enforce_admin_minimums_on_account! = enforce_admin_minimums_for(:account, abort_on_error: true)
   def enforce_admin_minimums_for(association_name, abort_on_error: false)
     association = public_send(association_name)
     return if

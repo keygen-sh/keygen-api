@@ -51,7 +51,7 @@ Feature: User machines relationship
     And the current account has 3 isolated "machines" for the last "license"
     And I am an environment of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/$2/machines?environment=isolated"
+    When I send a GET request to "/accounts/test1/users/$1/machines?environment=isolated"
     Then the response status should be "200"
     And the response body should be an array with 3 "machines"
 

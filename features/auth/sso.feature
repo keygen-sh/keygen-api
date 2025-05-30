@@ -68,6 +68,7 @@ Feature: SSO
       """
       { "id": "cb2cab2f-aec0-4102-a1ca-8abc674d6adc", "code": "isolated" }
       """
+    And the account "ecorp-example" has 1 isolated "admin"
     And the last "admin" of account "ecorp-example" has the following attributes:
       """
       { "email": "elliot+isolated@ecorp.example" }
@@ -96,6 +97,7 @@ Feature: SSO
       """
       session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
+    And the account "ecorp-example" should have 2 "admins"
     And the last "admin" of account "ecorp-example" should have the following attributes:
       """
       {
@@ -126,9 +128,9 @@ Feature: SSO
   Scenario: We receive a successful callback for an existing admin (isolated environment, global admin)
     Given the account "ecorp-example" has 1 isolated "environment" with the following attributes:
       """
-      { "id": "cb2cab2f-aec0-4102-a1ca-8abc674d6adc", "code": "sandbox" }
+      { "id": "cb2cab2f-aec0-4102-a1ca-8abc674d6adc", "code": "isolated" }
       """
-    And the first "admin" of account "ecorp-example" has the following attributes:
+    And the last "admin" of account "ecorp-example" has the following attributes:
       """
       { "email": "elliot+global@ecorp.example" }
       """
@@ -149,12 +151,39 @@ Feature: SSO
       """
     And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
     And time is frozen at "2552-02-28T00:00:00.000Z"
-    When I send a GET request to "//auth.keygen.sh/sso?code=test_123&state=Z2I8ARocRyyaZ9RQamDy2lpyom1oUw-FcwoAh2E5G92XqjNnVI93Rm5a2_sB0PvOITPZWALiAfNKE-K72VjcKE7sefefA8IDduEinccEcpuZJ3e8XjJdvG0qSlJ_PTs.McBe_pYs7KwnytGl.xFUUPSckrxL4YkSKzqn8Kw"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123&state=zkeKTgQw357Nek3z7aeFHDTSSIdfkSwA-7s9E6NYj5QEKJA_h0sNnKjaJ7GJDOep8R_VC_cy_H0RlP1UQavxpk7Z40Ap15xxWgcdVT5FWjR8cUlVH94bgg-MeLhejto.pHs06JgatU88k4Ud.xbT5-byycH4IraHGZsOJeA"
     Then the response status should be "303"
-    And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_USER_NOT_FOUND"
-    And the response headers should not contain "Set-Cookie"
-    And the account "ecorp-example" should have 2 "admins"
-    And the account "ecorp-example" should have 0 "sessions"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/ecorp-example?env=isolated"
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
+      """
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      """
+    And the account "ecorp-example" should have 1 "admin"
+    And the last "admin" of account "ecorp-example" should have the following attributes:
+      """
+      {
+        "environment_id": null,
+        "sso_profile_id": "test_prof_61bbd8f6eedbaff8b040d1c98ba9",
+        "sso_connection_id": "test_conn_565647f76ab997ed8a62444451c6",
+        "sso_idp_id": "test_idp_332389f4fb8a9e823cb8308a2179",
+        "email": "elliot+global@ecorp.example",
+        "first_name": "Elliot",
+        "last_name": "Alderson"
+      }
+      """
+    And the account "ecorp-example" should have 1 "session"
+    And the last "session" of account "ecorp-example" should have the following attributes:
+      """
+      {
+        "environment_id": "cb2cab2f-aec0-4102-a1ca-8abc674d6adc",
+        "bearer_type": "User",
+        "bearer_id": "$users[0]",
+        "token_id": null,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
+        "ip": "127.0.0.1",
+        "last_used_at": null
+      }
+      """
     And time is unfrozen
 
   Scenario: We receive a successful callback for an existing admin (shared environment, shared admin)
@@ -191,6 +220,7 @@ Feature: SSO
       """
       session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
+    And the account "ecorp-example" should have 2 "admins"
     And the last "admin" of account "ecorp-example" should have the following attributes:
       """
       {
@@ -251,6 +281,7 @@ Feature: SSO
       """
       session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 12:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
+    And the account "ecorp-example" should have 1 "admin"
     And the last "admin" of account "ecorp-example" should have the following attributes:
       """
       {
@@ -580,7 +611,7 @@ Feature: SSO
       """
       session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 08:00:00 GMT; secure; httponly; samesite=None; partitioned;
       """
-    And the account "lumon-example" should have 2 "admins"
+    And the account "lumon-example" should have 1 "admin"
     And the account "lumon-example" should have 1 "read-only" admin
     And the last "read-only" admin of account "lumon-example" should have the following attributes:
       """
@@ -599,7 +630,7 @@ Feature: SSO
       """
       {
         "bearer_type": "User",
-        "bearer_id": "$users[2]",
+        "bearer_id": "$users[1]",
         "token_id": null,
         "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
         "ip": "127.0.0.1",

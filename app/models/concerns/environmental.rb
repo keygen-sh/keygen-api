@@ -167,7 +167,10 @@ module Environmental
               when environment.nil?
                 association.environment_id.nil?
               when environment.isolated?
-                association.environment_id == environment_id
+                association.environment_id == environment_id || (
+                  # NB(ezekg) allow global admins to escape environment isolation
+                  association in User(role: Role(:admin), environment_id: nil)
+                )
               when environment.shared?
                 association.environment_id == environment_id || association.environment_id.nil?
               end
