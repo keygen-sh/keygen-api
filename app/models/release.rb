@@ -161,6 +161,15 @@ class Release < ApplicationRecord
       if: :tag?,
     }
 
+  validate on: %i[create update] do
+    next unless
+      backdated_to_changed?
+
+    unless backdated_to.nil? || backdated_to.past?
+      errors.add :backdated_to, :invalid, message: 'must be in the past'
+    end
+  end
+
   # Assert that package matches the release's product.
   validate on: %i[create update] do
     next unless

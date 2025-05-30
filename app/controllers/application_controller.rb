@@ -361,6 +361,10 @@ class ApplicationController < ActionController::API
         error.pointer = '/data/attributes/arch'
       in source: { pointer: %r{^/data/attributes/admins} }
         error.pointer = '/data/relationships/admins'
+      in source: { pointer: %r{^/data/attributes/backdatedTo} },
+         code: /^BACKDATED_TO_(.+)/
+        error.pointer = '/data/attributes/backdated'
+        error.code    = "BACKDATED_#{$1}"
       in code: /^(?:LICENSE_)?USERS?_LIMIT_EXCEEDED$/ # normalize user limit errors
         error.pointer = '/data/relationships/users'
         error.code    = 'USER_LIMIT_EXCEEDED'

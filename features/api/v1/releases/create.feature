@@ -440,6 +440,55 @@ Feature: Create release
     And sidekiq should have 1 "request-log" job
     And sidekiq should have 1 "event-log" job
 
+  Scenario: Admin creates a backdated release in the future
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 14 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Patch Release",
+            "channel": "stable",
+            "version": "1.9.99",
+            "backdated": "2552-09-05T22:53:37.000Z"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response body should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be in the past",
+        "code": "BACKDATED_INVALID",
+        "source": {
+          "pointer": "/data/attributes/backdated"
+        },
+        "links": {
+          "about": "https://keygen.sh/docs/api/releases/#releases-object-attrs-backdated"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "event-log" jobs
+
   Scenario: Admin creates a new release for their account (free tier, limit not reached)
     Given the account "test1" is on a free tier
     And the account "test1" is subscribed
