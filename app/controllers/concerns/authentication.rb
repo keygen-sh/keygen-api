@@ -188,8 +188,12 @@ module Authentication
       )
     end
 
-    user = current_account.users.for_environment(current_environment)
-                                .find_by(email: email.downcase)
+    user = current_account.users.for_environment(current_environment).union(
+                                  current_account.admins.for_environment(nil), # NB(ezekg) allow global admins to authn everywhere
+                                )
+                                .find_by(
+                                  email: email.downcase,
+                                )
 
     @current_http_scheme = :password
     @current_http_token  = nil
