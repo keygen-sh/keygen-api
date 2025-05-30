@@ -129,7 +129,7 @@ end
 
 Given /^I (?:use (?:an|my) authentication|authenticate with (?:a|my)) token$/ do
   @token = if @bearer.respond_to?(:environment)
-             @bearer.tokens.first_or_create!(account: @bearer.account, environment: @bearer.environment, bearer: @bearer)
+             @bearer.tokens.first_or_create!(account: @bearer.account, environment: @environment || @bearer.environment, bearer: @bearer)
            else
              @bearer.tokens.first_or_create!(account: @bearer.account, bearer: @bearer)
            end

@@ -98,7 +98,7 @@ Given /^the current account is "([^\"]*)"$/ do |id|
 end
 
 Given /^the current environment is "([^\"]*)"$/ do |id|
-  Current.environment = FindByAliasService.call(@account.environments, id:, aliases: :code)
+  Current.environment = @environment = FindByAliasService.call(@account.environments, id:, aliases: :code)
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|

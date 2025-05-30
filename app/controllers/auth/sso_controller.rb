@@ -62,33 +62,43 @@ module Auth
       #
       # 1. first, we attempt to lookup the user by their workos profile.
       # 2. next, we attempt to lookup the user by their email.
-      # 3. otherwise, initialize a new user.
+      # 3. otherwise, jit-provision a new user in the env.
       #
       # lastly, we keep the user's attributes up-to-date.
-      user = account.users.for_environment(environment).then do |users|
-        users.find_by(sso_profile_id: profile.id) || users.find_or_initialize_by(email: profile.email) do |u|
-          unless account.sso_jit_provisioning?
-            Keygen.logger.warn { "[sso] user was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
+      user = account.users.for_environment(environment).union(
+                            account.admins.for_environment(nil), # NB(ezekg) allow global admins to authn everywhere
+                          )
+                          .find_by(
+                            'sso_profile_id = ? OR email = ?',
+                            profile.id,
+                            profile.email,
+                          )
 
-            raise Keygen::Error::InvalidSingleSignOnError.new('user was not found', code: 'SSO_USER_NOT_FOUND')
-          end
+      unless user.present?
+        unless account.sso_jit_provisioning?
+          Keygen.logger.warn { "[sso] user was not found: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
 
-          u.sso_profile_id    = profile.id
-          u.sso_connection_id = profile.connection_id
-          u.sso_idp_id        = profile.idp_id
-          u.first_name        = profile.first_name
-          u.last_name         = profile.last_name
-          u.email             = profile.email
+          raise Keygen::Error::InvalidSingleSignOnError.new('user was not found', code: 'SSO_USER_NOT_FOUND')
+        end
+
+        # provision a new user for the current environment (not using existing users scope because it's a union)
+        user = account.users.build(email: profile.email, environment:) do |new_user|
+          new_user.sso_profile_id    = profile.id
+          new_user.sso_connection_id = profile.connection_id
+          new_user.sso_idp_id        = profile.idp_id
+          new_user.first_name        = profile.first_name
+          new_user.last_name         = profile.last_name
+          new_user.email             = profile.email
 
           if profile.role in { slug: String => name }
-            u.assign_role name.underscore.to_sym
+            new_user.assign_role name.underscore.to_sym
           else
-            u.assign_role :user # principle of least privilege
+            new_user.assign_role :user # principle of least privilege
           end
         end
       end
 
-      # keep the user's attributes up-to-date with the IdP
+      # keep the user's attributes up-to-date with the IdP (also saves if not persisted)
       user.update(
         sso_profile_id: profile.id,
         sso_connection_id: profile.connection_id,

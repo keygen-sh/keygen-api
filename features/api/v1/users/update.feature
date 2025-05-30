@@ -663,6 +663,7 @@ Feature: Update user
   Scenario: Admin attempts to demote themself to user when they're the only admin for an isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -680,19 +681,7 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "environment must have at least 1 admin user",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        },
-        "code": "ENVIRONMENT_ADMINS_REQUIRED"
-      }
-      """
-    And the current user should have 1 "token"
+    Then the response status should be "200"
 
   @ee
   Scenario: Admin attempts to demote themself to user when they're not the only admin for a shared environment
@@ -1348,6 +1337,7 @@ Feature: Update user
   Scenario: Admin updates their permissions (isolated environment, other admins without full permissions)
     Given the current account is "ent1"
     And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
     And the current account has 2 isolated "admins" with the following:
       """
       { "permissions": ["license.validate"] }
@@ -1365,18 +1355,7 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "environment must have at least 1 admin user with a full permission set",
-        "source": {
-          "pointer": "/data/relationships/environment"
-        },
-        "code": "ENVIRONMENT_ADMINS_REQUIRED"
-      }
-      """
+    Then the response status should be "200"
 
   @ee
   Scenario: Admin updates their permissions (shared environment, other admins without full permissions)
@@ -1681,7 +1660,7 @@ Feature: Update user
       """
       { "keygen-environment": "isolated" }
       """
-    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       {
         "data": {

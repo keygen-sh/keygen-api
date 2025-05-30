@@ -21,16 +21,5 @@ FactoryBot.define do
       isolation_strategy { 'SHARED' }
       code               { 'shared' }
     end
-
-    # Add an admin to isolated environments (at least 1 is required).
-    after :build do |environment|
-      next unless
-        environment.isolated?
-
-      next if
-        environment.users.any?
-
-      environment.users << build(:admin, account: environment.account, environment:)
-    end
   end
 end

@@ -37,7 +37,7 @@ describe Environment, type: :model do
         account:,
       )
 
-      expect { environment.save }.to change { account.admins.count }.by_at_most(+1) # for isolated admin
+      expect { environment.save }.to_not change { account.admins.count }
     end
 
     it 'should not promote isolated users to admins on update' do

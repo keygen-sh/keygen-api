@@ -61,10 +61,6 @@ class Environment < ApplicationRecord
       update
     ]
 
-  validate :enforce_founding_admins!,
-    if: :isolated?,
-    on: :create
-
   validates :code,
     exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
     uniqueness: { case_sensitive: false, scope: :account_id },
@@ -112,7 +108,7 @@ class Environment < ApplicationRecord
 
   ##
   # admins returns the admins accessible from the environment.
-  def admins = account.admins.for_environment(self, strict: false)
+  def admins = account.admins.for_environment(self).union(account.admins.for_environment(nil))
 
   ##
   # codes returns the codes of the environments.
@@ -130,14 +126,5 @@ class Environment < ApplicationRecord
         account_id:,
       )
     end
-  end
-
-  def enforce_founding_admins!
-    return if
-      users.count(&:admin?) >= User::MINIMUM_ADMIN_COUNT
-
-    errors.add :admins, :required, message: "environment must have at least #{User::MINIMUM_ADMIN_COUNT} admin user"
-
-    throw :abort
   end
 end

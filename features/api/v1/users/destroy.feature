@@ -347,14 +347,13 @@ Feature: Delete user
       """
     When I send a DELETE request to "/accounts/test1/users/$2"
     Then the response status should be "204"
-    And the current account should have 3 "admins"
+    And the current account should have 2 "admins"
 
   @ee
   Scenario: Admin attempts to delete themself when they're the only admin for an isolated environment
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
-    # NOTE(ezekg) Isolated environments automatically have an admin created for them,
-    #             so we're authenticating as the isolated admin here.
+    And the current account has 1 isolated "admin"
     And I am the last admin of account "test1"
     And I use an authentication token
     And I send the following headers:
@@ -362,19 +361,8 @@ Feature: Delete user
       { "Keygen-Environment": "isolated" }
       """
     When I send a DELETE request to "/accounts/test1/users/$1"
-    Then the response status should be "422"
-    And the current account should have 2 "admins"
-    And the first error should have the following properties:
-      """
-        {
-          "title": "Unprocessable resource",
-          "detail": "environment must have at least 1 admin user",
-          "code": "ENVIRONMENT_ADMINS_REQUIRED",
-          "source": {
-            "pointer": "/data/relationships/environment"
-          }
-        }
-      """
+    Then the response status should be "204"
+    And the current account should have 1 "admin"
 
   @ee
   Scenario: Admin attempts to delete themself when they're not the only admin for a shared environment
