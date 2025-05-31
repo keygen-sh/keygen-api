@@ -13,31 +13,31 @@ FactoryBot.define do
     environment { NIL_ENVIRONMENT }
 
     factory :admin do
-      role { build(:role, :admin) }
+      role { build(:role, :admin, account:) }
     end
 
     factory :developer do
-      role { build(:role, :developer) }
+      role { build(:role, :developer, account:) }
     end
 
     factory :support_agent do
-      role { build(:role, :support_agent) }
+      role { build(:role, :support_agent, account:) }
     end
 
     factory :sales_agent do
-      role { build(:role, :sales_agent) }
+      role { build(:role, :sales_agent, account:) }
     end
 
     factory :read_only do
-      role { build(:role, :read_only) }
+      role { build(:role, :read_only, account:) }
     end
 
     trait :admin do
-      role { build(:role, :admin) }
+      role { build(:role, :admin, account:) }
     end
 
     trait :read_only do
-      role { build(:role, :read_only) }
+      role { build(:role, :read_only, account:) }
     end
 
     trait :passwordless do

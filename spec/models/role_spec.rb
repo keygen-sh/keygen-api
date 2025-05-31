@@ -7,6 +7,9 @@ describe Role, type: :model do
   let(:account)  { create(:account) }
   let(:resource) { create(:user, account:) }
 
+  # FIXME(ezekg) this isn't working with the default :role factory
+  # it_behaves_like :accountable
+
   subject { resource.role }
 
   describe 'pattern matching' do

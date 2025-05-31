@@ -2,8 +2,9 @@
 
 FactoryBot.define do
   factory :role do
-    initialize_with { new(**attributes) }
+    initialize_with { new(**attributes.reject { _2 in NIL_ACCOUNT }) }
 
+    account  { NIL_ACCOUNT }
     resource { nil }
 
     trait :user do

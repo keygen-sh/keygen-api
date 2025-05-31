@@ -3,6 +3,7 @@
 class Role < ApplicationRecord
   include Keygen::EE::ProtectedMethods[:permissions=, entitlements: %i[permissions]]
   include Keygen::PortableClass
+  include Accountable
   include Dirtyable
 
   USER_ROLES        = %w[user admin developer read_only sales_agent support_agent].freeze
@@ -22,15 +23,10 @@ class Role < ApplicationRecord
   }.with_indifferent_access
    .freeze
 
-  # FIXME(ezekg) replace this with has_account() after we backfill existing data
-  belongs_to :account, optional: true, validate: false,
-    default: -> {
-      Current.account || resource&.account
-    }
-
   belongs_to :resource,
     polymorphic: true,
     inverse_of: :role
+
   has_many :role_permissions,
     dependent: :delete_all,
     inverse_of: :role,
@@ -40,9 +36,11 @@ class Role < ApplicationRecord
     def actions = loaded? ? collect(&:action) : super
   end
 
+  # NB(ezekg) we're using account over account_id here because it may not be persisted
+  has_account default: -> { resource&.account }
+
   # FIXME(ezekg) replace with accountable concern i.e. an association
-  delegate :account, :account_id,
-    :default_permissions, :default_permission_ids,
+  delegate :default_permissions, :default_permission_ids,
     :allowed_permissions, :allowed_permission_ids,
     allow_nil: true,
     to: :resource

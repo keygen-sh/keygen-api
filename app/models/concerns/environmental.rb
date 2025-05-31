@@ -75,11 +75,11 @@ module Environmental
       # may rely on the environment being set on their parent.
       #
       # This is only applicable in EE, since current env is always nil in CE.
-      after_initialize -> { self.environment_id ||= Current.environment_id },
+      after_initialize -> { self.environment ||= Current.environment },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { Keygen.ee? && new_record? && environment.nil? }
 
-      before_validation -> { self.environment_id ||= Current.environment_id },
+      before_validation -> { self.environment ||= Current.environment },
         unless: -> { environment_id_attribute_assigned? || environment_attribute_assigned? },
         if: -> { Keygen.ee? && new_record? && environment.nil? },
         on: %i[create]

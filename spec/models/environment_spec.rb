@@ -55,9 +55,9 @@ describe Environment, type: :model do
   context 'with a shared isolation strategy' do
     it 'should promote nested shared users to admins on create' do
       users_attributes = [
-        attributes_for(:user),
-        attributes_for(:user),
-        attributes_for(:user),
+        attributes_for(:user, account:),
+        attributes_for(:user, account:),
+        attributes_for(:user, account:),
       ]
 
       # We also want to make sure existing users in the nil environment are not promoted

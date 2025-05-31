@@ -33,13 +33,13 @@ module Accountable
       # We're not using belongs_to(default:) because it only adds a before_validation
       # callback, but we want to also do it after_initialize because new children
       # may rely on the account being set on their parent.
-      after_initialize -> { self.account_id ||= Current.account_id },
+      after_initialize -> { self.account ||= Current.account },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-        if: -> { new_record? && account_id.nil? }
+        if: -> { new_record? && account.nil? }
 
-      before_validation -> { self.account_id ||= Current.account_id },
+      before_validation -> { self.account ||= Current.account },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-        if: -> { new_record? && account_id.nil? },
+        if: -> { new_record? && account.nil? },
         on: %i[create]
 
       # This is essentially Rails' default presence: validator but with an explicit
@@ -88,11 +88,11 @@ module Accountable
 
         # Again, we want to make absolutely sure our default is applied.
         after_initialize unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-          if: -> { new_record? && account_id.nil? },
+          if: -> { new_record? && account.nil? },
           &fn
 
         before_validation unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
-          if: -> { new_record? && account_id.nil? },
+          if: -> { new_record? && account.nil? },
           on: %i[create],
           &fn
       end
