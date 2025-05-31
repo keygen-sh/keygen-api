@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_31_022728) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_31_023019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -804,7 +804,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_31_022728) do
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.uuid "resource_id"
-    t.uuid "account_id"
+    t.uuid "account_id", null: false
     t.index ["account_id"], name: "index_roles_on_account_id"
     t.index ["created_at"], name: "index_roles_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
@@ -812,7 +812,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_31_022728) do
     t.index ["resource_id", "resource_type", "created_at"], name: "index_roles_on_resource_id_and_resource_type_and_created_at"
     t.index ["resource_id", "resource_type"], name: "index_roles_on_resource_id_and_resource_type", unique: true
     t.index ["resource_type", "resource_id", "name"], name: "index_roles_on_resource_type_and_resource_id_and_name"
-    t.check_constraint "account_id IS NOT NULL", name: "roles_account_id_not_null"
   end
 
   create_table "second_factors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
