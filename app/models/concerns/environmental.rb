@@ -112,14 +112,14 @@ module Environmental
                     raise ArgumentError, 'expected proc with 0..1 arguments'
                   end
 
-          self.environment_id ||= case value
-                                  in Environment => env
-                                    env.id
-                                  in String => id
-                                    id
-                                  in nil
-                                    nil
-                                  end
+          case value
+          in Environment => environment
+            self.environment ||= environment # NB(ezekg) could be an unpersisted record
+          in String => id
+            self.environment_id ||= id
+          in nil
+            # leave as-is
+          end
         }
 
         # Again, we want to make absolutely sure our default is applied.

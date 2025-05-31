@@ -33,11 +33,11 @@ module Accountable
       # We're not using belongs_to(default:) because it only adds a before_validation
       # callback, but we want to also do it after_initialize because new children
       # may rely on the account being set on their parent.
-      after_initialize -> { self.account_id ||= Current.account&.id },
+      after_initialize -> { self.account_id ||= Current.account_id },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
         if: -> { new_record? && account_id.nil? }
 
-      before_validation -> { self.account_id ||= Current.account&.id },
+      before_validation -> { self.account_id ||= Current.account_id },
         unless: -> { account_id_attribute_assigned? || account_attribute_assigned? },
         if: -> { new_record? && account_id.nil? },
         on: %i[create]
@@ -76,14 +76,14 @@ module Accountable
                     raise ArgumentError, 'expected proc with 0..1 arguments'
                   end
 
-          self.account_id ||= case value
-                              in Account => account
-                                account.id
-                              in String => id
-                                id
-                              in nil
-                                nil
-                              end
+          case value
+          in Account => account
+            self.account ||= account # NB(ezekg) could be an unpersisted record
+          in String => id
+            self.account_id ||= id
+          in nil
+            # leave as-is
+          end
         }
 
         # Again, we want to make absolutely sure our default is applied.
