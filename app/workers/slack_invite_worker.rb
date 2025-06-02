@@ -9,7 +9,7 @@ class SlackInviteWorker < BaseWorker
       account.free_or_disposable_domain?
 
     admin = account.admins.last
-    return if
+    return unless
       admin.email_domain_has_mx?
 
     # create a private channel
