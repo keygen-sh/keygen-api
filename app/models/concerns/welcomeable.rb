@@ -8,7 +8,7 @@ module Welcomeable
 
     after_commit :send_welcome_email, on: :create,
       unless: -> { skip_welcome_email? || free_or_disposable_domain? },
-      if: -> { Keygen.multiplayer? }
+      if: -> { Keygen.cloud? }
   end
 
   def skip_welcome_email? = !!skip_welcome_email
