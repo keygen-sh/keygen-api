@@ -10,7 +10,7 @@ module Slackable
 
     after_commit :send_slack_invite, on: :create,
       unless: -> { skip_slack_invite? || free_or_disposable_domain? }, # skip non-work accounts
-      if: -> { Keygen.multiplayer? }
+      if: -> { Keygen.cloud? }
   end
 
   def skip_slack_invite? = !!skip_slack_invite

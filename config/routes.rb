@@ -496,7 +496,7 @@ Rails.application.routes.draw do
     end
   end
 
-  if Keygen.multiplayer?
+  if Keygen.cloud?
     # Simplified short URLs for artifact distribution
     scope module: :bin, constraints: { domain: Keygen::DOMAIN, subdomain: %w[bin get], format: :jsonapi } do
       version_constraint '<=1.0' do
@@ -529,8 +529,7 @@ Rails.application.routes.draw do
 
       constraints domain: Keygen::DOMAIN do
         constraints subdomain: Keygen::SUBDOMAIN do
-          # FIXME(ezekg) these are only applicable to cloud i.e. not other multiplayer instances
-          if Keygen.multiplayer?
+          if Keygen.cloud?
             post :stripe, to: 'stripe#callback', as: :stripe_callback
             post :slack,  to: 'slack#callback',  as: :slack_callback
 
@@ -559,7 +558,7 @@ Rails.application.routes.draw do
         scope 'accounts/:account_id', as: :account do
           scope constraints: MimeTypeConstraint.new(:jsonapi, :json, raise_on_no_match: true), defaults: { format: :jsonapi } do
             constraints subdomain: Keygen::SUBDOMAIN do
-              if Keygen.multiplayer?
+              if Keygen.cloud?
                 scope module: 'accounts/relationships' do
                   resource :billing, only: %i[show update]
                   resource :plan,    only: %i[show update]

@@ -15,7 +15,7 @@ class AccountSerializer < BaseSerializer
     @object.updated_at
   end
 
-  if Keygen.multiplayer?
+  if Keygen.cloud?
     relationship :billing, unless: -> { @object.billing.nil? } do
       linkage always: true do
         { type: :billings, id: @object.billing&.id }
@@ -138,7 +138,7 @@ class AccountSerializer < BaseSerializer
       }
     }
 
-    if Keygen.multiplayer? && @object.slack_accepted_at?
+    if Keygen.cloud? && @object.slack_accepted_at?
       meta = {
         slack_deeplink: "https://slack.com/app_redirect?channel=#{@object.slack_channel_id}&team=#{@object.slack_team_id}",
         **meta,
