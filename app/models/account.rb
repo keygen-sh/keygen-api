@@ -96,7 +96,7 @@ class Account < ApplicationRecord
 
   validates :plan,
     presence: true,
-    if: -> { Keygen.multiplayer? }
+    if: -> { Keygen.cloud? }
 
   validates :users,
     length: { minimum: 1, message: "must have at least one admin user" }

@@ -274,6 +274,86 @@ describe Keygen, type: :ee do
     end
   end
 
+  describe '.cloud?' do
+    within_ce do
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false in a CE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return false in a CE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false in a CE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return false in a CE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+    end
+
+    within_ee do
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false in an EE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return false in an EE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false in an EE env' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return true in an EE env' do
+          expect(Keygen.cloud?).to be true
+        end
+      end
+    end
+
+    with_env KEYGEN_EDITION: nil do
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false with a nil edition' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'singleplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return false with nil edition' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.acme.example' do
+        it 'should return false with a nil edition' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+
+      with_env KEYGEN_MODE: 'multiplayer', KEYGEN_HOST: 'api.keygen.sh' do
+        it 'should return false with a nil edition' do
+          expect(Keygen.cloud?).to be false
+        end
+      end
+    end
+  end
+
   describe '.ee' do
     within_ce do
       it 'should not call the block in a CE env' do

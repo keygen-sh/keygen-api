@@ -7,7 +7,7 @@ module Billable
     # Virtual attribute for tracking referrals
     attr_accessor :referral_id
 
-    after_commit :initialize_billing, on: :create, if: -> { Keygen.multiplayer? }
+    after_commit :initialize_billing, on: :create, if: -> { Keygen.cloud? }
 
     Billing::AVAILABLE_EVENTS.each do |event|
       delegate "#{event}!", to: :billing, allow_nil: true
