@@ -42,7 +42,7 @@ module EnvHelper
     def with_env(**next_env, &)
       prev_env = ENV.to_hash
 
-      context "with environment #{next_env.keys.inspect}" do
+      context "with environment #{next_env.inspect}" do
         before do
           ENV.update(
             next_env.transform_keys(&:to_s).transform_values(&:to_s),
