@@ -173,7 +173,7 @@ module Api::V1
         }
 
         unless billing.plan.price in 0 | nil
-          kwargs[:trial_end] = 45.days.from_now # start a trial on paid tiers
+          kwargs[:trial_end] = 45.days.from_now.to_i # start a trial on paid tiers
         end
 
         # create a trial subscription (possibly without a payment method)
