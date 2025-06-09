@@ -2,8 +2,6 @@
 
 module Billings
   class CreateSubscriptionService < BaseService
-    TRIAL_DURATION = 1.month
-
     def initialize(customer:, plan:, trial_end: nil)
       @customer  = customer
       @plan      = plan
@@ -12,7 +10,7 @@ module Billings
 
     def call
       Billings::Subscription.create(
-        trial_end: trial_end || TRIAL_DURATION.from_now.to_i,
+        trial_end:,
         customer:,
         plan:,
       )

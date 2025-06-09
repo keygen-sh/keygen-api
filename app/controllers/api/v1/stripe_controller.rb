@@ -163,14 +163,21 @@ module Api::V1
         )
       when "customer.created"
         customer = event.data.object
-        billing = Billing.find_by customer_id: customer.id
-        return unless billing && billing.subscription_id.nil?
+        billing = Billing.find_by(customer_id: customer.id)
+        return unless
+          billing && billing.subscription_id.nil?
 
-        # Create a trial subscription (possibly without a payment method)
-        Billings::CreateSubscriptionService.call(
+        kwargs = {
           customer: billing.customer_id,
-          plan: billing.plan.plan_id
-        )
+          plan: billing.plan.plan_id,
+        }
+
+        unless billing.plan.price in 0 | nil
+          kwargs[:trial_end] = 45.days.from_now # start a trial on paid tiers
+        end
+
+        # create a trial subscription (possibly without a payment method)
+        Billings::CreateSubscriptionService.call(**kwargs)
       end
 
       Keygen.logger.info("[stripe] action=received event_id=#{event.id} event_type=#{event.type}")
