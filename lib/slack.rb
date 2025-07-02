@@ -31,6 +31,7 @@ module Slack
         default_options.merge(query: {
           channel: channel_id,
           emails: email,
+          external_limited: false, # allow them to invite teammates
         }),
       )
 
