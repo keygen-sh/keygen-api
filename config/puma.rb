@@ -25,6 +25,9 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }.to_i
 # Specifies connection keep-alive/idle timeout
 persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }.to_i
 
+# FIXME(ezekg) https://www.heroku.com/blog/pumas-routers-keepalives-ohmy/
+enable_keep_alives false
+
 # Ensure our backlog is drained
 drain_on_shutdown
 
