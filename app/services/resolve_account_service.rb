@@ -11,14 +11,19 @@ class ResolveAccountService < BaseService
   def call!
     case
     when Keygen.singleplayer?
-      account_id = request.params[:account_id] ||
-                   ENV['KEYGEN_ACCOUNT_ID']
+      player_one_id = ActiveRecord::Type.lookup(:uuid)
+                                        .cast(
+                                          # normalize for format agnostic comparisons
+                                          ENV['KEYGEN_ACCOUNT_ID'],
+                                        )
+
+      account_id = request.params[:account_id] || player_one_id
       raise Keygen::Error::InvalidAccountIdError, 'account is required' unless
         account_id.present?
 
       account = find_by_account_id!(account_id)
-      raise Keygen::Error::InvalidAccountIdError, "account is invalid (expected #{ENV['KEYGEN_ACCOUNT_ID']})" unless
-        account.id == ENV['KEYGEN_ACCOUNT_ID']
+      raise Keygen::Error::InvalidAccountIdError, "account is invalid (expected #{player_one_id})" unless
+        account.id == player_one_id
 
       account
     when Keygen.multiplayer?
