@@ -1,0 +1,39 @@
+{
+    "name": "keygen-api",
+    "build": {
+        "dockerfile": "debian.dockerfile",
+        "target": "build-base",
+        "context": "."
+    },
+    "workspaceFolder": "/app",
+    "features": {
+        // https://github.com/devcontainers/features/tree/main/src/common-utils
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "nonFreePackages": true,
+            "upgradePackages": false
+        },
+        // https://github.com/devcontainers/features/tree/main/src/docker-in-docker
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "moby": false
+        }
+    },
+    "mounts": [
+        {
+            "type": "bind",
+            "source": "${localWorkspaceFolder}",
+            "target": "/app"
+        }
+    ],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
+            "extensions": [
+                "Shopify.ruby-extensions-pack",
+                "Shopify.ruby-lsp"
+            ]
+        }
+    },
+    "runArgs": ["--network=host"]
+}
