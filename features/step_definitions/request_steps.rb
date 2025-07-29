@@ -841,6 +841,16 @@ Then /^the response(?: headers)? should contain the following(?: headers)?:$/ do
   end
 end
 
+Then /^the response(?: headers)? should not contain the following(?: headers)?:$/ do |body|
+  body    = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  headers = JSON.parse(body)
+
+  headers.each do |key, value|
+    expect(last_response.headers[key]).to_not eq value&.strip
+  end
+end
+
+
 Then /^the response should contain the following raw headers:$/ do |body|
   body    = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   headers = body.split(/\n/)

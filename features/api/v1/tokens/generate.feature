@@ -515,6 +515,51 @@ Feature: Generate authentication token
     And sidekiq should have 1 "event-log" job
 
   @ee
+  Scenario: Global admin generates a token for an isolated environment via token authentication
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          },
+          "relationships": {
+            "environment": {
+              "data": { "type": "environments", "id": "$environments[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        },
+        "bearer": {
+          "links": { "related": "/v1/accounts/$account/users/$users[0]" },
+          "data": { "type": "users", "id": "$users[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should not contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  @ee
   Scenario: Shared admin generates a token for an shared environment
     Given the current account is "test1"
     And the current account has 1 shared "environment"
