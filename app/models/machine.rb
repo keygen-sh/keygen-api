@@ -255,7 +255,7 @@ class Machine < ApplicationRecord
       owner_id_changed?
 
     next unless
-      owner.present?
+      license.present? && owner.present?
 
     unless license.users.exists?(owner.id)
       errors.add :owner, :invalid, message: 'must be a valid license user'
