@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_31_023019) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_22_152252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -547,11 +547,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_31_023019) do
     t.jsonb "metadata"
     t.string "backend"
     t.uuid "environment_id"
+    t.index ["account_id", "release_id"], name: "release_artifacts_uploaded_idx", where: "((status)::text = 'UPLOADED'::text)"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_release_artifacts_on_environment_id"
     t.index ["filename", "release_id", "account_id"], name: "release_artifacts_uniq_filename_idx", unique: true, where: "(filename IS NOT NULL)"
     t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"
     t.index ["release_filetype_id"], name: "index_release_artifacts_on_release_filetype_id"
+    t.index ["release_id"], name: "index_release_artifacts_on_release_id"
     t.index ["release_platform_id"], name: "index_release_artifacts_on_release_platform_id"
     t.index ["status"], name: "index_release_artifacts_on_status"
   end
