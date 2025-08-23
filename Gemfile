@@ -45,7 +45,6 @@ gem 'action_policy', '~> 0.6.3'
 gem 'openssl', '~> 3.1.0'
 gem 'ed25519'
 gem 'jwt'
-gem 'uuid7'
 
 # Scopes and pagination
 gem 'has_scope'
