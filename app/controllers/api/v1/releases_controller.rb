@@ -55,7 +55,7 @@ module Api::V1
           param :version, type: :string
           param :tag, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :backdated, type: :time, optional: true, coerce: true, allow_nil: true, as: :backdated_to
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           with if: -> { current_api_version == '1.0' } do
             param :filename, type: :string, allow_blank: true, optional: true
             param :filesize, type: :integer, allow_nil: true, optional: true
@@ -136,7 +136,7 @@ module Api::V1
           param :description, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :tag, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :backdated, type: :time, optional: true, coerce: true, allow_nil: true, as: :backdated_to
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           with if: -> { current_api_version == '1.0' } do
             param :filesize, type: :integer, allow_nil: true, optional: true
             param :signature, type: :string, allow_blank: true, allow_nil: true, optional: true

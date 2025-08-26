@@ -36,7 +36,7 @@ module Api::V1
             transform: -> (_, key) {
               [:engine_attributes, { key: }]
             }
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
         param :relationships, type: :hash do
           param :product, type: :hash do
@@ -90,7 +90,7 @@ module Api::V1
             transform: -> (_, key) {
               [:engine_attributes, { key: }]
             }
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
       end
     }

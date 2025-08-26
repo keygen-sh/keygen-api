@@ -73,7 +73,7 @@ module Api::V1
           param :heartbeat_resurrection_strategy, type: :string, optional: true
           param :heartbeat_basis, type: :string, optional: true
           param :require_heartbeat, type: :boolean, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
         param :relationships, type: :hash do
           param :product, type: :hash do
@@ -163,7 +163,7 @@ module Api::V1
           param :heartbeat_resurrection_strategy, type: :string, optional: true
           param :heartbeat_basis, type: :string, optional: true
           param :require_heartbeat, type: :boolean, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
       end
     }

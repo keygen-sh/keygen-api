@@ -41,7 +41,7 @@ module Api::V1
                   param :password, type: :string, allow_blank: true, allow_nil: true, optional: true
                   param :first_name, type: :string, allow_blank: true, allow_nil: true, optional: true
                   param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
-                  param :metadata, type: :metadata, allow_blank: true, optional: true
+                  param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
                   param :role, type: :string, inclusion: { in: %w[admin] }, optional: true, noop: true
                 end
               end

@@ -795,7 +795,41 @@ Feature: Update user
           "attributes": {
             "metadata": {
               "object": {
-                "object": { "key": "value" }
+                "nested": { "key": "value" }
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "user" with the following "metadata":
+      """
+      {
+        "object": {
+          "nested": { "key": "value" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a users metadata with a deeply nested hash of non-scalar values (hash)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "object": {
+                "nested": [{ "key": "value" }]
               }
             }
           }
@@ -807,9 +841,9 @@ Feature: Update user
       """
       {
         "title": "Bad request",
-        "detail": "type mismatch (received object expected metadata object)",
+        "detail": "maximum depth of 2 exceeded",
         "source": {
-          "pointer": "/data/attributes/metadata"
+          "pointer": "/data/attributes/metadata/object/nested/0"
         }
       }
       """
@@ -838,14 +872,53 @@ Feature: Update user
         }
       }
       """
+     Then the response status should be "200"
+    And the response body should be a "user" with the following "metadata":
+      """
+      {
+        "array": [
+          "foo",
+          "bar",
+          { "key": "value" },
+          "baz"
+        ]
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a users metadata with a deeply nested hash of non-scalar values (array)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "array": [
+                { "foo": 1 },
+                { "bar": 2 },
+                { "baz": [3] }
+              ]
+            }
+          }
+        }
+      }
+      """
     Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
         "title": "Bad request",
-        "detail": "type mismatch (received object expected metadata object)",
+        "detail": "maximum depth of 2 exceeded",
         "source": {
-          "pointer": "/data/attributes/metadata"
+          "pointer": "/data/attributes/metadata/array/2/baz"
         }
       }
       """

@@ -45,7 +45,7 @@ module Api::V1
           param :last_name, type: :string, allow_blank: true, optional: true
           param :email, type: :string
           param :password, type: :string, allow_nil: true, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent read-only] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {
@@ -111,7 +111,7 @@ module Api::V1
           param :last_name, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :email, type: :string, optional: true
           param :password, type: :string, allow_nil: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :product, :environment) }
-          param :metadata, type: :metadata, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true, if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) }
           param :role, type: :string, inclusion: { in: %w[user admin developer sales-agent support-agent read-only] }, optional: true,
             if: -> { current_bearer&.has_role?(:admin) },
             transform: -> (k, v) {

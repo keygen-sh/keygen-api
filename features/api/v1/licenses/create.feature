@@ -2238,7 +2238,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license with complex metadata
+  Scenario: Admin creates a license with nested metadata
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -2314,7 +2314,65 @@ Feature: Create license
                 "key": { "k": "v" }
               },
               "array": [
-                [1, 2, 3]
+                { "foo": 1 },
+                { "bar": 2 },
+                { "baz": 3 }
+              ]
+            }
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following "metadata":
+      """
+      {
+        "key": ["value"],
+        "object": {
+          "key": { "k": "v" }
+        },
+        "array": [
+          { "foo": 1 },
+          { "bar": 2 },
+          { "baz": 3 }
+        ]
+      }
+      """
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license with too complex nested metadata
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "metadata": {
+              "key": ["value"],
+              "object": {
+                "key": { "k": "v" }
+              },
+              "array": [
+                [0],
+                [{ "foo": 1 }, 2, [3]]
               ]
             }
           },
@@ -2335,9 +2393,9 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "type mismatch (received object expected metadata object)",
+        "detail": "maximum depth of 2 exceeded",
         "source": {
-          "pointer": "/data/attributes/metadata"
+          "pointer": "/data/attributes/metadata/array/1/0"
         }
       }
       """

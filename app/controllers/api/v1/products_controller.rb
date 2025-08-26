@@ -30,7 +30,7 @@ module Api::V1
           param :code, type: :string, optional: true
           param :distribution_strategy, type: :string, optional: true
           param :url, type: :string, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           param :platforms, type: :array, allow_nil: true, optional: true do
             items type: :string
           end
@@ -87,7 +87,7 @@ module Api::V1
           param :code, type: :string, optional: true
           param :distribution_strategy, type: :string, allow_nil: true, optional: true
           param :url, type: :string, allow_nil: true, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           param :platforms, type: :array, allow_nil: true, optional: true do
             items type: :string
           end

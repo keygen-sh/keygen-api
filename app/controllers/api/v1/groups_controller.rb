@@ -30,7 +30,7 @@ module Api::V1
           param :max_users, type: :integer, optional: true
           param :max_licenses, type: :integer, optional: true
           param :max_machines, type: :integer, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
         param :relationships, type: :hash, optional: true do
           Keygen.ee do |license|
@@ -75,7 +75,7 @@ module Api::V1
           param :max_users, type: :integer, allow_nil: true, optional: true
           param :max_licenses, type: :integer, allow_nil: true, optional: true
           param :max_machines, type: :integer, allow_nil: true, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
       end
     }

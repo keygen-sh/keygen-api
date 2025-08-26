@@ -28,7 +28,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string
           param :code, type: :string
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
         param :relationships, type: :hash, optional: true do
           Keygen.ee do |license|
@@ -71,7 +71,7 @@ module Api::V1
         param :attributes, type: :hash do
           param :name, type: :string, optional: true
           param :code, type: :string, optional: true
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
       end
     }

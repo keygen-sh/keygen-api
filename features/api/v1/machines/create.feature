@@ -62,6 +62,142 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a machine with complex metadata
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+            "metadata": {
+              "cpuCount": 16,
+              "cpuCountPhysical": 8,
+              "memoryTotal": 17179869184,
+              "memoryAvailable": 8589934592,
+              "bootTime": 1600000000,
+              "diskTotal": 500000000000,
+              "diskUsed": 250000000000,
+              "diskFree": 250000000000,
+              "platformSystem": "Linux",
+              "platformRelease": "test-release",
+              "platformVersion": "test-version",
+              "platformMachine": "x86_64",
+              "platformProcessor": "generic-processor",
+              "hostname": "test-host",
+              "osPrettyName": "TestOS 1.0",
+              "osName": "TestOS",
+              "osVersionId": "1.0",
+              "osVersion": "1.0.0",
+              "osVersionCodename": "testcodename",
+              "osId": "testos",
+              "osIdLike": "testnix",
+              "osHomeUrl": "https://example.com/",
+              "osSupportUrl": "https://support.example.com/",
+              "osBugReportUrl": "https://bugs.example.com/",
+              "osPrivacyPolicyUrl": "https://example.com/privacy",
+              "osUbuntuCodename": "testcodename",
+              "kernelVersion": "test-kernel-version",
+              "kernelCmdline": "BOOT_IMAGE=/boot/test-kernel root=UUID=00000000-0000-0000-0000-000000000000 ro console=tty0",
+              "cpuModel": "Generic CPU Model @ 2.50GHz",
+              "kernelMemoryTotal": "1024000 kB",
+              "gpuDevices": [
+                "gpu0",
+                "gpu1",
+                "gpu-virtual"
+              ],
+              "gpuCount": 3,
+              "networkInterfaces": [
+                {
+                  "name": "lo",
+                  "ipv4": "127.0.0.1",
+                  "ipv6": "::1"
+                },
+                {
+                  "name": "eth0",
+                  "ipv4": "192.0.2.1"
+                }
+              ]
+            }
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "machine" with the following attributes:
+      """
+      {
+        "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+        "metadata": {
+          "cpuCount": 16,
+          "cpuCountPhysical": 8,
+          "memoryTotal": 17179869184,
+          "memoryAvailable": 8589934592,
+          "bootTime": 1600000000,
+          "diskTotal": 500000000000,
+          "diskUsed": 250000000000,
+          "diskFree": 250000000000,
+          "platformSystem": "Linux",
+          "platformRelease": "test-release",
+          "platformVersion": "test-version",
+          "platformMachine": "x86_64",
+          "platformProcessor": "generic-processor",
+          "hostname": "test-host",
+          "osPrettyName": "TestOS 1.0",
+          "osName": "TestOS",
+          "osVersionId": "1.0",
+          "osVersion": "1.0.0",
+          "osVersionCodename": "testcodename",
+          "osId": "testos",
+          "osIdLike": "testnix",
+          "osHomeUrl": "https://example.com/",
+          "osSupportUrl": "https://support.example.com/",
+          "osBugReportUrl": "https://bugs.example.com/",
+          "osPrivacyPolicyUrl": "https://example.com/privacy",
+          "osUbuntuCodename": "testcodename",
+          "kernelVersion": "test-kernel-version",
+          "kernelCmdline": "BOOT_IMAGE=/boot/test-kernel root=UUID=00000000-0000-0000-0000-000000000000 ro console=tty0",
+          "cpuModel": "Generic CPU Model @ 2.50GHz",
+          "kernelMemoryTotal": "1024000 kB",
+          "gpuDevices": [
+            "gpu0",
+            "gpu1",
+            "gpu-virtual"
+          ],
+          "gpuCount": 3,
+          "networkInterfaces": [
+            {
+              "name": "lo",
+              "ipv4": "127.0.0.1",
+              "ipv6": "::1"
+            },
+            {
+              "name": "eth0",
+              "ipv4": "192.0.2.1"
+            }
+          ]
+        }
+
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
   Scenario: Admin creates a machine with an owner (license owner matches license owner)
     Given I am an admin of account "test1"
     And the current account is "test1"

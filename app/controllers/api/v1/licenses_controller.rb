@@ -63,7 +63,7 @@ module Api::V1
             param :max_processes, type: :integer, allow_nil: true, optional: true
             param :max_users, type: :integer, allow_nil: true, optional: true
           end
-          param :metadata, type: :metadata, allow_blank: true, optional: true
+          param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
 
           Keygen.ee do |license|
             next unless
@@ -142,7 +142,7 @@ module Api::V1
             param :max_uses, type: :integer, allow_nil: true, optional: true
             param :max_processes, type: :integer, allow_nil: true, optional: true
             param :max_users, type: :integer, allow_nil: true, optional: true
-            param :metadata, type: :metadata, allow_blank: true, optional: true
+            param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           end
 
           Keygen.ee do |license|
