@@ -103,6 +103,24 @@ Feature: Update user
       """
     Then the response status should be "200"
 
+  Scenario: Sales attempts to update an admin for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Support updates a user for their account
     Given the current account is "test1"
     And the current account has 1 "support-agent"

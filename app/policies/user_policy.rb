@@ -51,7 +51,7 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer)
       allow!
-    in role: Role(:product | :environment) if record.user?
+    in role: Role(:sales_agent | :product | :environment) if record.user?
       allow!
     in nil
       !account.protected?
@@ -66,9 +66,9 @@ class UserPolicy < ApplicationPolicy
     verify_privileges!
 
     case bearer
-    in role: Role(:admin | :developer | :sales_agent)
+    in role: Role(:admin | :developer)
       allow!
-    in role: Role(:product | :environment) if record.user?
+    in role: Role(:sales_agent | :product | :environment) if record.user?
       allow!
     in role: Role(:user) if record == bearer
       allow!
