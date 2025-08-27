@@ -6,8 +6,6 @@ module Denormalizable
   DENORMALIZE_ASSOCIATION_ASYNC_BATCH_SIZE = 1_000
 
   class_methods do
-    cattr_accessor :denormalized_attributes, default: Set.new
-
     def denormalizes(*attribute_names, with: nil, from: nil, to: nil, prefix: nil)
       raise ArgumentError, 'must provide :from, :to, or :with (but not multiple)' unless
         from.present? ^ to.present? ^ with.present?
@@ -90,6 +88,8 @@ module Denormalizable
 
   # FIXME(ezekg) Move this out into a separate module so that we don't pollute the model.
   included do
+    cattr_reader :denormalized_attributes, default: Set.new
+
     private
 
     def write_denormalized_attribute_to_unpersisted_relation(target_association_name, target_attribute_name, source_attribute_name)
