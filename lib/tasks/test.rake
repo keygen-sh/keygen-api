@@ -43,6 +43,14 @@ begin
       parallel:seed
     ]
 
+    desc 'reset test suite'
+    task reset: %i[
+      test:environment
+      log:clear
+      parallel:drop
+      setup
+    ]
+
     desc 'run rspec test suite'
     task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
