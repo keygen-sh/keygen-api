@@ -340,11 +340,7 @@ Feature: PyPI simple package files
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "307"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://pypi.org/simple/foo" }
-      """
+    Then the response status should be "403"
 
   Scenario: License requests versions for an open product
     Given the last "product" has the following attributes:
@@ -374,11 +370,7 @@ Feature: PyPI simple package files
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "307"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://pypi.org/simple/foo" }
-      """
+    Then the response status should be "403"
 
   Scenario: License requests versions for another closed product
     Given the last "product" has the following attributes:
@@ -393,11 +385,7 @@ Feature: PyPI simple package files
     And I am a license of account "test1"
     And I authenticate with my key
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "307"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://pypi.org/simple/foo" }
-      """
+    Then the response status should be "403"
 
   Scenario: License requests versions for another open product
     Given the last "product" has the following attributes:
@@ -420,11 +408,7 @@ Feature: PyPI simple package files
       { "distributionStrategy": "LICENSED" }
       """
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "307"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://pypi.org/simple/foo" }
-      """
+    Then the response status should be "403"
 
   Scenario: Anonymous requests versions for a closed product
     Given the last "product" has the following attributes:
@@ -432,11 +416,7 @@ Feature: PyPI simple package files
       { "distributionStrategy": "CLOSED" }
       """
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "307"
-    And the response should contain the following headers:
-      """
-      { "Location": "https://pypi.org/simple/foo" }
-      """
+    Then the response status should be "403"
 
   Scenario: Anonymous requests versions for an open product
     Given the last "product" has the following attributes:

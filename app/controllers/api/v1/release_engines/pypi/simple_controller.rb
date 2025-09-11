@@ -52,7 +52,10 @@ module Api::V1::ReleaseEngines
 
     def set_package
       @package = Current.resource = FindByAliasService.call(
-        authorized_scope(current_account.release_packages.pypi),
+        # NOTE(ezekg) See below comment. We're not using authorized_scope here so that we can
+        #             return an authz error for packages that do exist but aren't accessible
+        #             by the current bearer, rather than redirecting to PyPI.
+        current_account.release_packages.pypi,
         id: params[:package],
         aliases: :key,
       )
