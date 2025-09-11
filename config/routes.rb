@@ -574,7 +574,7 @@ Rails.application.routes.draw do
               end
 
               scope module: 'accounts/relationships' do
-                resources :settings
+                resources :account_settings, path: 'settings'
               end
             end
           end

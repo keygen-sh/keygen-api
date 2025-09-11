@@ -22,6 +22,6 @@ class AccountSettingSerializer < BaseSerializer
   end
 
   link :self do
-    @url_helpers.v1_account_setting_path @object.account_id, @object
+    @url_helpers.v1_account_account_setting_path @object.account_id, @object
   end
 end

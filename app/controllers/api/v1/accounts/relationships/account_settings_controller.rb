@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Accounts::Relationships
-  class SettingsController < Api::V1::BaseController
+  class AccountSettingsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_setting, only: %i[show update destroy]
@@ -9,14 +9,14 @@ module Api::V1::Accounts::Relationships
     def index
       settings = apply_pagination(authorized_scope(apply_scopes(current_account.settings)))
       authorize! settings,
-        with: Accounts::SettingPolicy
+        with: Accounts::AccountSettingPolicy
 
       render jsonapi: settings
     end
 
     def show
       authorize! setting,
-        with: Accounts::SettingPolicy
+        with: Accounts::AccountSettingPolicy
 
       render jsonapi: setting
     end
@@ -33,9 +33,9 @@ module Api::V1::Accounts::Relationships
       end
     }
     def create
-      setting = current_account.settings.new(**setting_params)
+      setting = current_account.settings.new(**account_setting_params)
       authorize! setting,
-        with: Accounts::SettingPolicy
+        with: Accounts::AccountSettingPolicy
 
       if setting.save
         BroadcastEventService.call(
@@ -44,7 +44,7 @@ module Api::V1::Accounts::Relationships
           resource: setting,
         )
 
-        render jsonapi: setting, status: :created, location: v1_account_setting_url(setting.account_id, setting)
+        render jsonapi: setting, status: :created, location: v1_account_account_setting_url(setting.account_id, setting)
       else
         render_unprocessable_resource setting
       end
@@ -63,9 +63,9 @@ module Api::V1::Accounts::Relationships
     }
     def update
       authorize! setting,
-        with: Accounts::SettingPolicy
+        with: Accounts::AccountSettingPolicy
 
-      if setting.update(setting_params)
+      if setting.update(account_setting_params)
         BroadcastEventService.call(
           event: 'account.settings.updated',
           account: current_account,
@@ -80,7 +80,7 @@ module Api::V1::Accounts::Relationships
 
     def destroy
       authorize! setting,
-        with: Accounts::SettingPolicy
+        with: Accounts::AccountSettingPolicy
 
       BroadcastEventService.call(
         event: 'account.settings.deleted',
