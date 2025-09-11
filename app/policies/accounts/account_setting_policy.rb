@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Accounts
-  class SettingPolicy < ApplicationPolicy
+  class AccountSettingPolicy < ApplicationPolicy
     scope_for :active_record_relation do |relation|
       case bearer
       in role: Role(:admin | :developer)

@@ -37,7 +37,7 @@ class AccountSerializer < BaseSerializer
 
   relationship :settings do
     link :related do
-      @url_helpers.v1_account_settings_path @object
+      @url_helpers.v1_account_account_settings_path @object
     end
   end
 

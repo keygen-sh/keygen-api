@@ -91,17 +91,12 @@ class EventLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        next unless @object.resource.present?
+        next unless @object.resource.present? # handle when resource no longer exists
 
-        # FIXME(ezekg) some models don't play well with polymorphic routing
         case @object.resource
-        when AccountSetting
-          @url_helpers.v1_account_setting_path @object.account_id, @object.resource_id
-        when Billing
-          @url_helpers.v1_account_billing_path @object.account_id
-        when Plan
-          @url_helpers.v1_account_plan_path @object.account_id
-        when Accountable
+        in Billing | Plan # special case singular routes
+          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource_type.underscore.to_sym]
+        in Accountable
           @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
         else
           @url_helpers.polymorphic_path [:v1, @object.resource]
