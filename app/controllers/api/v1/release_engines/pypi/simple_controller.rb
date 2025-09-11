@@ -44,6 +44,14 @@ module Api::V1::ReleaseEngines
           package:,
           artifacts:,
         }
+    rescue ActionPolicy::Unauthorized
+      # FIXME(ezekg) Although we leak information here, we improve DX by letting pip prompt
+      #              the end-user for authentication when the package requires it.
+      if current_bearer.nil?
+        render_unauthorized
+      else
+        raise
+      end
     end
 
     private
@@ -51,11 +59,10 @@ module Api::V1::ReleaseEngines
     attr_reader :package
 
     def set_package
+      scoped_packages = authorized_scope(current_account.release_packages.pypi, with: ReleaseEngines::Pypi::ReleasePackagePolicy) # see below comment
+
       @package = Current.resource = FindByAliasService.call(
-        # NOTE(ezekg) See below comment. We're not using authorized_scope here so that we can
-        #             return an authz error for packages that do exist but aren't accessible
-        #             by the current bearer, rather than redirecting to PyPI.
-        current_account.release_packages.pypi,
+        scoped_packages,
         id: params[:package],
         aliases: :key,
       )

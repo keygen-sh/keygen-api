@@ -408,7 +408,7 @@ Feature: PyPI simple package files
       { "distributionStrategy": "LICENSED" }
       """
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "403"
+    Then the response status should be "401"
 
   Scenario: Anonymous requests versions for a closed product
     Given the last "product" has the following attributes:
@@ -416,7 +416,7 @@ Feature: PyPI simple package files
       { "distributionStrategy": "CLOSED" }
       """
     When I send a GET request to "/accounts/test1/engines/pypi/simple/foo"
-    Then the response status should be "403"
+    Then the response status should be "401"
 
   Scenario: Anonymous requests versions for an open product
     Given the last "product" has the following attributes:
