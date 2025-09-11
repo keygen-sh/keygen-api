@@ -181,6 +181,9 @@ events = %w[
 
   account.billing.updated
   account.plan.updated
+  account.settings.created
+  account.settings.deleted
+  account.settings.updated
   account.subscription.canceled
   account.subscription.paused
   account.subscription.renewed

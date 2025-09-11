@@ -109,7 +109,21 @@ class RequestLogSerializer < BaseSerializer
 
     if @object.resource_id.present? && @object.resource_type.present?
       link :related do
-        @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
+        next unless @object.resource.present?
+
+        # FIXME(ezekg) some models don't play well with polymorphic routing
+        case @object.resource
+        when AccountSetting
+          @url_helpers.v1_account_setting_path @object.account_id, @object.resource_id
+        when Billing
+          @url_helpers.v1_account_billing_path @object.account_id
+        when Plan
+          @url_helpers.v1_account_plan_path @object.account_id
+        when Accountable
+          @url_helpers.polymorphic_path [:v1, @object.account, @object.resource]
+        else
+          @url_helpers.polymorphic_path [:v1, @object.resource]
+        end
       end
     end
   end
