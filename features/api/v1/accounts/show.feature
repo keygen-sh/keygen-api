@@ -25,7 +25,8 @@ Feature: Show account
         "publicKey": "$~accounts[0].public_key",
         "keys": {
           "ed25519": "$~accounts[0].ed25519_public_key",
-          "rsa2048": "$~accounts[0].public_key"
+          "rsa2048": "$~accounts[0].public_key",
+          "ecdsa": "$~accounts[0].ecdsa_public_key"
         }
       }
       """
@@ -360,6 +361,17 @@ Feature: Show account
       """
     When I send a GET request to "/accounts/test1"
     And the response should contain a valid "rsa-sha256" signature header for "test1"
+    Then the response status should be "200"
+
+  Scenario: Admin retrieves their account, accepting an ecdsa-p256 signature algorithm
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "algorithm=\"ecdsa-p256\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    And the response should contain a valid "ecdsa-p256" signature header for "test1"
     Then the response status should be "200"
 
   Scenario: Admin retrieves their account, accepting an invalid signature algorithm

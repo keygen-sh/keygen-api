@@ -129,12 +129,14 @@ class AccountSerializer < BaseSerializer
   meta do
     ed25519_key = Base64.strict_encode64(@object.ed25519_public_key)
     rsa2048_key = Base64.strict_encode64(@object.public_key)
+    ecdsa_key   = Base64.strict_encode64(@object.ecdsa_public_key)
 
     meta = {
       public_key: rsa2048_key,
       keys: {
         ed25519: ed25519_key,
         rsa2048: rsa2048_key,
+        ecdsa: ecdsa_key,
       }
     }
 

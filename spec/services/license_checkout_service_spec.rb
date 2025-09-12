@@ -489,6 +489,111 @@ describe LicenseCheckoutService do
     end
   end
 
+  %w[
+    ECDSA_P256_SIGN
+  ].each do |scheme|
+    context "when the signing scheme is #{scheme}" do
+      let(:policy) { create(:policy, scheme.downcase.to_sym, account: account) }
+      let(:license) { create(:license, policy: policy, account: account) }
+
+      context 'when the license file is not encrypted' do
+        it 'should have a correct algorithm' do
+          license_file = LicenseCheckoutService.call(
+            account: account,
+            license: license,
+          )
+
+          cert    = license_file.certificate
+          payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                        .delete_suffix("-----END LICENSE FILE-----\n")
+
+          dec  = Base64.decode64(payload)
+          json = JSON.parse(dec)
+
+          expect(json).to include(
+            'alg' => 'base64+ecdsa-p256'
+          )
+        end
+
+        it 'should sign the encoded payload' do
+          license_file = LicenseCheckoutService.call(
+            account: account,
+            license: license,
+          )
+
+          cert    = license_file.certificate
+          payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                        .delete_suffix("-----END LICENSE FILE-----\n")
+
+          dec  = Base64.decode64(payload)
+          json = JSON.parse(dec)
+
+          enc       = json.fetch('enc')
+          sig       = json.fetch('sig')
+          sig_bytes = Base64.strict_decode64(sig)
+
+          pub_key = OpenSSL::PKey::EC.new(account.ecdsa_public_key)
+          digest  = OpenSSL::Digest::SHA256.new
+          verify  = -> {
+            pub_key.verify(digest, sig_bytes, "license/#{enc}")
+          }
+
+          expect { verify.call }.to_not raise_error
+          expect(verify.call).to be true
+        end
+      end
+
+      context 'when the license file is encrypted' do
+        it 'should have a correct algorithm' do
+          license_file = LicenseCheckoutService.call(
+            account: account,
+            license: license,
+            encrypt: true,
+          )
+
+          cert    = license_file.certificate
+          payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                        .delete_suffix("-----END LICENSE FILE-----\n")
+
+          dec  = Base64.decode64(payload)
+          json = JSON.parse(dec)
+
+          expect(json).to include(
+            'alg' => 'aes-256-gcm+ecdsa-p256'
+          )
+        end
+
+        it 'should sign the encrypted payload' do
+          license_file = LicenseCheckoutService.call(
+            account: account,
+            license: license,
+            encrypt: true,
+          )
+
+          cert    = license_file.certificate
+          payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                        .delete_suffix("-----END LICENSE FILE-----\n")
+
+          dec  = Base64.decode64(payload)
+          json = JSON.parse(dec)
+
+          enc       = json.fetch('enc')
+          sig       = json.fetch('sig')
+          sig_bytes = Base64.strict_decode64(sig)
+
+          pub_key = OpenSSL::PKey::EC.new(account.ecdsa_public_key)
+          digest  = OpenSSL::Digest::SHA256.new
+          verify  = -> {
+            pub_key.verify(digest, sig_bytes, "license/#{enc}")
+          }
+
+          expect { verify.call }.to_not raise_error
+          expect(verify.call).to be true
+        end
+      end
+    end
+  end
+
   context 'when the signing scheme is nil' do
     let(:license) { create(:license, account: account) }
 

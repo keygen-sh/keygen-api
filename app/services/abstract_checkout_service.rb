@@ -15,6 +15,7 @@ class AbstractCheckoutService < BaseService
     ed25519
     rsa-pss-sha256
     rsa-sha256
+    ecdsa-p256
   ].freeze
 
   def initialize(account:, encrypt: false, sign: true, algorithm: nil, ttl: 1.month, include: [], api_version: nil)
@@ -50,6 +51,8 @@ class AbstractCheckoutService < BaseService
                      account.ed25519_private_key
                    when rsa?
                      account.private_key
+                   when ecdsa?
+                     account.ecdsa_private_key
                    end
   end
 
@@ -75,6 +78,7 @@ class AbstractCheckoutService < BaseService
   def encoded?   = encoding_algorithm.in?(ENCODING_ALGORITHMS)
   def ed25519?   = signing_algorithm == 'ed25519'
   def rsa?       = signing_algorithm.in?(%w[rsa-pss-sha256 rsa-sha256])
+  def ecdsa?     = signing_algorithm == 'ecdsa-p256'
   def ttl?       = ttl.present?
 
   def encrypt(value, secret:)
@@ -118,6 +122,9 @@ class AbstractCheckoutService < BaseService
     when 'ed25519'
       ed25519 = Ed25519::SigningKey.new([private_key].pack('H*'))
       sig     = ed25519.sign(data)
+    when 'ecdsa-p256'
+      ec  = OpenSSL::PKey::EC.new(private_key)
+      sig = ec.sign(OpenSSL::Digest::SHA256.new, data)
     else
       raise InvalidAlgorithmError, 'signing algorithm is not supported'
     end

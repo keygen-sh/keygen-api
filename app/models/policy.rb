@@ -24,6 +24,7 @@ class Policy < ApplicationRecord
     RSA_2048_PKCS1_SIGN_V2
     RSA_2048_PKCS1_PSS_SIGN_V2
     ED25519_SIGN
+    ECDSA_P256_SIGN
   ].freeze
 
   MACHINE_UNIQUENESS_STRATEGIES = %w[
@@ -193,7 +194,7 @@ class Policy < ApplicationRecord
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
-  validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
+  validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported signing scheme" }, if: :scheme?
   validates :machine_uniqueness_strategy, inclusion: { in: MACHINE_UNIQUENESS_STRATEGIES, message: "unsupported machine uniqueness strategy" }, allow_nil: true
   validates :machine_matching_strategy, inclusion: { in: MACHINE_MATCHING_STRATEGIES, message: "unsupported machine matching strategy" }, allow_nil: true
   validates :component_uniqueness_strategy, inclusion: { in: COMPONENT_UNIQUENESS_STRATEGIES, message: "unsupported component uniqueness strategy" }, allow_nil: true
