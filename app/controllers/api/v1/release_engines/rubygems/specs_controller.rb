@@ -22,7 +22,7 @@ module Api::V1::ReleaseEngines
       zipped  = deflate(dumped)
 
       return unless
-        stale?(zipped, cache_control: { max_age: 1.day, private: true })
+        stale?(zipped, cache_control: { max_age: 10.minutes, private: true })
 
       send_data zipped, filename: "#{params[:gem]}.gemspec.rz"
     end
@@ -41,7 +41,7 @@ module Api::V1::ReleaseEngines
       zipped = gzip(dumped)
 
       return unless
-        stale?(zipped, cache_control: { max_age: 1.day, private: true })
+        stale?(zipped, cache_control: { max_age: 10.minutes, private: true })
 
       send_data zipped
     end
@@ -74,7 +74,7 @@ module Api::V1::ReleaseEngines
       zipped = gzip(dumped)
 
       return unless
-        stale?(zipped, cache_control: { max_age: 1.day, private: true })
+        stale?(zipped, cache_control: { max_age: 10.minutes, private: true })
 
       send_data zipped
     end
@@ -96,7 +96,7 @@ module Api::V1::ReleaseEngines
       zipped = gzip(dumped)
 
       return unless
-        stale?(zipped, cache_control: { max_age: 1.day, private: true })
+        stale?(zipped, cache_control: { max_age: 10.minutes, private: true })
 
       send_data zipped
     end

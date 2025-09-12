@@ -1073,7 +1073,7 @@ Feature: OCI image manifests
     And the response should contain the following raw headers:
       """
       Etag: W/"c2eab43acb840126ba7a214819e2c71a"
-      Cache-Control: max-age=86400, private, no-transform
+      Cache-Control: max-age=600, private, no-transform
       """
 
   Scenario: Product retrieves their licensed manifest

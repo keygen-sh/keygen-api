@@ -174,7 +174,7 @@ Feature: PyPI simple package index
     And the response should contain the following raw headers:
       """
       Etag: W/"397755b058e59854428836c292bdfaed"
-      Cache-Control: max-age=86400, private, no-transform
+      Cache-Control: max-age=600, private, no-transform
       """
 
   Scenario: License requests an index for a licensed product

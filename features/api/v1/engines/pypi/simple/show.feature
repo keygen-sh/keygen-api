@@ -309,7 +309,7 @@ Feature: PyPI simple package files
     And the response should contain the following raw headers:
       """
       Etag: W/"6d7793913c7e76a1b8964e1798c316ae"
-      Cache-Control: max-age=86400, private, no-transform
+      Cache-Control: max-age=600, private, no-transform
       """
 
   Scenario: License requests versions for a licensed product
