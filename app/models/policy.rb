@@ -24,6 +24,7 @@ class Policy < ApplicationRecord
     RSA_2048_PKCS1_SIGN_V2
     RSA_2048_PKCS1_PSS_SIGN_V2
     ED25519_SIGN
+    ECDSA_SECP256R1_SIGN
   ].freeze
 
   MACHINE_UNIQUENESS_STRATEGIES = %w[
