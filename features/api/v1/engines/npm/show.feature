@@ -332,7 +332,7 @@ Feature: npm package metadata
     And the response should contain the following raw headers:
       """
       Etag: W/"68fca08fa381b6979de4b675868cf283"
-      Cache-Control: max-age=86400, private, no-transform
+      Cache-Control: max-age=600, private, no-transform
       """
 
   Scenario: Endpoint should return an error for a package without any versions

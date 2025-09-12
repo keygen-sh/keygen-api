@@ -40,7 +40,7 @@ module Api::V1::ReleaseEngines
 
       # for etag support
       return unless
-        stale?(versions, cache_control: { max_age: 1.day, private: true })
+        stale?(versions, cache_control: { max_age: 10.minutes, private: true })
 
       render plain: versions
     end
@@ -63,7 +63,7 @@ module Api::V1::ReleaseEngines
       )
 
       return unless
-        stale?(info, cache_control: { max_age: 1.day, private: true })
+        stale?(info, cache_control: { max_age: 10.minutes, private: true })
 
       render plain: info
     end
@@ -81,7 +81,7 @@ module Api::V1::ReleaseEngines
       )
 
       return unless
-        stale?(names, cache_control: { max_age: 1.day, private: true })
+        stale?(names, cache_control: { max_age: 10.minutes, private: true })
 
       render plain: names
     end

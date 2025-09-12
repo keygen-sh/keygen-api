@@ -54,7 +54,7 @@ module Api::V1::ReleaseEngines
 
       # for etag support
       return unless
-        stale?(metadata, last_modified:, cache_control: { max_age: 1.day, private: true })
+        stale?(metadata, last_modified:, cache_control: { max_age: 10.minutes, private: true })
 
       render json: metadata
     end

@@ -30,7 +30,7 @@ module Api::V1::ReleaseEngines
 
       # for etag support
       return unless
-        stale?(manifest, cache_control: { max_age: 1.day, private: true })
+        stale?(manifest, cache_control: { max_age: 10.minutes, private: true })
 
       # oci spec is very particular about content length and media types
       response.headers['Content-Length'] = manifest.content_length
