@@ -71,6 +71,9 @@ class SignatureHelper
     when 'rsa-sha256'
       pub = OpenSSL::PKey::RSA.new(account.public_key)
       ok  = pub.verify(sha256, sig_bytes, signing_data) rescue false
+    when 'ecdsa-p256'
+      pub = OpenSSL::PKey::EC.new(account.ecdsa_public_key)
+      ok  = pub.verify(sha256, sig_bytes, signing_data) rescue false
     end
 
     ok

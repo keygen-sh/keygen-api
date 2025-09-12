@@ -44,6 +44,8 @@ class MachineCheckoutService < AbstractCheckoutService
              'rsa-sha256'
            when 'ED25519_SIGN'
              'ed25519'
+           when 'ECDSA_P256_SIGN'
+             'ecdsa-p256'
            else
              true
            end

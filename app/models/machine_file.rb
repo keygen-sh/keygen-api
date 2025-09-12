@@ -8,9 +8,11 @@ class MachineFile
     aes-256-gcm+ed25519
     aes-256-gcm+rsa-pss-sha256
     aes-256-gcm+rsa-sha256
+    aes-256-gcm+ecdsa-p256
     base64+ed25519
     base64+rsa-pss-sha256
     base64+rsa-sha256
+    base64+ecdsa-p256
   ].freeze
 
   attribute :account_id,     :uuid

@@ -66,6 +66,11 @@ FactoryBot.define do
       encrypted { false }
     end
 
+    trait :ecdsa_p256_sign do
+      scheme    { 'ECDSA_P256_SIGN' }
+      encrypted { false }
+    end
+
     trait :day_check_in do
       require_check_in        { true }
       check_in_interval       { 'day' }

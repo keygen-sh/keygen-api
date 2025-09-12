@@ -3,7 +3,7 @@
 module SignatureMethods
   extend ActiveSupport::Concern
 
-  SUPPORTED_SIGNATURE_ALGORITHMS = %w[ed25519 rsa-pss-sha256 rsa-sha256].freeze
+  SUPPORTED_SIGNATURE_ALGORITHMS = %w[ed25519 rsa-pss-sha256 rsa-sha256 ecdsa-p256].freeze
   DEFAULT_SIGNATURE_ALGORITHM    = 'ed25519'.freeze
   ACCEPT_SIGNATURE_RE            =
     %r{
@@ -56,9 +56,10 @@ module SignatureMethods
       sign_with_ed25519(key: account.ed25519_private_key, data: data.to_s)
     when 'rsa-pss-sha256'
       sign_with_rsa_pkcs1_pss(key: account.private_key, data: data.to_s)
-    when 'rsa-sha256',
-         'legacy'
+    when 'rsa-sha256', 'legacy'
       sign_with_rsa_pkcs1(key: account.private_key, data: data.to_s)
+    when 'ecdsa-p256'
+      sign_with_ecdsa_p256(key: account.ecdsa_private_key, data: data.to_s)
     end
   rescue => e
     Keygen.logger.exception e
@@ -109,6 +110,14 @@ module SignatureMethods
   def sign_with_rsa_pkcs1(key:, data:)
     digest = OpenSSL::Digest::SHA256.new
     priv   = OpenSSL::PKey::RSA.new(key)
+    sig    = priv.sign(digest, data)
+
+    Base64.strict_encode64(sig)
+  end
+
+  def sign_with_ecdsa_p256(key:, data:)
+    digest = OpenSSL::Digest::SHA256.new
+    priv   = OpenSSL::PKey::EC.new(key)
     sig    = priv.sign(digest, data)
 
     Base64.strict_encode64(sig)

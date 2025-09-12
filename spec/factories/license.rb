@@ -41,6 +41,10 @@ FactoryBot.define do
       policy { build(:policy, :ed25519_sign, account:, environment:) }
     end
 
+    trait :ecdsa_p256_sign do
+      policy { build(:policy, :ecdsa_p256_sign, account:, environment:) }
+    end
+
     trait :day_check_in do
       policy { build(:policy, :day_check_in, account:, environment:) }
     end

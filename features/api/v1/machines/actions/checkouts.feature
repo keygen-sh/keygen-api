@@ -374,6 +374,44 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin performs a machine checkout using ECDSA (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      { "scheme": "ECDSA_P256_SIGN" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
+    Then the response status should be "200"
+    And the response body should be a "machine-file" with a certificate signed using "ecdsa-p256"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout using ECDSA (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      { "scheme": "ECDSA_P256_SIGN" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate signed using "ecdsa-p256"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin performs a machine checkout with a custom algorithm (POST)
     Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
@@ -383,10 +421,10 @@ Feature: Machine checkout actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
-      { "meta": { "algorithm": "aes-256-gcm+rsa-pss-sha256" } }
+      { "meta": { "algorithm": "aes-256-gcm+ecdsa-p256" } }
       """
     Then the response status should be "200"
-    And the response body should be a "machine-file" with a certificate signed using "rsa-pss-sha256"
+    And the response body should be a "machine-file" with a certificate signed using "ecdsa-p256"
     And the response body should be a "machine-file" with the following encrypted certificate data:
       """
       {
@@ -413,9 +451,9 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?algorithm=base64%2Brsa-sha256"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?algorithm=base64%2Brsa-pss-sha256"
     Then the response status should be "200"
-    And the response should be a "MACHINE" certificate signed using "rsa-sha256"
+    And the response should be a "MACHINE" certificate signed using "rsa-pss-sha256"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
       {

@@ -469,6 +469,8 @@ Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, r
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_sign_v2, account: @account, key: SecureRandom.hex)
     when 'ED25519_SIGN'
       @crypt << create(resource.singularize.underscore, :ed25519_sign, account: @account, key: SecureRandom.hex)
+    when 'ECDSA_P256_SIGN'
+      @crypt << create(resource.singularize.underscore, :ecdsa_p256_sign, account: @account, key: SecureRandom.hex)
     end
   end
 end

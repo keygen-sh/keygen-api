@@ -36,7 +36,8 @@ Feature: Update account
         "publicKey": "$~accounts[0].public_key",
         "keys": {
           "ed25519": "$~accounts[0].ed25519_public_key",
-          "rsa2048": "$~accounts[0].public_key"
+          "rsa2048": "$~accounts[0].public_key",
+          "ecdsa": "$~accounts[0].ecdsa_public_key"
         }
       }
       """

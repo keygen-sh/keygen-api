@@ -499,6 +499,14 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
 
+  Scenario: Admin attempts to retrieve a license for their account by key using scheme ECDSA_P256_SIGN
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license" using "ECDSA_P256_SIGN"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
   Scenario: Admin attempts to retrieves an active license for their account (new license)
     Given I am an admin of account "test1"
     And the current account is "test1"

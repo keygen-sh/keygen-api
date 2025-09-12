@@ -494,6 +494,50 @@ describe BroadcastEventService do
     end
   end
 
+  context 'when signature algorithm is ecdsa-p256' do
+    let(:endpoint) { create(:webhook_endpoint, url: "https://keygen.example/hooks?token=#{SecureRandom.hex}", signature_algorithm: 'ecdsa-p256', account: account) }
+
+    it 'should have a valid legacy signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body = options.fetch(:body)
+
+        ok = SignatureHelper.verify_legacy(account: account, signature: headers['X-Signature'], body: body)
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+
+    it 'should have a valid signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body    = options.fetch(:body)
+        uri     = URI.parse(endpoint.url)
+
+        ok = SignatureHelper.verify(
+          account: account,
+          method: 'POST',
+          host: uri.host,
+          uri: "#{uri.path}?#{uri.query}",
+          body: body,
+          signature_algorithm: 'ecdsa-p256',
+          signature_header: headers['Keygen-Signature'],
+          digest_header: headers['Digest'],
+          date_header: headers['Date'],
+        )
+
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+  end
+
   context 'when endpoint version is greater than account version' do
     let(:account)  { create(:account, api_version: '1.0') }
     let(:endpoint) { create(:webhook_endpoint, api_version: CURRENT_API_VERSION, account:) }
