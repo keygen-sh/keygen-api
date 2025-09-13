@@ -463,7 +463,7 @@ Feature: Account settings
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 0 "event-log" jobs
 
-  Scenario: Admin updates an account setting
+  Scenario: Admin updates a valid account setting
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -509,7 +509,49 @@ Feature: Account settings
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 1 "event-log" job
 
-  Scenario: Admin deletes an account setting
+  Scenario: Admin updates an invalid account setting
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value": [
+          "license.validate",
+          "license.read"
+        ]
+      }
+      """
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_user_permissions",
+        "value": [
+          "license.validate",
+          "license.read",
+          "user.read"
+        ]
+      }
+      """
+    When I send a PATCH request to "/accounts/test1/settings/foo" with the following:
+      """
+      {
+        "data": {
+          "type": "settings",
+          "attributes": {
+            "value": "bar"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
+
+  Scenario: Admin deletes a valid account setting
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
@@ -541,3 +583,35 @@ Feature: Account settings
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "request-log" jobs
     And sidekiq should have 1 "event-log" job
+
+  Scenario: Admin deletes an invalid account setting
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_license_permissions",
+        "value": [
+          "license.validate",
+          "license.read"
+        ]
+      }
+      """
+    And the current account has 1 "setting" with the following:
+      """
+      {
+        "key": "default_user_permissions",
+        "value": [
+          "license.validate",
+          "license.read",
+          "user.read"
+        ]
+      }
+      """
+    When I send a DELETE request to "/accounts/test1/settings/foo"
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "event-log" jobs
