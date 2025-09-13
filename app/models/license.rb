@@ -1037,6 +1037,8 @@ class License < ApplicationRecord
       generate_pkcs1_pss_signed_key! version: 2
     when "ED25519_SIGN"
       generate_ed25519_signed_key!
+    when "ECDSA_SECP256R1_SIGN"
+      generate_ecdsa_secp256r1_signed_key!
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?
@@ -1153,6 +1155,16 @@ class License < ApplicationRecord
     signing_data = "key/#{encoded_license_key}"
     sig = signing_key.sign signing_data
     encoded_sig = Base64.urlsafe_encode64 sig
+
+    self.key = "#{signing_data}.#{encoded_sig}"
+  end
+
+  def generate_ecdsa_secp256r1_signed_key!
+    signing_key = OpenSSL::PKey::EC.new(account.ecdsa_private_key)
+    encoded_license_key = Base64.urlsafe_encode64(seed_key)
+    signing_data = "key/#{encoded_license_key}"
+    sig = signing_key.sign(OpenSSL::Digest::SHA256.new, signing_data)
+    encoded_sig = Base64.urlsafe_encode64(sig)
 
     self.key = "#{signing_data}.#{encoded_sig}"
   end
