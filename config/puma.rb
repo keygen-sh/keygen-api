@@ -25,6 +25,11 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }.to_i
 # Specifies connection keep-alive/idle timeout
 persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }.to_i
 
+# specifies max acceptable request body size in bytes (returns 413 if exceeded)
+if max_request_size = ENV['RAILS_MAX_REQUEST_BODY_SIZE']
+  http_content_length_limit max_request_size.to_i
+end
+
 # FIXME(ezekg) https://www.heroku.com/blog/pumas-routers-keepalives-ohmy/
 enable_keep_alives false
 
