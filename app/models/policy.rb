@@ -192,7 +192,6 @@ class Policy < ApplicationRecord
   validates :max_uses, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
-  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
   validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
   validates :machine_uniqueness_strategy, inclusion: { in: MACHINE_UNIQUENESS_STRATEGIES, message: "unsupported machine uniqueness strategy" }, allow_nil: true
@@ -202,6 +201,14 @@ class Policy < ApplicationRecord
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
   validates :renewal_basis, inclusion: { in: RENEWAL_BASES, message: "unsupported renewal basis" }, allow_nil: true
+
+  validates :metadata,
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
+
   validates :authentication_strategy,
     inclusion: { in: AUTHENTICATION_STRATEGIES, message: "unsupported authentication strategy" },
     allow_nil: true

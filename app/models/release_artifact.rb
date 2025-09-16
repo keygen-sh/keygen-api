@@ -120,7 +120,11 @@ class ReleaseArtifact < ApplicationRecord
     length: { maximum: 4.kilobytes }
 
   validates :metadata,
-    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   scope :order_by_version, -> (order = :desc) {
     sql = case order

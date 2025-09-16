@@ -32,7 +32,11 @@ class EventLog < ApplicationRecord
   before_create -> { self.created_date ||= (created_at || Date.current) }
 
   validates :metadata,
-    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   scope :for_event_type, -> event {
     where(event_type_id: EventType.where(event:))

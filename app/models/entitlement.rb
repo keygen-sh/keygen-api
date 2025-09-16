@@ -34,7 +34,11 @@ class Entitlement < ApplicationRecord
     presence: true
 
   validates :metadata,
-    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   scope :accessible_by, -> accessor {
     case accessor

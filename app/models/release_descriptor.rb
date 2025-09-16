@@ -31,7 +31,11 @@ class ReleaseDescriptor < ApplicationRecord
     length: { maximum: 4.kilobytes }
 
   validates :metadata,
-    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   # assert that release matches the artifact's release
   validate on: %i[create update] do

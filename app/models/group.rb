@@ -27,7 +27,11 @@ class Group < ApplicationRecord
     length: { minimum: 1, maximum: 255 }
 
   validates :metadata,
-    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   # Give products the ability to read all groups
   scope :for_product, -> id { self }
