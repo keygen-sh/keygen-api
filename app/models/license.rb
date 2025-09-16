@@ -232,20 +232,26 @@ class License < ApplicationRecord
     end
   end
 
-  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
+
+  validates :metadata,
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   # Key is immutable so we only need to assert on create
   validates :key,
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
     uniqueness: { case_sensitive: true, scope: :account_id },
-    length: { minimum: 1, maximum: 64.kilobytes },
+    length: { minimum: 1, maximum: 16.kilobytes },
     unless: -> { key.nil? },
     on: :create
 
   # Non-crypted keys should be 6 character minimum
   validates :key,
-    length: { minimum: 6, maximum: 64.kilobytes },
+    length: { minimum: 6, maximum: 16.kilobytes },
     if: -> { key.present? && !scheme? },
     on: :create
 

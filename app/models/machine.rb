@@ -99,7 +99,11 @@ class Machine < ApplicationRecord
     presence: true
 
   validates :metadata,
-    length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+    json: {
+      maximum_bytesize: 16.kilobytes,
+      maximum_depth: 4,
+      maximum_keys: 64,
+    }
 
   validates :cores,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
