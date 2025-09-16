@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   namespace '-' do
     post 'csp-reports', to: proc { |env|
       bytesize = env['rack.input'].size
-      next [422, {}, []] if bytesize > 10.kilobytes
+      next [413, {}, []] if bytesize > 10.kilobytes
 
       payload = env['rack.input'].read
       env['rack.input'].rewind
