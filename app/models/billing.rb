@@ -15,6 +15,9 @@ class Billing < ApplicationRecord
 
   before_destroy :close_customer_account
 
+  normalizes :referral_id,
+    with: -> ref { ref[0..64] } # truncate
+
   aasm column: :state, whiny_transitions: false do
     state :pending, initial: true
     state :trialing

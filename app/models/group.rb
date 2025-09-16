@@ -23,6 +23,12 @@ class Group < ApplicationRecord
   has_environment
   has_account
 
+  validates :name,
+    length: { minimum: 1, maximum: 255 }
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+
   # Give products the ability to read all groups
   scope :for_product, -> id { self }
 

@@ -94,6 +94,7 @@ class Machine < ApplicationRecord
   validates :fingerprint,
     uniqueness: { message: 'has already been taken', scope: %i[license_id] },
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    length: { maximum: 4.kilobytes },
     allow_blank: false,
     presence: true
 
@@ -108,6 +109,11 @@ class Machine < ApplicationRecord
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     if: :max_processes_override?,
     allow_nil: true
+
+  validates :ip,       length: { maximum: 255 }
+  validates :hostname, length: { maximum: 255 }
+  validates :platform, length: { maximum: 255 }
+  validates :name,     length: { maximum: 255 }
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if

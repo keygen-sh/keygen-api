@@ -108,6 +108,9 @@ class Account < ApplicationRecord
     length: { maximum: 255 },
     unless: -> { slug.nil? }
 
+  validates :name,
+    length: { maximum: 255 }
+
   validates :api_version,
     allow_nil: true,
     inclusion: {

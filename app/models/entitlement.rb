@@ -20,8 +20,21 @@ class Entitlement < ApplicationRecord
   has_environment
   has_account
 
-  validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
-  validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
+  validates :code,
+    exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
+    uniqueness: { case_sensitive: false, scope: :account_id },
+    length: { minimum: 1, maximum: 255 },
+    format: { without: UUID_RE },
+    allow_blank: false,
+    presence: true
+
+  validates :name,
+    length: { minimum: 1, maximum: 255 },
+    allow_blank: false,
+    presence: true
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
 
   scope :accessible_by, -> accessor {
     case accessor

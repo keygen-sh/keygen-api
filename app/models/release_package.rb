@@ -58,6 +58,9 @@ class ReleasePackage < ApplicationRecord
     allow_blank: false,
     presence: true
 
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+
   scope :for_product, -> id {
     joins(:product).where(product: { id: })
   }

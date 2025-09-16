@@ -31,6 +31,9 @@ class EventLog < ApplicationRecord
   #             the table is too big and it would break everything.
   before_create -> { self.created_date ||= (created_at || Date.current) }
 
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
+
   scope :for_event_type, -> event {
     where(event_type_id: EventType.where(event:))
   }

@@ -180,7 +180,7 @@ class Policy < ApplicationRecord
   validates :product,
     scope: { by: :account_id }
 
-  validates :name, presence: true
+  validates :name, presence: true, length: { maximum: 255 }
   validates :duration, numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true
   validates :duration, numericality: { greater_than_or_equal_to: 1.day.to_i, message: "must be greater than or equal to 86400 (1 day)" }, allow_nil: true
   validates :heartbeat_duration, numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true

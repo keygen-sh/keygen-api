@@ -39,10 +39,14 @@ class MachineProcess < ApplicationRecord
   validates :pid,
     uniqueness: { message: 'has already been taken', scope: %i[machine_id] },
     exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
+    length: { maximum: 4.kilobytes },
     presence: true
 
   validates :last_heartbeat_at,
     presence: true
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if

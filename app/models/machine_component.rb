@@ -32,10 +32,15 @@ class MachineComponent < ApplicationRecord
   validates :fingerprint,
     uniqueness: { message: 'has already been taken', scope: %i[machine_id] },
     exclusion: { in: EXCLUDED_ALIASES, message: 'is reserved' },
+    length: { maximum: 4.kilobytes },
     presence: true
 
   validates :name,
+    length: { maximum: 255 },
     presence: true
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
 
   # Fingerprint uniqueness on create
   validate on: :create do |component|
