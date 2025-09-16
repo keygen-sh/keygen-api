@@ -32,7 +32,11 @@ class ReleaseEngine < ApplicationRecord
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id },
-    inclusion: { in: ENGINES }
+    inclusion: { in: ENGINES },
+    length: { maximum: 255 }
+
+  validates :name,
+    length: { maximum: 255 }
 
   scope :for_environment, -> environment, strict: environment.nil? {
     joins(:packages)

@@ -25,7 +25,7 @@ class Key < ApplicationRecord
     allow_blank: false,
     uniqueness: { case_sensitive: true, scope: :account_id },
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
-    length: { minimum: 8, maximum: 1.kilobytes }
+    length: { minimum: 8, maximum: 1.kilobyte }
 
   validate on: :create do
     errors.add :policy, :not_supported, message: "cannot be added to an unpooled policy" if !policy.nil? && !policy.pool?

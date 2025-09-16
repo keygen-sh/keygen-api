@@ -155,11 +155,21 @@ class Release < ApplicationRecord
 
   validates :tag,
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    length: { maximum: 255 },
     uniqueness: {
       scope: %i[tag release_package_id product_id account_id],
       message: 'tag already exists',
       if: :tag?,
     }
+
+  validates :name,
+    length: { maximum: 255 }
+
+  validates :description,
+    length: { maximum: 16.kilobytes }
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
 
   validate on: %i[create update] do
     next unless

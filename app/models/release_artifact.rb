@@ -99,7 +99,8 @@ class ReleaseArtifact < ApplicationRecord
 
   validates :filename,
     presence: true,
-    uniqueness: { message: 'already exists', scope: %i[account_id release_id] }
+    uniqueness: { message: 'already exists', scope: %i[account_id release_id] },
+    length: { maximum: 255 }
 
   validates :filesize,
     allow_blank: true,
@@ -111,6 +112,15 @@ class ReleaseArtifact < ApplicationRecord
       message: 'unsupported status',
       in: STATUSES,
     }
+
+  validates :checksum,
+    length: { maximum: 4.kilobytes }
+
+  validates :signature,
+    length: { maximum: 4.kilobytes }
+
+  validates :metadata,
+    length: { maximum: 64, message: 'too many keys (exceeded limit of 64 keys)' }
 
   scope :order_by_version, -> (order = :desc) {
     sql = case order

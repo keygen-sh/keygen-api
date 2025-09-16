@@ -239,15 +239,18 @@ class License < ApplicationRecord
   validates :key,
     exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
     uniqueness: { case_sensitive: true, scope: :account_id },
-    length: { minimum: 1, maximum: 100.kilobytes },
+    length: { minimum: 1, maximum: 64.kilobytes },
     unless: -> { key.nil? },
     on: :create
 
   # Non-crypted keys should be 6 character minimum
   validates :key,
-    length: { minimum: 6, maximum: 100.kilobytes },
+    length: { minimum: 6, maximum: 64.kilobytes },
     if: -> { key.present? && !scheme? },
     on: :create
+
+  validates :name,
+    length: { maximum: 255 }
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },

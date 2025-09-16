@@ -17,7 +17,7 @@ class WebhookEndpoint < ApplicationRecord
   before_save -> { self.subscriptions = subscriptions.uniq }, if: :subscriptions?
 
   validates :subscriptions, length: { minimum: 1, message: 'must have at least 1 webhook event subscription' }
-  validates :url, url: { protocols: %w[https] }, presence: true
+  validates :url, url: { protocols: %w[https] }, length: { maximum: 4.kilobytes }, presence: true
   validates :signature_algorithm,
     inclusion: { in: %w[ed25519 rsa-pss-sha256 rsa-sha256], message: 'unsupported signature algorithm' },
     allow_nil: true

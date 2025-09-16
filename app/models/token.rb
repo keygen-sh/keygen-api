@@ -88,6 +88,9 @@ class Token < ApplicationRecord
   validates :activations, numericality: { greater_than_or_equal_to: 0 }, if: :activation_token?
   validates :deactivations, numericality: { greater_than_or_equal_to: 0 }, if: :activation_token?
 
+  validates :name,
+    length: { maximum: 255 }
+
   validate on: :update, if: :activation_token? do |token|
     next if token&.activations.nil? || token.max_activations.nil?
     next if token.activations <= token.max_activations

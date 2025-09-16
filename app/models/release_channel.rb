@@ -25,7 +25,11 @@ class ReleaseChannel < ApplicationRecord
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id },
-    inclusion: { in: CHANNELS }
+    inclusion: { in: CHANNELS },
+    length: { maximum: 255 }
+
+  validates :name,
+    length: { maximum: 255 }
 
   before_create -> { self.key = key&.downcase&.strip }
 
