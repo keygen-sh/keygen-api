@@ -245,10 +245,9 @@ The CLA is available [here](https://keygen.sh/cla/).
 
 ## Security
 
-We take security at Keygen very seriously. We perform annual pen-tests on our
-code base and infrastructure. In addition, we regularly perform code audits.
-Our most recent pen-test was performed by [Greg Molnar](https://greg.molnar.io/security-consultancy/),
-an OSCP-certified security researcher in the Ruby and Rails community.
+We take security at Keygen very seriously. We try to perform annual pen-tests
+on our code base and infrastructure. In addition, we regularly perform both
+internal and external code audits.
 
 If you believe you've found a vulnerability, please see our [`SECURITY.md`](https://github.com/keygen-sh/keygen-api/blob/master/SECURITY.md)
 file.

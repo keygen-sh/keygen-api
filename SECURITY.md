@@ -4,7 +4,7 @@ Thanks for helping make Keygen safe for everyone.
 
 We take the security of Keygen seriously. We perform annual internal penetration tests of Keygen's code base and infrastructure. In addition, we perform regular internal and external code audits and external pen-tests.
 
-Our most recent external pen-test was performed in May, 2023 by [Greg Molnar](https://greg.molnar.io/security-consultancy/), an OSCP-certified security researcher in the Ruby and Rails community.
+Our most recent external pen-test was performed in September, 2025 by [Casco](https://casco.com).
 
 ## Reporting Security Issues
 
