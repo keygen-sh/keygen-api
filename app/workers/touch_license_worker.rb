@@ -11,7 +11,8 @@ class TouchLicenseWorker < BaseWorker
     # sheds load when a license is validated too often, e.g. in an infinite
     # loop or via a high number of concurrent processes.
     license.with_lock 'FOR UPDATE SKIP LOCKED' do
-      license.update!(**touches.symbolize_keys)
+      license.assign_attributes(**touches.symbolize_keys)
+      license.save!(validate: false)
     end
   rescue ActiveRecord::LockWaitTimeout, # For NOWAIT lock wait timeout error
          ActiveRecord::RecordNotFound   # SKIP LOCKED also raises not found
