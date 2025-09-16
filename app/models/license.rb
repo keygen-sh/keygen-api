@@ -255,8 +255,9 @@ class License < ApplicationRecord
     if: -> { key.present? && !scheme? },
     on: :create
 
+  # NB(ezekg) length limit is larger than other name fields for backwards compat
   validates :name,
-    length: { maximum: 255 }
+    length: { maximum: 1.kilobyte }
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
