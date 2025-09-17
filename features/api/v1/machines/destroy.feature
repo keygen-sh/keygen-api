@@ -413,9 +413,7 @@ Feature: Delete machine
     And the current account should have 2 "machines"
     And the current token should have the following attributes:
       """
-      {
-        "deactivations": 1
-      }
+      { "deactivations": 1 }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -431,7 +429,12 @@ Feature: Delete machine
       {
         "machines": {
           "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
-          "meta": { "cores": 0, "count": 2 }
+          "meta": {
+            "cores": 0,
+            "memory": 0,
+            "disk": 0,
+            "count": 2
+          }
         }
       }
       """

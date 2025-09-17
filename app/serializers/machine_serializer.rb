@@ -5,6 +5,8 @@ class MachineSerializer < BaseSerializer
 
   attribute :fingerprint
   attribute :cores
+  attribute :memory
+  attribute :disk
   attribute :ip
   attribute :hostname
   attribute :platform

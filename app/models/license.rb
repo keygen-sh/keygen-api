@@ -279,6 +279,16 @@ class License < ApplicationRecord
     allow_nil: true,
     if: -> { max_cores_override? }
 
+  validates :max_memory,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
+    allow_nil: true,
+    if: -> { max_memory_override? }
+
+  validates :max_disk,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
+    allow_nil: true,
+    if: -> { max_disk_override? }
+
   validates :max_uses,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
@@ -776,6 +786,18 @@ class License < ApplicationRecord
   def max_cores? = max_cores.present?
   def max_cores=(value)
     self.max_cores_override = value
+  end
+
+  def max_memory  = max_memory_override? ? max_memory_override : policy&.max_memory
+  def max_memory? = max_memory.present?
+  def max_memory=(value)
+    self.max_memory_override = value
+  end
+
+  def max_disk  = max_disk_override? ? max_disk_override : policy&.max_disk
+  def max_disk? = max_disk.present?
+  def max_disk=(value)
+    self.max_disk_override = value
   end
 
   def max_uses  = max_uses_override? ? max_uses_override : policy&.max_uses

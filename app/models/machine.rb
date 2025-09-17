@@ -70,6 +70,16 @@ class Machine < ApplicationRecord
   after_update :update_machines_core_count_on_update
   after_destroy :update_machines_core_count_on_destroy
 
+  # Update license's total memory count on machine create, update and destroy
+  after_create :update_machines_memory_count_on_create
+  after_update :update_machines_memory_count_on_update
+  after_destroy :update_machines_memory_count_on_destroy
+
+  # Update license's total disk count on machine create, update and destroy
+  after_create :update_machines_disk_count_on_create
+  after_update :update_machines_disk_count_on_update
+  after_destroy :update_machines_disk_count_on_destroy
+
   # Notify license of creation event (in case license isn't whodunnit)
   on_exclusive_event 'machine.created', -> { license.notify!('machine.created') },
     auto_release_lock: true
@@ -107,6 +117,14 @@ class Machine < ApplicationRecord
 
   validates :cores,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true
+
+  validates :memory,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
+    allow_nil: true
+
+  validates :disk,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
     allow_nil: true
 
   validates :max_processes,
@@ -229,6 +247,102 @@ class Machine < ApplicationRecord
         machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
 
       machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed for user (#{machine.license.max_cores})"
+    end
+  end
+
+  # disallow machine memory overages according to policy overage strategy
+  validate on: %i[create update] do |machine|
+    next if machine.license.nil?
+    next if
+      machine.license.always_allow_overage?
+
+    next unless
+      machine.license.max_memory?
+
+    case
+    when lease_per_license?
+      prev_memory_count = machine.license.machines.where.not(id: machine.id)
+                                                  .sum(:memory)
+      next_memory_count = prev_memory_count + machine.memory.to_i
+      next unless
+        next_memory_count > machine.license.max_memory
+
+      next if
+        machine.license.allow_1_25x_overage? && next_memory_count <= machine.license.max_memory * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_memory_count <= machine.license.max_memory * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_memory_count <= machine.license.max_memory * 2
+
+      machine.errors.add :base, :memory_limit_exceeded, message: "machine memory has exceeded maximum allowed for license (#{machine.license.max_memory})"
+    when lease_per_user?
+      prev_memory_count = machine.license.machines.where.not(id: machine.id)
+                                                  .where(owner:) # nil owner is significant
+                                                  .sum(:memory)
+      next_memory_count = prev_memory_count + machine.memory.to_i
+      next unless
+        next_memory_count > machine.license.max_memory
+
+      next if
+        machine.license.allow_1_25x_overage? && next_memory_count <= machine.license.max_memory * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_memory_count <= machine.license.max_memory * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_memory_count <= machine.license.max_memory * 2
+
+      machine.errors.add :base, :memory_limit_exceeded, message: "machine memory has exceeded maximum allowed for user (#{machine.license.max_memory})"
+    end
+  end
+
+  # disallow machine disk overages according to policy overage strategy
+  validate on: %i[create update] do |machine|
+    next if machine.license.nil?
+    next if
+      machine.license.always_allow_overage?
+
+    next unless
+      machine.license.max_disk?
+
+    case
+    when lease_per_license?
+      prev_disk_count = machine.license.machines.where.not(id: machine.id)
+                                                .sum(:disk)
+      next_disk_count = prev_disk_count + machine.disk.to_i
+      next unless
+        next_disk_count > machine.license.max_disk
+
+      next if
+        machine.license.allow_1_25x_overage? && next_disk_count <= machine.license.max_disk * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_disk_count <= machine.license.max_disk * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_disk_count <= machine.license.max_disk * 2
+
+      machine.errors.add :base, :disk_limit_exceeded, message: "machine disk has exceeded maximum allowed for license (#{machine.license.max_disk})"
+    when lease_per_user?
+      prev_disk_count = machine.license.machines.where.not(id: machine.id)
+                                                .where(owner:) # nil owner is significant
+                                                .sum(:disk)
+      next_disk_count = prev_disk_count + machine.disk.to_i
+      next unless
+        next_disk_count > machine.license.max_disk
+
+      next if
+        machine.license.allow_1_25x_overage? && next_disk_count <= machine.license.max_disk * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_disk_count <= machine.license.max_disk * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_disk_count <= machine.license.max_disk * 2
+
+      machine.errors.add :base, :disk_limit_exceeded, message: "machine disk has exceeded maximum allowed for user (#{machine.license.max_disk})"
     end
   end
 
@@ -764,6 +878,90 @@ class Machine < ApplicationRecord
     return if license.machines_core_count == core_count
 
     license.update!(machines_core_count: core_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_memory_count_on_create
+    return if policy.nil? || license.nil?
+
+    prev_memory_count = license.machines.where.not(id: id).sum(:memory) || 0
+    next_memory_count = prev_memory_count + memory.to_i
+    return if license.machines_memory_count == next_memory_count
+
+    license.update!(machines_memory_count: next_memory_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_memory_count_on_update
+    return if policy.nil? || license.nil?
+
+    # Skip unless memory has changed
+    return unless saved_change_to_memory?
+
+    memory_count = license.machines.sum(:memory) || 0
+    return if license.machines_memory_count == memory_count
+
+    license.update!(machines_memory_count: memory_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_memory_count_on_destroy
+    return if policy.nil? || license.nil?
+
+    # Skip if license is being destroyed
+    return if
+      license.marked_for_destruction? ||
+      license.destroyed?
+
+    memory_count = license.machines.where.not(id: id).sum(:memory) || 0
+    return if license.machines_memory_count == memory_count
+
+    license.update!(machines_memory_count: memory_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_disk_count_on_create
+    return if policy.nil? || license.nil?
+
+    prev_disk_count = license.machines.where.not(id: id).sum(:disk) || 0
+    next_disk_count = prev_disk_count + disk.to_i
+    return if license.machines_disk_count == next_disk_count
+
+    license.update!(machines_disk_count: next_disk_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_disk_count_on_update
+    return if policy.nil? || license.nil?
+
+    # Skip unless disk has changed
+    return unless saved_change_to_disk?
+
+    disk_count = license.machines.sum(:disk) || 0
+    return if license.machines_disk_count == disk_count
+
+    license.update!(machines_disk_count: disk_count)
+  rescue => e
+    Keygen.logger.exception e
+  end
+
+  def update_machines_disk_count_on_destroy
+    return if policy.nil? || license.nil?
+
+    # Skip if license is being destroyed
+    return if
+      license.marked_for_destruction? ||
+      license.destroyed?
+
+    disk_count = license.machines.where.not(id: id).sum(:disk) || 0
+    return if license.machines_disk_count == disk_count
+
+    license.update!(machines_disk_count: disk_count)
   rescue => e
     Keygen.logger.exception e
   end

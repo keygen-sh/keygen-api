@@ -46,6 +46,8 @@ module Api::V1
           param :hostname, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :platform, type: :string, allow_blank: true, allow_nil: true, optional: true
           param :cores, type: :integer, allow_nil: true, optional: true
+          param :memory, type: :integer, allow_nil: true, optional: true
+          param :disk, type: :integer, allow_nil: true, optional: true
           param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
         end
         param :relationships, type: :hash do
@@ -153,6 +155,8 @@ module Api::V1
           param :platform, type: :string, allow_blank: true, allow_nil: true, optional: true
           with if: -> { current_bearer&.has_role?(:admin, :developer, :sales_agent, :product, :environment) } do
             param :cores, type: :integer, allow_nil: true, optional: true
+            param :memory, type: :integer, allow_nil: true, optional: true
+            param :disk, type: :integer, allow_nil: true, optional: true
             param :metadata, type: :hash, depth: { maximum: 2 }, allow_blank: true, optional: true
           end
         end

@@ -35,6 +35,8 @@ class LicenseSerializer < BaseSerializer
   attribute :max_processes
   attribute :max_users
   attribute :max_cores
+  attribute :max_memory
+  attribute :max_disk
   attribute :max_uses
   attribute :require_heartbeat do
     @object.require_heartbeat?
@@ -159,6 +161,8 @@ class LicenseSerializer < BaseSerializer
     meta do
       {
         cores: @object.machines_core_count || 0,
+        memory: @object.machines_memory_count || 0,
+        disk: @object.machines_disk_count || 0,
         count: @object.machines_count || 0,
       }
     end
