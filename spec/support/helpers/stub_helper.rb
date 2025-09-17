@@ -8,6 +8,10 @@ def stub_keygens!
   allow_any_instance_of(Account).to receive(:ed25519_private_key) { '7e122ed891de6dcaf5316a2f0e09187fbf3fa5b5441cb835a67b53d8c87eafc5' }
   allow_any_instance_of(Account).to receive(:ed25519_public_key) { '799efc7752286e6c3815b13358d98fc0f0b566764458adcb48f1be2c10a55906'}
   allow_any_instance_of(Account).to receive(:generate_ed25519_keys!) { true }
+
+  allow_any_instance_of(Account).to receive(:ecdsa_private_key) { "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgj8QDg1f53BhiwC1u\nciaCllT/mhEXyl1PZkbxRuOqBJKhRANCAARH9tgQKtsjuBK9r0HhoPQssA2G8A98\nzSbkQM9YZkTWiQ6uRvh6nK0GKDXqfLubQUHslSei+sqMnqzk4I8xI4bj\n-----END PRIVATE KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:ecdsa_public_key) { "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAER/bYECrbI7gSva9B4aD0LLANhvAP\nfM0m5EDPWGZE1okOrkb4epytBig16ny7m0FB7JUnovrKjJ6s5OCPMSOG4w==\n-----END PUBLIC KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:generate_ecdsa_keys!) { true }
 end
 
 # FIXME(ezekg) Caching breaks due to stubbing
