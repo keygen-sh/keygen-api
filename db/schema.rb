@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_22_152252) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_12_151308) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -58,6 +58,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_22_152252) do
     t.datetime "slack_accepted_at"
     t.string "slack_team_id"
     t.string "slack_channel_id"
+    t.text "ecdsa_private_key"
+    t.text "ecdsa_public_key"
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true

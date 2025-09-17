@@ -77,6 +77,7 @@ class Account < ApplicationRecord
   tracks_nested_attributes_for :plan
 
   encrypts :ed25519_private_key
+  encrypts :ecdsa_private_key
   encrypts :private_key
   encrypts :secret_key
 
@@ -93,6 +94,10 @@ class Account < ApplicationRecord
   before_create :generate_secret_key!
   before_create :generate_rsa_keys!
   before_create :generate_ed25519_keys!
+  before_create :generate_ecdsa_keys!
+
+  after_commit :clear_cache!,
+    on: %i[update destroy]
 
   validates :plan,
     presence: true,
@@ -157,9 +162,6 @@ class Account < ApplicationRecord
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
   scope :ent,  -> { joins(:plan, :billing).where(plan: Plan.ent, billings: { state: 'subscribed' }) }
   scope :with_plan, -> (id) { where plan: id }
-
-  after_commit :clear_cache!,
-    on: %i[update destroy]
 
   delegate :max_users, :max_policies, :max_licenses, :max_products, :max_reqs, :max_admins,
     :request_log_retention_duration, :event_log_retention_duration,
@@ -421,4 +423,16 @@ class Account < ApplicationRecord
     self.ed25519_public_key = pub.to_bytes.unpack1("H*")
   end
   alias_method :regenerate_ed25519_keys!, :generate_ed25519_keys!
+
+  def generate_ecdsa_keys!
+    ec = if ecdsa_private_key.nil?
+           OpenSSL::PKey::EC.generate('prime256v1') # aka secp256r1 and nist-p256
+         else
+           OpenSSL::PKey::EC.new(ecdsa_private_key)
+         end
+
+    self.ecdsa_private_key = ec.private_to_pem
+    self.ecdsa_public_key  = ec.public_to_pem
+  end
+  alias_method :regenerate_ecdsa_keys!, :generate_ecdsa_keys!
 end
