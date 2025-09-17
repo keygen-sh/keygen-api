@@ -392,4 +392,179 @@ describe License, type: :model do
       expect(License.with_status(:banned).count).to eq 3
     end
   end
+
+  describe 'atomic counter caches', :skip_transaction_cleaner do
+    let(:license) { create(:license, account:) }
+
+    describe '#machines_core_count' do
+      it 'handles concurrent creates atomically' do
+        threads = 10.times.map do
+          Thread.new { create(:machine, account:, license:, cores: 5) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_core_count).to eq(50)
+        expect(license.machines.sum(:cores)).to eq(50)
+      end
+
+      it 'handles concurrent updates atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, cores: 2) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.update!(cores: 4) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_core_count).to eq(40)
+        expect(license.machines.sum(:cores)).to eq(40)
+      end
+
+      it 'handles concurrent deletes atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, cores: 32) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.destroy! }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_core_count).to eq(0)
+        expect(license.machines.sum(:cores)).to eq(0)
+      end
+
+      it 'handles mixed concurrent operations atomically' do
+        machines = 5.times.map { create(:machine, account:, license:, cores: 5) }
+
+        threads = []
+        threads << Thread.new { 5.times { machines << create(:machine, account:, license:, cores: 5) } }
+        threads << Thread.new { machines.first(2).each { _1.update!(cores: 1) } }
+        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_core_count).to eq(32)
+        expect(license.machines.sum(:cores)).to eq(32)
+      end
+    end
+
+    describe '#machines_memory_count' do
+      it 'handles concurrent creates atomically' do
+        threads = 10.times.map do
+          Thread.new { create(:machine, account:, license:, memory: 5.megabytes) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_memory_count).to eq(50.megabytes)
+        expect(license.machines.sum(:memory)).to eq(50.megabytes)
+      end
+
+      it 'handles concurrent updates atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, memory: 2.megabytes) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.update!(memory: 4.megabytes) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_memory_count).to eq(40.megabytes) # 10 machines * 4096
+        expect(license.machines.sum(:memory)).to eq(40.megabytes)
+      end
+
+      it 'handles concurrent deletes atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, memory: 512.megabyte) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.destroy! }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_memory_count).to eq(0)
+        expect(license.machines.sum(:memory)).to eq(0)
+      end
+
+      it 'handles mixed concurrent operations atomically' do
+        machines = 5.times.map { create(:machine, account:, license:, memory: 5.megabyte) }
+
+        threads = []
+        threads << Thread.new { 5.times { machines << create(:machine, account:, license:, memory: 5.megabytes) } }
+        threads << Thread.new { machines.first(2).each { _1.update!(memory: 1.megabytes) } }
+        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_memory_count).to eq(32.megabytes)
+        expect(license.machines.sum(:memory)).to eq(32.megabytes)
+      end
+    end
+
+    describe '#machines_disk_count' do
+      it 'handles concurrent creates atomically' do
+        threads = 10.times.map do
+          Thread.new { create(:machine, account:, license:, disk: 5.gigabytes) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_disk_count).to eq(50.gigabytes)
+        expect(license.machines.sum(:disk)).to eq(50.gigabytes)
+      end
+
+      it 'handles concurrent updates atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, disk: 2.gigabytes) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.update!(disk: 4.gigabytes) }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_disk_count).to eq(40.gigabytes)
+        expect(license.machines.sum(:disk)).to eq(40.gigabytes)
+      end
+
+      it 'handles concurrent deletes atomically' do
+        machines = 10.times.map { create(:machine, account:, license:, disk: 512.gigabytes) }
+
+        threads = machines.map do |machine|
+          Thread.new { machine.destroy! }
+        end
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_disk_count).to eq(0)
+        expect(license.machines.sum(:disk)).to eq(0)
+      end
+
+      it 'handles mixed concurrent operations atomically' do
+        machines = 5.times.map { create(:machine, account:, license:, disk: 5.gigabytes) }
+
+        threads = []
+        threads << Thread.new { 5.times { machines << create(:machine, account:, license:, disk: 5.gigabytes) } }
+        threads << Thread.new { machines.first(2).each { _1.update!(disk: 1.gigabyte) } }
+        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+
+        threads.each(&:join)
+        license.reload
+
+        expect(license.machines_disk_count).to eq(32.gigabytes)
+        expect(license.machines.sum(:disk)).to eq(32.gigabytes)
+      end
+    end
+  end
 end

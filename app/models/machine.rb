@@ -65,21 +65,6 @@ class Machine < ApplicationRecord
     if: :heartbeat_from_creation?,
     on: :create
 
-  # Update license's total core count on machine create, update and destroy
-  after_create :update_machines_core_count_on_create
-  after_update :update_machines_core_count_on_update
-  after_destroy :update_machines_core_count_on_destroy
-
-  # Update license's total memory count on machine create, update and destroy
-  after_create :update_machines_memory_count_on_create
-  after_update :update_machines_memory_count_on_update
-  after_destroy :update_machines_memory_count_on_destroy
-
-  # Update license's total disk count on machine create, update and destroy
-  after_create :update_machines_disk_count_on_create
-  after_update :update_machines_disk_count_on_update
-  after_destroy :update_machines_disk_count_on_destroy
-
   # Notify license of creation event (in case license isn't whodunnit)
   on_exclusive_event 'machine.created', -> { license.notify!('machine.created') },
     auto_release_lock: true
@@ -839,133 +824,6 @@ class Machine < ApplicationRecord
     }
   end
 
-  # FIXME(ezekg) Maybe there's a better way to do this?
-  def update_machines_core_count_on_create
-    return if policy.nil? || license.nil?
-
-    prev_core_count = license.machines.where.not(id: id).sum(:cores) || 0
-    next_core_count = prev_core_count + cores.to_i
-    return if license.machines_core_count == next_core_count
-
-    license.update!(machines_core_count: next_core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_core_count_on_update
-    return if policy.nil? || license.nil?
-
-    # Skip unless cores have changed
-    return unless saved_change_to_cores?
-
-    core_count = license.machines.sum(:cores) || 0
-    return if license.machines_core_count == core_count
-
-    license.update!(machines_core_count: core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_core_count_on_destroy
-    return if policy.nil? || license.nil?
-
-    # Skip if license is being destroyed
-    return if
-      license.marked_for_destruction? ||
-      license.destroyed?
-
-    core_count = license.machines.where.not(id: id).sum(:cores) || 0
-    return if license.machines_core_count == core_count
-
-    license.update!(machines_core_count: core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_memory_count_on_create
-    return if policy.nil? || license.nil?
-
-    prev_memory_count = license.machines.where.not(id: id).sum(:memory) || 0
-    next_memory_count = prev_memory_count + memory.to_i
-    return if license.machines_memory_count == next_memory_count
-
-    license.update!(machines_memory_count: next_memory_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_memory_count_on_update
-    return if policy.nil? || license.nil?
-
-    # Skip unless memory has changed
-    return unless saved_change_to_memory?
-
-    memory_count = license.machines.sum(:memory) || 0
-    return if license.machines_memory_count == memory_count
-
-    license.update!(machines_memory_count: memory_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_memory_count_on_destroy
-    return if policy.nil? || license.nil?
-
-    # Skip if license is being destroyed
-    return if
-      license.marked_for_destruction? ||
-      license.destroyed?
-
-    memory_count = license.machines.where.not(id: id).sum(:memory) || 0
-    return if license.machines_memory_count == memory_count
-
-    license.update!(machines_memory_count: memory_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_disk_count_on_create
-    return if policy.nil? || license.nil?
-
-    prev_disk_count = license.machines.where.not(id: id).sum(:disk) || 0
-    next_disk_count = prev_disk_count + disk.to_i
-    return if license.machines_disk_count == next_disk_count
-
-    license.update!(machines_disk_count: next_disk_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_disk_count_on_update
-    return if policy.nil? || license.nil?
-
-    # Skip unless disk has changed
-    return unless saved_change_to_disk?
-
-    disk_count = license.machines.sum(:disk) || 0
-    return if license.machines_disk_count == disk_count
-
-    license.update!(machines_disk_count: disk_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_disk_count_on_destroy
-    return if policy.nil? || license.nil?
-
-    # Skip if license is being destroyed
-    return if
-      license.marked_for_destruction? ||
-      license.destroyed?
-
-    disk_count = license.machines.where.not(id: id).sum(:disk) || 0
-    return if license.machines_disk_count == disk_count
-
-    license.update!(machines_disk_count: disk_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
   def reject_associated_records_for_components(attrs)
     return if
       new_record?
@@ -974,5 +832,60 @@ class Machine < ApplicationRecord
       # Make sure we only select real columns, not e.g. _destroy.
       attrs.slice(attributes.keys),
     )
+  end
+
+  # atomically update license's counter caches on machine create, update, and destroy
+  # FIXME(ezekg) move this into an attribute counter cache concern?
+  {
+    cores: :machines_core_count,
+    memory: :machines_memory_count,
+    disk: :machines_disk_count,
+  }.each do |attr, counter_cache_attr|
+    module_eval <<~RUBY, __FILE__, __LINE__ + 1
+      after_create  :update_#{counter_cache_attr}_on_create
+      after_update  :update_#{counter_cache_attr}_on_update
+      after_destroy :update_#{counter_cache_attr}_on_destroy
+
+      def update_#{counter_cache_attr}_on_create
+        return if license.nil? || policy.nil?
+
+        delta = #{attr}.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+
+      def update_#{counter_cache_attr}_on_update
+        return if license.nil? || policy.nil?
+        return unless
+          saved_change_to_#{attr}?
+
+        delta = #{attr}.to_i - #{attr}_before_last_save.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+
+      def update_#{counter_cache_attr}_on_destroy
+        return if license.nil? || policy.nil?
+        return if
+          license.marked_for_destruction? ||
+          license.destroyed?
+
+        delta = -#{attr}.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+    RUBY
   end
 end
