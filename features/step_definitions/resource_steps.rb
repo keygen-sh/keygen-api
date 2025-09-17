@@ -1020,6 +1020,44 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "li
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
 end
 
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have a correct machine memory count$/ do |word_index|
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eighth"  => 7,
+    "ninth"   => 8,
+    "last"    => -1,
+  }
+  index = numbers[word_index]
+  model = @account.licenses.all[index]
+
+  expect(model.machines_memory_count).to eq model.machines.sum(:memory)
+end
+
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have a correct machine disk count$/ do |word_index|
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eighth"  => 7,
+    "ninth"   => 8,
+    "last"    => -1,
+  }
+  index = numbers[word_index]
+  model = @account.licenses.all[index]
+
+  expect(model.machines_disk_count).to eq model.machines.sum(:disk)
+end
+
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "license" should have an? (\w+) within seconds of "([^\"]+)"$/ do |index_in_words, attr_name, value|
   value = parse_placeholders(value, account: @account, bearer: @bearer, crypt: @crypt)
 

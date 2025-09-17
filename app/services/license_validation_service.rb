@@ -363,6 +363,62 @@ class LicenseValidationService < BaseService
         core_count > core_limit
     end
 
+    # Check if license has exceeded its memory limit
+    if license.max_memory?
+      memory_limit = license.max_memory
+      memory_count = case
+                     when license.machine_lease_per_user?
+                       owner = if scope.present? && scope.key?(:user)
+                                 license.users.where(id: scope[:user])
+                                              .or(
+                                                license.users.where(email: scope[:user]),
+                                              )
+                                              .take
+                               end
+
+                       license.machines.where(owner:) # nil owner is significant
+                                       .sum(:memory)
+                     else
+                       license.machines_memory_count
+                     end
+
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && memory_count <= memory_limit * 1.25) ||
+                      (license.allow_1_5x_overage? && memory_count <= memory_limit * 1.5) ||
+                      (license.allow_2x_overage? && memory_count <= memory_limit * 2)
+
+      return [allow_overage, "has too much associated machine memory", :TOO_MUCH_MEMORY] if
+        memory_count > memory_limit
+    end
+
+    # Check if license has exceeded its disk limit
+    if license.max_disk?
+      disk_limit = license.max_disk
+      disk_count = case
+                   when license.machine_lease_per_user?
+                     owner = if scope.present? && scope.key?(:user)
+                               license.users.where(id: scope[:user])
+                                            .or(
+                                              license.users.where(email: scope[:user]),
+                                            )
+                                            .take
+                             end
+
+                     license.machines.where(owner:) # nil owner is significant
+                                     .sum(:disk)
+                   else
+                     license.machines_disk_count
+                   end
+
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && disk_count <= disk_limit * 1.25) ||
+                      (license.allow_1_5x_overage? && disk_count <= disk_limit * 1.5) ||
+                      (license.allow_2x_overage? && disk_count <= disk_limit * 2)
+
+      return [allow_overage, "has too much associated machine disk", :TOO_MUCH_DISK] if
+        disk_count > disk_limit
+    end
+
     # Check if license has exceeded its process limit
     if license.max_processes?
       process_count = 0

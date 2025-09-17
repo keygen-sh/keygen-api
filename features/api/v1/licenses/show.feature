@@ -800,17 +800,13 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$1"
     Then the response status should be "404"
 
-  Scenario: Admin retrieves a license with a correct machine core count
+  Scenario: Admin retrieves a license with a correct machine core counter cache
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "licenses"
-    And the current account has 4 "machines"
-    And all "machines" have the following attributes:
+    And the current account has 4 "machines" for the first "license" with the following:
       """
-      {
-        "licenseId": "$licenses[0]",
-        "cores": 8
-      }
+      { "cores": 8 }
       """
     And I use an authentication token
     And I send a GET request to "/accounts/test1/licenses/$0"
@@ -821,12 +817,56 @@ Feature: Show license
       {
         "machines": {
           "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
-          "meta": { "cores": 32, "count": 4 }
+          "meta": { "cores": 32, "memory": 0, "disk": 0, "count": 4 }
         }
       }
       """
 
-  Scenario: Admin retrieves a license with a correct user count
+  Scenario: Admin retrieves a license with a correct machine memory counter cache
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "licenses"
+    And the current account has 4 "machines" for the first "license" with the following:
+      """
+      { "memory": 34359738368 }
+      """
+    And I use an authentication token
+    And I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "machines": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
+          "meta": { "cores": 0, "memory": 137438953472, "disk": 0, "count": 4 }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a license with a correct machine disk counter cache
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "licenses"
+    And the current account has 4 "machines" for the first "license" with the following:
+      """
+      { "disk": 1099511627776 }
+      """
+    And I use an authentication token
+    And I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should be a "license" with the following relationships:
+      """
+      {
+        "machines": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
+          "meta": { "cores": 0, "memory": 0, "disk": 4398046511104, "count": 4 }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a license with a correct user counter cache
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "user"
