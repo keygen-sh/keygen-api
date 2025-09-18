@@ -6801,6 +6801,46 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license with an invalid max memory override
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "maxMemory": 0
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than or equal to 1",
+        "code": "MAX_MEMORY_INVALID",
+        "source": {
+          "pointer": "/data/attributes/maxMemory"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license with a max disk override
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -6832,7 +6872,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license with an invalid max memory override
+  Scenario: Admin creates a license with an invalid max disk override
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policy"
@@ -6843,7 +6883,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "maxMemory": -1
+            "maxDisk": -1
           },
           "relationships": {
             "policy": {
@@ -6862,9 +6902,9 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must be greater than or equal to 1",
-        "code": "MAX_MEMORY_INVALID",
+        "code": "MAX_DISK_INVALID",
         "source": {
-          "pointer": "/data/attributes/maxMemory"
+          "pointer": "/data/attributes/maxDisk"
         }
       }
       """
