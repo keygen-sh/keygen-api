@@ -1,4 +1,6 @@
 class SeedEcdsaKeysForAccounts < ActiveRecord::Migration[7.2]
+  disable_ddl_transaction!
+
   # NB(ezekg) migration is intentionally not verbose! to avoid logging keys
 
   def change
