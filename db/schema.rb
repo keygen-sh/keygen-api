@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_12_151446) do
+
+ActiveRecord::Schema[7.2].define(version: 2025_09_17_152227) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -266,6 +267,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_12_151446) do
     t.uuid "product_id", null: false
     t.integer "max_users_override"
     t.integer "license_users_count", default: 0, null: false
+    t.bigint "max_memory_override"
+    t.bigint "max_disk_override"
+    t.bigint "machines_memory_count"
+    t.bigint "machines_disk_count"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -339,6 +344,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_12_151446) do
     t.string "heartbeat_jid"
     t.uuid "owner_id"
     t.uuid "policy_id", null: false
+    t.bigint "memory"
+    t.bigint "disk"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -459,6 +466,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_12_151446) do
     t.integer "max_users"
     t.string "machine_leasing_strategy"
     t.string "process_leasing_strategy"
+    t.bigint "max_memory"
+    t.bigint "max_disk"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

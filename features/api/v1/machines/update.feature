@@ -247,7 +247,7 @@ Feature: Update machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a machine's core count to an amount that is permissable
+  Scenario: Admin updates a machine's core count to an amount that is permissible
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -402,6 +402,268 @@ Feature: Update machine
     Then the response status should be "200"
     And the response body should be a "machine" with the cores "32"
     And the first "license" should have a correct machine core count
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's memory to an amount that is permissible
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxMemory": 268435456,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license" with the following:
+      """
+      { "memory": 67108864 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "memory": 67108864
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the memory "67108864"
+    And the first "license" should have a correct machine memory count
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's memory to an amount that exceeds their maximum memory limit (no overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 2,
+        "maxMemory": 268435456,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the first "machine" has the following attributes:
+      """
+      { "memory": 67108864 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "memory": 536870912
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine memory has exceeded maximum allowed for license (268435456)",
+        "code": "MACHINE_MEMORY_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's memory to an amount that exceeds their maximum memory limit (allows overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 2,
+        "maxMemory": 268435456,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the first "machine" has the following attributes:
+      """
+      { "memory": 67108864 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "memory": 536870912
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the memory "536870912"
+    And the first "license" should have a correct machine memory count
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's disk to an amount that is permissible
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxDisk": 274877906944,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license" with the following:
+      """
+      { "disk": 68719476736 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "disk": 68719476736
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the disk "68719476736"
+    And the first "license" should have a correct machine disk count
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's disk to an amount that exceeds their maximum disk limit (no overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 2,
+        "maxDisk": 274877906944,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the first "machine" has the following attributes:
+      """
+      { "disk": 68719476736 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "disk": 549755813888
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine disk has exceeded maximum allowed for license (274877906944)",
+        "code": "MACHINE_DISK_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a machine's disk to an amount that exceeds their maximum disk limit (allows overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 2,
+        "maxDisk": 274877906944,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the first "machine" has the following attributes:
+      """
+      { "disk": 68719476736 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "disk": 549755813888
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response body should be a "machine" with the disk "549755813888"
+    And the first "license" should have a correct machine disk count
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

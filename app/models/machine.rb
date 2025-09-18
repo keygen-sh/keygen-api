@@ -65,11 +65,6 @@ class Machine < ApplicationRecord
     if: :heartbeat_from_creation?,
     on: :create
 
-  # Update license's total core count on machine create, update and destroy
-  after_create :update_machines_core_count_on_create
-  after_update :update_machines_core_count_on_update
-  after_destroy :update_machines_core_count_on_destroy
-
   # Notify license of creation event (in case license isn't whodunnit)
   on_exclusive_event 'machine.created', -> { license.notify!('machine.created') },
     auto_release_lock: true
@@ -109,9 +104,17 @@ class Machine < ApplicationRecord
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true
 
+  validates :memory,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
+    allow_nil: true
+
+  validates :disk,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
+    allow_nil: true
+
   validates :max_processes,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
-    if: :max_processes_override?,
+    if: -> { max_processes_override.present? },
     allow_nil: true
 
   validates :ip,       length: { maximum: 255 }
@@ -229,6 +232,102 @@ class Machine < ApplicationRecord
         machine.license.allow_2x_overage? && next_core_count <= machine.license.max_cores * 2
 
       machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed for user (#{machine.license.max_cores})"
+    end
+  end
+
+  # disallow machine memory overages according to policy overage strategy
+  validate on: %i[create update] do |machine|
+    next if machine.license.nil?
+    next if
+      machine.license.always_allow_overage?
+
+    next unless
+      machine.license.max_memory?
+
+    case
+    when lease_per_license?
+      prev_memory_count = machine.license.machines.where.not(id: machine.id)
+                                                  .sum(:memory)
+      next_memory_count = prev_memory_count + machine.memory.to_i
+      next unless
+        next_memory_count > machine.license.max_memory
+
+      next if
+        machine.license.allow_1_25x_overage? && next_memory_count <= machine.license.max_memory * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_memory_count <= machine.license.max_memory * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_memory_count <= machine.license.max_memory * 2
+
+      machine.errors.add :base, :memory_limit_exceeded, message: "machine memory has exceeded maximum allowed for license (#{machine.license.max_memory})"
+    when lease_per_user?
+      prev_memory_count = machine.license.machines.where.not(id: machine.id)
+                                                  .where(owner:) # nil owner is significant
+                                                  .sum(:memory)
+      next_memory_count = prev_memory_count + machine.memory.to_i
+      next unless
+        next_memory_count > machine.license.max_memory
+
+      next if
+        machine.license.allow_1_25x_overage? && next_memory_count <= machine.license.max_memory * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_memory_count <= machine.license.max_memory * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_memory_count <= machine.license.max_memory * 2
+
+      machine.errors.add :base, :memory_limit_exceeded, message: "machine memory has exceeded maximum allowed for user (#{machine.license.max_memory})"
+    end
+  end
+
+  # disallow machine disk overages according to policy overage strategy
+  validate on: %i[create update] do |machine|
+    next if machine.license.nil?
+    next if
+      machine.license.always_allow_overage?
+
+    next unless
+      machine.license.max_disk?
+
+    case
+    when lease_per_license?
+      prev_disk_count = machine.license.machines.where.not(id: machine.id)
+                                                .sum(:disk)
+      next_disk_count = prev_disk_count + machine.disk.to_i
+      next unless
+        next_disk_count > machine.license.max_disk
+
+      next if
+        machine.license.allow_1_25x_overage? && next_disk_count <= machine.license.max_disk * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_disk_count <= machine.license.max_disk * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_disk_count <= machine.license.max_disk * 2
+
+      machine.errors.add :base, :disk_limit_exceeded, message: "machine disk has exceeded maximum allowed for license (#{machine.license.max_disk})"
+    when lease_per_user?
+      prev_disk_count = machine.license.machines.where.not(id: machine.id)
+                                                .where(owner:) # nil owner is significant
+                                                .sum(:disk)
+      next_disk_count = prev_disk_count + machine.disk.to_i
+      next unless
+        next_disk_count > machine.license.max_disk
+
+      next if
+        machine.license.allow_1_25x_overage? && next_disk_count <= machine.license.max_disk * 1.25
+
+      next if
+        machine.license.allow_1_5x_overage? && next_disk_count <= machine.license.max_disk * 1.5
+
+      next if
+        machine.license.allow_2x_overage? && next_disk_count <= machine.license.max_disk * 2
+
+      machine.errors.add :base, :disk_limit_exceeded, message: "machine disk has exceeded maximum allowed for user (#{machine.license.max_disk})"
     end
   end
 
@@ -573,7 +672,7 @@ class Machine < ApplicationRecord
     group
   end
 
-  def max_processes  = max_processes_override? ? max_processes_override : license&.max_processes
+  def max_processes  = max_processes_override.present? ? max_processes_override : license&.max_processes
   def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
@@ -725,49 +824,6 @@ class Machine < ApplicationRecord
     }
   end
 
-  # FIXME(ezekg) Maybe there's a better way to do this?
-  def update_machines_core_count_on_create
-    return if policy.nil? || license.nil?
-
-    prev_core_count = license.machines.where.not(id: id).sum(:cores) || 0
-    next_core_count = prev_core_count + cores.to_i
-    return if license.machines_core_count == next_core_count
-
-    license.update!(machines_core_count: next_core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_core_count_on_update
-    return if policy.nil? || license.nil?
-
-    # Skip unless cores have changed
-    return unless saved_change_to_cores?
-
-    core_count = license.machines.sum(:cores) || 0
-    return if license.machines_core_count == core_count
-
-    license.update!(machines_core_count: core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def update_machines_core_count_on_destroy
-    return if policy.nil? || license.nil?
-
-    # Skip if license is being destroyed
-    return if
-      license.marked_for_destruction? ||
-      license.destroyed?
-
-    core_count = license.machines.where.not(id: id).sum(:cores) || 0
-    return if license.machines_core_count == core_count
-
-    license.update!(machines_core_count: core_count)
-  rescue => e
-    Keygen.logger.exception e
-  end
-
   def reject_associated_records_for_components(attrs)
     return if
       new_record?
@@ -776,5 +832,60 @@ class Machine < ApplicationRecord
       # Make sure we only select real columns, not e.g. _destroy.
       attrs.slice(attributes.keys),
     )
+  end
+
+  # atomically update license's counter caches on machine create, update, and destroy
+  # FIXME(ezekg) move this into an attribute counter cache concern?
+  {
+    cores: :machines_core_count,
+    memory: :machines_memory_count,
+    disk: :machines_disk_count,
+  }.each do |attr, counter_cache_attr|
+    module_eval <<~RUBY, __FILE__, __LINE__ + 1
+      after_create  :update_#{counter_cache_attr}_on_create
+      after_update  :update_#{counter_cache_attr}_on_update
+      after_destroy :update_#{counter_cache_attr}_on_destroy
+
+      def update_#{counter_cache_attr}_on_create
+        return if license.nil? || policy.nil?
+
+        delta = #{attr}.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+
+      def update_#{counter_cache_attr}_on_update
+        return if license.nil? || policy.nil?
+        return unless
+          saved_change_to_#{attr}?
+
+        delta = #{attr}.to_i - #{attr}_before_last_save.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+
+      def update_#{counter_cache_attr}_on_destroy
+        return if license.nil? || policy.nil?
+        return if
+          license.marked_for_destruction? ||
+          license.destroyed?
+
+        delta = -#{attr}.to_i
+        return if
+          delta.zero?
+
+        License.update_counters(license.id,
+          #{counter_cache_attr}: delta,
+        )
+      end
+    RUBY
   end
 end

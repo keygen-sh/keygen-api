@@ -12,6 +12,8 @@ class PolicySerializer < BaseSerializer
   attribute :max_processes
   attribute :max_users
   attribute :max_cores
+  attribute :max_memory
+  attribute :max_disk
   attribute :max_uses
   attribute :machine_uniqueness_strategy
   attribute :machine_matching_strategy

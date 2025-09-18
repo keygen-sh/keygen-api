@@ -991,6 +991,798 @@ Feature: License validation actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin quick validates a non-strict license that has too much machine memory
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": false
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 40000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 1,
+        "maxMemory": 16000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 24000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 1,
+        "maxMemory": 16000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 20000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 5,
+        "maxMemory": 32000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine memory (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxMemory": 16000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "memory": 32000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine memory", "code": "TOO_MUCH_MEMORY" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a non-strict license that has too much machine disk
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": false
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1250000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_25X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 1,
+        "maxDisk": 500000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 750000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_25X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 1,
+        "maxDisk": 500000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 625000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 5,
+        "maxDisk": 1000000000000,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too much machine disk (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxDisk": 500000000000,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "disk": 1000000000000
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too much associated machine disk", "code": "TOO_MUCH_DISK" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin quick validates a license that has not been used
     Given I am an admin of account "test1"
     And the current account is "test1"

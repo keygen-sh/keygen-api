@@ -174,6 +174,15 @@ RSpec.configure do |config|
     end
   end
 
+  # disable implicit transaction for cleaning up after tests (mainly to facilitate threading)
+  config.around :each, :skip_transaction_cleaner do |example|
+    DatabaseCleaner.strategy = [:deletion, except: %w[event_types permissions]]
+
+    example.run
+  ensure
+    DatabaseCleaner.strategy = :transaction
+  end
+
   # ignore false positives e.g. to_not raise_error SomeError
   config.around :each, :ignore_potential_false_positives do |example|
     on_potential_false_positives_was, econfig.on_potential_false_positives = econfig.on_potential_false_positives, :nothing

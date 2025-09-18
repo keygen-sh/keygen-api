@@ -59,6 +59,8 @@ module Api::V1
             param :suspended, type: :boolean, optional: true
             param :max_machines, type: :integer, allow_nil: true, optional: true
             param :max_cores, type: :integer, allow_nil: true, optional: true
+            param :max_memory, type: :integer, allow_nil: true, optional: true
+            param :max_disk, type: :integer, allow_nil: true, optional: true
             param :max_uses, type: :integer, allow_nil: true, optional: true
             param :max_processes, type: :integer, allow_nil: true, optional: true
             param :max_users, type: :integer, allow_nil: true, optional: true
@@ -139,6 +141,8 @@ module Api::V1
             param :suspended, type: :boolean, optional: true
             param :max_machines, type: :integer, allow_nil: true, optional: true
             param :max_cores, type: :integer, allow_nil: true, optional: true
+            param :max_memory, type: :integer, allow_nil: true, optional: true
+            param :max_disk, type: :integer, allow_nil: true, optional: true
             param :max_uses, type: :integer, allow_nil: true, optional: true
             param :max_processes, type: :integer, allow_nil: true, optional: true
             param :max_users, type: :integer, allow_nil: true, optional: true
