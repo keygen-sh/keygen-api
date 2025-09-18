@@ -34,6 +34,7 @@ Feature: Create webhook endpoint
     Then the response status should be "201"
     And the response body should be a "webhook-endpoint" with the url "https://example.com"
     And the response body should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response body should be a "webhook-endpoint" with the apiVersion "1.8"
     And the response body should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
@@ -47,6 +48,27 @@ Feature: Create webhook endpoint
         }
       }
       """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for an older API version
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "apiVersion": "1.5"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "webhook-endpoint" with the url "https://example.com"
+    And the response body should be a "webhook-endpoint" with the apiVersion "1.5"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account that subscribes to certain events

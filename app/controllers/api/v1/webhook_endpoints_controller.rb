@@ -30,6 +30,7 @@ module Api::V1
           param :subscriptions, type: :array, optional: true do
             items type: :string
           end
+          param :api_version, type: :string, inclusion: { in: RequestMigrations.supported_versions }, optional: true
           param :signature_algorithm, type: :string, optional: true
         end
         param :relationships, type: :hash, optional: true do
