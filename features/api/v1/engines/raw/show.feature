@@ -288,7 +288,7 @@ Feature: Raw artifact download
       { "Location": "https://api.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/b49e82e3-911d-49b0-8548-15fbf1ffbdd6/relay_windows_386.exe" }
       """
 
-  Scenario: License downloads an artifact they have access to
+  Scenario: License downloads an artifact they have access to (header auth)
     Given the current account has 1 "policy" with the following:
       """
       {
@@ -304,6 +304,26 @@ Feature: Raw artifact download
     And the response should contain the following headers:
       """
       { "Location": "https://api.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/a8e49ea6-17df-4798-937f-e4756e331db5/keygen_darwin_arm64" }
+      """
+
+  Scenario: License downloads an artifact they have access to (query auth)
+    Given the current account has 1 "policy" with the following:
+      """
+      {
+        "productId": "6198261a-48b5-4445-a045-9fed4afc7735",
+        "authenticationStrategy": "LICENSE"
+      }
+      """
+    And the current account has 1 "license" for the last "policy" with the following:
+      """
+      { "key": "test-key" }
+      """
+    And I am a license of account "keygen"
+    When I send a GET request to "/accounts/keygen/engines/raw/cli/1.0.0/keygen_darwin_arm64?auth=license:test-key"
+    Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://api.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/a8e49ea6-17df-4798-937f-e4756e331db5/keygen_darwin_arm64?auth=license%3Atest-key" }
       """
 
   Scenario: License downloads an artifact they don't have access to
