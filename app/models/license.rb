@@ -262,47 +262,47 @@ class License < ApplicationRecord
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> { max_machines_override? }
+    if: -> { max_machines_override.present? }
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 1, message: 'must be greater than or equal to 1 for floating policy' },
     allow_nil: true,
-    if: -> { max_machines_override? && floating? }
+    if: -> { max_machines_override.present? && floating? }
 
   validates :max_machines,
     numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
     allow_nil: true,
-    if: -> { max_machines_override? && node_locked? }
+    if: -> { max_machines_override.present? && node_locked? }
 
   validates :max_cores,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> { max_cores_override? }
+    if: -> { max_cores_override.present? }
 
   validates :max_memory,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
     allow_nil: true,
-    if: -> { max_memory_override? }
+    if: -> { max_memory_override.present? }
 
   validates :max_disk,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 9_223_372_036_854_775_807 },
     allow_nil: true,
-    if: -> { max_disk_override? }
+    if: -> { max_disk_override.present? }
 
   validates :max_uses,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> { max_uses_override? }
+    if: -> { max_uses_override.present? }
 
   validates :max_processes,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> { max_processes_override? }
+    if: -> { max_processes_override.present? }
 
   validates :max_users,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> { max_users_override? }
+    if: -> { max_users_override.present? }
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -775,44 +775,43 @@ class License < ApplicationRecord
     end
   end
 
-
-  def max_machines  = max_machines_override? ? max_machines_override : policy&.max_machines
+  def max_machines  = max_machines_override.present? ? max_machines_override : policy&.max_machines
   def max_machines? = max_machines.present?
   def max_machines=(value)
     self.max_machines_override = value
   end
 
-  def max_cores  = max_cores_override? ? max_cores_override : policy&.max_cores
+  def max_cores  = max_cores_override.present? ? max_cores_override : policy&.max_cores
   def max_cores? = max_cores.present?
   def max_cores=(value)
     self.max_cores_override = value
   end
 
-  def max_memory  = max_memory_override? ? max_memory_override : policy&.max_memory
+  def max_memory  = max_memory_override.present? ? max_memory_override : policy&.max_memory
   def max_memory? = max_memory.present?
   def max_memory=(value)
     self.max_memory_override = value
   end
 
-  def max_disk  = max_disk_override? ? max_disk_override : policy&.max_disk
+  def max_disk  = max_disk_override.present? ? max_disk_override : policy&.max_disk
   def max_disk? = max_disk.present?
   def max_disk=(value)
     self.max_disk_override = value
   end
 
-  def max_uses  = max_uses_override? ? max_uses_override : policy&.max_uses
+  def max_uses  = max_uses_override.present? ? max_uses_override : policy&.max_uses
   def max_uses? = max_uses.present?
   def max_uses=(value)
     self.max_uses_override = value
   end
 
-  def max_processes  = max_processes_override? ? max_processes_override : policy&.max_processes
+  def max_processes  = max_processes_override.present? ? max_processes_override : policy&.max_processes
   def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
   end
 
-  def max_users  = max_users_override? ? max_users_override : policy&.max_users
+  def max_users  = max_users_override.present? ? max_users_override : policy&.max_users
   def max_users? = max_users.present?
   def max_users=(value)
     self.max_users_override = value
