@@ -665,6 +665,11 @@ class Machine < ApplicationRecord
     allow_nil: true,
     to: :policy
 
+  delegate :max_processes,
+    to: :license,
+    allow_nil: true,
+    prefix: true
+
   def group!
     raise Keygen::Error::NotFoundError.new(model: Group.name) unless
       group.present?
@@ -672,7 +677,7 @@ class Machine < ApplicationRecord
     group
   end
 
-  def max_processes  = max_processes_override.present? ? max_processes_override : license&.max_processes
+  def max_processes  = max_processes_override.presence || license_max_processes
   def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
