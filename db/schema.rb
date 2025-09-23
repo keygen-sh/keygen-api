@@ -10,7 +10,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema[7.2].define(version: 2025_09_17_152227) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -269,8 +268,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_17_152227) do
     t.integer "license_users_count", default: 0, null: false
     t.bigint "max_memory_override"
     t.bigint "max_disk_override"
-    t.bigint "machines_memory_count"
-    t.bigint "machines_disk_count"
+    t.bigint "machines_memory_count", default: 0, null: false
+    t.bigint "machines_disk_count", default: 0, null: false
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
