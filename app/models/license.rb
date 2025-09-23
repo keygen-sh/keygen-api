@@ -689,6 +689,11 @@ class License < ApplicationRecord
     to: :policy,
     allow_nil: true
 
+  delegate :max_machines, :max_cores, :max_memory, :max_disk, :max_uses, :max_processes, :max_users,
+    to: :policy,
+    allow_nil: true,
+    prefix: true
+
   # override permissions reader to intersect with owner's permissions
   def permissions
     return Permission.none unless
@@ -775,43 +780,43 @@ class License < ApplicationRecord
     end
   end
 
-  def max_machines  = max_machines_override.present? ? max_machines_override : policy&.max_machines
+  def max_machines  = max_machines_override.presence || policy_max_machines
   def max_machines? = max_machines.present?
   def max_machines=(value)
     self.max_machines_override = value
   end
 
-  def max_cores  = max_cores_override.present? ? max_cores_override : policy&.max_cores
+  def max_cores  = max_cores_override.presence || policy_max_cores
   def max_cores? = max_cores.present?
   def max_cores=(value)
     self.max_cores_override = value
   end
 
-  def max_memory  = max_memory_override.present? ? max_memory_override : policy&.max_memory
+  def max_memory  = max_memory_override.presence || policy_max_memory
   def max_memory? = max_memory.present?
   def max_memory=(value)
     self.max_memory_override = value
   end
 
-  def max_disk  = max_disk_override.present? ? max_disk_override : policy&.max_disk
+  def max_disk  = max_disk_override.presence || policy_max_disk
   def max_disk? = max_disk.present?
   def max_disk=(value)
     self.max_disk_override = value
   end
 
-  def max_uses  = max_uses_override.present? ? max_uses_override : policy&.max_uses
+  def max_uses  = max_uses_override.presence || policy_max_uses
   def max_uses? = max_uses.present?
   def max_uses=(value)
     self.max_uses_override = value
   end
 
-  def max_processes  = max_processes_override.present? ? max_processes_override : policy&.max_processes
+  def max_processes  = max_processes_override.presence || policy_max_processes
   def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
   end
 
-  def max_users  = max_users_override.present? ? max_users_override : policy&.max_users
+  def max_users  = max_users_override.presence || policy_max_users
   def max_users? = max_users.present?
   def max_users=(value)
     self.max_users_override = value
