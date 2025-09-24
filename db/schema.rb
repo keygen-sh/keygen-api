@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_17_152227) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_24_165540) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -253,7 +253,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_17_152227) do
     t.string "name"
     t.integer "machines_count", default: 0
     t.datetime "last_validated_at", precision: nil
-    t.integer "machines_core_count"
+    t.integer "machines_core_count", default: 0, null: false
     t.integer "max_machines_override"
     t.integer "max_cores_override"
     t.integer "max_uses_override"
