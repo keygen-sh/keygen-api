@@ -60,7 +60,7 @@ class User < ApplicationRecord
     union_of: %i[owned_licenses user_licenses],
     class_name: License.name
 
-  has_secure_password :password, validations: false
+  has_secure_password :password, validations: false, reset_token: false
   has_environment
   has_account inverse_of: :users
   has_default_role :user
