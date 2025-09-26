@@ -55,6 +55,7 @@ RSpec.configure do |config|
   config.include EnvHelper
   config.include KeygenHelper
   config.include TaskHelper
+  config.include MutexHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -204,10 +205,14 @@ RSpec.configure do |config|
     Keygen::EE::License.reset!
   end
 
-  # Load rake tasks
-  config.before type: :task do
-    require 'rake'
+  # Load rake tasks once
+  mu = MutexHelper::Once.new
 
-    Rails.application.load_tasks
+  config.before type: :task do
+    mu.synchronize do
+      require 'rake'
+
+      Rails.application.load_tasks
+    end
   end
 end

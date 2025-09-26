@@ -16,8 +16,8 @@ Given /^the account "([^\"]*)" is (\w+)$/ do |id, state|
     customer_id: customer.id,
     subscription_id: subscription.id,
     subscription_status: subscription.status,
-    subscription_period_start: subscription.current_period_start,
-    subscription_period_end: subscription.current_period_end,
+    subscription_period_start: Time.at(subscription.current_period_start),
+    subscription_period_end: Time.at(subscription.current_period_end),
     state: state
   )
 
@@ -100,8 +100,8 @@ Given /^there is an incoming "([^\"]*)" event(?: with an? "([^\"]*)" status)?$/ 
     customer_id: @customer.id,
     subscription_id: @subscription.id,
     subscription_status: @subscription.status,
-    subscription_period_start: @subscription.current_period_start,
-    subscription_period_end: @subscription.current_period_end
+    subscription_period_start: Time.at(@subscription.current_period_start),
+    subscription_period_end: Time.at(@subscription.current_period_end),
   }
 
   @event = StripeMock.mock_webhook_event type, Proc.new {
@@ -141,8 +141,8 @@ Given /^there is an incoming "([^\"]*)" event with a new plan$/ do |event_type|
     customer_id: @customer.id,
     subscription_id: @subscription.id,
     subscription_status: @subscription.status,
-    subscription_period_start: @subscription.current_period_start,
-    subscription_period_end: @subscription.current_period_end
+    subscription_period_start: Time.at(@subscription.current_period_start),
+    subscription_period_end: Time.at(@subscription.current_period_end),
   }
 
   @event = StripeMock.mock_webhook_event event_type, Proc.new {
