@@ -11,8 +11,8 @@ module Environments
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
         allow!
-      in role: Role(:environment) if environment == bearer
-        record.all? { _1 in bearer_type: ^(Environment.name), bearer_id: ^(bearer.id) }
+      in role: Role(:environment), id: bearer_id if environment == bearer
+        record.all? { _1 in bearer_type: 'Environment', bearer_id: ^bearer_id }
       else
         deny!
       end

@@ -73,11 +73,53 @@ Feature: Revoke authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$3"
     Then the response status should be "404"
 
-  Scenario: Product attempts to revoke a user's token
+  Scenario: Product revokes a token for an admin
     Given the current account is "test1"
-    And the current account has 5 "users"
-    And the current account has 1 "token" for each "user"
-    And I am a user of account "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "admin"
+    And the current account has 1 "token" for the last "admin"
+    And I am a product of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/tokens/$4"
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product revokes a token for their user
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should be "204"
+
+  Scenario: Product revokes a token for a user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product revokes a token for their license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should be "204"
+
+  Scenario: Product revokes a token for a license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "404"

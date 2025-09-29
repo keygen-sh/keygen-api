@@ -16,7 +16,7 @@ module AuthorizationHelper
       in []
         let(:account)     { create(:account, *account_traits) }
         let(:environment) { nil }
-        let(:bearer)      { create(:admin, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:bearer)      { create(:admin, *authn_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -25,7 +25,7 @@ module AuthorizationHelper
       in []
         let(:account)     { create(:account, *account_traits) }
         let(:environment) { nil }
-        let(:bearer)      { create(:environment, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:bearer)      { create(:environment, *authn_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -34,7 +34,7 @@ module AuthorizationHelper
       in []
         let(:account)     { create(:account, *account_traits) }
         let(:environment) { nil }
-        let(:bearer)      { create(:product, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:bearer)      { create(:product, *authn_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -43,7 +43,7 @@ module AuthorizationHelper
       in []
         let(:account)     { create(:account, *account_traits) }
         let(:environment) { nil }
-        let(:bearer)      { create(:license, *license_traits, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:bearer)      { create(:license, *license_traits, *authn_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -52,7 +52,7 @@ module AuthorizationHelper
       in []
         let(:account)     { create(:account, *account_traits) }
         let(:environment) { nil }
-        let(:bearer)      { create(:user, *bearer_traits, account:, permissions: bearer_permissions) }
+        let(:bearer)      { create(:user, *authn_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -501,13 +501,13 @@ module AuthorizationHelper
     def accessing_tokens(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:tokens) { create_list(:token, 3, account: other_account) }
+        let(:tokens) { create_list(:token, 3, *token_traits, account: other_account) }
       else
         let(:tokens) {
           [
-            create(:token, account:, bearer: create(:product, *product_traits, account:)),
-            create(:token, account:, bearer: create(:license, *license_traits, account:)),
-            create(:token, account:, bearer: create(:user, *user_traits, account:)),
+            create(:token, account:, bearer: create(:product, *product_traits, *token_traits, account:)),
+            create(:token, account:, bearer: create(:license, *license_traits, *token_traits, account:)),
+            create(:token, account:, bearer: create(:user, *user_traits, *token_traits, account:)),
           ]
         }
       end
@@ -518,9 +518,9 @@ module AuthorizationHelper
     def accessing_a_token(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:_token) { create(:token, account: other_account) }
+        let(:_token) { create(:token, *token_traits, account: other_account) }
       else
-        let(:_token) { create(:token, account:) }
+        let(:_token) { create(:token, *token_traits, account:) }
       end
 
       let(:record) { _token }
@@ -529,17 +529,17 @@ module AuthorizationHelper
     def accessing_its_tokens(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:tokens)   { create_list(:token, 3, account: product.account, bearer: product) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: product.account, bearer: product) }
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:tokens)   { create_list(:token, 3, account: license.account, bearer: license) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: license.account, bearer: license) }
       in [*, :accessing_its_user | :accessing_a_user, *]
-        let(:tokens)   { create_list(:token, 3, account: user.account, bearer: user) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: user.account, bearer: user) }
       in [*, :accessing_its_owner, *]
-        let(:tokens)   { create_list(:token, 3, account: user.account, bearer: owner) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: user.account, bearer: owner) }
       in [*, :accessing_itself, *]
-        let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: bearer.account, bearer:) }
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
-        let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
+        let(:tokens)   { create_list(:token, 3, *token_traits, account: bearer.account, bearer:) }
       end
 
       let(:record) { tokens }
@@ -548,17 +548,17 @@ module AuthorizationHelper
     def accessing_its_token(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:_token) { create(:token, account: product.account, bearer: product) }
+        let(:_token) { create(:token, *token_traits, account: product.account, bearer: product) }
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:_token) { create(:token, account: license.account, bearer: license) }
+        let(:_token) { create(:token, *token_traits, account: license.account, bearer: license) }
       in [*, :accessing_its_user | :accessing_a_user, *]
-        let(:_token) { create(:token, account: user.account, bearer: user) }
+        let(:_token) { create(:token, *token_traits, account: user.account, bearer: user) }
       in [*, :accessing_its_owner, *]
-        let(:_token) { create(:token, account: user.account, bearer: owner) }
+        let(:_token) { create(:token, *token_traits, account: user.account, bearer: owner) }
       in [*, :accessing_itself, *]
-        let(:_token) { create(:token, account: bearer.account, bearer:) }
+        let(:_token) { create(:token, *token_traits, account: bearer.account, bearer:) }
       in [:as_admin | :as_environment | :as_product | :as_license | :as_user, *]
-        let(:_token) { create(:token, account: bearer.account, bearer:) }
+        let(:_token) { create(:token, *token_traits, account: bearer.account, bearer:) }
       end
 
       let(:record) { _token }
@@ -2125,7 +2125,8 @@ module AuthorizationHelper
         let(:bearer_permissions) { nil }
         let(:token_permissions)  { nil }
         let(:account_traits)     { [] }
-        let(:bearer_traits)      { [] }
+        let(:authn_traits)       { [] }
+        let(:authz_traits)       { [] }
         let(:token_traits)       { [] }
         let(:release_traits)     { [] }
         let(:artifact_traits)    { [] }
@@ -2151,7 +2152,8 @@ module AuthorizationHelper
         using_scenario :as_anonymous
 
         let(:account_traits)    { [] }
-        let(:bearer_traits)     { [] }
+        let(:authn_traits)      { [] }
+        let(:authz_traits)      { [] }
         let(:token_traits)      { [] }
         let(:release_traits)    { [] }
         let(:artifact_traits)   { [] }
@@ -2238,7 +2240,7 @@ module AuthorizationHelper
                           env
                         end
 
-          create(:token, *token_traits, account:, bearer:, environment:, permissions: token_permissions)
+          create(:token, *authz_traits, account:, bearer:, environment:, permissions: token_permissions)
         }
 
         instance_exec(&)
@@ -2354,18 +2356,57 @@ module AuthorizationHelper
     def with_account_trait(trait, &) = with_account_traits(*trait, &)
 
     ##
-    # with_bearer_traits defines traits on the bearer context.
-    def with_bearer_traits(traits, &)
-      context "with bearer #{traits} traits" do
-        let(:bearer_traits) { traits }
+    # with_authn_traits defines traits on the authn context.
+    def with_authn_traits(traits, &)
+      context "with authn #{traits} traits" do
+        let(:authn_traits) { traits }
 
         instance_exec(&)
       end
     end
 
     ##
-    # with_bearer_trait defines a trait on the bearer context.
-    def with_bearer_trait(trait, &) = with_bearer_traits(*trait, &)
+    # with_authn_trait defines a trait on the authn context.
+    def with_authn_trait(trait, &) = with_authn_traits(*trait, &)
+
+    ##
+    # FIXME(ezekg) aliases for backwards compatibility to reduce code churn
+    alias :with_bearer_traits :with_authn_traits
+    alias :with_bearer_trait :with_authn_trait
+
+    ##
+    # with_authz_traits defines traits on the authz context.
+    def with_authz_traits(traits, &)
+      context "with authz #{traits} traits" do
+        let(:authz_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_authz_trait defines a trait on the authz context.
+    def with_authz_trait(trait, &) = with_token_traits(*trait, &)
+
+    ##
+    # with_auth_traits defines traits on the authn and authz contexts.
+    def with_auth_traits(traits, &)
+      context "with auth #{traits} traits" do
+        let(:authn_traits) { traits }
+        let(:authz_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_auth_trait defines a trait on the authn and authz contexts.
+    def with_auth_trait(trait, &) = with_bearer_and_token_traits(*trait, &)
+
+    ##
+    # FIXME(ezekg) aliases for backwards compatibility to reduce code churn
+    alias :with_bearer_and_token_traits :with_auth_traits
+    alias :with_bearer_and_token_trait :with_auth_trait
 
     ##
     # with_token_traits defines traits on the token context.
@@ -2380,21 +2421,6 @@ module AuthorizationHelper
     ##
     # with_token_trait defines a trait on the token context.
     def with_token_trait(trait, &) = with_token_traits(*trait, &)
-
-    ##
-    # with_bearer_and_token_traits defines traits on the bearer and token contexts.
-    def with_bearer_and_token_traits(traits, &)
-      context "with token and bearer #{traits} traits" do
-        let(:bearer_traits) { traits }
-        let(:token_traits)  { traits }
-
-        instance_exec(&)
-      end
-    end
-
-    ##
-    # with_bearer_and_token_trait defines a trait on the bearer and token contexts.
-    def with_bearer_and_token_trait(trait, &) = with_bearer_and_token_traits(*trait, &)
 
     ##
     # with_release_traits defines traits on the release context.

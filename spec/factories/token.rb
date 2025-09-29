@@ -10,6 +10,26 @@ FactoryBot.define do
     environment { NIL_ENVIRONMENT }
     bearer      { build(:user, account:, environment:) }
 
+    trait :environment do
+      bearer { build(:environment, account:) }
+    end
+
+    trait :product do
+      bearer { build(:product, account:, environment:) }
+    end
+
+    trait :license do
+      bearer { build(:license, account:, environment:) }
+    end
+
+    trait :admin do
+      bearer { build(:admin, account:, environment:) }
+    end
+
+    trait :user do
+      bearer { build(:user, account:, environment:) }
+    end
+
     trait :in_isolated_environment do
       environment { build(:environment, :isolated, account:) }
     end

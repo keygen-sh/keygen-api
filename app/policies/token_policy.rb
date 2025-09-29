@@ -10,13 +10,12 @@ class TokenPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:product)
-      record.all? { _1 in { bearer_type: ^(Product.name), bearer_id: ^(bearer.id) } |
-                          { bearer_type: ^(License.name) | ^(User.name) } }
-    in role: Role(:license)
-      record.all? { _1 in { bearer_type: ^(License.name), bearer_id: ^(bearer.id) } }
-    in role: Role(:user)
-      record.all? { _1 in { bearer_type: ^(User.name), bearer_id: ^(bearer.id) } }
+    in role: Role(:product), id: bearer_id
+      record.all? { _1 in { bearer_type: 'Product', bearer_id: ^bearer_id } | { bearer_type: 'License' | 'User' } }
+    in role: Role(:license), id: bearer_id
+      record.all? { _1 in { bearer_type: 'License', bearer_id: ^bearer_id } }
+    in role: Role(:user), id: bearer_id
+      record.all? { _1 in { bearer_type: 'User', bearer_id: ^bearer_id } }
     else
       deny!
     end
@@ -30,6 +29,10 @@ class TokenPolicy < ApplicationPolicy
 
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
+      allow!
+    in role: Role(:product) if record.user_token? && record.bearer.products.exists?(bearer.id)
+      allow!
+    in role: Role(:product) if record.license_token? && record.bearer.product == bearer
       allow!
     else
       record.bearer == bearer
@@ -47,7 +50,11 @@ class TokenPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment) if record.bearer == bearer
       allow!
-    in role: Role(:admin | :developer | :environment) if record.bearer.user?
+    in role: Role(:admin | :developer | :environment) if record.user_token?
+      allow!
+    in role: Role(:product) if record.user_token? && record.bearer.products.exists?(bearer.id)
+      allow!
+    in role: Role(:product) if record.license_token? && record.bearer.product == bearer
       allow!
     in role: Role(:user) if record.bearer == bearer
       deny! 'user is banned' if
@@ -64,9 +71,13 @@ class TokenPolicy < ApplicationPolicy
     verify_environment!
 
     case bearer
-    in role: Role(:admin | :developer) if record.bearer == bearer || record.bearer.environment? || record.bearer.product? || record.bearer.license? || record.bearer.user?
+    in role: Role(:admin | :developer) if record.bearer == bearer || record.environment_token? || record.product_token? || record.license_token? || record.user_token?
       allow!
-    in role: Role(:environment) if record.bearer == bearer || record.bearer.product? || record.bearer.license? || record.bearer.user?
+    in role: Role(:environment) if record.bearer == bearer || record.product_token? || record.license_token? || record.user_token?
+      allow!
+    in role: Role(:product) if record.user_token? && record.bearer.products.exists?(bearer.id)
+      allow!
+    in role: Role(:product) if record.license_token? && record.bearer.product == bearer
       allow!
     else
       record.bearer == bearer
@@ -79,6 +90,10 @@ class TokenPolicy < ApplicationPolicy
 
     case bearer
     in role: Role(:admin | :developer | :environment)
+      allow!
+    in role: Role(:product) if record.user_token? && record.bearer.products.exists?(bearer.id)
+      allow!
+    in role: Role(:product) if record.license_token? && record.bearer.product == bearer
       allow!
     else
       record.bearer == bearer
