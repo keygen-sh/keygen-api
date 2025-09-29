@@ -621,6 +621,70 @@ describe TokenPolicy, type: :policy do
       end
     end
 
+    with_scenarios %i[accessing_its_license accessing_its_token] do
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          allows :show
+        end
+
+        with_permissions %w[token.generate] do
+          allows :generate
+        end
+
+        with_permissions %w[token.regenerate] do
+          allows :regenerate
+        end
+
+        with_permissions %w[token.revoke] do
+          allows :revoke
+        end
+
+        with_wildcard_permissions do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        with_default_permissions do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        without_permissions do
+          denies :show, :generate, :regenerate, :revoke
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_its_user accessing_its_token] do
+      with_token_authentication do
+        with_permissions %w[token.read] do
+          allows :show
+        end
+
+        with_permissions %w[token.generate] do
+          allows :generate
+        end
+
+        with_permissions %w[token.regenerate] do
+          allows :regenerate
+        end
+
+        with_permissions %w[token.revoke] do
+          allows :revoke
+        end
+
+        with_wildcard_permissions do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        with_default_permissions do
+          allows :show, :generate, :regenerate, :revoke
+        end
+
+        without_permissions do
+          denies :show, :generate, :regenerate, :revoke
+        end
+      end
+    end
+
     with_scenarios %i[accessing_tokens] do
       with_token_authentication do
         with_permissions %w[token.read] do
@@ -634,33 +698,67 @@ describe TokenPolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_a_token] do
-      with_token_authentication do
-        with_permissions %w[token.read] do
-          denies :show
-        end
+      with_token_trait :license do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            denies :show
+          end
 
-        with_permissions %w[token.generate] do
-          denies :generate
-        end
+          with_permissions %w[token.generate] do
+            denies :generate
+          end
 
-        with_permissions %w[token.regenerate] do
-          denies :regenerate
-        end
+          with_permissions %w[token.regenerate] do
+            denies :regenerate
+          end
 
-        with_permissions %w[token.revoke] do
-          denies :revoke
-        end
+          with_permissions %w[token.revoke] do
+            denies :revoke
+          end
 
-        with_wildcard_permissions do
-          denies :show, :generate, :regenerate, :revoke
-        end
+          with_wildcard_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
 
-        with_default_permissions do
-          denies :show, :generate, :regenerate, :revoke
-        end
+          with_default_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
 
-        without_permissions do
-          denies :show, :generate, :regenerate, :revoke
+          without_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+        end
+      end
+
+      with_token_trait :user do
+        with_token_authentication do
+          with_permissions %w[token.read] do
+            denies :show
+          end
+
+          with_permissions %w[token.generate] do
+            denies :generate
+          end
+
+          with_permissions %w[token.regenerate] do
+            denies :regenerate
+          end
+
+          with_permissions %w[token.revoke] do
+            denies :revoke
+          end
+
+          with_wildcard_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          with_default_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
+
+          without_permissions do
+            denies :show, :generate, :regenerate, :revoke
+          end
         end
       end
     end

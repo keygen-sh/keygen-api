@@ -58,6 +58,71 @@ Feature: Show authentication token
     Then the response status should be "200"
     And the response body should be a "token"
 
+  Scenario: Product requests a token for their license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the response body should be a "token"
+
+  Scenario: Product requests a token for a license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product requests a token for an environment
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "environment"
+    And the current account has 1 "token" for the last "environment"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product requests a token for an admin
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "admin"
+    And the current account has 1 "token" for the last "admin"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product requests a token for their user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy" and the last "user" as "owner"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the response body should be a "token"
+
+  Scenario: Product requests a token for a user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
   Scenario: User requests a token while authenticated
     Given the current account is "test1"
     And the current account has 1 "user"

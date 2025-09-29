@@ -245,3 +245,56 @@ Feature: Regenerate authentication token
     And I authenticate with my license key
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "404"
+
+  Scenario: Product resets a token for an admin
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "admin"
+    And the current account has 1 "token" for the last "admin"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product resets a token for their user
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user" as "owner"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the response body should be a "token" with a token
+
+  Scenario: Product resets a token for a user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "token" for the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"
+
+  Scenario: Product resets a token for their license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "200"
+    And the response body should be a "token" with a token
+
+  Scenario: Product resets a token for a license
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And the current account has 1 "token" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens/$0"
+    Then the response status should be "404"

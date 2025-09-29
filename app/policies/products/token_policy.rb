@@ -13,8 +13,8 @@ module Products
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: Role(:product) if product == bearer
-        record.all? { _1 in bearer_type: ^(Product.name), bearer_id: ^(bearer.id) }
+      in role: Role(:product), id: bearer_id if product == bearer
+        record.all? { _1 in bearer_type: 'Product', bearer_id: ^bearer_id }
       else
         deny!
       end

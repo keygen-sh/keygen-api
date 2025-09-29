@@ -356,11 +356,12 @@ class Token < ApplicationRecord
     bearer.has_role? :user
   end
 
-  def activation_token?
+  def license_token?
     return false if orphaned_token?
 
     bearer.has_role? :license
   end
+  alias :activation_token? :license_token?
 
   def kind
     case
