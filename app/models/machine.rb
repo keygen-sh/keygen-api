@@ -114,7 +114,7 @@ class Machine < ApplicationRecord
 
   validates :max_processes,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
-    if: -> { max_processes_override.present? },
+    if: -> { max_processes_override? },
     allow_nil: true
 
   validates :ip,       length: { maximum: 255 }
@@ -677,7 +677,7 @@ class Machine < ApplicationRecord
     group
   end
 
-  def max_processes  = max_processes_override.presence || license_max_processes
+  def max_processes  = max_processes_override? ? max_processes_override : license_max_processes
   def max_processes? = max_processes.present?
   def max_processes=(value)
     self.max_processes_override = value
