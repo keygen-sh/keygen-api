@@ -6812,7 +6812,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "maxMemory": 0
+            "maxMemory": -1
           },
           "relationships": {
             "policy": {
