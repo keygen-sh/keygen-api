@@ -20,7 +20,8 @@ module Roleable
 
     def change_role(name)
       change_role!(name)
-    rescue ActiveRecord::RecordInvalid
+    rescue ActiveRecord::RecordNotSaved,
+           ActiveRecord::RecordInvalid
       nil
     end
 
