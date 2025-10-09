@@ -45,7 +45,7 @@ class Machine < ApplicationRecord
 
   denormalizes :policy_id, from: :license
 
-  accepts_nested_attributes_for :components, limit: 20, reject_if: :reject_associated_records_for_components
+  accepts_nested_attributes_for :components, limit: 20
   tracks_nested_attributes_for :components
 
   # Machines firstly automatically inherit their license's group ID.
@@ -827,16 +827,6 @@ class Machine < ApplicationRecord
       },
       ts: Time.current,
     }
-  end
-
-  def reject_associated_records_for_components(attrs)
-    return if
-      new_record?
-
-    components.exists?(
-      # Make sure we only select real columns, not e.g. _destroy.
-      attrs.slice(attributes.keys),
-    )
   end
 
   # atomically update license's counter caches on machine create, update, and destroy
