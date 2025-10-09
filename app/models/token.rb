@@ -45,7 +45,7 @@ class Token < ApplicationRecord
     # Default to wildcard permission but allow all
     default: %w[*]
 
-  accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
+  accepts_nested_attributes_for :token_permissions
   tracks_nested_attributes_for :token_permissions
 
   tracks_attributes :expiry
@@ -438,18 +438,6 @@ class Token < ApplicationRecord
                   else
                     nil
                   end
-  end
-
-  ##
-  # reject_associated_records_for_token_permissions rejects duplicate token permissions.
-  def reject_associated_records_for_token_permissions(attrs)
-    return if
-      new_record?
-
-    token_permissions.exists?(
-      # Make sure we only select real columns, not e.g. _destroy.
-      attrs.slice(attributes.keys),
-    )
   end
 
   ##

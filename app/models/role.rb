@@ -45,7 +45,7 @@ class Role < ApplicationRecord
     allow_nil: true,
     to: :resource
 
-  accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
+  accepts_nested_attributes_for :role_permissions
   tracks_nested_attributes_for :role_permissions
 
   # Set default permissions unless already set
@@ -223,18 +223,6 @@ class Role < ApplicationRecord
   def set_default_permissions
     assign_attributes(
       role_permissions_attributes: default_permission_ids.map {{ permission_id: _1 }},
-    )
-  end
-
-  ##
-  # reject_associated_records_for_role_permissions rejects duplicate role permissions.
-  def reject_associated_records_for_role_permissions(attrs)
-    return if
-      new_record?
-
-    role_permissions.exists?(
-      # Make sure we only select real columns, not e.g. _destroy.
-      attrs.slice(attributes.keys),
     )
   end
 

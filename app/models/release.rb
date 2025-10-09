@@ -101,7 +101,7 @@ class Release < ApplicationRecord
   has_environment default: -> { product&.environment_id }
   has_account default: -> { product&.account_id }, inverse_of: :releases
 
-  accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
+  accepts_nested_attributes_for :constraints, limit: 20
   tracks_nested_attributes_for :constraints
 
   accepts_nested_attributes_for :channel
@@ -915,16 +915,6 @@ class Release < ApplicationRecord
     SQL
 
     self.channel = rows.first
-  end
-
-  def reject_associated_records_for_constraints(attrs)
-    return if
-      new_record?
-
-    constraints.exists?(
-      # Make sure we only select real columns, not e.g. _destroy.
-      attrs.slice(attributes.keys),
-    )
   end
 
   def enforce_release_limit_on_account!
