@@ -31,6 +31,12 @@ describe User, type: :model do
     end
 
     context 'on role change' do
+      it 'should noop when role is unchanged' do
+        admin = create(:admin, account:)
+
+        expect { admin.change_role!(:admin) }.to match_queries(count: 0)
+      end
+
       it 'should intersect permissions when upgraded to admin role' do
         user = create(:user, account:)
         user.change_role!(:admin)

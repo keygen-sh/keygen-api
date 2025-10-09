@@ -15,6 +15,10 @@ module Roleable
       errors.add :role, :not_allowed, message: 'role is missing' unless
         persisted?
 
+      # save a query in case role is unchanged
+      return if
+        name.to_s == role.name.to_s
+
       update!(role_attributes: { name: })
     end
 
