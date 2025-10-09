@@ -156,6 +156,14 @@ class WebhookWorker < BaseWorker
         endpoint.disable!
 
         return
+      in last_response_code: 530
+        Keygen.logger.warn "[webhook_worker] Disabling Frozen endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+
+        # Automatically disable endpoints returning 530 Frozen
+        event.update!(status: 'FAILED')
+        endpoint.disable!
+
+        return
       else
         Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
