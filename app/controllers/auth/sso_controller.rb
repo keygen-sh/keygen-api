@@ -83,6 +83,8 @@ module Auth
 
         # provision a new user for the current environment (not using existing users scope because it's a union)
         user = account.users.build(email: profile.email, environment:) do |new_user|
+          Keygen.logger.info { "[sso] creating new user: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect}" }
+
           new_user.sso_profile_id    = profile.id
           new_user.sso_connection_id = profile.connection_id
           new_user.sso_idp_id        = profile.idp_id
@@ -113,6 +115,8 @@ module Auth
         role = name.underscore.to_sym # pin expects a symbol
 
         unless user.role in Role(^role)
+          Keygen.logger.info { "[sso] changing user role: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} user_role=#{role.inspect}" }
+
           user.change_role role
         end
       end
@@ -124,6 +128,8 @@ module Auth
       end
 
       session = user.transaction do
+        Keygen.logger.info { "[sso] creating new session: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect}" }
+
         # FIXME(ezekg) quirk: https://stackoverflow.com/a/78727914/3247081
         user.sessions.delete_all(:delete_all) # clear current sessions
         user.sessions.create(
