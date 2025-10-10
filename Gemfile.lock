@@ -362,7 +362,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (2.2.19)
+    rack (2.2.20)
     rack-attack (6.6.0)
       rack (>= 1.0, < 3)
     rack-cors (1.1.1)
@@ -593,7 +593,7 @@ DEPENDENCIES
   premailer (~> 1.23.0)
   premailer-rails
   puma (~> 6.6)
-  rack (~> 2.2.19)
+  rack (~> 2.2.20)
   rack-attack (~> 6.6)
   rack-cors
   rack-timeout
