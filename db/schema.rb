@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_24_165540) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "account_settings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -60,6 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_24_165540) do
     t.string "slack_channel_id"
     t.text "ecdsa_private_key"
     t.text "ecdsa_public_key"
+    t.boolean "sso_sync_roles", default: false, null: false
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true

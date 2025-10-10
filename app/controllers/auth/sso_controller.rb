@@ -110,8 +110,8 @@ module Auth
         email: profile.email,
       )
 
-      # keep the user's role up-to-date with the IdP
-      if profile.role in slug: String => name
+      # keep the user's role up-to-date with the IdP (some IdPs e.g. Google OIDC have issues with groups)
+      if account.sso_sync_roles? && profile.role in slug: String => name
         role = name.underscore.to_sym # pin expects a symbol
 
         unless user.role in Role(^role)

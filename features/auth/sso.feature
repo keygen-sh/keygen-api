@@ -2,11 +2,11 @@
 Feature: SSO
   Background:
     Given the following "accounts" exist:
-      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning | sso_external_authn | secret_key                       |
-      | Keygen           | keygen-sh     |                                       |                          |                      |                      |                    | 04cd269a781e207653eb2ff3e9ab0be5 |
-      | Example          | example-com   |                                       |                          |                      |                      |                    | a1f091cf41085e9436708a79090e37a6 |
-      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                | true               | a9be6bf4b17f353d002758ad33a0e0a4 |
-      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 | false              | 98a2f3ad35a80561ce2b2c2d93d7e7e4 |
+      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning | sso_external_authn | sso_sync_roles | secret_key                       |
+      | Keygen           | keygen-sh     |                                       |                          |                      |                      |                    |                | 04cd269a781e207653eb2ff3e9ab0be5 |
+      | Example          | example-com   |                                       |                          |                      |                      |                    |                | a1f091cf41085e9436708a79090e37a6 |
+      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                | true               | true           | a9be6bf4b17f353d002758ad33a0e0a4 |
+      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 | false              | false          | 98a2f3ad35a80561ce2b2c2d93d7e7e4 |
 
   Scenario: We receive a successful callback for an existing admin
     Given the first "admin" of account "ecorp-example" has the following attributes:
@@ -365,7 +365,7 @@ Feature: SSO
       """
     And time is unfrozen
 
-  Scenario: We receive a successful callback for an existing user (changed role)
+  Scenario: We receive a successful callback for an existing user (changed role, role sync enabled)
     Given the account "ecorp-example" has 1 "user" with the following:
       """
       { "email": "elliot@ecorp.example" }
@@ -410,6 +410,62 @@ Feature: SSO
       """
     And the account "ecorp-example" should have 1 "session"
     And the last "session" of account "ecorp-example" should have the following attributes:
+      """
+      {
+        "bearer_type": "User",
+        "bearer_id": "$users[1]",
+        "token_id": null,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
+        "ip": "127.0.0.1",
+        "last_used_at": null
+      }
+      """
+    And time is unfrozen
+
+  Scenario: We receive a successful callback for an existing user (changed role, role sync disabled)
+    Given the account "lumon-example" has 1 "user" with the following:
+      """
+      { "email": "mark@lumon.example" }
+      """
+    And the SSO callback code "test_123" returns the following profile:
+      """
+      {
+        "id": "test_prof_b2c45c1af54f9cad85edf6104091",
+        "organization_id": "test_org_669aa06c521982d5c12b3eb74bf0",
+        "connection_id": "test_conn_6ca55425d9b4842cdd3ba3f1ea9c",
+        "idp_id": "test_idp_34d99d8985608b3d0297183a1265",
+        "email": "mark@lumon.example",
+        "first_name": "Mark",
+        "last_name": "Scout",
+        "role": {
+          "slug": "admin"
+        }
+      }
+      """
+    And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+    And time is frozen at "2552-02-28T00:00:00.000Z"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123&state=TOqaPpXRH1plNlmQrU76PG35WvLupDqoJPpQX52M8LcYIUh1fIpvlj5kiM1wiyVpRWEAYA.LE-szECwEiE2sSqH.f9GClmuiFnrT7Xe81U_Rxw"
+    Then the response status should be "303"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/lumon-example"
+    And the response headers should contain "Set-Cookie" with an encrypted cookie:
+      """
+      session_id=$sessions[0]; domain=keygen.sh; path=/; expires=Mon, 28 Feb 2552 08:00:00 GMT; secure; httponly; samesite=None; partitioned;
+      """
+    And the account "lumon-example" should have 1 "admin"
+    And the account "lumon-example" should have 1 "user"
+    And the last "user" of account "lumon-example" should have the following attributes:
+      """
+      {
+        "sso_profile_id": "test_prof_b2c45c1af54f9cad85edf6104091",
+        "sso_connection_id": "test_conn_6ca55425d9b4842cdd3ba3f1ea9c",
+        "sso_idp_id": "test_idp_34d99d8985608b3d0297183a1265",
+        "email": "mark@lumon.example",
+        "first_name": "Mark",
+        "last_name": "Scout"
+      }
+      """
+    And the account "lumon-example" should have 1 "session"
+    And the last "session" of account "lumon-example" should have the following attributes:
       """
       {
         "bearer_type": "User",
