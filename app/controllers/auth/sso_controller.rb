@@ -110,7 +110,7 @@ module Auth
 
       # keep the user's role up-to-date with the IdP
       if profile.role in { slug: String => name }
-        role = name.underscore.to_sym # pattern matching expects a symbol
+        role = name.underscore.to_sym # pin expects a symbol
 
         unless user.role in Role(^role)
           user.change_role role
