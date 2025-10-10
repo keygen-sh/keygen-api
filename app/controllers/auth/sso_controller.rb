@@ -121,7 +121,7 @@ module Auth
         end
       end
 
-      unless user.errors.empty?
+      unless user.valid?
         Keygen.logger.warn { "[sso] user is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} error_messages=#{user.errors.messages.inspect}" }
 
         raise Keygen::Error::InvalidSingleSignOnError.new('user is not valid', code: 'SSO_USER_INVALID')
@@ -140,7 +140,7 @@ module Auth
         )
       end
 
-      unless session.errors.empty?
+      unless session.valid?
         Keygen.logger.warn { "[sso] session is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} user_id=#{user.id.inspect} session_id=#{session.id.inspect} error_messages=#{session.errors.messages.inspect}" }
 
         raise Keygen::Error::InvalidSingleSignOnError.new('session is not valid', code: 'SSO_SESSION_INVALID')
