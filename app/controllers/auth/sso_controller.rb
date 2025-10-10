@@ -90,7 +90,7 @@ module Auth
           new_user.last_name         = profile.last_name
           new_user.email             = profile.email
 
-          if profile.role in { slug: String => name }
+          if profile.role in slug: String => name
             new_user.assign_role name.underscore.to_sym
           else
             new_user.assign_role :user # principle of least privilege
@@ -109,7 +109,7 @@ module Auth
       )
 
       # keep the user's role up-to-date with the IdP
-      if profile.role in { slug: String => name }
+      if profile.role in slug: String => name
         role = name.underscore.to_sym # pin expects a symbol
 
         unless user.role in Role(^role)
