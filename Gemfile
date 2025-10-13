@@ -138,6 +138,7 @@ end
 
 group :test do
   gem 'stripe-ruby-mock', github: 'stripe-ruby-mock/stripe-ruby-mock', ref: '6ceea9679bb573cb8bc6830f1bdf670b220a9859', require: 'stripe_mock'
+  gem 'cucumber', '~> 10'
   gem 'cucumber-rails', '~> 4', require: false
   gem 'rspec-rails', '~> 8'
   gem 'rspec-expectations', '~> 3.13'
@@ -145,7 +146,7 @@ group :test do
   gem 'factory_bot_rails', '~> 6.5'
   gem 'database_cleaner', '~> 2.1'
   gem 'database_cleaner-active_record', '~> 2.2'
-  gem 'webmock', '~> 3.14.0'
+  gem 'webmock', '~> 3.25'
   gem 'elif', '~> 0.1.0'
   gem 'memory_profiler'
 end
