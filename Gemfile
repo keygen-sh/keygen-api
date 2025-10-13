@@ -14,6 +14,7 @@ unless ENV.key?('NO_RACK_ATTACK')
 end
 gem 'rack-cors'
 gem 'uri', '>= 0.12.2'
+gem 'ostruct'
 
 # Redis for caching and background jobs
 gem 'redis', '~> 4.7.1'
