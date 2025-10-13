@@ -40,7 +40,7 @@ gem 'rotp', '~> 6.2'
 gem 'workos', '~> 5.15'
 
 # Authorization
-gem 'action_policy', '~> 0.6.3'
+gem 'action_policy', '~> 0.7.5'
 
 # Cryptography
 gem 'openssl', '~> 3.1.0'
