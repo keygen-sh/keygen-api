@@ -41,7 +41,7 @@ module Api::V1::Groups::Relationships
         with: Groups::GroupOwnerPolicy
 
       attached = group.owners.create!(
-        user_ids.map {{ account_id: current_account.id, user_id: _1 }},
+        user_ids.map {{ account_id: current_account.id, user_id: it }},
       )
 
       BroadcastEventService.call(

@@ -22,7 +22,7 @@ Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, rows|
     when :release
       codes = hash.delete(:entitlements)&.split(/,\s*/)
       if codes.present? && codes.any?
-        entitlements = codes.map {{ entitlement: Entitlement.find_by!(code: _1) }}
+        entitlements = codes.map {{ entitlement: Entitlement.find_by!(code: it) }}
 
         hash[:constraints_attributes] = entitlements
       end
@@ -529,8 +529,8 @@ Given /^(?:all|the) "([^\"]*)" have the following attributes:$/ do |resource, bo
     end
 
   resources.each {
-    _1.assign_attributes(attrs)
-    _1.save!(validate: false)
+    it.assign_attributes(attrs)
+    it.save!(validate: false)
   }
 end
 
@@ -542,8 +542,8 @@ Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, r
                       .first(count)
 
   resources.each {
-    _1.assign_attributes(attrs)
-    _1.save!(validate: false)
+    it.assign_attributes(attrs)
+    it.save!(validate: false)
   }
 end
 
@@ -555,8 +555,8 @@ Given /^the last (\d+) "([^\"]*)" have the following attributes:$/ do |count, re
                       .last(count)
 
   resources.each {
-    _1.assign_attributes(attrs)
-    _1.save!(validate: false)
+    it.assign_attributes(attrs)
+    it.save!(validate: false)
   }
 end
 
@@ -567,8 +567,8 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   resources = @account.send(resource.pluralize.underscore).limit(count)
 
   resources.each {
-    _1.assign_attributes(attrs)
-    _1.save!(validate: false)
+    it.assign_attributes(attrs)
+    it.save!(validate: false)
   }
 end
 
@@ -600,8 +600,8 @@ Given /^(?:the )?"([^\"]*)" (\d+)(?:\.\.(\.)?)(\d+) (?:have|has) the following a
           end
 
   slice.each {
-    _1.assign_attributes(attrs)
-    _1.save!(validate: false)
+    it.assign_attributes(attrs)
+    it.save!(validate: false)
   }
 end
 
@@ -1227,7 +1227,7 @@ end
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following relationships:$/ do |word_index, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse(last_response.body)
-  data = json['data'].select { _1['type'] == resource.pluralize }
+  data = json['data'].select { it['type'] == resource.pluralize }
                      .send(word_index)
 
   expect(data['relationships']).to include JSON.parse(body)
@@ -1236,7 +1236,7 @@ end
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following data:$/ do |word_index, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse(last_response.body)
-  data = json['data'].select { _1['type'] == resource.pluralize }
+  data = json['data'].select { it['type'] == resource.pluralize }
                      .send(word_index)
 
   expect(data).to include JSON.parse(body)

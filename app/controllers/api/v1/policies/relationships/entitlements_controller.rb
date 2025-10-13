@@ -42,7 +42,7 @@ module Api::V1::Policies::Relationships
 
       attached = policy.transaction do
         policy.policy_entitlements.create!(
-          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: it }},
         )
       end
 

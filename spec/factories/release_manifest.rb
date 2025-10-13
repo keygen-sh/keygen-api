@@ -40,7 +40,7 @@ FactoryBot.define do
         tgz = file_fixture('hello-2.0.0.tgz').read
         tar = Zlib::GzipReader.new(tgz)
         pkg = Minitar::Reader.open tar do |archive|
-          archive.find { _1.name in 'package/package.json' }
+          archive.find { it.name in 'package/package.json' }
                  .read
         end
 

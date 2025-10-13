@@ -45,7 +45,7 @@ class BroadcastWebhookService < BaseService
       selected_endpoint_ids.empty?
 
     # render resource while we have it
-    renderer_options = { meta: meta&.transform_keys { _1.to_s.camelize(:lower) } }.compact
+    renderer_options = { meta: meta&.transform_keys { it.to_s.camelize(:lower) } }.compact
     renderer         = Keygen::JSONAPI::Renderer.new(
       api_version: CURRENT_API_VERSION,
       context: :webhook,

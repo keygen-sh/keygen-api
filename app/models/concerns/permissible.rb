@@ -85,7 +85,7 @@ module Permissible
       return permissions?(*Permission::ALL_PERMISSIONS) unless
         role_permissions_attributes_assigned?
 
-      permission_ids = role_permissions_attributes.collect { _1[:permission_id] }
+      permission_ids = role_permissions_attributes.collect { it[:permission_id] }
       permissions    = Permission.where(id: permission_ids)
                                  .actions
                                  .uniq
@@ -150,7 +150,7 @@ module Permissible
           perms = resolver.call(nil, default)
 
           # When no defaults are provided, default to allowed minus wildcard.
-          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
+          next allowed_permissions.reject { it == Permission::WILDCARD_PERMISSION }
                                   .freeze if
             perms.empty?
 
@@ -170,7 +170,7 @@ module Permissible
           perms = resolver.call(self, default)
 
           # When no defaults are provided, default to allowed minus wildcard.
-          next allowed_permissions.reject { _1 == Permission::WILDCARD_PERMISSION }
+          next allowed_permissions.reject { it == Permission::WILDCARD_PERMISSION }
                                   .freeze if
             perms.empty?
 

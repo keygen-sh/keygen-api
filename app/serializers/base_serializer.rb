@@ -7,7 +7,7 @@ class BaseSerializer < JSONAPI::Serializable::Resource
   extend JSONAPI::Serializable::Resource::ConditionalFields
   extend JSONAPI::Serializable::Resource::KeyFormat
 
-  key_format { _1.to_s.camelize(:lower) }
+  key_format { it.to_s.camelize(:lower) }
   id         { @object.id }
 
   def self.ee(&) = Keygen.ee(&)

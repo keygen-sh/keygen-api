@@ -55,7 +55,7 @@ class MachineComponent < ApplicationRecord
     # association params, so this adds better error messaging vs a plain
     # 409 Conflict error via the unique index violation.
     if !machine.persisted? && machine.components_attributes_assigned?
-      count = machine.components.count { _1.fingerprint == component.fingerprint }
+      count = machine.components.count { it.fingerprint == component.fingerprint }
 
       component.errors.add(:fingerprint, :conflict, message: 'is duplicated') if
         count > 1

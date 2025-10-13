@@ -73,14 +73,14 @@ module RequestLogger
 
       controller = request.path_parameters[:controller]
       return false if
-        REQUEST_LOG_IGNORED_RESOURCES.any? { controller&.include?(_1) }
+        REQUEST_LOG_IGNORED_RESOURCES.any? { controller&.include?(it) }
 
       Current.account.present?
     end
 
     def queue_request_log_worker
       return unless
-        Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
+        Keygen.ee? && Keygen.ee { it.entitled?(:request_logs) }
 
       return unless
         log_request?

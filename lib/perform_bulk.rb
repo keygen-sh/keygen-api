@@ -141,8 +141,8 @@ module PerformBulk
     sidekiq_options queue: QUEUE_PROCESSING, cronitor_disabled: true
 
     def perform(*batch)
-      batch.group_by { _1['class'] }.each do |class_name, job_hashes|
-        args = job_hashes.collect { _1['args'] }
+      batch.group_by { it['class'] }.each do |class_name, job_hashes|
+        args = job_hashes.collect { it['args'] }
 
         # NB(ezekg) for a better DX we'll unwrap jobs with a singular arg
         if args.all?(&:one?)
@@ -198,7 +198,7 @@ module PerformBulk
     end
 
     def requeue
-      config.redis { _1.rpush(queue, *jobs) }
+      config.redis { it.rpush(queue, *jobs) }
     end
   end
 
@@ -217,7 +217,7 @@ module PerformBulk
 
     def retrieve_work
       queue = "queue:#{QUEUE_WAITING}"
-      batch = config.redis { _1.rpop(queue, batch_size) } # TODO(ezekg) make reliable?
+      batch = config.redis { it.rpop(queue, batch_size) } # TODO(ezekg) make reliable?
 
       if batch.blank?
         logger.debug { "no bulk work - sleeping for #{TIMEOUT}..." }

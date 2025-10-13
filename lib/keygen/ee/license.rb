@@ -15,7 +15,7 @@ module Keygen
       end
 
       def id           = lic.license['id']
-      def entitlements = lic.entitlements.collect { _1['attributes']['code'].downcase.to_sym }
+      def entitlements = lic.entitlements.collect { it['attributes']['code'].downcase.to_sym }
       def product      = lic.product&.[]('id')
       def policy       = lic.policy&.[]('id')
 

@@ -285,7 +285,7 @@ loop do
 
     # Activity
     unless ENV.key?('SKIP_ACTIVITY')
-      routes = Rails.application.routes.routes.select { _1.requirements[:subdomain] == 'api' }
+      routes = Rails.application.routes.routes.select { it.requirements[:subdomain] == 'api' }
 
       rand(0..100_000).times do
         request_time = rand(1.year).seconds.ago

@@ -30,12 +30,12 @@ class MimeTypeConstraint
   def raise_on_no_match? = !!@raise_on_no_match
 
   def path_format_matches?(request)
-    mimes.any? { request.format == _1 }
+    mimes.any? { request.format == it }
   end
 
   def accept_header_matches?(request)
     mimes.any? { |mime|
-      request.accepts.none? || request.accepts.any? { _1 == '*/*' || _1 == mime }
+      request.accepts.none? || request.accepts.any? { it == '*/*' || it == mime }
     }
   end
 end

@@ -10,7 +10,7 @@ class EntitlementPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :product | :environment)
       allow!
-    in role: Role(:user | :license) if record.all? { _1.id.in?(bearer.entitlement_ids) }
+    in role: Role(:user | :license) if record.all? { it.id.in?(bearer.entitlement_ids) }
       allow!
     else
       deny!

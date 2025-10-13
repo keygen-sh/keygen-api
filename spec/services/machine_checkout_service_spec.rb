@@ -807,7 +807,7 @@ describe MachineCheckoutService do
         ciphertext,
         iv,
         tag            = enc.split('.')
-                            .map { Base64.strict_decode64(_1) }
+                            .map { Base64.strict_decode64(it) }
 
         aes.key = key
         aes.iv  = iv

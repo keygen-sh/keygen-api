@@ -37,7 +37,7 @@ RSpec::Matchers.define :upload do |*expectations|
     block.call
 
     # FIXME(ezekg) should this compare sizes >=?
-    expectations.empty? ? !objects.empty? : expectations.all? { matches.include?(_1.hash) }
+    expectations.empty? ? !objects.empty? : expectations.all? { matches.include?(it.hash) }
   end
 
   failure_message do

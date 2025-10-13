@@ -13,7 +13,7 @@ module Users
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: Role(:product) if record.all? { _1 == bearer }
+      in role: Role(:product) if record.all? { it == bearer }
         allow!
       in role: Role(:user) if user == bearer
         allow!

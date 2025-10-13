@@ -41,7 +41,7 @@ class ProcessNpmPackageWorker < BaseWorker
     # unpack the package tarball
     unpack tar do |archive|
       # NOTE(ezekg) npm prefixes everything in the archive with package/
-      entry = archive.find { _1.name in 'package/package.json' }
+      entry = archive.find { it.name in 'package/package.json' }
 
       raise PackageNotAcceptableError, 'manifest at package/package.json must exist' if
         entry.nil?

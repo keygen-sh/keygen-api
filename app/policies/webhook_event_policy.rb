@@ -10,7 +10,7 @@ class WebhookEventPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :read_only | :environment)
       allow!
-    in role: Role(:product) if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { it.product == bearer }
       allow!
     else
       deny!

@@ -13,7 +13,7 @@ describe ProcessHeartbeatWorker do
     let(:last_heartbeat_at) { Time.current }
 
     it 'should send a process.heartbeat.pong webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
       worker.perform_async process.id
       worker.drain
@@ -33,7 +33,7 @@ describe ProcessHeartbeatWorker do
     let(:last_heartbeat_at) { 1.hour.ago }
 
     it 'should send a process.heartbeat.dead webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
       worker.perform_async process.id
       worker.drain
@@ -53,7 +53,7 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         worker.drain
@@ -74,7 +74,7 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         worker.drain
@@ -95,7 +95,7 @@ describe ProcessHeartbeatWorker do
       let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
       it 'should send a process.heartbeat.dead webhook event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
         worker.perform_async process.id
         expect { worker.drain }.to_not raise_error
@@ -120,7 +120,7 @@ describe ProcessHeartbeatWorker do
         let(:last_heartbeat_at) { 11.minutes.ago }
 
         it 'should send a process.heartbeat.dead webhook event' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
           worker.perform_async process.id
           expect { worker.drain }.to raise_error error
@@ -139,7 +139,7 @@ describe ProcessHeartbeatWorker do
         let(:process) { create(:machine_process, last_heartbeat_at:, machine:, account:) }
 
         it 'should send a process.heartbeat.dead webhook event' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
           worker.perform_async process.id
           expect { worker.drain }.to_not raise_error

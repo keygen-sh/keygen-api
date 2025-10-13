@@ -98,7 +98,7 @@ class ApplicationPolicy
     end
 
     case record
-    in [{ account_id: _ }, *] => r if r.any? { _1.account_id != account.id }
+    in [{ account_id: _ }, *] => r if r.any? { it.account_id != account.id }
       deny! "a record's account does not match current account"
     in { account_id: } if account_id != account.id
       deny! 'record account does not match current account'

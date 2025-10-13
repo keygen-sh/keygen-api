@@ -31,9 +31,9 @@ module Groups
       case bearer
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
-      in role: Role(:product) if record.all? { _1.product == bearer }
+      in role: Role(:product) if record.all? { it.product == bearer }
         allow!
-      in role: Role(:user) if bearer.group_ids? && record.all? { _1.group_id? && _1.group_id.in?(bearer.group_ids) }
+      in role: Role(:user) if bearer.group_ids? && record.all? { it.group_id? && it.group_id.in?(bearer.group_ids) }
         allow!
       else
         deny!

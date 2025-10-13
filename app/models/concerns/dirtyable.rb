@@ -38,9 +38,9 @@ module Dirtyable
     def tracks_attributes(*attribute_names)
       raise NotImplementedError, "attributes not accepted for #{self}: #{attribute_names.inspect}" unless
         attribute_names.empty? || attribute_names.all? {
-          _1.to_s.in?(self.attribute_names) || (
+          it.to_s.in?(self.attribute_names) || (
             self < ::ActiveRecord::Base && (
-              _1.to_s.in?(self.column_names) || _1.to_s.in?(reflections.keys)
+              it.to_s.in?(self.column_names) || it.to_s.in?(reflections.keys)
             )
           )
         }

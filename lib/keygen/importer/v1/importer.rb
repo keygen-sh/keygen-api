@@ -52,7 +52,7 @@ module Keygen
             raise InvalidAccountError unless account.id == account_id
           else
             # assert records are for account
-            raise InvalidRecordError unless records.all? { _1.account_id == account_id }
+            raise InvalidRecordError unless records.all? { it.account_id == account_id }
           end
         end
 

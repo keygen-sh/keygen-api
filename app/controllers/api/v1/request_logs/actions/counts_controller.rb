@@ -42,7 +42,7 @@ module Api::V1::RequestLogs::Actions
         )
 
         {
-          meta: rows.map { [_1['period'].strftime('%Y-%m-%d'), _1['count'].to_i] }
+          meta: rows.map { [it['period'].strftime('%Y-%m-%d'), it['count'].to_i] }
                     .to_h,
         }
       end

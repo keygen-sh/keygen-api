@@ -10,7 +10,7 @@ RSpec::Matchers.define :log do |message|
 
     @levels.each do |level|
       allow(Rails.logger).to(
-        receive(level) { @messages << _1.strip }.and_return(nil),
+        receive(level) { @messages << it.strip }.and_return(nil),
       )
     end
 

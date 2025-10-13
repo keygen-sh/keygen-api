@@ -100,7 +100,7 @@ module Accountable
       # We also want to assert that the model's current account matches
       # all of its :belongs_to associations that are accountable.
       unless (reflections = reflect_on_all_associations(:belongs_to)).empty?
-        reflections.reject { _1.name == :account }
+        reflections.reject { it.name == :account }
                    .each do |reflection|
           # Assert that we're either dealing with a polymorphic association (and in that case
           # we'll perform the account assert later during validation), or we want to

@@ -33,7 +33,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
     # association params, so this adds better error messaging vs a plain
     # 409 Conflict error via the unique index violation.
     if release.constraints_attributes_assigned?
-      count = release.constraints.count { _1.entitlement_id == constraint.entitlement_id }
+      count = release.constraints.count { it.entitlement_id == constraint.entitlement_id }
 
       constraint.errors.add(:entitlement, :conflict, message: 'is duplicated') if
         count > 1

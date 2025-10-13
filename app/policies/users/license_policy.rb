@@ -14,9 +14,9 @@ module Users
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
       in role: Role(:product) if user.user?
-        record.all? { _1.product == bearer }
+        record.all? { it.product == bearer }
       in role: Role(:user) if user == bearer
-        record.all? { _1.owner == bearer || _1.id.in?(bearer.license_ids) }
+        record.all? { it.owner == bearer || it.id.in?(bearer.license_ids) }
       else
         deny!
       end

@@ -38,9 +38,9 @@ class JsonValidator < ActiveModel::EachValidator
   def calculate_depth(value)
     case value
     when Hash
-      1 + (value.values.map { calculate_depth(_1) }.max || 0)
+      1 + (value.values.map { calculate_depth(it) }.max || 0)
     when Array
-      1 + (value.map { calculate_depth(_1) }.max || 0)
+      1 + (value.map { calculate_depth(it) }.max || 0)
     else
       0
     end
@@ -49,9 +49,9 @@ class JsonValidator < ActiveModel::EachValidator
   def count_keys(value)
     case value
     when Hash
-      value.size + value.values.sum { count_keys(_1) }
+      value.size + value.values.sum { count_keys(it) }
     when Array
-      value.sum { count_keys(_1) }
+      value.sum { count_keys(it) }
     else
       0
     end

@@ -206,7 +206,7 @@ class Token < ApplicationRecord
     end
 
     assign_attributes(
-      token_permissions_attributes: permission_ids.map {{ permission_id: _1 }},
+      token_permissions_attributes: permission_ids.map {{ permission_id: it }},
     )
   end
 
@@ -235,13 +235,13 @@ class Token < ApplicationRecord
       token_permissions_attributes_assigned?
 
     Permission.where(
-      id: token_permissions_attributes.collect { _1[:permission_id] },
+      id: token_permissions_attributes.collect { it[:permission_id] },
     )
   end
 
   def permission_ids
     if token_permissions_attributes_assigned?
-      token_permissions_attributes.collect { _1[:permission_id] }
+      token_permissions_attributes.collect { it[:permission_id] }
     else
       token_permissions.collect(&:permission_id)
     end
@@ -427,7 +427,7 @@ class Token < ApplicationRecord
 
   def set_default_permissions
     assign_attributes(
-      token_permissions_attributes: default_permission_ids.map {{ permission_id: _1 }},
+      token_permissions_attributes: default_permission_ids.map {{ permission_id: it }},
     )
   end
 
@@ -454,7 +454,7 @@ class Token < ApplicationRecord
       #              some reason token_id ends up being nil. Instead, we'll use the
       #              class method and then call reload.
       TokenPermission.upsert_all(
-        token_permissions_attributes.map { _1.merge(token_id: id) },
+        token_permissions_attributes.map { it.merge(token_id: id) },
         record_timestamps: true,
         on_duplicate: :skip,
       )

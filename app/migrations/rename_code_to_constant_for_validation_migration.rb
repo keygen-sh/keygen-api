@@ -6,7 +6,7 @@ class RenameCodeToConstantForValidationMigration < BaseMigration
   migrate if: -> body { body in meta: { ** } } do |body|
     case body
     in meta: { code: }
-      body[:meta].tap { _1[:constant] = _1.delete(:code) }
+      body[:meta].tap { it[:constant] = it.delete(:code) }
     else
     end
   end

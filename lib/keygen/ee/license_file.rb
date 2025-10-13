@@ -21,10 +21,10 @@ module Keygen
       end
 
       def license      = data['data']
-      def entitlements = data['included']&.filter { _1['type'] == 'entitlements' } || []
-      def environment  = data['included']&.find { _1['type'] == 'environments' }
-      def product      = data['included']&.find { _1['type'] == 'products' }
-      def policy       = data['included']&.find { _1['type'] == 'policies' }
+      def entitlements = data['included']&.filter { it['type'] == 'entitlements' } || []
+      def environment  = data['included']&.find { it['type'] == 'environments' }
+      def product      = data['included']&.find { it['type'] == 'products' }
+      def policy       = data['included']&.find { it['type'] == 'policies' }
 
       def present?  = data.present? rescue false
       def issued    = Time.parse(data['meta']['issued'])
@@ -100,7 +100,7 @@ module Keygen
 
         enc                 = data['enc']
         ciphertext, iv, tag = enc.split('.')
-                                 .map { Base64.strict_decode64(_1) }
+                                 .map { Base64.strict_decode64(it) }
 
         aes.key = OpenSSL::Digest::SHA256.digest(key)
         aes.iv  = iv

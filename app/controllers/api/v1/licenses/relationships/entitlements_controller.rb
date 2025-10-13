@@ -43,7 +43,7 @@ module Api::V1::Licenses::Relationships
 
       attached = license.transaction do
         license.license_entitlements.create!(
-          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+          entitlement_ids.map {{ account_id: current_account.id, entitlement_id: it }},
         )
       end
 

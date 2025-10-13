@@ -4,7 +4,7 @@ require 'anbt-sql-formatter/formatter'
 
 rule = AnbtSql::Rule.new
 rule.keyword = AnbtSql::Rule::KEYWORD_UPPER_CASE
-%w[count sum substr date].each { rule.function_names << _1.upcase }
+%w[count sum substr date].each { rule.function_names << it.upcase }
 rule.indent_string = '  '
 formatter = AnbtSql::Formatter.new(rule)
 

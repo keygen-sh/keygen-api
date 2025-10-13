@@ -2,11 +2,11 @@
 
 RACK_ATTACK_IP_WHITELIST = ENV.fetch('RACK_ATTACK_IP_WHITELIST') { '' }
                               .split(',')
-                              .map { IPAddr.new(_1.strip) }
+                              .map { IPAddr.new(it.strip) }
 
 RACK_ATTACK_IP_BLACKLIST = ENV.fetch('RACK_ATTACK_IP_BLACKLIST') { '' }
                               .split(',')
-                              .map { IPAddr.new(_1.strip) }
+                              .map { IPAddr.new(it.strip) }
 
 RACK_ATTACK_MAX_RPS = ENV.fetch('RACK_ATTACK_MAX_RPS') { -1 }.to_i
 RACK_ATTACK_MAX_RPM = ENV.fetch('RACK_ATTACK_MAX_RPM') { -1 }.to_i
@@ -29,7 +29,7 @@ unless ENV.key?('NO_RACK_ATTACK')
     req = ActionDispatch::Request.new(rack_req.env)
     ip  = req.remote_ip
 
-    RACK_ATTACK_IP_WHITELIST.any? { _1 === ip }
+    RACK_ATTACK_IP_WHITELIST.any? { it === ip }
   rescue => e
     Keygen.logger.exception(e)
 
@@ -40,7 +40,7 @@ unless ENV.key?('NO_RACK_ATTACK')
     req = ActionDispatch::Request.new(rack_req.env)
     ip  = req.remote_ip
 
-    RACK_ATTACK_IP_BLACKLIST.any? { _1 === ip }
+    RACK_ATTACK_IP_BLACKLIST.any? { it === ip }
   rescue => e
     Keygen.logger.exception(e)
 

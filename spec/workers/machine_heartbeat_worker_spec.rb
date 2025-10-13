@@ -13,7 +13,7 @@ describe MachineHeartbeatWorker do
     let(:heartbeat_at) { nil }
 
     it 'should not send a webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(0).times
 
       worker.perform_async machine.id
       worker.drain
@@ -34,7 +34,7 @@ describe MachineHeartbeatWorker do
       let(:heartbeat_at) { Time.current }
 
       it 'should send a machine.heartbeat.pong webhook event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
         worker.perform_async machine.id
         worker.drain
@@ -54,7 +54,7 @@ describe MachineHeartbeatWorker do
       let(:heartbeat_at) { 1.hour.ago }
 
       it 'should send a machine.heartbeat.dead webhook event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
         worker.perform_async machine.id
         worker.drain
@@ -73,7 +73,7 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           worker.drain
@@ -93,7 +93,7 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           worker.drain
@@ -113,7 +113,7 @@ describe MachineHeartbeatWorker do
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
         it 'should send a machine.heartbeat.dead webhook event' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
           worker.perform_async machine.id
           expect { worker.drain }.to_not raise_error
@@ -137,7 +137,7 @@ describe MachineHeartbeatWorker do
           let(:heartbeat_at) { 11.minutes.ago }
 
           it 'should send a machine.heartbeat.dead webhook event' do
-            expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+            expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
             worker.perform_async machine.id
             expect { worker.drain }.to raise_error error
@@ -156,7 +156,7 @@ describe MachineHeartbeatWorker do
           let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
           it 'should send a machine.heartbeat.dead webhook event' do
-            expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+            expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
             worker.perform_async machine.id
             expect { worker.drain }.to_not raise_error

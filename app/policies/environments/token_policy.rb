@@ -12,7 +12,7 @@ module Environments
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only)
         allow!
       in role: Role(:environment), id: bearer_id if environment == bearer
-        record.all? { _1 in bearer_type: 'Environment', bearer_id: ^bearer_id }
+        record.all? { it in bearer_type: 'Environment', bearer_id: ^bearer_id }
       else
         deny!
       end

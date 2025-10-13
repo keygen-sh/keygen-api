@@ -148,6 +148,6 @@ class AccountSerializer < BaseSerializer
     end
 
     # FIXME(ezekg) base serializer should handle this
-    meta.transform_keys { _1.to_s.camelize(:lower) }
+    meta.transform_keys { it.to_s.camelize(:lower) }
   end
 end

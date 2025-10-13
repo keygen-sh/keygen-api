@@ -27,7 +27,7 @@ class RequestLogWorker < BaseWorker
     request_queue_time = nil
   )
     return unless
-      Keygen.ee? && Keygen.ee { _1.entitled?(:request_logs) }
+      Keygen.ee? && Keygen.ee { it.entitled?(:request_logs) }
 
     account = fetch_account(account_id)
 

@@ -4,7 +4,7 @@ Rails.application.configure do
   config.host_authorization = { exclude: -> req { req.path =~ %r(^/v\d+/health) } }
   config.hosts.concat(
     [ENV.fetch('KEYGEN_HOST'), *ENV.fetch('KEYGEN_HOSTS', '').split(',')].then { |host|
-      host.uniq.compact_blank.map { _1.downcase.strip }
+      host.uniq.compact_blank.map { it.downcase.strip }
     },
   )
 

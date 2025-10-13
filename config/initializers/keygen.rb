@@ -23,7 +23,7 @@ Rails.application.config.to_prepare do
 
   case
   when Keygen.multiplayer?(strict: false)
-    unless Keygen.ee { _1.entitled?(:multiplayer) }
+    unless Keygen.ee { it.entitled?(:multiplayer) }
       abort "Keygen EE license is missing the multiplayer entitlement (use KEYGEN_MODE=singleplayer instead)"
     end
   when Keygen.singleplayer?

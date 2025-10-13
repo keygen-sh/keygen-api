@@ -11,11 +11,11 @@ class TokenPolicy < ApplicationPolicy
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
     in role: Role(:product), id: bearer_id
-      record.all? { _1 in { bearer_type: 'Product', bearer_id: ^bearer_id } | { bearer_type: 'License' | 'User' } }
+      record.all? { it in { bearer_type: 'Product', bearer_id: ^bearer_id } | { bearer_type: 'License' | 'User' } }
     in role: Role(:license), id: bearer_id
-      record.all? { _1 in { bearer_type: 'License', bearer_id: ^bearer_id } }
+      record.all? { it in { bearer_type: 'License', bearer_id: ^bearer_id } }
     in role: Role(:user), id: bearer_id
-      record.all? { _1 in { bearer_type: 'User', bearer_id: ^bearer_id } }
+      record.all? { it in { bearer_type: 'User', bearer_id: ^bearer_id } }
     else
       deny!
     end

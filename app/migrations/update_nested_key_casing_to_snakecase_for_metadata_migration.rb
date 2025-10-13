@@ -12,13 +12,13 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
           metadata.each do |key, value|
             case value
             when Hash
-              value.deep_transform_keys! { _1.to_s.underscore }
+              value.deep_transform_keys! { it.to_s.underscore }
             when Array
               value.map do |v|
                 next unless
                   v in Hash
 
-                v.deep_transform_keys! { _1.to_s.underscore }
+                v.deep_transform_keys! { it.to_s.underscore }
               end
             end
           end
@@ -38,13 +38,13 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
           metadata.each do |key, value|
             case value
             when Hash
-              value.deep_transform_keys! { _1.to_s.underscore }
+              value.deep_transform_keys! { it.to_s.underscore }
             when Array
               value.map do |v|
                 next unless
                   v in Hash
 
-                v.deep_transform_keys! { _1.to_s.underscore }
+                v.deep_transform_keys! { it.to_s.underscore }
               end
             end
           end
@@ -61,13 +61,13 @@ class UpdateNestedKeyCasingToSnakecaseForMetadataMigration < BaseMigration
       metadata.each do |key, value|
         case value
         when Hash
-          value.deep_transform_keys! { _1.to_s.underscore }
+          value.deep_transform_keys! { it.to_s.underscore }
         when Array
           value.map do |v|
             next unless
               v in Hash
 
-            v.deep_transform_keys! { _1.to_s.underscore }
+            v.deep_transform_keys! { it.to_s.underscore }
           end
         end
       end

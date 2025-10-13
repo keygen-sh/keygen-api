@@ -442,8 +442,8 @@ describe License, type: :model do
 
         threads = []
         threads << Thread.new { 5.times { machines << create(:machine, account:, license:, cores: 5) } }
-        threads << Thread.new { machines.first(2).each { _1.update!(cores: 1) } }
-        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+        threads << Thread.new { machines.first(2).each { it.update!(cores: 1) } }
+        threads << Thread.new { machines.last(2).each { it.destroy! } }
 
         threads.each(&:join)
         license.reload
@@ -499,8 +499,8 @@ describe License, type: :model do
 
         threads = []
         threads << Thread.new { 5.times { machines << create(:machine, account:, license:, memory: 5.megabytes) } }
-        threads << Thread.new { machines.first(2).each { _1.update!(memory: 1.megabytes) } }
-        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+        threads << Thread.new { machines.first(2).each { it.update!(memory: 1.megabytes) } }
+        threads << Thread.new { machines.last(2).each { it.destroy! } }
 
         threads.each(&:join)
         license.reload
@@ -556,8 +556,8 @@ describe License, type: :model do
 
         threads = []
         threads << Thread.new { 5.times { machines << create(:machine, account:, license:, disk: 5.gigabytes) } }
-        threads << Thread.new { machines.first(2).each { _1.update!(disk: 1.gigabyte) } }
-        threads << Thread.new { machines.last(2).each { _1.destroy! } }
+        threads << Thread.new { machines.first(2).each { it.update!(disk: 1.gigabyte) } }
+        threads << Thread.new { machines.last(2).each { it.destroy! } }
 
         threads.each(&:join)
         license.reload

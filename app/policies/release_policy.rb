@@ -34,7 +34,7 @@ class ReleasePolicy < ApplicationPolicy
     )
 
     allow! if
-      record.all? { _1.open? && _1.constraints.none? }
+      record.all? { it.open? && it.constraints.none? }
 
     deny! 'authentication is required' if
       bearer.nil?
@@ -42,10 +42,10 @@ class ReleasePolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:product) if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { it.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.open? && _1.constraints.none? ||
-                                          _1.product_id.in?(bearer.product_ids) }
+    in role: Role(:user) if record.all? { it.open? && it.constraints.none? ||
+                                          it.product_id.in?(bearer.product_ids) }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed?)
 
@@ -65,8 +65,8 @@ class ReleasePolicy < ApplicationPolicy
       end
 
       allow!
-    in role: Role(:license) if record.all? { _1.open? && _1.constraints.none? ||
-                                             _1.product == bearer.product }
+    in role: Role(:license) if record.all? { it.open? && it.constraints.none? ||
+                                             it.product == bearer.product }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed?)
 

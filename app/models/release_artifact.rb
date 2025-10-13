@@ -400,7 +400,7 @@ class ReleaseArtifact < ApplicationRecord
   scope :open,     -> { joins(release: :product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed,   -> { joins(release: :product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
+  scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { it.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
   scope :with_checksum, -> checksum { where(checksum:) }
 

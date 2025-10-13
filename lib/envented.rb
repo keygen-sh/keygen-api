@@ -209,7 +209,7 @@ module Envented
 
   class IdempotencyLock
     def self.lock!(key)
-      redis { _1.set(Envented::IDEMPOTENCY_PREFIX + key, 1, nx: true, ex: Envented::IDEMPOTENCY_TTL) }
+      redis { it.set(Envented::IDEMPOTENCY_PREFIX + key, 1, nx: true, ex: Envented::IDEMPOTENCY_TTL) }
     end
 
     def self.lock(...)
@@ -221,7 +221,7 @@ module Envented
     end
 
     def self.unlock!(key)
-      redis { !_1.del(Envented::IDEMPOTENCY_PREFIX + key).zero? }
+      redis { !it.del(Envented::IDEMPOTENCY_PREFIX + key).zero? }
     end
 
     def self.unlock(...)
@@ -248,7 +248,7 @@ module Envented
       Timeout.timeout(lock_wait_timeout) do
         loop do
           token = SecureRandom.hex
-          if redis { _1.set(key, token, nx: true, ex: Envented::LOCK_TTL) }
+          if redis { it.set(key, token, nx: true, ex: Envented::LOCK_TTL) }
             return token
           end
 
@@ -286,9 +286,9 @@ module Envented
 
       shasum = (Envented::LUA_SHASUMS[:unlock] ||= Digest::SHA1.hexdigest(cmd))
       res    = begin
-                 redis { _1.evalsha(shasum, keys: [key], argv: [token]) }
+                 redis { it.evalsha(shasum, keys: [key], argv: [token]) }
                rescue Redis::CommandError
-                 redis { _1.eval(cmd, keys: [key], argv: [token]) }
+                 redis { it.eval(cmd, keys: [key], argv: [token]) }
                end
 
       !res.zero?

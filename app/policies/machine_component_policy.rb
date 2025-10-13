@@ -10,11 +10,11 @@ class MachineComponentPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:product) if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { it.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.owner == bearer || _1.license.owner == bearer || _1.machine_id.in?(bearer.machine_ids) }
+    in role: Role(:user) if record.all? { it.owner == bearer || it.license.owner == bearer || it.machine_id.in?(bearer.machine_ids) }
       allow!
-    in role: Role(:license) if record.all? { _1.license == bearer }
+    in role: Role(:license) if record.all? { it.license == bearer }
       allow!
     else
       deny!

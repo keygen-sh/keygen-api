@@ -11,7 +11,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expired' }
 
     it 'should send a license.expired webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
       create :license, expiry: Time.current, account: account
 
@@ -20,7 +20,7 @@ describe LicenseExpirationsWorker do
     end
 
     it 'should send multiple license.expired webhook events' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(3).times
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(3).times
 
       create :license, expiry: Time.current, account: account
       create :license, expiry: Time.current, account: account
@@ -48,7 +48,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expired' }
 
     it 'should not send a license.expired webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(0).times
 
       create :license, expiry: 7.days.from_now, account: account
 
@@ -72,7 +72,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expiring-soon' }
 
     it 'should send a license.expiring-soon webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(1).time
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(1).time
 
       create :license, expiry: 2.days.from_now, account: account
 
@@ -81,7 +81,7 @@ describe LicenseExpirationsWorker do
     end
 
     it 'should send multiple license.expiring-soon webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(4).times
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(4).times
 
       create :license, expiry: 2.days.from_now, account: account
       create :license, expiry: 1.day.from_now, account: account
@@ -108,7 +108,7 @@ describe LicenseExpirationsWorker do
     let(:event) { 'license.expiring-soon' }
 
     it 'should not send a license.expiring-soon webhook event' do
-      expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event:) }.exactly(0).times
+      expect(BroadcastEventService).to receive(:call) { expect(it).to include(event:) }.exactly(0).times
 
       create :license, expiry: 9.days.from_now, account: account
 

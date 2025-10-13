@@ -10,7 +10,7 @@ class PolicyPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:product) if record.all? { _1.product_id == bearer.id }
+    in role: Role(:product) if record.all? { it.product_id == bearer.id }
       allow!
     in role: Role(:license) if record == [bearer.policy]
       allow!

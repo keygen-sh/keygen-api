@@ -337,7 +337,7 @@ describe Release, type: :model do
           2.1.0-rc.1
         ]
 
-        versions.each { create(:release, :published, version: _1, product:, account:) }
+        versions.each { create(:release, :published, version: it, product:, account:) }
       end
 
       it 'should not upgrade' do
@@ -400,7 +400,7 @@ describe Release, type: :model do
           3.0.2
         ]
 
-        versions.each { create(:release, :published, version: _1, product:, account:) }
+        versions.each { create(:release, :published, version: it, product:, account:) }
       end
 
       context 'when upgrading from the stable channel' do
@@ -844,7 +844,7 @@ describe Release, type: :model do
           2.1.0-rc.1
         ]
 
-        versions.each { create(:release, :published, version: _1, product:, account:) }
+        versions.each { create(:release, :published, version: it, product:, account:) }
       end
 
       it 'should not upgrade' do
@@ -887,7 +887,7 @@ describe Release, type: :model do
           3.0.2
         ]
 
-        versions.each { create(:release, :published, version: _1, product:, account:) }
+        versions.each { create(:release, :published, version: it, product:, account:) }
       end
 
       it 'should upgrade' do
@@ -1104,7 +1104,7 @@ describe Release, type: :model do
         22.0.1-beta.1
       ]
 
-      versions.map { create(:release, :published, version: _1, product:, account:) }
+      versions.map { create(:release, :published, version: it, product:, account:) }
     end
 
     it 'should sort by semver' do
