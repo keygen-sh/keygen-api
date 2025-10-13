@@ -21,8 +21,8 @@ GEM
   specs:
     aasm (5.0.8)
       concurrent-ruby (~> 1.0)
-    action_policy (0.6.3)
-      ruby-next-core (>= 0.14.0)
+    action_policy (0.7.5)
+      ruby-next-core (>= 1.0)
     actioncable (8.0.3)
       actionpack (= 8.0.3)
       activesupport (= 8.0.3)
@@ -446,7 +446,7 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.1)
-    ruby-next-core (0.15.2)
+    ruby-next-core (1.1.2)
     ruby_http_client (3.5.5)
     ruby_parser (3.19.0)
       sexp_processor (~> 4.16)
@@ -547,7 +547,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 5.0.3)
-  action_policy (~> 0.6.3)
+  action_policy (~> 0.7.5)
   active_record_distinct_on (~> 1.7)
   active_record_union!
   activerecord_where_assoc (~> 1.2)
