@@ -12,7 +12,7 @@ class MachineComponentSerializer < BaseSerializer
     @object.updated_at
   end
   attribute :metadata do
-    @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}
+    @object.metadata&.deep_transform_keys { it.to_s.camelize :lower } or {}
   end
 
   relationship :account do

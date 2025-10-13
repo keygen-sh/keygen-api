@@ -48,7 +48,7 @@ module Api::V1::Releases::Relationships
         with: Releases::ReleaseEntitlementConstraintPolicy
 
       attached = release.constraints.create!(
-        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: _1 }},
+        entitlement_ids.map {{ account_id: current_account.id, entitlement_id: it }},
       )
 
       BroadcastEventService.call(

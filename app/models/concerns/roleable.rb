@@ -57,7 +57,7 @@ module Roleable
       return false if
         role.nil?
 
-      names.any? { _1.to_s == role.name.to_s }
+      names.any? { it.to_s == role.name.to_s }
     end
     alias_method :has_roles?, :has_role?
 

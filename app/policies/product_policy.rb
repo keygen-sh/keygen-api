@@ -30,9 +30,9 @@ class ProductPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:user) if record.all? { _1.open? || _1.licensed? && _1.id.in?(bearer.product_ids) }
+    in role: Role(:user) if record.all? { it.open? || it.licensed? && it.id.in?(bearer.product_ids) }
       allow!
-    in role: Role(:license) if record.all? { _1.open? || _1.licensed? && _1 == bearer.product }
+    in role: Role(:license) if record.all? { it.open? || it.licensed? && it == bearer.product }
       allow!
     else
       deny!

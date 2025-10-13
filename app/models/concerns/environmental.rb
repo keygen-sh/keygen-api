@@ -138,7 +138,7 @@ module Environmental
       # We also want to assert that the model's current environment is compatible
       # with all of its :belongs_to associations that are environmental.
       unless (reflections = reflect_on_all_associations(:belongs_to)).empty?
-        reflections.reject { _1.name == :environment }
+        reflections.reject { it.name == :environment }
                    .each do |reflection|
           # Assert that we're either dealing with a polymorphic association (and in that case
           # we'll perform the environment assert later during validation), or we want to

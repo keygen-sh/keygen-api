@@ -12,9 +12,9 @@ module Denormalizable
 
       case
       when from.present?
-        attribute_names.each { instrument_denormalized_attribute_from(_1, from:, prefix:) }
+        attribute_names.each { instrument_denormalized_attribute_from(it, from:, prefix:) }
       when to.present?
-        attribute_names.each { instrument_denormalized_attribute_to(_1, to:, prefix:) }
+        attribute_names.each { instrument_denormalized_attribute_to(it, to:, prefix:) }
       when with.present?
         raise NotImplementedError, 'denormalizes :with is not supported yet'
       else
@@ -138,8 +138,8 @@ module Denormalizable
 
       # If we're denormalizing a foreign key, we need to look up the association and denormalize
       # the actual record, since it likely doesn't have an ID assigned yet.
-      if record.present? && (source_reflection = record.class.reflect_on_all_associations.find { _1.foreign_key == source_attribute_name.to_s })
-        target_reflection = self.class.reflect_on_all_associations.find { _1.foreign_key == target_attribute_name.to_s }
+      if record.present? && (source_reflection = record.class.reflect_on_all_associations.find { it.foreign_key == source_attribute_name.to_s })
+        target_reflection = self.class.reflect_on_all_associations.find { it.foreign_key == target_attribute_name.to_s }
 
         send(:"#{target_reflection.name}=", record.send(source_reflection.name))
       else
@@ -167,7 +167,7 @@ module Denormalizable
       record = send(source_association_name)
 
       unless read_attribute(target_attribute_name) == record&.read_attribute(source_attribute_name)
-        if target_reflection = self.class.reflect_on_all_associations.find { _1.foreign_key == target_attribute_name.to_s }
+        if target_reflection = self.class.reflect_on_all_associations.find { it.foreign_key == target_attribute_name.to_s }
           errors.add target_reflection.name, :not_allowed, message: 'cannot be modified directly because it is a denormalized association'
         else
           errors.add target_attribute_name, :not_allowed, message: 'cannot be modified directly because it is a denormalized attribute'

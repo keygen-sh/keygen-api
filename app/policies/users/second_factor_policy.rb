@@ -14,7 +14,7 @@ module Users
       in role: Role(:admin)
         allow!
       in role: Role(:developer | :sales_agent | :support_agent | :read_only | :user)
-        record.all? { _1.user_id == bearer.id }
+        record.all? { it.user_id == bearer.id }
       else
         deny!
       end

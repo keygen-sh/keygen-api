@@ -4,7 +4,7 @@
 module EmailCheck
   class EmailAddress
     # NB(ezekg) using any? here instead of include? allows domains to be regexes and strings
-    def educational? = EmailCheck.edu_email_domains.any? { _1 === @email.domain }
+    def educational? = EmailCheck.edu_email_domains.any? { it === @email.domain }
     alias :edu? :educational?
   end
 

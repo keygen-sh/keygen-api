@@ -22,7 +22,7 @@ describe ProcessNpmPackageWorker do
       tar = Zlib::GzipReader.new(tgz)
 
       Minitar::Reader.open tar do |archive|
-        archive.find { _1.file? && _1.name in 'package/package.json' }
+        archive.find { it.file? && it.name in 'package/package.json' }
                .read
       end
     }

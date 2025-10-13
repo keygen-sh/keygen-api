@@ -16,7 +16,7 @@ class DigestIO < SimpleDelegator
 
   # FIXME(ezekg) mark as written and don't rehash on read/rewind
   def write(*data)
-    data.each { @digest << _1 }
+    data.each { @digest << it }
 
     super
   end

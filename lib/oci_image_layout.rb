@@ -229,7 +229,7 @@ module OciImageLayout
     def each(&)
       super
 
-      manifests.each { _1.each(&) }
+      manifests.each { it.each(&) }
     end
   end
 
@@ -292,7 +292,7 @@ module OciImageLayout
     def each(&)
       super
 
-      layers.each { _1.each(&) }
+      layers.each { it.each(&) }
       config&.each(&)
     end
   end

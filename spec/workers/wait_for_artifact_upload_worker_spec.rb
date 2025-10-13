@@ -22,7 +22,7 @@ describe WaitForArtifactUploadWorker do
     context 'when an upload succeeds' do
       it 'should emit success events' do
         # double event is for backwards compat
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: %w[artifact.upload.succeeded artifact.uploaded]) }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: %w[artifact.upload.succeeded artifact.uploaded]) }.exactly(1).time
 
         subject.perform_async(artifact.id)
         subject.drain
@@ -53,7 +53,7 @@ describe WaitForArtifactUploadWorker do
       end
 
       it 'should emit a failed event' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
         subject.perform_async(artifact.id)
         subject.drain
@@ -79,8 +79,8 @@ describe WaitForArtifactUploadWorker do
       end
 
       it 'should emit processing and succeeded events' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.succeeded') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.succeeded') }.exactly(1).time
 
         subject.perform_async(artifact.id)
         subject.drain
@@ -112,8 +112,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and failed events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain
@@ -151,8 +151,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and failed events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain
@@ -190,8 +190,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and succeeded events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain
@@ -225,8 +225,8 @@ describe WaitForArtifactUploadWorker do
       end
 
       it 'should emit processing and succeeded events' do
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-        expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.succeeded') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+        expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.succeeded') }.exactly(1).time
 
         subject.perform_async(artifact.id)
         subject.drain
@@ -258,8 +258,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and failed events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain
@@ -297,8 +297,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and failed events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain
@@ -336,8 +336,8 @@ describe WaitForArtifactUploadWorker do
         end
 
         it 'should emit processing and succeeded events' do
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.processing') }.exactly(1).time
-          expect(BroadcastEventService).to receive(:call) { expect(_1).to include(event: 'artifact.upload.failed') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.processing') }.exactly(1).time
+          expect(BroadcastEventService).to receive(:call) { expect(it).to include(event: 'artifact.upload.failed') }.exactly(1).time
 
           subject.perform_async(artifact.id)
           subject.drain

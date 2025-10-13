@@ -17,7 +17,7 @@ class UserSerializer < BaseSerializer
     end
   end
   attribute :metadata do
-    @object.metadata&.deep_transform_keys { _1.to_s.camelize :lower } or {}
+    @object.metadata&.deep_transform_keys { it.to_s.camelize :lower } or {}
   end
   attribute :created do
     @object.created_at

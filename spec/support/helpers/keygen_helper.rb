@@ -8,7 +8,7 @@ module KeygenHelper
           before do
             allow(Keygen::EE::LicenseFile).to receive(:current).and_return(
               Keygen::EE::LicenseFile.new(
-                included: entitlements.map {{ type: 'entitlements', attributes: { code: _1.to_s.upcase } }},
+                included: entitlements.map {{ type: 'entitlements', attributes: { code: it.to_s.upcase } }},
                 data: { type: 'licenses', attributes: { expiry: } },
                 meta: { issued:, expiry: },
               ),

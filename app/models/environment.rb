@@ -98,7 +98,7 @@ class Environment < ApplicationRecord
   }
 
   def self.cache_key(key, account:)      = [:envs, account.id, key, CACHE_KEY_VERSION].join(':')
-  def self.clear_cache!(*keys, account:) = keys.each { Rails.cache.delete(cache_key(_1, account:)) }
+  def self.clear_cache!(*keys, account:) = keys.each { Rails.cache.delete(cache_key(it, account:)) }
 
   def cache_key    = Environment.cache_key(id, account:)
   def clear_cache! = Environment.clear_cache!(id, code, account:)

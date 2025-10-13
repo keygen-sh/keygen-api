@@ -30,7 +30,7 @@ class FindByAliasService < BaseService
     # strip out ID attribute if the ID doesn't resemble a UUID (pg will throw)
     columns = [PRIMARY_KEY, *aliases].uniq
 
-    columns.reject! { _1 == PRIMARY_KEY } unless
+    columns.reject! { it == PRIMARY_KEY } unless
       UUID_RE.match?(id)
 
     raise Keygen::Error::NotFoundError.new(model:, id:) if

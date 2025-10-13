@@ -10,7 +10,7 @@ end
 # Lookup chain should support arrays of like-activemodels.
 ActionPolicy::LookupChain.chain << -> records, **options {
   case records
-  in Array(_ => first, *) if records.all? { _1.class == first.class }
+  in Array(_ => first, *) if records.all? { it.class == first.class }
     ActionPolicy.lookup(first, **options)
   else
     nil

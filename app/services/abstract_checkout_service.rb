@@ -95,7 +95,7 @@ class AbstractCheckoutService < BaseService
     tag        = aes.auth_tag
 
     [ciphertext, iv, tag]
-      .map { encode(_1, strict: true) }
+      .map { encode(it, strict: true) }
       .join('.')
   end
 

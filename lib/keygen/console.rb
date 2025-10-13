@@ -32,7 +32,7 @@ module Keygen
     def about!
       puts '-' * CONSOLE_WIDTH
       puts
-      puts LOGOMARK.lines.map { ' ' * LOGOMARK_PAD + _1 }.join
+      puts LOGOMARK.lines.map { ' ' * LOGOMARK_PAD + it }.join
       puts
       puts '-' * CONSOLE_WIDTH
       puts " Ruby: #{RUBY_DESCRIPTION}"

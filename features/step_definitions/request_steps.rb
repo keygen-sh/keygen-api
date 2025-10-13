@@ -282,7 +282,7 @@ end
 
 Then /^the response body should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, resource|
   json    = JSON.parse last_response.body
-  matches = json['data'].select { _1['type'] == resource.pluralize }
+  matches = json['data'].select { it['type'] == resource.pluralize }
 
   expect(matches.size).to eq count.to_i
 
@@ -1123,7 +1123,7 @@ Then /^the response should be a "([^\"]+)" certificate with the following encryp
   ciphertext,
   iv,
   tag         = enc.split('.')
-                   .map { Base64.strict_decode64(_1) }
+                   .map { Base64.strict_decode64(it) }
 
   aes.key = key
   aes.iv  = iv
@@ -1307,7 +1307,7 @@ Then /^the response body should be a "([^\"]+)" with the following encrypted cer
   ciphertext,
   iv,
   tag         = enc.split('.')
-                   .map { Base64.strict_decode64(_1) }
+                   .map { Base64.strict_decode64(it) }
 
   aes.key = key
   aes.iv  = iv
@@ -1417,6 +1417,6 @@ Given /^the JSON data should be sorted by "([^\"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')
 
-  expect(data).to eq data.sort_by { _1.dig(*key.split('.')) }
+  expect(data).to eq data.sort_by { it.dig(*key.split('.')) }
                          .reverse
 end

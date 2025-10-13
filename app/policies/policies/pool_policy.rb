@@ -14,7 +14,7 @@ module Policies
       in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
         allow!
       in role: Role(:product) if policy.product == bearer
-        record.all? { _1.product == bearer }
+        record.all? { it.product == bearer }
       else
         deny!
       end

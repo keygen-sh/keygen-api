@@ -33,7 +33,7 @@ module Groups
         allow!
       in role: Role(:product)
         allow!
-      in role: Role(:user) if bearer.group_ids? && record.all? { _1.group_id? && _1.group_id.in?(bearer.group_ids) }
+      in role: Role(:user) if bearer.group_ids? && record.all? { it.group_id? && it.group_id.in?(bearer.group_ids) }
         allow!
       else
         deny!

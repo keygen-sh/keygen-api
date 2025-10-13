@@ -16,7 +16,7 @@ module Keygen
       def write_chunk(data)      = raise NotImplementedError
 
       def to_io
-        @io.tap { _1.rewind if seekable?(_1) }
+        @io.tap { it.rewind if seekable?(it) }
       end
 
       private

@@ -40,7 +40,7 @@ module Keygen::JSONAPI
             source, *rest =
             path          = key.to_s.gsub(/\[(\d+)\]/, '.\1') # remove brackets from indexes
                                     .split('.')
-                                    .map { _1.match?(INDEX_RE) ? _1.to_i : _1.to_sym }
+                                    .map { it.match?(INDEX_RE) ? it.to_i : it.to_sym }
 
             errors.map do |error|
               pointer = %i[data]
@@ -76,7 +76,7 @@ module Keygen::JSONAPI
 
               # Simplify and clarify validation error codes i.e. we don't need
               # to expose our validators to the world.
-              prefix = source == :base ? @base.class.name.underscore : path.select { _1 in Symbol }.join('_')
+              prefix = source == :base ? @base.class.name.underscore : path.select { it in Symbol }.join('_')
               code   = case error.type
                        when :greater_than_or_equal_to,
                             :less_than_or_equal_to,
@@ -99,7 +99,7 @@ module Keygen::JSONAPI
                        end
 
               ResourceError.new(error.message,
-                pointer: '/' + pointer.map { _1.to_s.camelize(:lower) }.join('/'),
+                pointer: '/' + pointer.map { it.to_s.camelize(:lower) }.join('/'),
                 code: "#{prefix}_#{code}".parameterize
                                          .underscore
                                          .upcase,

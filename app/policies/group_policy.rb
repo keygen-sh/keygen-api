@@ -10,9 +10,9 @@ class GroupPolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :product | :environment)
       allow!
-    in role: Role(:user) if record.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) }
+    in role: Role(:user) if record.all? { it.id == bearer.group_id || it.id.in?(bearer.group_ids) }
       allow!
-    in role: Role(:license) if record.all? { _1.id == bearer.group_id }
+    in role: Role(:license) if record.all? { it.id == bearer.group_id }
       allow!
     else
       deny!

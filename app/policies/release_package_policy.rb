@@ -32,11 +32,11 @@ class ReleasePackagePolicy < ApplicationPolicy
     case bearer
     in role: Role(:admin | :developer | :sales_agent | :support_agent | :read_only | :environment)
       allow!
-    in role: Role(:product) if record.all? { _1.product == bearer }
+    in role: Role(:product) if record.all? { it.product == bearer }
       allow!
-    in role: Role(:user) if record.all? { _1.open? || _1.licensed? && _1.product_id.in?(bearer.product_ids) }
+    in role: Role(:user) if record.all? { it.open? || it.licensed? && it.product_id.in?(bearer.product_ids) }
       allow!
-    in role: Role(:license) if record.all? { _1.open? || _1.licensed? && _1.product == bearer.product }
+    in role: Role(:license) if record.all? { it.open? || it.licensed? && it.product == bearer.product }
       allow!
     in nil if record.all?(&:open?)
       allow!

@@ -10,8 +10,8 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
       { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } }, license: { data: { type: /\Alicenses\z/, id: _ } } } },
       *
     ] => includes
-      account_ids = includes.collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      license_ids = includes.collect { _1[:relationships][:license][:data][:id] }.compact.uniq
+      account_ids = includes.collect { it[:relationships][:account][:data][:id] }.compact.uniq
+      license_ids = includes.collect { it[:relationships][:license][:data][:id] }.compact.uniq
 
       licenses = License.where(account_id: account_ids, id: license_ids)
                         .select(:id, :user_id)
@@ -42,8 +42,8 @@ class AddUserRelationshipToMachinesMigration < BaseMigration
       { type: /\Amachines\z/, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } }, license: { data: { type: /\Alicenses\z/, id: _ } } } },
       *
     ] => data
-      account_ids = data.collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      license_ids = data.collect { _1[:relationships][:license][:data][:id] }.compact.uniq
+      account_ids = data.collect { it[:relationships][:account][:data][:id] }.compact.uniq
+      license_ids = data.collect { it[:relationships][:license][:data][:id] }.compact.uniq
 
       licenses = License.where(account_id: account_ids, id: license_ids)
                         .select(:id, :user_id)

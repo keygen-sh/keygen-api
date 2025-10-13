@@ -660,7 +660,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, *user_traits, account:, group:)
 
-          users.each { create(:license, *license_traits, account:, policy:, owner: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, owner: it) }
 
           users
         }
@@ -671,7 +671,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, *user_traits, account:)
 
-          users.each { create(:license, *license_traits, account:, policy:, owner: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, owner: it) }
 
           users
         }
@@ -1296,7 +1296,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:releases) { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
       in [:as_user, *]
-        let(:releases) { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+        let(:releases) { bearer.licenses.map { create(:release, *release_traits, account:, product: it.product) } }
       end
 
       let(:record) { releases }
@@ -1351,13 +1351,13 @@ module AuthorizationHelper
         let(:artifacts) { create_list(:artifact, 3, *artifact_traits, account:, release:) }
       in [:as_product, *]
         let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer) }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
       in [:as_license, *]
         let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
       in [:as_user, *]
-        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: it.product) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
       end
 
       let(:record) { artifacts }
@@ -1423,15 +1423,15 @@ module AuthorizationHelper
         let(:manifests) { create_list(:manifest, 3, *manifest_traits, account:, release:, artifact:) }
       in [:as_product, *]
         let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer) }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
       in [:as_license, *]
         let(:releases)  { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
       in [:as_user, *]
-        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
-        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: it.product) } }
+        let(:artifacts) { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:manifests) { releases.zip(artifacts).map { create(:manifest, *manifest_traits, account:, release: _1, artifact: _2) } }
       end
 
@@ -1504,15 +1504,15 @@ module AuthorizationHelper
         let(:descriptors) { create_list(:descriptor, 3, *descriptor_traits, account:, release:, artifact:) }
       in [:as_product, *]
         let(:releases)    { create_list(:release, 3, *release_traits, account:, product: bearer) }
-        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
       in [:as_license, *]
         let(:releases)    { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
-        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
       in [:as_user, *]
-        let(:releases)    { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
-        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: _1) } }
+        let(:releases)    { bearer.licenses.map { create(:release, *release_traits, account:, product: it.product) } }
+        let(:artifacts)   { releases.map { create(:artifact, *artifact_traits, account:, release: it) } }
         let(:descriptors) { releases.zip(artifacts).map { create(:descriptor, *descriptor_traits, account:, release: _1, artifact: _2) } }
       end
 

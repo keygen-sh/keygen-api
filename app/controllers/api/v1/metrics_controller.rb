@@ -18,7 +18,7 @@ module Api::V1
         metrics = apply_pagination(authorized_scope(apply_scopes(current_account.metrics)).preload(:event_type))
         data    = Keygen::JSONAPI.render(metrics)
 
-        data.tap { _1[:links] = pagination_links(metrics) }
+        data.tap { it[:links] = pagination_links(metrics) }
       end
 
       render json: json

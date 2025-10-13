@@ -134,7 +134,7 @@ module Keygen
     config.action_dispatch.trusted_proxies =
       ActionDispatch::RemoteIp::TRUSTED_PROXIES + ENV.fetch('TRUSTED_PROXIES') { '' }
                                                      .split(',')
-                                                     .map { IPAddr.new(_1.strip) }
+                                                     .map { IPAddr.new(it.strip) }
 
     # Use mailers queue
     config.action_mailer.deliver_later_queue_name = :mailers

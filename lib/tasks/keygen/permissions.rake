@@ -12,14 +12,14 @@ namespace :keygen do
       # Split args up into ID and permission buckets.
       new_permissions,
       record_ids =
-        args.extras.flatten.partition { Permission::ALL_PERMISSIONS.include?(_1) }
+        args.extras.flatten.partition { Permission::ALL_PERMISSIONS.include?(it) }
 
       records = model.includes(:account, role: { role_permissions: :permission })
                      .where(id: record_ids)
 
       records.find_each(batch_size:) do |record|
         # Use preloaded permissions to save on superfluous queries.
-        prev_permissions = record.role_permissions.map { _1.permission.action }
+        prev_permissions = record.role_permissions.map { it.permission.action }
 
         # We only want to add new permissions to records that have the default
         # permission set, i.e. not to records with a custom permission set.

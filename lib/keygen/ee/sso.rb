@@ -41,7 +41,7 @@ module Keygen
 
         crypt = ActiveSupport::MessageEncryptor.new(derive_key(secret_key), serializer: JSON)
         enc   = ciphertext.split('.')
-                          .map { urlsafe64_to_strict64(_1) }
+                          .map { urlsafe64_to_strict64(it) }
                           .join('--')
 
         dec = crypt.decrypt_and_verify(enc)
@@ -58,7 +58,7 @@ module Keygen
         crypt = ActiveSupport::MessageEncryptor.new(derive_key(secret_key), serializer: JSON)
         enc   = crypt.encrypt_and_sign(state, expires_in:)
                      .split('--')
-                     .map { strict64_to_urlsafe64(_1) }
+                     .map { strict64_to_urlsafe64(it) }
                      .join('.')
 
         enc

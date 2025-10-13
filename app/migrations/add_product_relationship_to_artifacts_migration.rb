@@ -6,8 +6,8 @@ class AddProductRelationshipToArtifactsMigration < BaseMigration
   migrate if: -> body { body in data: [*] } do |body|
     case body
     in data: [*, { type: /\Aartifacts\z/, id: _, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } } } }, *]
-      account_ids  = body[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      artifact_ids = body[:data].collect { _1[:id] }.compact.uniq
+      account_ids  = body[:data].collect { it[:relationships][:account][:data][:id] }.compact.uniq
+      artifact_ids = body[:data].collect { it[:id] }.compact.uniq
 
       products = Product.joins(:release_artifacts)
                         .where(account_id: account_ids, release_artifacts: { id: artifact_ids })

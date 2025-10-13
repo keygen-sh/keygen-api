@@ -6,8 +6,8 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
   migrate if: -> body { body in data: [*] } do |body|
     case body
     in data: [*, { type: /\Areleases\z/, id: _, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } }, artifacts: { ** } } }, *]
-      account_ids = body[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      release_ids = body[:data].collect { _1[:id] }.compact.uniq
+      account_ids = body[:data].collect { it[:relationships][:account][:data][:id] }.compact.uniq
+      release_ids = body[:data].collect { it[:id] }.compact.uniq
 
       artifacts = ReleaseArtifact.distinct_on(:release_id)
                                  .select(:id, :release_id)
