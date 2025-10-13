@@ -535,7 +535,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    workos (5.15.0)
+    workos (5.26.0)
       encryptor (~> 3.0)
       jwt (~> 2.8)
     xpath (3.2.0)
@@ -630,7 +630,7 @@ DEPENDENCIES
   uri (>= 0.12.2)
   verbose_migrations
   webmock (~> 3.14.0)
-  workos (~> 5.15)
+  workos (~> 5.26)
 
 RUBY VERSION
    ruby 3.4.7p58
