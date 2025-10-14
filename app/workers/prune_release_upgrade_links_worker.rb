@@ -15,7 +15,7 @@ class PruneReleaseUpgradeLinksWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-release-upgrade-links] Starting: accounts=#{accounts.count} time=#{cutoff_time}"
 
-    accounts.find_each do |account|
+    accounts.unordered.find_each do |account|
       account_id = account.id
       upgrades   = account.release_upgrade_links.where('created_at < ?', cutoff_time)
 

@@ -54,7 +54,7 @@ class PruneEventLogsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
 
-    accounts.find_each do |account|
+    accounts.unordered.find_each do |account|
       account_id = account.id
       event_logs = account.event_logs.where(created_date: ...cutoff_date)
       plan       = account.plan

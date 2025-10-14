@@ -22,7 +22,7 @@ class LicenseOverdueCheckInsWorker < BaseWorker
                           :end_date
                       SQL
 
-    licenses.find_each do |license|
+    licenses.unordered.find_each do |license|
       next if license.expired? || license.account.nil? || license.policy.nil?
 
       case

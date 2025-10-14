@@ -23,7 +23,7 @@ class BroadcastWebhookService < BaseService
     )
 
     # skip resources that our endpoint's product aren't authorized to read (if any)
-    webhook_endpoints.find_each do |webhook_endpoint|
+    webhook_endpoints.unordered.find_each do |webhook_endpoint|
       next unless
         webhook_endpoint.subscribed?(event)
 

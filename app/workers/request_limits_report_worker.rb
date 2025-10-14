@@ -11,7 +11,7 @@ class RequestLimitsReportWorker < BaseWorker
     start_date = date.beginning_of_day
     end_date = date.end_of_day
 
-    Account.includes(:billing, :plan).where(billings: { state: active_states }).find_each do |account|
+    Account.includes(:billing, :plan).where(billings: { state: active_states }).unordered.find_each do |account|
       request_count = account.request_logs.where(created_at: (start_date..end_date)).count
       if request_count == 0
         next unless account.trialing_or_free? &&

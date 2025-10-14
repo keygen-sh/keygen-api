@@ -10,7 +10,7 @@ class CullDeadMachinesWorker < BaseWorker
                       .where(heartbeat_jid: nil)
                       .dead
 
-    machines.find_each do |machine|
+    machines.unordered.find_each do |machine|
       jid = SecureRandom.hex(12) # precalc jid so we can set it on machine beforehand
       job = MachineHeartbeatWorker.set(jid:)
 

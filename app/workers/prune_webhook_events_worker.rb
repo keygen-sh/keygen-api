@@ -22,7 +22,7 @@ class PruneWebhookEventsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-webhook-events] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_time}"
 
-    accounts.find_each do |account|
+    accounts.unordered.find_each do |account|
       account_id = account.id
       events     = account.webhook_events.where(created_at: ...cutoff_time)
 
