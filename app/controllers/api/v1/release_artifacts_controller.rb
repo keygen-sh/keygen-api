@@ -116,7 +116,7 @@ module Api::V1
       )
 
       # Respond without a redirect if that's what the client prefers
-      render jsonapi: artifact, location: upload.url if
+      return render jsonapi: artifact, location: upload.url if
         prefers?('no-redirect')
 
       render jsonapi: artifact, status: :temporary_redirect, location: upload.url
