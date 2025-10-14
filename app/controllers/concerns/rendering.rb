@@ -10,8 +10,9 @@ module Rendering
       # overload render method to more intelligently set the content-type header, regardless
       # of the current route default format (which is a great default but can fall short
       # when a user accepts a content-type that differs from the route format)
-      def render(options, ...)
+      def render(*args, &)
         return super unless response.content_type.nil?
+        return super unless args in [Hash => options]
 
         case options
         in { jsonapi: _ } | { json: _ }

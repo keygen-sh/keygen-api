@@ -8,14 +8,10 @@ module Pagination
 
   included do
     # Overload render method to append pagination links to JSONAPI responses
-    def render(args, ...)
-      return super(args, ...) unless args in Hash(jsonapi:)
+    def render(*args, &)
+      return super unless args in [Hash(jsonapi:) => options]
 
-      super(args.merge(links: pagination_links(jsonapi)), ...) unless performed?
-    rescue => e # TODO: Let's not catch everything here
-      Keygen.logger.exception(e)
-
-      super(args, ...) unless performed? # Avoid double render
+      super(options.merge(links: pagination_links(jsonapi)), &)
     end
 
     private
