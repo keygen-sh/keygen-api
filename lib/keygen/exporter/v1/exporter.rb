@@ -97,7 +97,7 @@ module Keygen
             association = owner.association(reflection.name)
             scope       = association.scope
 
-            scope.in_batches(of: BATCH_SIZE) do |records|
+            scope.unordered.in_batches(of: BATCH_SIZE) do |records|
               attributes = records.map(&:attributes_for_export)
 
               export_records(reflection.klass.name, attributes, writer:)

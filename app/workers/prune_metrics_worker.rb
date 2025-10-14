@@ -22,7 +22,7 @@ class PruneMetricsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-metrics] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
 
-    accounts.find_each do |account|
+    accounts.unordered.find_each do |account|
       account_id = account.id
       metrics    = account.metrics.where(created_date: ...cutoff_date)
 

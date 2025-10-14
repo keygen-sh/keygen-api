@@ -22,7 +22,7 @@ class PruneRequestLogsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-request-logs] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
 
-    accounts.find_each do |account|
+    accounts.unordered.find_each do |account|
       account_id   = account.id
       request_logs = account.request_logs.where(created_date: ...cutoff_date)
       plan         = account.plan

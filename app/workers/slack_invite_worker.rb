@@ -19,7 +19,7 @@ class SlackInviteWorker < BaseWorker
     )
 
     # send a connect invite
-    account.admins.find_each do |admin|
+    account.admins.unordered.find_each do |admin|
       next if
         admin.free_or_disposable_email?
 

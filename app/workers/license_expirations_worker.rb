@@ -11,7 +11,7 @@ class LicenseExpirationsWorker < BaseWorker
                       .reorder(nil)
                       .distinct
 
-    licenses.find_each do |license|
+    licenses.unordered.find_each do |license|
       next if license.account.nil? || license.policy.nil?
 
       case

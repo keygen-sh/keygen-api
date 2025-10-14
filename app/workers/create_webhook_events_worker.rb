@@ -18,7 +18,7 @@ class CreateWebhookEventsWorker < BaseWorker
       strict: true,
     )
 
-    webhook_endpoints.find_each do |webhook_endpoint|
+    webhook_endpoints.unordered.find_each do |webhook_endpoint|
       next unless
         webhook_endpoint.subscribed?(event)
 

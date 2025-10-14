@@ -10,7 +10,7 @@ class CullDeadProcessesWorker < BaseWorker
                               .where(heartbeat_jid: nil)
                               .dead
 
-    processes.find_each do |process|
+    processes.unordered.find_each do |process|
       jid = SecureRandom.hex(12) # precalc jid so we can set it on process beforehand
       job = ProcessHeartbeatWorker.set(jid:)
 
