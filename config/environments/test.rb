@@ -33,6 +33,8 @@ Rails.application.configure do
   unless ENV.key?('TEST_LOG') || ENV.key?('DEBUG')
     config.logger    = Logger.new(nil)
     config.log_level = :fatal
+  else
+    config.log_file_size = nil
   end
 
   # Enable/disable caching with redis.
