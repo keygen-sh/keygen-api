@@ -25,6 +25,7 @@ class PruneMetricsWorker < BaseWorker
     accounts.unordered.find_each do |account|
       account_id = account.id
       metrics    = account.metrics.where(created_date: ...cutoff_date)
+                                  .reorder(created_date: :asc)
 
       total = metrics.count
       sum   = 0
@@ -42,7 +43,7 @@ class PruneMetricsWorker < BaseWorker
         end
 
         count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
-          account.metrics.where(id: metrics.limit(BATCH_SIZE).reorder(nil).ids)
+          account.metrics.where(id: metrics.limit(BATCH_SIZE).ids)
                          .delete_all
         end
 

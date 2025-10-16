@@ -25,6 +25,7 @@ class PruneRequestLogsWorker < BaseWorker
     accounts.unordered.find_each do |account|
       account_id   = account.id
       request_logs = account.request_logs.where(created_date: ...cutoff_date)
+                                         .reorder(created_date: :asc)
       plan         = account.plan
 
       total = request_logs.count
@@ -43,7 +44,7 @@ class PruneRequestLogsWorker < BaseWorker
         end
 
         count = request_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          prune = account.request_logs.where(id: request_logs.limit(BATCH_SIZE).reorder(nil).ids)
+          prune = account.request_logs.where(id: request_logs.limit(BATCH_SIZE).ids)
 
           # apply the account's log retention policy if there is one
           if plan.ent? && plan.request_log_retention_duration?

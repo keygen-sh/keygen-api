@@ -18,6 +18,7 @@ class PruneReleaseDownloadLinksWorker < BaseWorker
     accounts.unordered.find_each do |account|
       account_id = account.id
       downloads  = account.release_download_links.where('created_at < ?', cutoff_time)
+                                                 .reorder(created_at: :asc)
 
       total = downloads.count
       sum   = 0
