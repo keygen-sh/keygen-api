@@ -18,6 +18,7 @@ class PruneReleaseUpgradeLinksWorker < BaseWorker
     accounts.unordered.find_each do |account|
       account_id = account.id
       upgrades   = account.release_upgrade_links.where('created_at < ?', cutoff_time)
+                                                .reorder(created_at: :asc)
 
       total = upgrades.count
       sum   = 0

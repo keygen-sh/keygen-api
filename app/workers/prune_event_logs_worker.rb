@@ -57,6 +57,7 @@ class PruneEventLogsWorker < BaseWorker
     accounts.unordered.find_each do |account|
       account_id = account.id
       event_logs = account.event_logs.where(created_date: ...cutoff_date)
+                                     .reorder(created_date: :asc)
       plan       = account.plan
 
       total = event_logs.count
@@ -75,7 +76,7 @@ class PruneEventLogsWorker < BaseWorker
         end
 
         count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).reorder(nil).ids)
+          prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).ids)
 
           # for ent accounts, we keep the event backlog for the retention period except dup high-volume events.
           # for std accounts, we prune everything in the event backlog.
