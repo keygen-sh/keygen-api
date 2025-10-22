@@ -15,6 +15,9 @@ module PasswordResettable
   end
 
   def send_password_reset_email(token:)
+    return if
+      managed? # managed users aren't allowed to reset password
+
     UserMailer.password_reset(user: self, token: token).deliver_later
   end
 end
