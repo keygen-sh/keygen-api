@@ -34,7 +34,7 @@ RUN apk add --no-cache \
   postgresql-dev \
   libc6-compat \
   libstdc++ \
-  xz-dev && \
+  xz-libs && \
   bundle config --global without "${BUNDLE_WITHOUT}" && \
   bundle config --global path "${BUNDLE_PATH}" && \
   bundle config --global deployment "${BUNDLE_DEPLOYMENT}" && \
@@ -65,7 +65,7 @@ RUN apk add --no-cache \
   tzdata \
   libc6-compat \
   libstdc++ \
-  xz-dev \
+  xz-libs \
   libxml2 \
   libxslt && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen
