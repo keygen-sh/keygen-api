@@ -26,7 +26,7 @@ RUN apk add --no-cache \
   openssl \
   postgresql-dev \
   libc6-compat \
-  libstdc++ && \
+  libstdc++ \
   xz-libs && \
   bundle config --global without "${BUNDLE_WITHOUT}"  && \
   bundle config --global path "${BUNDLE_PATH}" && \
@@ -55,7 +55,7 @@ RUN apk add --no-cache \
   libc6-compat \
   xz-libs \
   libxml2 \
-  libxslt && \
+  libxslt \
   libstdc++ && \
   adduser -h /app -g keygen -u 1000 -s /bin/bash -D keygen
 
