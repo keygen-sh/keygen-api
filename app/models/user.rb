@@ -456,9 +456,11 @@ class User < ApplicationRecord
   def single_sign_on_enabled? = !role.user? && account.sso?
   alias :sso_enabled? :single_sign_on_enabled?
 
-  def password?
-    password_digest?
-  end
+  def password?     = password_digest?
+  def passwordless? = !password?
+
+  # NOTE(ezekg) a "managed user" is a passwordless user with the "user" role
+  def managed? = has_role?(:user) && passwordless? && account.protected?
 
   def active?(t = 90.days.ago)
     created_at >= t || any_active_licenses.any?
