@@ -528,7 +528,7 @@ class ApplicationController < ActionController::API
   rescue ActiveRecord::StatementInvalid => e
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case e.cause
-    in PG::InvalidTextRepresentation | PG::CharacterNotInRepertoire
+    in PG::InvalidTextRepresentation | PG::CharacterNotInRepertoire | PG::UntranslatableCharacter
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     in PG::Error if e.message in /incomplete multibyte character/ | /invalid multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
