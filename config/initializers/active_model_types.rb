@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 class ActiveModel::Type::UUID
+  def type     = :uuid
+  def mutable? = true
+
   def cast(value)
     value
-  end
-
-  def type
-    :uuid
   end
 
   def assert_valid_value(value)
@@ -21,12 +20,11 @@ class ActiveModel::Type::UUID
 end
 
 class ActiveModel::Type::Array
+  def type     = :array
+  def mutable? = true
+
   def cast(value)
     value.to_a
-  end
-
-  def type
-    :array
   end
 
   def assert_valid_value(value)
@@ -41,12 +39,11 @@ class ActiveModel::Type::Array
 end
 
 class ActiveModel::Type::Hash
+  def type     = :hash
+  def mutable? = true
+
   def cast(value)
     value.to_h
-  end
-
-  def type
-    :hash
   end
 
   def assert_valid_value(value)

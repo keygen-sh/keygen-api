@@ -69,7 +69,7 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    active_record_distinct_on (1.9.0)
+    active_record_distinct_on (1.10.0)
       activerecord (>= 6.1)
     activejob (8.1.1)
       activesupport (= 8.1.1)
@@ -418,7 +418,7 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
-    request_migrations (1.1.1)
+    request_migrations (1.1.2)
       rails (>= 6.0)
       semverse (~> 3.0)
     request_store (1.5.1)
@@ -473,11 +473,12 @@ GEM
       sentry-ruby (~> 6.1.0)
       sidekiq (>= 5.0)
     sexp_processor (4.16.0)
-    sidekiq (7.2.4)
-      concurrent-ruby (< 2)
+    sidekiq (7.3.9)
+      base64
       connection_pool (>= 2.3.0)
+      logger
       rack (>= 2.2.4)
-      redis-client (>= 0.19.0)
+      redis-client (>= 0.22.2)
     sidekiq-cron (1.12.0)
       fugit (~> 1.8)
       globalid (>= 1.0.1)
@@ -512,7 +513,7 @@ GEM
     timeout (0.4.4)
     tracer (0.1.1)
     tsort (0.2.0)
-    typed_params (1.4.0)
+    typed_params (1.4.1)
       rails (>= 6.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -600,7 +601,7 @@ DEPENDENCIES
   rails (~> 8)
   rails-pattern_matching
   redis (~> 4.7.1)
-  request_migrations (~> 1.1)
+  request_migrations (~> 1.1.2)
   rotp (~> 6.2)
   rspec-expectations (~> 3.13)
   rspec-rails (~> 8)
@@ -611,7 +612,7 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   sentry-sidekiq
-  sidekiq (~> 7.2.4)
+  sidekiq (~> 7.3)
   sidekiq-cron (~> 1.12.0)
   sidekiq-cronitor (~> 3.6.0)
   sprockets (~> 3.0)
@@ -623,7 +624,7 @@ DEPENDENCIES
   temporary_tables
   timecop (~> 0.9.5)
   tracer
-  typed_params (~> 1.4.0)
+  typed_params (~> 1.4.1)
   union_of
   uri (>= 0.12.2)
   verbose_migrations

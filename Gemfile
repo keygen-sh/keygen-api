@@ -20,10 +20,10 @@ gem 'ostruct'
 gem 'redis', '~> 4.7.1'
 
 # API migrations
-gem 'request_migrations', '~> 1.1'
+gem 'request_migrations', '~> 1.1.2'
 
 # API params
-gem 'typed_params', '~> 1.4.0'
+gem 'typed_params', '~> 1.4.1'
 
 # Serializers
 gem 'json', '~> 2.3.0'
@@ -67,7 +67,7 @@ gem 'order_as_specified'
 gem 'rails-pattern_matching'
 
 # Background jobs
-gem 'sidekiq', '~> 7.2.4'
+gem 'sidekiq', '~> 7.3'
 gem 'sidekiq-cron', '~> 1.12.0'
 gem 'sidekiq-cronitor', '~> 3.6.0'
 
