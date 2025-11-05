@@ -12508,6 +12508,84 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous validates a perpetual fallback license scoped to an inaccessible release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.2.3" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS", "requireVersionScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "version-key", "expiry": "$time.1.year.ago" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "version": "1.2.3" },
+          "key": "version-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "version scope is not valid (does not match any accessible releases)", "code": "VERSION_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a perpetual fallback license scoped to a backdated release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.2.3", "backdatedTo": "$time.366.days.ago" }
+      """
+    And the current account has 1 "policy" for the last "product"
+    And the last "policy" has the following attributes:
+      """
+      { "expirationStrategy": "MAINTAIN_ACCESS", "requireVersionScope": true }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "key": "version-key", "expiry": "$time.1.year.ago" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "scope": { "version": "1.2.3" },
+          "key": "version-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the response body should contain a "license"
+    And the response body should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is expired", "code": "EXPIRED" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a license key that requires a version scope (match open product)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
