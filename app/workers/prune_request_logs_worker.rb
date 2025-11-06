@@ -13,60 +13,64 @@ class PruneRequestLogsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep request backlog forever
 
-    cutoff_date = BACKLOG_DAYS.days.ago.to_date
-    start_time  = Time.parse(ts)
+    cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
+    cutoff_start_date = RequestLog.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    start_time        = Time.parse(ts)
 
-    accounts = Account.where_assoc_exists(:request_logs,
-      created_date: ...cutoff_date,
-    )
+    Keygen.logger.info "[workers.prune-request-logs] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
 
-    Keygen.logger.info "[workers.prune-request-logs] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
+    (cutoff_start_date...cutoff_end_date).each do |date|
+      accounts = Account.preload(:plan).where_assoc_exists(:request_logs,
+        created_date: date,
+      )
 
-    accounts.unordered.find_each do |account|
-      account_id   = account.id
-      request_logs = account.request_logs.where(created_date: ...cutoff_date)
-                                         .reorder(created_date: :asc)
-      plan         = account.plan
+      Keygen.logger.info "[workers.prune-request-logs] Pruning day: accounts=#{accounts.count} date=#{date}"
 
-      total = request_logs.count
-      sum   = 0
+      accounts.unordered.find_each do |account|
+        account_id   = account.id
+        request_logs = account.request_logs.where(created_date: date)
+        plan         = account.plan
 
-      batches = (total / BATCH_SIZE) + 1
-      batch   = 0
+        total = request_logs.count
+        sum   = 0
 
-      Keygen.logger.info "[workers.prune-request-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
+        batches = (total / BATCH_SIZE) + 1
+        batch   = 0
 
-      loop do
-        unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
-          Keygen.logger.info "[workers.prune-request-logs] Pausing: start=#{start_time} end=#{t}"
+        Keygen.logger.info "[workers.prune-request-logs] Pruning #{total} rows: account_id=#{account_id} date=#{date} batches=#{batches}"
 
-          return # we'll pick up on the next cron
-        end
+        loop do
+          unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
+            Keygen.logger.info "[workers.prune-request-logs] Pausing: date=#{date} start=#{start_time} end=#{t}"
 
-        count = request_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          prune = account.request_logs.where(id: request_logs.limit(BATCH_SIZE).ids)
-
-          # apply the account's log retention policy if there is one
-          if plan.ent? && plan.request_log_retention_duration?
-            retention_cutoff_date = plan.request_log_retention_duration.seconds.ago.to_date
-
-            prune = prune.where(created_date: ...retention_cutoff_date)
+            return # we'll pick up on the next cron
           end
 
-          prune.delete_all
+          count = request_logs.statement_timeout(STATEMENT_TIMEOUT) do
+            prune = account.request_logs.where(id: request_logs.limit(BATCH_SIZE).ids)
+
+            # apply the account's log retention policy if there is one
+            if plan.ent? && plan.request_log_retention_duration?
+              retention_cutoff_date = plan.request_log_retention_duration.seconds.ago.to_date
+
+              prune = prune.where(created_date: ...retention_cutoff_date)
+            end
+
+            prune.delete_all
+          end
+
+          sum   += count
+          batch += 1
+
+          Keygen.logger.info "[workers.prune-request-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} date=#{date} batch=#{batch}/#{batches}"
+
+          sleep BATCH_WAIT
+
+          break if count < BATCH_SIZE
         end
-
-        sum   += count
-        batch += 1
-
-        Keygen.logger.info "[workers.prune-request-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
-
-        sleep BATCH_WAIT
-
-        break if count < BATCH_SIZE
       end
-    end
 
-    Keygen.logger.info "[workers.prune-request-logs] Done"
+      Keygen.logger.info "[workers.prune-request-logs] Done: date=#{date}"
+    end
   end
 end
