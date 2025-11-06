@@ -40,84 +40,87 @@ class PruneEventLogsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep event backlog forever
 
-    cutoff_date = BACKLOG_DAYS.days.ago.to_date
-    start_time  = Time.parse(ts)
+    cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
+    cutoff_start_date = EventLog.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    start_time        = Time.parse(ts)
 
     # we only want to prune certain high-volume event logs for ent accounts
     hi_vol_event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
                                      .ids
 
-    # FIXME(ezekg) should we iterate each day separately to improve performance?
-    accounts = Account.preload(:plan).where_assoc_exists(:event_logs,
-      created_date: ...cutoff_date,
-    )
+    Keygen.logger.info "[workers.prune-event-logs] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
 
-    Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count} start=#{start_time} cutoff=#{cutoff_date}"
+    (cutoff_start_date...cutoff_end_date).each do |date|
+      accounts = Account.preload(:plan).where_assoc_exists(:event_logs,
+        created_date: date,
+      )
 
-    accounts.unordered.find_each do |account|
-      account_id = account.id
-      event_logs = account.event_logs.where(created_date: ...cutoff_date)
-                                     .reorder(created_date: :asc)
-      plan       = account.plan
+      Keygen.logger.info "[workers.prune-event-logs] Pruning day: accounts=#{accounts.count} date=#{date}"
 
-      total = event_logs.count
-      sum   = 0
+      accounts.unordered.find_each do |account|
+        account_id = account.id
+        event_logs = account.event_logs.where(created_date: date)
+        plan       = account.plan
 
-      batches = (total / BATCH_SIZE) + 1
-      batch   = 0
+        total = event_logs.count
+        sum   = 0
 
-      Keygen.logger.info "[workers.prune-event-logs] Pruning #{total} rows: account_id=#{account_id} batches=#{batches}"
+        batches = (total / BATCH_SIZE) + 1
+        batch   = 0
 
-      loop do
-        unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
-          Keygen.logger.info "[workers.prune-event-logs] Pausing: start=#{start_time} end=#{t}"
+        Keygen.logger.info "[workers.prune-event-logs] Pruning #{total} rows: account_id=#{account_id} date=#{date} batches=#{batches}"
 
-          return # we'll pick up on the next cron
-        end
+        loop do
+          unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
+            Keygen.logger.info "[workers.prune-event-logs] Pausing: date=#{date} start=#{start_time} end=#{t}"
 
-        count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
-          prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).ids)
-
-          # for ent accounts, we keep the event backlog for the retention period except dup high-volume events.
-          # for std accounts, we prune everything in the event backlog.
-          if plan.ent?
-            hi_vol = prune.where(event_type_id: hi_vol_event_type_ids) # dedup even in retention period
-
-            # apply the account's log retention policy if there is one
-            if plan.event_log_retention_duration?
-              retention_cutoff_date = plan.event_log_retention_duration.seconds.ago.to_date
-
-              prune = prune.where(created_date: ...retention_cutoff_date)
-            end
-
-            # for high-volume events, we keep one event per-day per-event per-resource since some of these can
-            # be very high-volume, e.g. thousands and thousands of validations and heartbeats per-day.
-            keep = hi_vol.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
-                         .reorder(:resource_id, :resource_type, :event_type_id,
-                           created_date: :desc,
-                         )
-                         .select(
-                           :id,
-                         )
-
-            # FIXME(ezekg) would be better to somehow rollup this data vs deduping
-            hi_vol.delete_by("id NOT IN (#{keep.to_sql})")
+            return # we'll pick up on the next cron
           end
 
-          prune.delete_all
+          count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
+            prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).ids)
+
+            # for ent accounts, we keep the event backlog for the retention period except dup high-volume events.
+            # for std accounts, we prune everything in the event backlog.
+            if plan.ent?
+              hi_vol = prune.where(event_type_id: hi_vol_event_type_ids) # dedup even in retention period
+
+              # apply the account's log retention policy if there is one
+              if plan.event_log_retention_duration?
+                retention_cutoff_date = plan.event_log_retention_duration.seconds.ago.to_date
+
+                prune = prune.where(created_date: ...retention_cutoff_date)
+              end
+
+              # for high-volume events, we keep one event per-day per-event per-resource since some of these can
+              # be very high-volume, e.g. thousands and thousands of validations and heartbeats per-day.
+              keep = hi_vol.distinct_on(:resource_id, :resource_type, :event_type_id, :created_date)
+                           .reorder(:resource_id, :resource_type, :event_type_id,
+                             created_date: :desc,
+                           )
+                           .select(
+                             :id,
+                           )
+
+              # FIXME(ezekg) would be better to somehow rollup this data vs deduping
+              hi_vol.delete_by("id NOT IN (#{keep.to_sql})")
+            end
+
+            prune.delete_all
+          end
+
+          sum   += count
+          batch += 1
+
+          Keygen.logger.info "[workers.prune-event-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} date=#{date} batch=#{batch}/#{batches}"
+
+          sleep BATCH_WAIT
+
+          break if count < BATCH_SIZE
         end
-
-        sum   += count
-        batch += 1
-
-        Keygen.logger.info "[workers.prune-event-logs] Pruned #{sum}/#{total} rows: account_id=#{account_id} batch=#{batch}/#{batches}"
-
-        sleep BATCH_WAIT
-
-        break if count < BATCH_SIZE
       end
-    end
 
-    Keygen.logger.info "[workers.prune-event-logs] Done"
+      Keygen.logger.info "[workers.prune-event-logs] Done: date=#{date}"
+    end
   end
 end
