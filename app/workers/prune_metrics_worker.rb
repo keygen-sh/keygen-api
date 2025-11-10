@@ -26,11 +26,10 @@ class PruneMetricsWorker < BaseWorker
 
       Keygen.logger.info "[workers.prune-metrics] Pruning day: accounts=#{accounts.count} date=#{date}"
 
-      accounts.unordered.find_each do |account|
-        break unless
-          within_execution_timeout?
-
-        prune_metrics_for_date(account, date:)
+      catch :pause do
+        accounts.unordered.find_each do |account|
+          prune_metrics_for_date(account, date:)
+        end
       end
 
       Keygen.logger.info "[workers.prune-metrics] Done: date=#{date}"
@@ -58,7 +57,7 @@ class PruneMetricsWorker < BaseWorker
       unless within_execution_timeout?
         Keygen.logger.info "[workers.prune-metrics] Pausing: date=#{date} start=#{start_time} end=#{current_time}"
 
-        return
+        throw :pause
       end
 
       count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
