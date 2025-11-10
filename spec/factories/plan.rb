@@ -34,6 +34,9 @@ FactoryBot.define do
     end
 
     trait :std do
+      request_log_retention_duration { 24.hours }
+      event_log_retention_duration   { 3.days }
+
       name { 'Std 1' }
     end
 

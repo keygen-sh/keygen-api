@@ -131,15 +131,14 @@ class PruneEventLogsWorker < BaseWorker
         EventLog.where(id: selected_ids).delete_all
       end
 
-      break if
-        count.zero?
-
       sum   += count
       batch += 1
 
       Keygen.logger.info "[workers.prune-event-logs] Deduped #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} progress=#{sum}/#{total}"
 
       sleep BATCH_WAIT
+
+      break if count < BATCH_SIZE
     end
 
     Keygen.logger.info "[workers.prune-event-logs] Deduping done: account_id=#{account.id} date=#{date} progress=#{sum}/#{total}"
@@ -167,15 +166,14 @@ class PruneEventLogsWorker < BaseWorker
         event_logs.limit(BATCH_SIZE).delete_all
       end
 
-      break if
-        count.zero?
-
       sum   += count
       batch += 1
 
       Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} count=#{sum}/#{total}"
 
       sleep BATCH_WAIT
+
+      break if count < BATCH_SIZE
     end
 
     Keygen.logger.info "[workers.prune-event-logs] Pruning done: account_id=#{account.id} date=#{date} count=#{sum}/#{total}"

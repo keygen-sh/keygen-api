@@ -64,15 +64,14 @@ class PruneMetricsWorker < BaseWorker
         metrics.limit(BATCH_SIZE).delete_all
       end
 
-      break if
-        count.zero?
-
       sum   += count
       batch += 1
 
       Keygen.logger.info "[workers.prune-metrics] Pruned #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} count=#{sum}/#{total}"
 
       sleep BATCH_WAIT
+
+      break if count < BATCH_SIZE
     end
 
     Keygen.logger.info "[workers.prune-metrics] Pruning done: account_id=#{account.id} date=#{date} count=#{sum}/#{total}"

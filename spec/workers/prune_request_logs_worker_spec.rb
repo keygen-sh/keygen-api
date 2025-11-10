@@ -52,11 +52,11 @@ describe PruneRequestLogsWorker do
     end
 
     context 'with a request log retention policy' do
-      let(:account) { create(:account, plan: build(:plan, :std, request_log_retention_duration: (worker::BACKLOG_DAYS + 30).days)) }
+      let(:account) { create(:account, plan: build(:plan, :std, request_log_retention_duration: (worker::BACKLOG_DAYS + 3).days)) }
 
       it 'should prune according to retention policy' do
-        create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
-        create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
+        create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 4).days.ago)
+        create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 3).days.ago)
         create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
         create_list(:request_log, 50, account:, created_at: (worker::BACKLOG_DAYS - 1).days.ago)
 
