@@ -78,7 +78,8 @@ class PruneEventLogsWorker < BaseWorker
           end
 
           count = event_logs.statement_timeout(STATEMENT_TIMEOUT) do
-            prune = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).ids)
+            prune   = account.event_logs.where(id: event_logs.limit(BATCH_SIZE).ids)
+            deduped = 0
 
             # for ent accounts, we keep the event backlog for the retention period except dup high-volume events.
             # for std accounts, we prune everything in the event backlog.
@@ -89,7 +90,7 @@ class PruneEventLogsWorker < BaseWorker
               if plan.event_log_retention_duration?
                 retention_cutoff_date = plan.event_log_retention_duration.seconds.ago.to_date
 
-                prune = prune.where(created_date: ...retention_cutoff_date)
+                prune = prune.where(created_date: ..retention_cutoff_date)
               end
 
               # for high-volume events, we keep one event per-day per-event per-resource since some of these can
@@ -102,11 +103,13 @@ class PruneEventLogsWorker < BaseWorker
                              :id,
                            )
 
-              # FIXME(ezekg) would be better to somehow rollup this data vs deduping
-              hi_vol.delete_by("id NOT IN (#{keep.to_sql})")
+              # TODO(ezekg) would be better to somehow rollup this data vs deduping
+              deduped = hi_vol.delete_by("id NOT IN (#{keep.to_sql})")
             end
 
-            prune.delete_all
+            pruned = prune.delete_all
+
+            deduped + pruned
           end
 
           sum   += count
@@ -116,7 +119,7 @@ class PruneEventLogsWorker < BaseWorker
 
           sleep BATCH_WAIT
 
-          break if count < BATCH_SIZE
+          break unless batch < batches
         end
       end
 

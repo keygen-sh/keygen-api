@@ -85,6 +85,10 @@ describe PruneEventLogsWorker do
     context 'with an event log retention policy' do
       let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: (worker::BACKLOG_DAYS + 30).days)) }
 
+      # use small a batch size assert our batches always move forward
+      # even if some logs are retained
+      before { stub_const('PruneEventLogsWorker::BATCH_SIZE', 25) }
+
       it 'should prune according to retention policy' do
         license = create(:license, account:)
         machine = create(:machine, license:)
