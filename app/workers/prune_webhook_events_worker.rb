@@ -27,8 +27,7 @@ class PruneWebhookEventsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-webhook-events] Pruning day: accounts=#{accounts.count} date=#{date}"
 
       accounts.unordered.find_each do |account|
-        account_id = account.id
-        events     = account.webhook_events.where(created_at: date.all_day)
+        events = account.webhook_events.where(created_at: date.all_day)
 
         total = events.count
         sum   = 0
@@ -36,7 +35,7 @@ class PruneWebhookEventsWorker < BaseWorker
         batches = (total / BATCH_SIZE) + 1
         batch   = 0
 
-        Keygen.logger.info "[workers.prune-webhook-events] Pruning #{total} rows: account_id=#{account_id} date=#{date} batches=#{batches}"
+        Keygen.logger.info "[workers.prune-webhook-events] Pruning #{total} rows: account_id=#{account.id} date=#{date} batches=#{batches}"
 
         loop do
           unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
@@ -52,7 +51,7 @@ class PruneWebhookEventsWorker < BaseWorker
           sum   += count
           batch += 1
 
-          Keygen.logger.info "[workers.prune-webhook-events] Pruned #{sum}/#{total} rows: account_id=#{account_id} date=#{date} batch=#{batch}/#{batches}"
+          Keygen.logger.info "[workers.prune-webhook-events] Pruned #{sum}/#{total} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches}"
 
           sleep SLEEP_DURATION
 
