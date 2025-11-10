@@ -13,9 +13,9 @@ class PruneMetricsWorker < BaseWorker
     return if
       BACKLOG_DAYS <= 0 # never prune -- keep metrics backlog forever
 
-    cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
-    cutoff_start_date = Metric.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
-    start_time        = Time.parse(ts)
+    @cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
+    @cutoff_start_date = Metric.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    @start_time        = Time.parse(ts)
 
     Keygen.logger.info "[workers.prune-metrics] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
 
@@ -27,41 +27,61 @@ class PruneMetricsWorker < BaseWorker
       Keygen.logger.info "[workers.prune-metrics] Pruning day: accounts=#{accounts.count} date=#{date}"
 
       accounts.unordered.find_each do |account|
-        account_id = account.id
-        metrics    = account.metrics.where(created_date: date)
+        break unless
+          within_execution_timeout?
 
-        total = metrics.count
-        sum   = 0
-
-        batches = (total / BATCH_SIZE) + 1
-        batch   = 0
-
-        Keygen.logger.info "[workers.prune-metrics] Pruning #{total} rows: account_id=#{account_id} date=#{date} batches=#{batches}"
-
-        loop do
-          unless (t = Time.current).before?(start_time + EXEC_TIMEOUT.seconds)
-            Keygen.logger.info "[workers.prune-metrics] Pausing: date=#{date} start=#{start_time} end=#{t}"
-
-            return # we'll pick up on the next cron
-          end
-
-          count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
-            account.metrics.where(id: metrics.limit(BATCH_SIZE).ids)
-                           .delete_all
-          end
-
-          sum   += count
-          batch += 1
-
-          Keygen.logger.info "[workers.prune-metrics] Pruned #{sum}/#{total} rows: account_id=#{account_id} date=#{date} batch=#{batch}/#{batches}"
-
-          sleep BATCH_WAIT
-
-          break if count < BATCH_SIZE
-        end
+        prune_metrics_for_date(account, date:)
       end
 
       Keygen.logger.info "[workers.prune-metrics] Done: date=#{date}"
     end
+  end
+
+  private
+
+  attr_reader :cutoff_start_date,
+              :cutoff_end_date,
+              :start_time
+
+  def prune_metrics_for_date(account, date:)
+    metrics = account.metrics.where(created_date: date)
+
+    total = metrics.count
+    sum   = 0
+
+    batches = (total / BATCH_SIZE) + 1
+    batch   = 0
+
+    Keygen.logger.info "[workers.prune-metrics] Pruning #{total} rows: account_id=#{account.id} date=#{date}"
+
+    loop do
+      unless within_execution_timeout?
+        Keygen.logger.info "[workers.prune-metrics] Pausing: date=#{date} start=#{start_time} end=#{current_time}"
+
+        return
+      end
+
+      count = metrics.statement_timeout(STATEMENT_TIMEOUT) do
+        metrics.limit(BATCH_SIZE).delete_all
+      end
+
+      break if
+        count.zero?
+
+      sum   += count
+      batch += 1
+
+      Keygen.logger.info "[workers.prune-metrics] Pruned #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} count=#{sum}/#{total}"
+
+      sleep BATCH_WAIT
+    end
+
+    Keygen.logger.info "[workers.prune-metrics] Pruning done: account_id=#{account.id} date=#{date} count=#{sum}/#{total}"
+  end
+
+  def current_time = Time.current
+
+  def within_execution_timeout?
+    current_time.before?(start_time + EXEC_TIMEOUT.seconds)
   end
 end
