@@ -88,7 +88,7 @@ class PruneEventLogsWorker < BaseWorker
     )
 
     # partition and rank to dedup high volume events within retention period
-    ranked_event_logs = hi_vol_event_logs.reorder(nil).select(<<~SQL.squish)
+    ranked_event_logs = hi_vol_event_logs.unordered.select(<<~SQL.squish)
       event_logs.id,
       event_logs.created_at,
       ROW_NUMBER() OVER (
