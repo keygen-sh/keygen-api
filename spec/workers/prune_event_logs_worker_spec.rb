@@ -12,7 +12,7 @@ describe PruneEventLogsWorker do
   context 'for ent account' do
     let(:account) { create(:account, :ent) }
 
-    it 'should prune and dedup backlog of event logs' do
+    it 'should prune and dedup event logs inside backlog' do
       license = create(:license, account:)
       machine = create(:machine, account:)
       process = create(:process, account:)
@@ -37,39 +37,7 @@ describe PruneEventLogsWorker do
       )
     end
 
-    it 'should prune dup event logs from backlog' do
-      licenses = create_list(:license, 5, account:)
-
-      licenses.each do |license|
-        ((worker::BACKLOG_DAYS - 2)..(worker::BACKLOG_DAYS + 2)).each do |i|
-          create_list(:event_log, 10, :license_validation_succeeded, account:, resource: license, created_at: i.days.ago)
-        end
-      end
-
-      expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
-        satisfy { |counts|
-          counts.all? { |_, count| count == 10 }
-        },
-      )
-
-      expect { worker.perform_async }.to(
-        change { account.event_logs.count }.from(250).to(160),
-      )
-
-      expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
-        satisfy { |counts|
-          counts.all? { |(id, type, event, date), count|
-            if date >= worker::BACKLOG_DAYS.days.ago.to_date
-              count == 10
-            else
-              count == 1
-            end
-          }
-        },
-      )
-    end
-
-    it 'should not prune event logs not in target batch' do
+    it 'should not prune event logs outside backlog' do
       license = create(:license, account:)
 
       create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: (worker::BACKLOG_DAYS - 1).days.ago)
@@ -82,8 +50,33 @@ describe PruneEventLogsWorker do
       )
     end
 
+    context 'without an event log retention policy' do
+      let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: nil)) }
+
+      it 'should prune backlog' do
+        license = create(:license, account:)
+        machine = create(:machine, license:)
+
+        # within target window (prune)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+
+        # recent (keep)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS - 1).day.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS - 1).day.ago)
+
+        expect { worker.perform_async }.to(
+          change { account.event_logs.count }.from(400).to(100),
+        )
+      end
+    end
+
     context 'with an event log retention policy' do
-      let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: (worker::BACKLOG_DAYS + 30).days)) }
+      let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: (worker::BACKLOG_DAYS + 90).days)) }
 
       # use small a batch size assert our batches always move forward
       # even if some logs are retained
@@ -94,14 +87,14 @@ describe PruneEventLogsWorker do
         machine = create(:machine, license:)
 
         # outside retention window (prune)
-        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
-        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
-        create_list(:event_log, 50, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 91).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 91).days.ago)
+        create_list(:event_log, 50, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 91).days.ago)
 
         # within retention window (dedup hi-vol, keep lo-vol)
-        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
-        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
-        create_list(:event_log, 50, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 89).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 89).days.ago)
+        create_list(:event_log, 50, :machine_created, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 89).days.ago)
 
         # within target window (dedup hi-vol, keep lo-vol)
         create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
@@ -123,7 +116,7 @@ describe PruneEventLogsWorker do
   context 'for std account' do
     let(:account) { create(:account, :std) }
 
-    it 'should prune and not dedup backlog of event logs' do
+    it 'should prune and dedup event logs inside backlog' do
       license = create(:license, account:)
       machine = create(:machine, account:)
       process = create(:process, account:)
@@ -148,39 +141,7 @@ describe PruneEventLogsWorker do
       )
     end
 
-    it 'should prune event logs from backlog' do
-      licenses = create_list(:license, 5, account:)
-
-      licenses.each do |license|
-        ((worker::BACKLOG_DAYS - 2)..(worker::BACKLOG_DAYS + 2)).each do |i|
-          create_list(:event_log, 10, :license_validation_succeeded, account:, resource: license, created_at: i.days.ago)
-        end
-      end
-
-      expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
-        satisfy { |counts|
-          counts.all? { |_, count| count == 10 }
-        },
-      )
-
-      expect { worker.perform_async }.to(
-        change { account.event_logs.count }.from(250).to(150),
-      )
-
-      expect(account.event_logs.group(:resource_id, :resource_type, :event_type_id, :created_date).reorder(nil).count).to(
-        satisfy { |counts|
-          counts.all? { |(id, type, event, date), count|
-            if date >= worker::BACKLOG_DAYS.days.ago.to_date
-              count == 10
-            else
-              count == 0
-            end
-          }
-        },
-      )
-    end
-
-    it 'should not prune event logs not in target batch' do
+    it 'should not prune event logs outside backlog' do
       license = create(:license, account:)
 
       create_list(:event_log, 50, :license_validation_failed, account:, resource: license, created_at: (worker::BACKLOG_DAYS - 1).days.ago)
@@ -193,20 +154,45 @@ describe PruneEventLogsWorker do
       )
     end
 
+    context 'without an event log retention policy' do
+      let(:account) { create(:account, plan: build(:plan, :std, event_log_retention_duration: nil)) }
+
+      it 'should prune backlog' do
+        license = create(:license, account:)
+        machine = create(:machine, license:)
+
+        # within target window (prune)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 4).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 4).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 2).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 2).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
+
+        # recent (keep)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS - 1).day.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS - 1).day.ago)
+
+        expect { worker.perform_async }.to(
+          change { account.event_logs.count }.from(400).to(100),
+        )
+      end
+    end
+
     context 'with an event log retention policy' do
-      let(:account) { create(:account, plan: build(:plan, :std, event_log_retention_duration: (worker::BACKLOG_DAYS + 3).days)) }
+      let(:account) { create(:account, plan: build(:plan, :std, event_log_retention_duration: (worker::BACKLOG_DAYS + 30).days)) }
 
       it 'should prune according to retention policy' do
         license = create(:license, account:)
         machine = create(:machine, license:)
 
         # outside retention window (prune)
-        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 4).days.ago)
-        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 4).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 31).days.ago)
 
         # within retention window (dedup hi-vol, keep lo-vol)
-        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 2).days.ago)
-        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 2).days.ago)
+        create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
+        create_list(:event_log, 50, :machine_heartbeat_ping, account:, resource: machine, created_at: (worker::BACKLOG_DAYS + 29).days.ago)
 
         # within target window (dedup hi-vol, keep lo-vol)
         create_list(:event_log, 50, :license_validation_succeeded, account:, resource: license, created_at: (worker::BACKLOG_DAYS + 1).days.ago)
