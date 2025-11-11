@@ -19,21 +19,23 @@ class PruneRequestLogsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-request-logs] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
 
-    (cutoff_start_date...cutoff_end_date).each do |date|
-      accounts = Account.preload(:plan).where_assoc_exists(:request_logs,
-        created_date: date,
-      )
+    catch :pause do
+      (cutoff_start_date...cutoff_end_date).each do |date|
+        accounts = Account.preload(:plan).where_assoc_exists(:request_logs,
+          created_date: date,
+        )
 
-      Keygen.logger.info "[workers.prune-request-logs] Pruning day: accounts=#{accounts.count} date=#{date}"
+        Keygen.logger.info "[workers.prune-request-logs] Pruning day: accounts=#{accounts.count} date=#{date}"
 
-      catch :pause do
         accounts.unordered.find_each do |account|
           prune_request_logs_for_date(account, date:)
         end
-      end
 
-      Keygen.logger.info "[workers.prune-request-logs] Done: date=#{date}"
+        Keygen.logger.info "[workers.prune-request-logs] Pruned day: date=#{date}"
+      end
     end
+
+    Keygen.logger.info "[workers.prune-request-logs] Done"
   end
 
   private
