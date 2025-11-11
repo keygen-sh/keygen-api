@@ -19,21 +19,23 @@ class PruneMetricsWorker < BaseWorker
 
     Keygen.logger.info "[workers.prune-metrics] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
 
-    (cutoff_start_date...cutoff_end_date).each do |date|
-      accounts = Account.where_assoc_exists(:metrics,
-        created_date: date,
-      )
+    catch :pause do
+      (cutoff_start_date...cutoff_end_date).each do |date|
+        accounts = Account.where_assoc_exists(:metrics,
+          created_date: date,
+        )
 
-      Keygen.logger.info "[workers.prune-metrics] Pruning day: accounts=#{accounts.count} date=#{date}"
+        Keygen.logger.info "[workers.prune-metrics] Pruning day: accounts=#{accounts.count} date=#{date}"
 
-      catch :pause do
         accounts.unordered.find_each do |account|
           prune_metrics_for_date(account, date:)
         end
-      end
 
-      Keygen.logger.info "[workers.prune-metrics] Done: date=#{date}"
+        Keygen.logger.info "[workers.prune-metrics] Pruned day: date=#{date}"
+      end
     end
+
+    Keygen.logger.info "[workers.prune-metrics] Done"
   end
 
   private
