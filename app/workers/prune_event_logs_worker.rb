@@ -136,14 +136,14 @@ class PruneEventLogsWorker < BaseWorker
       sum   += count
       batch += 1
 
-      Keygen.logger.info "[workers.prune-event-logs] Deduped #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} progress=#{sum}/#{total}"
+      Keygen.logger.info "[workers.prune-event-logs] Deduped #{count} rows: account_id=#{account.id} date=#{date} batch=#{batch}/#{batches} count=#{sum}/#{total}"
 
       sleep BATCH_WAIT
 
       break if count < BATCH_SIZE
     end
 
-    Keygen.logger.info "[workers.prune-event-logs] Deduping done: account_id=#{account.id} date=#{date} progress=#{sum}/#{total}"
+    Keygen.logger.info "[workers.prune-event-logs] Deduping done: account_id=#{account.id} date=#{date} count=#{sum}/#{total}"
   end
 
   def prune_event_logs_for_date(account, date:)
