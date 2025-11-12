@@ -92,7 +92,7 @@ class PruneRequestLogsWorker < BaseWorker
     plan = account.plan
 
     return false unless
-      plan.present? && plan.ent? && plan.request_log_retention_duration?
+      plan.present? && plan.request_log_retention_duration?
 
     cutoff_date = plan.request_log_retention_duration.seconds
                                                      .ago
