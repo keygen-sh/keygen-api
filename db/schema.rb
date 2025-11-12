@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_12_213258) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -19,48 +19,48 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "account_settings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "key", null: false
-    t.jsonb "value", null: false
     t.datetime "created_at", null: false
+    t.string "key", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "value", null: false
     t.index ["account_id", "created_at"], name: "index_account_settings_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_account_settings_on_account_id_and_key", unique: true
   end
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "slug"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.uuid "plan_id"
-    t.boolean "protected", default: false
-    t.text "public_key"
-    t.text "private_key"
-    t.text "secret_key"
-    t.datetime "last_low_activity_lifeline_sent_at", precision: nil
-    t.datetime "last_trial_will_end_sent_at", precision: nil
-    t.datetime "last_license_limit_exceeded_sent_at", precision: nil
-    t.datetime "last_request_limit_exceeded_sent_at", precision: nil
-    t.datetime "last_prompt_for_review_sent_at", precision: nil
-    t.text "ed25519_private_key"
-    t.text "ed25519_public_key"
-    t.string "domain"
-    t.string "subdomain"
     t.string "api_version"
-    t.string "cname"
     t.string "backend"
-    t.string "sso_organization_id"
-    t.string "sso_organization_domains", default: [], array: true
-    t.integer "sso_session_duration"
-    t.boolean "sso_jit_provisioning", default: false, null: false
-    t.boolean "sso_external_authn", default: false, null: false
-    t.datetime "slack_invited_at"
-    t.datetime "slack_accepted_at"
-    t.string "slack_team_id"
-    t.string "slack_channel_id"
+    t.string "cname"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "domain"
     t.text "ecdsa_private_key"
     t.text "ecdsa_public_key"
+    t.text "ed25519_private_key"
+    t.text "ed25519_public_key"
+    t.datetime "last_license_limit_exceeded_sent_at", precision: nil
+    t.datetime "last_low_activity_lifeline_sent_at", precision: nil
+    t.datetime "last_prompt_for_review_sent_at", precision: nil
+    t.datetime "last_request_limit_exceeded_sent_at", precision: nil
+    t.datetime "last_trial_will_end_sent_at", precision: nil
+    t.string "name"
+    t.uuid "plan_id"
+    t.text "private_key"
+    t.boolean "protected", default: false
+    t.text "public_key"
+    t.text "secret_key"
+    t.datetime "slack_accepted_at"
+    t.string "slack_channel_id"
+    t.datetime "slack_invited_at"
+    t.string "slack_team_id"
+    t.string "slug"
+    t.boolean "sso_external_authn", default: false, null: false
+    t.boolean "sso_jit_provisioning", default: false, null: false
+    t.string "sso_organization_domains", default: [], array: true
+    t.string "sso_organization_id"
+    t.integer "sso_session_duration"
     t.boolean "sso_sync_roles", default: false, null: false
+    t.string "subdomain"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
@@ -76,20 +76,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "billings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "customer_id"
-    t.string "subscription_status"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "subscription_id"
-    t.datetime "subscription_period_start", precision: nil
-    t.datetime "subscription_period_end", precision: nil
-    t.datetime "card_expiry", precision: nil
-    t.string "card_brand"
-    t.string "card_last4"
-    t.string "state"
     t.uuid "account_id"
-    t.string "referral_id"
     t.datetime "card_added_at", precision: nil
+    t.string "card_brand"
+    t.datetime "card_expiry", precision: nil
+    t.string "card_last4"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "customer_id"
+    t.string "referral_id"
+    t.string "state"
+    t.string "subscription_id"
+    t.datetime "subscription_period_end", precision: nil
+    t.datetime "subscription_period_start", precision: nil
+    t.string "subscription_status"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "created_at"], name: "index_billings_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_billings_on_created_at", order: :desc
     t.index ["customer_id", "created_at"], name: "index_billings_on_customer_id_and_created_at"
@@ -99,12 +99,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name", null: false
     t.string "code", null: false
-    t.jsonb "metadata"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.jsonb "metadata"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "code"], name: "index_entitlements_on_account_id_and_code", unique: true
     t.index ["code"], name: "index_entitlements_on_code"
     t.index ["environment_id"], name: "index_entitlements_on_environment_id"
@@ -112,11 +112,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "environments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "code", null: false
+    t.datetime "created_at", null: false
     t.string "isolation_strategy", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "code"], name: "index_environments_on_account_id_and_code", unique: true
     t.index ["account_id", "created_at"], name: "index_environments_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["code"], name: "index_environments_on_code"
@@ -124,20 +124,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "event_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
+    t.datetime "created_at", null: false
+    t.date "created_date"
+    t.uuid "environment_id"
     t.uuid "event_type_id", null: false
-    t.string "resource_type", null: false
-    t.uuid "resource_id", null: false
-    t.string "whodunnit_type"
-    t.uuid "whodunnit_id"
-    t.uuid "request_log_id"
     t.string "idempotency_key"
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.uuid "request_log_id"
+    t.uuid "resource_id", null: false
+    t.string "resource_type", null: false
     t.datetime "updated_at", null: false
-    t.uuid "environment_id"
-    t.date "created_date"
+    t.uuid "whodunnit_id"
+    t.string "whodunnit_type"
     t.index ["account_id", "created_at"], name: "index_event_logs_on_account_id_and_created_at", order: { created_at: :desc }
-    t.index ["account_id", "created_date"], name: "index_event_logs_on_account_id_and_created_date", order: { created_date: :desc }
+    t.index ["created_date", "account_id"], name: "index_event_logs_on_created_date_and_account_id", order: { created_date: :desc }
     t.index ["environment_id"], name: "index_event_logs_on_environment_id"
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
@@ -147,19 +147,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "event"
     t.datetime "created_at", precision: nil, null: false
+    t.string "event"
     t.datetime "updated_at", precision: nil, null: false
     t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
   create_table "group_owners", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "group_id", null: false
-    t.uuid "user_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.uuid "group_id", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
     t.index ["account_id"], name: "index_group_owners_on_account_id"
     t.index ["environment_id"], name: "index_group_owners_on_environment_id"
     t.index ["group_id", "user_id"], name: "index_group_owners_on_group_id_and_user_id", unique: true
@@ -168,9 +168,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "group_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "permission_id", null: false
-    t.uuid "group_id", null: false
     t.datetime "created_at", null: false
+    t.uuid "group_id", null: false
+    t.uuid "permission_id", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id", "permission_id"], name: "index_group_permissions_on_group_id_and_permission_id", unique: true
     t.index ["permission_id"], name: "index_group_permissions_on_permission_id"
@@ -178,25 +178,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
-    t.integer "max_users"
+    t.datetime "created_at", null: false
+    t.uuid "environment_id"
     t.integer "max_licenses"
     t.integer "max_machines"
+    t.integer "max_users"
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
-    t.uuid "environment_id"
     t.index ["account_id"], name: "index_groups_on_account_id"
     t.index ["environment_id"], name: "index_groups_on_environment_id"
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "key"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.uuid "policy_id"
     t.uuid "account_id"
+    t.datetime "created_at", precision: nil, null: false
     t.uuid "environment_id"
+    t.string "key"
+    t.uuid "policy_id"
+    t.datetime "updated_at", precision: nil, null: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "keys_tsv_key_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at"
@@ -209,11 +209,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "license_entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "license_id", null: false
-    t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.uuid "entitlement_id", null: false
     t.uuid "environment_id"
+    t.uuid "license_id", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "license_id", "entitlement_id"], name: "license_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_license_entitlements_on_entitlement_id"
     t.index ["environment_id"], name: "index_license_entitlements_on_environment_id"
@@ -222,11 +222,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "license_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
+    t.datetime "created_at", null: false
     t.uuid "environment_id"
     t.uuid "license_id", null: false
-    t.uuid "user_id", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
     t.index ["account_id", "created_at"], name: "index_license_users_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "license_id", "user_id"], name: "index_license_users_on_account_id_and_license_id_and_user_id", unique: true
     t.index ["environment_id"], name: "index_license_users_on_environment_id"
@@ -235,42 +235,42 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "key", null: false
-    t.datetime "expiry", precision: nil
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.jsonb "metadata"
-    t.uuid "user_id"
-    t.uuid "policy_id", null: false
     t.uuid "account_id", null: false
-    t.boolean "suspended", default: false
-    t.datetime "last_check_in_at", precision: nil
-    t.datetime "last_expiration_event_sent_at", precision: nil
-    t.datetime "last_check_in_event_sent_at", precision: nil
-    t.datetime "last_expiring_soon_event_sent_at", precision: nil
-    t.datetime "last_check_in_soon_event_sent_at", precision: nil
-    t.integer "uses", default: 0
-    t.boolean "protected"
-    t.string "name"
-    t.integer "machines_count", default: 0
-    t.datetime "last_validated_at", precision: nil
-    t.integer "machines_core_count", default: 0, null: false
-    t.integer "max_machines_override"
-    t.integer "max_cores_override"
-    t.integer "max_uses_override"
-    t.uuid "group_id"
-    t.integer "max_processes_override"
-    t.datetime "last_check_out_at", precision: nil
+    t.datetime "created_at", precision: nil, null: false
     t.uuid "environment_id"
+    t.datetime "expiry", precision: nil
+    t.uuid "group_id"
+    t.string "key", null: false
+    t.datetime "last_check_in_at", precision: nil
+    t.datetime "last_check_in_event_sent_at", precision: nil
+    t.datetime "last_check_in_soon_event_sent_at", precision: nil
+    t.datetime "last_check_out_at", precision: nil
+    t.datetime "last_expiration_event_sent_at", precision: nil
+    t.datetime "last_expiring_soon_event_sent_at", precision: nil
+    t.datetime "last_validated_at", precision: nil
     t.string "last_validated_checksum"
     t.string "last_validated_version"
-    t.uuid "product_id", null: false
-    t.integer "max_users_override"
     t.integer "license_users_count", default: 0, null: false
-    t.bigint "max_memory_override"
-    t.bigint "max_disk_override"
-    t.bigint "machines_memory_count", default: 0, null: false
+    t.integer "machines_core_count", default: 0, null: false
+    t.integer "machines_count", default: 0
     t.bigint "machines_disk_count", default: 0, null: false
+    t.bigint "machines_memory_count", default: 0, null: false
+    t.integer "max_cores_override"
+    t.bigint "max_disk_override"
+    t.integer "max_machines_override"
+    t.bigint "max_memory_override"
+    t.integer "max_processes_override"
+    t.integer "max_users_override"
+    t.integer "max_uses_override"
+    t.jsonb "metadata"
+    t.string "name"
+    t.uuid "policy_id", null: false
+    t.uuid "product_id", null: false
+    t.boolean "protected"
+    t.boolean "suspended", default: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.uuid "user_id"
+    t.integer "uses", default: 0
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -291,12 +291,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "machine_components", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "machine_id", null: false
+    t.datetime "created_at", null: false
     t.uuid "environment_id"
     t.string "fingerprint", null: false
-    t.string "name", null: false
+    t.uuid "machine_id", null: false
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_machine_components_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_machine_components_on_environment_id"
@@ -306,15 +306,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "machine_processes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "machine_id", null: false
-    t.string "pid", null: false
-    t.datetime "last_heartbeat_at", null: false
-    t.datetime "last_death_event_sent_at"
-    t.jsonb "metadata"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
     t.string "heartbeat_jid"
+    t.datetime "last_death_event_sent_at"
+    t.datetime "last_heartbeat_at", null: false
+    t.uuid "machine_id", null: false
+    t.jsonb "metadata"
+    t.string "pid", null: false
+    t.datetime "updated_at", null: false
     t.index "machine_id, md5((pid)::text)", name: "index_machine_processes_on_machine_id_md5_pid", unique: true
     t.index ["account_id"], name: "index_machine_processes_on_account_id"
     t.index ["environment_id"], name: "index_machine_processes_on_environment_id"
@@ -324,28 +324,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "machines", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "fingerprint"
-    t.string "ip"
-    t.string "hostname"
-    t.string "platform"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "name"
-    t.jsonb "metadata"
     t.uuid "account_id", null: false
-    t.uuid "license_id", null: false
-    t.datetime "last_heartbeat_at", precision: nil
     t.integer "cores"
-    t.datetime "last_death_event_sent_at", precision: nil
-    t.uuid "group_id"
-    t.integer "max_processes_override"
-    t.datetime "last_check_out_at", precision: nil
-    t.uuid "environment_id"
-    t.string "heartbeat_jid"
-    t.uuid "owner_id"
-    t.uuid "policy_id", null: false
-    t.bigint "memory"
+    t.datetime "created_at", precision: nil, null: false
     t.bigint "disk"
+    t.uuid "environment_id"
+    t.string "fingerprint"
+    t.uuid "group_id"
+    t.string "heartbeat_jid"
+    t.string "hostname"
+    t.string "ip"
+    t.datetime "last_check_out_at", precision: nil
+    t.datetime "last_death_event_sent_at", precision: nil
+    t.datetime "last_heartbeat_at", precision: nil
+    t.uuid "license_id", null: false
+    t.integer "max_processes_override"
+    t.bigint "memory"
+    t.jsonb "metadata"
+    t.string "name"
+    t.uuid "owner_id"
+    t.string "platform"
+    t.uuid "policy_id", null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -365,18 +365,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
-    t.jsonb "data"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.uuid "event_type_id", null: false
     t.date "created_date", null: false
+    t.jsonb "data"
+    t.uuid "event_type_id", null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id <> ALL (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid, '6f75f2c4-6451-405a-a389-fa029137f6f0'::uuid]))"
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_high_vol_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id = ANY (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid]))"
     t.index ["account_id", "created_date", "event_type_id"], name: "metrics_hi_vol_acct_created_date_event_type_idx", order: { created_date: :desc }, where: "(event_type_id = ANY (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, 'e84ab2b7-efd8-42f9-87be-1f3aa34b3e42'::uuid, '2634100c-40aa-4879-a84d-8d9878573efc'::uuid]))"
     t.index ["account_id", "created_date", "event_type_id"], name: "metrics_lo_vol_acct_created_date_event_type_idx", order: { created_date: :desc }, where: "(event_type_id <> ALL (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, 'e84ab2b7-efd8-42f9-87be-1f3aa34b3e42'::uuid, '2634100c-40aa-4879-a84d-8d9878573efc'::uuid]))"
-    t.index ["account_id", "created_date"], name: "index_metrics_on_account_id_and_created_date", order: { created_date: :desc }
     t.index ["account_id"], name: "index_metrics_on_account_id"
     t.index ["created_at"], name: "index_metrics_on_created_at", order: :desc
+    t.index ["created_date", "account_id"], name: "index_metrics_on_created_date_and_account_id", order: { created_date: :desc }
     t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
   end
 
@@ -388,86 +388,86 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
-    t.integer "price"
-    t.integer "max_users"
-    t.integer "max_policies"
-    t.integer "max_licenses"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "max_products"
-    t.string "plan_id"
-    t.boolean "private", default: false
-    t.integer "trial_duration"
-    t.integer "max_reqs"
-    t.integer "max_admins"
-    t.string "interval"
-    t.integer "request_log_retention_duration"
     t.integer "event_log_retention_duration"
+    t.string "interval"
+    t.integer "max_admins"
+    t.integer "max_licenses"
+    t.integer "max_policies"
+    t.integer "max_products"
+    t.integer "max_reqs"
     t.bigint "max_storage"
     t.bigint "max_transfer"
     t.bigint "max_upload"
+    t.integer "max_users"
+    t.string "name"
+    t.string "plan_id"
+    t.integer "price"
+    t.boolean "private", default: false
+    t.integer "request_log_retention_duration"
+    t.integer "trial_duration"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["created_at"], name: "index_plans_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_plans_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_plans_on_plan_id_and_created_at"
   end
 
   create_table "policies", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
-    t.integer "duration"
-    t.boolean "strict", default: false
-    t.boolean "floating", default: false
-    t.boolean "use_pool", default: false
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "lock_version", default: 0, null: false
-    t.integer "max_machines"
-    t.boolean "encrypted", default: false
-    t.boolean "protected"
-    t.jsonb "metadata"
-    t.uuid "product_id", null: false
     t.uuid "account_id", null: false
+    t.string "authentication_strategy"
     t.string "check_in_interval"
     t.integer "check_in_interval_count"
-    t.boolean "require_check_in", default: false
-    t.boolean "require_product_scope", default: false
-    t.boolean "require_policy_scope", default: false
-    t.boolean "require_machine_scope", default: false
-    t.boolean "require_fingerprint_scope", default: false
-    t.boolean "concurrent", default: true
-    t.integer "max_uses"
-    t.string "scheme"
-    t.integer "heartbeat_duration"
-    t.string "fingerprint_uniqueness_strategy"
-    t.string "fingerprint_matching_strategy"
-    t.integer "max_cores"
-    t.string "expiration_strategy"
-    t.string "expiration_basis"
-    t.string "authentication_strategy"
-    t.string "heartbeat_cull_strategy"
-    t.string "heartbeat_resurrection_strategy"
-    t.boolean "require_heartbeat", default: false, null: false
-    t.string "transfer_strategy"
-    t.boolean "require_user_scope", default: false, null: false
-    t.string "leasing_strategy"
-    t.integer "max_processes"
-    t.string "overage_strategy"
-    t.uuid "environment_id"
-    t.string "heartbeat_basis"
-    t.boolean "require_environment_scope", default: false, null: false
-    t.boolean "require_checksum_scope", default: false, null: false
-    t.boolean "require_version_scope", default: false, null: false
-    t.boolean "require_components_scope", default: false, null: false
-    t.string "machine_uniqueness_strategy"
-    t.string "machine_matching_strategy"
-    t.string "component_uniqueness_strategy"
     t.string "component_matching_strategy"
-    t.string "renewal_basis"
-    t.integer "max_users"
+    t.string "component_uniqueness_strategy"
+    t.boolean "concurrent", default: true
+    t.datetime "created_at", precision: nil, null: false
+    t.integer "duration"
+    t.boolean "encrypted", default: false
+    t.uuid "environment_id"
+    t.string "expiration_basis"
+    t.string "expiration_strategy"
+    t.string "fingerprint_matching_strategy"
+    t.string "fingerprint_uniqueness_strategy"
+    t.boolean "floating", default: false
+    t.string "heartbeat_basis"
+    t.string "heartbeat_cull_strategy"
+    t.integer "heartbeat_duration"
+    t.string "heartbeat_resurrection_strategy"
+    t.string "leasing_strategy"
+    t.integer "lock_version", default: 0, null: false
     t.string "machine_leasing_strategy"
-    t.string "process_leasing_strategy"
-    t.bigint "max_memory"
+    t.string "machine_matching_strategy"
+    t.string "machine_uniqueness_strategy"
+    t.integer "max_cores"
     t.bigint "max_disk"
+    t.integer "max_machines"
+    t.bigint "max_memory"
+    t.integer "max_processes"
+    t.integer "max_users"
+    t.integer "max_uses"
+    t.jsonb "metadata"
+    t.string "name"
+    t.string "overage_strategy"
+    t.string "process_leasing_strategy"
+    t.uuid "product_id", null: false
+    t.boolean "protected"
+    t.string "renewal_basis"
+    t.boolean "require_check_in", default: false
+    t.boolean "require_checksum_scope", default: false, null: false
+    t.boolean "require_components_scope", default: false, null: false
+    t.boolean "require_environment_scope", default: false, null: false
+    t.boolean "require_fingerprint_scope", default: false
+    t.boolean "require_heartbeat", default: false, null: false
+    t.boolean "require_machine_scope", default: false
+    t.boolean "require_policy_scope", default: false
+    t.boolean "require_product_scope", default: false
+    t.boolean "require_user_scope", default: false, null: false
+    t.boolean "require_version_scope", default: false, null: false
+    t.string "scheme"
+    t.boolean "strict", default: false
+    t.string "transfer_strategy"
+    t.datetime "updated_at", precision: nil, null: false
+    t.boolean "use_pool", default: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
@@ -482,11 +482,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "policy_entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "policy_id", null: false
-    t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.uuid "entitlement_id", null: false
     t.uuid "environment_id"
+    t.uuid "policy_id", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "policy_id", "entitlement_id"], name: "policy_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_policy_entitlements_on_entitlement_id"
     t.index ["environment_id"], name: "index_policy_entitlements_on_environment_id"
@@ -494,16 +494,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "products", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.jsonb "platforms"
-    t.jsonb "metadata"
     t.uuid "account_id", null: false
-    t.string "url"
+    t.string "code"
+    t.datetime "created_at", precision: nil, null: false
     t.string "distribution_strategy"
     t.uuid "environment_id"
-    t.string "code"
+    t.jsonb "metadata"
+    t.string "name"
+    t.jsonb "platforms"
+    t.datetime "updated_at", precision: nil, null: false
+    t.string "url"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
@@ -517,12 +517,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "receipts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "invoice_id"
     t.integer "amount"
-    t.boolean "paid"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
     t.uuid "billing_id"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "invoice_id"
+    t.boolean "paid"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["billing_id", "created_at"], name: "index_receipts_on_billing_id_and_created_at"
     t.index ["created_at"], name: "index_receipts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_receipts_on_id_and_created_at", unique: true
@@ -530,10 +530,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_arches", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
+    t.datetime "created_at", null: false
     t.string "key"
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_arches_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_arches_on_account_id_and_key", unique: true
@@ -541,23 +541,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_artifacts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "release_id", null: false
-    t.string "filename"
-    t.string "etag"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "backend"
+    t.string "checksum"
     t.bigint "content_length"
     t.string "content_type"
-    t.uuid "release_platform_id"
-    t.uuid "release_filetype_id"
-    t.bigint "filesize"
-    t.string "signature"
-    t.string "checksum"
-    t.uuid "release_arch_id"
-    t.string "status"
-    t.jsonb "metadata"
-    t.string "backend"
+    t.datetime "created_at", null: false
     t.uuid "environment_id"
+    t.string "etag"
+    t.string "filename"
+    t.bigint "filesize"
+    t.jsonb "metadata"
+    t.uuid "release_arch_id"
+    t.uuid "release_filetype_id"
+    t.uuid "release_id", null: false
+    t.uuid "release_platform_id"
+    t.string "signature"
+    t.string "status"
+    t.datetime "updated_at", null: false
     t.index ["account_id", "release_id"], name: "release_artifacts_uploaded_idx", where: "((status)::text = 'UPLOADED'::text)"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_release_artifacts_on_environment_id"
@@ -571,9 +571,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_channels", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
-    t.string "key"
     t.datetime "created_at", null: false
+    t.string "key"
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_channels_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_channels_on_account_id_and_key", unique: true
@@ -581,15 +581,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_descriptors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "environment_id"
-    t.uuid "release_id", null: false
-    t.uuid "release_artifact_id", null: false
+    t.string "content_digest", null: false
+    t.bigint "content_length", null: false
     t.string "content_path", null: false
     t.string "content_type", null: false
-    t.bigint "content_length", null: false
-    t.string "content_digest", null: false
-    t.jsonb "metadata"
     t.datetime "created_at", null: false
+    t.uuid "environment_id"
+    t.jsonb "metadata"
+    t.uuid "release_artifact_id", null: false
+    t.uuid "release_id", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_descriptors_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["content_digest", "release_artifact_id"], name: "idx_on_content_digest_release_artifact_id_ca13eb81a4", unique: true
@@ -602,12 +602,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_download_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "release_id", null: false
-    t.text "url"
-    t.integer "ttl"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.integer "ttl"
+    t.datetime "updated_at", null: false
+    t.text "url"
     t.index ["account_id", "created_at"], name: "index_release_download_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_download_links_on_environment_id"
     t.index ["release_id"], name: "index_release_download_links_on_release_id"
@@ -615,9 +615,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_engines", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
-    t.string "key", null: false
     t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_engines_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_engines_on_account_id_and_key", unique: true
@@ -625,11 +625,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_entitlement_constraints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "release_id", null: false
-    t.uuid "entitlement_id", null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.uuid "entitlement_id", null: false
     t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "release_entls_acct_created_idx", order: { created_at: :desc }
     t.index ["account_id", "release_id", "entitlement_id"], name: "release_entls_acct_rel_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_release_entitlement_constraints_on_entitlement_id"
@@ -639,9 +639,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_filetypes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
-    t.string "key"
     t.datetime "created_at", null: false
+    t.string "key"
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
@@ -649,17 +649,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_manifests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "environment_id"
-    t.uuid "release_id", null: false
-    t.uuid "release_artifact_id", null: false
     t.binary "content", null: false
-    t.jsonb "metadata"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "content_digest"
+    t.bigint "content_length"
     t.string "content_path"
     t.string "content_type"
-    t.bigint "content_length"
-    t.string "content_digest"
+    t.datetime "created_at", null: false
+    t.uuid "environment_id"
+    t.jsonb "metadata"
+    t.uuid "release_artifact_id", null: false
+    t.uuid "release_id", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_manifests_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["content_digest", "release_artifact_id"], name: "idx_on_content_digest_release_artifact_id_cba1f00640", unique: true
     t.index ["content_path", "release_artifact_id"], name: "idx_on_content_path_release_artifact_id_f77b8efd5b", unique: true
@@ -671,13 +671,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_packages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "product_id", null: false
-    t.uuid "release_engine_id"
+    t.datetime "created_at", null: false
     t.uuid "environment_id"
-    t.string "name", null: false
     t.string "key", null: false
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.uuid "product_id", null: false
+    t.uuid "release_engine_id"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_packages_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_packages_on_account_id_and_key", unique: true
@@ -688,10 +688,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_platforms", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.string "name"
+    t.datetime "created_at", null: false
     t.string "key"
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_platforms_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
@@ -699,12 +699,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_upgrade_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "release_id", null: false
-    t.text "url"
-    t.integer "ttl"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.integer "ttl"
+    t.datetime "updated_at", null: false
+    t.text "url"
     t.index ["account_id", "created_at"], name: "index_release_upgrade_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_upgrade_links_on_environment_id"
     t.index ["release_id"], name: "index_release_upgrade_links_on_release_id"
@@ -712,12 +712,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "release_upload_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "release_id", null: false
-    t.text "url"
-    t.integer "ttl"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.uuid "environment_id"
+    t.uuid "release_id", null: false
+    t.integer "ttl"
+    t.datetime "updated_at", null: false
+    t.text "url"
     t.index ["account_id", "created_at"], name: "index_release_upload_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_release_upload_links_on_environment_id"
     t.index ["release_id"], name: "index_release_upload_links_on_release_id"
@@ -725,36 +725,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "releases", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "product_id", null: false
-    t.uuid "release_platform_id"
-    t.uuid "release_channel_id", null: false
-    t.string "name"
-    t.string "version"
+    t.string "api_version"
+    t.datetime "backdated_to", precision: nil
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "download_count", default: 0
+    t.uuid "environment_id"
     t.string "filename"
     t.bigint "filesize"
-    t.bigint "download_count", default: 0
     t.jsonb "metadata"
-    t.datetime "yanked_at", precision: nil
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "upgrade_count", default: 0
+    t.string "name"
+    t.uuid "product_id", null: false
+    t.uuid "release_channel_id", null: false
     t.uuid "release_filetype_id"
-    t.text "description"
-    t.string "signature"
-    t.string "checksum"
-    t.string "status"
-    t.string "api_version"
+    t.uuid "release_package_id"
+    t.uuid "release_platform_id"
+    t.bigint "semver_build_num"
+    t.string "semver_build_word"
     t.bigint "semver_major"
     t.bigint "semver_minor"
     t.bigint "semver_patch"
-    t.string "semver_pre_word"
     t.bigint "semver_pre_num"
-    t.string "semver_build_word"
-    t.bigint "semver_build_num"
+    t.string "semver_pre_word"
+    t.string "signature"
+    t.string "status"
     t.string "tag"
-    t.uuid "environment_id"
-    t.uuid "release_package_id"
-    t.datetime "backdated_to", precision: nil
+    t.datetime "updated_at", null: false
+    t.bigint "upgrade_count", default: 0
+    t.string "version"
+    t.datetime "yanked_at", precision: nil
     t.index ["account_id", "created_at", "backdated_to"], name: "index_releases_on_account_id_and_created_at_and_backdated_to", order: { created_at: :desc, backdated_to: :desc }
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
@@ -774,28 +774,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
-    t.string "url"
-    t.string "method"
-    t.string "ip"
-    t.string "user_agent"
-    t.string "status"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "requestor_type"
-    t.uuid "requestor_id"
-    t.text "request_body"
-    t.text "response_body"
-    t.text "response_signature"
-    t.string "resource_type"
-    t.uuid "resource_id"
     t.date "created_date", null: false
     t.uuid "environment_id"
-    t.jsonb "request_headers"
-    t.jsonb "response_headers"
-    t.float "run_time"
+    t.string "ip"
+    t.string "method"
     t.float "queue_time"
+    t.text "request_body"
+    t.jsonb "request_headers"
+    t.uuid "requestor_id"
+    t.string "requestor_type"
+    t.uuid "resource_id"
+    t.string "resource_type"
+    t.text "response_body"
+    t.jsonb "response_headers"
+    t.text "response_signature"
+    t.float "run_time"
+    t.string "status"
+    t.datetime "updated_at", precision: nil, null: false
+    t.string "url"
+    t.string "user_agent"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
-    t.index ["account_id", "created_date"], name: "index_request_logs_on_account_id_and_created_date", order: { created_date: :desc }
+    t.index ["created_date", "account_id"], name: "index_request_logs_on_created_date_and_account_id", order: { created_date: :desc }
     t.index ["environment_id"], name: "index_request_logs_on_environment_id"
     t.index ["method"], name: "request_logs_method_idx"
     t.index ["requestor_id", "requestor_type"], name: "request_logs_requestor_idx"
@@ -803,21 +803,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "role_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.uuid "permission_id", null: false
     t.uuid "role_id", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["permission_id"], name: "index_role_permissions_on_permission_id"
     t.index ["role_id", "permission_id"], name: "index_role_permissions_on_role_id_and_permission_id", unique: true
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "resource_type"
-    t.datetime "created_at", precision: nil
-    t.datetime "updated_at", precision: nil
-    t.uuid "resource_id"
     t.uuid "account_id", null: false
+    t.datetime "created_at", precision: nil
+    t.string "name"
+    t.uuid "resource_id"
+    t.string "resource_type"
+    t.datetime "updated_at", precision: nil
     t.index ["account_id"], name: "index_roles_on_account_id"
     t.index ["created_at"], name: "index_roles_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
@@ -829,13 +829,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "second_factors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "user_id", null: false
-    t.text "secret", null: false
-    t.boolean "enabled", default: false, null: false
-    t.datetime "last_verified_at", precision: nil
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
+    t.boolean "enabled", default: false, null: false
     t.uuid "environment_id"
+    t.datetime "last_verified_at", precision: nil
+    t.text "secret", null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.uuid "user_id", null: false
     t.index ["account_id", "created_at"], name: "index_second_factors_on_account_id_and_created_at"
     t.index ["environment_id"], name: "index_second_factors_on_environment_id"
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
@@ -845,16 +845,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
 
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
-    t.uuid "environment_id"
-    t.uuid "token_id"
-    t.string "bearer_type", null: false
     t.uuid "bearer_id", null: false
-    t.datetime "last_used_at"
+    t.string "bearer_type", null: false
+    t.datetime "created_at", null: false
+    t.uuid "environment_id"
     t.datetime "expiry", null: false
     t.string "ip", null: false
-    t.string "user_agent"
-    t.datetime "created_at", null: false
+    t.datetime "last_used_at"
+    t.uuid "token_id"
     t.datetime "updated_at", null: false
+    t.string "user_agent"
     t.index ["account_id", "created_at"], name: "index_sessions_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["bearer_id", "bearer_type"], name: "index_sessions_on_bearer_id_and_bearer_type"
     t.index ["created_at", "expiry", "last_used_at"], name: "index_sessions_on_created_at_and_expiry_and_last_used_at"
@@ -863,28 +863,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "token_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.uuid "permission_id", null: false
     t.uuid "token_id", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["permission_id"], name: "index_token_permissions_on_permission_id"
     t.index ["token_id", "permission_id"], name: "index_token_permissions_on_token_id_and_permission_id", unique: true
   end
 
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "digest"
+    t.uuid "account_id"
+    t.integer "activations", default: 0
+    t.uuid "bearer_id"
     t.string "bearer_type"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
+    t.integer "deactivations", default: 0
+    t.string "digest"
+    t.uuid "environment_id"
     t.datetime "expiry", precision: nil
-    t.uuid "bearer_id"
-    t.uuid "account_id"
     t.integer "max_activations"
     t.integer "max_deactivations"
-    t.integer "activations", default: 0
-    t.integer "deactivations", default: 0
     t.string "name"
-    t.uuid "environment_id"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
     t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc
@@ -894,24 +894,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "email"
-    t.string "password_digest"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "password_reset_token"
-    t.datetime "password_reset_sent_at", precision: nil
-    t.jsonb "metadata"
     t.uuid "account_id", null: false
-    t.string "first_name"
-    t.string "last_name"
-    t.datetime "stdout_unsubscribed_at", precision: nil
-    t.datetime "stdout_last_sent_at", precision: nil
     t.datetime "banned_at", precision: nil
-    t.uuid "group_id"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "email"
     t.uuid "environment_id"
-    t.string "sso_profile_id"
-    t.string "sso_idp_id"
+    t.string "first_name"
+    t.uuid "group_id"
+    t.string "last_name"
+    t.jsonb "metadata"
+    t.string "password_digest"
+    t.datetime "password_reset_sent_at", precision: nil
+    t.string "password_reset_token"
     t.string "sso_connection_id"
+    t.string "sso_idp_id"
+    t.string "sso_profile_id"
+    t.datetime "stdout_last_sent_at", precision: nil
+    t.datetime "stdout_unsubscribed_at", precision: nil
+    t.datetime "updated_at", precision: nil, null: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
@@ -927,15 +927,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "webhook_endpoints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "url"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
     t.uuid "account_id"
-    t.jsonb "subscriptions", default: ["*"]
-    t.string "signature_algorithm", default: "ed25519"
     t.string "api_version"
+    t.datetime "created_at", precision: nil, null: false
     t.uuid "environment_id"
     t.uuid "product_id"
+    t.string "signature_algorithm", default: "ed25519"
+    t.jsonb "subscriptions", default: ["*"]
+    t.datetime "updated_at", precision: nil, null: false
+    t.string "url"
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", order: :desc
     t.index ["environment_id"], name: "index_webhook_endpoints_on_environment_id"
@@ -944,19 +944,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_143945) do
   end
 
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.text "payload"
-    t.string "jid"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "endpoint"
     t.uuid "account_id"
-    t.string "idempotency_token"
-    t.integer "last_response_code"
-    t.text "last_response_body"
-    t.uuid "event_type_id", null: false
-    t.string "status"
     t.string "api_version"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "endpoint"
     t.uuid "environment_id"
+    t.uuid "event_type_id", null: false
+    t.string "idempotency_token"
+    t.string "jid"
+    t.text "last_response_body"
+    t.integer "last_response_code"
+    t.text "payload"
+    t.string "status"
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "webhook_endpoint_id"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["environment_id"], name: "index_webhook_events_on_environment_id"
