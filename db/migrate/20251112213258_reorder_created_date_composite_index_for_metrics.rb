@@ -3,10 +3,11 @@ class ReorderCreatedDateCompositeIndexForMetrics < ActiveRecord::Migration[8.1]
   verbose!
 
   def change
-    remove_index :metrics, %i[account_id created_date], algorithm: :concurrently
+    remove_index :metrics, %i[account_id created_date], algorithm: :concurrently, if_exists: true
 
     add_index :metrics, %i[created_date account_id],
       order: { created_date: :desc },
-      algorithm: :concurrently
+      algorithm: :concurrently,
+      if_not_exists: true
   end
 end
