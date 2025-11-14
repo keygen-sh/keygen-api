@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_12_213258) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_14_033324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_12_213258) do
     t.string "slack_team_id"
     t.string "slug"
     t.boolean "sso_external_authn", default: false, null: false
+    t.boolean "sso_idp_initiated_authn", default: false, null: false
     t.boolean "sso_jit_provisioning", default: false, null: false
     t.string "sso_organization_domains", default: [], array: true
     t.string "sso_organization_id"
