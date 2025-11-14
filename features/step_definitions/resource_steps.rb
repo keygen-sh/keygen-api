@@ -159,14 +159,27 @@ Given /^the current account has the following attributes:$/ do |body|
   @account.update!(attributes)
 end
 
-Given /^the current account has SSO configured for "([^\"]*)"$/ do |domain|
+Given /^the current account has SSO (?:configured|stubbed) for "([^\"]*)"$/ do |domain|
   allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, **|
     "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}"
   end
 
   @account.update!(
-    sso_organization_id: "test_org_#{SecureRandom.hex}",
-    sso_organization_domains: [domain],
+    sso_organization_id: @account.sso_organization_id.presence || "test_org_#{SecureRandom.hex}",
+    sso_organization_domains: @account.sso_organization_domains.presence || [domain],
+  )
+end
+
+Given /^the account "([^\"]*)" has SSO (?:configured|stubbed) for "([^\"]*)"$/ do |id, domain|
+  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, **|
+    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}"
+  end
+
+  account = FindByAliasService.call(Account, id:, aliases: :slug)
+
+  account.update!(
+    sso_organization_id: account.sso_organization_id.presence || "test_org_#{SecureRandom.hex}",
+    sso_organization_domains: account.sso_organization_domains.presence || [domain],
   )
 end
 

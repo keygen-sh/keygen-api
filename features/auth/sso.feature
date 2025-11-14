@@ -2,11 +2,11 @@
 Feature: SSO
   Background:
     Given the following "accounts" exist:
-      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning | sso_external_authn | sso_sync_roles | secret_key                       |
-      | Keygen           | keygen-sh     |                                       |                          |                      |                      |                    |                | 04cd269a781e207653eb2ff3e9ab0be5 |
-      | Example          | example-com   |                                       |                          |                      |                      |                    |                | a1f091cf41085e9436708a79090e37a6 |
-      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                | true               | true           | a9be6bf4b17f353d002758ad33a0e0a4 |
-      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 | false              | false          | 98a2f3ad35a80561ce2b2c2d93d7e7e4 |
+      | name             | slug          | sso_organization_id                   | sso_organization_domains | sso_session_duration | sso_jit_provisioning | sso_external_authn | sso_sync_roles | sso_idp_initiated_authn | secret_key                       |
+      | Keygen           | keygen-sh     |                                       |                          |                      |                      |                    |                |                         | 04cd269a781e207653eb2ff3e9ab0be5 |
+      | Example          | example-com   |                                       |                          |                      |                      |                    |                |                         | a1f091cf41085e9436708a79090e37a6 |
+      | Evil Corp        | ecorp-example | test_org_59f4ac10f7b6acbf3304f3fc2211 | ecorp.example            | 43200                | false                | true               | true           | false                   | a9be6bf4b17f353d002758ad33a0e0a4 |
+      | Lumon Industries | lumon-example | test_org_669aa06c521982d5c12b3eb74bf0 | lumon.example            |                      | true                 | false              | false          | true                    | 98a2f3ad35a80561ce2b2c2d93d7e7e4 |
 
   Scenario: We receive a successful callback for an existing admin
     Given the first "admin" of account "ecorp-example" has the following attributes:
@@ -928,7 +928,7 @@ Feature: SSO
     And there should be 0 "sessions"
     And time is unfrozen
 
-  Scenario: We receive a callback with missing state
+  Scenario: We receive a callback with missing state (IdP-initiated authn disabled)
     Given the SSO callback code "test_123" returns the following profile:
       """
       {
@@ -948,7 +948,33 @@ Feature: SSO
     And time is frozen at "2552-02-28T00:00:00.000Z"
     When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
     Then the response status should be "303"
-    And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_STATE_INVALID"
+    And the response headers should contain "Location" with "https://portal.keygen.sh/sso/error?code=SSO_STATE_MISSING"
+    And the response headers should not contain "Set-Cookie"
+    And there should be 0 "sessions"
+    And time is unfrozen
+
+  Scenario: We receive a callback with missing state (IdP-initiated authn enabled)
+    Given the account "lumon-example" has SSO stubbed for "lumon.example"
+    And the SSO callback code "test_123" returns the following profile:
+      """
+      {
+        "id": "test_prof_b2c45c1af54f9cad85edf6104091",
+        "organization_id": "test_org_669aa06c521982d5c12b3eb74bf0",
+        "connection_id": "test_conn_6ca55425d9b4842cdd3ba3f1ea9c",
+        "idp_id": "test_idp_34d99d8985608b3d0297183a1265",
+        "email": "mark@lumon.example",
+        "first_name": "Mark",
+        "last_name": "Scout",
+        "role": {
+          "slug": "read-only"
+        }
+      }
+      """
+    And I use user agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0"
+    And time is frozen at "2552-02-28T00:00:00.000Z"
+    When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
+    Then the response status should be "303"
+    And the response headers should contain "Location" with "https://api.workos.test/sso/authorize?domain_hint=lumon.example&login_hint=mark@lumon.example"
     And the response headers should not contain "Set-Cookie"
     And there should be 0 "sessions"
     And time is unfrozen

@@ -11,7 +11,7 @@ module Auth
     skip_verify_authorized
 
     def callback
-      code, enc = request.query_parameters.values_at(:code, :state)
+      code, enc_state = request.query_parameters.values_at(:code, :state)
 
       # redeem the callback authentication code for a user profile
       profile = Keygen::EE::SSO.redeem_code(code:)
@@ -37,10 +37,24 @@ module Auth
       end
 
       # decrypt and verify state
-      state = Keygen::EE::SSO.decrypt_state(enc, secret_key: account.secret_key)
+      state = Keygen::EE::SSO.decrypt_state(enc_state, secret_key: account.secret_key)
 
-      unless state.present? && state.email == profile.email
-        Keygen.logger.warn { "[sso] state is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} enc=#{enc.inspect}" }
+      unless state.present?
+        Keygen.logger.info { "[sso] state was not provided: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} enc_state=#{enc_state.inspect}" }
+
+        # NB(ezekg) we want to restart the authn dance with valid state when we receive
+        #           an IdP-initiated authn request i.e. a request without state
+        if account.sso_idp_initiated_authn?
+          redirect_url = Keygen::EE::SSO.redirect_url(account:, email: profile.email, callback_url: sso_callback_url)
+
+          return redirect_to redirect_url, status: :see_other, allow_other_host: true
+        end
+
+        raise Keygen::Error::InvalidSingleSignOnError.new('state was not provided', code: 'SSO_STATE_MISSING')
+      end
+
+      unless state.email == profile.email
+        Keygen.logger.warn { "[sso] state is not valid: profile_id=#{profile.id.inspect} organization_id=#{profile.organization_id.inspect} account_id=#{account.id.inspect} enc_state=#{enc_state.inspect}" }
 
         raise Keygen::Error::InvalidSingleSignOnError.new('state is not valid', code: 'SSO_STATE_INVALID')
       end
@@ -58,9 +72,9 @@ module Auth
         raise Keygen::Error::InvalidSingleSignOnError.new('environment was not found', code: 'SSO_ENVIRONMENT_NOT_FOUND')
       end
 
-      # workos recommends jit-provisioning: https://workos.com/docs/sso/jit-provisioning
+      # WorkOS recommends jit-provisioning: https://workos.com/docs/sso/jit-provisioning
       #
-      # 1. first, we attempt to lookup the user by their workos profile.
+      # 1. first, we attempt to lookup the user by their WorkOS profile.
       # 2. next, we attempt to lookup the user by their email.
       # 3. otherwise, jit-provision a new user in the env.
       #
