@@ -46,7 +46,7 @@ class PruneEventLogsWorker < BaseWorker
 
     @hi_vol_event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS).ids
     @cutoff_end_date       = BACKLOG_DAYS.days.ago.to_date
-    @cutoff_start_date     = EventLog.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    @cutoff_start_date     = EventLog.unordered.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
     @start_time            = Time.parse(ts)
 
     Keygen.logger.info "[workers.prune-event-logs] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"

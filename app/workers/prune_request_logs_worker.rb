@@ -14,7 +14,7 @@ class PruneRequestLogsWorker < BaseWorker
       BACKLOG_DAYS <= 0 # never prune -- keep request backlog forever
 
     @cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
-    @cutoff_start_date = RequestLog.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    @cutoff_start_date = RequestLog.unordered.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
     @start_time        = Time.parse(ts)
 
     Keygen.logger.info "[workers.prune-request-logs] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"

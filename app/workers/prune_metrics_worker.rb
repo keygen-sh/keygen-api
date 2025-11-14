@@ -14,7 +14,7 @@ class PruneMetricsWorker < BaseWorker
       BACKLOG_DAYS <= 0 # never prune -- keep metrics backlog forever
 
     @cutoff_end_date   = BACKLOG_DAYS.days.ago.to_date
-    @cutoff_start_date = Metric.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
+    @cutoff_start_date = Metric.unordered.where(created_date: ..cutoff_end_date).minimum(:created_date) || cutoff_end_date
     @start_time        = Time.parse(ts)
 
     Keygen.logger.info "[workers.prune-metrics] Starting: start=#{start_time} cutoff_start=#{cutoff_start_date} cutoff_end=#{cutoff_end_date}"
