@@ -84,13 +84,13 @@ class PruneEventLogsWorker < BaseWorker
   end
 
   def dedup_hi_vol_event_logs_for_date(account, date:)
-    hi_vol_event_logs = account.event_logs.where(
+    hi_vol_event_logs = account.event_logs.unordered.where(
       event_type_id: hi_vol_event_type_ids,
       created_date: date,
     )
 
     # partition and rank to dedup high volume events within retention period
-    ranked_event_logs = hi_vol_event_logs.unordered.select(<<~SQL.squish)
+    ranked_event_logs = hi_vol_event_logs.select(<<~SQL.squish)
       event_logs.id,
       event_logs.created_at,
       ROW_NUMBER() OVER (
@@ -147,7 +147,7 @@ class PruneEventLogsWorker < BaseWorker
   end
 
   def prune_event_logs_for_date(account, date:)
-    event_logs = account.event_logs.where(created_date: date)
+    event_logs = account.event_logs.unordered.where(created_date: date)
 
     total = event_logs.count
     sum   = 0

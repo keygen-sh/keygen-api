@@ -48,7 +48,7 @@ class PruneRequestLogsWorker < BaseWorker
     return if
       within_retention_period?(account, date:)
 
-    request_logs = account.request_logs.where(created_date: date)
+    request_logs = account.request_logs.unordered.where(created_date: date)
 
     total = request_logs.count
     sum   = 0
