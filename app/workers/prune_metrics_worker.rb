@@ -45,7 +45,7 @@ class PruneMetricsWorker < BaseWorker
               :start_time
 
   def prune_metrics_for_date(account, date:)
-    metrics = account.metrics.where(created_date: date)
+    metrics = account.metrics.unordered.where(created_date: date)
 
     total = metrics.count
     sum   = 0
