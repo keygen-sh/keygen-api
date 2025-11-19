@@ -2533,7 +2533,7 @@ Feature: Generate authentication token
           "header": "Authorization"
         },
         "links": {
-          "redirect": "https://api.workos.test/sso/authorize?domain_hint=keygen.example&login_hint=zeke@keygen.example"
+          "redirect": "https://api.workos.test/sso/authorize?domain_hint=keygen.example&login_hint=zeke@keygen.example&state=eyJlbWFpbCI6Inpla2VAa2V5Z2VuLmV4YW1wbGUiLCJlbnZpcm9ubWVudF9pZCI6bnVsbH0"
         }
       }
       """

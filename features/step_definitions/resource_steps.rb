@@ -160,8 +160,11 @@ Given /^the current account has the following attributes:$/ do |body|
 end
 
 Given /^the current account has SSO (?:configured|stubbed) for "([^\"]*)"$/ do |domain|
-  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, **|
-    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}"
+  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, state:, **|
+    dec = Keygen::EE::SSO.decrypt_state(state, secret_key: @account.secret_key)
+    enc = Base64.urlsafe_encode64(dec.to_json, padding: false)
+
+    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}&state=#{enc}"
   end
 
   @account.update!(
@@ -171,11 +174,14 @@ Given /^the current account has SSO (?:configured|stubbed) for "([^\"]*)"$/ do |
 end
 
 Given /^the account "([^\"]*)" has SSO (?:configured|stubbed) for "([^\"]*)"$/ do |id, domain|
-  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, **|
-    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}"
-  end
-
   account = FindByAliasService.call(Account, id:, aliases: :slug)
+
+  allow(WorkOS::SSO).to receive(:authorization_url).and_wrap_original do |*, domain_hint:, login_hint:, state:, **|
+    dec = Keygen::EE::SSO.decrypt_state(state, secret_key: account.secret_key)
+    enc = Base64.urlsafe_encode64(dec.to_json, padding: false)
+
+    "https://api.workos.test/sso/authorize?domain_hint=#{domain_hint}&login_hint=#{login_hint}&state=#{enc}"
+  end
 
   account.update!(
     sso_organization_id: account.sso_organization_id.presence || "test_org_#{SecureRandom.hex}",

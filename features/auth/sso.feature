@@ -974,7 +974,7 @@ Feature: SSO
     And time is frozen at "2552-02-28T00:00:00.000Z"
     When I send a GET request to "//auth.keygen.sh/sso?code=test_123"
     Then the response status should be "303"
-    And the response headers should contain "Location" with "https://api.workos.test/sso/authorize?domain_hint=lumon.example&login_hint=mark@lumon.example"
+    And the response headers should contain "Location" with "https://api.workos.test/sso/authorize?domain_hint=lumon.example&login_hint=mark@lumon.example&state=eyJlbWFpbCI6Im1hcmtAbHVtb24uZXhhbXBsZSIsImVudmlyb25tZW50X2lkIjpudWxsfQ"
     And the response headers should not contain "Set-Cookie"
     And there should be 0 "sessions"
     And time is unfrozen
