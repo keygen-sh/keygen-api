@@ -59,7 +59,7 @@ gem 'ar_lazy_preload', '~> 2.0'
 gem 'strong_migrations'
 gem 'verbose_migrations'
 gem 'temporary_tables'
-gem 'statement_timeout'
+gem 'statement_timeout', '~> 1.1'
 gem 'union_of'
 gem 'order_as_specified'
 

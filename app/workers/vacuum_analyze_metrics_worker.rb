@@ -5,7 +5,7 @@ class VacuumAnalyzeMetricsWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    Metric.statement_timeout(STATEMENT_TIMEOUT) do |conn|
+    Metric.statement_timeout(STATEMENT_TIMEOUT, mode: :session) do |conn|
       conn.execute 'VACUUM ANALYZE metrics'
     end
   end

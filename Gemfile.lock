@@ -494,7 +494,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     stackprof (0.2.26)
-    statement_timeout (1.0.0)
+    statement_timeout (1.1.0)
       rails (>= 6.0)
     statsd-ruby (1.5.0)
     stringio (3.1.7)
@@ -617,7 +617,7 @@ DEPENDENCIES
   sidekiq-cronitor (~> 3.6.0)
   sprockets (~> 3.0)
   stackprof
-  statement_timeout
+  statement_timeout (~> 1.1)
   stripe (~> 5.43)
   stripe-ruby-mock!
   strong_migrations

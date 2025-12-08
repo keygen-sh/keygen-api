@@ -5,7 +5,7 @@ class VacuumAnalyzeWebhookEventsWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    WebhookEvent.statement_timeout(STATEMENT_TIMEOUT) do |conn|
+    WebhookEvent.statement_timeout(STATEMENT_TIMEOUT, mode: :session) do |conn|
       conn.execute 'VACUUM ANALYZE webhook_events'
     end
   end
