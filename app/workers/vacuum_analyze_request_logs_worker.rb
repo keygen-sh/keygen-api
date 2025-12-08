@@ -5,7 +5,7 @@ class VacuumAnalyzeRequestLogsWorker < BaseWorker
                   cronitor_disabled: false
 
   def perform
-    RequestLog.statement_timeout(STATEMENT_TIMEOUT) do |conn|
+    RequestLog.statement_timeout(STATEMENT_TIMEOUT, mode: :session) do |conn|
       conn.execute 'VACUUM ANALYZE request_logs'
     end
   end
