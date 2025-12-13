@@ -82,7 +82,7 @@ module Api::V1::Environments::Relationships
     def set_environment
       scoped_environments = authorized_scope(current_account.environments)
 
-      @environment = scoped_environments.find(params[:environment_id])
+      @environment = FindByAliasService.call(scoped_environments, id: params[:environment_id], aliases: :code)
 
       Current.resource = environment
     end

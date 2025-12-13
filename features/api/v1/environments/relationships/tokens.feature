@@ -22,7 +22,7 @@ Feature: Generate authentication token for environment
     When I send a GET request to "/accounts/test1/environments/$0/tokens"
     Then the response status should be "403"
 
-  Scenario: Isolated admin generates a token for an isolated environment
+  Scenario: Isolated admin generates a token for an isolated environment (by ID)
     Given the current account is "test1"
     And the current account has 1 isolated "environment"
     And the current account has 1 isolated "admin"
@@ -33,6 +33,54 @@ Feature: Generate authentication token for environment
       { "Keygen-Environment": "isolated" }
       """
     When I send a POST request to "/accounts/test1/environments/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Isolated Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response body should be a "token" with the following relationships:
+      """
+      {
+        "environment": {
+          "links": { "related": "/v1/accounts/$account/environments/$environments[0]" },
+          "data": { "type": "environments", "id": "$environments[0]" }
+        }
+      }
+      """
+    And the response body should be a "token" with the following attributes:
+      """
+      {
+        "name": "Isolated Token",
+        "kind": "environment-token",
+        "expiry": null
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the response should contain the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Isolated admin generates a token for an isolated environment (by code)
+    Given the current account is "test1"
+    And the current account has 1 isolated "environment"
+    And the current account has 1 isolated "admin"
+    And I am the last admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Environment": "isolated" }
+      """
+    When I send a POST request to "/accounts/test1/environments/isolated/tokens" with the following:
       """
       {
         "data": {
