@@ -4,8 +4,11 @@ module Keygen
   module OpenAPI
     module Writer
       class RefResolver
-        def initialize
+        attr_reader :monolithic
+
+        def initialize(monolithic: false)
           @refs = {}
+          @monolithic = monolithic
         end
 
         # Register a reference
@@ -20,9 +23,13 @@ module Keygen
           @refs[name] || "./#{category}/#{name}.yaml"
         end
 
-        # Build a $ref object
-        def build_ref(name, category: 'schemas/objects')
-          { '$ref' => ref(name, category: category) }
+        # Build a $ref object or inline schema depending on mode
+        def build_ref(name, category: 'schemas/objects', inline_schema: nil)
+          if monolithic && inline_schema
+            inline_schema
+          else
+            { '$ref' => ref(name, category: category) }
+          end
         end
       end
     end

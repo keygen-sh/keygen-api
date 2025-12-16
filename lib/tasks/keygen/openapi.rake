@@ -8,13 +8,14 @@ namespace :keygen do
 
       output_dir = ENV.fetch('OUTPUT_DIR', 'openapi')
       edition = ENV.fetch('EDITION', 'both').to_sym # :ce, :ee, :both
+      monolithic = ENV.fetch('MONOLITHIC', 'false').downcase == 'true'
 
       generator = Keygen::OpenAPI::Generator.new(
         output_dir: output_dir,
         logger: Keygen.logger
       )
 
-      generator.generate(edition: edition)
+      generator.generate(edition: edition, monolithic: monolithic)
 
       Keygen.logger.info "OpenAPI specs written to #{output_dir}/"
     rescue => e

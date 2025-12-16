@@ -31,8 +31,8 @@ module Keygen
         @schemas = {}
       end
 
-      def generate(edition: :both)
-        logger.info "Starting OpenAPI spec generation for edition: #{edition}"
+      def generate(edition: :both, monolithic: false)
+        logger.info "Starting OpenAPI spec generation for edition: #{edition}#{monolithic ? ' (monolithic)' : ''}"
 
         # Phase 1: Parse all sources
         parse_routes
@@ -45,12 +45,12 @@ module Keygen
         # Phase 3: Write output
         case edition
         when :ce
-          write_ce_spec
+          write_ce_spec(monolithic: monolithic)
         when :ee
-          write_ee_spec
+          write_ee_spec(monolithic: monolithic)
         when :both
-          write_ce_spec
-          write_ee_spec
+          write_ce_spec(monolithic: monolithic)
+          write_ee_spec(monolithic: monolithic)
         end
 
         logger.info "OpenAPI spec generation completed"
@@ -107,24 +107,26 @@ module Keygen
         # This method can be expanded to pre-build common schemas
       end
 
-      def write_ce_spec
-        logger.info "Writing CE specification..."
-        writer = Writer::YamlWriter.new(output_dir, edition: :ce)
-        spec_builder = Writer::SpecBuilder.new(@routes, @controllers, @serializers, edition: :ce)
+      def write_ce_spec(monolithic: false)
+        logger.info "Writing CE specification#{monolithic ? ' (monolithic)' : ''}..."
+        writer = Writer::YamlWriter.new(output_dir, edition: :ce, monolithic: monolithic)
+        spec_builder = Writer::SpecBuilder.new(@routes, @controllers, @serializers, edition: :ce, monolithic: monolithic)
 
         spec = spec_builder.build
         writer.write(spec)
-        logger.info "CE spec written to #{output_dir}/openapi.yaml"
+        filename = monolithic ? 'openapi-monolithic.yaml' : 'openapi.yaml'
+        logger.info "CE spec written to #{output_dir}/#{filename}"
       end
 
-      def write_ee_spec
-        logger.info "Writing EE specification..."
-        writer = Writer::YamlWriter.new(output_dir, edition: :ee)
-        spec_builder = Writer::SpecBuilder.new(@routes, @controllers, @serializers, edition: :ee)
+      def write_ee_spec(monolithic: false)
+        logger.info "Writing EE specification#{monolithic ? ' (monolithic)' : ''}..."
+        writer = Writer::YamlWriter.new(output_dir, edition: :ee, monolithic: monolithic)
+        spec_builder = Writer::SpecBuilder.new(@routes, @controllers, @serializers, edition: :ee, monolithic: monolithic)
 
         spec = spec_builder.build
         writer.write(spec)
-        logger.info "EE spec written to #{output_dir}/openapi-ee.yaml"
+        filename = monolithic ? 'openapi-ee-monolithic.yaml' : 'openapi-ee.yaml'
+        logger.info "EE spec written to #{output_dir}/#{filename}"
       end
     end
   end

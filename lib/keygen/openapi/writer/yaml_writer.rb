@@ -7,14 +7,37 @@ module Keygen
   module OpenAPI
     module Writer
       class YamlWriter
-        attr_reader :output_dir, :edition
+        attr_reader :output_dir, :edition, :monolithic
 
-        def initialize(output_dir, edition: :ce)
+        def initialize(output_dir, edition: :ce, monolithic: false)
           @output_dir = Pathname.new(output_dir)
           @edition = edition
+          @monolithic = monolithic
         end
 
         def write(spec)
+          if monolithic
+            write_monolithic_spec(spec)
+          else
+            write_split_spec(spec)
+          end
+        end
+
+        def write_monolithic_spec(spec)
+          # Create output directory
+          FileUtils.mkdir_p(output_dir)
+
+          # Build complete monolithic spec
+          complete_spec = build_monolithic_spec(spec)
+
+          # Write single file
+          filename = edition == :ce ? 'openapi-monolithic.yaml' : 'openapi-ee-monolithic.yaml'
+          path = output_dir.join(filename)
+
+          File.write(path, complete_spec.to_yaml)
+        end
+
+        def write_split_spec(spec)
           # Create directory structure
           create_directories
 
@@ -101,6 +124,62 @@ module Keygen
             path = output_dir.join('responses', "#{name}.yaml")
             File.write(path, response_spec.to_yaml)
           end
+        end
+
+        def build_monolithic_spec(spec)
+          # Start with the root spec
+          complete_spec = Marshal.load(Marshal.dump(spec[:root]))
+
+          # Inline paths
+          if spec[:paths]
+            spec[:paths].each do |path_key, path_data|
+              complete_spec['paths'][path_key] = path_data
+            end
+          end
+
+          # Inline schemas into components
+          if spec[:schemas]
+            complete_spec['components'] ||= {}
+            complete_spec['components']['schemas'] ||= {}
+
+            spec[:schemas].each do |category, category_schemas|
+              category_schemas.each do |name, schema|
+                complete_spec['components']['schemas'][name] = schema
+              end
+            end
+          end
+
+          # Inline common schemas
+          if spec[:common_schemas]
+            complete_spec['components'] ||= {}
+            complete_spec['components']['schemas'] ||= {}
+
+            spec[:common_schemas].each do |name, schema|
+              complete_spec['components']['schemas'][name] = schema
+            end
+          end
+
+          # Inline parameters
+          if spec[:parameters]
+            complete_spec['components'] ||= {}
+            complete_spec['components']['parameters'] ||= {}
+
+            spec[:parameters].each do |name, param_spec|
+              complete_spec['components']['parameters'][name] = param_spec
+            end
+          end
+
+          # Inline responses
+          if spec[:responses]
+            complete_spec['components'] ||= {}
+            complete_spec['components']['responses'] ||= {}
+
+            spec[:responses].each do |name, response_spec|
+              complete_spec['components']['responses'][name] = response_spec
+            end
+          end
+
+          complete_spec
         end
 
         def path_to_filename(path)

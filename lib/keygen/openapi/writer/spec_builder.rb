@@ -6,28 +6,40 @@ module Keygen
       class SpecBuilder
         CURRENT_API_VERSION = '1.7'
 
-        attr_reader :routes, :controllers, :serializers, :edition
+        attr_reader :routes, :controllers, :serializers, :edition, :monolithic
 
-        def initialize(routes, controllers, serializers, edition: :ce)
+        def initialize(routes, controllers, serializers, edition: :ce, monolithic: false)
           @routes = routes
           @controllers = controllers
           @serializers = serializers
           @edition = edition
-          @ref_resolver = RefResolver.new
+          @monolithic = monolithic
+          @ref_resolver = RefResolver.new(monolithic: monolithic)
           @param_builder = Schema::ParameterSchemaBuilder.new
           @request_builder = Schema::RequestBodyBuilder.new
           @response_builder = Schema::ResponseSchemaBuilder.new(edition: edition)
         end
 
         def build
-          {
-            root: build_root_spec,
-            common_schemas: build_common_schemas,
-            paths: build_paths_data,
-            schemas: {},
-            parameters: build_common_parameters,
-            responses: build_common_responses
-          }
+          if monolithic
+            {
+              root: build_monolithic_root_spec,
+              common_schemas: build_common_schemas_data,
+              paths: build_paths_data,
+              schemas: build_schemas_data,
+              parameters: build_common_parameters_data,
+              responses: build_common_responses_data
+            }
+          else
+            {
+              root: build_root_spec,
+              common_schemas: build_common_schemas,
+              paths: build_paths_data,
+              schemas: {},
+              parameters: build_common_parameters,
+              responses: build_common_responses
+            }
+          end
         end
 
         private
@@ -42,6 +54,25 @@ module Keygen
               'schemas' => build_schema_refs,
               'parameters' => build_parameter_refs,
               'responses' => build_response_refs,
+              'securitySchemes' => build_security_schemes
+            },
+            'security' => [
+              { 'BearerAuth' => [] }
+            ],
+            'tags' => build_tags
+          }
+        end
+
+        def build_monolithic_root_spec
+          {
+            'openapi' => '3.1.0',
+            'info' => build_info,
+            'servers' => build_servers,
+            'paths' => {}, # Will be inlined by YamlWriter
+            'components' => {
+              'schemas' => {}, # Will be inlined by YamlWriter
+              'parameters' => {}, # Will be inlined by YamlWriter
+              'responses' => {}, # Will be inlined by YamlWriter
               'securitySchemes' => build_security_schemes
             },
             'security' => [
@@ -133,6 +164,23 @@ module Keygen
           {
             'AccountIdParameter' => { '$ref' => './parameters/AccountIdParameter.yaml' },
             'IdParameter' => { '$ref' => './parameters/IdParameter.yaml' },
+            'MachineComponentIdParameter' => { '$ref' => './parameters/MachineComponentIdParameter.yaml' },
+            'MachineProcessIdParameter' => { '$ref' => './parameters/MachineProcessIdParameter.yaml' },
+            'UserIdParameter' => { '$ref' => './parameters/UserIdParameter.yaml' },
+            'KeyIdParameter' => { '$ref' => './parameters/KeyIdParameter.yaml' },
+            'LicenseIdParameter' => { '$ref' => './parameters/LicenseIdParameter.yaml' },
+            'MachineIdParameter' => { '$ref' => './parameters/MachineIdParameter.yaml' },
+            'PolicyIdParameter' => { '$ref' => './parameters/PolicyIdParameter.yaml' },
+            'ProductIdParameter' => { '$ref' => './parameters/ProductIdParameter.yaml' },
+            'ReleaseIdParameter' => { '$ref' => './parameters/ReleaseIdParameter.yaml' },
+            'GroupIdParameter' => { '$ref' => './parameters/GroupIdParameter.yaml' },
+            'EnvironmentIdParameter' => { '$ref' => './parameters/EnvironmentIdParameter.yaml' },
+            'FilenameParameter' => { '$ref' => './parameters/FilenameParameter.yaml' },
+            'PackageParameter' => { '$ref' => './parameters/PackageParameter.yaml' },
+            'ArtifactParameter' => { '$ref' => './parameters/ArtifactParameter.yaml' },
+            'DigestParameter' => { '$ref' => './parameters/DigestParameter.yaml' },
+            'GemParameter' => { '$ref' => './parameters/GemParameter.yaml' },
+            'ReferenceParameter' => { '$ref' => './parameters/ReferenceParameter.yaml' },
             'PageNumberParameter' => { '$ref' => './parameters/PageNumberParameter.yaml' },
             'PageSizeParameter' => { '$ref' => './parameters/PageSizeParameter.yaml' }
           }
@@ -180,6 +228,22 @@ module Keygen
           Schema::CommonSchemas.all
         end
 
+        def build_common_schemas_data
+          build_common_schemas
+        end
+
+        def build_schemas_data
+          {} # For now, empty - can be expanded if needed
+        end
+
+        def build_common_parameters_data
+          build_common_parameters
+        end
+
+        def build_common_responses_data
+          build_common_responses
+        end
+
         def build_common_parameters
           {
             'AccountIdParameter' => {
@@ -195,6 +259,125 @@ module Keygen
               'required' => true,
               'schema' => { 'type' => 'string' },
               'description' => 'The unique identifier for the resource'
+            },
+            'MachineComponentIdParameter' => {
+              'name' => 'machine_component_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the machine component'
+            },
+            'MachineProcessIdParameter' => {
+              'name' => 'machine_process_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the machine process'
+            },
+            'UserIdParameter' => {
+              'name' => 'user_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the user'
+            },
+            'KeyIdParameter' => {
+              'name' => 'key_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the key'
+            },
+            'LicenseIdParameter' => {
+              'name' => 'license_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the license'
+            },
+            'MachineIdParameter' => {
+              'name' => 'machine_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the machine'
+            },
+            'PolicyIdParameter' => {
+              'name' => 'policy_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the policy'
+            },
+            'ProductIdParameter' => {
+              'name' => 'product_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the product'
+            },
+            'ReleaseIdParameter' => {
+              'name' => 'release_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the release'
+            },
+            'GroupIdParameter' => {
+              'name' => 'group_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the group'
+            },
+            'EnvironmentIdParameter' => {
+              'name' => 'environment_id',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The unique identifier for the environment'
+            },
+            'FilenameParameter' => {
+              'name' => 'filename',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The filename'
+            },
+            'PackageParameter' => {
+              'name' => 'package',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The package name'
+            },
+            'ArtifactParameter' => {
+              'name' => 'artifact',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The artifact identifier'
+            },
+            'DigestParameter' => {
+              'name' => 'digest',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The digest hash'
+            },
+            'GemParameter' => {
+              'name' => 'gem',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The gem name'
+            },
+            'ReferenceParameter' => {
+              'name' => 'reference',
+              'in' => 'path',
+              'required' => true,
+              'schema' => { 'type' => 'string' },
+              'description' => 'The reference identifier'
             },
             'PageNumberParameter' => {
               'name' => 'page[number]',
@@ -276,6 +459,7 @@ module Keygen
 
         def build_operation(route)
           operation = {
+            'summary' => build_operation_summary(route),
             'responses' => build_operation_responses(route)
           }
 
@@ -291,6 +475,24 @@ module Keygen
           operation
         end
 
+        def build_operation_summary(route)
+          resource = extract_resource_type(route) || 'resource'
+          action = route[:action]
+
+          case route[:verb]
+          when :get
+            action == 'index' ? "List #{resource.pluralize}" : "Retrieve #{resource.singularize}"
+          when :post
+            "Create #{resource.singularize}"
+          when :put, :patch
+            "Update #{resource.singularize}"
+          when :delete
+            "Delete #{resource.singularize}"
+          else
+            "#{route[:verb].to_s.capitalize} #{resource}"
+          end
+        end
+
         def build_operation_parameters(route)
           params = []
 
@@ -299,19 +501,47 @@ module Keygen
             param_ref = case param_name
                         when 'account_id' then 'AccountIdParameter'
                         when 'id' then 'IdParameter'
+                        when 'machine_component_id' then 'MachineComponentIdParameter'
+                        when 'machine_process_id' then 'MachineProcessIdParameter'
+                        when 'user_id' then 'UserIdParameter'
+                        when 'key_id' then 'KeyIdParameter'
+                        when 'license_id' then 'LicenseIdParameter'
+                        when 'machine_id' then 'MachineIdParameter'
+                        when 'policy_id' then 'PolicyIdParameter'
+                        when 'product_id' then 'ProductIdParameter'
+                        when 'release_id' then 'ReleaseIdParameter'
+                        when 'group_id' then 'GroupIdParameter'
+                        when 'environment_id' then 'EnvironmentIdParameter'
+                        when 'filename' then 'FilenameParameter'
+                        when 'package' then 'PackageParameter'
+                        when 'artifact' then 'ArtifactParameter'
+                        when 'digest' then 'DigestParameter'
+                        when 'gem' then 'GemParameter'
+                        when 'reference' then 'ReferenceParameter'
                         else "#{param_name.camelize}Parameter"
                         end
 
-            params << { '$ref' => "#/components/parameters/#{param_ref}" }
+            if monolithic
+              # Inline the parameter definition
+              param_def = build_common_parameters[param_ref]
+              params << param_def if param_def
+            else
+              params << { '$ref' => "#/components/parameters/#{param_ref}" }
+            end
           end
 
           # Add common query parameters for GET requests
           if route[:verb] == :get
-            params << { '$ref' => '#/components/parameters/PageNumberParameter' }
-            params << { '$ref' => '#/components/parameters/PageSizeParameter' }
+            if monolithic
+              params << build_common_parameters['PageNumberParameter']
+              params << build_common_parameters['PageSizeParameter']
+            else
+              params << { '$ref' => '#/components/parameters/PageNumberParameter' }
+              params << { '$ref' => '#/components/parameters/PageSizeParameter' }
+            end
           end
 
-          params
+          params.compact
         end
 
         def build_operation_responses(route)
@@ -331,18 +561,30 @@ module Keygen
           # Add error responses
           %w[400 401 403 404 422 429 500].each do |code|
             error_name = error_code_to_name(code)
-            responses[code] = { '$ref' => "#/components/responses/#{error_name}" }
+            if monolithic
+              # Inline the response definition
+              response_def = build_common_responses[error_name]
+              responses[code] = response_def if response_def
+            else
+              responses[code] = { '$ref' => "#/components/responses/#{error_name}" }
+            end
           end
 
           responses
         end
 
         def build_request_body(route)
+          schema_ref = if monolithic
+                        build_common_schemas['JsonApiDocument']
+                      else
+                        { '$ref' => '#/components/schemas/JsonApiDocument' }
+                      end
+
           {
             'required' => true,
             'content' => {
               'application/vnd.api+json' => {
-                'schema' => { '$ref' => '#/components/schemas/JsonApiDocument' }
+                'schema' => schema_ref
               }
             }
           }
