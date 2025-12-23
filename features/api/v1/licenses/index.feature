@@ -1038,6 +1038,130 @@ Feature: List license
     And the response body should be an array with 0 "licenses"
     And time is unfrozen
 
+  Scenario: Admin retrieves all licenses expired within the last 31 days (duration)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T12:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-01-10T12:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-05-10T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-08-01T12:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expired[within]=31d"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves all licenses expired in the last 31 days (duration)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T12:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-01-10T12:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-05-10T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-08-01T12:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expired[in]=31d"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves all licenses expired before a timestamp (ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T12:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-01-10T12:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-05-10T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-08-01T12:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expired[before]=2022-05-10T13:00:01.000Z"
+    Then the response status should be "200"
+    And the response body should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves all licenses expired after a timestamp (unix)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T12:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-01-10T12:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-05-10T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-08-01T12:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expired[after]=1652313600"
+    Then the response status should be "200"
+    And the response body should be an array with 1 "license"
+    And time is unfrozen
+
   Scenario: Admin retrieves licenses with activity inside the last 30 days (simple ISO)
     Given I am an admin of account "test1"
     And the current account is "test1"

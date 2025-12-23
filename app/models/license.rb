@@ -573,11 +573,34 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry < ? OR expiry > ?', Time.current, 3.days.from_now
     end
   }
-  scope :expired, -> (status = true) {
-    if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'expiry IS NOT NULL AND expiry < ?', Time.current
-    else
-      where 'expiry IS NULL OR expiry >= ?', Time.current
+  scope :expired, -> (status = true, within: nil, in: nil, before: nil, after: nil) {
+    within ||= binding.local_variable_get(:in)
+
+    begin
+      case
+      when within.present?
+        s = within.to_s.match?(/\A\d+\z/) ? "PT#{within.to_s}S".upcase : "P#{within.to_s.delete_prefix('P').upcase}"
+        d = ActiveSupport::Duration.parse(s)
+
+        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, d.ago
+      when before.present?
+        t = before.to_s.match?(/\A\d+\z/) ? Time.at(before.to_i) : before.to_time
+
+        where 'expiry IS NOT NULL AND expiry < ? AND expiry <= ?', Time.current, t
+      when after.present?
+        t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
+
+        where 'expiry IS NOT NULL AND expiry < ? AND expiry >= ?', Time.current, t
+      else
+        if ActiveRecord::Type::Boolean.new.cast(status) # general expired/unexpired scopes
+          where 'expiry IS NOT NULL AND expiry < ?', Time.current
+        else
+          where 'expiry IS NULL OR expiry >= ?', Time.current
+        end
+      end
+    rescue ActiveSupport::Duration::ISO8601Parser::ParsingError,
+           ArgumentError # to_time raises for invalid input
+      none
     end
   }
   scope :expires, -> (within: nil, in: nil, before: nil, after: nil) {

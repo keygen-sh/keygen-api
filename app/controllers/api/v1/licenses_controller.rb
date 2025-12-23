@@ -18,7 +18,13 @@ module Api::V1
     }
     has_scope :suspended
     has_scope :expiring
-    has_scope :expired
+    has_scope(:expired, type: :any, only: :index) { |c, s, v|
+      if v in Hash
+        s.expired(**v.symbolize_keys.slice(:within, :in, :before, :after))
+      else
+        s.expired(v)
+      end
+    }
     has_scope :unassigned
     has_scope :assigned
     has_scope :activated
