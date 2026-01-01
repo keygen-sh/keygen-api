@@ -280,7 +280,7 @@ describe DualWrites do
           expect(record.data).to eq 'new'
         end
 
-        it 'should create record on replica if not exists' do
+        it 'should not insert if record does not exist' do
           record_id = 999_998
           attrs = { 'id' => record_id, 'name' => 'new', 'data' => 'created', 'created_at' => Time.current, 'updated_at' => Time.current }
 
@@ -294,10 +294,9 @@ describe DualWrites do
               attributes: attrs,
               replica: 'analytics',
             )
-          }.to change { model.count }.by(1)
+          }.not_to change { model.count }
 
-          created = model.find_by(id: record_id)
-          expect(created.name).to eq 'new'
+          expect(model.find_by(id: record_id)).to be_nil
         end
       end
 
@@ -336,6 +335,232 @@ describe DualWrites do
             )
           }.to raise_error(DualWrites::ReplicationError, /unknown operation/)
         end
+      end
+    end
+
+    describe '#perform with resolve_with' do
+      temporary_table :resolved_records do |t|
+        t.string :name
+        t.text :data
+        t.timestamps
+      end
+
+      temporary_model :resolved_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :updated_at
+      end
+
+      let(:resolved_model) { ResolvedRecord }
+      let(:job) { DualWrites::ReplicationJob.new }
+
+      context 'when record does not exist' do
+        it 'should insert new record' do
+          record_id = 888_888
+          now = Time.current
+          attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => now, 'updated_at' => now }
+
+          allow(resolved_model).to receive(:connected_to).and_yield
+
+          expect {
+            job.perform(
+              operation: 'create',
+              class_name: resolved_model.name,
+              primary_key: record_id,
+              attributes: attrs,
+              replica: 'analytics',
+            )
+          }.to change { resolved_model.count }.by(1)
+
+          expect(resolved_model.find_by(id: record_id).name).to eq 'new'
+        end
+      end
+
+      context 'when incoming data is newer' do
+        it 'should update existing record' do
+          old_time = 1.hour.ago
+          new_time = Time.current
+
+          record = resolved_model.create!(name: 'old', data: 'old', updated_at: old_time)
+
+          attrs = { 'name' => 'new', 'data' => 'new', 'created_at' => old_time, 'updated_at' => new_time }
+
+          allow(resolved_model).to receive(:connected_to).and_yield
+
+          job.perform(
+            operation: 'update',
+            class_name: resolved_model.name,
+            primary_key: record.id,
+            attributes: attrs,
+            replica: 'analytics',
+          )
+
+          record.reload
+          expect(record.name).to eq 'new'
+          expect(record.data).to eq 'new'
+        end
+      end
+
+      context 'when incoming data is older (out-of-order job)' do
+        it 'should skip stale update silently' do
+          old_time = 1.hour.ago
+          new_time = Time.current
+
+          record = resolved_model.create!(name: 'current', data: 'current', updated_at: new_time)
+
+          attrs = { 'name' => 'stale', 'data' => 'stale', 'created_at' => old_time, 'updated_at' => old_time }
+
+          allow(resolved_model).to receive(:connected_to).and_yield
+
+          # should not raise, just silently skip
+          job.perform(
+            operation: 'update',
+            class_name: resolved_model.name,
+            primary_key: record.id,
+            attributes: attrs,
+            replica: 'analytics',
+          )
+
+          record.reload
+          expect(record.name).to eq 'current'
+          expect(record.data).to eq 'current'
+        end
+      end
+
+      context 'when destroying with newer timestamp' do
+        it 'should delete the record' do
+          old_time = 1.hour.ago
+          record = resolved_model.create!(name: 'test', data: 'test', updated_at: old_time)
+          record_id = record.id
+
+          attrs = { 'updated_at' => Time.current }
+
+          allow(resolved_model).to receive(:connected_to).and_yield
+
+          expect {
+            job.perform(
+              operation: 'destroy',
+              class_name: resolved_model.name,
+              primary_key: record_id,
+              attributes: attrs,
+              replica: 'analytics',
+            )
+          }.to change { resolved_model.count }.by(-1)
+        end
+      end
+
+      context 'when destroying with older timestamp' do
+        it 'should skip stale deletion silently' do
+          new_time = Time.current
+          record = resolved_model.create!(name: 'test', data: 'test', updated_at: new_time)
+          record_id = record.id
+
+          attrs = { 'updated_at' => 1.hour.ago }
+
+          allow(resolved_model).to receive(:connected_to).and_yield
+
+          # should not raise, just silently skip
+          job.perform(
+            operation: 'destroy',
+            class_name: resolved_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            replica: 'analytics',
+          )
+
+          expect(resolved_model.find_by(id: record_id)).to be_present
+        end
+      end
+    end
+
+    describe '#perform with lock_version resolution' do
+      temporary_table :versioned_records do |t|
+        t.string :name
+        t.integer :lock_version, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :versioned_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :lock_version
+      end
+
+      let(:versioned_model) { VersionedRecord }
+      let(:job) { DualWrites::ReplicationJob.new }
+
+      it 'should apply update with higher lock_version' do
+        record = versioned_model.create!(name: 'v1', lock_version: 1)
+
+        attrs = { 'name' => 'v2', 'lock_version' => 2, 'created_at' => record.created_at, 'updated_at' => Time.current }
+
+        allow(versioned_model).to receive(:connected_to).and_yield
+
+        job.perform(
+          operation: 'update',
+          class_name: versioned_model.name,
+          primary_key: record.id,
+          attributes: attrs,
+          replica: 'analytics',
+        )
+
+        record.reload
+        expect(record.name).to eq 'v2'
+        expect(record.lock_version).to eq 2
+      end
+
+      it 'should skip update with lower lock_version silently' do
+        record = versioned_model.create!(name: 'v3', lock_version: 3)
+
+        attrs = { 'name' => 'v1', 'lock_version' => 1, 'created_at' => record.created_at, 'updated_at' => Time.current }
+
+        allow(versioned_model).to receive(:connected_to).and_yield
+
+        # should not raise, just silently skip
+        job.perform(
+          operation: 'update',
+          class_name: versioned_model.name,
+          primary_key: record.id,
+          attributes: attrs,
+          replica: 'analytics',
+        )
+
+        record.reload
+        expect(record.name).to eq 'v3'
+        expect(record.lock_version).to eq 3
+      end
+    end
+
+    describe 'resolve_with auto-detection' do
+      temporary_table :auto_resolve_with_lock_version_records do |t|
+        t.string :name
+        t.integer :lock_version, default: 0
+        t.timestamps
+      end
+
+      temporary_table :auto_resolve_with_updated_at_records do |t|
+        t.string :name
+        t.timestamps
+      end
+
+      temporary_model :auto_resolve_with_lock_version_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+      end
+
+      temporary_model :auto_resolve_with_updated_at_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+      end
+
+      it 'should prefer lock_version when present' do
+        expect(AutoResolveWithLockVersionRecord.dual_writes_config[:resolve_with]).to eq :lock_version
+      end
+
+      it 'should fall back to updated_at when lock_version not present' do
+        expect(AutoResolveWithUpdatedAtRecord.dual_writes_config[:resolve_with]).to eq :updated_at
       end
     end
   end

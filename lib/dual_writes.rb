@@ -30,6 +30,9 @@ module DualWrites
       # @param to [Symbol] the primary database shard (default: :primary)
       # @param replicates_to [Array<Symbol>] the replica shards to write to
       # @param async [Boolean] whether to replicate asynchronously via background job (default: true)
+      # @param resolve_with [Symbol, nil] column to use for conflict resolution (e.g., :updated_at).
+      #   When set, only applies changes if the incoming value is newer than the existing value.
+      #   This prevents out-of-order job execution from overwriting newer data with older data.
       #
       # @example
       #   class RequestLog < ApplicationRecord
@@ -45,17 +48,49 @@ module DualWrites
       #     dual_writes to: :primary, replicates_to: %i[analytics], async: false
       #   end
       #
-      def dual_writes(to: :primary, replicates_to:, async: true)
+      # @example with conflict resolution using lock_version (recommended for critical data)
+      #   class License < ApplicationRecord
+      #     include DualWrites::Model
+      #
+      #     dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :lock_version
+      #   end
+      #
+      # @example with auto-detected conflict resolution (uses lock_version if present, else updated_at)
+      #   class License < ApplicationRecord
+      #     include DualWrites::Model
+      #
+      #     dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+      #   end
+      #
+      def dual_writes(to: :primary, replicates_to:, async: true, resolve_with: nil)
         raise ConfigurationError, 'replicates_to must be an array of symbols' unless
           replicates_to.is_a?(Array) && replicates_to.all? { it.is_a?(Symbol) }
 
         raise ConfigurationError, 'replicates_to cannot be empty' if
           replicates_to.empty?
 
+        raise ConfigurationError, 'resolve_with must be a symbol or true' if
+          resolve_with.present? && !resolve_with.is_a?(Symbol) && resolve_with != true
+
+        # auto-detect resolution column: prefer lock_version, fall back to updated_at
+        resolved_column = case resolve_with
+                          when true
+                            if column_names.include?('lock_version')
+                              :lock_version
+                            elsif column_names.include?('updated_at')
+                              :updated_at
+                            else
+                              raise ConfigurationError, 'resolve_with: true requires lock_version or updated_at column'
+                            end
+                          when Symbol
+                            resolve_with
+                          end
+
         self.dual_writes_config = {
           primary: to,
           replicates_to: replicates_to,
           async: async,
+          resolve_with: resolved_column,
         }.freeze
       end
 
@@ -165,26 +200,70 @@ module DualWrites
         raise ConfigurationError, "#{class_name} is not configured for dual writes"
       end
 
-      replicate_to(operation.to_sym, klass, replica.to_sym, primary_key, attributes)
+      config = klass.dual_writes_config
+
+      replicate_to(operation.to_sym, klass, replica.to_sym, primary_key, attributes, resolve_with: config[:resolve_with])
     end
 
     private
 
-    def replicate_to(operation, klass, replica, primary_key, attributes)
+    def replicate_to(operation, klass, replica, primary_key, attributes, resolve_with: nil)
       klass.connected_to(role: :writing, shard: replica) do
         klass.transaction do
-          case operation
-          when :create, :update
-            klass.upsert(attributes.merge('id' => primary_key), unique_by: :id)
-          when :destroy
-            klass.where(id: primary_key).delete_all
+          if resolve_with.present?
+            replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
           else
-            raise ReplicationError, "unknown operation: #{operation}"
+            replicate_without_resolution(operation, klass, primary_key, attributes)
           end
         end
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{replica} not established: #{e.message}"
+    end
+
+    def replicate_without_resolution(operation, klass, primary_key, attributes)
+      case operation
+      when :create
+        klass.upsert(attributes.merge('id' => primary_key), unique_by: :id)
+      when :update
+        klass.where(id: primary_key).update_all(attributes.except('id'))
+      when :destroy
+        klass.where(id: primary_key).delete_all
+      else
+        raise ReplicationError, "unknown operation: #{operation}"
+      end
+    end
+
+    def replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
+      resolve_column    = resolve_with.to_s
+      incoming_resolved = attributes[resolve_column]
+
+      raise ConfigurationError, "resolve_with column #{resolve_column.inspect} not found in attributes" if
+        incoming_resolved.nil?
+
+      case operation
+      when :create
+        # insert, or update if conflict and incoming is newer
+        begin
+          klass.insert(attributes.merge('id' => primary_key))
+        rescue ActiveRecord::RecordNotUnique
+          klass.where(id: primary_key)
+               .where(klass.arel_table[resolve_column].lt(incoming_resolved))
+               .update_all(attributes.except('id'))
+        end
+      when :update
+        # only update if record exists and incoming is newer
+        klass.where(id: primary_key)
+             .where(klass.arel_table[resolve_column].lt(incoming_resolved))
+             .update_all(attributes.except('id'))
+      when :destroy
+        # only delete if record exists and incoming is newer or equal
+        klass.where(id: primary_key)
+             .where(klass.arel_table[resolve_column].lteq(incoming_resolved))
+             .delete_all
+      else
+        raise ReplicationError, "unknown operation: #{operation}"
+      end
     end
   end
 end
