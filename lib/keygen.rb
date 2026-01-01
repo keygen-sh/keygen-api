@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'keygen/console'
+require_relative 'keygen/database'
 require_relative 'keygen/ee'
 require_relative 'keygen/error'
 require_relative 'keygen/jsonapi'
@@ -40,7 +41,8 @@ module Keygen
     def revision = Version.revision
     def version  = Version.version
 
-    def logger = Logger
+    def database = Database
+    def logger   = Logger
 
     def console?   = Rails.const_defined?(:Console)
     def server?    = Rails.const_defined?(:Server) || puma?

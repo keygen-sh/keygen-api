@@ -1,4 +1,4 @@
-default: &default
+default: &postgres
   adapter: postgresql
   pool: <%= ENV['DB_POOL'] || (Sidekiq.server? ? ENV.fetch('SIDEKIQ_CONCURRENCY', 10) : ENV.fetch('RAILS_MAX_THREADS', 2)) %>
   timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
@@ -6,17 +6,50 @@ default: &default
   variables:
     statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"] || '15s' %>
 
+clickhouse: &clickhouse
+  adapter: clickhouse
+  keep_alive_timeout: <%= ENV['CLICKHOUSE_KEEP_ALIVE_TIMEOUT'] || 10 %>
+  read_timeout: <%= ENV['CLICKHOUSE_READ_TIMEOUT'] || 30 %>
+  write_timeout: <%= ENV['CLICKHOUSE_WRITE_TIMEOUT'] || 30 %>
+  migrations_paths: db/clickhouse
+
 development:
-  <<: *default
-  database: keygen_dev
+  primary: &primary_dev
+    <<: *postgres
+    url: <%= ENV['DATABASE_URL'] %>
+    database: keygen_dev
+  replica:
+    <<: *primary_dev
+    url: <%= ENV['REPLICA_DATABASE_URL'] %>
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
+    database: keygen_clickhouse_dev
+    debug: true
 
 test: &test
-  <<: *default
-  database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  primary: &primary_test
+    <<: *postgres
+    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  replica:
+    <<: *primary_test
+    url: <%= ENV['REPLICA_DATABASE_URL'] %>
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
+    database: keygen_clickhouse_test<%= ENV['TEST_ENV_NUMBER'] %>
 
 production:
-  <<: *default
-  url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
+  primary:
+    <<: *postgres
+    url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
+  replica:
+    <<: *postgres
+    url: <%= ENV['REPLICA_DATABASE_CONNECTION_POOL_URL'] || ENV['REPLICA_DATABASE_URL'] %>
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
 
-cucumber:
-  <<: *test

@@ -90,7 +90,7 @@ After do |scenario|
           error_log: $!&.backtrace || [],
           query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
             Elif.open(log_path) do |log|
-              count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 5 }.to_i
+              count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 25 }.to_i
               lines = []
 
               # Read the last n SQL lines from the log file (useful when debugging CI)
