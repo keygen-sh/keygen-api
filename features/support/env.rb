@@ -4,14 +4,7 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-# frozen_string_literal: true
-
 require 'cucumber/rails'
-
-# Capybara defaults to CSS3 selectors rather than XPath.
-# If you'd prefer to use XPath, just uncomment this line and adjust any
-# selectors in your step definitions to use the XPath syntax.
-# Capybara.default_selector = :xpath
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -33,7 +26,13 @@ ActionController::Base.allow_rescue = false
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
-  DatabaseCleaner.strategy = :transaction
+  Rails.application.eager_load!
+
+  # NB(ezekg) for integration tests, our database resolver will select the replica on GETs
+  #           so we need to use :deletion instead of :transaction, otherwise we can't read
+  #           the other connection's uncommitted transaction before rollback.
+  DatabaseCleaner[:active_record].strategy                  = [:deletion, except: %w[event_types permissions]]
+  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
@@ -52,3 +51,8 @@ end
 #     DatabaseCleaner.strategy = :transaction
 #   end
 #
+
+# Possible values are :truncation and :transaction
+# The :transaction strategy is faster, but might give you threading problems.
+# See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
+Cucumber::Rails::Database.javascript_strategy = :none

@@ -2,6 +2,8 @@
 
 module Api::V1
   class SearchesController < Api::V1::BaseController
+    use_read_replica
+
     class UnsupportedSearchTypeError < StandardError; end
     class EmptyQueryError < StandardError; end
 

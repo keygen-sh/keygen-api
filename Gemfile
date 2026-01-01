@@ -62,6 +62,7 @@ gem 'temporary_tables'
 gem 'statement_timeout', '~> 1.1'
 gem 'union_of'
 gem 'order_as_specified'
+gem 'clickhouse-activerecord', github: 'keygen-sh/clickhouse-activerecord', ref: 'c42088e9a265e54a5adace2b1fcfb59175362981'
 
 # Pattern matching
 gem 'rails-pattern_matching'

@@ -2,6 +2,9 @@
 
 module Api::V1::Licenses::Actions
   class ValidationsController < Api::V1::BaseController
+    prefer_read_replica only: %i[validate_by_id validate_by_key]
+    use_read_replica only: %i[quick_validate_by_id]
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[validate_by_key]

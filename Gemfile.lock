@@ -7,6 +7,15 @@ GIT
       activerecord (>= 6.0)
 
 GIT
+  remote: https://github.com/keygen-sh/clickhouse-activerecord.git
+  revision: c42088e9a265e54a5adace2b1fcfb59175362981
+  ref: c42088e9a265e54a5adace2b1fcfb59175362981
+  specs:
+    clickhouse-activerecord (1.5.1)
+      activerecord (>= 7.1, < 9.0)
+      bundler (>= 1.13.4)
+
+GIT
   remote: https://github.com/stripe-ruby-mock/stripe-ruby-mock.git
   revision: 6ceea9679bb573cb8bc6830f1bdf670b220a9859
   ref: 6ceea9679bb573cb8bc6830f1bdf670b220a9859
@@ -556,6 +565,7 @@ DEPENDENCIES
   bcrypt (= 3.1.17)
   bullet (~> 8)
   byebug
+  clickhouse-activerecord!
   compact_index
   cucumber (~> 10)
   cucumber-rails (~> 4)

@@ -2,6 +2,7 @@
 
 class EventLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[event_logs]]
+  include DualWrites::Model
   include Keygen::PortableClass
   include Environmental
   include Accountable
@@ -9,6 +10,9 @@ class EventLog < ApplicationRecord
   include Limitable
   include Orderable
   include Pageable
+
+  dual_writes to: :clickhouse, strategy: :clickhouse,
+    clickhouse_ttl: -> { Current.account&.event_log_retention_duration }
 
   belongs_to :event_type
   belongs_to :resource,

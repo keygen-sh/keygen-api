@@ -2,12 +2,16 @@
 
 class RequestLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[request_logs]]
+  include DualWrites::Model
   include Environmental
   include Accountable
   include DateRangeable
   include Limitable
   include Orderable
   include Pageable
+
+  dual_writes to: :clickhouse, strategy: :clickhouse,
+    clickhouse_ttl: -> { Current.account&.request_log_retention_duration }
 
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true

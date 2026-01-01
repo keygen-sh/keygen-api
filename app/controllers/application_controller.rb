@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include ReadYourOwnWrites::Controller
   include Rendering::JSON
   include CurrentRequestAttributes
   include DefaultUrlOptions

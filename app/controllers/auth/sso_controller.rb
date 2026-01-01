@@ -2,6 +2,8 @@
 
 module Auth
   class SsoController < Api::V1::BaseController
+    use_primary
+
     DEFAULT_SESSION_DURATION = 8.hours
 
     before_action :require_ee!
