@@ -18,5 +18,35 @@ production:
   <<: *default
   url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
 
+# Dual-write shards for replicating data to multiple databases.
+#
+# To enable dual writes, configure shards and update your model's
+# base class to use connects_to with the shards:
+#
+#   class ApplicationRecord < ActiveRecord::Base
+#     self.abstract_class = true
+#
+#     connects_to shards: {
+#       primary: { writing: :primary },
+#       logs: { writing: :logs },
+#     }
+#   end
+#
+# Then include DualWrites::Model in models that need replication:
+#
+#   class RequestLog < ApplicationRecord
+#     include DualWrites::Model
+#
+#     dual_writes to: :primary, replicates_to: %i[logs]
+#   end
+#
+# production:
+#   primary:
+#     <<: *default
+#     url: <%= ENV['DATABASE_URL'] %>
+#   logs:
+#     <<: *default
+#     url: <%= ENV['ANALYTICS_DATABASE_URL'] %>
+
 cucumber:
   <<: *test
