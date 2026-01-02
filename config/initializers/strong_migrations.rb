@@ -7,4 +7,7 @@ StrongMigrations.tap do |config|
   # timeouts
   config.lock_timeout      = 10.seconds
   config.statement_timeout = 1.hour
+
+  # skip unsupported databases
+  config.skip_database(:clickhouse)
 end
