@@ -231,7 +231,7 @@ module DualWrites
     private
 
     def replicate_to(operation, klass, shard, primary_key, attributes, strategy: :standard, resolve_with: nil)
-      klass.connected_to(role: :writing, shard:) do
+      ActiveRecord::Base.connected_to(role: :writing, shard:) do
         klass.transaction do
           case strategy
           when :append_only

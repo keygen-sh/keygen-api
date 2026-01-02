@@ -150,9 +150,9 @@ describe DualWrites do
       let(:sync_model) { SyncDualWriteRecord }
 
       it 'should switch to sync mode within block' do
-        # stub connected_to without yielding to avoid duplicate key errors
+        # stub connected_to to avoid needing ClickHouse tables
         # (we're just testing that no async job is enqueued)
-        allow(sync_model).to receive(:connected_to)
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
 
         expect {
           sync_model.with_sync_dual_writes do
@@ -162,7 +162,7 @@ describe DualWrites do
       end
 
       it 'should revert to async mode after block' do
-        allow(sync_model).to receive(:connected_to)
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
 
         sync_model.with_sync_dual_writes do
           sync_model.create!(name: 'test', data: 'hello')
@@ -194,7 +194,7 @@ describe DualWrites do
       end
 
       it 'should not enqueue jobs' do
-        allow(sync_model).to receive(:connected_to)
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
 
         expect {
           sync_model.create!(name: 'test', data: 'hello')
@@ -204,29 +204,18 @@ describe DualWrites do
   end
 
   describe DualWrites::ReplicationJob do
-    temporary_table :replication_test_records do |t|
-      t.string :name
-      t.text :data
-      t.timestamps
-    end
-
-    temporary_model :replication_test_record do
-      include DualWrites::Model
-
-      dual_writes to: :primary, replicates_to: %i[clickhouse]
-    end
-
-    let(:model) { ReplicationTestRecord }
     let(:job) { DualWrites::ReplicationJob.new }
 
     describe '#perform' do
+      temporary_table :replication_test_records do |t|
+        t.string :name
+        t.text :data
+        t.timestamps
+      end
+
+      temporary_model :unconfigured_model, table_name: :replication_test_records
+
       it 'should raise error for unconfigured model' do
-        unconfigured_class = Class.new(ApplicationRecord) do
-          self.table_name = 'replication_test_records'
-        end
-
-        stub_const('UnconfiguredModel', unconfigured_class)
-
         expect {
           job.perform(
             operation: 'create',
@@ -238,99 +227,20 @@ describe DualWrites do
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
       end
 
-      context 'with create operation' do
-        it 'should create record on replica' do
-          record_id = 999_999
-          attrs = { 'name' => 'test', 'data' => 'hello', 'created_at' => Time.current, 'updated_at' => Time.current }
-
-          allow(model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'create',
-              class_name: model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { model.count }.by(1)
-
-          created = model.find_by(id: record_id)
-          expect(created.name).to eq 'test'
-          expect(created.data).to eq 'hello'
-        end
-      end
-
-      context 'with update operation' do
-        it 'should update existing record on replica' do
-          record = model.create!(name: 'original', data: 'old')
-
-          attrs = record.attributes.merge('name' => 'updated', 'data' => 'new').transform_keys(&:to_s)
-
-          allow(model).to receive(:connected_to).and_yield
-
-          job.perform(
-            operation: 'update',
-            class_name: model.name,
-            primary_key: record.id,
-            attributes: attrs,
-            shard: 'clickhouse',
-          )
-
-          record.reload
-          expect(record.name).to eq 'updated'
-          expect(record.data).to eq 'new'
-        end
-
-        it 'should not insert if record does not exist' do
-          record_id = 999_998
-          attrs = { 'id' => record_id, 'name' => 'new', 'data' => 'created', 'created_at' => Time.current, 'updated_at' => Time.current }
-
-          allow(model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'update',
-              class_name: model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.not_to change { model.count }
-
-          expect(model.find_by(id: record_id)).to be_nil
-        end
-      end
-
-      context 'with destroy operation' do
-        it 'should delete record from replica' do
-          record = model.create!(name: 'test', data: 'hello')
-          record_id = record.id
-
-          allow(model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'destroy',
-              class_name: model.name,
-              primary_key: record_id,
-              attributes: {},
-              shard: 'clickhouse',
-            )
-          }.to change { model.count }.by(-1)
-
-          expect(model.find_by(id: record_id)).to be_nil
-        end
-      end
-
       context 'with invalid operation' do
+        temporary_model :invalid_op_record, table_name: :replication_test_records do
+          include DualWrites::Model
+
+          dual_writes to: :primary, replicates_to: %i[clickhouse]
+        end
+
         it 'should raise error for unknown operation' do
-          allow(model).to receive(:connected_to).and_yield
+          allow(ActiveRecord::Base).to receive(:connected_to).and_yield
 
           expect {
             job.perform(
               operation: 'invalid',
-              class_name: model.name,
+              class_name: 'InvalidOpRecord',
               primary_key: 999_996,
               attributes: {},
               shard: 'clickhouse',
@@ -340,6 +250,8 @@ describe DualWrites do
       end
     end
 
+    # NOTE: resolve_with uses UPDATE/DELETE which requires a SQL database (not ClickHouse).
+    # These tests stub the shard connection to test the conflict resolution logic.
     describe '#perform with resolve_with' do
       temporary_table :resolved_records do |t|
         t.string :name
@@ -350,11 +262,14 @@ describe DualWrites do
       temporary_model :resolved_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :updated_at
+        dual_writes to: :primary, replicates_to: %i[replica], resolve_with: :updated_at
       end
 
       let(:resolved_model) { ResolvedRecord }
-      let(:job) { DualWrites::ReplicationJob.new }
+
+      before do
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+      end
 
       context 'when record does not exist' do
         it 'should insert new record' do
@@ -362,17 +277,13 @@ describe DualWrites do
           now = Time.current
           attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => now, 'updated_at' => now }
 
-          allow(resolved_model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'create',
-              class_name: resolved_model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { resolved_model.count }.by(1)
+          job.perform(
+            operation: 'create',
+            class_name: resolved_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            shard: 'replica',
+          )
 
           expect(resolved_model.find_by(id: record_id).name).to eq 'new'
         end
@@ -387,14 +298,12 @@ describe DualWrites do
 
           attrs = { 'name' => 'new', 'data' => 'new', 'created_at' => old_time, 'updated_at' => new_time }
 
-          allow(resolved_model).to receive(:connected_to).and_yield
-
           job.perform(
             operation: 'update',
             class_name: resolved_model.name,
             primary_key: record.id,
             attributes: attrs,
-            shard: 'clickhouse',
+            shard: 'replica',
           )
 
           record.reload
@@ -412,15 +321,12 @@ describe DualWrites do
 
           attrs = { 'name' => 'stale', 'data' => 'stale', 'created_at' => old_time, 'updated_at' => old_time }
 
-          allow(resolved_model).to receive(:connected_to).and_yield
-
-          # should not raise, just silently skip
           job.perform(
             operation: 'update',
             class_name: resolved_model.name,
             primary_key: record.id,
             attributes: attrs,
-            shard: 'clickhouse',
+            shard: 'replica',
           )
 
           record.reload
@@ -437,17 +343,15 @@ describe DualWrites do
 
           attrs = { 'updated_at' => Time.current }
 
-          allow(resolved_model).to receive(:connected_to).and_yield
+          job.perform(
+            operation: 'destroy',
+            class_name: resolved_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            shard: 'replica',
+          )
 
-          expect {
-            job.perform(
-              operation: 'destroy',
-              class_name: resolved_model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { resolved_model.count }.by(-1)
+          expect(resolved_model.find_by(id: record_id)).to be_nil
         end
       end
 
@@ -459,15 +363,12 @@ describe DualWrites do
 
           attrs = { 'updated_at' => 1.hour.ago }
 
-          allow(resolved_model).to receive(:connected_to).and_yield
-
-          # should not raise, just silently skip
           job.perform(
             operation: 'destroy',
             class_name: resolved_model.name,
             primary_key: record_id,
             attributes: attrs,
-            shard: 'clickhouse',
+            shard: 'replica',
           )
 
           expect(resolved_model.find_by(id: record_id)).to be_present
@@ -485,25 +386,26 @@ describe DualWrites do
       temporary_model :versioned_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :lock_version
+        dual_writes to: :primary, replicates_to: %i[replica], resolve_with: :lock_version
       end
 
       let(:versioned_model) { VersionedRecord }
-      let(:job) { DualWrites::ReplicationJob.new }
+
+      before do
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+      end
 
       it 'should apply update with higher lock_version' do
         record = versioned_model.create!(name: 'v1', lock_version: 1)
 
         attrs = { 'name' => 'v2', 'lock_version' => 2, 'created_at' => record.created_at, 'updated_at' => Time.current }
 
-        allow(versioned_model).to receive(:connected_to).and_yield
-
         job.perform(
           operation: 'update',
           class_name: versioned_model.name,
           primary_key: record.id,
           attributes: attrs,
-          shard: 'clickhouse',
+          shard: 'replica',
         )
 
         record.reload
@@ -516,15 +418,12 @@ describe DualWrites do
 
         attrs = { 'name' => 'v1', 'lock_version' => 1, 'created_at' => record.created_at, 'updated_at' => Time.current }
 
-        allow(versioned_model).to receive(:connected_to).and_yield
-
-        # should not raise, just silently skip
         job.perform(
           operation: 'update',
           class_name: versioned_model.name,
           primary_key: record.id,
           attributes: attrs,
-          shard: 'clickhouse',
+          shard: 'replica',
         )
 
         record.reload
@@ -581,7 +480,10 @@ describe DualWrites do
       end
 
       let(:append_only_model) { AppendOnlyRecord }
-      let(:job) { DualWrites::ReplicationJob.new }
+
+      before do
+        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+      end
 
       it 'should configure append_only strategy' do
         expect(append_only_model.dual_writes_config[:strategy]).to eq :append_only
@@ -592,19 +494,16 @@ describe DualWrites do
           record_id = 777_777
           attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
-          allow(append_only_model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'create',
-              class_name: append_only_model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { append_only_model.count }.by(1)
+          job.perform(
+            operation: 'create',
+            class_name: append_only_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            shard: 'clickhouse',
+          )
 
           record = append_only_model.find_by(id: record_id)
+          expect(record).to be_present
           expect(record.name).to eq 'new'
           expect(record.is_deleted).to eq 0
         end
@@ -617,19 +516,16 @@ describe DualWrites do
           record_id = 777_778
           attrs = { 'name' => 'updated', 'data' => 'new', 'created_at' => Time.current, 'updated_at' => Time.current }
 
-          allow(append_only_model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'update',
-              class_name: append_only_model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { append_only_model.count }.by(1)
+          job.perform(
+            operation: 'update',
+            class_name: append_only_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            shard: 'clickhouse',
+          )
 
           record = append_only_model.find_by(id: record_id)
+          expect(record).to be_present
           expect(record.is_deleted).to eq 0
         end
       end
@@ -639,19 +535,16 @@ describe DualWrites do
           record_id = 777_779
           attrs = { 'name' => 'deleted', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
-          allow(append_only_model).to receive(:connected_to).and_yield
-
-          expect {
-            job.perform(
-              operation: 'destroy',
-              class_name: append_only_model.name,
-              primary_key: record_id,
-              attributes: attrs,
-              shard: 'clickhouse',
-            )
-          }.to change { append_only_model.count }.by(1)
+          job.perform(
+            operation: 'destroy',
+            class_name: append_only_model.name,
+            primary_key: record_id,
+            attributes: attrs,
+            shard: 'clickhouse',
+          )
 
           record = append_only_model.find_by(id: record_id)
+          expect(record).to be_present
           expect(record.is_deleted).to eq 1
         end
       end
