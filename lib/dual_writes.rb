@@ -30,39 +30,50 @@ module DualWrites
       # @param to [Symbol] the primary database shard (default: :primary)
       # @param replicates_to [Array<Symbol>] the replica shards to write to
       # @param async [Boolean] whether to replicate asynchronously via background job (default: true)
+      # @param strategy [Symbol] replication strategy - :standard (default) or :append_only.
+      #   Use :append_only for append-only databases like ClickHouse with ReplacingMergeTree.
+      #   In :append_only mode, all operations become inserts and deletes are skipped.
       # @param resolve_with [Symbol, nil] column to use for conflict resolution (e.g., :updated_at).
       #   When set, only applies changes if the incoming value is newer than the existing value.
       #   This prevents out-of-order job execution from overwriting newer data with older data.
+      #   Note: resolve_with is ignored when using :append_only strategy.
       #
       # @example
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[analytics]
+      #     dual_writes to: :primary, replicates_to: %i[clickhouse]
       #   end
       #
       # @example with synchronous replication
       #   class EventLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[analytics], async: false
+      #     dual_writes to: :primary, replicates_to: %i[clickhouse], async: false
+      #   end
+      #
+      # @example with insert-only strategy for ClickHouse (ReplacingMergeTree)
+      #   class RequestLog < ApplicationRecord
+      #     include DualWrites::Model
+      #
+      #     dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only
       #   end
       #
       # @example with conflict resolution using lock_version (recommended for critical data)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :lock_version
+      #     dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :lock_version
       #   end
       #
       # @example with auto-detected conflict resolution (uses lock_version if present, else updated_at)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+      #     dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: true
       #   end
       #
-      def dual_writes(to: :primary, replicates_to:, async: true, resolve_with: nil)
+      def dual_writes(to: :primary, replicates_to:, async: true, strategy: :standard, resolve_with: nil)
         raise ConfigurationError, 'replicates_to must be an array of symbols' unless
           replicates_to.is_a?(Array) && replicates_to.all? { it.is_a?(Symbol) }
 
@@ -71,6 +82,9 @@ module DualWrites
 
         raise ConfigurationError, 'resolve_with must be a symbol or true' if
           resolve_with.present? && !resolve_with.is_a?(Symbol) && resolve_with != true
+
+        raise ConfigurationError, 'strategy must be :standard or :append_only' unless
+          %i[standard append_only].include?(strategy)
 
         # auto-detect resolution column: prefer lock_version, fall back to updated_at
         resolved_column = case resolve_with
@@ -90,6 +104,7 @@ module DualWrites
           primary: to,
           replicates_to: replicates_to,
           async: async,
+          strategy: strategy,
           resolve_with: resolved_column,
         }.freeze
       end
@@ -155,13 +170,13 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:replicates_to].each do |replica|
+      config[:replicates_to].each do |shard|
         ReplicationJob.perform_later(
           operation: operation.to_s,
           class_name: self.class.name,
           primary_key: id,
           attributes: attrs,
-          replica: replica.to_s,
+          shard: shard.to_s,
         )
       end
     end
@@ -170,13 +185,13 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:replicates_to].each do |replica|
+      config[:replicates_to].each do |shard|
         ReplicationJob.perform_now(
           operation: operation.to_s,
           class_name: self.class.name,
           primary_key: id,
           attributes: attrs,
-          replica: replica.to_s,
+          shard: shard.to_s,
         )
       end
     end
@@ -193,7 +208,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, primary_key:, attributes:, replica:)
+    def perform(operation:, class_name:, primary_key:, attributes:, shard:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -202,23 +217,54 @@ module DualWrites
 
       config = klass.dual_writes_config
 
-      replicate_to(operation.to_sym, klass, replica.to_sym, primary_key, attributes, resolve_with: config[:resolve_with])
+      replicate_to(
+        operation.to_sym,
+        klass,
+        shard.to_sym,
+        primary_key,
+        attributes,
+        strategy: config[:strategy],
+        resolve_with: config[:resolve_with],
+      )
     end
 
     private
 
-    def replicate_to(operation, klass, replica, primary_key, attributes, resolve_with: nil)
-      klass.connected_to(role: :writing, shard: replica) do
+    def replicate_to(operation, klass, shard, primary_key, attributes, strategy: :standard, resolve_with: nil)
+      klass.connected_to(role: :writing, shard:) do
         klass.transaction do
-          if resolve_with.present?
-            replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
+          case strategy
+          when :append_only
+            replicate_append_only(operation, klass, primary_key, attributes)
+          when :standard
+            if resolve_with.present?
+              replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
+            else
+              replicate_without_resolution(operation, klass, primary_key, attributes)
+            end
           else
-            replicate_without_resolution(operation, klass, primary_key, attributes)
+            raise ReplicationError, "unknown strategy: #{strategy}"
           end
         end
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
-      raise ReplicationError, "connection to #{replica} not established: #{e.message}"
+      raise ReplicationError, "connection to #{shard} not established: #{e.message}"
+    end
+
+    # Insert-only replication for append-only databases like ClickHouse.
+    # All operations become inserts; updates insert new versions (ReplacingMergeTree handles dedup),
+    # and deletes are skipped (or could be handled via sign column in the future).
+    def replicate_append_only(operation, klass, primary_key, attributes)
+      case operation
+      when :create, :update
+        klass.insert(attributes.merge('id' => primary_key))
+      when :destroy
+        # no-op: append-only databases don't support deletes directly
+        # ClickHouse ReplacingMergeTree will keep the latest version
+        nil
+      else
+        raise ReplicationError, "unknown operation: #{operation}"
+      end
     end
 
     def replicate_without_resolution(operation, klass, primary_key, attributes)

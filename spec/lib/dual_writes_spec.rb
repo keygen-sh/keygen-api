@@ -26,7 +26,7 @@ describe DualWrites do
     temporary_model :dual_write_record do
       include DualWrites::Model
 
-      dual_writes to: :primary, replicates_to: %i[analytics]
+      dual_writes to: :primary, replicates_to: %i[clickhouse]
     end
 
     let(:model) { DualWriteRecord }
@@ -35,8 +35,10 @@ describe DualWrites do
       it 'should configure dual writes' do
         expect(model.dual_writes_config).to eq(
           primary: :primary,
-          replicates_to: [:analytics],
+          replicates_to: [:clickhouse],
           async: true,
+          strategy: :standard,
+          resolve_with: nil,
         )
       end
 
@@ -55,7 +57,7 @@ describe DualWrites do
           Class.new(ApplicationRecord) do
             include DualWrites::Model
 
-            dual_writes to: :primary, replicates_to: ['analytics']
+            dual_writes to: :primary, replicates_to: ['clickhouse']
           end
         }.to raise_error(DualWrites::ConfigurationError, /must be an array of symbols/)
       end
@@ -70,7 +72,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: an_instance_of(Integer),
           attributes: hash_including('name' => 'test', 'data' => 'hello'),
-          replica: 'analytics',
+          shard: 'clickhouse',
         )
       end
     end
@@ -86,7 +88,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record.id,
           attributes: hash_including('name' => 'updated'),
-          replica: 'analytics',
+          shard: 'clickhouse',
         )
       end
     end
@@ -103,7 +105,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record_id,
           attributes: an_instance_of(Hash),
-          replica: 'analytics',
+          shard: 'clickhouse',
         )
       end
     end
@@ -142,7 +144,7 @@ describe DualWrites do
       temporary_model :sync_dual_write_record, table_name: :dual_write_records do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], async: true
+        dual_writes to: :primary, replicates_to: %i[clickhouse], async: true
       end
 
       let(:sync_model) { SyncDualWriteRecord }
@@ -174,7 +176,7 @@ describe DualWrites do
       temporary_model :sync_replication_record, table_name: :dual_write_records do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], async: false
+        dual_writes to: :primary, replicates_to: %i[clickhouse], async: false
       end
 
       let(:sync_model) { SyncReplicationRecord }
@@ -211,7 +213,7 @@ describe DualWrites do
     temporary_model :replication_test_record do
       include DualWrites::Model
 
-      dual_writes to: :primary, replicates_to: %i[analytics]
+      dual_writes to: :primary, replicates_to: %i[clickhouse]
     end
 
     let(:model) { ReplicationTestRecord }
@@ -231,7 +233,7 @@ describe DualWrites do
             class_name: 'UnconfiguredModel',
             primary_key: 999_997,
             attributes: { 'name' => 'test' },
-            replica: 'analytics',
+            shard: 'clickhouse',
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
       end
@@ -249,7 +251,7 @@ describe DualWrites do
               class_name: model.name,
               primary_key: record_id,
               attributes: attrs,
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.to change { model.count }.by(1)
 
@@ -272,7 +274,7 @@ describe DualWrites do
             class_name: model.name,
             primary_key: record.id,
             attributes: attrs,
-            replica: 'analytics',
+            shard: 'clickhouse',
           )
 
           record.reload
@@ -292,7 +294,7 @@ describe DualWrites do
               class_name: model.name,
               primary_key: record_id,
               attributes: attrs,
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.not_to change { model.count }
 
@@ -313,7 +315,7 @@ describe DualWrites do
               class_name: model.name,
               primary_key: record_id,
               attributes: {},
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.to change { model.count }.by(-1)
 
@@ -331,7 +333,7 @@ describe DualWrites do
               class_name: model.name,
               primary_key: 999_996,
               attributes: {},
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.to raise_error(DualWrites::ReplicationError, /unknown operation/)
         end
@@ -348,7 +350,7 @@ describe DualWrites do
       temporary_model :resolved_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :updated_at
+        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :updated_at
       end
 
       let(:resolved_model) { ResolvedRecord }
@@ -368,7 +370,7 @@ describe DualWrites do
               class_name: resolved_model.name,
               primary_key: record_id,
               attributes: attrs,
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.to change { resolved_model.count }.by(1)
 
@@ -392,7 +394,7 @@ describe DualWrites do
             class_name: resolved_model.name,
             primary_key: record.id,
             attributes: attrs,
-            replica: 'analytics',
+            shard: 'clickhouse',
           )
 
           record.reload
@@ -418,7 +420,7 @@ describe DualWrites do
             class_name: resolved_model.name,
             primary_key: record.id,
             attributes: attrs,
-            replica: 'analytics',
+            shard: 'clickhouse',
           )
 
           record.reload
@@ -443,7 +445,7 @@ describe DualWrites do
               class_name: resolved_model.name,
               primary_key: record_id,
               attributes: attrs,
-              replica: 'analytics',
+              shard: 'clickhouse',
             )
           }.to change { resolved_model.count }.by(-1)
         end
@@ -465,7 +467,7 @@ describe DualWrites do
             class_name: resolved_model.name,
             primary_key: record_id,
             attributes: attrs,
-            replica: 'analytics',
+            shard: 'clickhouse',
           )
 
           expect(resolved_model.find_by(id: record_id)).to be_present
@@ -483,7 +485,7 @@ describe DualWrites do
       temporary_model :versioned_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: :lock_version
+        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :lock_version
       end
 
       let(:versioned_model) { VersionedRecord }
@@ -501,7 +503,7 @@ describe DualWrites do
           class_name: versioned_model.name,
           primary_key: record.id,
           attributes: attrs,
-          replica: 'analytics',
+          shard: 'clickhouse',
         )
 
         record.reload
@@ -522,7 +524,7 @@ describe DualWrites do
           class_name: versioned_model.name,
           primary_key: record.id,
           attributes: attrs,
-          replica: 'analytics',
+          shard: 'clickhouse',
         )
 
         record.reload
@@ -546,13 +548,13 @@ describe DualWrites do
       temporary_model :auto_resolve_with_lock_version_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: true
       end
 
       temporary_model :auto_resolve_with_updated_at_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[analytics], resolve_with: true
+        dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: true
       end
 
       it 'should prefer lock_version when present' do
@@ -561,6 +563,104 @@ describe DualWrites do
 
       it 'should fall back to updated_at when lock_version not present' do
         expect(AutoResolveWithUpdatedAtRecord.dual_writes_config[:resolve_with]).to eq :updated_at
+      end
+    end
+
+    describe '#perform with append_only strategy' do
+      temporary_table :append_only_records do |t|
+        t.string :name
+        t.text :data
+        t.timestamps
+      end
+
+      temporary_model :append_only_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only
+      end
+
+      let(:append_only_model) { AppendOnlyRecord }
+      let(:job) { DualWrites::ReplicationJob.new }
+
+      it 'should configure append_only strategy' do
+        expect(append_only_model.dual_writes_config[:strategy]).to eq :append_only
+      end
+
+      context 'with create operation' do
+        it 'should insert record' do
+          record_id = 777_777
+          attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
+
+          allow(append_only_model).to receive(:connected_to).and_yield
+
+          expect {
+            job.perform(
+              operation: 'create',
+              class_name: append_only_model.name,
+              primary_key: record_id,
+              attributes: attrs,
+              shard: 'clickhouse',
+            )
+          }.to change { append_only_model.count }.by(1)
+
+          expect(append_only_model.find_by(id: record_id).name).to eq 'new'
+        end
+      end
+
+      context 'with update operation' do
+        it 'should insert new version (append-only)' do
+          # In insert-only mode, updates insert new rows rather than updating existing ones
+          # ClickHouse ReplacingMergeTree will deduplicate based on the version column
+          record_id = 777_778
+          attrs = { 'name' => 'updated', 'data' => 'new', 'created_at' => Time.current, 'updated_at' => Time.current }
+
+          allow(append_only_model).to receive(:connected_to).and_yield
+
+          expect {
+            job.perform(
+              operation: 'update',
+              class_name: append_only_model.name,
+              primary_key: record_id,
+              attributes: attrs,
+              shard: 'clickhouse',
+            )
+          }.to change { append_only_model.count }.by(1)
+        end
+      end
+
+      context 'with destroy operation' do
+        it 'should be a no-op (skip deletion)' do
+          record = append_only_model.create!(name: 'test', data: 'hello')
+          record_id = record.id
+
+          allow(append_only_model).to receive(:connected_to).and_yield
+
+          expect {
+            job.perform(
+              operation: 'destroy',
+              class_name: append_only_model.name,
+              primary_key: record_id,
+              attributes: {},
+              shard: 'clickhouse',
+            )
+          }.not_to change { append_only_model.count }
+
+          expect(append_only_model.find_by(id: record_id)).to be_present
+        end
+      end
+    end
+
+    describe 'strategy validation' do
+      it 'should raise error for invalid strategy' do
+        expect {
+          Class.new(ApplicationRecord) do
+            self.table_name = 'replication_test_records'
+
+            include DualWrites::Model
+
+            dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :invalid
+          end
+        }.to raise_error(DualWrites::ConfigurationError, /strategy must be :standard or :append_only/)
       end
     end
   end

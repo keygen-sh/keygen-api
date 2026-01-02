@@ -13,13 +13,19 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
+  connects_to shards: {
+    primary: { writing: :primary, reading: :replica },
+    replica: { reading: :replica },
+    clickhouse: { writing: :clickhouse },
+  }
+
   # FIXME(ezekg) Not sure why this isn't already happening by Rails?
   #              We could also do def destroying? = _destroy.
   before_destroy :mark_for_destruction,
     prepend: true
 
   default_scope -> {
-    # FIXME(ezekg) why do we need an explciit table_name everywhere?
+    # FIXME(ezekg) why do we need an explicit table_name everywhere?
     order("#{table_name}.created_at": DEFAULT_SORT_ORDER)
   }
 

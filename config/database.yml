@@ -1,4 +1,4 @@
-default: &default
+default: &postgres
   adapter: postgresql
   pool: <%= ENV['DB_POOL'] || (Sidekiq.server? ? ENV.fetch('SIDEKIQ_CONCURRENCY', 10) : ENV.fetch('RAILS_MAX_THREADS', 2)) %>
   timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
@@ -6,47 +6,51 @@ default: &default
   variables:
     statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"] || '15s' %>
 
+clickhouse: &clickhouse
+  migrations_paths: db/clickhouse
+  # FIXME(ezekg) parse DATABASE_CLICKHOUSE_URL?
+  database: default
+  username: default
+  password: clickhouse
+
 development:
-  <<: *default
-  database: keygen_dev
+  primary:
+    <<: *postgres
+    database: keygen_dev
+  replica:
+    <<: *postgres
+    database: keygen_dev
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    adapter: clickhouse
+    database: keygen_dev
 
 test: &test
-  <<: *default
-  database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  primary:
+    <<: *postgres
+    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  replica:
+    <<: *postgres
+    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    adapter: clickhouse
+    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
 
 production:
-  <<: *default
-  url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
-
-# Dual-write shards for replicating data to multiple databases.
-#
-# To enable dual writes, configure shards and update your model's
-# base class to use connects_to with the shards:
-#
-#   class ApplicationRecord < ActiveRecord::Base
-#     self.abstract_class = true
-#
-#     connects_to shards: {
-#       primary: { writing: :primary },
-#       logs: { writing: :logs },
-#     }
-#   end
-#
-# Then include DualWrites::Model in models that need replication:
-#
-#   class RequestLog < ApplicationRecord
-#     include DualWrites::Model
-#
-#     dual_writes to: :primary, replicates_to: %i[logs]
-#   end
-#
-# production:
-#   primary:
-#     <<: *default
-#     url: <%= ENV['DATABASE_URL'] %>
-#   logs:
-#     <<: *default
-#     url: <%= ENV['ANALYTICS_DATABASE_URL'] %>
+  primary:
+    <<: *postgres
+    url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
+  replica:
+    <<: *postgres
+    url: <%= ENV['REPLICA_DATABASE_CONNECTION_POOL_URL'] || ENV['REPLICA_DATABASE_URL'] %>
+    replica: true
+  clickhouse:
+    <<: *clickhouse
+    adapter: clickhouse
+    url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
 
 cucumber:
   <<: *test
