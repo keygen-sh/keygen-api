@@ -5,6 +5,29 @@ module DualWrites
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
 
+  # Registry of abstract base classes for each shard.
+  # e.g., DualWrites.base_class_for(:clickhouse) returns an abstract class
+  # that connects to the :clickhouse shard.
+  @base_classes = {}
+
+  class << self
+    def base_class_for(shard)
+      @base_classes[shard] ||= begin
+        class_name = "#{shard.to_s.camelize}Record"
+
+        # Create and name the class first (Rails requires a name for connects_to)
+        base = Class.new(ActiveRecord::Base)
+        const_set(class_name, base)
+
+        # Now configure it
+        base.abstract_class = true
+        base.connects_to database: { writing: shard }
+
+        base
+      end
+    end
+  end
+
   # Concern to be included in models that need dual writing
   module Model
     extend ActiveSupport::Concern
@@ -99,6 +122,24 @@ module DualWrites
                           when Symbol
                             resolve_with
                           end
+
+        # Auto-generate replica model classes for each shard.
+        # e.g., RequestLog with replicates_to: [:clickhouse] creates RequestLog::Clickhouse
+        # that inherits from DualWrites::ClickhouseRecord and has its own schema cache.
+        replicates_to.each do |shard|
+          replica_class_name = shard.to_s.camelize
+
+          next if const_defined?(replica_class_name, false)
+
+          base_class = DualWrites.base_class_for(shard)
+          table = table_name
+
+          replica_class = Class.new(base_class) do
+            self.table_name = table
+          end
+
+          const_set(replica_class_name, replica_class)
+        end
 
         self.dual_writes_config = {
           primary: to,
@@ -231,22 +272,24 @@ module DualWrites
     private
 
     def replicate_to(operation, klass, shard, primary_key, attributes, strategy: :standard, resolve_with: nil)
-      ActiveRecord::Base.connected_to(role: :writing, shard:) do
-        case strategy
-        when :append_only
-          # No transaction needed for append-only (ClickHouse doesn't support them)
-          replicate_append_only(operation, klass, primary_key, attributes)
-        when :standard
-          klass.transaction do
-            if resolve_with.present?
-              replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
-            else
-              replicate_without_resolution(operation, klass, primary_key, attributes)
-            end
+      # Get the auto-generated replica class (e.g., RequestLog::Clickhouse)
+      # which connects directly to the shard and has its own schema cache.
+      replica_class = klass.const_get(shard.to_s.camelize)
+
+      case strategy
+      when :append_only
+        # No transaction needed for append-only (ClickHouse doesn't support them)
+        replicate_append_only(operation, replica_class, primary_key, attributes)
+      when :standard
+        replica_class.transaction do
+          if resolve_with.present?
+            replicate_with_resolution(operation, replica_class, primary_key, attributes, resolve_with)
+          else
+            replicate_without_resolution(operation, replica_class, primary_key, attributes)
           end
-        else
-          raise ReplicationError, "unknown strategy: #{strategy}"
         end
+      else
+        raise ReplicationError, "unknown strategy: #{strategy}"
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{shard} not established: #{e.message}"

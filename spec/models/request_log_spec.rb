@@ -118,14 +118,12 @@ describe RequestLog, type: :model do
         expect(primary_record).to be_present
 
         # Verify record exists in replica (ClickHouse)
-        ActiveRecord::Base.connected_to(shard: :clickhouse, role: :writing) do
-          replica_record = RequestLog.find_by(id: request_log.id)
-          expect(replica_record).to be_present
-          expect(replica_record.account_id).to eq request_log.account_id
-          expect(replica_record.method).to eq request_log.method
-          expect(replica_record.url).to eq request_log.url
-          expect(replica_record.is_deleted).to eq 0
-        end
+        replica_record = RequestLog::Clickhouse.find_by(id: request_log.id)
+        expect(replica_record).to be_present
+        expect(replica_record.account_id).to eq request_log.account_id
+        expect(replica_record.method).to eq request_log.method
+        expect(replica_record.url).to eq request_log.url
+        expect(replica_record.is_deleted).to eq 0
       end
     end
   end

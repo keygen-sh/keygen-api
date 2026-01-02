@@ -123,15 +123,13 @@ describe EventLog, type: :model do
         expect(primary_record).to be_present
 
         # Verify record exists in replica (ClickHouse)
-        ActiveRecord::Base.connected_to(shard: :clickhouse, role: :writing) do
-          replica_record = EventLog.find_by(id: event_log.id)
-          expect(replica_record).to be_present
-          expect(replica_record.account_id).to eq event_log.account_id
-          expect(replica_record.event_type_id).to eq event_log.event_type_id
-          expect(replica_record.resource_type).to eq event_log.resource_type
-          expect(replica_record.resource_id).to eq event_log.resource_id
-          expect(replica_record.is_deleted).to eq 0
-        end
+        replica_record = EventLog::Clickhouse.find_by(id: event_log.id)
+        expect(replica_record).to be_present
+        expect(replica_record.account_id).to eq event_log.account_id
+        expect(replica_record.event_type_id).to eq event_log.event_type_id
+        expect(replica_record.resource_type).to eq event_log.resource_type
+        expect(replica_record.resource_id).to eq event_log.resource_id
+        expect(replica_record.is_deleted).to eq 0
       end
     end
   end
