@@ -2,6 +2,7 @@
 
 class EventLog < ApplicationRecord
   include Keygen::EE::ProtectedClass[entitlements: %i[event_logs]]
+  include DualWrites::Model
   include Keygen::PortableClass
   include Environmental
   include Accountable
@@ -9,6 +10,8 @@ class EventLog < ApplicationRecord
   include Limitable
   include Orderable
   include Pageable
+
+  dual_writes replicates_to: %i[clickhouse], strategy: :append_only
 
   belongs_to :event_type
   belongs_to :resource,
