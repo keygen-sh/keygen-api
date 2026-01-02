@@ -3,46 +3,46 @@
 class CreateRequestLogs < ActiveRecord::Migration[7.2]
   def up
     create_table :request_logs, id: false,
-      options: "ReplacingMergeTree(_version) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
+      options: "ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
       force: :cascade do |t|
-      # identifiers (null: false prevents gem from auto-wrapping in Nullable)
-      t.column :id, "UUID", null: false
-      t.column :account_id, "UUID", null: false
-      t.column :environment_id, "Nullable(UUID)", null: false
+      # identifiers
+      t.uuid :id, null: false
+      t.uuid :account_id, null: false
+      t.uuid :environment_id, null: true
 
       # timestamps
-      t.column :created_at, "DateTime64(3, 'UTC')", null: false
-      t.column :updated_at, "DateTime64(3, 'UTC')", null: false
-      t.column :created_date, "Date", null: false
+      t.datetime :created_at, precision: 3, null: false
+      t.datetime :updated_at, precision: 3, null: false
+      t.date :created_date, null: false
 
       # request metadata
-      t.column :method, "LowCardinality(Nullable(String))", null: false
-      t.column :status, "LowCardinality(Nullable(String))", null: false
-      t.column :url, "Nullable(String)", null: false
-      t.column :ip, "Nullable(String)", null: false
-      t.column :user_agent, "Nullable(String)", null: false
+      t.string :method, low_cardinality: true, null: true
+      t.string :status, low_cardinality: true, null: true
+      t.string :url, null: true
+      t.string :ip, null: true
+      t.string :user_agent, null: true
 
       # polymorphic requestor
-      t.column :requestor_type, "LowCardinality(Nullable(String))", null: false
-      t.column :requestor_id, "Nullable(UUID)", null: false
+      t.string :requestor_type, low_cardinality: true, null: true
+      t.uuid :requestor_id, null: true
 
       # polymorphic resource
-      t.column :resource_type, "LowCardinality(Nullable(String))", null: false
-      t.column :resource_id, "Nullable(UUID)", null: false
+      t.string :resource_type, low_cardinality: true, null: true
+      t.uuid :resource_id, null: true
 
       # bodies (often excluded from queries via without_blobs scope)
-      t.column :request_body, "Nullable(String)", null: false
-      t.column :request_headers, "Nullable(String)", null: false
-      t.column :response_body, "Nullable(String)", null: false
-      t.column :response_headers, "Nullable(String)", null: false
-      t.column :response_signature, "Nullable(String)", null: false
+      t.text :request_body, null: true
+      t.text :request_headers, null: true
+      t.text :response_body, null: true
+      t.text :response_headers, null: true
+      t.text :response_signature, null: true
 
       # performance metrics
-      t.column :queue_time, "Nullable(Float64)", null: false
-      t.column :run_time, "Nullable(Float64)", null: false
+      t.float :queue_time, null: true
+      t.float :run_time, null: true
 
       # version for ReplacingMergeTree deduplication
-      t.column :_version, "UInt64 DEFAULT toUnixTimestamp64Milli(now64(3))", null: false
+      t.datetime :ver, null: false, default: -> { 'now()' }
     end
 
     # secondary indexes

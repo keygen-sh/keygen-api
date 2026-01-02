@@ -10,5 +10,63 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 0) do
+ActiveRecord::Schema[8.1].define(version: 1767378080) do
+  # TABLE: event_logs
+  # SQL: CREATE TABLE event_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `event_type_id` UUID, `request_log_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `resource_type` LowCardinality(String), `resource_id` UUID, `whodunnit_type` LowCardinality(Nullable(String)), `whodunnit_id` Nullable(UUID), `idempotency_key` Nullable(String), `metadata` Nullable(String), `ver` DateTime DEFAULT now(), INDEX idx_event_type event_type_id TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_whodunnit (whodunnit_type, whodunnit_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_request_log request_log_id TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_idempotency idempotency_key TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id) SETTINGS index_granularity = 8192
+  create_table "event_logs", id: :uuid, options: "ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id) SETTINGS index_granularity = 8192", force: :cascade do |t|
+    t.uuid "id", null: false
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.uuid "event_type_id", null: false
+    t.uuid "request_log_id"
+    t.datetime "created_at", precision: 3, null: false
+    t.datetime "updated_at", precision: 3, null: false
+    t.date "created_date", null: false
+    t.string "resource_type", low_cardinality: true, null: false
+    t.uuid "resource_id", null: false
+    t.string "whodunnit_type", low_cardinality: true
+    t.uuid "whodunnit_id"
+    t.string "idempotency_key"
+    t.string "metadata"
+    t.datetime "ver", precision: nil, default: -> { "now()" }, null: false
+
+    t.index "event_type_id", name: "idx_event_type", type: "bloom_filter", granularity: 4
+    t.index "request_log_id", name: "idx_request_log", type: "bloom_filter", granularity: 4
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
+    t.index "idempotency_key", name: "idx_idempotency", type: "bloom_filter", granularity: 4
+  end
+
+  # TABLE: request_logs
+  # SQL: CREATE TABLE request_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `method` LowCardinality(Nullable(String)), `status` LowCardinality(Nullable(String)), `url` Nullable(String), `ip` Nullable(String), `user_agent` Nullable(String), `requestor_type` LowCardinality(Nullable(String)), `requestor_id` Nullable(UUID), `resource_type` LowCardinality(Nullable(String)), `resource_id` Nullable(UUID), `request_body` Nullable(String), `request_headers` Nullable(String), `response_body` Nullable(String), `response_headers` Nullable(String), `response_signature` Nullable(String), `queue_time` Nullable(Float32), `run_time` Nullable(Float32), `ver` DateTime DEFAULT now(), INDEX idx_status status TYPE set(100) GRANULARITY 4, INDEX idx_method method TYPE set(20) GRANULARITY 4, INDEX idx_requestor (requestor_type, requestor_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_ip ip TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id) SETTINGS index_granularity = 8192
+  create_table "request_logs", id: :uuid, options: "ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id) SETTINGS index_granularity = 8192", force: :cascade do |t|
+    t.uuid "id", null: false
+    t.uuid "account_id", null: false
+    t.uuid "environment_id"
+    t.datetime "created_at", precision: 3, null: false
+    t.datetime "updated_at", precision: 3, null: false
+    t.date "created_date", null: false
+    t.string "method", low_cardinality: true
+    t.string "status", low_cardinality: true
+    t.string "url"
+    t.string "ip"
+    t.string "user_agent"
+    t.string "requestor_type", low_cardinality: true
+    t.uuid "requestor_id"
+    t.string "resource_type", low_cardinality: true
+    t.uuid "resource_id"
+    t.string "request_body"
+    t.string "request_headers"
+    t.string "response_body"
+    t.string "response_headers"
+    t.string "response_signature"
+    t.float "queue_time"
+    t.float "run_time"
+    t.datetime "ver", precision: nil, default: -> { "now()" }, null: false
+
+    t.index "status", name: "idx_status", type: "set(100)", granularity: 4
+    t.index "method", name: "idx_method", type: "set(20)", granularity: 4
+    t.index "ip", name: "idx_ip", type: "bloom_filter", granularity: 4
+    t.index "environment_id", name: "idx_environment", type: "bloom_filter", granularity: 4
+  end
+
 end

@@ -3,34 +3,34 @@
 class CreateEventLogs < ActiveRecord::Migration[7.2]
   def up
     create_table :event_logs, id: false,
-      options: "ReplacingMergeTree(_version) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
+      options: "ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
       force: :cascade do |t|
-      # identifiers (null: false prevents gem from auto-wrapping in Nullable)
-      t.column :id, "UUID", null: false
-      t.column :account_id, "UUID", null: false
-      t.column :environment_id, "Nullable(UUID)", null: false
-      t.column :event_type_id, "UUID", null: false
-      t.column :request_log_id, "Nullable(UUID)", null: false
+      # identifiers
+      t.uuid :id, null: false
+      t.uuid :account_id, null: false
+      t.uuid :environment_id, null: true
+      t.uuid :event_type_id, null: false
+      t.uuid :request_log_id, null: true
 
       # timestamps
-      t.column :created_at, "DateTime64(3, 'UTC')", null: false
-      t.column :updated_at, "DateTime64(3, 'UTC')", null: false
-      t.column :created_date, "Date", null: false
+      t.datetime :created_at, precision: 3, null: false
+      t.datetime :updated_at, precision: 3, null: false
+      t.date :created_date, null: false
 
       # polymorphic resource (required)
-      t.column :resource_type, "LowCardinality(String)", null: false
-      t.column :resource_id, "UUID", null: false
+      t.string :resource_type, low_cardinality: true, null: false
+      t.uuid :resource_id, null: false
 
       # polymorphic whodunnit (optional)
-      t.column :whodunnit_type, "LowCardinality(Nullable(String))", null: false
-      t.column :whodunnit_id, "Nullable(UUID)", null: false
+      t.string :whodunnit_type, low_cardinality: true, null: true
+      t.uuid :whodunnit_id, null: true
 
       # event data
-      t.column :idempotency_key, "Nullable(String)", null: false
-      t.column :metadata, "Nullable(String)", null: false
+      t.string :idempotency_key, null: true
+      t.text :metadata, null: true
 
       # version for ReplacingMergeTree deduplication
-      t.column :_version, "UInt64 DEFAULT toUnixTimestamp64Milli(now64(3))", null: false
+      t.datetime :ver, null: false, default: -> { 'now()' }
     end
 
     # secondary indexes
