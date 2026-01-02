@@ -232,19 +232,20 @@ module DualWrites
 
     def replicate_to(operation, klass, shard, primary_key, attributes, strategy: :standard, resolve_with: nil)
       ActiveRecord::Base.connected_to(role: :writing, shard:) do
-        klass.transaction do
-          case strategy
-          when :append_only
-            replicate_append_only(operation, klass, primary_key, attributes)
-          when :standard
+        case strategy
+        when :append_only
+          # No transaction needed for append-only (ClickHouse doesn't support them)
+          replicate_append_only(operation, klass, primary_key, attributes)
+        when :standard
+          klass.transaction do
             if resolve_with.present?
               replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
             else
               replicate_without_resolution(operation, klass, primary_key, attributes)
             end
-          else
-            raise ReplicationError, "unknown strategy: #{strategy}"
           end
+        else
+          raise ReplicationError, "unknown strategy: #{strategy}"
         end
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
@@ -255,13 +256,16 @@ module DualWrites
     # All operations become inserts; updates insert new versions (ReplacingMergeTree handles dedup),
     # and deletes insert a tombstone row with is_deleted = 1.
     def replicate_append_only(operation, klass, primary_key, attributes)
+      # Serialize any non-primitive values to JSON for ClickHouse compatibility
+      serialized = attributes.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
+
       case operation
       when :create, :update
-        klass.insert(attributes.merge('id' => primary_key, 'is_deleted' => 0))
+        klass.insert!(serialized.merge('id' => primary_key, 'is_deleted' => 0))
       when :destroy
         # Insert a tombstone row with is_deleted = 1
         # ReplacingMergeTree(ver, is_deleted) will handle cleanup
-        klass.insert(attributes.merge('id' => primary_key, 'is_deleted' => 1))
+        klass.insert!(serialized.merge('id' => primary_key, 'is_deleted' => 1))
       else
         raise ReplicationError, "unknown operation: #{operation}"
       end
