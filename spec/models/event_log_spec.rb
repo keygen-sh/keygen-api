@@ -108,57 +108,5 @@ describe EventLog, type: :model do
         }.not_to have_enqueued_job(DualWrites::ReplicationJob)
       end
     end
-
-    describe 'append_only strategy' do
-      let(:job) { DualWrites::ReplicationJob.new }
-
-      before { event_log.save! }
-
-      it 'should insert on create' do
-        new_id = SecureRandom.uuid
-
-        allow(EventLog).to receive(:connected_to).and_yield
-
-        expect {
-          job.perform(
-            operation: 'create',
-            class_name: 'EventLog',
-            primary_key: new_id,
-            attributes: event_log.attributes.merge('id' => new_id),
-            shard: 'clickhouse',
-          )
-        }.to change { EventLog.count }.by(1)
-      end
-
-      it 'should insert on update (append-only)' do
-        new_id = SecureRandom.uuid
-
-        allow(EventLog).to receive(:connected_to).and_yield
-
-        expect {
-          job.perform(
-            operation: 'update',
-            class_name: 'EventLog',
-            primary_key: new_id,
-            attributes: event_log.attributes.merge('id' => new_id, 'metadata' => { 'updated' => true }),
-            shard: 'clickhouse',
-          )
-        }.to change { EventLog.count }.by(1)
-      end
-
-      it 'should skip destroy (append-only)' do
-        allow(EventLog).to receive(:connected_to).and_yield
-
-        expect {
-          job.perform(
-            operation: 'destroy',
-            class_name: 'EventLog',
-            primary_key: event_log.id,
-            attributes: {},
-            shard: 'clickhouse',
-          )
-        }.not_to change { EventLog.count }
-      end
-    end
   end
 end

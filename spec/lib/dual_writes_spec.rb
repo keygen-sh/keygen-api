@@ -570,6 +570,7 @@ describe DualWrites do
       temporary_table :append_only_records do |t|
         t.string :name
         t.text :data
+        t.integer :is_deleted, default: 0, null: false
         t.timestamps
       end
 
@@ -587,7 +588,7 @@ describe DualWrites do
       end
 
       context 'with create operation' do
-        it 'should insert record' do
+        it 'should insert record with is_deleted = 0' do
           record_id = 777_777
           attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
@@ -603,12 +604,14 @@ describe DualWrites do
             )
           }.to change { append_only_model.count }.by(1)
 
-          expect(append_only_model.find_by(id: record_id).name).to eq 'new'
+          record = append_only_model.find_by(id: record_id)
+          expect(record.name).to eq 'new'
+          expect(record.is_deleted).to eq 0
         end
       end
 
       context 'with update operation' do
-        it 'should insert new version (append-only)' do
+        it 'should insert new version with is_deleted = 0' do
           # In insert-only mode, updates insert new rows rather than updating existing ones
           # ClickHouse ReplacingMergeTree will deduplicate based on the version column
           record_id = 777_778
@@ -625,13 +628,16 @@ describe DualWrites do
               shard: 'clickhouse',
             )
           }.to change { append_only_model.count }.by(1)
+
+          record = append_only_model.find_by(id: record_id)
+          expect(record.is_deleted).to eq 0
         end
       end
 
       context 'with destroy operation' do
-        it 'should be a no-op (skip deletion)' do
-          record = append_only_model.create!(name: 'test', data: 'hello')
-          record_id = record.id
+        it 'should insert tombstone with is_deleted = 1' do
+          record_id = 777_779
+          attrs = { 'name' => 'deleted', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
           allow(append_only_model).to receive(:connected_to).and_yield
 
@@ -640,12 +646,13 @@ describe DualWrites do
               operation: 'destroy',
               class_name: append_only_model.name,
               primary_key: record_id,
-              attributes: {},
+              attributes: attrs,
               shard: 'clickhouse',
             )
-          }.not_to change { append_only_model.count }
+          }.to change { append_only_model.count }.by(1)
 
-          expect(append_only_model.find_by(id: record_id)).to be_present
+          record = append_only_model.find_by(id: record_id)
+          expect(record.is_deleted).to eq 1
         end
       end
     end

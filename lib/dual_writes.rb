@@ -253,15 +253,15 @@ module DualWrites
 
     # Insert-only replication for append-only databases like ClickHouse.
     # All operations become inserts; updates insert new versions (ReplacingMergeTree handles dedup),
-    # and deletes are skipped (or could be handled via sign column in the future).
+    # and deletes insert a tombstone row with is_deleted = 1.
     def replicate_append_only(operation, klass, primary_key, attributes)
       case operation
       when :create, :update
-        klass.insert(attributes.merge('id' => primary_key))
+        klass.insert(attributes.merge('id' => primary_key, 'is_deleted' => 0))
       when :destroy
-        # no-op: append-only databases don't support deletes directly
-        # ClickHouse ReplacingMergeTree will keep the latest version
-        nil
+        # Insert a tombstone row with is_deleted = 1
+        # ReplacingMergeTree(ver, is_deleted) will handle cleanup
+        klass.insert(attributes.merge('id' => primary_key, 'is_deleted' => 1))
       else
         raise ReplicationError, "unknown operation: #{operation}"
       end

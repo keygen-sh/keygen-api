@@ -3,7 +3,7 @@
 class CreateRequestLogs < ActiveRecord::Migration[7.2]
   def up
     create_table :request_logs, id: false,
-      options: "ReplacingMergeTree(ver) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
+      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
       force: :cascade do |t|
       # identifiers
       t.uuid :id, null: false
@@ -40,6 +40,9 @@ class CreateRequestLogs < ActiveRecord::Migration[7.2]
       # performance metrics
       t.float :queue_time, null: true
       t.float :run_time, null: true
+
+      # soft delete flag for ReplacingMergeTree
+      t.column :is_deleted, "UInt8", null: false, default: 0
 
       # version for ReplacingMergeTree deduplication
       t.datetime :ver, null: false, default: -> { 'now()' }
