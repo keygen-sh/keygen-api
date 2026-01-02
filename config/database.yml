@@ -7,6 +7,9 @@ default: &postgres
     statement_timeout: <%= ENV["DB_STATEMENT_TIMEOUT"] || '15s' %>
 
 clickhouse: &clickhouse
+  keep_alive_timeout: <%= ENV['CLICKHOUSE_KEEP_ALIVE_TIMEOUT'] || 10 %>
+  read_timeout: <%= ENV['CLICKHOUSE_READ_TIMEOUT'] || 30 %>
+  write_timeout: <%= ENV['CLICKHOUSE_WRITE_TIMEOUT'] || 30 %>
   migrations_paths: db/clickhouse
   # FIXME(ezekg) parse DATABASE_CLICKHOUSE_URL?
   database: default
@@ -25,6 +28,7 @@ development:
     <<: *clickhouse
     adapter: clickhouse
     database: keygen_dev
+    debug: true
 
 test: &test
   primary:

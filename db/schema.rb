@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_14_033324) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_222642) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -130,11 +130,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_14_033324) do
     t.uuid "environment_id"
     t.uuid "event_type_id", null: false
     t.string "idempotency_key"
+    t.datetime "is_deleted", precision: nil
     t.jsonb "metadata"
     t.uuid "request_log_id"
     t.uuid "resource_id", null: false
     t.string "resource_type", null: false
     t.datetime "updated_at", null: false
+    t.integer "ver"
     t.uuid "whodunnit_id"
     t.string "whodunnit_type"
     t.index ["account_id", "created_at"], name: "index_event_logs_on_account_id_and_created_at", order: { created_at: :desc }
@@ -779,6 +781,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_14_033324) do
     t.date "created_date", null: false
     t.uuid "environment_id"
     t.string "ip"
+    t.datetime "is_deleted", precision: nil
     t.string "method"
     t.float "queue_time"
     t.text "request_body"
@@ -795,6 +798,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_14_033324) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "url"
     t.string "user_agent"
+    t.integer "ver"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["created_date", "account_id"], name: "index_request_logs_on_created_date_and_account_id", order: { created_date: :desc }
     t.index ["environment_id"], name: "index_request_logs_on_environment_id"

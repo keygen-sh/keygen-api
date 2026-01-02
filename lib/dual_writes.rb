@@ -204,7 +204,7 @@ module DualWrites
   class ReplicationJob < ActiveJob::Base
     queue_as { ActiveRecord.queues[:dual_writes] || :default }
 
-    retry_on StandardError, wait: :polynomially_longer, attempts: 5
+    retry_on ActiveRecord::ActiveRecordError, wait: :polynomially_longer, attempts: 5
 
     discard_on ActiveJob::DeserializationError
 
