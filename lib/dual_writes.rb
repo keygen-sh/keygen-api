@@ -181,6 +181,52 @@ module DualWrites
       ensure
         self.dual_writes_config = original_config
       end
+
+      # Override bulk insert methods to automatically replicate
+      def insert_all(attributes, **options)
+        result = super
+        replicate_bulk(:insert_all, attributes)
+        result
+      end
+
+      def insert_all!(attributes, **options)
+        result = super
+        replicate_bulk(:insert_all, attributes)
+        result
+      end
+
+      def upsert_all(attributes, **options)
+        result = super
+        replicate_bulk(:upsert_all, attributes)
+        result
+      end
+
+      private
+
+      def replicate_bulk(operation, attributes)
+        return if dual_writes_config.nil?
+        return unless dual_writes_enabled
+
+        config = dual_writes_config
+
+        config[:replicates_to].each do |shard|
+          if config[:async]
+            BulkReplicationJob.perform_later(
+              operation: operation.to_s,
+              class_name: name,
+              attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              shard: shard.to_s,
+            )
+          else
+            BulkReplicationJob.perform_now(
+              operation: operation.to_s,
+              class_name: name,
+              attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              shard: shard.to_s,
+            )
+          end
+        end
+      end
     end
 
     private
@@ -356,6 +402,70 @@ module DualWrites
              .delete_all
       else
         raise ReplicationError, "unknown operation: #{operation}"
+      end
+    end
+  end
+
+  class BulkReplicationJob < ActiveJob::Base
+    queue_as { ActiveRecord.queues[:dual_writes] || :default }
+
+    retry_on ActiveRecord::ActiveRecordError, wait: :polynomially_longer, attempts: 5
+
+    discard_on ActiveJob::DeserializationError
+
+    def perform(operation:, class_name:, attributes:, shard:)
+      klass = class_name.constantize
+
+      unless klass.respond_to?(:dual_writes_config)
+        raise ConfigurationError, "#{class_name} is not configured for dual writes"
+      end
+
+      config = klass.dual_writes_config
+      replica_class = klass.const_get(shard.to_s.camelize)
+
+      case operation
+      when 'insert_all'
+        replicate_insert_all(replica_class, attributes, strategy: config[:strategy])
+      when 'upsert_all'
+        replicate_upsert_all(replica_class, attributes, strategy: config[:strategy])
+      else
+        raise ReplicationError, "unknown bulk operation: #{operation}"
+      end
+    rescue ActiveRecord::ConnectionNotEstablished => e
+      raise ReplicationError, "connection to #{shard} not established: #{e.message}"
+    end
+
+    private
+
+    def replicate_insert_all(klass, attributes, strategy:)
+      case strategy
+      when :append_only
+        # Serialize and add is_deleted for ClickHouse
+        records = attributes.map do |attrs|
+          serialized = attrs.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
+          serialized.merge('is_deleted' => 0)
+        end
+        klass.insert_all!(records)
+      when :standard
+        klass.insert_all!(attributes)
+      else
+        raise ReplicationError, "unknown strategy: #{strategy}"
+      end
+    end
+
+    def replicate_upsert_all(klass, attributes, strategy:)
+      case strategy
+      when :append_only
+        # For append-only, upsert becomes insert (ReplacingMergeTree handles dedup)
+        records = attributes.map do |attrs|
+          serialized = attrs.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
+          serialized.merge('is_deleted' => 0)
+        end
+        klass.insert_all!(records)
+      when :standard
+        klass.upsert_all(attributes)
+      else
+        raise ReplicationError, "unknown strategy: #{strategy}"
       end
     end
   end
