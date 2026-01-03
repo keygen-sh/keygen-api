@@ -70,7 +70,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: an_instance_of(Integer),
           attributes: hash_including('name' => 'test', 'data' => 'hello'),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -86,7 +86,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record.id,
           attributes: hash_including('name' => 'updated'),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -103,7 +103,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record_id,
           attributes: an_instance_of(Hash),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -232,7 +232,7 @@ describe DualWrites do
             class_name: 'UnconfiguredModel',
             primary_key: 999_997,
             attributes: { 'name' => 'test' },
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
       end
@@ -253,7 +253,7 @@ describe DualWrites do
               class_name: 'InvalidOpRecord',
               primary_key: 999_996,
               attributes: {},
-              shard: 'clickhouse',
+              database: 'clickhouse',
             )
           }.to raise_error(DualWrites::ReplicationError, /unknown operation/)
         end
@@ -295,7 +295,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
 
           record = clickhouse_model.find_by(id: record_id)
@@ -317,7 +317,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
 
           record = clickhouse_model.find_by(id: record_id)
@@ -336,7 +336,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
 
           record = clickhouse_model.find_by(id: record_id)
@@ -392,7 +392,7 @@ describe DualWrites do
             hash_including('name' => 'record1', 'data' => 'data1'),
             hash_including('name' => 'record2', 'data' => 'data2'),
           ],
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
 
@@ -420,7 +420,7 @@ describe DualWrites do
           operation: 'insert_all',
           class_name: 'BulkRecord',
           attributes: an_instance_of(Array),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -437,7 +437,7 @@ describe DualWrites do
           operation: 'upsert_all',
           class_name: 'BulkRecord',
           attributes: an_instance_of(Array),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -489,7 +489,7 @@ describe DualWrites do
           operation: 'insert_all',
           class_name: model.name,
           attributes: attributes,
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
 
         records = model.all
@@ -506,7 +506,7 @@ describe DualWrites do
           operation: 'insert_all',
           class_name: model.name,
           attributes: attributes,
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
 
         record = model.last
@@ -522,7 +522,7 @@ describe DualWrites do
           operation: 'upsert_all',
           class_name: model.name,
           attributes: attributes,
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
 
         record = model.last
@@ -543,7 +543,7 @@ describe DualWrites do
             operation: 'delete_all',
             class_name: 'BulkInvalidRecord',
             attributes: [],
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
         }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)
       end

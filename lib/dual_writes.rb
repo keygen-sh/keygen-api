@@ -5,15 +5,15 @@ module DualWrites
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
 
-  # Registry of abstract base classes for each shard.
+  # Registry of abstract base classes for each database.
   # e.g., DualWrites.base_class_for(:clickhouse) returns an abstract class
-  # that connects to the :clickhouse shard.
+  # that connects to the :clickhouse database.
   @base_classes = {}
 
   class << self
-    def base_class_for(shard)
-      @base_classes[shard] ||= begin
-        class_name = "#{shard.to_s.camelize}Record"
+    def base_class_for(database)
+      @base_classes[database] ||= begin
+        class_name = "#{database.to_s.camelize}Record"
 
         # Create and name the class first (Rails requires a name for connects_to)
         base = Class.new(ActiveRecord::Base)
@@ -21,7 +21,7 @@ module DualWrites
 
         # Now configure it
         base.abstract_class = true
-        base.connects_to database: { writing: shard }
+        base.connects_to database: { writing: database }
 
         base
       end
@@ -42,7 +42,7 @@ module DualWrites
   # @example Using a custom strategy
   #   class MyModel < ApplicationRecord
   #     include DualWrites::Model
-  #     dual_writes to: :my_shard, strategy: MyStrategy
+  #     dual_writes to: :my_database, strategy: MyStrategy
   #   end
   #
   class Strategy
@@ -136,7 +136,7 @@ module DualWrites
     class_methods do
       # Configure dual writes for this model.
       #
-      # @param to [Symbol, Array<Symbol>] the replica shard(s) to write to
+      # @param to [Symbol, Array<Symbol>] the database(s) to write to
       # @param strategy [Symbol, Class] replication strategy class or name.
       #   Built-in strategies: :clickhouse.
       #   Use :clickhouse for ClickHouse with ReplacingMergeTree (insert-only with is_deleted flag).
@@ -167,41 +167,41 @@ module DualWrites
       #   class MyModel < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :my_shard, strategy: MyCustomStrategy
+      #     dual_writes to: :my_database, strategy: MyCustomStrategy
       #   end
       #
       def dual_writes(to:, strategy:, sync: false)
-        shards = Array(to)
+        databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
-          shards.all? { it.is_a?(Symbol) }
+          databases.all? { it.is_a?(Symbol) }
 
         raise ConfigurationError, 'to cannot be empty' if
-          shards.empty?
+          databases.empty?
 
         # Validate strategy can be looked up
         Strategy.lookup(strategy)
 
-        # Auto-generate replica model classes for each shard.
+        # Auto-generate model classes for each database.
         # e.g., RequestLog with to: :clickhouse creates RequestLog::Clickhouse
         # that inherits from DualWrites::ClickhouseRecord and has its own schema cache.
-        shards.each do |shard|
-          replica_class_name = shard.to_s.camelize
+        databases.each do |database|
+          database_class_name = database.to_s.camelize
 
-          next if const_defined?(replica_class_name, false)
+          next if const_defined?(database_class_name, false)
 
-          base_class = DualWrites.base_class_for(shard)
+          base_class = DualWrites.base_class_for(database)
           table = table_name
 
-          replica_class = Class.new(base_class) do
+          database_class = Class.new(base_class) do
             self.table_name = table
           end
 
-          const_set(replica_class_name, replica_class)
+          const_set(database_class_name, database_class)
         end
 
         self.dual_writes_config = {
-          to: shards,
+          to: databases,
           sync:,
           strategy:,
         }.freeze
@@ -266,20 +266,20 @@ module DualWrites
 
         config = dual_writes_config
 
-        config[:to].each do |shard|
+        config[:to].each do |database|
           if config[:sync]
             BulkReplicationJob.perform_now(
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
-              shard: shard.to_s,
+              database: database.to_s,
             )
           else
             BulkReplicationJob.perform_later(
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
-              shard: shard.to_s,
+              database: database.to_s,
             )
           end
         end
@@ -314,13 +314,13 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:to].each do |shard|
+      config[:to].each do |database|
         ReplicationJob.perform_later(
           operation: operation.to_s,
           class_name: self.class.name,
           primary_key: id,
           attributes: attrs,
-          shard: shard.to_s,
+          database: database.to_s,
         )
       end
     end
@@ -329,13 +329,13 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:to].each do |shard|
+      config[:to].each do |database|
         ReplicationJob.perform_now(
           operation: operation.to_s,
           class_name: self.class.name,
           primary_key: id,
           attributes: attrs,
-          shard: shard.to_s,
+          database: database.to_s,
         )
       end
     end
@@ -352,7 +352,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, primary_key:, attributes:, shard:)
+    def perform(operation:, class_name:, primary_key:, attributes:, database:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -360,8 +360,8 @@ module DualWrites
       end
 
       config = klass.dual_writes_config
-      replica_class = klass.const_get(shard.to_s.camelize)
-      strategy = Strategy.lookup(config[:strategy]).new(replica_class)
+      database_class = klass.const_get(database.to_s.camelize)
+      strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
       unless strategy.respond_to?(operation.to_sym)
         raise ReplicationError, "unknown operation: #{operation}"
@@ -369,7 +369,7 @@ module DualWrites
 
       strategy.public_send(operation.to_sym, primary_key, attributes)
     rescue ActiveRecord::ConnectionNotEstablished => e
-      raise ReplicationError, "connection to #{shard} not established: #{e.message}"
+      raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
   end
 
@@ -380,7 +380,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, attributes:, shard:)
+    def perform(operation:, class_name:, attributes:, database:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -388,8 +388,8 @@ module DualWrites
       end
 
       config = klass.dual_writes_config
-      replica_class = klass.const_get(shard.to_s.camelize)
-      strategy = Strategy.lookup(config[:strategy]).new(replica_class)
+      database_class = klass.const_get(database.to_s.camelize)
+      strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
       unless strategy.respond_to?(operation.to_sym)
         raise ReplicationError, "unknown bulk operation: #{operation}"
@@ -397,7 +397,7 @@ module DualWrites
 
       strategy.public_send(operation.to_sym, attributes)
     rescue ActiveRecord::ConnectionNotEstablished => e
-      raise ReplicationError, "connection to #{shard} not established: #{e.message}"
+      raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
   end
 end

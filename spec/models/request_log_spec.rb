@@ -41,7 +41,7 @@ describe RequestLog, type: :model do
             'method' => request_log.method,
             'url' => request_log.url,
           ),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
 
@@ -75,7 +75,7 @@ describe RequestLog, type: :model do
           class_name: 'RequestLog',
           primary_key: request_log.id,
           attributes: hash_including('status' => '404'),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -89,7 +89,7 @@ describe RequestLog, type: :model do
           class_name: 'RequestLog',
           primary_key: request_log.id,
           attributes: kind_of(Hash),
-          shard: 'clickhouse',
+          database: 'clickhouse',
         )
       end
     end
@@ -162,7 +162,7 @@ describe RequestLog, type: :model do
             operation: 'insert_all',
             class_name: 'RequestLog',
             attributes: an_instance_of(Array),
-            shard: 'clickhouse',
+            database: 'clickhouse',
           )
         end
 
