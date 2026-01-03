@@ -27,7 +27,7 @@ development:
   clickhouse:
     <<: *clickhouse
     adapter: clickhouse
-    database: keygen_dev
+    database: keygen_dev_clickhouse
     debug: true
 
 test: &test
@@ -41,7 +41,7 @@ test: &test
   clickhouse:
     <<: *clickhouse
     adapter: clickhouse
-    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+    database: keygen_test_clickhouse<%= ENV['TEST_ENV_NUMBER'] %>
 
 production:
   primary:

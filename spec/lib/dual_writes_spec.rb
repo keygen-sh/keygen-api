@@ -141,28 +141,33 @@ describe DualWrites do
     end
 
     describe '.with_sync_dual_writes' do
-      temporary_model :sync_dual_write_record, table_name: :dual_write_records do
+      temporary_table :sync_dual_write_records do |t|
+        t.string :name
+        t.text :data
+        t.integer :is_deleted, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :sync_dual_write_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[clickhouse], async: true
+        dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only, async: true
       end
 
       let(:sync_model) { SyncDualWriteRecord }
 
       it 'should switch to sync mode within block' do
-        # stub connected_to to avoid needing ClickHouse tables
-        # (we're just testing that no async job is enqueued)
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        # Verify perform_now is called (sync) instead of perform_later (async)
+        expect(DualWrites::ReplicationJob).to receive(:perform_now).at_least(:once)
+        expect(DualWrites::ReplicationJob).not_to receive(:perform_later)
 
-        expect {
-          sync_model.with_sync_dual_writes do
-            sync_model.create!(name: 'test', data: 'hello')
-          end
-        }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        sync_model.with_sync_dual_writes do
+          sync_model.create!(name: 'test', data: 'hello')
+        end
       end
 
       it 'should revert to async mode after block' do
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        allow(DualWrites::ReplicationJob).to receive(:perform_now)
 
         sync_model.with_sync_dual_writes do
           sync_model.create!(name: 'test', data: 'hello')
@@ -173,10 +178,17 @@ describe DualWrites do
     end
 
     describe 'sync replication' do
-      temporary_model :sync_replication_record, table_name: :dual_write_records do
+      temporary_table :sync_replication_records do |t|
+        t.string :name
+        t.text :data
+        t.integer :is_deleted, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :sync_replication_record do
         include DualWrites::Model
 
-        dual_writes to: :primary, replicates_to: %i[clickhouse], async: false
+        dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only, async: false
       end
 
       let(:sync_model) { SyncReplicationRecord }
@@ -194,7 +206,7 @@ describe DualWrites do
       end
 
       it 'should not enqueue jobs' do
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        allow(DualWrites::ReplicationJob).to receive(:perform_now)
 
         expect {
           sync_model.create!(name: 'test', data: 'hello')
@@ -235,7 +247,7 @@ describe DualWrites do
         end
 
         it 'should raise error for unknown operation' do
-          allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+          stub_const('InvalidOpRecord::Clickhouse', InvalidOpRecord)
 
           expect {
             job.perform(
@@ -251,7 +263,7 @@ describe DualWrites do
     end
 
     # NOTE: resolve_with uses UPDATE/DELETE which requires a SQL database (not ClickHouse).
-    # These tests stub the shard connection to test the conflict resolution logic.
+    # These tests use the primary model as the replica to test conflict resolution logic.
     describe '#perform with resolve_with' do
       temporary_table :resolved_records do |t|
         t.string :name
@@ -268,7 +280,8 @@ describe DualWrites do
       let(:resolved_model) { ResolvedRecord }
 
       before do
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        # Stub the replica class to use the primary model (same table/connection)
+        stub_const('ResolvedRecord::Replica', resolved_model)
       end
 
       context 'when record does not exist' do
@@ -392,7 +405,8 @@ describe DualWrites do
       let(:versioned_model) { VersionedRecord }
 
       before do
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        # Stub the replica class to use the primary model (same table/connection)
+        stub_const('VersionedRecord::Replica', versioned_model)
       end
 
       it 'should apply update with higher lock_version' do
@@ -482,7 +496,8 @@ describe DualWrites do
       let(:append_only_model) { AppendOnlyRecord }
 
       before do
-        allow(ActiveRecord::Base).to receive(:connected_to).and_yield
+        # Stub the replica class to use the primary model (same table/connection)
+        stub_const('AppendOnlyRecord::Clickhouse', append_only_model)
       end
 
       it 'should configure append_only strategy' do
@@ -561,6 +576,247 @@ describe DualWrites do
             dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :invalid
           end
         }.to raise_error(DualWrites::ConfigurationError, /strategy must be :standard or :append_only/)
+      end
+    end
+  end
+
+  describe 'bulk operations' do
+    temporary_table :bulk_records do |t|
+      t.string :name
+      t.text :data
+      t.timestamps
+    end
+
+    temporary_model :bulk_record do
+      include DualWrites::Model
+
+      dual_writes to: :primary, replicates_to: %i[clickhouse]
+    end
+
+    let(:model) { BulkRecord }
+
+    describe '.insert_all' do
+      it 'should enqueue bulk replication job' do
+        attributes = [
+          { name: 'record1', data: 'data1' },
+          { name: 'record2', data: 'data2' },
+        ]
+
+        expect {
+          model.insert_all(attributes)
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'insert_all',
+          class_name: 'BulkRecord',
+          attributes: [
+            hash_including('name' => 'record1', 'data' => 'data1'),
+            hash_including('name' => 'record2', 'data' => 'data2'),
+          ],
+          shard: 'clickhouse',
+        )
+      end
+
+      it 'should insert records into primary' do
+        attributes = [
+          { name: 'record1', data: 'data1' },
+          { name: 'record2', data: 'data2' },
+        ]
+
+        expect {
+          model.insert_all(attributes)
+        }.to change { model.count }.by(2)
+      end
+    end
+
+    describe '.insert_all!' do
+      it 'should enqueue bulk replication job' do
+        attributes = [
+          { name: 'record1', data: 'data1' },
+        ]
+
+        expect {
+          model.insert_all!(attributes)
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'insert_all',
+          class_name: 'BulkRecord',
+          attributes: an_instance_of(Array),
+          shard: 'clickhouse',
+        )
+      end
+    end
+
+    describe '.upsert_all' do
+      it 'should enqueue bulk replication job' do
+        attributes = [
+          { name: 'record1', data: 'data1' },
+        ]
+
+        expect {
+          model.upsert_all(attributes)
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'upsert_all',
+          class_name: 'BulkRecord',
+          attributes: an_instance_of(Array),
+          shard: 'clickhouse',
+        )
+      end
+    end
+
+    describe '.without_dual_writes' do
+      it 'should not enqueue bulk replication job' do
+        attributes = [{ name: 'record1', data: 'data1' }]
+
+        expect {
+          model.without_dual_writes do
+            model.insert_all(attributes)
+          end
+        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+      end
+    end
+  end
+
+  describe DualWrites::BulkReplicationJob do
+    let(:job) { DualWrites::BulkReplicationJob.new }
+
+    describe '#perform with standard strategy' do
+      temporary_table :bulk_standard_records do |t|
+        t.string :name
+        t.text :data
+        t.timestamps
+      end
+
+      temporary_model :bulk_standard_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[replica], strategy: :standard
+      end
+
+      let(:model) { BulkStandardRecord }
+
+      before do
+        # Stub the replica class to use the primary model (same table/connection)
+        stub_const('BulkStandardRecord::Replica', model)
+      end
+
+      it 'should insert_all records to replica' do
+        attributes = [
+          { 'name' => 'record1', 'data' => 'data1' },
+          { 'name' => 'record2', 'data' => 'data2' },
+        ]
+
+        expect {
+          job.perform(
+            operation: 'insert_all',
+            class_name: model.name,
+            attributes: attributes,
+            shard: 'replica',
+          )
+        }.to change { model.count }.by(2)
+      end
+
+      it 'should upsert_all records to replica' do
+        attributes = [
+          { 'name' => 'record1', 'data' => 'data1' },
+        ]
+
+        expect {
+          job.perform(
+            operation: 'upsert_all',
+            class_name: model.name,
+            attributes: attributes,
+            shard: 'replica',
+          )
+        }.to change { model.count }.by(1)
+      end
+    end
+
+    describe '#perform with append_only strategy' do
+      temporary_table :bulk_append_records do |t|
+        t.string :name
+        t.text :data
+        t.integer :is_deleted, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :bulk_append_record do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only
+      end
+
+      let(:model) { BulkAppendRecord }
+
+      before do
+        # Stub the replica class to use the primary model (same table/connection)
+        stub_const('BulkAppendRecord::Clickhouse', model)
+      end
+
+      it 'should insert_all records with is_deleted = 0' do
+        attributes = [
+          { 'name' => 'record1', 'data' => 'data1' },
+          { 'name' => 'record2', 'data' => 'data2' },
+        ]
+
+        job.perform(
+          operation: 'insert_all',
+          class_name: model.name,
+          attributes: attributes,
+          shard: 'clickhouse',
+        )
+
+        records = model.all
+        expect(records.count).to eq 2
+        expect(records.all? { |r| r.is_deleted == 0 }).to be true
+      end
+
+      it 'should serialize JSON attributes' do
+        attributes = [
+          { 'name' => 'record1', 'data' => { 'nested' => 'value' } },
+        ]
+
+        job.perform(
+          operation: 'insert_all',
+          class_name: model.name,
+          attributes: attributes,
+          shard: 'clickhouse',
+        )
+
+        record = model.last
+        expect(record.data).to eq '{"nested":"value"}'
+      end
+
+      it 'should handle upsert_all as insert_all' do
+        attributes = [
+          { 'name' => 'record1', 'data' => 'data1' },
+        ]
+
+        job.perform(
+          operation: 'upsert_all',
+          class_name: model.name,
+          attributes: attributes,
+          shard: 'clickhouse',
+        )
+
+        record = model.last
+        expect(record.is_deleted).to eq 0
+      end
+    end
+
+    describe '#perform with invalid operation' do
+      temporary_model :bulk_invalid_record, table_name: :bulk_records do
+        include DualWrites::Model
+
+        dual_writes to: :primary, replicates_to: %i[clickhouse]
+      end
+
+      it 'should raise error for unknown operation' do
+        expect {
+          job.perform(
+            operation: 'delete_all',
+            class_name: 'BulkInvalidRecord',
+            attributes: [],
+            shard: 'clickhouse',
+          )
+        }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)
       end
     end
   end
