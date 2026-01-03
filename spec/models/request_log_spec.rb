@@ -24,7 +24,7 @@ describe RequestLog, type: :model do
       it 'should be configured for dual writes' do
         expect(RequestLog.dual_writes_config).to include(
           to: [:clickhouse],
-          strategy: :append_only,
+          strategy: :clickhouse,
           sync: false,
         )
       end

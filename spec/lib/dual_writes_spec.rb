@@ -26,7 +26,7 @@ describe DualWrites do
     temporary_model :dual_write_record do
       include DualWrites::Model
 
-      dual_writes to: %i[clickhouse]
+      dual_writes to: %i[clickhouse], strategy: :clickhouse
     end
 
     let(:model) { DualWriteRecord }
@@ -36,8 +36,7 @@ describe DualWrites do
         expect(model.dual_writes_config).to eq(
           to: [:clickhouse],
           sync: false,
-          strategy: :standard,
-          resolve_with: nil,
+          strategy: :clickhouse,
         )
       end
 
@@ -46,7 +45,7 @@ describe DualWrites do
           Class.new(ApplicationRecord) do
             include DualWrites::Model
 
-            dual_writes to: []
+            dual_writes to: [], strategy: :clickhouse
           end
         }.to raise_error(DualWrites::ConfigurationError, /cannot be empty/)
       end
@@ -56,7 +55,7 @@ describe DualWrites do
           Class.new(ApplicationRecord) do
             include DualWrites::Model
 
-            dual_writes to: ['clickhouse']
+            dual_writes to: ['clickhouse'], strategy: :clickhouse
           end
         }.to raise_error(DualWrites::ConfigurationError, /must be a symbol or array of symbols/)
       end
@@ -150,7 +149,7 @@ describe DualWrites do
       temporary_model :sync_dual_write_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only
+        dual_writes to: %i[clickhouse], strategy: :clickhouse
       end
 
       let(:sync_model) { SyncDualWriteRecord }
@@ -187,7 +186,7 @@ describe DualWrites do
       temporary_model :sync_replication_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only, sync: true
+        dual_writes to: %i[clickhouse], strategy: :clickhouse, sync: true
       end
 
       let(:sync_model) { SyncReplicationRecord }
@@ -242,7 +241,7 @@ describe DualWrites do
         temporary_model :invalid_op_record, table_name: :replication_test_records do
           include DualWrites::Model
 
-          dual_writes to: %i[clickhouse]
+          dual_writes to: %i[clickhouse], strategy: :clickhouse
         end
 
         it 'should raise error for unknown operation' do
@@ -261,246 +260,29 @@ describe DualWrites do
       end
     end
 
-    # NOTE: resolve_with uses UPDATE/DELETE which requires a SQL database (not ClickHouse).
-    # These tests use the primary model as the replica to test conflict resolution logic.
-    describe '#perform with resolve_with' do
-      temporary_table :resolved_records do |t|
-        t.string :name
-        t.text :data
-        t.timestamps
-      end
-
-      temporary_model :resolved_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[replica], resolve_with: :updated_at
-      end
-
-      let(:resolved_model) { ResolvedRecord }
-
-      before do
-        # Stub the replica class to use the primary model (same table/connection)
-        stub_const('ResolvedRecord::Replica', resolved_model)
-      end
-
-      context 'when record does not exist' do
-        it 'should insert new record' do
-          record_id = 888_888
-          now = Time.current
-          attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => now, 'updated_at' => now }
-
-          job.perform(
-            operation: 'create',
-            class_name: resolved_model.name,
-            primary_key: record_id,
-            attributes: attrs,
-            shard: 'replica',
-          )
-
-          expect(resolved_model.find_by(id: record_id).name).to eq 'new'
-        end
-      end
-
-      context 'when incoming data is newer' do
-        it 'should update existing record' do
-          old_time = 1.hour.ago
-          new_time = Time.current
-
-          record = resolved_model.create!(name: 'old', data: 'old', updated_at: old_time)
-
-          attrs = { 'name' => 'new', 'data' => 'new', 'created_at' => old_time, 'updated_at' => new_time }
-
-          job.perform(
-            operation: 'update',
-            class_name: resolved_model.name,
-            primary_key: record.id,
-            attributes: attrs,
-            shard: 'replica',
-          )
-
-          record.reload
-          expect(record.name).to eq 'new'
-          expect(record.data).to eq 'new'
-        end
-      end
-
-      context 'when incoming data is older (out-of-order job)' do
-        it 'should skip stale update silently' do
-          old_time = 1.hour.ago
-          new_time = Time.current
-
-          record = resolved_model.create!(name: 'current', data: 'current', updated_at: new_time)
-
-          attrs = { 'name' => 'stale', 'data' => 'stale', 'created_at' => old_time, 'updated_at' => old_time }
-
-          job.perform(
-            operation: 'update',
-            class_name: resolved_model.name,
-            primary_key: record.id,
-            attributes: attrs,
-            shard: 'replica',
-          )
-
-          record.reload
-          expect(record.name).to eq 'current'
-          expect(record.data).to eq 'current'
-        end
-      end
-
-      context 'when destroying with newer timestamp' do
-        it 'should delete the record' do
-          old_time = 1.hour.ago
-          record = resolved_model.create!(name: 'test', data: 'test', updated_at: old_time)
-          record_id = record.id
-
-          attrs = { 'updated_at' => Time.current }
-
-          job.perform(
-            operation: 'destroy',
-            class_name: resolved_model.name,
-            primary_key: record_id,
-            attributes: attrs,
-            shard: 'replica',
-          )
-
-          expect(resolved_model.find_by(id: record_id)).to be_nil
-        end
-      end
-
-      context 'when destroying with older timestamp' do
-        it 'should skip stale deletion silently' do
-          new_time = Time.current
-          record = resolved_model.create!(name: 'test', data: 'test', updated_at: new_time)
-          record_id = record.id
-
-          attrs = { 'updated_at' => 1.hour.ago }
-
-          job.perform(
-            operation: 'destroy',
-            class_name: resolved_model.name,
-            primary_key: record_id,
-            attributes: attrs,
-            shard: 'replica',
-          )
-
-          expect(resolved_model.find_by(id: record_id)).to be_present
-        end
-      end
-    end
-
-    describe '#perform with lock_version resolution' do
-      temporary_table :versioned_records do |t|
-        t.string :name
-        t.integer :lock_version, default: 0, null: false
-        t.timestamps
-      end
-
-      temporary_model :versioned_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[replica], resolve_with: :lock_version
-      end
-
-      let(:versioned_model) { VersionedRecord }
-
-      before do
-        # Stub the replica class to use the primary model (same table/connection)
-        stub_const('VersionedRecord::Replica', versioned_model)
-      end
-
-      it 'should apply update with higher lock_version' do
-        record = versioned_model.create!(name: 'v1', lock_version: 1)
-
-        attrs = { 'name' => 'v2', 'lock_version' => 2, 'created_at' => record.created_at, 'updated_at' => Time.current }
-
-        job.perform(
-          operation: 'update',
-          class_name: versioned_model.name,
-          primary_key: record.id,
-          attributes: attrs,
-          shard: 'replica',
-        )
-
-        record.reload
-        expect(record.name).to eq 'v2'
-        expect(record.lock_version).to eq 2
-      end
-
-      it 'should skip update with lower lock_version silently' do
-        record = versioned_model.create!(name: 'v3', lock_version: 3)
-
-        attrs = { 'name' => 'v1', 'lock_version' => 1, 'created_at' => record.created_at, 'updated_at' => Time.current }
-
-        job.perform(
-          operation: 'update',
-          class_name: versioned_model.name,
-          primary_key: record.id,
-          attributes: attrs,
-          shard: 'replica',
-        )
-
-        record.reload
-        expect(record.name).to eq 'v3'
-        expect(record.lock_version).to eq 3
-      end
-    end
-
-    describe 'resolve_with auto-detection' do
-      temporary_table :auto_resolve_with_lock_version_records do |t|
-        t.string :name
-        t.integer :lock_version, default: 0
-        t.timestamps
-      end
-
-      temporary_table :auto_resolve_with_updated_at_records do |t|
-        t.string :name
-        t.timestamps
-      end
-
-      temporary_model :auto_resolve_with_lock_version_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[clickhouse], resolve_with: true
-      end
-
-      temporary_model :auto_resolve_with_updated_at_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[clickhouse], resolve_with: true
-      end
-
-      it 'should prefer lock_version when present' do
-        expect(AutoResolveWithLockVersionRecord.dual_writes_config[:resolve_with]).to eq :lock_version
-      end
-
-      it 'should fall back to updated_at when lock_version not present' do
-        expect(AutoResolveWithUpdatedAtRecord.dual_writes_config[:resolve_with]).to eq :updated_at
-      end
-    end
-
-    describe '#perform with append_only strategy' do
-      temporary_table :append_only_records do |t|
+    describe '#perform with clickhouse strategy' do
+      temporary_table :clickhouse_strategy_records do |t|
         t.string :name
         t.text :data
         t.integer :is_deleted, default: 0, null: false
         t.timestamps
       end
 
-      temporary_model :append_only_record do
+      temporary_model :clickhouse_strategy_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only
+        dual_writes to: %i[clickhouse], strategy: :clickhouse
       end
 
-      let(:append_only_model) { AppendOnlyRecord }
+      let(:clickhouse_model) { ClickhouseStrategyRecord }
 
       before do
         # Stub the replica class to use the primary model (same table/connection)
-        stub_const('AppendOnlyRecord::Clickhouse', append_only_model)
+        stub_const('ClickhouseStrategyRecord::Clickhouse', clickhouse_model)
       end
 
-      it 'should configure append_only strategy' do
-        expect(append_only_model.dual_writes_config[:strategy]).to eq :append_only
+      it 'should configure clickhouse strategy' do
+        expect(clickhouse_model.dual_writes_config[:strategy]).to eq :clickhouse
       end
 
       context 'with create operation' do
@@ -510,13 +292,13 @@ describe DualWrites do
 
           job.perform(
             operation: 'create',
-            class_name: append_only_model.name,
+            class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
             shard: 'clickhouse',
           )
 
-          record = append_only_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: record_id)
           expect(record).to be_present
           expect(record.name).to eq 'new'
           expect(record.is_deleted).to eq 0
@@ -532,13 +314,13 @@ describe DualWrites do
 
           job.perform(
             operation: 'update',
-            class_name: append_only_model.name,
+            class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
             shard: 'clickhouse',
           )
 
-          record = append_only_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: record_id)
           expect(record).to be_present
           expect(record.is_deleted).to eq 0
         end
@@ -551,13 +333,13 @@ describe DualWrites do
 
           job.perform(
             operation: 'destroy',
-            class_name: append_only_model.name,
+            class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
             shard: 'clickhouse',
           )
 
-          record = append_only_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: record_id)
           expect(record).to be_present
           expect(record.is_deleted).to eq 1
         end
@@ -574,7 +356,7 @@ describe DualWrites do
 
             dual_writes to: %i[clickhouse], strategy: :invalid
           end
-        }.to raise_error(DualWrites::ConfigurationError, /strategy must be :standard or :append_only/)
+        }.to raise_error(DualWrites::ConfigurationError, /unknown strategy/)
       end
     end
   end
@@ -589,7 +371,7 @@ describe DualWrites do
     temporary_model :bulk_record do
       include DualWrites::Model
 
-      dual_writes to: %i[clickhouse]
+      dual_writes to: %i[clickhouse], strategy: :clickhouse
     end
 
     let(:model) { BulkRecord }
@@ -676,77 +458,25 @@ describe DualWrites do
   describe DualWrites::BulkReplicationJob do
     let(:job) { DualWrites::BulkReplicationJob.new }
 
-    describe '#perform with standard strategy' do
-      temporary_table :bulk_standard_records do |t|
-        t.string :name
-        t.text :data
-        t.timestamps
-      end
-
-      temporary_model :bulk_standard_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[replica], strategy: :standard
-      end
-
-      let(:model) { BulkStandardRecord }
-
-      before do
-        # Stub the replica class to use the primary model (same table/connection)
-        stub_const('BulkStandardRecord::Replica', model)
-      end
-
-      it 'should insert_all records to replica' do
-        attributes = [
-          { 'name' => 'record1', 'data' => 'data1' },
-          { 'name' => 'record2', 'data' => 'data2' },
-        ]
-
-        expect {
-          job.perform(
-            operation: 'insert_all',
-            class_name: model.name,
-            attributes: attributes,
-            shard: 'replica',
-          )
-        }.to change { model.count }.by(2)
-      end
-
-      it 'should upsert_all records to replica' do
-        attributes = [
-          { 'name' => 'record1', 'data' => 'data1' },
-        ]
-
-        expect {
-          job.perform(
-            operation: 'upsert_all',
-            class_name: model.name,
-            attributes: attributes,
-            shard: 'replica',
-          )
-        }.to change { model.count }.by(1)
-      end
-    end
-
-    describe '#perform with append_only strategy' do
-      temporary_table :bulk_append_records do |t|
+    describe '#perform with clickhouse strategy' do
+      temporary_table :bulk_clickhouse_records do |t|
         t.string :name
         t.text :data
         t.integer :is_deleted, default: 0, null: false
         t.timestamps
       end
 
-      temporary_model :bulk_append_record do
+      temporary_model :bulk_clickhouse_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only
+        dual_writes to: %i[clickhouse], strategy: :clickhouse
       end
 
-      let(:model) { BulkAppendRecord }
+      let(:model) { BulkClickhouseRecord }
 
       before do
         # Stub the replica class to use the primary model (same table/connection)
-        stub_const('BulkAppendRecord::Clickhouse', model)
+        stub_const('BulkClickhouseRecord::Clickhouse', model)
       end
 
       it 'should insert_all records with is_deleted = 0' do
@@ -804,7 +534,7 @@ describe DualWrites do
       temporary_model :bulk_invalid_record, table_name: :bulk_records do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse]
+        dual_writes to: %i[clickhouse], strategy: :clickhouse
       end
 
       it 'should raise error for unknown operation' do

@@ -11,7 +11,7 @@ class EventLog < ApplicationRecord
   include Orderable
   include Pageable
 
-  dual_writes to: :clickhouse, strategy: :append_only
+  dual_writes to: :clickhouse, strategy: :clickhouse
 
   belongs_to :event_type
   belongs_to :resource,

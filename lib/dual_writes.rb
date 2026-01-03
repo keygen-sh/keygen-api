@@ -28,6 +28,92 @@ module DualWrites
     end
   end
 
+  # Base class for replication strategies.
+  # Subclass this to implement custom replication logic for different databases.
+  #
+  # @example Creating a custom strategy
+  #   class MyStrategy < DualWrites::Strategy
+  #     def create(primary_key, attributes)
+  #       # custom create logic
+  #     end
+  #     # ... implement other methods
+  #   end
+  #
+  # @example Using a custom strategy
+  #   class MyModel < ApplicationRecord
+  #     include DualWrites::Model
+  #     dual_writes to: :my_shard, strategy: MyStrategy
+  #   end
+  #
+  class Strategy
+    class << self
+      # Look up a strategy class by name.
+      #
+      # @param name [Symbol, String, Class] the strategy name or class
+      # @return [Class] the strategy class
+      # @raise [ConfigurationError] if the strategy is not found
+      def lookup(name)
+        case name
+        when Class
+          name
+        when Symbol, String
+          const_get(name.to_s.camelize)
+        else
+          raise ConfigurationError, "strategy must be a symbol or class, got #{name.class}"
+        end
+      rescue NameError
+        raise ConfigurationError, "unknown strategy: #{name.inspect}"
+      end
+    end
+
+    attr_reader :replica_class
+
+    def initialize(replica_class)
+      @replica_class = replica_class
+    end
+
+    # @!group Single Record Operations
+
+    # Replicate a create operation.
+    # @param primary_key [String] the primary key of the record
+    # @param attributes [Hash] the record attributes
+    def create(primary_key, attributes)
+      raise NotImplementedError, "#{self.class}#create must be implemented"
+    end
+
+    # Replicate an update operation.
+    # @param primary_key [String] the primary key of the record
+    # @param attributes [Hash] the record attributes
+    def update(primary_key, attributes)
+      raise NotImplementedError, "#{self.class}#update must be implemented"
+    end
+
+    # Replicate a destroy operation.
+    # @param primary_key [String] the primary key of the record
+    # @param attributes [Hash] the record attributes
+    def destroy(primary_key, attributes)
+      raise NotImplementedError, "#{self.class}#destroy must be implemented"
+    end
+
+    # @!endgroup
+
+    # @!group Bulk Operations
+
+    # Replicate a bulk insert operation.
+    # @param records [Array<Hash>] the records to insert
+    def insert_all(records)
+      raise NotImplementedError, "#{self.class}#insert_all must be implemented"
+    end
+
+    # Replicate a bulk upsert operation.
+    # @param records [Array<Hash>] the records to upsert
+    def upsert_all(records)
+      raise NotImplementedError, "#{self.class}#upsert_all must be implemented"
+    end
+
+    # @!endgroup
+  end
+
   # Concern to be included in models that need dual writing
   module Model
     extend ActiveSupport::Concern
@@ -48,61 +134,43 @@ module DualWrites
     end
 
     class_methods do
-      # Configure dual writes for this model
+      # Configure dual writes for this model.
       #
       # @param to [Symbol, Array<Symbol>] the replica shard(s) to write to
+      # @param strategy [Symbol, Class] replication strategy class or name.
+      #   Built-in strategies: :clickhouse.
+      #   Use :clickhouse for ClickHouse with ReplacingMergeTree (insert-only with is_deleted flag).
       # @param sync [Boolean] whether to replicate synchronously inside the transaction (default: false)
-      # @param strategy [Symbol] replication strategy - :standard (default) or :append_only.
-      #   Use :append_only for append-only databases like ClickHouse with ReplacingMergeTree.
-      #   In :append_only mode, all operations become inserts and deletes are skipped.
-      # @param resolve_with [Symbol, nil] column to use for conflict resolution (e.g., :updated_at).
-      #   When set, only applies changes if the incoming value is newer than the existing value.
-      #   This prevents out-of-order job execution from overwriting newer data with older data.
-      #   Note: resolve_with is ignored when using :append_only strategy.
       #
-      # @example
+      # @example Basic usage
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :clickhouse
+      #     dual_writes to: :clickhouse, strategy: :clickhouse
       #   end
       #
-      # @example with multiple replicas
+      # @example With multiple replicas
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: %i[clickhouse analytics]
+      #     dual_writes to: %i[clickhouse analytics], strategy: :clickhouse
       #   end
       #
-      # @example with synchronous replication
+      # @example With synchronous replication
       #   class EventLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :clickhouse, sync: true
+      #     dual_writes to: :clickhouse, strategy: :clickhouse, sync: true
       #   end
       #
-      # @example with insert-only strategy for ClickHouse (ReplacingMergeTree)
-      #   class RequestLog < ApplicationRecord
+      # @example With custom strategy
+      #   class MyModel < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :clickhouse, strategy: :append_only
+      #     dual_writes to: :my_shard, strategy: MyCustomStrategy
       #   end
       #
-      # @example with conflict resolution using lock_version (recommended for critical data)
-      #   class License < ApplicationRecord
-      #     include DualWrites::Model
-      #
-      #     dual_writes to: :clickhouse, resolve_with: :lock_version
-      #   end
-      #
-      # @example with auto-detected conflict resolution (uses lock_version if present, else updated_at)
-      #   class License < ApplicationRecord
-      #     include DualWrites::Model
-      #
-      #     dual_writes to: :clickhouse, resolve_with: true
-      #   end
-      #
-      def dual_writes(to:, sync: false, strategy: :standard, resolve_with: nil)
+      def dual_writes(to:, strategy:, sync: false)
         shards = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -111,25 +179,8 @@ module DualWrites
         raise ConfigurationError, 'to cannot be empty' if
           shards.empty?
 
-        raise ConfigurationError, 'resolve_with must be a symbol or true' if
-          resolve_with.present? && !resolve_with.is_a?(Symbol) && resolve_with != true
-
-        raise ConfigurationError, 'strategy must be :standard or :append_only' unless
-          %i[standard append_only].include?(strategy)
-
-        # auto-detect resolution column: prefer lock_version, fall back to updated_at
-        resolved_column = case resolve_with
-                          when true
-                            if column_names.include?('lock_version')
-                              :lock_version
-                            elsif column_names.include?('updated_at')
-                              :updated_at
-                            else
-                              raise ConfigurationError, 'resolve_with: true requires lock_version or updated_at column'
-                            end
-                          when Symbol
-                            resolve_with
-                          end
+        # Validate strategy can be looked up
+        Strategy.lookup(strategy)
 
         # Auto-generate replica model classes for each shard.
         # e.g., RequestLog with to: :clickhouse creates RequestLog::Clickhouse
@@ -153,11 +204,10 @@ module DualWrites
           to: shards,
           sync:,
           strategy:,
-          resolve_with: resolved_column,
         }.freeze
       end
 
-      # Temporarily disable dual writes for a block
+      # Temporarily disable dual writes for a block.
       #
       # @example
       #   RequestLog.without_dual_writes do
@@ -172,7 +222,7 @@ module DualWrites
         self.dual_writes_enabled = original
       end
 
-      # Temporarily enable synchronous dual writes for a block
+      # Temporarily enable synchronous dual writes for a block.
       #
       # @example
       #   RequestLog.with_sync_dual_writes do
@@ -310,106 +360,16 @@ module DualWrites
       end
 
       config = klass.dual_writes_config
-
-      replicate_to(
-        operation.to_sym,
-        klass,
-        shard.to_sym,
-        primary_key,
-        attributes,
-        strategy: config[:strategy],
-        resolve_with: config[:resolve_with],
-      )
-    end
-
-    private
-
-    def replicate_to(operation, klass, shard, primary_key, attributes, strategy: :standard, resolve_with: nil)
-      # Get the auto-generated replica class (e.g., RequestLog::Clickhouse)
-      # which connects directly to the shard and has its own schema cache.
       replica_class = klass.const_get(shard.to_s.camelize)
+      strategy = Strategy.lookup(config[:strategy]).new(replica_class)
 
-      case strategy
-      when :append_only
-        # No transaction needed for append-only (ClickHouse doesn't support them)
-        replicate_append_only(operation, replica_class, primary_key, attributes)
-      when :standard
-        replica_class.transaction do
-          if resolve_with.present?
-            replicate_with_resolution(operation, replica_class, primary_key, attributes, resolve_with)
-          else
-            replicate_without_resolution(operation, replica_class, primary_key, attributes)
-          end
-        end
-      else
-        raise ReplicationError, "unknown strategy: #{strategy}"
+      unless strategy.respond_to?(operation.to_sym)
+        raise ReplicationError, "unknown operation: #{operation}"
       end
+
+      strategy.public_send(operation.to_sym, primary_key, attributes)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{shard} not established: #{e.message}"
-    end
-
-    # Insert-only replication for append-only databases like ClickHouse.
-    # All operations become inserts; updates insert new versions (ReplacingMergeTree handles dedup),
-    # and deletes insert a tombstone row with is_deleted = 1.
-    def replicate_append_only(operation, klass, primary_key, attributes)
-      # Serialize any non-primitive values to JSON for ClickHouse compatibility
-      serialized = attributes.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
-
-      case operation
-      when :create, :update
-        klass.insert!(serialized.merge('id' => primary_key, 'is_deleted' => 0))
-      when :destroy
-        # Insert a tombstone row with is_deleted = 1
-        # ReplacingMergeTree(ver, is_deleted) will handle cleanup
-        klass.insert!(serialized.merge('id' => primary_key, 'is_deleted' => 1))
-      else
-        raise ReplicationError, "unknown operation: #{operation}"
-      end
-    end
-
-    def replicate_without_resolution(operation, klass, primary_key, attributes)
-      case operation
-      when :create
-        klass.upsert(attributes.merge('id' => primary_key), unique_by: :id)
-      when :update
-        klass.where(id: primary_key).update_all(attributes.except('id'))
-      when :destroy
-        klass.where(id: primary_key).delete_all
-      else
-        raise ReplicationError, "unknown operation: #{operation}"
-      end
-    end
-
-    def replicate_with_resolution(operation, klass, primary_key, attributes, resolve_with)
-      resolve_column    = resolve_with.to_s
-      incoming_resolved = attributes[resolve_column]
-
-      raise ConfigurationError, "resolve_with column #{resolve_column.inspect} not found in attributes" if
-        incoming_resolved.nil?
-
-      case operation
-      when :create
-        # insert, or update if conflict and incoming is newer
-        begin
-          klass.insert(attributes.merge('id' => primary_key))
-        rescue ActiveRecord::RecordNotUnique
-          klass.where(id: primary_key)
-               .where(klass.arel_table[resolve_column].lt(incoming_resolved))
-               .update_all(attributes.except('id'))
-        end
-      when :update
-        # only update if record exists and incoming is newer
-        klass.where(id: primary_key)
-             .where(klass.arel_table[resolve_column].lt(incoming_resolved))
-             .update_all(attributes.except('id'))
-      when :destroy
-        # only delete if record exists and incoming is newer or equal
-        klass.where(id: primary_key)
-             .where(klass.arel_table[resolve_column].lteq(incoming_resolved))
-             .delete_all
-      else
-        raise ReplicationError, "unknown operation: #{operation}"
-      end
     end
   end
 
@@ -429,51 +389,18 @@ module DualWrites
 
       config = klass.dual_writes_config
       replica_class = klass.const_get(shard.to_s.camelize)
+      strategy = Strategy.lookup(config[:strategy]).new(replica_class)
 
-      case operation
-      when 'insert_all'
-        replicate_insert_all(replica_class, attributes, strategy: config[:strategy])
-      when 'upsert_all'
-        replicate_upsert_all(replica_class, attributes, strategy: config[:strategy])
-      else
+      unless strategy.respond_to?(operation.to_sym)
         raise ReplicationError, "unknown bulk operation: #{operation}"
       end
+
+      strategy.public_send(operation.to_sym, attributes)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{shard} not established: #{e.message}"
     end
-
-    private
-
-    def replicate_insert_all(klass, attributes, strategy:)
-      case strategy
-      when :append_only
-        # Serialize and add is_deleted for ClickHouse
-        records = attributes.map do |attrs|
-          serialized = attrs.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
-          serialized.merge('is_deleted' => 0)
-        end
-        klass.insert_all!(records)
-      when :standard
-        klass.insert_all!(attributes)
-      else
-        raise ReplicationError, "unknown strategy: #{strategy}"
-      end
-    end
-
-    def replicate_upsert_all(klass, attributes, strategy:)
-      case strategy
-      when :append_only
-        # For append-only, upsert becomes insert (ReplacingMergeTree handles dedup)
-        records = attributes.map do |attrs|
-          serialized = attrs.transform_values { |v| v.is_a?(Hash) || v.is_a?(Array) ? v.to_json : v }
-          serialized.merge('is_deleted' => 0)
-        end
-        klass.insert_all!(records)
-      when :standard
-        klass.upsert_all(attributes)
-      else
-        raise ReplicationError, "unknown strategy: #{strategy}"
-      end
-    end
   end
 end
+
+# Load built-in strategies
+require_relative 'dual_writes/strategy/clickhouse'

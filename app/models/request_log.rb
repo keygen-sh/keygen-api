@@ -10,7 +10,7 @@ class RequestLog < ApplicationRecord
   include Orderable
   include Pageable
 
-  dual_writes to: :clickhouse, strategy: :append_only
+  dual_writes to: :clickhouse, strategy: :clickhouse
 
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true
