@@ -108,73 +108,6 @@ describe DualWrites do
       end
     end
 
-    describe '.without_dual_writes' do
-      it 'should disable dual writes within block' do
-        expect {
-          model.without_dual_writes do
-            model.create!(name: 'test', data: 'hello')
-          end
-        }.not_to have_enqueued_job(DualWrites::ReplicationJob)
-      end
-
-      it 'should re-enable dual writes after block' do
-        model.without_dual_writes do
-          model.create!(name: 'test', data: 'hello')
-        end
-
-        expect {
-          model.create!(name: 'test2', data: 'world')
-        }.to have_enqueued_job(DualWrites::ReplicationJob)
-      end
-
-      it 'should re-enable dual writes after exception' do
-        expect {
-          model.without_dual_writes do
-            raise 'test error'
-          end
-        }.to raise_error('test error')
-
-        expect(model.dual_writes_enabled).to eq true
-      end
-    end
-
-    describe '.with_sync_dual_writes' do
-      temporary_table :sync_dual_write_records do |t|
-        t.string :name
-        t.text :data
-        t.integer :is_deleted, default: 0, null: false
-        t.timestamps
-      end
-
-      temporary_model :sync_dual_write_record do
-        include DualWrites::Model
-
-        dual_writes to: %i[clickhouse], strategy: :clickhouse
-      end
-
-      let(:sync_model) { SyncDualWriteRecord }
-
-      it 'should switch to sync mode within block' do
-        # Verify perform_now is called (sync) instead of perform_later (async)
-        expect(DualWrites::ReplicationJob).to receive(:perform_now).at_least(:once)
-        expect(DualWrites::ReplicationJob).not_to receive(:perform_later)
-
-        sync_model.with_sync_dual_writes do
-          sync_model.create!(name: 'test', data: 'hello')
-        end
-      end
-
-      it 'should revert to async mode after block' do
-        allow(DualWrites::ReplicationJob).to receive(:perform_now)
-
-        sync_model.with_sync_dual_writes do
-          sync_model.create!(name: 'test', data: 'hello')
-        end
-
-        expect(sync_model.dual_writes_config[:sync]).to eq false
-      end
-    end
-
     describe 'sync replication' do
       temporary_table :sync_replication_records do |t|
         t.string :name
@@ -442,17 +375,6 @@ describe DualWrites do
       end
     end
 
-    describe '.without_dual_writes' do
-      it 'should not enqueue bulk replication job' do
-        attributes = [{ name: 'record1', data: 'data1' }]
-
-        expect {
-          model.without_dual_writes do
-            model.insert_all(attributes)
-          end
-        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
-      end
-    end
   end
 
   describe DualWrites::BulkReplicationJob do

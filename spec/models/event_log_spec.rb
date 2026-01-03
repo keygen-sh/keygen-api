@@ -99,16 +99,6 @@ describe EventLog, type: :model do
       end
     end
 
-    describe 'with dual writes disabled' do
-      it 'should not enqueue replication job' do
-        expect {
-          EventLog.without_dual_writes do
-            event_log.save!
-          end
-        }.not_to have_enqueued_job(DualWrites::ReplicationJob)
-      end
-    end
-
     describe 'replication' do
       it 'should replicate record to clickhouse' do
         event_log.save!
@@ -250,29 +240,6 @@ describe EventLog, type: :model do
         end
       end
 
-      describe 'with dual writes disabled' do
-        it 'should not enqueue bulk replication job' do
-          now = Time.current
-          attributes = [
-            {
-              id: SecureRandom.uuid,
-              account_id: account.id,
-              event_type_id: event_type.id,
-              resource_type: resource.class.name,
-              resource_id: resource.id,
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
-            },
-          ]
-
-          expect {
-            EventLog.without_dual_writes do
-              EventLog.insert_all(attributes)
-            end
-          }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
-        end
-      end
     end
   end
 end

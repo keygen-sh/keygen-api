@@ -120,7 +120,6 @@ module DualWrites
 
     included do
       class_attribute :dual_writes_config, instance_accessor: false, default: nil
-      class_attribute :dual_writes_enabled, instance_accessor: false, default: true
 
       # async replication: enqueue jobs after commit (no rollback on failure)
       after_create_commit  :replicate_create_async,  if: :should_replicate_async?
@@ -207,38 +206,6 @@ module DualWrites
         }.freeze
       end
 
-      # Temporarily disable dual writes for a block.
-      #
-      # @example
-      #   RequestLog.without_dual_writes do
-      #     RequestLog.create!(...)
-      #   end
-      #
-      def without_dual_writes(&)
-        original = dual_writes_enabled
-        self.dual_writes_enabled = false
-        yield
-      ensure
-        self.dual_writes_enabled = original
-      end
-
-      # Temporarily enable synchronous dual writes for a block.
-      #
-      # @example
-      #   RequestLog.with_sync_dual_writes do
-      #     RequestLog.create!(...)
-      #   end
-      #
-      def with_sync_dual_writes(&)
-        return yield if dual_writes_config.nil?
-
-        original_config = dual_writes_config
-        self.dual_writes_config = original_config.merge(sync: true)
-        yield
-      ensure
-        self.dual_writes_config = original_config
-      end
-
       # Override bulk insert methods to automatically replicate
       def insert_all(attributes, **options)
         result = super
@@ -262,7 +229,6 @@ module DualWrites
 
       def replicate_bulk(operation, attributes)
         return if dual_writes_config.nil?
-        return unless dual_writes_enabled
 
         config = dual_writes_config
 
@@ -289,14 +255,12 @@ module DualWrites
     private
 
     def should_replicate_async?
-      return false unless self.class.dual_writes_enabled
       return false if self.class.dual_writes_config.nil?
 
       !self.class.dual_writes_config[:sync]
     end
 
     def should_replicate_sync?
-      return false unless self.class.dual_writes_enabled
       return false if self.class.dual_writes_config.nil?
 
       self.class.dual_writes_config[:sync]

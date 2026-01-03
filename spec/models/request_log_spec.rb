@@ -94,16 +94,6 @@ describe RequestLog, type: :model do
       end
     end
 
-    describe 'with dual writes disabled' do
-      it 'should not enqueue replication job' do
-        expect {
-          RequestLog.without_dual_writes do
-            request_log.save!
-          end
-        }.not_to have_enqueued_job(DualWrites::ReplicationJob)
-      end
-    end
-
     describe 'replication' do
       it 'should replicate record to clickhouse' do
         request_log.save!
@@ -241,30 +231,6 @@ describe RequestLog, type: :model do
         end
       end
 
-      describe 'with dual writes disabled' do
-        it 'should not enqueue bulk replication job' do
-          now = Time.current
-          attributes = [
-            {
-              id: SecureRandom.uuid,
-              account_id: account.id,
-              method: 'GET',
-              url: '/v1/accounts',
-              status: '200',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
-            },
-          ]
-
-          expect {
-            RequestLog.without_dual_writes do
-              RequestLog.insert_all(attributes)
-            end
-          }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
-        end
-      end
     end
   end
 end
