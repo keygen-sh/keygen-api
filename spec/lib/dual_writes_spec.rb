@@ -26,7 +26,7 @@ describe DualWrites do
     temporary_model :dual_write_record do
       include DualWrites::Model
 
-      dual_writes replicates_to: %i[clickhouse]
+      dual_writes to: %i[clickhouse]
     end
 
     let(:model) { DualWriteRecord }
@@ -34,31 +34,31 @@ describe DualWrites do
     describe '.dual_writes' do
       it 'should configure dual writes' do
         expect(model.dual_writes_config).to eq(
-          replicates_to: [:clickhouse],
+          to: [:clickhouse],
           async: true,
           strategy: :standard,
           resolve_with: nil,
         )
       end
 
-      it 'should raise error for empty replicates_to' do
+      it 'should raise error for empty to' do
         expect {
           Class.new(ApplicationRecord) do
             include DualWrites::Model
 
-            dual_writes replicates_to: []
+            dual_writes to: []
           end
         }.to raise_error(DualWrites::ConfigurationError, /cannot be empty/)
       end
 
-      it 'should raise error for invalid replicates_to' do
+      it 'should raise error for invalid to' do
         expect {
           Class.new(ApplicationRecord) do
             include DualWrites::Model
 
-            dual_writes replicates_to: ['clickhouse']
+            dual_writes to: ['clickhouse']
           end
-        }.to raise_error(DualWrites::ConfigurationError, /must be an array of symbols/)
+        }.to raise_error(DualWrites::ConfigurationError, /must be a symbol or array of symbols/)
       end
     end
 
@@ -150,7 +150,7 @@ describe DualWrites do
       temporary_model :sync_dual_write_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], strategy: :append_only, async: true
+        dual_writes to: %i[clickhouse], strategy: :append_only, async: true
       end
 
       let(:sync_model) { SyncDualWriteRecord }
@@ -187,7 +187,7 @@ describe DualWrites do
       temporary_model :sync_replication_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], strategy: :append_only, async: false
+        dual_writes to: %i[clickhouse], strategy: :append_only, async: false
       end
 
       let(:sync_model) { SyncReplicationRecord }
@@ -242,7 +242,7 @@ describe DualWrites do
         temporary_model :invalid_op_record, table_name: :replication_test_records do
           include DualWrites::Model
 
-          dual_writes replicates_to: %i[clickhouse]
+          dual_writes to: %i[clickhouse]
         end
 
         it 'should raise error for unknown operation' do
@@ -273,7 +273,7 @@ describe DualWrites do
       temporary_model :resolved_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[replica], resolve_with: :updated_at
+        dual_writes to: %i[replica], resolve_with: :updated_at
       end
 
       let(:resolved_model) { ResolvedRecord }
@@ -398,7 +398,7 @@ describe DualWrites do
       temporary_model :versioned_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[replica], resolve_with: :lock_version
+        dual_writes to: %i[replica], resolve_with: :lock_version
       end
 
       let(:versioned_model) { VersionedRecord }
@@ -460,13 +460,13 @@ describe DualWrites do
       temporary_model :auto_resolve_with_lock_version_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], resolve_with: true
+        dual_writes to: %i[clickhouse], resolve_with: true
       end
 
       temporary_model :auto_resolve_with_updated_at_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], resolve_with: true
+        dual_writes to: %i[clickhouse], resolve_with: true
       end
 
       it 'should prefer lock_version when present' do
@@ -489,7 +489,7 @@ describe DualWrites do
       temporary_model :append_only_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], strategy: :append_only
+        dual_writes to: %i[clickhouse], strategy: :append_only
       end
 
       let(:append_only_model) { AppendOnlyRecord }
@@ -572,7 +572,7 @@ describe DualWrites do
 
             include DualWrites::Model
 
-            dual_writes replicates_to: %i[clickhouse], strategy: :invalid
+            dual_writes to: %i[clickhouse], strategy: :invalid
           end
         }.to raise_error(DualWrites::ConfigurationError, /strategy must be :standard or :append_only/)
       end
@@ -589,7 +589,7 @@ describe DualWrites do
     temporary_model :bulk_record do
       include DualWrites::Model
 
-      dual_writes replicates_to: %i[clickhouse]
+      dual_writes to: %i[clickhouse]
     end
 
     let(:model) { BulkRecord }
@@ -686,7 +686,7 @@ describe DualWrites do
       temporary_model :bulk_standard_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[replica], strategy: :standard
+        dual_writes to: %i[replica], strategy: :standard
       end
 
       let(:model) { BulkStandardRecord }
@@ -739,7 +739,7 @@ describe DualWrites do
       temporary_model :bulk_append_record do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse], strategy: :append_only
+        dual_writes to: %i[clickhouse], strategy: :append_only
       end
 
       let(:model) { BulkAppendRecord }
@@ -804,7 +804,7 @@ describe DualWrites do
       temporary_model :bulk_invalid_record, table_name: :bulk_records do
         include DualWrites::Model
 
-        dual_writes replicates_to: %i[clickhouse]
+        dual_writes to: %i[clickhouse]
       end
 
       it 'should raise error for unknown operation' do

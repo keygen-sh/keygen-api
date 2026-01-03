@@ -50,7 +50,7 @@ module DualWrites
     class_methods do
       # Configure dual writes for this model
       #
-      # @param replicates_to [Array<Symbol>] the replica shards to write to
+      # @param to [Symbol, Array<Symbol>] the replica shard(s) to write to
       # @param async [Boolean] whether to replicate asynchronously via background job (default: true)
       # @param strategy [Symbol] replication strategy - :standard (default) or :append_only.
       #   Use :append_only for append-only databases like ClickHouse with ReplacingMergeTree.
@@ -64,43 +64,52 @@ module DualWrites
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes replicates_to: %i[clickhouse]
+      #     dual_writes to: :clickhouse
+      #   end
+      #
+      # @example with multiple replicas
+      #   class RequestLog < ApplicationRecord
+      #     include DualWrites::Model
+      #
+      #     dual_writes to: %i[clickhouse analytics]
       #   end
       #
       # @example with synchronous replication
       #   class EventLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes replicates_to: %i[clickhouse], async: false
+      #     dual_writes to: :clickhouse, async: false
       #   end
       #
       # @example with insert-only strategy for ClickHouse (ReplacingMergeTree)
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes replicates_to: %i[clickhouse], strategy: :append_only
+      #     dual_writes to: :clickhouse, strategy: :append_only
       #   end
       #
       # @example with conflict resolution using lock_version (recommended for critical data)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes replicates_to: %i[clickhouse], resolve_with: :lock_version
+      #     dual_writes to: :clickhouse, resolve_with: :lock_version
       #   end
       #
       # @example with auto-detected conflict resolution (uses lock_version if present, else updated_at)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes replicates_to: %i[clickhouse], resolve_with: true
+      #     dual_writes to: :clickhouse, resolve_with: true
       #   end
       #
-      def dual_writes(replicates_to:, async: true, strategy: :standard, resolve_with: nil)
-        raise ConfigurationError, 'replicates_to must be an array of symbols' unless
-          replicates_to.is_a?(Array) && replicates_to.all? { it.is_a?(Symbol) }
+      def dual_writes(to:, async: true, strategy: :standard, resolve_with: nil)
+        shards = Array(to)
 
-        raise ConfigurationError, 'replicates_to cannot be empty' if
-          replicates_to.empty?
+        raise ConfigurationError, 'to must be a symbol or array of symbols' unless
+          shards.all? { it.is_a?(Symbol) }
+
+        raise ConfigurationError, 'to cannot be empty' if
+          shards.empty?
 
         raise ConfigurationError, 'resolve_with must be a symbol or true' if
           resolve_with.present? && !resolve_with.is_a?(Symbol) && resolve_with != true
@@ -123,9 +132,9 @@ module DualWrites
                           end
 
         # Auto-generate replica model classes for each shard.
-        # e.g., RequestLog with replicates_to: [:clickhouse] creates RequestLog::Clickhouse
+        # e.g., RequestLog with to: :clickhouse creates RequestLog::Clickhouse
         # that inherits from DualWrites::ClickhouseRecord and has its own schema cache.
-        replicates_to.each do |shard|
+        shards.each do |shard|
           replica_class_name = shard.to_s.camelize
 
           next if const_defined?(replica_class_name, false)
@@ -141,7 +150,7 @@ module DualWrites
         end
 
         self.dual_writes_config = {
-          replicates_to: replicates_to,
+          to: shards,
           async: async,
           strategy: strategy,
           resolve_with: resolved_column,
@@ -207,7 +216,7 @@ module DualWrites
 
         config = dual_writes_config
 
-        config[:replicates_to].each do |shard|
+        config[:to].each do |shard|
           if config[:async]
             BulkReplicationJob.perform_later(
               operation: operation.to_s,
@@ -255,7 +264,7 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:replicates_to].each do |shard|
+      config[:to].each do |shard|
         ReplicationJob.perform_later(
           operation: operation.to_s,
           class_name: self.class.name,
@@ -270,7 +279,7 @@ module DualWrites
       config = self.class.dual_writes_config
       attrs  = replication_attributes
 
-      config[:replicates_to].each do |shard|
+      config[:to].each do |shard|
         ReplicationJob.perform_now(
           operation: operation.to_s,
           class_name: self.class.name,
