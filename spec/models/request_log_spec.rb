@@ -25,7 +25,7 @@ describe RequestLog, type: :model do
         expect(RequestLog.dual_writes_config).to include(
           to: [:clickhouse],
           strategy: :append_only,
-          async: true,
+          sync: false,
         )
       end
     end

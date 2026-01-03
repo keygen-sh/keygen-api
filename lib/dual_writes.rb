@@ -51,7 +51,7 @@ module DualWrites
       # Configure dual writes for this model
       #
       # @param to [Symbol, Array<Symbol>] the replica shard(s) to write to
-      # @param async [Boolean] whether to replicate asynchronously via background job (default: true)
+      # @param sync [Boolean] whether to replicate synchronously inside the transaction (default: false)
       # @param strategy [Symbol] replication strategy - :standard (default) or :append_only.
       #   Use :append_only for append-only databases like ClickHouse with ReplacingMergeTree.
       #   In :append_only mode, all operations become inserts and deletes are skipped.
@@ -78,7 +78,7 @@ module DualWrites
       #   class EventLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :clickhouse, async: false
+      #     dual_writes to: :clickhouse, sync: true
       #   end
       #
       # @example with insert-only strategy for ClickHouse (ReplacingMergeTree)
@@ -102,7 +102,7 @@ module DualWrites
       #     dual_writes to: :clickhouse, resolve_with: true
       #   end
       #
-      def dual_writes(to:, async: true, strategy: :standard, resolve_with: nil)
+      def dual_writes(to:, sync: false, strategy: :standard, resolve_with: nil)
         shards = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -151,8 +151,8 @@ module DualWrites
 
         self.dual_writes_config = {
           to: shards,
-          async: async,
-          strategy: strategy,
+          sync:,
+          strategy:,
           resolve_with: resolved_column,
         }.freeze
       end
@@ -183,7 +183,7 @@ module DualWrites
         return yield if dual_writes_config.nil?
 
         original_config = dual_writes_config
-        self.dual_writes_config = original_config.merge(async: false)
+        self.dual_writes_config = original_config.merge(sync: true)
         yield
       ensure
         self.dual_writes_config = original_config
@@ -217,15 +217,15 @@ module DualWrites
         config = dual_writes_config
 
         config[:to].each do |shard|
-          if config[:async]
-            BulkReplicationJob.perform_later(
+          if config[:sync]
+            BulkReplicationJob.perform_now(
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
               shard: shard.to_s,
             )
           else
-            BulkReplicationJob.perform_now(
+            BulkReplicationJob.perform_later(
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
@@ -242,14 +242,14 @@ module DualWrites
       return false unless self.class.dual_writes_enabled
       return false if self.class.dual_writes_config.nil?
 
-      self.class.dual_writes_config[:async]
+      !self.class.dual_writes_config[:sync]
     end
 
     def should_replicate_sync?
       return false unless self.class.dual_writes_enabled
       return false if self.class.dual_writes_config.nil?
 
-      !self.class.dual_writes_config[:async]
+      self.class.dual_writes_config[:sync]
     end
 
     def replicate_create_async  = replicate_async(:create)

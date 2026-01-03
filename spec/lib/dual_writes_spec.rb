@@ -35,7 +35,7 @@ describe DualWrites do
       it 'should configure dual writes' do
         expect(model.dual_writes_config).to eq(
           to: [:clickhouse],
-          async: true,
+          sync: false,
           strategy: :standard,
           resolve_with: nil,
         )
@@ -150,7 +150,7 @@ describe DualWrites do
       temporary_model :sync_dual_write_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only, async: true
+        dual_writes to: %i[clickhouse], strategy: :append_only
       end
 
       let(:sync_model) { SyncDualWriteRecord }
@@ -172,7 +172,7 @@ describe DualWrites do
           sync_model.create!(name: 'test', data: 'hello')
         end
 
-        expect(sync_model.dual_writes_config[:async]).to eq true
+        expect(sync_model.dual_writes_config[:sync]).to eq false
       end
     end
 
@@ -187,7 +187,7 @@ describe DualWrites do
       temporary_model :sync_replication_record do
         include DualWrites::Model
 
-        dual_writes to: %i[clickhouse], strategy: :append_only, async: false
+        dual_writes to: %i[clickhouse], strategy: :append_only, sync: true
       end
 
       let(:sync_model) { SyncReplicationRecord }
