@@ -50,7 +50,6 @@ module DualWrites
     class_methods do
       # Configure dual writes for this model
       #
-      # @param to [Symbol] the primary database shard (default: :primary)
       # @param replicates_to [Array<Symbol>] the replica shards to write to
       # @param async [Boolean] whether to replicate asynchronously via background job (default: true)
       # @param strategy [Symbol] replication strategy - :standard (default) or :append_only.
@@ -65,38 +64,38 @@ module DualWrites
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[clickhouse]
+      #     dual_writes replicates_to: %i[clickhouse]
       #   end
       #
       # @example with synchronous replication
       #   class EventLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[clickhouse], async: false
+      #     dual_writes replicates_to: %i[clickhouse], async: false
       #   end
       #
       # @example with insert-only strategy for ClickHouse (ReplacingMergeTree)
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[clickhouse], strategy: :append_only
+      #     dual_writes replicates_to: %i[clickhouse], strategy: :append_only
       #   end
       #
       # @example with conflict resolution using lock_version (recommended for critical data)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: :lock_version
+      #     dual_writes replicates_to: %i[clickhouse], resolve_with: :lock_version
       #   end
       #
       # @example with auto-detected conflict resolution (uses lock_version if present, else updated_at)
       #   class License < ApplicationRecord
       #     include DualWrites::Model
       #
-      #     dual_writes to: :primary, replicates_to: %i[clickhouse], resolve_with: true
+      #     dual_writes replicates_to: %i[clickhouse], resolve_with: true
       #   end
       #
-      def dual_writes(to: :primary, replicates_to:, async: true, strategy: :standard, resolve_with: nil)
+      def dual_writes(replicates_to:, async: true, strategy: :standard, resolve_with: nil)
         raise ConfigurationError, 'replicates_to must be an array of symbols' unless
           replicates_to.is_a?(Array) && replicates_to.all? { it.is_a?(Symbol) }
 
@@ -142,7 +141,6 @@ module DualWrites
         end
 
         self.dual_writes_config = {
-          primary: to,
           replicates_to: replicates_to,
           async: async,
           strategy: strategy,
