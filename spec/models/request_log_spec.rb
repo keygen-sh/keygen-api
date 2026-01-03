@@ -126,5 +126,145 @@ describe RequestLog, type: :model do
         expect(replica_record.is_deleted).to eq 0
       end
     end
+
+    describe 'bulk operations' do
+      describe '.insert_all' do
+        it 'should enqueue bulk replication job' do
+          now = Time.current
+          attributes = [
+            {
+              id: SecureRandom.uuid,
+              account_id: account.id,
+              method: 'GET',
+              url: '/v1/accounts',
+              status: '200',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+            {
+              id: SecureRandom.uuid,
+              account_id: account.id,
+              method: 'POST',
+              url: '/v1/licenses',
+              status: '201',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+          ]
+
+          expect {
+            RequestLog.insert_all(attributes)
+          }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+            operation: 'insert_all',
+            class_name: 'RequestLog',
+            attributes: an_instance_of(Array),
+            shard: 'clickhouse',
+          )
+        end
+
+        it 'should insert records into primary' do
+          now = Time.current
+          attributes = [
+            {
+              id: SecureRandom.uuid,
+              account_id: account.id,
+              method: 'GET',
+              url: '/v1/accounts',
+              status: '200',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+          ]
+
+          expect {
+            RequestLog.insert_all(attributes)
+          }.to change { RequestLog.count }.by(1)
+        end
+      end
+
+      describe 'bulk replication' do
+        it 'should replicate bulk insert to clickhouse' do
+          now = Time.current
+          id1 = SecureRandom.uuid
+          id2 = SecureRandom.uuid
+
+          attributes = [
+            {
+              id: id1,
+              account_id: account.id,
+              method: 'GET',
+              url: '/v1/accounts',
+              status: '200',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+            {
+              id: id2,
+              account_id: account.id,
+              method: 'POST',
+              url: '/v1/licenses',
+              status: '201',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+          ]
+
+          RequestLog.insert_all(attributes)
+
+          # Perform the enqueued bulk replication job
+          job = ActiveJob::Base.queue_adapter.enqueued_jobs.find { _1['job_class'] == 'DualWrites::BulkReplicationJob' }
+          args = ActiveJob::Arguments.deserialize(job['arguments']).first
+          DualWrites::BulkReplicationJob.perform_now(**args)
+
+          # Verify records exist in replica (ClickHouse)
+          replica1 = RequestLog::Clickhouse.find_by(id: id1)
+          expect(replica1).to be_present
+          expect(replica1.account_id).to eq account.id
+          expect(replica1.method).to eq 'GET'
+          expect(replica1.is_deleted).to eq 0
+
+          replica2 = RequestLog::Clickhouse.find_by(id: id2)
+          expect(replica2).to be_present
+          expect(replica2.account_id).to eq account.id
+          expect(replica2.method).to eq 'POST'
+          expect(replica2.is_deleted).to eq 0
+        end
+      end
+
+      describe 'with dual writes disabled' do
+        it 'should not enqueue bulk replication job' do
+          now = Time.current
+          attributes = [
+            {
+              id: SecureRandom.uuid,
+              account_id: account.id,
+              method: 'GET',
+              url: '/v1/accounts',
+              status: '200',
+              ip: '127.0.0.1',
+              created_at: now,
+              updated_at: now,
+              created_date: now.to_date,
+            },
+          ]
+
+          expect {
+            RequestLog.without_dual_writes do
+              RequestLog.insert_all(attributes)
+            end
+          }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+        end
+      end
+    end
   end
 end
