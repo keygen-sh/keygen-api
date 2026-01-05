@@ -38,6 +38,24 @@ module DualWrites
         insert_all(records)
       end
 
+      def delete_all(query)
+        where  = query[:where] || query['where']
+        order  = query[:order] || query['order']
+        limit  = query[:limit] || query['limit']
+        offset = query[:offset] || query['offset']
+
+        return if where.blank?
+
+        # Build relation from query params
+        relation = replica_class.where(where)
+        relation = relation.order(Arel.sql(order.join(', '))) if order.present?
+        relation = relation.limit(limit) if limit
+        relation = relation.offset(offset) if offset
+
+        # Use ClickHouse's lightweight delete
+        relation.delete_all
+      end
+
       private
 
       # Serialize complex values to JSON for ClickHouse compatibility.

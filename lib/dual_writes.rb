@@ -111,6 +111,12 @@ module DualWrites
       raise NotImplementedError, "#{self.class}#upsert_all must be implemented"
     end
 
+    # Replicate a bulk delete operation.
+    # @param query [Hash] the query parameters (:where, :order, :limit, :offset)
+    def delete_all(query)
+      raise NotImplementedError, "#{self.class}#delete_all must be implemented"
+    end
+
     # @!endgroup
   end
 
@@ -222,6 +228,45 @@ module DualWrites
       def upsert_all(attributes, **options)
         result = super
         replicate_bulk(:upsert_all, attributes)
+        result
+      end
+
+      def delete_all
+        relation = all
+        result   = super
+
+        return result if dual_writes_config.nil?
+
+        # Capture query as serializable hash
+        query = {
+          where: relation.where_values_hash,
+          order: relation.order_values.map(&:to_sql),
+          limit: relation.limit_value,
+          offset: relation.offset_value,
+        }
+
+        return result if query[:where].empty?
+
+        config = dual_writes_config
+
+        config[:to].each do |database|
+          if config[:sync]
+            BulkReplicationJob.perform_now(
+              operation: 'delete_all',
+              class_name: name,
+              query:,
+              database: database.to_s,
+            )
+          else
+            BulkReplicationJob.perform_later(
+              operation: 'delete_all',
+              class_name: name,
+              query:,
+              database: database.to_s,
+            )
+          end
+        end
+
         result
       end
 
@@ -344,7 +389,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, attributes:, database:)
+    def perform(operation:, class_name:, database:, attributes: nil, query: nil)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -359,7 +404,12 @@ module DualWrites
         raise ReplicationError, "unknown bulk operation: #{operation}"
       end
 
-      strategy.public_send(operation.to_sym, attributes)
+      case operation.to_sym
+      when :delete_all
+        strategy.delete_all(query)
+      else
+        strategy.public_send(operation.to_sym, attributes)
+      end
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end

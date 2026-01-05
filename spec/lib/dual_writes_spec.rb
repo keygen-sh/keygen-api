@@ -375,6 +375,49 @@ describe DualWrites do
       end
     end
 
+    describe '.delete_all' do
+      before do
+        model.insert_all([
+          { name: 'record1', data: 'data1' },
+          { name: 'record2', data: 'data2' },
+        ])
+      end
+
+      it 'should enqueue bulk replication job with query' do
+        expect {
+          model.where(name: 'record1').delete_all
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'delete_all',
+          class_name: 'BulkRecord',
+          query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
+          database: 'clickhouse',
+        )
+      end
+
+      it 'should include limit and order in query' do
+        expect {
+          model.where(name: 'record1').order(:id).limit(10).delete_all
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'delete_all',
+          class_name: 'BulkRecord',
+          query: hash_including(where: { 'name' => 'record1' }, limit: 10),
+          database: 'clickhouse',
+        )
+      end
+
+      it 'should delete records from primary' do
+        expect {
+          model.where(name: 'record1').delete_all
+        }.to change { model.count }.by(-1)
+      end
+
+      it 'should not enqueue job without conditions' do
+        expect {
+          model.delete_all
+        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+      end
+    end
+
   end
 
   describe DualWrites::BulkReplicationJob do
@@ -449,6 +492,48 @@ describe DualWrites do
 
         record = model.last
         expect(record.is_deleted).to eq 0
+      end
+
+      it 'should handle delete_all with query' do
+        # First insert some records
+        model.insert_all!([
+          { name: 'record1', data: 'data1', is_deleted: 0 },
+          { name: 'record2', data: 'data2', is_deleted: 0 },
+        ])
+
+        expect(model.count).to eq 2
+
+        # Now delete with query
+        job.perform(
+          operation: 'delete_all',
+          class_name: model.name,
+          query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
+          database: 'clickhouse',
+        )
+
+        expect(model.count).to eq 1
+        expect(model.first.name).to eq 'record2'
+      end
+
+      it 'should handle delete_all with limit' do
+        # First insert some records
+        model.insert_all!([
+          { name: 'record1', data: 'data1', is_deleted: 0 },
+          { name: 'record1', data: 'data2', is_deleted: 0 },
+          { name: 'record1', data: 'data3', is_deleted: 0 },
+        ])
+
+        expect(model.count).to eq 3
+
+        # Delete with limit
+        job.perform(
+          operation: 'delete_all',
+          class_name: model.name,
+          query: { where: { 'name' => 'record1' }, order: [], limit: 2, offset: nil },
+          database: 'clickhouse',
+        )
+
+        expect(model.count).to eq 1
       end
     end
 
