@@ -45,6 +45,7 @@ describe EventLog, type: :model do
             'resource_type' => resource.class.name,
             'resource_id' => resource.id,
           ),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -80,6 +81,7 @@ describe EventLog, type: :model do
           class_name: 'EventLog',
           primary_key: event_log.id,
           attributes: hash_including('metadata' => { 'foo' => 'bar' }),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -94,6 +96,7 @@ describe EventLog, type: :model do
           class_name: 'EventLog',
           primary_key: event_log.id,
           attributes: kind_of(Hash),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -160,6 +163,7 @@ describe EventLog, type: :model do
             operation: 'insert_all',
             class_name: 'EventLog',
             attributes: an_instance_of(Array),
+            performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             database: 'clickhouse',
           )
         end

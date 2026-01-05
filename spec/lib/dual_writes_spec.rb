@@ -70,6 +70,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: an_instance_of(Integer),
           attributes: hash_including('name' => 'test', 'data' => 'hello'),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -86,6 +87,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record.id,
           attributes: hash_including('name' => 'updated'),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -103,6 +105,7 @@ describe DualWrites do
           class_name: 'DualWriteRecord',
           primary_key: record_id,
           attributes: an_instance_of(Hash),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -165,6 +168,7 @@ describe DualWrites do
             class_name: 'UnconfiguredModel',
             primary_key: 999_997,
             attributes: { 'name' => 'test' },
+            performed_at: Time.current,
             database: 'clickhouse',
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
@@ -186,6 +190,7 @@ describe DualWrites do
               class_name: 'InvalidOpRecord',
               primary_key: 999_996,
               attributes: {},
+              performed_at: Time.current,
               database: 'clickhouse',
             )
           }.to raise_error(DualWrites::ReplicationError, /unknown operation/)
@@ -228,6 +233,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
+            performed_at: Time.current,
             database: 'clickhouse',
           )
 
@@ -250,6 +256,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
+            performed_at: Time.current,
             database: 'clickhouse',
           )
 
@@ -269,6 +276,7 @@ describe DualWrites do
             class_name: clickhouse_model.name,
             primary_key: record_id,
             attributes: attrs,
+            performed_at: Time.current,
             database: 'clickhouse',
           )
 
@@ -325,6 +333,7 @@ describe DualWrites do
             hash_including('name' => 'record1', 'data' => 'data1'),
             hash_including('name' => 'record2', 'data' => 'data2'),
           ],
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -353,6 +362,7 @@ describe DualWrites do
           operation: 'insert_all',
           class_name: 'BulkRecord',
           attributes: an_instance_of(Array),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -370,6 +380,7 @@ describe DualWrites do
           operation: 'upsert_all',
           class_name: 'BulkRecord',
           attributes: an_instance_of(Array),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -390,6 +401,7 @@ describe DualWrites do
           operation: 'delete_all',
           class_name: 'BulkRecord',
           query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -401,6 +413,7 @@ describe DualWrites do
           operation: 'delete_all',
           class_name: 'BulkRecord',
           query: hash_including(where: { 'name' => 'record1' }, limit: 10),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -418,6 +431,7 @@ describe DualWrites do
           operation: 'delete_all',
           class_name: 'BulkRecord',
           query: { where: {}, order: [], limit: nil, offset: nil },
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -459,6 +473,7 @@ describe DualWrites do
           operation: 'insert_all',
           class_name: model.name,
           attributes: attributes,
+          performed_at: Time.current,
           database: 'clickhouse',
         )
 
@@ -476,6 +491,7 @@ describe DualWrites do
           operation: 'upsert_all',
           class_name: model.name,
           attributes: attributes,
+          performed_at: Time.current,
           database: 'clickhouse',
         )
 
@@ -486,8 +502,8 @@ describe DualWrites do
       it 'should handle delete_all with query' do
         # First insert some records
         model.insert_all!([
-          { name: 'record1', data: 'data1', is_deleted: 0 },
-          { name: 'record2', data: 'data2', is_deleted: 0 },
+          { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
+          { name: 'record2', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
         ])
 
         expect(model.count).to eq 2
@@ -497,6 +513,7 @@ describe DualWrites do
           operation: 'delete_all',
           class_name: model.name,
           query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
+          performed_at: Time.current,
           database: 'clickhouse',
         )
 
@@ -507,9 +524,9 @@ describe DualWrites do
       it 'should handle delete_all with limit' do
         # First insert some records
         model.insert_all!([
-          { name: 'record1', data: 'data1', is_deleted: 0 },
-          { name: 'record1', data: 'data2', is_deleted: 0 },
-          { name: 'record1', data: 'data3', is_deleted: 0 },
+          { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
+          { name: 'record1', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
+          { name: 'record1', data: 'data3', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
         ])
 
         expect(model.count).to eq 3
@@ -519,6 +536,7 @@ describe DualWrites do
           operation: 'delete_all',
           class_name: model.name,
           query: { where: { 'name' => 'record1' }, order: [], limit: 2, offset: nil },
+          performed_at: Time.current,
           database: 'clickhouse',
         )
 
@@ -540,6 +558,7 @@ describe DualWrites do
             operation: 'insert_all',
             class_name: 'BulkUnconfiguredModel',
             attributes: [{ 'name' => 'test' }],
+            performed_at: Time.current,
             database: 'clickhouse',
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
@@ -560,6 +579,7 @@ describe DualWrites do
               operation: 'invalid',
               class_name: 'BulkInvalidRecord',
               attributes: [],
+              performed_at: Time.current,
               database: 'clickhouse',
             )
           }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)

@@ -41,6 +41,7 @@ describe RequestLog, type: :model do
             'method' => request_log.method,
             'url' => request_log.url,
           ),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -75,6 +76,7 @@ describe RequestLog, type: :model do
           class_name: 'RequestLog',
           primary_key: request_log.id,
           attributes: hash_including('status' => '404'),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -89,6 +91,7 @@ describe RequestLog, type: :model do
           class_name: 'RequestLog',
           primary_key: request_log.id,
           attributes: kind_of(Hash),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
       end
@@ -152,6 +155,7 @@ describe RequestLog, type: :model do
             operation: 'insert_all',
             class_name: 'RequestLog',
             attributes: an_instance_of(Array),
+            performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             database: 'clickhouse',
           )
         end

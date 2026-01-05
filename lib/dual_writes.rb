@@ -75,23 +75,26 @@ module DualWrites
     # @!group Single Record Operations
 
     # Replicate a create operation.
-    # @param primary_key [String] the primary key of the record
+    # @param primary_key [Object] the primary key of the record
     # @param attributes [Hash] the record attributes
-    def create(primary_key, attributes)
+    # @param performed_at [Time] when the operation was performed on the primary
+    def create(primary_key, attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#create must be implemented"
     end
 
     # Replicate an update operation.
-    # @param primary_key [String] the primary key of the record
+    # @param primary_key [Object] the primary key of the record
     # @param attributes [Hash] the record attributes
-    def update(primary_key, attributes)
+    # @param performed_at [Time] when the operation was performed on the primary
+    def update(primary_key, attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#update must be implemented"
     end
 
     # Replicate a destroy operation.
-    # @param primary_key [String] the primary key of the record
+    # @param primary_key [Object] the primary key of the record
     # @param attributes [Hash] the record attributes
-    def destroy(primary_key, attributes)
+    # @param performed_at [Time] when the operation was performed on the primary
+    def destroy(primary_key, attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#destroy must be implemented"
     end
 
@@ -101,19 +104,22 @@ module DualWrites
 
     # Replicate a bulk insert operation.
     # @param records [Array<Hash>] the records to insert
-    def insert_all(records)
+    # @param performed_at [Time] when the operation was performed on the primary
+    def insert_all(records, performed_at:)
       raise NotImplementedError, "#{self.class}#insert_all must be implemented"
     end
 
     # Replicate a bulk upsert operation.
     # @param records [Array<Hash>] the records to upsert
-    def upsert_all(records)
+    # @param performed_at [Time] when the operation was performed on the primary
+    def upsert_all(records, performed_at:)
       raise NotImplementedError, "#{self.class}#upsert_all must be implemented"
     end
 
     # Replicate a bulk delete operation.
-    # @param query [Hash] the query parameters (:where, :order, :limit, :offset)
-    def delete_all(query)
+    # @param relation [ActiveRecord::Relation] the relation representing the delete scope
+    # @param performed_at [Time] when the operation was performed on the primary
+    def delete_all(relation, performed_at:)
       raise NotImplementedError, "#{self.class}#delete_all must be implemented"
     end
 
@@ -131,7 +137,8 @@ module DualWrites
       def delete_all
         return super if klass.dual_writes_config.nil?
 
-        # Capture query params before calling super (which executes the delete)
+        # Capture timestamp and query params before calling super (which executes the delete)
+        performed_at = Time.current
         query = {
           where: where_values_hash,
           order: order_values.map(&:to_sql),
@@ -148,6 +155,7 @@ module DualWrites
               operation: 'delete_all',
               class_name: klass.name,
               query:,
+              performed_at:,
               database: database.to_s,
             )
           else
@@ -155,6 +163,7 @@ module DualWrites
               operation: 'delete_all',
               class_name: klass.name,
               query:,
+              performed_at:,
               database: database.to_s,
             )
           end
@@ -283,7 +292,8 @@ module DualWrites
       def replicate_bulk(operation, attributes)
         return if dual_writes_config.nil?
 
-        config = dual_writes_config
+        performed_at = Time.current
+        config       = dual_writes_config
 
         config[:to].each do |database|
           if config[:sync]
@@ -291,6 +301,7 @@ module DualWrites
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              performed_at:,
               database: database.to_s,
             )
           else
@@ -298,6 +309,7 @@ module DualWrites
               operation: operation.to_s,
               class_name: name,
               attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              performed_at:,
               database: database.to_s,
             )
           end
@@ -328,30 +340,36 @@ module DualWrites
     def replicate_destroy_sync = replicate_sync(:destroy)
 
     def replicate_async(operation)
-      config = self.class.dual_writes_config
-      attrs  = replication_attributes
+      performed_at = Time.current
+      config       = self.class.dual_writes_config
+      pk           = self.class.primary_key
+      attrs        = replication_attributes
 
       config[:to].each do |database|
         ReplicationJob.perform_later(
           operation: operation.to_s,
           class_name: self.class.name,
-          primary_key: id,
+          primary_key: public_send(pk),
           attributes: attrs,
+          performed_at:,
           database: database.to_s,
         )
       end
     end
 
     def replicate_sync(operation)
-      config = self.class.dual_writes_config
-      attrs  = replication_attributes
+      performed_at = Time.current
+      config       = self.class.dual_writes_config
+      pk           = self.class.primary_key
+      attrs        = replication_attributes
 
       config[:to].each do |database|
         ReplicationJob.perform_now(
           operation: operation.to_s,
           class_name: self.class.name,
-          primary_key: id,
+          primary_key: public_send(pk),
           attributes: attrs,
+          performed_at:,
           database: database.to_s,
         )
       end
@@ -369,7 +387,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, primary_key:, attributes:, database:)
+    def perform(operation:, class_name:, primary_key:, attributes:, performed_at:, database:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -384,7 +402,7 @@ module DualWrites
         raise ReplicationError, "unknown operation: #{operation}"
       end
 
-      strategy.public_send(operation.to_sym, primary_key, attributes)
+      strategy.public_send(operation.to_sym, primary_key, attributes, performed_at:)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
@@ -397,7 +415,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, database:, attributes: nil, query: nil)
+    def perform(operation:, class_name:, database:, performed_at:, attributes: nil, query: nil)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -414,12 +432,31 @@ module DualWrites
 
       case operation.to_sym
       when :delete_all
-        strategy.delete_all(query)
+        relation = build_relation(klass, query)
+
+        strategy.delete_all(relation, performed_at:)
       else
-        strategy.public_send(operation.to_sym, attributes)
+        strategy.public_send(operation.to_sym, attributes, performed_at:)
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
+    end
+
+    private
+
+    def build_relation(klass, query)
+      where  = query[:where] || query['where']
+      order  = query[:order] || query['order']
+      limit  = query[:limit] || query['limit']
+      offset = query[:offset] || query['offset']
+
+      relation = klass.all
+      relation = relation.where(where) if where.present?
+      relation = relation.order(Arel.sql(order.join(', '))) if order.present?
+      relation = relation.limit(limit) if limit
+      relation = relation.offset(offset) if offset
+
+      relation
     end
   end
 end
