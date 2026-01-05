@@ -537,24 +537,44 @@ describe DualWrites do
       end
     end
 
-    describe '#perform with invalid operation' do
-      temporary_model :bulk_invalid_record, table_name: :bulk_records do
-        include DualWrites::Model
-
-        dual_writes to: %i[clickhouse], strategy: :clickhouse
+    describe '#perform' do
+      temporary_table :bulk_unconfigured_records do |t|
+        t.string :name
+        t.timestamps
       end
 
-      it 'should raise error for unknown operation' do
-        stub_const('BulkInvalidRecord::Clickhouse', BulkInvalidRecord)
+      temporary_model :bulk_unconfigured_model, table_name: :bulk_unconfigured_records
 
+      it 'should raise error for unconfigured model' do
         expect {
           job.perform(
-            operation: 'invalid',
-            class_name: 'BulkInvalidRecord',
-            attributes: [],
+            operation: 'insert_all',
+            class_name: 'BulkUnconfiguredModel',
+            attributes: [{ 'name' => 'test' }],
             database: 'clickhouse',
           )
-        }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)
+        }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
+      end
+
+      context 'with invalid operation' do
+        temporary_model :bulk_invalid_record, table_name: :bulk_unconfigured_records do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse
+        end
+
+        it 'should raise error for unknown operation' do
+          stub_const('BulkInvalidRecord::Clickhouse', BulkInvalidRecord)
+
+          expect {
+            job.perform(
+              operation: 'invalid',
+              class_name: 'BulkInvalidRecord',
+              attributes: [],
+              database: 'clickhouse',
+            )
+          }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)
+        end
       end
     end
   end
