@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateRequestLogs < ActiveRecord::Migration[7.2]
+class CreateRequestLogs < ActiveRecord::Migration[8.1]
   def up
     create_table :request_logs, id: false,
       options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)",
