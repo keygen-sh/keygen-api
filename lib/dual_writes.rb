@@ -140,10 +140,6 @@ module DualWrites
         }
 
         result = super
-
-        # Don't replicate unconditional deletes (safety measure)
-        return result if query[:where].empty?
-
         config = klass.dual_writes_config
 
         config[:to].each do |database|

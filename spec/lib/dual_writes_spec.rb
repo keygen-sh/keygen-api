@@ -411,10 +411,15 @@ describe DualWrites do
         }.to change { model.count }.by(-1)
       end
 
-      it 'should not enqueue job without conditions' do
+      it 'should enqueue job without conditions' do
         expect {
           model.delete_all
-        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+          operation: 'delete_all',
+          class_name: 'BulkRecord',
+          query: { where: {}, order: [], limit: nil, offset: nil },
+          database: 'clickhouse',
+        )
       end
     end
 

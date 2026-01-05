@@ -44,10 +44,15 @@ module DualWrites
         limit  = query[:limit] || query['limit']
         offset = query[:offset] || query['offset']
 
-        return if where.blank?
+        # Use TRUNCATE for unconditional deletes (much faster than DELETE)
+        if where.blank? && order.blank? && limit.nil? && offset.nil?
+          replica_class.connection.execute("TRUNCATE TABLE #{replica_class.table_name}")
+          return
+        end
 
-        # Build relation from query params
-        relation = replica_class.where(where)
+        # Build relation from query params for conditional deletes
+        relation = replica_class.all
+        relation = relation.where(where) if where.present?
         relation = relation.order(Arel.sql(order.join(', '))) if order.present?
         relation = relation.limit(limit) if limit
         relation = relation.offset(offset) if offset
