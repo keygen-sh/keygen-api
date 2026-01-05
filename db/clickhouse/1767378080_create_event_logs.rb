@@ -3,7 +3,8 @@
 class CreateEventLogs < ActiveRecord::Migration[8.1]
   def up
     create_table :event_logs, id: false,
-      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)",
+      options: 'ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)',
+      ttl: 'created_at + INTERVAL ttl SECOND',
       force: :cascade do |t|
       # identifiers
       t.uuid :id, null: false
@@ -27,7 +28,7 @@ class CreateEventLogs < ActiveRecord::Migration[8.1]
 
       # event data
       t.string :idempotency_key, null: true
-      t.json :metadata, null: true
+      t.json :metadata, null: true, ttl: 'created_at + INTERVAL 30 DAY'
 
       # soft delete flag for ReplacingMergeTree
       t.column :is_deleted, "UInt8", null: false, default: 0
@@ -38,12 +39,6 @@ class CreateEventLogs < ActiveRecord::Migration[8.1]
       # TTL in seconds (set per-account at insert time)
       t.column :ttl, "UInt32", null: false, default: 30.days.to_i
     end
-
-    # Set TTL based on created_at + ttl seconds
-    execute "ALTER TABLE event_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
-
-    # Set 30-day TTL on metadata column (resets to default after expiry)
-    execute "ALTER TABLE event_logs MODIFY COLUMN metadata Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
 
     # secondary indexes
     add_index :event_logs, :event_type_id, name: "idx_event_type", type: "bloom_filter", granularity: 4

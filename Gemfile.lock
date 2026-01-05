@@ -1,19 +1,19 @@
 GIT
-  remote: https://github.com/PNixx/clickhouse-activerecord.git
-  revision: f521559e2c96c253d4f053f37a76a7f5bdc0de94
-  ref: f521559e2c96c253d4f053f37a76a7f5bdc0de94
-  specs:
-    clickhouse-activerecord (1.5.1)
-      activerecord (>= 7.1, < 9.0)
-      bundler (>= 1.13.4)
-
-GIT
   remote: https://github.com/brianhempel/active_record_union.git
   revision: 8ebe558709aabe039abd24e3e7dd4d4354a6de88
   ref: 8ebe558709aabe039abd24e3e7dd4d4354a6de88
   specs:
     active_record_union (1.3.0)
       activerecord (>= 6.0)
+
+GIT
+  remote: https://github.com/keygen-sh/clickhouse-activerecord.git
+  revision: b4dae0727afaab27fdac4e007131ed8108acf4ff
+  ref: b4dae0727afaab27fdac4e007131ed8108acf4ff
+  specs:
+    clickhouse-activerecord (1.5.1)
+      activerecord (>= 7.1, < 9.0)
+      bundler (>= 1.13.4)
 
 GIT
   remote: https://github.com/stripe-ruby-mock/stripe-ruby-mock.git

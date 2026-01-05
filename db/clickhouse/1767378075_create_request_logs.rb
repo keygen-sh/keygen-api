@@ -3,7 +3,8 @@
 class CreateRequestLogs < ActiveRecord::Migration[8.1]
   def up
     create_table :request_logs, id: false,
-      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)",
+      options: 'ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)',
+      ttl: 'created_at + INTERVAL ttl SECOND',
       force: :cascade do |t|
       # identifiers
       t.uuid :id, null: false
@@ -19,8 +20,8 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
       t.string :method, low_cardinality: true, null: true
       t.string :status, low_cardinality: true, null: true
       t.string :url, null: true
-      t.string :ip, null: true
-      t.string :user_agent, null: true
+      t.string :ip, null: true, ttl: 'created_at + INTERVAL 30 DAY'
+      t.string :user_agent, null: true, ttl: 'created_at + INTERVAL 30 DAY'
 
       # polymorphic requestor
       t.string :requestor_type, low_cardinality: true, null: true
@@ -31,11 +32,11 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
       t.uuid :resource_id, null: true
 
       # bodies (often excluded from queries via without_blobs scope)
-      t.text :request_body, null: true, codec: 'ZSTD'
-      t.json :request_headers, null: true
-      t.text :response_body, null: true, codec: 'ZSTD'
-      t.json :response_headers, null: true
-      t.text :response_signature, null: true, codec: 'ZSTD'
+      t.text :request_body, null: true, codec: 'ZSTD', ttl: 'created_at + INTERVAL 30 DAY'
+      t.json :request_headers, null: true, ttl: 'created_at + INTERVAL 30 DAY'
+      t.text :response_body, null: true, codec: 'ZSTD', ttl: 'created_at + INTERVAL 30 DAY'
+      t.json :response_headers, null: true, ttl: 'created_at + INTERVAL 30 DAY'
+      t.text :response_signature, null: true, codec: 'ZSTD', ttl: 'created_at + INTERVAL 30 DAY'
 
       # performance metrics
       t.float :queue_time, null: true
@@ -51,18 +52,6 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
       # TTL in seconds (set per-account at insert time)
       t.column :ttl, "UInt32", null: false, default: 30.days.to_i
     end
-
-    # Set TTL based on created_at + ttl seconds
-    execute "ALTER TABLE request_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
-
-    # Set 30-day TTL on request/response columns (resets to default after expiry)
-    execute "ALTER TABLE request_logs MODIFY COLUMN ip Nullable(String) DEFAULT NULL TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN user_agent Nullable(String) DEFAULT NULL TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN request_headers Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN request_body Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN response_headers Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN response_body Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
-    execute "ALTER TABLE request_logs MODIFY COLUMN response_signature Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
 
     # secondary indexes
     add_index :request_logs, :status, name: "idx_status", type: "set(100)", granularity: 4
