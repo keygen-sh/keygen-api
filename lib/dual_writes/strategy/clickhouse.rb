@@ -28,15 +28,15 @@ module DualWrites
         replica_class.insert!(attributes.merge('is_deleted' => 1))
       end
 
-      def insert_all(records, performed_at:)
-        attributes = records.map { it.merge('is_deleted' => 0) }
+      def insert_all(attributes, performed_at:)
+        attributes = attributes.map { it.merge('is_deleted' => 0) }
 
         replica_class.insert_all!(attributes)
       end
 
-      def upsert_all(records, performed_at:)
+      def upsert_all(attributes, performed_at:)
         # For ClickHouse, upsert becomes insert (ReplacingMergeTree handles dedup)
-        insert_all(records, performed_at:)
+        insert_all(attributes, performed_at:)
       end
     end
   end
