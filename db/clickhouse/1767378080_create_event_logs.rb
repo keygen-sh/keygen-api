@@ -42,6 +42,9 @@ class CreateEventLogs < ActiveRecord::Migration[8.1]
     # Set TTL based on created_at + ttl seconds
     execute "ALTER TABLE event_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
 
+    # Set 30-day TTL on metadata column (resets to default after expiry)
+    execute "ALTER TABLE event_logs MODIFY COLUMN metadata Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
+
     # secondary indexes
     add_index :event_logs, :event_type_id, name: "idx_event_type", type: "bloom_filter", granularity: 4
     add_index :event_logs, "(resource_type, resource_id)", name: "idx_resource", type: "bloom_filter", granularity: 4

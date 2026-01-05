@@ -55,6 +55,15 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
     # Set TTL based on created_at + ttl seconds
     execute "ALTER TABLE request_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
 
+    # Set 30-day TTL on request/response columns (resets to default after expiry)
+    execute "ALTER TABLE request_logs MODIFY COLUMN ip Nullable(String) DEFAULT NULL TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN user_agent Nullable(String) DEFAULT NULL TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN request_headers Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN request_body Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN response_headers Nullable(JSON) TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN response_body Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
+    execute "ALTER TABLE request_logs MODIFY COLUMN response_signature Nullable(String) DEFAULT NULL CODEC(ZSTD) TTL created_at + INTERVAL 30 DAY"
+
     # secondary indexes
     add_index :request_logs, :status, name: "idx_status", type: "set(100)", granularity: 4
     add_index :request_logs, :method, name: "idx_method", type: "set(20)", granularity: 4

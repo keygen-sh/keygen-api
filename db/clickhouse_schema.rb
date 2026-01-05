@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema[8.1].define(version: 1767378080) do
   # TABLE: event_logs
-  # SQL: CREATE TABLE event_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `event_type_id` UUID, `request_log_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `resource_type` LowCardinality(String), `resource_id` UUID, `whodunnit_type` LowCardinality(Nullable(String)), `whodunnit_id` Nullable(UUID), `idempotency_key` Nullable(String), `metadata` Nullable(JSON), `is_deleted` UInt8 DEFAULT 0, `ver` DateTime DEFAULT now(), `ttl` UInt32 DEFAULT 2592000, INDEX idx_event_type event_type_id TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_whodunnit (whodunnit_type, whodunnit_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_request_log request_log_id TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_idempotency idempotency_key TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192
+  # SQL: CREATE TABLE event_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `event_type_id` UUID, `request_log_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `resource_type` LowCardinality(String), `resource_id` UUID, `whodunnit_type` LowCardinality(Nullable(String)), `whodunnit_id` Nullable(UUID), `idempotency_key` Nullable(String), `metadata` Nullable(JSON) TTL created_at + toIntervalDay(30), `is_deleted` UInt8 DEFAULT 0, `ver` DateTime DEFAULT now(), `ttl` UInt32 DEFAULT 2592000, INDEX idx_event_type event_type_id TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_whodunnit (whodunnit_type, whodunnit_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_request_log request_log_id TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4, INDEX idx_idempotency idempotency_key TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192
   create_table "event_logs", id: :uuid, options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "id", null: false
     t.uuid "account_id", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema[8.1].define(version: 1767378080) do
   end
 
   # TABLE: request_logs
-  # SQL: CREATE TABLE request_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `method` LowCardinality(Nullable(String)), `status` LowCardinality(Nullable(String)), `url` Nullable(String), `ip` Nullable(String), `user_agent` Nullable(String), `requestor_type` LowCardinality(Nullable(String)), `requestor_id` Nullable(UUID), `resource_type` LowCardinality(Nullable(String)), `resource_id` Nullable(UUID), `request_body` Nullable(String) CODEC(ZSTD(1)), `request_headers` Nullable(JSON), `response_body` Nullable(String) CODEC(ZSTD(1)), `response_headers` Nullable(JSON), `response_signature` Nullable(String) CODEC(ZSTD(1)), `queue_time` Nullable(Float32), `run_time` Nullable(Float32), `is_deleted` UInt8 DEFAULT 0, `ver` DateTime DEFAULT now(), `ttl` UInt32 DEFAULT 2592000, INDEX idx_status status TYPE set(100) GRANULARITY 4, INDEX idx_method method TYPE set(20) GRANULARITY 4, INDEX idx_requestor (requestor_type, requestor_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_ip ip TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192
+  # SQL: CREATE TABLE request_logs ( `id` UUID, `account_id` UUID, `environment_id` Nullable(UUID), `created_at` DateTime64(3), `updated_at` DateTime64(3), `created_date` Date, `method` LowCardinality(Nullable(String)), `status` LowCardinality(Nullable(String)), `url` Nullable(String), `ip` Nullable(String) DEFAULT NULL TTL created_at + toIntervalDay(30), `user_agent` Nullable(String) DEFAULT NULL TTL created_at + toIntervalDay(30), `requestor_type` LowCardinality(Nullable(String)), `requestor_id` Nullable(UUID), `resource_type` LowCardinality(Nullable(String)), `resource_id` Nullable(UUID), `request_body` Nullable(String) DEFAULT NULL CODEC(ZSTD(1)) TTL created_at + toIntervalDay(30), `request_headers` Nullable(JSON) TTL created_at + toIntervalDay(30), `response_body` Nullable(String) DEFAULT NULL CODEC(ZSTD(1)) TTL created_at + toIntervalDay(30), `response_headers` Nullable(JSON) TTL created_at + toIntervalDay(30), `response_signature` Nullable(String) DEFAULT NULL CODEC(ZSTD(1)) TTL created_at + toIntervalDay(30), `queue_time` Nullable(Float32), `run_time` Nullable(Float32), `is_deleted` UInt8 DEFAULT 0, `ver` DateTime DEFAULT now(), `ttl` UInt32 DEFAULT 2592000, INDEX idx_status status TYPE set(100) GRANULARITY 4, INDEX idx_method method TYPE set(20) GRANULARITY 4, INDEX idx_requestor (requestor_type, requestor_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_resource (resource_type, resource_id) TYPE bloom_filter GRANULARITY 4, INDEX idx_ip ip TYPE bloom_filter GRANULARITY 4, INDEX idx_environment environment_id TYPE bloom_filter GRANULARITY 4 ) ENGINE = ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192
   create_table "request_logs", id: :uuid, options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id) TTL created_at + toIntervalSecond(ttl) SETTINGS index_granularity = 8192", force: :cascade do |t|
     t.uuid "id", null: false
     t.uuid "account_id", null: false
@@ -50,17 +50,17 @@ ActiveRecord::Schema[8.1].define(version: 1767378080) do
     t.string "method", low_cardinality: true
     t.string "status", low_cardinality: true
     t.string "url"
-    t.string "ip"
-    t.string "user_agent"
+    t.string "ip", default: "NULL"
+    t.string "user_agent", default: "NULL"
     t.string "requestor_type", low_cardinality: true
     t.uuid "requestor_id"
     t.string "resource_type", low_cardinality: true
     t.uuid "resource_id"
-    t.string "request_body", codec: "ZSTD(1)"
+    t.string "request_body", codec: "ZSTD(1)", default: "NULL"
     t.json "request_headers"
-    t.string "response_body", codec: "ZSTD(1)"
+    t.string "response_body", codec: "ZSTD(1)", default: "NULL"
     t.json "response_headers"
-    t.string "response_signature", codec: "ZSTD(1)"
+    t.string "response_signature", codec: "ZSTD(1)", default: "NULL"
     t.float "queue_time"
     t.float "run_time"
     t.integer "is_deleted", limit: 1, default: 0, null: false
