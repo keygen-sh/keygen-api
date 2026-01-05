@@ -143,6 +143,7 @@ describe DualWrites do
         }.not_to have_enqueued_job(DualWrites::ReplicationJob)
       end
     end
+
   end
 
   describe DualWrites::ReplicationJob do
@@ -376,60 +377,6 @@ describe DualWrites do
         )
       end
     end
-
-    describe '.delete_all' do
-      before do
-        model.insert_all([
-          { name: 'record1', data: 'data1' },
-          { name: 'record2', data: 'data2' },
-        ])
-      end
-
-      it 'should enqueue bulk replication job with ids' do
-        expect {
-          model.where(name: 'record1').delete_all
-        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'delete_all',
-          class_name: 'BulkRecord',
-          ids: a_kind_of(Array),
-          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
-        )
-      end
-
-      it 'should delete records from primary' do
-        expect {
-          model.where(name: 'record1').delete_all
-        }.to change { model.count }.by(-1)
-      end
-
-      it 'should enqueue job with all ids when no conditions' do
-        expect {
-          model.delete_all
-        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'delete_all',
-          class_name: 'BulkRecord',
-          ids: a_kind_of(Array),
-          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
-        )
-      end
-
-      it 'should not enqueue job when no records match' do
-        expect {
-          model.where(name: 'nonexistent').delete_all
-        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
-      end
-
-      it 'should batch ids into multiple jobs' do
-        stub_const('DualWrites::Model::RelationExtension::DUAL_WRITES_BULK_OPERATION_BATCH_SIZE', 1)
-
-        expect {
-          model.delete_all
-        }.to have_enqueued_job(DualWrites::BulkReplicationJob).exactly(2).times
-      end
-    end
-
   end
 
   describe DualWrites::BulkReplicationJob do
@@ -490,55 +437,6 @@ describe DualWrites do
 
         record = model.last
         expect(record.is_deleted).to eq 0
-      end
-
-      it 'should handle delete_all with ids' do
-        # First insert some records
-        model.insert_all!([
-          { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-          { name: 'record2', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-        ])
-
-        expect(model.count).to eq 2
-
-        record_to_delete = model.find_by(name: 'record1')
-
-        # Now delete by ids
-        job.perform(
-          operation: 'delete_all',
-          class_name: model.name,
-          ids: [record_to_delete.id],
-          performed_at: Time.current,
-          database: 'clickhouse',
-        )
-
-        expect(model.count).to eq 1
-        expect(model.first.name).to eq 'record2'
-      end
-
-      it 'should handle delete_all with multiple ids' do
-        # First insert some records
-        model.insert_all!([
-          { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-          { name: 'record2', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-          { name: 'record3', data: 'data3', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-        ])
-
-        expect(model.count).to eq 3
-
-        ids_to_delete = model.where(name: %w[record1 record2]).pluck(:id)
-
-        # Delete multiple ids
-        job.perform(
-          operation: 'delete_all',
-          class_name: model.name,
-          ids: ids_to_delete,
-          performed_at: Time.current,
-          database: 'clickhouse',
-        )
-
-        expect(model.count).to eq 1
-        expect(model.first.name).to eq 'record3'
       end
     end
 

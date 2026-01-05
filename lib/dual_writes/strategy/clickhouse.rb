@@ -38,14 +38,6 @@ module DualWrites
         # For ClickHouse, upsert becomes insert (ReplacingMergeTree handles dedup)
         insert_all(records, performed_at:)
       end
-
-      def delete_all(ids, performed_at:)
-        return if ids.blank?
-
-        pk_column = replica_class.primary_key
-
-        replica_class.where(pk_column => ids).delete_all
-      end
     end
   end
 end

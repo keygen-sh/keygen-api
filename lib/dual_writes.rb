@@ -113,69 +113,12 @@ module DualWrites
       raise NotImplementedError, "#{self.class}#upsert_all must be implemented"
     end
 
-    # Replicate a bulk delete operation.
-    # @param ids [Array] the primary keys of records to delete
-    # @param performed_at [Time] when the operation was performed on the primary
-    def delete_all(ids, performed_at:)
-      raise NotImplementedError, "#{self.class}#delete_all must be implemented"
-    end
-
     # @!endgroup
   end
 
   # Concern to be included in models that need dual writing
   module Model
     extend ActiveSupport::Concern
-
-    # Module to extend relations with delete_all replication.
-    # This is needed because ActiveRecord::Relation#delete_all doesn't
-    # delegate to class methods like insert_all does.
-    module RelationExtension
-      # Batch size for delete_all replication, similar to dependent: :destroy_async.
-      DUAL_WRITES_BULK_OPERATION_BATCH_SIZE = 1_000
-
-      # Replicates delete_all to configured databases.
-      #
-      # Note: This collects IDs before deletion, so be mindful when calling
-      # delete_all on very large relations - ensure the list of IDs fits in memory.
-      # IDs are batched into jobs of DUAL_WRITES_BULK_OPERATION_BATCH_SIZE to avoid large payloads.
-      def delete_all
-        return super if klass.dual_writes_config.nil?
-
-        # Collect IDs before deletion so we know what to replicate
-        ids = pluck(klass.primary_key)
-
-        return super if ids.empty?
-
-        performed_at = Time.current
-        result = super
-        config = klass.dual_writes_config
-
-        config[:to].each do |database|
-          ids.each_slice(DUAL_WRITES_BULK_OPERATION_BATCH_SIZE) do |batch|
-            if config[:sync]
-              BulkReplicationJob.perform_now(
-                operation: 'delete_all',
-                class_name: klass.name,
-                ids: batch,
-                performed_at:,
-                database: database.to_s,
-              )
-            else
-              BulkReplicationJob.perform_later(
-                operation: 'delete_all',
-                class_name: klass.name,
-                ids: batch,
-                performed_at:,
-                database: database.to_s,
-              )
-            end
-          end
-        end
-
-        result
-      end
-    end
 
     included do
       class_attribute :dual_writes_config, instance_accessor: false, default: nil
@@ -263,13 +206,6 @@ module DualWrites
           sync:,
           strategy:,
         }.freeze
-      end
-
-      # Extend all relations with delete_all replication support.
-      # This is necessary because ActiveRecord::Relation#delete_all
-      # doesn't delegate to class methods like insert_all does.
-      def all
-        super.extending(RelationExtension)
       end
 
       # Override bulk insert methods to automatically replicate
@@ -415,7 +351,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, database:, performed_at:, attributes: nil, ids: nil)
+    def perform(operation:, class_name:, database:, performed_at:, attributes:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -430,12 +366,7 @@ module DualWrites
         raise ReplicationError, "unknown bulk operation: #{operation}"
       end
 
-      case operation.to_sym
-      when :delete_all
-        strategy.delete_all(ids, performed_at:)
-      else
-        strategy.public_send(operation.to_sym, attributes, performed_at:)
-      end
+      strategy.public_send(operation.to_sym, attributes, performed_at:)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
