@@ -75,26 +75,23 @@ module DualWrites
     # @!group Single Record Operations
 
     # Replicate a create operation.
-    # @param primary_key [Object] the primary key of the record
-    # @param attributes [Hash] the record attributes
+    # @param attributes [Hash] the record attributes (includes primary key)
     # @param performed_at [Time] when the operation was performed on the primary
-    def create(primary_key, attributes, performed_at:)
+    def create(attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#create must be implemented"
     end
 
     # Replicate an update operation.
-    # @param primary_key [Object] the primary key of the record
-    # @param attributes [Hash] the record attributes
+    # @param attributes [Hash] the record attributes (includes primary key)
     # @param performed_at [Time] when the operation was performed on the primary
-    def update(primary_key, attributes, performed_at:)
+    def update(attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#update must be implemented"
     end
 
     # Replicate a destroy operation.
-    # @param primary_key [Object] the primary key of the record
-    # @param attributes [Hash] the record attributes
+    # @param attributes [Hash] the record attributes (includes primary key)
     # @param performed_at [Time] when the operation was performed on the primary
-    def destroy(primary_key, attributes, performed_at:)
+    def destroy(attributes, performed_at:)
       raise NotImplementedError, "#{self.class}#destroy must be implemented"
     end
 
@@ -342,14 +339,12 @@ module DualWrites
     def replicate_async(operation)
       performed_at = Time.current
       config       = self.class.dual_writes_config
-      pk           = self.class.primary_key
       attrs        = replication_attributes
 
       config[:to].each do |database|
         ReplicationJob.perform_later(
           operation: operation.to_s,
           class_name: self.class.name,
-          primary_key: public_send(pk),
           attributes: attrs,
           performed_at:,
           database: database.to_s,
@@ -360,14 +355,12 @@ module DualWrites
     def replicate_sync(operation)
       performed_at = Time.current
       config       = self.class.dual_writes_config
-      pk           = self.class.primary_key
       attrs        = replication_attributes
 
       config[:to].each do |database|
         ReplicationJob.perform_now(
           operation: operation.to_s,
           class_name: self.class.name,
-          primary_key: public_send(pk),
           attributes: attrs,
           performed_at:,
           database: database.to_s,
@@ -387,7 +380,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, primary_key:, attributes:, performed_at:, database:)
+    def perform(operation:, class_name:, attributes:, performed_at:, database:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -402,7 +395,7 @@ module DualWrites
         raise ReplicationError, "unknown operation: #{operation}"
       end
 
-      strategy.public_send(operation.to_sym, primary_key, attributes, performed_at:)
+      strategy.public_send(operation.to_sym, attributes, performed_at:)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end

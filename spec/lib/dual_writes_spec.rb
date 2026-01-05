@@ -68,8 +68,7 @@ describe DualWrites do
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'create',
           class_name: 'DualWriteRecord',
-          primary_key: an_instance_of(Integer),
-          attributes: hash_including('name' => 'test', 'data' => 'hello'),
+          attributes: hash_including('id' => a_kind_of(Integer), 'name' => 'test', 'data' => 'hello'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -85,8 +84,7 @@ describe DualWrites do
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'update',
           class_name: 'DualWriteRecord',
-          primary_key: record.id,
-          attributes: hash_including('name' => 'updated'),
+          attributes: hash_including('id' => record.id, 'name' => 'updated'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -96,15 +94,13 @@ describe DualWrites do
     describe 'after_destroy_commit' do
       it 'should enqueue replication job on destroy' do
         record = model.create!(name: 'test', data: 'hello')
-        record_id = record.id
 
         expect {
           record.destroy!
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'destroy',
           class_name: 'DualWriteRecord',
-          primary_key: record_id,
-          attributes: an_instance_of(Hash),
+          attributes: hash_including('id' => record.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -166,7 +162,6 @@ describe DualWrites do
           job.perform(
             operation: 'create',
             class_name: 'UnconfiguredModel',
-            primary_key: 999_997,
             attributes: { 'name' => 'test' },
             performed_at: Time.current,
             database: 'clickhouse',
@@ -188,7 +183,6 @@ describe DualWrites do
             job.perform(
               operation: 'invalid',
               class_name: 'InvalidOpRecord',
-              primary_key: 999_996,
               attributes: {},
               performed_at: Time.current,
               database: 'clickhouse',
@@ -226,12 +220,11 @@ describe DualWrites do
       context 'with create operation' do
         it 'should insert record with is_deleted = 0' do
           record_id = 777_777
-          attrs = { 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { 'id' => record_id, 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
           job.perform(
             operation: 'create',
             class_name: clickhouse_model.name,
-            primary_key: record_id,
             attributes: attrs,
             performed_at: Time.current,
             database: 'clickhouse',
@@ -249,12 +242,11 @@ describe DualWrites do
           # In insert-only mode, updates insert new rows rather than updating existing ones
           # ClickHouse ReplacingMergeTree will deduplicate based on the version column
           record_id = 777_778
-          attrs = { 'name' => 'updated', 'data' => 'new', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { 'id' => record_id, 'name' => 'updated', 'data' => 'new', 'created_at' => Time.current, 'updated_at' => Time.current }
 
           job.perform(
             operation: 'update',
             class_name: clickhouse_model.name,
-            primary_key: record_id,
             attributes: attrs,
             performed_at: Time.current,
             database: 'clickhouse',
@@ -269,12 +261,11 @@ describe DualWrites do
       context 'with destroy operation' do
         it 'should insert tombstone with is_deleted = 1' do
           record_id = 777_779
-          attrs = { 'name' => 'deleted', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { 'id' => record_id, 'name' => 'deleted', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
 
           job.perform(
             operation: 'destroy',
             class_name: clickhouse_model.name,
-            primary_key: record_id,
             attributes: attrs,
             performed_at: Time.current,
             database: 'clickhouse',

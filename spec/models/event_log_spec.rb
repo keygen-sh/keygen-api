@@ -38,8 +38,8 @@ describe EventLog, type: :model do
         expect { event_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'create',
           class_name: 'EventLog',
-          primary_key: kind_of(String),
           attributes: hash_including(
+            'id' => a_kind_of(String),
             'account_id' => account.id,
             'event_type_id' => event_type.id,
             'resource_type' => resource.class.name,
@@ -79,8 +79,7 @@ describe EventLog, type: :model do
         expect { event_log.update!(metadata: { foo: 'bar' }) }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'update',
           class_name: 'EventLog',
-          primary_key: event_log.id,
-          attributes: hash_including('metadata' => { 'foo' => 'bar' }),
+          attributes: hash_including('id' => event_log.id, 'metadata' => { 'foo' => 'bar' }),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -94,8 +93,7 @@ describe EventLog, type: :model do
         expect { event_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'destroy',
           class_name: 'EventLog',
-          primary_key: event_log.id,
-          attributes: kind_of(Hash),
+          attributes: hash_including('id' => event_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )

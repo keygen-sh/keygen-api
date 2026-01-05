@@ -35,8 +35,8 @@ describe RequestLog, type: :model do
         expect { request_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'create',
           class_name: 'RequestLog',
-          primary_key: kind_of(String),
           attributes: hash_including(
+            'id' => a_kind_of(String),
             'account_id' => account.id,
             'method' => request_log.method,
             'url' => request_log.url,
@@ -74,8 +74,7 @@ describe RequestLog, type: :model do
         expect { request_log.update!(status: '404') }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'update',
           class_name: 'RequestLog',
-          primary_key: request_log.id,
-          attributes: hash_including('status' => '404'),
+          attributes: hash_including('id' => request_log.id, 'status' => '404'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -89,8 +88,7 @@ describe RequestLog, type: :model do
         expect { request_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           operation: 'destroy',
           class_name: 'RequestLog',
-          primary_key: request_log.id,
-          attributes: kind_of(Hash),
+          attributes: hash_including('id' => request_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )

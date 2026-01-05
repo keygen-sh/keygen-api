@@ -14,24 +14,18 @@ module DualWrites
     #   dual_writes to: :clickhouse, strategy: :clickhouse
     #
     class Clickhouse < Strategy
-      def create(primary_key, attributes, performed_at:)
-        pk_column = replica_class.primary_key
-
-        replica_class.insert!(attributes.merge(pk_column => primary_key, 'is_deleted' => 0))
+      def create(attributes, performed_at:)
+        replica_class.insert!(attributes.merge('is_deleted' => 0))
       end
 
-      def update(primary_key, attributes, performed_at:)
-        pk_column = replica_class.primary_key
-
-        replica_class.insert!(attributes.merge(pk_column => primary_key, 'is_deleted' => 0))
+      def update(attributes, performed_at:)
+        replica_class.insert!(attributes.merge('is_deleted' => 0))
       end
 
-      def destroy(primary_key, attributes, performed_at:)
-        pk_column = replica_class.primary_key
-
+      def destroy(attributes, performed_at:)
         # Insert a tombstone row with is_deleted = 1
         # ReplacingMergeTree(ver, is_deleted) will handle cleanup
-        replica_class.insert!(attributes.merge(pk_column => primary_key, 'is_deleted' => 1))
+        replica_class.insert!(attributes.merge('is_deleted' => 1))
       end
 
       def insert_all(records, performed_at:)
