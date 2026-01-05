@@ -29,9 +29,9 @@ module DualWrites
       end
 
       def insert_all(records, performed_at:)
-        prepared = records.map { |attrs| attrs.merge('is_deleted' => 0) }
+        attributes = records.map { it.merge('is_deleted' => 0) }
 
-        replica_class.insert_all!(prepared)
+        replica_class.insert_all!(attributes)
       end
 
       def upsert_all(records, performed_at:)

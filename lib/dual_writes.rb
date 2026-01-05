@@ -131,11 +131,14 @@ module DualWrites
     # This is needed because ActiveRecord::Relation#delete_all doesn't
     # delegate to class methods like insert_all does.
     module RelationExtension
+      # Batch size for delete_all replication, similar to dependent: :destroy_async.
+      DUAL_WRITES_BULK_OPERATION_BATCH_SIZE = 1_000
+
       # Replicates delete_all to configured databases.
       #
       # Note: This collects IDs before deletion, so be mindful when calling
-      # delete_all on large relations - ensure the list of IDs fits in memory.
-      # For very large deletions, consider batching with find_each or in_batches.
+      # delete_all on very large relations - ensure the list of IDs fits in memory.
+      # IDs are batched into jobs of DUAL_WRITES_BULK_OPERATION_BATCH_SIZE to avoid large payloads.
       def delete_all
         return super if klass.dual_writes_config.nil?
 
@@ -149,22 +152,24 @@ module DualWrites
         config = klass.dual_writes_config
 
         config[:to].each do |database|
-          if config[:sync]
-            BulkReplicationJob.perform_now(
-              operation: 'delete_all',
-              class_name: klass.name,
-              ids:,
-              performed_at:,
-              database: database.to_s,
-            )
-          else
-            BulkReplicationJob.perform_later(
-              operation: 'delete_all',
-              class_name: klass.name,
-              ids:,
-              performed_at:,
-              database: database.to_s,
-            )
+          ids.each_slice(DUAL_WRITES_BULK_OPERATION_BATCH_SIZE) do |batch|
+            if config[:sync]
+              BulkReplicationJob.perform_now(
+                operation: 'delete_all',
+                class_name: klass.name,
+                ids: batch,
+                performed_at:,
+                database: database.to_s,
+              )
+            else
+              BulkReplicationJob.perform_later(
+                operation: 'delete_all',
+                class_name: klass.name,
+                ids: batch,
+                performed_at:,
+                database: database.to_s,
+              )
+            end
           end
         end
 

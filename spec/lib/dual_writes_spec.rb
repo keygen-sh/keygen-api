@@ -420,6 +420,14 @@ describe DualWrites do
           model.where(name: 'nonexistent').delete_all
         }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
       end
+
+      it 'should batch ids into multiple jobs' do
+        stub_const('DualWrites::Model::RelationExtension::DUAL_WRITES_BULK_OPERATION_BATCH_SIZE', 1)
+
+        expect {
+          model.delete_all
+        }.to have_enqueued_job(DualWrites::BulkReplicationJob).exactly(2).times
+      end
     end
 
   end
