@@ -124,6 +124,50 @@ module DualWrites
   module Model
     extend ActiveSupport::Concern
 
+    # Module to extend relations with delete_all replication.
+    # This is needed because ActiveRecord::Relation#delete_all doesn't
+    # delegate to class methods like insert_all does.
+    module RelationExtension
+      def delete_all
+        return super if klass.dual_writes_config.nil?
+
+        # Capture query params before calling super (which executes the delete)
+        query = {
+          where: where_values_hash,
+          order: order_values.map(&:to_sql),
+          limit: limit_value,
+          offset: offset_value,
+        }
+
+        result = super
+
+        # Don't replicate unconditional deletes (safety measure)
+        return result if query[:where].empty?
+
+        config = klass.dual_writes_config
+
+        config[:to].each do |database|
+          if config[:sync]
+            BulkReplicationJob.perform_now(
+              operation: 'delete_all',
+              class_name: klass.name,
+              query:,
+              database: database.to_s,
+            )
+          else
+            BulkReplicationJob.perform_later(
+              operation: 'delete_all',
+              class_name: klass.name,
+              query:,
+              database: database.to_s,
+            )
+          end
+        end
+
+        result
+      end
+    end
+
     included do
       class_attribute :dual_writes_config, instance_accessor: false, default: nil
 
@@ -212,6 +256,13 @@ module DualWrites
         }.freeze
       end
 
+      # Extend all relations with delete_all replication support.
+      # This is necessary because ActiveRecord::Relation#delete_all
+      # doesn't delegate to class methods like insert_all does.
+      def all
+        super.extending(RelationExtension)
+      end
+
       # Override bulk insert methods to automatically replicate
       def insert_all(attributes, **options)
         result = super
@@ -228,45 +279,6 @@ module DualWrites
       def upsert_all(attributes, **options)
         result = super
         replicate_bulk(:upsert_all, attributes)
-        result
-      end
-
-      def delete_all
-        relation = all
-        result   = super
-
-        return result if dual_writes_config.nil?
-
-        # Capture query as serializable hash
-        query = {
-          where: relation.where_values_hash,
-          order: relation.order_values.map(&:to_sql),
-          limit: relation.limit_value,
-          offset: relation.offset_value,
-        }
-
-        return result if query[:where].empty?
-
-        config = dual_writes_config
-
-        config[:to].each do |database|
-          if config[:sync]
-            BulkReplicationJob.perform_now(
-              operation: 'delete_all',
-              class_name: name,
-              query:,
-              database: database.to_s,
-            )
-          else
-            BulkReplicationJob.perform_later(
-              operation: 'delete_all',
-              class_name: name,
-              query:,
-              database: database.to_s,
-            )
-          end
-        end
-
         result
       end
 

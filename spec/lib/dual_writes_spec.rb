@@ -545,9 +545,11 @@ describe DualWrites do
       end
 
       it 'should raise error for unknown operation' do
+        stub_const('BulkInvalidRecord::Clickhouse', BulkInvalidRecord)
+
         expect {
           job.perform(
-            operation: 'delete_all',
+            operation: 'invalid',
             class_name: 'BulkInvalidRecord',
             attributes: [],
             database: 'clickhouse',

@@ -31,6 +31,7 @@ class CreateRequestLogs < ActiveRecord::Migration[7.2]
       t.uuid :resource_id, null: true
 
       # bodies (often excluded from queries via without_blobs scope)
+      # FIXME(ezekg) use native json datatype!
       t.text :request_body, null: true
       t.text :request_headers, null: true
       t.text :response_body, null: true
@@ -42,6 +43,7 @@ class CreateRequestLogs < ActiveRecord::Migration[7.2]
       t.float :run_time, null: true
 
       # soft delete flag for ReplacingMergeTree
+      # FIXME(ezekg) use int and limit: 8?
       t.column :is_deleted, "UInt8", null: false, default: 0
 
       # version for ReplacingMergeTree deduplication
