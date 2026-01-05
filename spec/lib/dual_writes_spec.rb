@@ -37,6 +37,7 @@ describe DualWrites do
           to: [:clickhouse],
           sync: false,
           strategy: :clickhouse,
+          ttl: nil,
         )
       end
 
@@ -144,6 +145,34 @@ describe DualWrites do
       end
     end
 
+    describe 'ttl' do
+      temporary_table :expiring_records do |t|
+        t.string :name
+        t.integer :retention_seconds, default: 86_400
+        t.timestamps
+      end
+
+      temporary_model :expiring_record do
+        include DualWrites::Model
+
+        dual_writes to: %i[clickhouse], strategy: :clickhouse,
+          ttl: -> { retention_seconds }
+      end
+
+      let(:expiring_model) { ExpiringRecord }
+
+      it 'should include ttl in attributes' do
+        expect {
+          expiring_model.create!(name: 'test', retention_seconds: 7_776_000) # 90 days
+        }.to have_enqueued_job(DualWrites::ReplicationJob).with(
+          operation: 'create',
+          class_name: 'ExpiringRecord',
+          attributes: hash_including('ttl' => 7_776_000),
+          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
+          database: 'clickhouse',
+        )
+      end
+    end
   end
 
   describe DualWrites::ReplicationJob do

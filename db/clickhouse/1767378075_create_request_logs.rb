@@ -47,7 +47,13 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
 
       # version for ReplacingMergeTree deduplication
       t.datetime :ver, null: false, default: -> { "now()" }
+
+      # TTL in seconds (set per-account at insert time)
+      t.column :ttl, "UInt32", null: false, default: 30.days.to_i
     end
+
+    # Set TTL based on created_at + ttl seconds
+    execute "ALTER TABLE request_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
 
     # secondary indexes
     add_index :request_logs, :status, name: "idx_status", type: "set(100)", granularity: 4

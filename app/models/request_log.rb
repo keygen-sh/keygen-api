@@ -10,7 +10,8 @@ class RequestLog < ApplicationRecord
   include Orderable
   include Pageable
 
-  dual_writes to: :clickhouse, strategy: :clickhouse
+  dual_writes to: :clickhouse, strategy: :clickhouse,
+    ttl: -> { account.request_log_retention_duration }
 
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true

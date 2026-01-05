@@ -34,7 +34,13 @@ class CreateEventLogs < ActiveRecord::Migration[8.1]
 
       # version for ReplacingMergeTree deduplication
       t.datetime :ver, null: false, default: -> { "now()" }
+
+      # TTL in seconds (set per-account at insert time)
+      t.column :ttl, "UInt32", null: false, default: 30.days.to_i
     end
+
+    # Set TTL based on created_at + ttl seconds
+    execute "ALTER TABLE event_logs MODIFY TTL created_at + INTERVAL ttl SECOND"
 
     # secondary indexes
     add_index :event_logs, :event_type_id, name: "idx_event_type", type: "bloom_filter", granularity: 4

@@ -142,6 +142,8 @@ module DualWrites
       #   Built-in strategies: :clickhouse.
       #   Use :clickhouse for ClickHouse with ReplacingMergeTree (insert-only with is_deleted flag).
       # @param sync [Boolean] whether to replicate synchronously inside the transaction (default: false)
+      # @param ttl [Proc, nil] a proc that returns the TTL in seconds.
+      #   Called in the context of the model instance. Used for ClickHouse TTL expiration.
       #
       # @example Basic usage
       #   class RequestLog < ApplicationRecord
@@ -164,6 +166,14 @@ module DualWrites
       #     dual_writes to: :clickhouse, strategy: :clickhouse, sync: true
       #   end
       #
+      # @example With TTL expiration
+      #   class RequestLog < ApplicationRecord
+      #     include DualWrites::Model
+      #
+      #     dual_writes to: :clickhouse, strategy: :clickhouse,
+      #       ttl: -> { account.request_log_retention_duration }
+      #   end
+      #
       # @example With custom strategy
       #   class MyModel < ApplicationRecord
       #     include DualWrites::Model
@@ -171,7 +181,7 @@ module DualWrites
       #     dual_writes to: :my_database, strategy: MyCustomStrategy
       #   end
       #
-      def dual_writes(to:, strategy:, sync: false)
+      def dual_writes(to:, strategy:, sync: false, ttl: nil)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -205,6 +215,7 @@ module DualWrites
           to: databases,
           sync:,
           strategy:,
+          ttl:,
         }.freeze
       end
 
@@ -312,7 +323,13 @@ module DualWrites
     end
 
     def replication_attributes
-      attributes.transform_keys(&:to_s)
+      attrs = attributes.transform_keys(&:to_s)
+
+      if (ttl_proc = self.class.dual_writes_config[:ttl])
+        attrs['ttl'] = instance_exec(&ttl_proc)
+      end
+
+      attrs
     end
   end
 
