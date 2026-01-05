@@ -385,25 +385,13 @@ describe DualWrites do
         ])
       end
 
-      it 'should enqueue bulk replication job with query' do
+      it 'should enqueue bulk replication job with ids' do
         expect {
           model.where(name: 'record1').delete_all
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
           operation: 'delete_all',
           class_name: 'BulkRecord',
-          query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
-          performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
-        )
-      end
-
-      it 'should include limit and order in query' do
-        expect {
-          model.where(name: 'record1').order(:id).limit(10).delete_all
-        }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'delete_all',
-          class_name: 'BulkRecord',
-          query: hash_including(where: { 'name' => 'record1' }, limit: 10),
+          ids: a_kind_of(Array),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -415,16 +403,22 @@ describe DualWrites do
         }.to change { model.count }.by(-1)
       end
 
-      it 'should enqueue job without conditions' do
+      it 'should enqueue job with all ids when no conditions' do
         expect {
           model.delete_all
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
           operation: 'delete_all',
           class_name: 'BulkRecord',
-          query: { where: {}, order: [], limit: nil, offset: nil },
+          ids: a_kind_of(Array),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
+      end
+
+      it 'should not enqueue job when no records match' do
+        expect {
+          model.where(name: 'nonexistent').delete_all
+        }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
       end
     end
 
@@ -490,7 +484,7 @@ describe DualWrites do
         expect(record.is_deleted).to eq 0
       end
 
-      it 'should handle delete_all with query' do
+      it 'should handle delete_all with ids' do
         # First insert some records
         model.insert_all!([
           { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
@@ -499,11 +493,13 @@ describe DualWrites do
 
         expect(model.count).to eq 2
 
-        # Now delete with query
+        record_to_delete = model.find_by(name: 'record1')
+
+        # Now delete by ids
         job.perform(
           operation: 'delete_all',
           class_name: model.name,
-          query: { where: { 'name' => 'record1' }, order: [], limit: nil, offset: nil },
+          ids: [record_to_delete.id],
           performed_at: Time.current,
           database: 'clickhouse',
         )
@@ -512,26 +508,29 @@ describe DualWrites do
         expect(model.first.name).to eq 'record2'
       end
 
-      it 'should handle delete_all with limit' do
+      it 'should handle delete_all with multiple ids' do
         # First insert some records
         model.insert_all!([
           { name: 'record1', data: 'data1', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-          { name: 'record1', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
-          { name: 'record1', data: 'data3', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
+          { name: 'record2', data: 'data2', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
+          { name: 'record3', data: 'data3', is_deleted: 0, created_at: 1.hour.ago, updated_at: 1.hour.ago },
         ])
 
         expect(model.count).to eq 3
 
-        # Delete with limit
+        ids_to_delete = model.where(name: %w[record1 record2]).pluck(:id)
+
+        # Delete multiple ids
         job.perform(
           operation: 'delete_all',
           class_name: model.name,
-          query: { where: { 'name' => 'record1' }, order: [], limit: 2, offset: nil },
+          ids: ids_to_delete,
           performed_at: Time.current,
           database: 'clickhouse',
         )
 
         expect(model.count).to eq 1
+        expect(model.first.name).to eq 'record3'
       end
     end
 

@@ -114,9 +114,9 @@ module DualWrites
     end
 
     # Replicate a bulk delete operation.
-    # @param relation [ActiveRecord::Relation] the relation representing the delete scope
+    # @param ids [Array] the primary keys of records to delete
     # @param performed_at [Time] when the operation was performed on the primary
-    def delete_all(relation, performed_at:)
+    def delete_all(ids, performed_at:)
       raise NotImplementedError, "#{self.class}#delete_all must be implemented"
     end
 
@@ -131,18 +131,20 @@ module DualWrites
     # This is needed because ActiveRecord::Relation#delete_all doesn't
     # delegate to class methods like insert_all does.
     module RelationExtension
+      # Replicates delete_all to configured databases.
+      #
+      # Note: This collects IDs before deletion, so be mindful when calling
+      # delete_all on large relations - ensure the list of IDs fits in memory.
+      # For very large deletions, consider batching with find_each or in_batches.
       def delete_all
         return super if klass.dual_writes_config.nil?
 
-        # Capture timestamp and query params before calling super (which executes the delete)
-        performed_at = Time.current
-        query = {
-          where: where_values_hash,
-          order: order_values.map(&:to_sql),
-          limit: limit_value,
-          offset: offset_value,
-        }
+        # Collect IDs before deletion so we know what to replicate
+        ids = pluck(klass.primary_key)
 
+        return super if ids.empty?
+
+        performed_at = Time.current
         result = super
         config = klass.dual_writes_config
 
@@ -151,7 +153,7 @@ module DualWrites
             BulkReplicationJob.perform_now(
               operation: 'delete_all',
               class_name: klass.name,
-              query:,
+              ids:,
               performed_at:,
               database: database.to_s,
             )
@@ -159,7 +161,7 @@ module DualWrites
             BulkReplicationJob.perform_later(
               operation: 'delete_all',
               class_name: klass.name,
-              query:,
+              ids:,
               performed_at:,
               database: database.to_s,
             )
@@ -408,7 +410,7 @@ module DualWrites
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(operation:, class_name:, database:, performed_at:, attributes: nil, query: nil)
+    def perform(operation:, class_name:, database:, performed_at:, attributes: nil, ids: nil)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -425,31 +427,12 @@ module DualWrites
 
       case operation.to_sym
       when :delete_all
-        relation = build_relation(klass, query)
-
-        strategy.delete_all(relation, performed_at:)
+        strategy.delete_all(ids, performed_at:)
       else
         strategy.public_send(operation.to_sym, attributes, performed_at:)
       end
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
-    end
-
-    private
-
-    def build_relation(klass, query)
-      where  = query[:where] || query['where']
-      order  = query[:order] || query['order']
-      limit  = query[:limit] || query['limit']
-      offset = query[:offset] || query['offset']
-
-      relation = klass.all
-      relation = relation.where(where) if where.present?
-      relation = relation.order(Arel.sql(order.join(', '))) if order.present?
-      relation = relation.limit(limit) if limit
-      relation = relation.offset(offset) if offset
-
-      relation
     end
   end
 end

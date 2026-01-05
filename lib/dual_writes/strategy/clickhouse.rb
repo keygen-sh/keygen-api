@@ -39,20 +39,12 @@ module DualWrites
         insert_all(records, performed_at:)
       end
 
-      def delete_all(relation, performed_at:)
-        # Extract query components from the passed relation and rebuild on replica_class
-        replica_relation = replica_class.all
-        replica_relation = replica_relation.where(relation.where_values_hash) if relation.where_values_hash.present?
-        replica_relation = replica_relation.order(relation.order_values) if relation.order_values.present?
-        replica_relation = replica_relation.limit(relation.limit_value) if relation.limit_value
-        replica_relation = replica_relation.offset(relation.offset_value) if relation.offset_value
+      def delete_all(ids, performed_at:)
+        return if ids.blank?
 
-        # Constrain to records created before the operation to handle out-of-order replication.
-        # This prevents deleting records that were inserted after the delete_all was performed.
-        replica_relation = replica_relation.where(replica_class.arel_table[:created_at].lteq(performed_at))
+        pk_column = replica_class.primary_key
 
-        # Use ClickHouse's lightweight delete
-        replica_relation.delete_all
+        replica_class.where(pk_column => ids).delete_all
       end
     end
   end
