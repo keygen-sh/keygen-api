@@ -3,7 +3,7 @@
 class CreateEventLogs < ActiveRecord::Migration[7.2]
   def up
     create_table :event_logs, id: false,
-      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
+      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)",
       force: :cascade do |t|
       # identifiers
       t.uuid :id, null: false
@@ -27,13 +27,13 @@ class CreateEventLogs < ActiveRecord::Migration[7.2]
 
       # event data
       t.string :idempotency_key, null: true
-      t.text :metadata, null: true
+      t.json :metadata, null: true
 
       # soft delete flag for ReplacingMergeTree
       t.column :is_deleted, "UInt8", null: false, default: 0
 
       # version for ReplacingMergeTree deduplication
-      t.datetime :ver, null: false, default: -> { 'now()' }
+      t.datetime :ver, null: false, default: -> { "now()" }
     end
 
     # secondary indexes

@@ -3,7 +3,7 @@
 class CreateRequestLogs < ActiveRecord::Migration[7.2]
   def up
     create_table :request_logs, id: false,
-      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMM(created_date) ORDER BY (account_id, created_date, id)",
+      options: "ReplacingMergeTree(ver, is_deleted) PARTITION BY toYYYYMMDD(created_date) ORDER BY (account_id, created_date, id)",
       force: :cascade do |t|
       # identifiers
       t.uuid :id, null: false
@@ -31,12 +31,11 @@ class CreateRequestLogs < ActiveRecord::Migration[7.2]
       t.uuid :resource_id, null: true
 
       # bodies (often excluded from queries via without_blobs scope)
-      # FIXME(ezekg) use native json datatype!
-      t.text :request_body, null: true
-      t.text :request_headers, null: true
-      t.text :response_body, null: true
-      t.text :response_headers, null: true
-      t.text :response_signature, null: true
+      t.text :request_body, null: true, codec: 'ZSTD'
+      t.json :request_headers, null: true
+      t.text :response_body, null: true, codec: 'ZSTD'
+      t.json :response_headers, null: true
+      t.text :response_signature, null: true, codec: 'ZSTD'
 
       # performance metrics
       t.float :queue_time, null: true
@@ -47,7 +46,7 @@ class CreateRequestLogs < ActiveRecord::Migration[7.2]
       t.column :is_deleted, "UInt8", null: false, default: 0
 
       # version for ReplacingMergeTree deduplication
-      t.datetime :ver, null: false, default: -> { 'now()' }
+      t.datetime :ver, null: false, default: -> { "now()" }
     end
 
     # secondary indexes

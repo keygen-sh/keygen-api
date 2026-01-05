@@ -462,22 +462,6 @@ describe DualWrites do
         expect(records.all? { |r| r.is_deleted == 0 }).to be true
       end
 
-      it 'should serialize JSON attributes' do
-        attributes = [
-          { 'name' => 'record1', 'data' => { 'nested' => 'value' } },
-        ]
-
-        job.perform(
-          operation: 'insert_all',
-          class_name: model.name,
-          attributes: attributes,
-          database: 'clickhouse',
-        )
-
-        record = model.last
-        expect(record.data).to eq '{"nested":"value"}'
-      end
-
       it 'should handle upsert_all as insert_all' do
         attributes = [
           { 'name' => 'record1', 'data' => 'data1' },
