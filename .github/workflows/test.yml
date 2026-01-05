@@ -21,6 +21,14 @@ jobs:
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
+      clickhouse:
+        image: clickhouse/clickhouse-server:22-alpine
+        env:
+          CLICKHOUSE_PASSWORD: clickhouse
+          CLICKHOUSE_USER: clickhouse
+          CLICKHOUSE_DB: clickhouse
+        ports:
+          - 8123:8123
       redis:
         image: redis
         ports:
@@ -54,6 +62,7 @@ jobs:
       AWS_BUCKET: test
       AWS_REGION: us-east-2
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
     steps:
