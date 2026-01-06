@@ -11,11 +11,9 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'support/factory_bot'
 require 'database_cleaner'
+require 'database_cleaner/active_record'
 require 'sidekiq/testing'
 require 'request_migrations/testing'
-
-# Truncate database tables after each test.
-DatabaseCleaner.strategy = :transaction
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -56,6 +54,13 @@ RSpec.configure do |config|
   config.include KeygenHelper
   config.include TaskHelper
   config.include MutexHelper
+
+  # FIXME(ezekg) see: https://github.com/DatabaseCleaner/database_cleaner/issues/419#issuecomment-201949198
+  Rails.application.eager_load!
+
+  # truncate database tables after each test
+  DatabaseCleaner[:active_record, db: :primary].strategy    = :transaction
+  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -177,11 +182,11 @@ RSpec.configure do |config|
 
   # disable implicit transaction for cleaning up after tests (mainly to facilitate threading)
   config.around :each, :skip_transaction_cleaner do |example|
-    DatabaseCleaner.strategy = [:deletion, except: %w[event_types permissions]]
+    DatabaseCleaner[:active_record, db: :primary].strategy = [:deletion, except: %w[event_types permissions]]
 
     example.run
   ensure
-    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner[:active_record, db: :primary].strategy = :transaction
   end
 
   # ignore false positives e.g. to_not raise_error SomeError
