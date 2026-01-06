@@ -13,10 +13,9 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
-  connects_to shards: {
-    primary: { writing: :primary, reading: :replica },
-    replica: { reading: :replica },
-    clickhouse: { writing: :clickhouse },
+  connects_to database: {
+    writing: :primary,
+    reading: :replica,
   }
 
   # FIXME(ezekg) Not sure why this isn't already happening by Rails?
