@@ -14,9 +14,12 @@ clickhouse: &clickhouse
   migrations_paths: db/clickhouse
 
 development:
-  primary:
+  primary: &primary_dev
     <<: *postgres
     database: keygen_dev
+  replica:
+    <<: *primary_dev
+    replica: true
   clickhouse:
     <<: *clickhouse
     adapter: clickhouse
@@ -28,6 +31,9 @@ test: &test
     <<: *postgres
     url: <%= ENV['DATABASE_URL'] %>
     database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  replica:
+    <<: *primary_test
+    replica: true
   clickhouse:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
@@ -37,6 +43,10 @@ production:
   primary:
     <<: *postgres
     url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
+  replica:
+    <<: *postgres
+    url: <%= ENV['REPLICA_DATABASE_CONNECTION_POOL_URL'] || ENV['REPLICA_DATABASE_URL'] %>
+    replica: true
   clickhouse:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>

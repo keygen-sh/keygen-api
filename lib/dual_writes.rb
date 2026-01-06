@@ -25,7 +25,10 @@ module DualWrites
 
         # Now configure it
         base.abstract_class = true
-        base.connects_to database: { writing: database }
+        base.connects_to database: {
+          writing: database,
+          reading: database,
+        }
 
         base
       end
