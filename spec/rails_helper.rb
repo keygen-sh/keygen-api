@@ -36,7 +36,7 @@ Dir[Rails.root.join('spec/shared/**/*.rb')].each { |f| require(f) }
 # FIXME(ezekg) see: https://github.com/DatabaseCleaner/database_cleaner/issues/419#issuecomment-201949198
 Rails.application.eager_load!
 
-# truncate database tables after each test
+# clear database tables after each test
 DatabaseCleaner[:active_record].strategy                  = :transaction # covers e.g. :primary
 DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
