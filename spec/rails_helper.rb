@@ -33,9 +33,12 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require(f) }
 # Requires shared examples.
 Dir[Rails.root.join('spec/shared/**/*.rb')].each { |f| require(f) }
 
-# Checks for pending migration and applies them before tests are run.
-# If you are not using ActiveRecord, you can remove this line.
-ActiveRecord::Migration.maintain_test_schema!
+# FIXME(ezekg) see: https://github.com/DatabaseCleaner/database_cleaner/issues/419#issuecomment-201949198
+Rails.application.eager_load!
+
+# truncate database tables after each test
+DatabaseCleaner[:active_record].strategy                  = :transaction # covers e.g. :primary
+DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
 RSpec.configure do |config|
   econfig = RSpec::Expectations.configuration
@@ -54,13 +57,6 @@ RSpec.configure do |config|
   config.include KeygenHelper
   config.include TaskHelper
   config.include MutexHelper
-
-  # FIXME(ezekg) see: https://github.com/DatabaseCleaner/database_cleaner/issues/419#issuecomment-201949198
-  Rails.application.eager_load!
-
-  # truncate database tables after each test
-  DatabaseCleaner[:active_record, db: :primary].strategy    = :transaction
-  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -182,11 +178,11 @@ RSpec.configure do |config|
 
   # disable implicit transaction for cleaning up after tests (mainly to facilitate threading)
   config.around :each, :skip_transaction_cleaner do |example|
-    DatabaseCleaner[:active_record, db: :primary].strategy = [:deletion, except: %w[event_types permissions]]
+    DatabaseCleaner[:active_record].strategy = [:deletion, except: %w[event_types permissions]]
 
     example.run
   ensure
-    DatabaseCleaner[:active_record, db: :primary].strategy = :transaction
+    DatabaseCleaner[:active_record].strategy = :transaction
   end
 
   # ignore false positives e.g. to_not raise_error SomeError

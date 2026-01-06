@@ -29,7 +29,7 @@ begin
   Rails.application.eager_load!
 
   # truncate database tables after each test
-  DatabaseCleaner[:active_record, db: :primary].strategy    = :transaction
+  DatabaseCleaner[:active_record].strategy                  = :transaction
   DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
