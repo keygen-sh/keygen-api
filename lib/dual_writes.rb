@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require 'sidekiq'
+
 module DualWrites
+  DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS = 5
+
   class Error < StandardError; end
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
@@ -334,11 +338,12 @@ module DualWrites
   end
 
   class ReplicationJob < ActiveJob::Base
-    queue_as { ActiveRecord.queues[:dual_writes] || :default }
-
-    retry_on ActiveRecord::ActiveRecordError, wait: :polynomially_longer, attempts: 5
+    queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
+    retry_on StandardError,
+      attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
+      wait: :polynomially_longer
 
     def perform(operation:, class_name:, attributes:, performed_at:, database:)
       klass = class_name.constantize
@@ -362,11 +367,12 @@ module DualWrites
   end
 
   class BulkReplicationJob < ActiveJob::Base
-    queue_as { ActiveRecord.queues[:dual_writes] || :default }
-
-    retry_on ActiveRecord::ActiveRecordError, wait: :polynomially_longer, attempts: 5
+    queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
+    retry_on StandardError,
+      attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
+      wait: :polynomially_longer
 
     def perform(operation:, class_name:, database:, performed_at:, attributes:)
       klass = class_name.constantize
