@@ -15,7 +15,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   connects_to database: {
     writing: :primary,
-    reading: :replica,
   }
 
   # FIXME(ezekg) Not sure why this isn't already happening by Rails?

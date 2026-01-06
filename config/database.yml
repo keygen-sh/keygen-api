@@ -17,10 +17,6 @@ development:
   primary:
     <<: *postgres
     database: keygen_dev
-  replica:
-    <<: *postgres
-    database: keygen_dev
-    replica: true
   clickhouse:
     <<: *clickhouse
     adapter: clickhouse
@@ -28,13 +24,10 @@ development:
     debug: true
 
 test: &test
-  primary:
+  primary: &primary_test
     <<: *postgres
+    url: <%= ENV['DATABASE_URL'] %>
     database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
-  replica:
-    <<: *postgres
-    database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
-    replica: true
   clickhouse:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
@@ -44,13 +37,7 @@ production:
   primary:
     <<: *postgres
     url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
-  replica:
-    <<: *postgres
-    url: <%= ENV['REPLICA_DATABASE_CONNECTION_POOL_URL'] || ENV['REPLICA_DATABASE_URL'] %>
-    replica: true
   clickhouse:
     <<: *clickhouse
     url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
 
-cucumber:
-  <<: *test
