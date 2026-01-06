@@ -30,10 +30,14 @@ require 'cucumber/rails'
 #
 ActionController::Base.allow_rescue = false
 
+# FIXME(ezekg) see: https://github.com/DatabaseCleaner/database_cleaner/issues/419#issuecomment-201949198
+Rails.application.eager_load!
+
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
-  DatabaseCleaner.strategy = :transaction
+  DatabaseCleaner[:active_record, db: :primary].strategy    = :transaction
+  DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
