@@ -19,8 +19,9 @@ describe ReadYourOwnWrites do
       expect(described_class.configuration.redis_key_prefix).to eq('custom')
     end
 
-    it 'should read delay from Rails database_selector config' do
-      expect(described_class.configuration.delay).to eq(2.seconds)
+    it 'should sync delay from Rails database_selector config via load hook' do
+      # The load hook runs when ActiveRecord loads, syncing delay from database_selector
+      expect(described_class.configuration.database_selector_delay).to eq(2.seconds)
     end
 
     it 'should default redis_ttl to delay * 2' do
@@ -416,6 +417,131 @@ describe ReadYourOwnWrites do
         allow(Rails.cache).to receive(:redis).and_raise(Redis::BaseError)
 
         expect { context.update_last_write_timestamp }.not_to raise_error
+      end
+    end
+  end
+
+  describe ReadYourOwnWrites::Controller do
+    def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
+      instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
+    end
+
+    let(:test_controller_class) do
+      Class.new(ActionController::API) do
+        include ReadYourOwnWrites::Controller
+
+        def request
+          @request
+        end
+
+        def request=(req)
+          @request = req
+        end
+
+        def index
+          { role: ActiveRecord::Base.current_role }
+        end
+      end
+    end
+
+    let(:controller) { test_controller_class.new }
+
+    describe '.use_read_replica' do
+      it 'should add around_action for replica connection' do
+        test_controller_class.use_read_replica only: :index
+
+        expect(test_controller_class._process_action_callbacks.map(&:filter)).to include(:with_read_replica_connection)
+      end
+    end
+
+    describe '.prefer_read_replica' do
+      it 'should add around_action for conditional replica connection' do
+        test_controller_class.prefer_read_replica only: :index
+
+        expect(test_controller_class._process_action_callbacks.map(&:filter)).to include(:with_read_replica_connection_unless_reading_own_writes)
+      end
+    end
+
+    describe '#with_read_replica_connection' do
+      it 'should execute block with reading role' do
+        role_during_block = nil
+
+        controller.with_read_replica_connection do
+          role_during_block = ActiveRecord::Base.current_role
+        end
+
+        expect(role_during_block).to eq(:reading)
+      end
+
+      it 'should restore original role after block' do
+        original_role = ActiveRecord::Base.current_role
+
+        controller.with_read_replica_connection do
+          # inside block
+        end
+
+        expect(ActiveRecord::Base.current_role).to eq(original_role)
+      end
+    end
+
+    describe '#with_read_replica_connection_unless_reading_own_writes' do
+      context 'when no recent writes exist' do
+        before do
+          controller.request = build_request(path: '/v1/accounts/test/licenses')
+        end
+
+        it 'should execute block with reading role' do
+          role_during_block = nil
+
+          controller.with_read_replica_connection_unless_reading_own_writes do
+            role_during_block = ActiveRecord::Base.current_role
+          end
+
+          expect(role_during_block).to eq(:reading)
+        end
+      end
+
+      context 'when recent write exists' do
+        before do
+          write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+          write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+          write_context.update_last_write_timestamp
+
+          controller.request = build_request(path: '/v1/accounts/test/licenses')
+        end
+
+        it 'should not change role (respects RYOW)' do
+          original_role = ActiveRecord::Base.current_role
+          role_during_block = nil
+
+          controller.with_read_replica_connection_unless_reading_own_writes do
+            role_during_block = ActiveRecord::Base.current_role
+          end
+
+          expect(role_during_block).to eq(original_role)
+        end
+      end
+
+      context 'when write is older than delay' do
+        before do
+          write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+          write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+          write_context.update_last_write_timestamp
+
+          controller.request = build_request(path: '/v1/accounts/test/licenses')
+        end
+
+        it 'should execute block with reading role' do
+          role_during_block = nil
+
+          travel 5.seconds do
+            controller.with_read_replica_connection_unless_reading_own_writes do
+              role_during_block = ActiveRecord::Base.current_role
+            end
+          end
+
+          expect(role_during_block).to eq(:reading)
+        end
       end
     end
   end

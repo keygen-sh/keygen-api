@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include ReadYourOwnWrites::Controller
   include Rendering::JSON
   include CurrentRequestAttributes
   include DefaultUrlOptions
@@ -635,16 +636,6 @@ class ApplicationController < ActionController::API
       render_forbidden(detail: "must have an EE license with the following entitlements to access this resource: #{entitlements.join(', ')}")
     else
       render_forbidden(detail: "must have an EE license to access this resource")
-    end
-  end
-
-  # Prefer replica for read-only POST endpoints (e.g. search, validation).
-  # Respects RYOW - uses primary if there was a recent write affecting this resource.
-  def prefer_replica!
-    if ReadYourOwnWrites.reading_own_writes?(request)
-      yield
-    else
-      ActiveRecord::Base.connected_to(role: :reading) { yield }
     end
   end
 end

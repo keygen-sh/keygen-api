@@ -2,6 +2,8 @@
 
 module Api::V1
   class SearchesController < Api::V1::BaseController
+    use_read_replica
+
     class UnsupportedSearchTypeError < StandardError; end
     class EmptyQueryError < StandardError; end
 
@@ -19,7 +21,6 @@ module Api::V1
       Group.name,
     ].freeze
 
-    around_action :prefer_replica!
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!

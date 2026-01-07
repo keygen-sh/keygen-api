@@ -1,15 +1,22 @@
 # frozen_string_literal: true
 
+require 'active_support'
+require 'active_record'
+
 module ReadYourOwnWrites
   SKIP_RYOW_KEY    = 'database.skip_ryow'
   REDIS_KEY_PREFIX = 'ryow'
 
   class Configuration
+    # How long after a write to route reads to primary. Synced automatically from
+    # config.active_record.database_selector[:delay] when ActiveRecord loads.
+    attr_reader :database_selector_delay
+
     # Redis key prefix for storing write timestamps.
     attr_accessor :redis_key_prefix
 
-    # Time-to-live for write timestamp entries in Redis. Defaults to
-    # config.active_record.database_selector * 2.
+    # Time-to-live for write timestamp entries in Redis.
+    # Defaults to database_selector_delay * 2.
     attr_writer :redis_ttl
 
     # Path patterns that should always read from replica, regardless of recent
@@ -21,21 +28,16 @@ module ReadYourOwnWrites
     attr_accessor :client_identifier
 
     def initialize
-      @redis_key_prefix      = REDIS_KEY_PREFIX
-      @redis_ttl             = 30.seconds
-      @ignored_request_paths = []
-      @client_identifier     = ->(request) {
+      @database_selector_delay = 2.seconds
+      @redis_key_prefix        = REDIS_KEY_PREFIX
+      @redis_ttl               = nil
+      @ignored_request_paths   = []
+      @client_identifier       = ->(request) {
         [request.authorization, request.remote_ip]
       }
     end
 
-    def delay
-      Rails.application.config.active_record.database_selector[:delay]
-    end
-
-    def redis_ttl
-      @redis_ttl || delay * 2
-    end
+    def redis_ttl = @redis_ttl || @database_selector_delay * 2
   end
 
   class << self
@@ -57,7 +59,34 @@ module ReadYourOwnWrites
       context = RedisContext.new(request)
       last_write = context.last_write_timestamp
 
-      Time.current - last_write < configuration.delay
+      Time.current - last_write < configuration.database_selector_delay
+    end
+  end
+
+  module Controller
+    extend ActiveSupport::Concern
+
+    class_methods do
+      # use_read_replica connects to the replica database unless there has been a recent write (mainly
+      # useful for readonly POST requests, e.g. license validation and search)
+      def use_read_replica(always: true, **)
+        prepend_around_action(always ? :with_read_replica_connection : :with_read_replica_connection_unless_reading_own_writes, **)
+      end
+
+      # prefer_read_replica respects ryow behavior (i.e. prefer replica unless recent write)
+      def prefer_read_replica(**) = use_read_replica(**, always: false)
+    end
+
+    def with_read_replica_connection_unless_reading_own_writes
+      if ReadYourOwnWrites.reading_own_writes?(request)
+        yield # noop since already handled elsewhere
+      else
+        ActiveRecord::Base.connected_to(role: :reading) { yield }
+      end
+    end
+
+    def with_read_replica_connection
+      ActiveRecord::Base.connected_to(role: :reading) { yield }
     end
   end
 
@@ -201,6 +230,12 @@ module ReadYourOwnWrites
       return false if prefix_segments.length > full_segments.length
 
       prefix_segments.each_with_index.all? { |segment, i| segment == full_segments[i] }
+    end
+  end
+
+  ActiveSupport.on_load(:active_record) do
+    if (selector = Rails.application.config.active_record.database_selector)
+      ReadYourOwnWrites.configuration.database_selector_delay = selector[:delay]
     end
   end
 end
