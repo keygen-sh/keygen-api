@@ -1,22 +1,88 @@
 # frozen_string_literal: true
 
 module ReadYourOwnWrites
+  SKIP_RYOW_KEY    = 'database.skip_ryow'
+  REDIS_KEY_PREFIX = 'ryow'
+
+  class Configuration
+    # Redis key prefix for storing write timestamps.
+    #
+    # @return [String]
+    attr_accessor :redis_key_prefix
+
+    # Time-to-live for write timestamp entries in Redis. Should at least be
+    # greater than config.active_record.database_selector.
+    #
+    # @return [ActiveSupport::Duration, Integer]
+    attr_accessor :redis_ttl
+
+    # Path patterns that should always read from replica, regardless of recent
+    # writes. Useful for read-only POST endpoints like search or validation.
+    #
+    # @return [Array<Regexp>]
+    attr_accessor :ignored_request_paths
+
+    # Proc to extract client identifier parts from request for fingerprinting.
+    # Default uses authorization header and remote IP.
+    #
+    # @return [Proc]
+    attr_accessor :client_identifier
+
+    def initialize
+      @redis_key_prefix      = REDIS_KEY_PREFIX
+      @redis_ttl             = 30.seconds
+      @ignored_request_paths = []
+      @client_identifier     = ->(request) {
+        [request.authorization, request.remote_ip]
+      }
+    end
+  end
+
+  class << self
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    def configure
+      yield(configuration)
+    end
+
+    # Reset configuration to defaults (useful for testing)
+    def reset_configuration!
+      @configuration = Configuration.new
+    end
+  end
+
   # Redis-based resolver context for read-your-own-writes in API-only apps.
   #
   # Unlike the default Session resolver which uses cookies, this resolver
-  # stores the last write timestamp in Redis, keyed by a composite client
-  # identifier from Current attributes (account + bearer + token + IP).
+  # stores write timestamps in Redis using path-based prefix matching.
+  # This ensures reads are routed to primary only when they might be
+  # affected by a recent write from the same client.
   #
-  # This ensures that after a write, subsequent reads from the same client
-  # are routed to the primary database until the replica catches up.
+  # Path matching rules:
+  # - A write to /accounts/foo/licenses/bar affects:
+  #   - GET /accounts/foo/licenses (parent path - listing might include the written resource)
+  #   - GET /accounts/foo/licenses/bar/actions/validate (child path - operates on written resource)
+  # - But does NOT affect:
+  #   - GET /accounts/foo/users (sibling path - different resource type)
   #
   # @example Configuration
+  #   # config/initializers/read_your_own_writes.rb
+  #   ReadYourOwnWrites.configure do |config|
+  #     config.ignored_request_paths = [
+  #       /\/actions\/validate-key\z/,
+  #       /\/actions\/search\z/,
+  #     ]
+  #   end
+  #
+  #   # config/initializers/multi_db.rb
   #   config.active_record.database_resolver_context = ReadYourOwnWrites::RedisContext
   #
+  # @example Force replica in controller
+  #   request.env[ReadYourOwnWrites::SKIP_RYOW_KEY] = true
+  #
   class RedisContext
-    REDIS_KEY_PREFIX = 'ryow'
-    REDIS_TTL = 30.seconds
-
     class << self
       def call(request) = new(request)
 
@@ -33,18 +99,41 @@ module ReadYourOwnWrites
 
     def initialize(request)
       @request = request
+      @config = ReadYourOwnWrites.configuration
     end
 
     def last_write_timestamp
-      t = redis { it.get(redis_key) }&.to_i
+      # Replica-only requests always return epoch (use replica)
+      return Time.at(0) if replica_only_request?
 
-      self.class.convert_timestamp_to_time(t)
+      # Get all recent writes for this client
+      writes = redis { it.zrangebyscore(redis_key, '-inf', '+inf', with_scores: true) }
+
+      return Time.at(0) if writes.nil? || writes.empty?
+
+      # Find the most recent write that matches our path
+      matching_timestamp = writes
+        .select { |path, _| path_matches?(path, request_path) }
+        .map { |_, score| score.to_i }
+        .max
+
+      self.class.convert_timestamp_to_time(matching_timestamp)
     end
 
     def update_last_write_timestamp
       t = self.class.convert_time_to_timestamp(Time.now)
+      cutoff = t - (@config.redis_ttl.to_i * 1000)
 
-      redis { it.set(redis_key, t, ex: REDIS_TTL) }
+      redis do |r|
+        r.multi do |tx|
+          # Add this write path with its timestamp
+          tx.zadd(redis_key, t, request_path)
+          # Remove expired entries
+          tx.zremrangebyscore(redis_key, '-inf', cutoff)
+          # Set TTL on the whole key
+          tx.expire(redis_key, @config.redis_ttl)
+        end
+      end
     end
 
     def save(response)
@@ -53,7 +142,8 @@ module ReadYourOwnWrites
 
     private
 
-    def redis_key = "#{REDIS_KEY_PREFIX}:#{client_id}"
+    def redis_key = "#{@config.redis_key_prefix}:#{client_id}"
+
     def redis(&)
       Rails.cache.redis.then(&)
     rescue Redis::BaseError, Errno::ECONNREFUSED
@@ -62,23 +152,47 @@ module ReadYourOwnWrites
     end
 
     def client_id
-      # Combine all available identifiers for a unique client fingerprint.
-      # This ensures only the specific client that performed a write is
-      # routed to primary, not all clients sharing the same account.
       @client_id ||= begin
-        # FIXME(ezekg) request.params[:account_id] isn't available here since
-        #              afaict our routes haven't been defined yet
-        #
-        # TODO(ezekg) would be best to resolve the account and use ID
-        account_id  = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1] || ''
-        identifiers = [
-          account_id,
-          request.authorization,
-          request.remote_ip,
-        ]
+        identifiers = @config.client_identifier.call(request)
 
-        Digest::SHA2.hexdigest(identifiers.join(':'))
+        Digest::SHA2.hexdigest(Array(identifiers).join(':'))
       end
+    end
+
+    def request_path
+      # Normalize path: remove trailing slash, remove query string
+      @request_path ||= request.path.chomp('/').split('?').first
+    end
+
+    def replica_only_request?
+      # Check request env override
+      return true if request.env[SKIP_RYOW_KEY]
+
+      # Check configured patterns
+      @config.ignored_request_paths.any? { it.match?(request_path) }
+    end
+
+    def path_matches?(write_path, read_path)
+      # Paths match if one is a prefix of the other (delimited by /)
+      # This handles both cases:
+      # - Read is parent of write: GET /licenses matches write to /licenses/bar
+      # - Read is child of write: GET /licenses/bar/validate matches write to /licenses/bar
+      write_segments = write_path.split('/')
+      read_segments = read_path.split('/')
+
+      # Check if write path is prefix of read path
+      return true if segments_prefix?(write_segments, read_segments)
+
+      # Check if read path is prefix of write path
+      return true if segments_prefix?(read_segments, write_segments)
+
+      false
+    end
+
+    def segments_prefix?(prefix_segments, full_segments)
+      return false if prefix_segments.length > full_segments.length
+
+      prefix_segments.each_with_index.all? { |segment, i| segment == full_segments[i] }
     end
   end
 end
