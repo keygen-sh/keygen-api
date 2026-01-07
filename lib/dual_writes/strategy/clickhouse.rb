@@ -14,37 +14,45 @@ module DualWrites
     #   dual_writes to: :clickhouse, strategy: :clickhouse
     #
     class Clickhouse < Strategy
-      def create(attributes, performed_at:)
-        replica_class.insert!(with_metadata(attributes, is_deleted: 0, ver: performed_at))
+      def handle_create(operation)
+        insert_record(operation.attributes, is_deleted: 0, ver: operation.performed_at)
       end
 
-      def update(attributes, performed_at:)
-        replica_class.insert!(with_metadata(attributes, is_deleted: 0, ver: performed_at))
+      def handle_update(operation)
+        insert_record(operation.attributes, is_deleted: 0, ver: operation.performed_at)
       end
 
-      def destroy(attributes, performed_at:)
-        # Insert a tombstone row with is_deleted = 1
-        # ReplacingMergeTree(ver, is_deleted) will handle cleanup
-        replica_class.insert!(with_metadata(attributes, is_deleted: 1, ver: performed_at))
+      def handle_destroy(operation)
+        insert_record(operation.attributes, is_deleted: 1, ver: operation.performed_at)
       end
 
-      def insert_all(attributes, performed_at:)
-        attributes = attributes.map { with_metadata(it, is_deleted: 0, ver: performed_at) }
-
-        replica_class.insert_all!(attributes)
+      def handle_insert_all(operation)
+        insert_records(operation.records, is_deleted: 0, ver: operation.performed_at)
       end
 
-      def upsert_all(attributes, performed_at:)
-        # For ClickHouse, upsert becomes insert (ReplacingMergeTree handles dedup)
-        insert_all(attributes, performed_at:)
+      def handle_upsert_all(operation)
+        # upsert becomes insert (ReplacingMergeTree handles dedup)
+        insert_records(operation.records, is_deleted: 0, ver: operation.performed_at)
       end
 
       private
 
+      def insert_record(attributes, is_deleted:, ver:)
+        replica_class.insert!(with_metadata(attributes, is_deleted:, ver:))
+      end
+
+      def insert_records(records, is_deleted:, ver:)
+        records = records.map { with_metadata(it, is_deleted:, ver:) }
+
+        replica_class.insert_all!(records)
+      end
+
       def with_metadata(attributes, is_deleted:, ver:)
         attrs = attributes.dup
+
         attrs['is_deleted'] = is_deleted if replica_class.column_names.include?('is_deleted')
-        attrs['ver'] = ver if replica_class.column_names.include?('ver')
+        attrs['ver']        = ver        if replica_class.column_names.include?('ver')
+
         attrs
       end
     end

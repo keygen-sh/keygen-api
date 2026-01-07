@@ -217,7 +217,7 @@ describe DualWrites do
               performed_at: Time.current,
               database: 'clickhouse',
             )
-          }.to raise_error(DualWrites::ReplicationError, /unknown operation/)
+          }.to raise_error(ArgumentError, /unknown operation/)
         end
       end
     end
@@ -350,7 +350,7 @@ describe DualWrites do
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
           operation: 'insert_all',
           class_name: 'BulkRecord',
-          attributes: [
+          records: [
             hash_including('name' => 'record1', 'data' => 'data1'),
             hash_including('name' => 'record2', 'data' => 'data2'),
           ],
@@ -382,7 +382,7 @@ describe DualWrites do
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
           operation: 'insert_all',
           class_name: 'BulkRecord',
-          attributes: an_instance_of(Array),
+          records: an_instance_of(Array),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -400,7 +400,7 @@ describe DualWrites do
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
           operation: 'upsert_all',
           class_name: 'BulkRecord',
-          attributes: an_instance_of(Array),
+          records: an_instance_of(Array),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           database: 'clickhouse',
         )
@@ -433,7 +433,7 @@ describe DualWrites do
       end
 
       it 'should insert_all records with is_deleted = 0' do
-        attributes = [
+        records = [
           { 'name' => 'record1', 'data' => 'data1' },
           { 'name' => 'record2', 'data' => 'data2' },
         ]
@@ -441,25 +441,25 @@ describe DualWrites do
         job.perform(
           operation: 'insert_all',
           class_name: model.name,
-          attributes: attributes,
+          records:,
           performed_at: Time.current,
           database: 'clickhouse',
         )
 
-        records = model.all
-        expect(records.count).to eq 2
-        expect(records.all? { |r| r.is_deleted == 0 }).to be true
+        results = model.all
+        expect(results.count).to eq 2
+        expect(results.all? { |r| r.is_deleted == 0 }).to be true
       end
 
       it 'should handle upsert_all as insert_all' do
-        attributes = [
+        records = [
           { 'name' => 'record1', 'data' => 'data1' },
         ]
 
         job.perform(
           operation: 'upsert_all',
           class_name: model.name,
-          attributes: attributes,
+          records:,
           performed_at: Time.current,
           database: 'clickhouse',
         )
@@ -482,7 +482,7 @@ describe DualWrites do
           job.perform(
             operation: 'insert_all',
             class_name: 'BulkUnconfiguredModel',
-            attributes: [{ 'name' => 'test' }],
+            records: [{ 'name' => 'test' }],
             performed_at: Time.current,
             database: 'clickhouse',
           )
@@ -503,11 +503,11 @@ describe DualWrites do
             job.perform(
               operation: 'invalid',
               class_name: 'BulkInvalidRecord',
-              attributes: [],
+              records: [],
               performed_at: Time.current,
               database: 'clickhouse',
             )
-          }.to raise_error(DualWrites::ReplicationError, /unknown bulk operation/)
+          }.to raise_error(ArgumentError, /unknown bulk operation/)
         end
       end
     end

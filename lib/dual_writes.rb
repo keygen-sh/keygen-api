@@ -38,12 +38,25 @@ module DualWrites
   # Base class for replication strategies.
   # Subclass this to implement custom replication logic for different databases.
   #
+  # Strategies use the command pattern with Operation and BulkOperation objects
+  # to cleanly separate record attributes from execution context (like performed_at).
+  #
+  # Operations use double dispatch to call the appropriate handler method on the
+  # strategy, enabling clean polymorphic behavior without switch statements.
+  #
   # @example Creating a custom strategy
   #   class MyStrategy < DualWrites::Strategy
-  #     def create(primary_key, attributes)
-  #       # custom create logic
+  #     def handle_create(operation)
+  #       # custom create logic using operation.attributes and operation.performed_at
   #     end
-  #     # ... implement other methods
+  #
+  #     def handle_update(operation)
+  #       # custom update logic
+  #     end
+  #
+  #     def handle_destroy(operation)
+  #       # custom destroy logic
+  #     end
   #   end
   #
   # @example Using a custom strategy
@@ -79,45 +92,54 @@ module DualWrites
       @replica_class = replica_class
     end
 
-    # @!group Single Record Operations
-
-    # Replicate a create operation.
-    # @param attributes [Hash] the record attributes (includes primary key)
-    # @param performed_at [Time] when the operation was performed on the primary
-    def create(attributes, performed_at:)
-      raise NotImplementedError, "#{self.class}#create must be implemented"
+    # Execute a single-record operation using double dispatch.
+    #
+    # @param operation [Operation] the operation to execute (Create, Update, or Destroy)
+    def execute(operation)
+      operation.execute_with(self)
     end
 
-    # Replicate an update operation.
-    # @param attributes [Hash] the record attributes (includes primary key)
-    # @param performed_at [Time] when the operation was performed on the primary
-    def update(attributes, performed_at:)
-      raise NotImplementedError, "#{self.class}#update must be implemented"
+    # Execute a bulk operation using double dispatch.
+    #
+    # @param operation [BulkOperation] the operation to execute (InsertAll or UpsertAll)
+    def execute_bulk(operation)
+      operation.execute_with(self)
     end
 
-    # Replicate a destroy operation.
-    # @param attributes [Hash] the record attributes (includes primary key)
-    # @param performed_at [Time] when the operation was performed on the primary
-    def destroy(attributes, performed_at:)
-      raise NotImplementedError, "#{self.class}#destroy must be implemented"
+    # @!group Single Record Handlers
+
+    # Handle a create operation.
+    # @param operation [Operation::Create] the create operation
+    def handle_create(operation)
+      raise NotImplementedError, "#{self.class}#handle_create must be implemented"
+    end
+
+    # Handle an update operation.
+    # @param operation [Operation::Update] the update operation
+    def handle_update(operation)
+      raise NotImplementedError, "#{self.class}#handle_update must be implemented"
+    end
+
+    # Handle a destroy operation.
+    # @param operation [Operation::Destroy] the destroy operation
+    def handle_destroy(operation)
+      raise NotImplementedError, "#{self.class}#handle_destroy must be implemented"
     end
 
     # @!endgroup
 
-    # @!group Bulk Operations
+    # @!group Bulk Operation Handlers
 
-    # Replicate a bulk insert operation.
-    # @param records [Array<Hash>] the records to insert
-    # @param performed_at [Time] when the operation was performed on the primary
-    def insert_all(records, performed_at:)
-      raise NotImplementedError, "#{self.class}#insert_all must be implemented"
+    # Handle a bulk insert operation.
+    # @param operation [BulkOperation::InsertAll] the insert_all operation
+    def handle_insert_all(operation)
+      raise NotImplementedError, "#{self.class}#handle_insert_all must be implemented"
     end
 
-    # Replicate a bulk upsert operation.
-    # @param records [Array<Hash>] the records to upsert
-    # @param performed_at [Time] when the operation was performed on the primary
-    def upsert_all(records, performed_at:)
-      raise NotImplementedError, "#{self.class}#upsert_all must be implemented"
+    # Handle a bulk upsert operation.
+    # @param operation [BulkOperation::UpsertAll] the upsert_all operation
+    def handle_upsert_all(operation)
+      raise NotImplementedError, "#{self.class}#handle_upsert_all must be implemented"
     end
 
     # @!endgroup
@@ -247,7 +269,7 @@ module DualWrites
 
       private
 
-      def replicate_bulk(operation, attributes)
+      def replicate_bulk(operation, records)
         return if dual_writes_config.nil?
 
         performed_at = Time.current
@@ -258,7 +280,7 @@ module DualWrites
             BulkReplicationJob.perform_now(
               operation: operation.to_s,
               class_name: name,
-              attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              records: records.map { |record| record.transform_keys(&:to_s) },
               performed_at:,
               database: database.to_s,
             )
@@ -266,7 +288,7 @@ module DualWrites
             BulkReplicationJob.perform_later(
               operation: operation.to_s,
               class_name: name,
-              attributes: attributes.map { |attr| attr.transform_keys(&:to_s) },
+              records: records.map { |record| record.transform_keys(&:to_s) },
               performed_at:,
               database: database.to_s,
             )
@@ -359,11 +381,8 @@ module DualWrites
       database_class = klass.const_get(database.to_s.camelize)
       strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
-      unless strategy.respond_to?(operation.to_sym)
-        raise ReplicationError, "unknown operation: #{operation}"
-      end
-
-      strategy.public_send(operation.to_sym, attributes, performed_at:)
+      operation = Operation.lookup(operation).new(attributes, performed_at:)
+      strategy.execute(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
@@ -377,7 +396,7 @@ module DualWrites
       attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
       wait: :polynomially_longer
 
-    def perform(operation:, class_name:, database:, performed_at:, attributes:)
+    def perform(operation:, class_name:, database:, performed_at:, records:)
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -388,16 +407,17 @@ module DualWrites
       database_class = klass.const_get(database.to_s.camelize)
       strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
-      unless strategy.respond_to?(operation.to_sym)
-        raise ReplicationError, "unknown bulk operation: #{operation}"
-      end
-
-      strategy.public_send(operation.to_sym, attributes, performed_at:)
+      operation = BulkOperation.lookup(operation).new(records, performed_at:)
+      strategy.execute_bulk(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
     end
   end
 end
+
+# Load operation classes
+require_relative 'dual_writes/operation'
+require_relative 'dual_writes/bulk_operation'
 
 # Load built-in strategies
 require_relative 'dual_writes/strategy/clickhouse'
