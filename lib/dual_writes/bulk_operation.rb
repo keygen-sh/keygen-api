@@ -3,14 +3,15 @@
 module DualWrites
   # Base class for bulk replication operations.
   #
-  # BulkOperations encapsulate both the record collection and the execution context
-  # (like performed_at timestamp), separating actual parameters from internal state.
+  # BulkOperations combine record collections (the data parameter) with execution
+  # context (internal metadata), making the boundary between them explicit.
   #
   # Uses double dispatch to delegate execution to the appropriate strategy handler,
   # enabling clean polymorphic behavior without switch statements.
   #
   # @example
-  #   operation = BulkOperation::InsertAll.new(records)
+  #   context = Context.new(performed_at: Time.current)
+  #   operation = BulkOperation::InsertAll.new(records, context:)
   #   strategy.execute(operation) # delegates to strategy.handle_insert_all(operation)
   #
   class BulkOperation
@@ -27,14 +28,13 @@ module DualWrites
       end
     end
 
-    attr_reader :records,
-                :performed_at
+    attr_reader :records, :context
 
     # @param records [Array<Hash>] the records to operate on
-    # @param performed_at [Time] when the operation was performed on the primary (default: now)
-    def initialize(records, performed_at: Time.current)
-      @records      = records
-      @performed_at = performed_at
+    # @param context [Context] the execution context
+    def initialize(records, context:)
+      @records = records
+      @context = context
     end
 
     # Execute this operation with the given strategy.

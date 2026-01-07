@@ -15,24 +15,24 @@ module DualWrites
     #
     class Clickhouse < Strategy
       def handle_create(operation)
-        insert_record(operation.attributes, is_deleted: 0, ver: operation.performed_at)
+        insert_record(operation.attributes, is_deleted: 0, ver: operation.context.performed_at)
       end
 
       def handle_update(operation)
-        insert_record(operation.attributes, is_deleted: 0, ver: operation.performed_at)
+        insert_record(operation.attributes, is_deleted: 0, ver: operation.context.performed_at)
       end
 
       def handle_destroy(operation)
-        insert_record(operation.attributes, is_deleted: 1, ver: operation.performed_at)
+        insert_record(operation.attributes, is_deleted: 1, ver: operation.context.performed_at)
       end
 
       def handle_insert_all(operation)
-        insert_records(operation.records, is_deleted: 0, ver: operation.performed_at)
+        insert_records(operation.records, is_deleted: 0, ver: operation.context.performed_at)
       end
 
       def handle_upsert_all(operation)
         # upsert becomes insert (ReplacingMergeTree handles dedup)
-        insert_records(operation.records, is_deleted: 0, ver: operation.performed_at)
+        insert_records(operation.records, is_deleted: 0, ver: operation.context.performed_at)
       end
 
       private

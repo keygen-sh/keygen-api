@@ -3,14 +3,15 @@
 module DualWrites
   # Base class for single-record replication operations.
   #
-  # Operations encapsulate both the record attributes and the execution context
-  # (like performed_at timestamp), separating actual parameters from internal state.
+  # Operations combine record attributes (the data parameter) with execution
+  # context (internal metadata), making the boundary between them explicit.
   #
   # Uses double dispatch to delegate execution to the appropriate strategy handler,
   # enabling clean polymorphic behavior without switch statements.
   #
   # @example
-  #   operation = Operation::Create.new(attributes)
+  #   context = Context.new(performed_at: Time.current)
+  #   operation = Operation::Create.new(attributes, context:)
   #   strategy.execute(operation) # delegates to strategy.handle_create(operation)
   #
   class Operation
@@ -27,14 +28,13 @@ module DualWrites
       end
     end
 
-    attr_reader :attributes,
-                :performed_at
+    attr_reader :attributes, :context
 
     # @param attributes [Hash] the record attributes (includes primary key)
-    # @param performed_at [Time] when the operation was performed on the primary (default: now)
-    def initialize(attributes, performed_at: Time.current)
-      @attributes   = attributes
-      @performed_at = performed_at
+    # @param context [Context] the execution context
+    def initialize(attributes, context:)
+      @attributes = attributes
+      @context    = context
     end
 
     # Execute this operation with the given strategy.

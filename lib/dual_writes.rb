@@ -381,7 +381,8 @@ module DualWrites
       database_class = klass.const_get(database.to_s.camelize)
       strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
-      operation = Operation.lookup(operation).new(attributes, performed_at:)
+      context = Context.new(performed_at:)
+      operation = Operation.lookup(operation).new(attributes, context:)
       strategy.execute(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
@@ -407,7 +408,8 @@ module DualWrites
       database_class = klass.const_get(database.to_s.camelize)
       strategy = Strategy.lookup(config[:strategy]).new(database_class)
 
-      operation = BulkOperation.lookup(operation).new(records, performed_at:)
+      context = Context.new(performed_at:)
+      operation = BulkOperation.lookup(operation).new(records, context:)
       strategy.execute_bulk(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
       raise ReplicationError, "connection to #{database} not established: #{e.message}"
@@ -415,7 +417,8 @@ module DualWrites
   end
 end
 
-# Load operation classes
+# Load context and operation classes
+require_relative 'dual_writes/context'
 require_relative 'dual_writes/operation'
 require_relative 'dual_writes/bulk_operation'
 
