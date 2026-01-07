@@ -9,7 +9,7 @@ module ReadYourOwnWrites
 
   class Configuration
     # How long after a write to route reads to primary. Synced automatically from
-    # config.active_record.database_selector[:delay] when ActiveRecord loads.
+    # config.active_record.database_selector[:delay] after Rails initializes.
     attr_reader :database_selector_delay
 
     # Redis key prefix for storing write timestamps.
@@ -38,6 +38,12 @@ module ReadYourOwnWrites
     end
 
     def redis_ttl = @redis_ttl || @database_selector_delay * 2
+
+    private
+
+    def database_selector_delay=(delay)
+      database_selector_delay = delay
+    end
   end
 
   class << self
@@ -233,9 +239,11 @@ module ReadYourOwnWrites
     end
   end
 
-  ActiveSupport.on_load(:active_record) do
+  # using after_initialize instead of on_load(:active_record) to make sure we pick up any
+  # changes to the database selector delay inside of initializers, e.g. multi_db.rb.
+  Rails.application.config.after_initialize do
     if (selector = Rails.application.config.active_record.database_selector)
-      ReadYourOwnWrites.configuration.database_selector_delay = selector[:delay]
+      ReadYourOwnWrites.configuration.send(:database_selector_delay=, selector[:delay])
     end
   end
 end

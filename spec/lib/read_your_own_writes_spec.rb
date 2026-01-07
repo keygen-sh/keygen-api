@@ -20,7 +20,6 @@ describe ReadYourOwnWrites do
     end
 
     it 'should sync delay from Rails database_selector config via load hook' do
-      # The load hook runs when ActiveRecord loads, syncing delay from database_selector
       expect(described_class.configuration.database_selector_delay).to eq(2.seconds)
     end
 
