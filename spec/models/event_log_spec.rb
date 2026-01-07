@@ -160,7 +160,7 @@ describe EventLog, type: :model do
           }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
             operation: 'insert_all',
             class_name: 'EventLog',
-            attributes: an_instance_of(Array),
+            records: an_instance_of(Array),
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             database: 'clickhouse',
           )
