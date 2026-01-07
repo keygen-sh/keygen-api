@@ -28,8 +28,9 @@ ActionController::Base.allow_rescue = false
 begin
   Rails.application.eager_load!
 
-  # our database resolver will select the replica on GETs so we need to use :deletion
-  # instead of :transaction, otherwise we can't read the other connection's txn.
+  # NB(ezekg) for integration tests, our database resolver will select the replica on GETs
+  #           so we need to use :deletion instead of :transaction, otherwise we can't read
+  #           the other connection's uncommitted transaction before rollback.
   DatabaseCleaner[:active_record].strategy                  = [:deletion, except: %w[event_types permissions]]
   DatabaseCleaner[:active_record, db: :clickhouse].strategy = :truncation
 rescue NameError
