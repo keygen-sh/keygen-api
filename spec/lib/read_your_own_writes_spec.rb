@@ -13,12 +13,26 @@ describe ReadYourOwnWrites do
       described_class.configure do |config|
         config.ignored_request_paths = [/test/]
         config.redis_key_prefix = 'custom'
-        config.redis_ttl = 60.seconds
       end
 
       expect(described_class.configuration.ignored_request_paths).to eq([/test/])
       expect(described_class.configuration.redis_key_prefix).to eq('custom')
-      expect(described_class.configuration.redis_ttl).to eq(60.seconds)
+    end
+
+    it 'should read delay from Rails database_selector config' do
+      expect(described_class.configuration.delay).to eq(2.seconds)
+    end
+
+    it 'should default redis_ttl to delay * 2' do
+      expect(described_class.configuration.redis_ttl).to eq(4.seconds)
+    end
+
+    it 'should allow overriding redis_ttl' do
+      described_class.configure do |config|
+        config.redis_ttl = 30.seconds
+      end
+
+      expect(described_class.configuration.redis_ttl).to eq(30.seconds)
     end
   end
 
@@ -31,6 +45,50 @@ describe ReadYourOwnWrites do
       described_class.reset_configuration!
 
       expect(described_class.configuration.ignored_request_paths).to eq([])
+    end
+  end
+
+  describe '.reading_own_writes?' do
+    def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
+      instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
+    end
+
+    it 'should return false when no recent writes exist' do
+      request = build_request(path: '/v1/accounts/test/licenses')
+
+      expect(described_class.reading_own_writes?(request)).to be(false)
+    end
+
+    it 'should return true when recent write exists for matching path' do
+      write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context.update_last_write_timestamp
+
+      read_request = build_request(path: '/v1/accounts/test/licenses')
+
+      expect(described_class.reading_own_writes?(read_request)).to be(true)
+    end
+
+    it 'should return false when write is older than delay' do
+      write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context.update_last_write_timestamp
+
+      read_request = build_request(path: '/v1/accounts/test/licenses')
+
+      travel 5.seconds do
+        expect(described_class.reading_own_writes?(read_request)).to be(false)
+      end
+    end
+
+    it 'should return false for non-matching path' do
+      write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context.update_last_write_timestamp
+
+      read_request = build_request(path: '/v1/accounts/test/users')
+
+      expect(described_class.reading_own_writes?(read_request)).to be(false)
     end
   end
 
@@ -131,8 +189,9 @@ describe ReadYourOwnWrites do
         context.update_last_write_timestamp
 
         ttl = redis.then { it.ttl("ryow:#{context.send(:client_id)}") }
+        expected_ttl = ReadYourOwnWrites.configuration.redis_ttl.to_i
 
-        expect(ttl).to be_between(1, 30)
+        expect(ttl).to be_between(1, expected_ttl)
       end
 
       it 'should store multiple write paths' do

@@ -6,26 +6,18 @@ module ReadYourOwnWrites
 
   class Configuration
     # Redis key prefix for storing write timestamps.
-    #
-    # @return [String]
     attr_accessor :redis_key_prefix
 
-    # Time-to-live for write timestamp entries in Redis. Should at least be
-    # greater than config.active_record.database_selector.
-    #
-    # @return [ActiveSupport::Duration, Integer]
-    attr_accessor :redis_ttl
+    # Time-to-live for write timestamp entries in Redis. Defaults to
+    # config.active_record.database_selector * 2.
+    attr_writer :redis_ttl
 
     # Path patterns that should always read from replica, regardless of recent
     # writes. Useful for read-only POST endpoints like search or validation.
-    #
-    # @return [Array<Regexp>]
     attr_accessor :ignored_request_paths
 
     # Proc to extract client identifier parts from request for fingerprinting.
     # Default uses authorization header and remote IP.
-    #
-    # @return [Proc]
     attr_accessor :client_identifier
 
     def initialize
@@ -35,6 +27,14 @@ module ReadYourOwnWrites
       @client_identifier     = ->(request) {
         [request.authorization, request.remote_ip]
       }
+    end
+
+    def delay
+      Rails.application.config.active_record.database_selector[:delay]
+    end
+
+    def redis_ttl
+      @redis_ttl || delay * 2
     end
   end
 
@@ -50,6 +50,14 @@ module ReadYourOwnWrites
     # Reset configuration to defaults (useful for testing)
     def reset_configuration!
       @configuration = Configuration.new
+    end
+
+    # Check if the request is reading its own recent writes.
+    def reading_own_writes?(request)
+      context = RedisContext.new(request)
+      last_write = context.last_write_timestamp
+
+      Time.current - last_write < configuration.delay
     end
   end
 
