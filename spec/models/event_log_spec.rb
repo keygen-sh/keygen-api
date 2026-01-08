@@ -4,13 +4,16 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe EventLog, type: :model do
+  let(:account) { create(:account, plan: build(:plan, :ent, event_log_retention_duration: rand(1.day..365.days))) }
+
+  before { Current.account = account }
+
   it_behaves_like :environmental
   it_behaves_like :accountable
 
   describe 'dual writes' do
     subject(:event_log) { build(:event_log, account:, resource:, whodunnit:, event_type:) }
 
-    let(:account) { create(:account) }
     let(:resource) { create(:license, account:) }
     let(:whodunnit) { create(:user, account:) }
     let(:event_type) { create(:event_type, event: 'license.created') }
@@ -29,7 +32,9 @@ describe EventLog, type: :model do
           to: [:clickhouse],
           strategy: :clickhouse,
           sync: false,
-          ttl: an_instance_of(Proc),
+          strategy_config: hash_including(
+            clickhouse_ttl: an_instance_of(Proc),
+          ),
         )
       end
     end
@@ -39,15 +44,18 @@ describe EventLog, type: :model do
         expect { event_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'EventLog',
           attributes: hash_including(
-            id: a_kind_of(String),
-            account_id: account.id,
-            event_type_id: event_type.id,
-            resource_type: resource.class.name,
-            resource_id: resource.id,
+            'id' => a_kind_of(String),
+            'account_id' => account.id,
+            'event_type_id' => event_type.id,
+            'resource_type' => resource.class.name,
+            'resource_id' => resource.id,
           ),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :create,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.event_log_retention_duration,
+          ),
         )
       end
 
@@ -59,16 +67,16 @@ describe EventLog, type: :model do
         attrs = args[:attributes]
 
         expect(attrs).to include(
-          id: event_log.id,
-          account_id: account.id,
-          event_type_id: event_type.id,
-          created_at: event_log.created_at,
-          updated_at: event_log.updated_at,
-          created_date: event_log.created_date,
-          resource_type: resource.class.name,
-          resource_id: resource.id,
-          whodunnit_type: whodunnit.class.name,
-          whodunnit_id: whodunnit.id,
+          'id' => event_log.id,
+          'account_id' => account.id,
+          'event_type_id' => event_type.id,
+          'created_at' => event_log.created_at,
+          'updated_at' => event_log.updated_at,
+          'created_date' => event_log.created_date,
+          'resource_type' => resource.class.name,
+          'resource_id' => resource.id,
+          'whodunnit_type' => whodunnit.class.name,
+          'whodunnit_id' => whodunnit.id,
         )
       end
     end
@@ -79,10 +87,13 @@ describe EventLog, type: :model do
       it 'should enqueue replication job' do
         expect { event_log.update!(metadata: { foo: 'bar' }) }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'EventLog',
-          attributes: hash_including(id: event_log.id, metadata: { foo: 'bar' }),
+          attributes: hash_including('id' => event_log.id, 'metadata' => { 'foo' => 'bar' }),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :update,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.event_log_retention_duration,
+          ),
         )
       end
     end
@@ -93,10 +104,13 @@ describe EventLog, type: :model do
       it 'should enqueue replication job' do
         expect { event_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'EventLog',
-          attributes: hash_including(id: event_log.id),
+          attributes: hash_including('id' => event_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :destroy,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.event_log_retention_duration,
+          ),
         )
       end
     end
@@ -164,6 +178,9 @@ describe EventLog, type: :model do
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             operation: :insert_all,
             database: :clickhouse,
+            strategy_config: hash_including(
+              clickhouse_ttl: account.event_log_retention_duration,
+            ),
           )
         end
 

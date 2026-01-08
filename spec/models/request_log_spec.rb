@@ -4,13 +4,15 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe RequestLog, type: :model do
+  let(:account) { create(:account, plan: build(:plan, :ent, request_log_retention_duration: rand(1.day..365.days))) }
+
+  before { Current.account = account }
+
   it_behaves_like :environmental
   it_behaves_like :accountable
 
   describe 'dual writes' do
     subject(:request_log) { build(:request_log, account:) }
-
-    let(:account) { create(:account) }
 
     around do |example|
       adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
@@ -26,7 +28,9 @@ describe RequestLog, type: :model do
           to: %i[clickhouse],
           strategy: :clickhouse,
           sync: false,
-          ttl: an_instance_of(Proc),
+          strategy_config: hash_including(
+            clickhouse_ttl: an_instance_of(Proc),
+          ),
         )
       end
     end
@@ -36,14 +40,17 @@ describe RequestLog, type: :model do
         expect { request_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'RequestLog',
           attributes: hash_including(
-            id: a_kind_of(String),
-            account_id: account.id,
-            method: request_log.method,
-            url: request_log.url,
+            'id' => a_kind_of(String),
+            'account_id' => account.id,
+            'method' => request_log.method,
+            'url' => request_log.url,
           ),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :create,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.request_log_retention_duration,
+          ),
         )
       end
 
@@ -55,15 +62,15 @@ describe RequestLog, type: :model do
         attrs = args[:attributes]
 
         expect(attrs).to include(
-          id: request_log.id,
-          account_id: account.id,
-          created_at: request_log.created_at,
-          updated_at: request_log.updated_at,
-          created_date: request_log.created_date,
-          requestor_type: request_log.requestor_type,
-          requestor_id: request_log.requestor_id,
-          resource_type: request_log.resource_type,
-          resource_id: request_log.resource_id,
+          'id' => request_log.id,
+          'account_id' => account.id,
+          'created_at' => request_log.created_at,
+          'updated_at' => request_log.updated_at,
+          'created_date' => request_log.created_date,
+          'requestor_type' => request_log.requestor_type,
+          'requestor_id' => request_log.requestor_id,
+          'resource_type' => request_log.resource_type,
+          'resource_id' => request_log.resource_id,
         )
       end
     end
@@ -74,10 +81,13 @@ describe RequestLog, type: :model do
       it 'should enqueue replication job' do
         expect { request_log.update!(status: '404') }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'RequestLog',
-          attributes: hash_including(id: request_log.id, status: '404'),
+          attributes: hash_including('id' => request_log.id, 'status' => '404'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :update,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.request_log_retention_duration,
+          ),
         )
       end
     end
@@ -88,10 +98,13 @@ describe RequestLog, type: :model do
       it 'should enqueue replication job' do
         expect { request_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
           class_name: 'RequestLog',
-          attributes: hash_including(id: request_log.id),
+          attributes: hash_including('id' => request_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :destroy,
           database: :clickhouse,
+          strategy_config: hash_including(
+            clickhouse_ttl: account.request_log_retention_duration,
+          ),
         )
       end
     end
@@ -125,26 +138,26 @@ describe RequestLog, type: :model do
           now = Time.current
           attributes = [
             {
-              id: SecureRandom.uuid,
-              account_id: account.id,
-              method: 'GET',
-              url: '/v1/accounts',
-              status: '200',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
+              'id' => SecureRandom.uuid,
+              'account_id' => account.id,
+              'method' => 'GET',
+              'url' => '/v1/accounts',
+              'status' => '200',
+              'ip' => '127.0.0.1',
+              'created_at' => now,
+              'updated_at' => now,
+              'created_date' => now.to_date,
             },
             {
-              id: SecureRandom.uuid,
-              account_id: account.id,
-              method: 'POST',
-              url: '/v1/licenses',
-              status: '201',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
+              'id' => SecureRandom.uuid,
+              'account_id' => account.id,
+              'method' => 'POST',
+              'url' => '/v1/licenses',
+              'status' => '201',
+              'ip' => '127.0.0.1',
+              'created_at' => now,
+              'updated_at' => now,
+              'created_date' => now.to_date,
             },
           ]
 
@@ -156,6 +169,9 @@ describe RequestLog, type: :model do
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
             operation: :insert_all,
             database: :clickhouse,
+            strategy_config: hash_including(
+              clickhouse_ttl: account.request_log_retention_duration,
+            ),
           )
         end
 
@@ -163,15 +179,15 @@ describe RequestLog, type: :model do
           now = Time.current
           attributes = [
             {
-              id: SecureRandom.uuid,
-              account_id: account.id,
-              method: 'GET',
-              url: '/v1/accounts',
-              status: '200',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
+              'id' => SecureRandom.uuid,
+              'account_id' => account.id,
+              'method' => 'GET',
+              'url' => '/v1/accounts',
+              'status' => '200',
+              'ip' => '127.0.0.1',
+              'created_at' => now,
+              'updated_at' => now,
+              'created_date' => now.to_date,
             },
           ]
 
@@ -189,26 +205,26 @@ describe RequestLog, type: :model do
 
           attributes = [
             {
-              id: id1,
-              account_id: account.id,
-              method: 'GET',
-              url: '/v1/accounts',
-              status: '200',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
+              'id' => id1,
+              'account_id' => account.id,
+              'method' => 'GET',
+              'url' => '/v1/accounts',
+              'status' => '200',
+              'ip' => '127.0.0.1',
+              'created_at' => now,
+              'updated_at' => now,
+              'created_date' => now.to_date,
             },
             {
-              id: id2,
-              account_id: account.id,
-              method: 'POST',
-              url: '/v1/licenses',
-              status: '201',
-              ip: '127.0.0.1',
-              created_at: now,
-              updated_at: now,
-              created_date: now.to_date,
+              'id' => id2,
+              'account_id' => account.id,
+              'method' => 'POST',
+              'url' => '/v1/licenses',
+              'status' => '201',
+              'ip' => '127.0.0.1',
+              'created_at' => now,
+              'updated_at' => now,
+              'created_date' => now.to_date,
             },
           ]
 

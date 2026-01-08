@@ -10,8 +10,15 @@ module DualWrites
     #
     # ReplacingMergeTree(ver, is_deleted) handles deduplication and cleanup.
     #
-    # @example
+    # @example Basic usage
     #   dual_writes to: :clickhouse, strategy: :clickhouse
+    #
+    # @example With TTL expiration
+    #   dual_writes to: :clickhouse, strategy: :clickhouse,
+    #     clickhouse_ttl: -> { account.request_log_retention_duration }
+    #
+    # Strategy-specific options (prefix with clickhouse_):
+    # - clickhouse_ttl: Proc that returns TTL in seconds, evaluated per-record
     #
     class Clickhouse < Strategy
       def handle_create(operation)
@@ -51,7 +58,8 @@ module DualWrites
         attrs = attributes.dup
 
         attrs['is_deleted'] = is_deleted if replica_class.column_names.include?('is_deleted')
-        attrs['ver']        = ver        if replica_class.column_names.include?('ver')
+        attrs['ver']        = ver if replica_class.column_names.include?('ver')
+        attrs['ttl']        = config[:clickhouse_ttl] if replica_class.column_names.include?('ttl')
 
         attrs
       end

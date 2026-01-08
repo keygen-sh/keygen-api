@@ -86,10 +86,12 @@ module DualWrites
       end
     end
 
-    attr_reader :replica_class
+    attr_reader :replica_class,
+                :config
 
-    def initialize(replica_class)
+    def initialize(replica_class, config = {})
       @replica_class = replica_class
+      @config        = config
     end
 
     # Execute a single-record operation using double dispatch.
@@ -171,8 +173,9 @@ module DualWrites
       #   Built-in strategies: :clickhouse.
       #   Use :clickhouse for ClickHouse with ReplacingMergeTree (insert-only with is_deleted flag).
       # @param sync [Boolean] whether to replicate synchronously inside the transaction (default: false)
-      # @param ttl [Proc, nil] a proc that returns the TTL in seconds.
-      #   Called in the context of the model instance. Used for ClickHouse TTL expiration.
+      # @param strategy_config [Hash] strategy-specific options, prefixed by strategy name.
+      #   Values can be procs that will be evaluated in the model instance context.
+      #   See individual strategy documentation for supported options.
       #
       # @example Basic usage
       #   class RequestLog < ApplicationRecord
@@ -195,12 +198,12 @@ module DualWrites
       #     dual_writes to: :clickhouse, strategy: :clickhouse, sync: true
       #   end
       #
-      # @example With TTL expiration
+      # @example With strategy-specific TTL (ClickHouse)
       #   class RequestLog < ApplicationRecord
       #     include DualWrites::Model
       #
       #     dual_writes to: :clickhouse, strategy: :clickhouse,
-      #       ttl: -> { account.request_log_retention_duration }
+      #       clickhouse_ttl: -> { account.request_log_retention_duration }
       #   end
       #
       # @example With custom strategy
@@ -210,7 +213,7 @@ module DualWrites
       #     dual_writes to: :my_database, strategy: MyCustomStrategy
       #   end
       #
-      def dual_writes(to:, strategy:, sync: false, ttl: nil)
+      def dual_writes(to:, strategy:, sync: false, **strategy_config)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -231,7 +234,7 @@ module DualWrites
           next if const_defined?(database_class_name, false)
 
           base_class = DualWrites.base_class_for(database)
-          table = table_name
+          table      = table_name
 
           database_class = Class.new(base_class) do
             self.table_name = table
@@ -244,7 +247,7 @@ module DualWrites
           to: databases,
           sync:,
           strategy:,
-          ttl:,
+          strategy_config:,
         }.freeze
       end
 
@@ -272,8 +275,9 @@ module DualWrites
       def replicate_bulk(operation, records)
         return if dual_writes_config.nil?
 
-        performed_at = Time.current
-        config       = dual_writes_config
+        performed_at    = Time.current
+        config          = dual_writes_config
+        strategy_config = resolved_strategy_config
 
         config[:to].each do |database|
           if config[:sync]
@@ -283,6 +287,7 @@ module DualWrites
               operation:,
               database:,
               records:,
+              strategy_config:,
             )
           else
             BulkReplicationJob.perform_later(
@@ -291,8 +296,15 @@ module DualWrites
               operation:,
               database:,
               records:,
+              strategy_config:,
             )
           end
+        end
+      end
+
+      def resolved_strategy_config
+        dual_writes_config[:strategy_config].transform_values do |value|
+          value.is_a?(Proc) ? value.call : value
         end
       end
     end
@@ -320,45 +332,43 @@ module DualWrites
     def replicate_destroy_sync = replicate_sync(:destroy)
 
     def replicate_async(operation)
-      performed_at = Time.current
-      config       = self.class.dual_writes_config
-      attrs        = replication_attributes
+      performed_at    = Time.current
+      config          = self.class.dual_writes_config
+      strategy_config = resolved_strategy_config
 
       config[:to].each do |database|
         ReplicationJob.perform_later(
           class_name: self.class.name,
-          attributes: attrs,
+          attributes:,
           performed_at:,
           operation:,
           database:,
+          strategy_config:,
         )
       end
     end
 
     def replicate_sync(operation)
-      performed_at = Time.current
-      config       = self.class.dual_writes_config
-      attrs        = replication_attributes
+      performed_at    = Time.current
+      config          = self.class.dual_writes_config
+      strategy_config = resolved_strategy_config
 
       config[:to].each do |database|
         ReplicationJob.perform_now(
           class_name: self.class.name,
-          attributes: attrs,
+          attributes:,
           performed_at:,
           operation:,
           database:,
+          strategy_config:,
         )
       end
     end
 
-    def replication_attributes
-      attrs = attributes.with_indifferent_access
-
-      if (ttl_proc = self.class.dual_writes_config[:ttl])
-        attrs[:ttl] = instance_exec(&ttl_proc)
+    def resolved_strategy_config
+      self.class.dual_writes_config[:strategy_config].transform_values do |value|
+        value.is_a?(Proc) ? instance_exec(&value) : value
       end
-
-      attrs
     end
   end
 
@@ -370,7 +380,7 @@ module DualWrites
       attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
       wait: :polynomially_longer
 
-    def perform(operation:, class_name:, attributes:, performed_at:, database:)
+    def perform(operation:, class_name:, attributes:, performed_at:, database:, strategy_config: {})
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -379,7 +389,7 @@ module DualWrites
 
       config = klass.dual_writes_config
       database_class = klass.const_get(database.to_s.camelize)
-      strategy = Strategy.lookup(config[:strategy]).new(database_class)
+      strategy = Strategy.lookup(config[:strategy]).new(database_class, strategy_config)
 
       context = Context.new(performed_at:)
       operation = Operation.lookup(operation).new(attributes, context:)
@@ -397,7 +407,7 @@ module DualWrites
       attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
       wait: :polynomially_longer
 
-    def perform(operation:, class_name:, database:, performed_at:, records:)
+    def perform(operation:, class_name:, database:, performed_at:, records:, strategy_config: {})
       klass = class_name.constantize
 
       unless klass.respond_to?(:dual_writes_config)
@@ -406,7 +416,7 @@ module DualWrites
 
       config = klass.dual_writes_config
       database_class = klass.const_get(database.to_s.camelize)
-      strategy = Strategy.lookup(config[:strategy]).new(database_class)
+      strategy = Strategy.lookup(config[:strategy]).new(database_class, strategy_config)
 
       context = Context.new(performed_at:)
       operation = BulkOperation.lookup(operation).new(records, context:)
