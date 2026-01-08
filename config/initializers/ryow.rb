@@ -15,7 +15,8 @@ ReadYourOwnWrites.configure do |config|
   config.client_identifier = -> request {
     account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1] # FIXME(ezekg) use account ID
     session_id = request.cookie_jar.encrypted[:session_id]
+    auth_value = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
 
-    [account_id, session_id, request.authorization, request.remote_ip]
+    [account_id, session_id, auth_value, request.remote_ip]
   }
 end
