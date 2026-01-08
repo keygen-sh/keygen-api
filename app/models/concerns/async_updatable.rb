@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
-module AsyncUpdateable
+module AsyncUpdatable
   extend ActiveSupport::Concern
 
   def update_async(attributes)
+    optimistic = dup.tap(&:readonly!)
+
     UpdateAsyncJob.perform_later(
       class_name: self.class.name,
-      record_id: id,
+      id:,
       attributes:,
       last_updated_at: updated_at,
     )
+
+    optimistic
   end
 
   class UpdateAsyncJob < ActiveJob::Base
@@ -17,9 +21,9 @@ module AsyncUpdateable
 
     discard_on ActiveJob::DeserializationError
 
-    def perform(class_name:, record_id:, attributes:, last_updated_at:)
+    def perform(class_name:, id:, attributes:, last_updated_at:)
       klass  = class_name.constantize
-      record = klass.find_by(klass.primary_key => record_id)
+      record = klass.find_by(klass.primary_key => id)
       return if
         record.nil?
 

@@ -2,8 +2,6 @@
 
 module Api::V1::ReleaseEngines
   class Rubygems::GemsController < Api::V1::BaseController
-    use_primary only: %i[show]
-
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
