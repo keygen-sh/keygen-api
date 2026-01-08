@@ -13,7 +13,7 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
-  if Keygen.database.read_replica_enabled?
+  if Keygen.database.read_replica_available? && Keygen.database.read_replica_enabled?
     connects_to database: { writing: :primary, reading: :replica }
   else
     connects_to database: { writing: :primary, reading: :primary }
