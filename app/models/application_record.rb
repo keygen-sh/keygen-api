@@ -13,10 +13,11 @@ class ApplicationRecord < ActiveRecord::Base
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
 
-  connects_to database: {
-    writing: :primary,
-    reading: :replica,
-  }
+  if Keygen.database.read_replica_enabled?
+    connects_to database: { writing: :primary, reading: :replica }
+  else
+    connects_to database: { writing: :primary, reading: :primary }
+  end
 
   # FIXME(ezekg) Not sure why this isn't already happening by Rails?
   #              We could also do def destroying? = _destroy.
