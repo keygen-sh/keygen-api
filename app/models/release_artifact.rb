@@ -539,18 +539,22 @@ class ReleaseArtifact < ApplicationRecord
     redirect_url.present?
   end
 
-  def download!(path: filename, ttl: 1.hour)
+  def presigned_download_url(path: filename, ttl: 1.hour)
     self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(path), expires_in: ttl&.to_i)
 
-    ReleaseDownloadLink.create_async(release_id: release.id, url: redirect_url, ttl:, account_id: account.id)
+    ReleaseDownloadLink.create_async(url: redirect_url, ttl:, release_id:, account_id:)
+
+    redirect_url
   end
 
-  def upload!(ttl: 1.hour)
+  def presigned_upload_url(ttl: 1.hour)
     self.redirect_url = presigner.presigned_url(:put_object, bucket:, key:, expires_in: ttl.to_i)
 
     WaitForArtifactUploadWorker.perform_async(id)
 
-    ReleaseUploadLink.create_async(release_id: release.id, url: redirect_url, ttl:, account_id: account.id)
+    ReleaseUploadLink.create_async(url: redirect_url, ttl:, release_id:, account_id:)
+
+    redirect_url
   end
 
   def yank!
