@@ -13,11 +13,9 @@ ReadYourOwnWrites.configure do |config|
   #
   # extract tenant (account) from request path for client identifier
   config.client_identifier = -> request {
-    account_id    = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1] # FIXME(ezekg) use account ID
-    session_authn = request.headers['Cookie']                        # FIXME(ezekg) use session ID
-    token_authn   = request.headers['Authorization']                 # FIXME(ezekg) use token ID
+    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1] # FIXME(ezekg) use account ID
+    session_id = request.cookie_jar.encrypted[:session_id]
 
-    # FIXME(ezekg) use bearer ID?
-    [account_id, session_authn, token_authn, request.remote_ip]
+    [account_id, session_id, request.authorization, request.remote_ip]
   }
 end

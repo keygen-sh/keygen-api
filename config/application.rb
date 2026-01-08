@@ -47,6 +47,9 @@ module Keygen
     # readd support for cookies
     config.middleware.use ActionDispatch::Cookies
 
+    # move database selector to after cookies
+    config.middleware.move ActiveRecord::Middleware::DatabaseSelector, ActionDispatch::Cookies
+
     # ignore X-Forwarded-For header
     config.middleware.insert_before 0, Keygen::Middleware::IgnoreForwardedHost
 
