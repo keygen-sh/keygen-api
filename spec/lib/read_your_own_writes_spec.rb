@@ -445,6 +445,14 @@ describe ReadYourOwnWrites do
 
     let(:controller) { test_controller_class.new }
 
+    describe '.use_primary' do
+      it 'should add around_action for primary connection' do
+        test_controller_class.use_primary only: :index
+
+        expect(test_controller_class._process_action_callbacks.map(&:filter)).to include(:with_primary_connection)
+      end
+    end
+
     describe '.use_read_replica' do
       it 'should add around_action for replica connection' do
         test_controller_class.use_read_replica only: :index
@@ -461,6 +469,30 @@ describe ReadYourOwnWrites do
       end
     end
 
+    describe '#with_primary_connection' do
+      it 'should execute block with writing role' do
+        role_during_block = nil
+
+        controller.with_primary_connection do
+          role_during_block = ActiveRecord::Base.current_role
+        end
+
+        expect(role_during_block).to eq(:writing)
+      end
+
+      it 'should restore role after block' do
+        ActiveRecord::Base.connected_to(role: :reading) do
+          role_was = ActiveRecord::Base.current_role
+
+          controller.with_primary_connection do
+            # nothing
+          end
+
+          expect(ActiveRecord::Base.current_role).to eq(role_was)
+        end
+      end
+    end
+
     describe '#with_read_replica_connection' do
       it 'should execute block with reading role' do
         role_during_block = nil
@@ -472,14 +504,16 @@ describe ReadYourOwnWrites do
         expect(role_during_block).to eq(:reading)
       end
 
-      it 'should restore original role after block' do
-        original_role = ActiveRecord::Base.current_role
+      it 'should restore role after block' do
+        ActiveRecord::Base.connected_to(role: :writing) do
+          role_was = ActiveRecord::Base.current_role
 
-        controller.with_read_replica_connection do
-          # inside block
+          controller.with_read_replica_connection do
+            # nada
+          end
+
+          expect(ActiveRecord::Base.current_role).to eq(role_was)
         end
-
-        expect(ActiveRecord::Base.current_role).to eq(original_role)
       end
     end
 
