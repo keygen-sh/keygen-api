@@ -18,6 +18,18 @@ def drain_async_destroy_jobs
   YankArtifactWorker.drain
 end
 
+def drain_async_update_jobs
+  require 'sidekiq/testing'
+
+  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
+  active_job.jobs.each do |job|
+    case job['wrapped']
+    when AsyncUpdateable::UpdateAsyncJob.name
+      active_job.process_job(job)
+    end
+  end
+end
+
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name
