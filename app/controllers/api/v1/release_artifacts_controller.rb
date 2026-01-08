@@ -2,8 +2,6 @@
 
 module Api::V1
   class ReleaseArtifactsController < Api::V1::BaseController
-    use_primary only: %i[show], unless: -> { prefers?('no-download') }
-
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:release) { |c, s, v| s.for_release(v) }

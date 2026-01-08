@@ -2,8 +2,6 @@
 
 module Api::V1::Releases::Relationships
   class ReleaseArtifactsController < Api::V1::BaseController
-    use_primary only: %i[show]
-
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }

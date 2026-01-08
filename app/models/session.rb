@@ -3,7 +3,7 @@
 class Session < ApplicationRecord
   MAX_AGE = 2.weeks
 
-  include AsyncUpdateable
+  include AsyncUpdatable
   include Denormalizable
   include Environmental
   include Accountable

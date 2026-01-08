@@ -67,6 +67,7 @@ When /^I send a HEAD request to "([^\"]*)"$/ do |path|
     head path
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -87,6 +88,7 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
     get path
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -107,6 +109,7 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
     post path
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -127,6 +130,7 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
     put path
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -147,6 +151,7 @@ When /^I send a PATCH request to "([^\"]*)"$/ do |path|
     patch path
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -168,6 +173,7 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
     post path, body
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -189,6 +195,7 @@ When /^I send a POST request to "([^\"]*)" with the following badly encoded data
     post path, body.encode!('CP1252')
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -210,6 +217,7 @@ When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body
     patch path, body
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -231,6 +239,7 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
     put path, body
   end
 
+  drain_async_create_jobs
   drain_async_update_jobs
 end
 
@@ -252,8 +261,9 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
     delete path, body
   end
 
-  drain_async_destroy_jobs
+  drain_async_create_jobs
   drain_async_update_jobs
+  drain_async_destroy_jobs
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
@@ -273,8 +283,9 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
     delete path
   end
 
-  drain_async_destroy_jobs
+  drain_async_create_jobs
   drain_async_update_jobs
+  drain_async_destroy_jobs
 rescue Timeout::Error
 end
 

@@ -542,13 +542,7 @@ class ReleaseArtifact < ApplicationRecord
   def download!(path: filename, ttl: 1.hour)
     self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(path), expires_in: ttl&.to_i)
 
-    release.download_links.create!(url: redirect_url, ttl:, account:)
-  end
-
-  def upgrade!(ttl: 1.hour)
-    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key:, expires_in: ttl&.to_i)
-
-    release.upgrade_links.create!(url: redirect_url, ttl:, account:)
+    ReleaseDownloadLink.create_async(release_id: release.id, url: redirect_url, ttl:, account_id: account.id)
   end
 
   def upload!(ttl: 1.hour)
@@ -556,7 +550,7 @@ class ReleaseArtifact < ApplicationRecord
 
     WaitForArtifactUploadWorker.perform_async(id)
 
-    release.upload_links.create!(url: redirect_url, ttl:, account:)
+    ReleaseUploadLink.create_async(release_id: release.id, url: redirect_url, ttl:, account_id: account.id)
   end
 
   def yank!
