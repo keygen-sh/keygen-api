@@ -48,5 +48,5 @@ production:
     replica: true
   clickhouse:
     <<: *clickhouse
-    url: <%= ENV['CLICKHOUSE_CONNECTION_POOL_URL'] || ENV['CLICKHOUSE_DATABASE_URL'] %>
+    url: <%= ENV['CLICKHOUSE_DATABASE_URL'] %>
 
