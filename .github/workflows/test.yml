@@ -22,7 +22,7 @@ jobs:
         ports:
           - 5432:5432
       clickhouse:
-        image: clickhouse/clickhouse-server:22-alpine
+        image: clickhouse/clickhouse-server:25.12-alpine
         env:
           CLICKHOUSE_PASSWORD: clickhouse
           CLICKHOUSE_USER: clickhouse
