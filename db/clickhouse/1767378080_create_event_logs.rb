@@ -34,7 +34,7 @@ class CreateEventLogs < ActiveRecord::Migration[8.1]
       t.column :is_deleted, "UInt8", null: false, default: 0
 
       # version for ReplacingMergeTree deduplication
-      t.datetime :ver, null: false, default: -> { "now()" }
+      t.datetime :ver, precision: 3, null: false, default: -> { "now()" }
 
       # TTL in seconds (set per-account at insert time)
       t.column :ttl, "UInt32", null: false, default: 30.days.to_i
