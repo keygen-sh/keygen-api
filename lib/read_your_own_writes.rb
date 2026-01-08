@@ -25,6 +25,9 @@ module ReadYourOwnWrites
 
     # Proc to extract client identifier parts from request for fingerprinting.
     # Default uses authorization header and remote IP.
+    #
+    # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
+    #           middleware, so things like route params are NOT available.
     attr_accessor :client_identifier
 
     def initialize
