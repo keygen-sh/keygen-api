@@ -89,8 +89,6 @@ module ReadYourOwnWrites
       def prefer_read_replica(**) = use_read_replica(**, always: false)
     end
 
-    private
-
     def with_primary_connection
       ActiveRecord::Base.connected_to(role: :writing) { yield }
     end
