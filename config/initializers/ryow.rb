@@ -9,9 +9,11 @@ ReadYourOwnWrites.configure do |config|
   ]
 
   # extract tenant (account) from request path for client identifier
-  config.client_identifier = ->(request) {
-    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1]
+  config.client_identifier = -> request {
+    account_id    = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1]
+    session_authn = request.headers['Cookie']
+    token_authn   = request.headers['Authorization']
 
-    [account_id, request.authorization, request.remote_ip]
+    [account_id, session_authn, token_authn, request.remote_ip]
   }
 end
