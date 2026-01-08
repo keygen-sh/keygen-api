@@ -76,6 +76,9 @@ module ReadYourOwnWrites
     extend ActiveSupport::Concern
 
     class_methods do
+      # use_primary always connects to the primary database (useful for GET requests that perform writes)
+      def use_primary(**) = prepend_around_action(:with_primary_connection, **)
+
       # use_read_replica connects to the replica database unless there has been a recent write (mainly
       # useful for readonly POST requests, e.g. license validation and search)
       def use_read_replica(always: true, **)
@@ -84,6 +87,12 @@ module ReadYourOwnWrites
 
       # prefer_read_replica respects ryow behavior (i.e. prefer replica unless recent write)
       def prefer_read_replica(**) = use_read_replica(**, always: false)
+    end
+
+    private
+
+    def with_primary_connection
+      ActiveRecord::Base.connected_to(role: :writing) { yield }
     end
 
     def with_read_replica_connection_unless_reading_own_writes

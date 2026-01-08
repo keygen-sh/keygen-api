@@ -2,7 +2,7 @@
 
 module Auth
   class SsoController < Api::V1::BaseController
-    use_read_replica only: %i[callback]
+    use_primary
 
     DEFAULT_SESSION_DURATION = 8.hours
 
