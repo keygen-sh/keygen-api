@@ -13,7 +13,7 @@ ReadYourOwnWrites.configure do |config|
   #
   # extract tenant (account) from request path for client identifier
   config.client_identifier = -> request {
-    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1] # FIXME(ezekg) use account ID
+    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use account ID
     session_id = request.cookie_jar.encrypted[:session_id]
     auth_value = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
 
