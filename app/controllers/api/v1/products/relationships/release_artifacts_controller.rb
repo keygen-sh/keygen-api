@@ -2,8 +2,6 @@
 
 module Api::V1::Products::Relationships
   class ReleaseArtifactsController < Api::V1::BaseController
-    use_primary only: %i[show]
-
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype, allow_blank: true) { |c, s, v| s.for_filetype(v.presence) }

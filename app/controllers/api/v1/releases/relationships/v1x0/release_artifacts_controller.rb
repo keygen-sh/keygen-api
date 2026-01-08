@@ -2,8 +2,6 @@
 
 module Api::V1::Releases::Relationships::V1x0
   class ReleaseArtifactsController < Api::V1::BaseController
-    use_primary only: %i[show]
-
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[show]

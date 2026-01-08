@@ -3,6 +3,7 @@
 class ReleaseUploadLink < ApplicationRecord
   include Environmental
   include Accountable
+  include AsyncCreatable
   include Limitable
   include Orderable
   include Pageable
