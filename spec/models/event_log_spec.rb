@@ -16,11 +16,11 @@ describe EventLog, type: :model do
     let(:event_type) { create(:event_type, event: 'license.created') }
 
     around do |example|
-      original_adapter = ActiveJob::Base.queue_adapter
-      ActiveJob::Base.queue_adapter = :test
+      adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
+
       example.run
     ensure
-      ActiveJob::Base.queue_adapter = original_adapter
+      ActiveJob::Base.queue_adapter = adapter_was
     end
 
     describe 'configuration' do
@@ -29,6 +29,7 @@ describe EventLog, type: :model do
           to: [:clickhouse],
           strategy: :clickhouse,
           sync: false,
+          ttl: an_instance_of(Proc),
         )
       end
     end
@@ -36,17 +37,17 @@ describe EventLog, type: :model do
     describe 'on create' do
       it 'should enqueue replication job' do
         expect { event_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'create',
           class_name: 'EventLog',
           attributes: hash_including(
-            'id' => a_kind_of(String),
-            'account_id' => account.id,
-            'event_type_id' => event_type.id,
-            'resource_type' => resource.class.name,
-            'resource_id' => resource.id,
+            id: a_kind_of(String),
+            account_id: account.id,
+            event_type_id: event_type.id,
+            resource_type: resource.class.name,
+            resource_id: resource.id,
           ),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :create,
+          database: :clickhouse,
         )
       end
 
@@ -58,16 +59,16 @@ describe EventLog, type: :model do
         attrs = args[:attributes]
 
         expect(attrs).to include(
-          'id' => event_log.id,
-          'account_id' => account.id,
-          'event_type_id' => event_type.id,
-          'created_at' => event_log.created_at,
-          'updated_at' => event_log.updated_at,
-          'created_date' => event_log.created_date,
-          'resource_type' => resource.class.name,
-          'resource_id' => resource.id,
-          'whodunnit_type' => whodunnit.class.name,
-          'whodunnit_id' => whodunnit.id,
+          id: event_log.id,
+          account_id: account.id,
+          event_type_id: event_type.id,
+          created_at: event_log.created_at,
+          updated_at: event_log.updated_at,
+          created_date: event_log.created_date,
+          resource_type: resource.class.name,
+          resource_id: resource.id,
+          whodunnit_type: whodunnit.class.name,
+          whodunnit_id: whodunnit.id,
         )
       end
     end
@@ -77,11 +78,11 @@ describe EventLog, type: :model do
 
       it 'should enqueue replication job' do
         expect { event_log.update!(metadata: { foo: 'bar' }) }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'update',
           class_name: 'EventLog',
-          attributes: hash_including('id' => event_log.id, 'metadata' => { 'foo' => 'bar' }),
+          attributes: hash_including(id: event_log.id, metadata: { foo: 'bar' }),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :update,
+          database: :clickhouse,
         )
       end
     end
@@ -91,11 +92,11 @@ describe EventLog, type: :model do
 
       it 'should enqueue replication job' do
         expect { event_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'destroy',
           class_name: 'EventLog',
-          attributes: hash_including('id' => event_log.id),
+          attributes: hash_including(id: event_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :destroy,
+          database: :clickhouse,
         )
       end
     end
@@ -158,11 +159,11 @@ describe EventLog, type: :model do
           expect {
             EventLog.insert_all(attributes)
           }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-            operation: 'insert_all',
             class_name: 'EventLog',
-            records: an_instance_of(Array),
+            records: array_including(*attributes),
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-            database: 'clickhouse',
+            operation: :insert_all,
+            database: :clickhouse,
           )
         end
 

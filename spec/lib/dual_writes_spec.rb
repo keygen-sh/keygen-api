@@ -67,11 +67,11 @@ describe DualWrites do
         expect {
           model.create!(name: 'test', data: 'hello')
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'create',
           class_name: 'DualWriteRecord',
-          attributes: hash_including('id' => a_kind_of(Integer), 'name' => 'test', 'data' => 'hello'),
+          attributes: hash_including(id: a_kind_of(Integer), name: 'test', data: 'hello'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :create,
+          database: :clickhouse,
         )
       end
     end
@@ -83,11 +83,11 @@ describe DualWrites do
         expect {
           record.update!(name: 'updated')
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'update',
           class_name: 'DualWriteRecord',
-          attributes: hash_including('id' => record.id, 'name' => 'updated'),
+          attributes: hash_including(id: record.id, name: 'updated'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :update,
+          database: :clickhouse,
         )
       end
     end
@@ -99,11 +99,11 @@ describe DualWrites do
         expect {
           record.destroy!
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'destroy',
           class_name: 'DualWriteRecord',
-          attributes: hash_including('id' => record.id),
+          attributes: hash_including(id: record.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :destroy,
+          database: :clickhouse,
         )
       end
     end
@@ -165,11 +165,11 @@ describe DualWrites do
         expect {
           expiring_model.create!(name: 'test', retention_seconds: 7_776_000) # 90 days
         }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'create',
           class_name: 'ExpiringRecord',
-          attributes: hash_including('ttl' => 7_776_000),
+          attributes: hash_including(ttl: 7_776_000),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :create,
+          database: :clickhouse,
         )
       end
     end
@@ -190,11 +190,11 @@ describe DualWrites do
       it 'should raise error for unconfigured model' do
         expect {
           job.perform(
-            operation: 'create',
             class_name: 'UnconfiguredModel',
-            attributes: { 'name' => 'test' },
+            attributes: { name: 'test' },
             performed_at: Time.current,
-            database: 'clickhouse',
+            operation: :create,
+            database: :clickhouse,
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
       end
@@ -211,11 +211,11 @@ describe DualWrites do
 
           expect {
             job.perform(
-              operation: 'invalid',
               class_name: 'InvalidOpRecord',
               attributes: {},
               performed_at: Time.current,
-              database: 'clickhouse',
+              operation: :invalid,
+              database: :clickhouse,
             )
           }.to raise_error(ArgumentError, /unknown operation/)
         end
@@ -249,18 +249,17 @@ describe DualWrites do
 
       context 'with create operation' do
         it 'should insert record with is_deleted = 0' do
-          record_id = 777_777
-          attrs = { 'id' => record_id, 'name' => 'new', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { id: 1, name: 'new', data: 'test', created_at: Time.current, updated_at: Time.current }
 
           job.perform(
-            operation: 'create',
             class_name: clickhouse_model.name,
             attributes: attrs,
             performed_at: Time.current,
-            database: 'clickhouse',
+            operation: :create,
+            database: :clickhouse,
           )
 
-          record = clickhouse_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: 1)
           expect(record).to be_present
           expect(record.name).to eq 'new'
           expect(record.is_deleted).to eq 0
@@ -271,18 +270,17 @@ describe DualWrites do
         it 'should insert new version with is_deleted = 0' do
           # In insert-only mode, updates insert new rows rather than updating existing ones
           # ClickHouse ReplacingMergeTree will deduplicate based on the version column
-          record_id = 777_778
-          attrs = { 'id' => record_id, 'name' => 'updated', 'data' => 'new', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { id: 2, name: 'updated', data: 'new', created_at: Time.current, updated_at: Time.current }
 
           job.perform(
-            operation: 'update',
             class_name: clickhouse_model.name,
             attributes: attrs,
             performed_at: Time.current,
-            database: 'clickhouse',
+            operation: :update,
+            database: :clickhouse,
           )
 
-          record = clickhouse_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: 2)
           expect(record).to be_present
           expect(record.is_deleted).to eq 0
         end
@@ -290,18 +288,17 @@ describe DualWrites do
 
       context 'with destroy operation' do
         it 'should insert tombstone with is_deleted = 1' do
-          record_id = 777_779
-          attrs = { 'id' => record_id, 'name' => 'deleted', 'data' => 'test', 'created_at' => Time.current, 'updated_at' => Time.current }
+          attrs = { id: 3, name: 'deleted', data: 'test', created_at: Time.current, updated_at: Time.current }
 
           job.perform(
-            operation: 'destroy',
             class_name: clickhouse_model.name,
             attributes: attrs,
             performed_at: Time.current,
-            database: 'clickhouse',
+            operation: :destroy,
+            database: :clickhouse,
           )
 
-          record = clickhouse_model.find_by(id: record_id)
+          record = clickhouse_model.find_by(id: 3)
           expect(record).to be_present
           expect(record.is_deleted).to eq 1
         end
@@ -348,14 +345,14 @@ describe DualWrites do
         expect {
           model.insert_all(attributes)
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'insert_all',
           class_name: 'BulkRecord',
           records: [
-            hash_including('name' => 'record1', 'data' => 'data1'),
-            hash_including('name' => 'record2', 'data' => 'data2'),
+            hash_including(name: 'record1', data: 'data1'),
+            hash_including(name: 'record2', data: 'data2'),
           ],
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :insert_all,
+          database: :clickhouse,
         )
       end
 
@@ -380,11 +377,11 @@ describe DualWrites do
         expect {
           model.insert_all!(attributes)
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'insert_all',
           class_name: 'BulkRecord',
-          records: an_instance_of(Array),
+          records: array_including(*attributes),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :insert_all,
+          database: :clickhouse,
         )
       end
     end
@@ -398,11 +395,11 @@ describe DualWrites do
         expect {
           model.upsert_all(attributes)
         }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-          operation: 'upsert_all',
           class_name: 'BulkRecord',
-          records: an_instance_of(Array),
+          records: array_including(*attributes),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :upsert_all,
+          database: :clickhouse,
         )
       end
     end
@@ -439,11 +436,11 @@ describe DualWrites do
         ]
 
         job.perform(
-          operation: 'insert_all',
           class_name: model.name,
-          records:,
           performed_at: Time.current,
-          database: 'clickhouse',
+          operation: :insert_all,
+          database: :clickhouse,
+          records:,
         )
 
         results = model.all
@@ -480,11 +477,11 @@ describe DualWrites do
       it 'should raise error for unconfigured model' do
         expect {
           job.perform(
-            operation: 'insert_all',
             class_name: 'BulkUnconfiguredModel',
-            records: [{ 'name' => 'test' }],
+            records: [{ name: 'test' }],
             performed_at: Time.current,
-            database: 'clickhouse',
+            operation: :insert_all,
+            database: :clickhouse,
           )
         }.to raise_error(DualWrites::ConfigurationError, /not configured for dual writes/)
       end
@@ -501,11 +498,11 @@ describe DualWrites do
 
           expect {
             job.perform(
-              operation: 'invalid',
               class_name: 'BulkInvalidRecord',
               records: [],
               performed_at: Time.current,
-              database: 'clickhouse',
+              operation: :delete_all,
+              database: :clickhouse,
             )
           }.to raise_error(ArgumentError, /unknown bulk operation/)
         end

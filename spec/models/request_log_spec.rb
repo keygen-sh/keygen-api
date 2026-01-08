@@ -13,19 +13,20 @@ describe RequestLog, type: :model do
     let(:account) { create(:account) }
 
     around do |example|
-      original_adapter = ActiveJob::Base.queue_adapter
-      ActiveJob::Base.queue_adapter = :test
+      adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
+
       example.run
     ensure
-      ActiveJob::Base.queue_adapter = original_adapter
+      ActiveJob::Base.queue_adapter = adapter_was
     end
 
     describe 'configuration' do
       it 'should be configured for dual writes' do
         expect(RequestLog.dual_writes_config).to include(
-          to: [:clickhouse],
+          to: %i[clickhouse],
           strategy: :clickhouse,
           sync: false,
+          ttl: an_instance_of(Proc),
         )
       end
     end
@@ -33,16 +34,16 @@ describe RequestLog, type: :model do
     describe 'on create' do
       it 'should enqueue replication job' do
         expect { request_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'create',
           class_name: 'RequestLog',
           attributes: hash_including(
-            'id' => a_kind_of(String),
-            'account_id' => account.id,
-            'method' => request_log.method,
-            'url' => request_log.url,
+            id: a_kind_of(String),
+            account_id: account.id,
+            method: request_log.method,
+            url: request_log.url,
           ),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :create,
+          database: :clickhouse,
         )
       end
 
@@ -54,15 +55,15 @@ describe RequestLog, type: :model do
         attrs = args[:attributes]
 
         expect(attrs).to include(
-          'id' => request_log.id,
-          'account_id' => account.id,
-          'created_at' => request_log.created_at,
-          'updated_at' => request_log.updated_at,
-          'created_date' => request_log.created_date,
-          'requestor_type' => request_log.requestor_type,
-          'requestor_id' => request_log.requestor_id,
-          'resource_type' => request_log.resource_type,
-          'resource_id' => request_log.resource_id,
+          id: request_log.id,
+          account_id: account.id,
+          created_at: request_log.created_at,
+          updated_at: request_log.updated_at,
+          created_date: request_log.created_date,
+          requestor_type: request_log.requestor_type,
+          requestor_id: request_log.requestor_id,
+          resource_type: request_log.resource_type,
+          resource_id: request_log.resource_id,
         )
       end
     end
@@ -72,11 +73,11 @@ describe RequestLog, type: :model do
 
       it 'should enqueue replication job' do
         expect { request_log.update!(status: '404') }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'update',
           class_name: 'RequestLog',
-          attributes: hash_including('id' => request_log.id, 'status' => '404'),
+          attributes: hash_including(id: request_log.id, status: '404'),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :update,
+          database: :clickhouse,
         )
       end
     end
@@ -86,11 +87,11 @@ describe RequestLog, type: :model do
 
       it 'should enqueue replication job' do
         expect { request_log.destroy! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
-          operation: 'destroy',
           class_name: 'RequestLog',
-          attributes: hash_including('id' => request_log.id),
+          attributes: hash_including(id: request_log.id),
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-          database: 'clickhouse',
+          operation: :destroy,
+          database: :clickhouse,
         )
       end
     end
@@ -150,11 +151,11 @@ describe RequestLog, type: :model do
           expect {
             RequestLog.insert_all(attributes)
           }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
-            operation: 'insert_all',
             class_name: 'RequestLog',
-            records: an_instance_of(Array),
+            records: array_including(*attributes),
             performed_at: a_kind_of(ActiveSupport::TimeWithZone),
-            database: 'clickhouse',
+            operation: :insert_all,
+            database: :clickhouse,
           )
         end
 

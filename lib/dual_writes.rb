@@ -278,19 +278,19 @@ module DualWrites
         config[:to].each do |database|
           if config[:sync]
             BulkReplicationJob.perform_now(
-              operation: operation.to_s,
               class_name: name,
-              records: records.map { |record| record.transform_keys(&:to_s) },
               performed_at:,
-              database: database.to_s,
+              operation:,
+              database:,
+              records:,
             )
           else
             BulkReplicationJob.perform_later(
-              operation: operation.to_s,
               class_name: name,
-              records: records.map { |record| record.transform_keys(&:to_s) },
               performed_at:,
-              database: database.to_s,
+              operation:,
+              database:,
+              records:,
             )
           end
         end
@@ -326,11 +326,11 @@ module DualWrites
 
       config[:to].each do |database|
         ReplicationJob.perform_later(
-          operation: operation.to_s,
           class_name: self.class.name,
           attributes: attrs,
           performed_at:,
-          database: database.to_s,
+          operation:,
+          database:,
         )
       end
     end
@@ -342,20 +342,20 @@ module DualWrites
 
       config[:to].each do |database|
         ReplicationJob.perform_now(
-          operation: operation.to_s,
           class_name: self.class.name,
           attributes: attrs,
           performed_at:,
-          database: database.to_s,
+          operation:,
+          database:,
         )
       end
     end
 
     def replication_attributes
-      attrs = attributes.transform_keys(&:to_s)
+      attrs = attributes.with_indifferent_access
 
       if (ttl_proc = self.class.dual_writes_config[:ttl])
-        attrs['ttl'] = instance_exec(&ttl_proc)
+        attrs[:ttl] = instance_exec(&ttl_proc)
       end
 
       attrs
