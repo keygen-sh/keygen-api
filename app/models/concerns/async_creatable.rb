@@ -5,14 +5,10 @@ module AsyncCreatable
 
   class_methods do
     def create_async(attributes)
-      optimistic = new(attributes).tap(&:readonly!)
-
       CreateAsyncJob.perform_later(
         class_name: name,
         attributes:,
       )
-
-      optimistic
     end
   end
 

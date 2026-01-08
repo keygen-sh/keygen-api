@@ -39,7 +39,7 @@ module Api::V1
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download = artifact.download!(
+      download_url = artifact.presigned_download_url(
         path: params[:filename] || artifact.filename,
         ttl: release_artifact_query[:ttl],
       )
@@ -52,10 +52,10 @@ module Api::V1
       )
 
       # Respond without a redirect if that's what the client prefers
-      return render jsonapi: artifact, location: download.url if
+      return render jsonapi: artifact, location: download_url if
         prefers?('no-redirect')
 
-      render jsonapi: artifact, status: :see_other, location: download.url
+      render jsonapi: artifact, status: :see_other, location: download_url
     end
 
     typed_params {
@@ -107,7 +107,7 @@ module Api::V1
 
       artifact.save!
 
-      upload = artifact.upload!
+      upload_url = artifact.presigned_upload_url
 
       BroadcastEventService.call(
         event: 'artifact.created',
@@ -116,10 +116,10 @@ module Api::V1
       )
 
       # Respond without a redirect if that's what the client prefers
-      return render jsonapi: artifact, location: upload.url if
+      return render jsonapi: artifact, location: upload_url if
         prefers?('no-redirect')
 
-      render jsonapi: artifact, status: :temporary_redirect, location: upload.url
+      render jsonapi: artifact, status: :temporary_redirect, location: upload_url
     end
 
     typed_params {

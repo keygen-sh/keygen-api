@@ -38,7 +38,7 @@ module Api::V1::Products::Relationships
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download = artifact.download!(ttl: release_artifact_query[:ttl])
+      download_url = artifact.presigned_download_url(ttl: release_artifact_query[:ttl])
 
       BroadcastEventService.call(
         event: %w[artifact.downloaded release.downloaded],
@@ -47,10 +47,10 @@ module Api::V1::Products::Relationships
       )
 
       # Respond without a redirect if that's what the client prefers
-      return render jsonapi: artifact, location: download.url if
+      return render jsonapi: artifact, location: download_url if
         prefers?('no-redirect')
 
-      render jsonapi: artifact, status: :see_other, location: download.url
+      render jsonapi: artifact, status: :see_other, location: download_url
     end
 
     private

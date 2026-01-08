@@ -4,16 +4,12 @@ module AsyncUpdatable
   extend ActiveSupport::Concern
 
   def update_async(attributes)
-    optimistic = dup.tap(&:readonly!)
-
     UpdateAsyncJob.perform_later(
       class_name: self.class.name,
       id:,
       attributes:,
       last_updated_at: updated_at,
     )
-
-    optimistic
   end
 
   class UpdateAsyncJob < ActiveJob::Base
