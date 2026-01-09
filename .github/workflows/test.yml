@@ -65,6 +65,7 @@ jobs:
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
+      DEBUG: ${{vars.DEBUG}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
