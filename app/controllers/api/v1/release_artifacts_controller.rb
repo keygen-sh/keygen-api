@@ -39,7 +39,7 @@ module Api::V1
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download_url = artifact.presigned_download_url(
+      download_url = artifact.download(
         path: params[:filename] || artifact.filename,
         ttl: release_artifact_query[:ttl],
       )
@@ -107,7 +107,7 @@ module Api::V1
 
       artifact.save!
 
-      upload_url = artifact.presigned_upload_url
+      upload_url = artifact.upload
 
       BroadcastEventService.call(
         event: 'artifact.created',

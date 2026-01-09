@@ -232,5 +232,5 @@ class ReleaseDescriptor < ApplicationRecord
   def bucket = artifact.bucket
   def key    = artifact.key_for(content_path)
 
-  def presigned_download_url(**) = artifact.presigned_download_url(**, path: content_path)
+  def download(**) = artifact.download(**, path: content_path)
 end
