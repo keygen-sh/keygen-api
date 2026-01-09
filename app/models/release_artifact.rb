@@ -2,6 +2,7 @@
 
 class ReleaseArtifact < ApplicationRecord
   include Keygen::PortableClass
+  include AsyncUpdatable
   include Environmental
   include Accountable
   include Limitable
