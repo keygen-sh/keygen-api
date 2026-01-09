@@ -13,6 +13,7 @@ describe AsyncUpdatable, type: :concern do
   end
 
   temporary_table :people do |t|
+    t.string :email
     t.string :name
     t.timestamps
   end
@@ -36,6 +37,19 @@ describe AsyncUpdatable, type: :concern do
       perform_enqueued_jobs { person.update_async(name: 'updated') }
 
       expect(person.reload.name).to eq 'updated'
+    end
+
+    it 'includes dirty attributes in the update' do
+      person = Person.create!(name: 'test', email: 'test@keygen.example')
+
+      person.email = 'updated@keygen.example'
+
+      perform_enqueued_jobs { person.update_async(name: 'updated') }
+
+      person.reload
+
+      expect(person.email).to eq 'updated@keygen.example'
+      expect(person.name).to eq 'updated'
     end
 
     it 'discards stale updates' do
