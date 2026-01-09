@@ -10,10 +10,13 @@ def drain_async_jobs
   active_job.jobs.each do |job|
     case job['wrapped']
     when AsyncCreatable::CreateAsyncJob.name, AsyncUpdatable::UpdateAsyncJob.name,
-         AsyncTouchable::TouchAsyncJob.name, AsyncDestroyable::DestroyAsyncJob.name
+         AsyncTouchable::TouchAsyncJob.name, AsyncDestroyable::DestroyAsyncJob.name,
+         ActiveRecord::DestroyAssociationAsyncJob.name
       active_job.process_job(job)
     end
   end
+
+  YankArtifactWorker.drain
 end
 
 Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
