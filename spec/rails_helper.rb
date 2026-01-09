@@ -90,6 +90,11 @@ RSpec.configure do |config|
   # Stub keygens
   config.before { stub_everything! }
 
+  # make sure we always have a clean slate
+  config.before :all do
+    DatabaseCleaner.clean_with :truncation, except: %w[event_types permissions]
+  end
+
   # Setup Sidekiq, Stripe, etc.
   config.before :each do
     DatabaseCleaner.start
