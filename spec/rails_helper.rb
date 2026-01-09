@@ -178,7 +178,7 @@ RSpec.configure do |config|
 
   # disable implicit transaction for cleaning up after tests (mainly to facilitate threading)
   config.around :each, :skip_transaction_cleaner do |example|
-    DatabaseCleaner[:active_record].strategy = [:deletion, except: %w[event_types permissions]]
+    DatabaseCleaner[:active_record].strategy = [:truncation, except: %w[event_types permissions]]
 
     example.run
   ensure
