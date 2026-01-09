@@ -123,7 +123,9 @@ module Api::V1::Machines::Actions
         to: :show?
 
       machine_file.validate!
-      machine.touch(:last_check_out_at)
+      machine.touch_async(:last_check_out_at,
+        time: Time.current,
+      )
 
       BroadcastEventService.call(
         event: 'machine.checked-out',
