@@ -24,6 +24,8 @@ WebMock.disable_net_connect!(allow: 'localhost:8123')
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  config.color = ENV.key?('CI')
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
