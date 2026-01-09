@@ -19,6 +19,11 @@ end
 Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
 After("@skip/bullet")  { Bullet.instance_variable_set :@enable, true }
 
+# make sure we always have a clean slate
+BeforeAll do
+  DatabaseCleaner.clean_with :truncation, except: %w[event_types permissions]
+end
+
 Before do |scenario|
   # Skip CE tests if we're running in an EE env, and vice-versa
   # for EE tests in a CE env.
