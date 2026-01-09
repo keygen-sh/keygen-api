@@ -539,7 +539,7 @@ class ReleaseArtifact < ApplicationRecord
     redirect_url.present?
   end
 
-  def presigned_download_url(path: filename, ttl: 1.hour)
+  def download(path: filename, ttl: 1.hour)
     self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(path), expires_in: ttl&.to_i)
 
     ReleaseDownloadLink.create_async(url: redirect_url, ttl:, release_id:, account_id:)
@@ -547,7 +547,15 @@ class ReleaseArtifact < ApplicationRecord
     redirect_url
   end
 
-  def presigned_upload_url(ttl: 1.hour)
+  def upgrade(path: filename, ttl: 1.hour)
+    self.redirect_url = presigner.presigned_url(:get_object, bucket:, key: key_for(path), expires_in: ttl&.to_i)
+
+    ReleaseUpgradeLink.create_async(url: redirect_url, ttl:, release_id:, account_id:)
+
+    redirect_url
+  end
+
+  def upload(ttl: 1.hour)
     self.redirect_url = presigner.presigned_url(:put_object, bucket:, key:, expires_in: ttl.to_i)
 
     WaitForArtifactUploadWorker.perform_async(id)
@@ -561,6 +569,12 @@ class ReleaseArtifact < ApplicationRecord
     YankArtifactWorker.perform_async(id)
 
     update!(status: 'YANKED')
+  end
+
+  def yank
+    YankArtifactWorker.perform_async(id)
+
+    update(status: 'YANKED')
   end
 
   def waiting?
