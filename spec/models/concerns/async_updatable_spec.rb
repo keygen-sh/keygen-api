@@ -25,8 +25,9 @@ describe AsyncUpdatable, type: :concern do
     it 'enqueues an UpdateAsyncJob' do
       person = Person.create!(name: 'test')
 
-      expect { person.update_async(name: 'updated') }
-        .to have_enqueued_job(AsyncUpdatable::UpdateAsyncJob)
+      expect { person.update_async(name: 'updated') }.to(
+        have_enqueued_job(AsyncUpdatable::UpdateAsyncJob),
+      )
     end
 
     it 'updates the record when job is performed' do
@@ -53,6 +54,40 @@ describe AsyncUpdatable, type: :concern do
       )
 
       expect(person.reload.name).to eq 'newer'
+    end
+  end
+
+  describe '#update_async!' do
+    it 'enqueues an UpdateAsyncJob' do
+      person = Person.create!(name: 'test')
+
+      expect { person.update_async!(name: 'updated') }.to(
+        have_enqueued_job(AsyncUpdatable::UpdateAsyncJob),
+      )
+    end
+
+    it 'applies attributes optimistically' do
+      person = Person.create!(name: 'test')
+
+      person.update_async!(name: 'updated')
+
+      expect(person.name).to eq 'updated'
+    end
+
+    it 'marks the record as readonly' do
+      person = Person.create!(name: 'test')
+
+      person.update_async!(name: 'updated')
+
+      expect(person).to be_readonly
+    end
+
+    it 'updates the record when job is performed' do
+      person = Person.create!(name: 'test')
+
+      perform_enqueued_jobs { person.update_async!(name: 'updated') }
+
+      expect(person.reload.name).to eq 'updated'
     end
   end
 
