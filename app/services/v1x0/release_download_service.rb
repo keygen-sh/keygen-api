@@ -44,25 +44,22 @@ class V1x0::ReleaseDownloadService < BaseService
       client = artifact.client
       obj    = client.head_object(bucket: artifact.bucket, key: artifact.key)
 
-      artifact.update!(
+      artifact.update_async(
         content_length: obj.content_length,
         content_type: obj.content_type,
         etag: obj.etag.delete('"'),
       )
     end
 
-    signer   = artifact.presigner
-    url      = signer.presigned_url(:get_object, bucket: artifact.bucket, key: artifact.key, expires_in: ttl&.to_i)
-    link     =
-      if upgrade?
-        release.upgrade_links.create!(account: account, url: url, ttl: ttl)
-      else
-        release.download_links.create!(account: account, url: url, ttl: ttl)
-      end
+    redirect_url = if upgrade?
+                     artifact.upgrade(ttl:)
+                   else
+                     artifact.download(ttl:)
+                   end
 
     DownloadResult.new(
-      redirect_url: link.url,
-      artifact: artifact,
+      redirect_url:,
+      artifact:,
     )
   rescue ActiveRecord::SoleRecordExceeded
     raise TooManyArtifactsError.new('multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)')
