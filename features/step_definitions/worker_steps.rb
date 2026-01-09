@@ -2,41 +2,15 @@
 
 World Rack::Test::Methods
 
-def drain_async_destroy_jobs
+def drain_async_jobs
   require 'sidekiq/testing'
 
-  # FIXME(ezekg) We only want to process the destroy async jobs so we
-  #              can't just drain the entire job wrapper class.
+  # FIXME(ezekg) there doesn't seem to be an easier way to drain a subset of wrapped jobs
   active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
   active_job.jobs.each do |job|
     case job['wrapped']
-    when ActiveRecord::DestroyAssociationAsyncJob.name
-      active_job.process_job(job)
-    end
-  end
-
-  YankArtifactWorker.drain
-end
-
-def drain_async_create_jobs
-  require 'sidekiq/testing'
-
-  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
-  active_job.jobs.each do |job|
-    case job['wrapped']
-    when AsyncCreatable::CreateAsyncJob.name
-      active_job.process_job(job)
-    end
-  end
-end
-
-def drain_async_update_jobs
-  require 'sidekiq/testing'
-
-  active_job = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper
-  active_job.jobs.each do |job|
-    case job['wrapped']
-    when AsyncUpdatable::UpdateAsyncJob.name
+    when AsyncCreatable::CreateAsyncJob.name, AsyncUpdatable::UpdateAsyncJob.name,
+         AsyncTouchable::TouchAsyncJob.name, AsyncDestroyable::DestroyAsyncJob.name
       active_job.process_job(job)
     end
   end
