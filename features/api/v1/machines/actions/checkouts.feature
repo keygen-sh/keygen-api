@@ -104,8 +104,7 @@ Feature: Machine checkout actions
     Given time is frozen at "2022-10-16T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "machine"
-    And the last "machine" has the following attributes:
+    And the current account has 1 "machine" with the following attributes:
       """
       { "id": "dc664944-c4e3-49a5-a3f8-a8804ffd804d" }
       """
