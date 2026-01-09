@@ -13,6 +13,19 @@ module AsyncTouchable
     )
   end
 
+  # optimistic variant: assigns timestamps, validates, and marks record as readonly
+  def touch_async!(*names, time: nil)
+    time ||= Time.current # if not provided we have to default to now
+
+    touch_async(*names, time:)
+
+    [:updated_at, *names].each { self[it] = time }
+    validate!
+    readonly!
+
+    self
+  end
+
   class TouchAsyncJob < ActiveJob::Base
     queue_as { ActiveRecord.queues[:default] }
 

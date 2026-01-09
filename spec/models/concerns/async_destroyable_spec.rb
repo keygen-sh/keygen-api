@@ -25,8 +25,9 @@ describe AsyncDestroyable, type: :concern do
     it 'enqueues a DestroyAsyncJob' do
       person = Person.create!(name: 'test')
 
-      expect { person.destroy_async }
-        .to have_enqueued_job(AsyncDestroyable::DestroyAsyncJob)
+      expect { person.destroy_async }.to(
+        have_enqueued_job(AsyncDestroyable::DestroyAsyncJob),
+      )
     end
 
     it 'destroys the record when job is performed' do

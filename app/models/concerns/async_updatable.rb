@@ -12,6 +12,17 @@ module AsyncUpdatable
     )
   end
 
+  # optimistic variant: assigns attributes, validates, and marks record as readonly
+  def update_async!(attributes)
+    update_async(attributes)
+
+    assign_attributes(attributes)
+    validate!
+    readonly!
+
+    self
+  end
+
   class UpdateAsyncJob < ActiveJob::Base
     queue_as { ActiveRecord.queues[:default] }
 

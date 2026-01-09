@@ -26,8 +26,9 @@ describe AsyncTouchable, type: :concern do
     it 'enqueues a TouchAsyncJob' do
       person = Person.create!(name: 'test')
 
-      expect { person.touch_async }
-        .to have_enqueued_job(AsyncTouchable::TouchAsyncJob)
+      expect { person.touch_async }.to(
+        have_enqueued_job(AsyncTouchable::TouchAsyncJob),
+      )
     end
 
     it 'touches the record when job is performed' do
@@ -68,6 +69,56 @@ describe AsyncTouchable, type: :concern do
       )
 
       expect(person.reload.updated_at).to eq newer_updated_at
+    end
+  end
+
+  describe '#touch_async!' do
+    it 'enqueues a TouchAsyncJob' do
+      person = Person.create!(name: 'test')
+
+      expect { person.touch_async! }.to(
+        have_enqueued_job(AsyncTouchable::TouchAsyncJob),
+      )
+    end
+
+    it 'applies timestamps optimistically' do
+      person         = Person.create!(name: 'test')
+      updated_at_was = person.updated_at
+
+      travel_to 1.minute.from_now do
+        person.touch_async!
+      end
+
+      expect(person.updated_at).to be > updated_at_was
+    end
+
+    it 'applies specific columns optimistically' do
+      person = Person.create!(name: 'test')
+
+      expect(person.last_seen_at).to be_nil
+
+      person.touch_async!(:last_seen_at)
+
+      expect(person.last_seen_at).to_not be_nil
+    end
+
+    it 'marks the record as readonly' do
+      person = Person.create!(name: 'test')
+
+      person.touch_async!
+
+      expect(person).to be_readonly
+    end
+
+    it 'touches the record when job is performed' do
+      person         = Person.create!(name: 'test')
+      updated_at_was = person.updated_at
+
+      travel_to 1.minute.from_now do
+        perform_enqueued_jobs { person.touch_async! }
+      end
+
+      expect(person.reload.updated_at).to be > updated_at_was
     end
   end
 
