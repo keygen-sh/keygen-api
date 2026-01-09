@@ -23,8 +23,9 @@ describe AsyncCreatable, type: :concern do
 
   describe '.create_async' do
     it 'enqueues a CreateAsyncJob' do
-      expect { Person.create_async(name: 'test') }
-        .to have_enqueued_job(AsyncCreatable::CreateAsyncJob)
+      expect { Person.create_async(name: 'test') }.to(
+        have_enqueued_job(AsyncCreatable::CreateAsyncJob),
+      )
     end
 
     it 'creates the record when job is performed' do
