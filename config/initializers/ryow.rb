@@ -12,11 +12,10 @@ ReadYourOwnWrites.configure do |config|
   # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
   #           middleware, so things like route params are NOT available.
   config.client_identifier = -> request {
-    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use resolved account ID
-    session_id = request.cookie_jar.encrypted[:session_id]
-    auth_value = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
-
-    fingerprint = [request.host, account_id, session_id, auth_value, request.remote_ip].join(':')
+    account_id  = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use resolved account ID
+    session_id  = request.cookie_jar.encrypted[:session_id]
+    auth        = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
+    fingerprint = [request.host, account_id, session_id, auth, request.remote_ip].join(':')
 
     ReadYourOwnWrites::Client.new(fingerprint:)
   }
