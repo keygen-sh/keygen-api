@@ -9,8 +9,8 @@ ReadYourOwnWrites.configure do |config|
     %r{/search\z},
   ]
 
-  # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
-  #           middleware, so things like route params are NOT available.
+  # NB(ezekg) this is run BEFORE the rails app via rails' DatabaseSelector
+  #           middleware i.e. things like route params are NOT available
   config.client_identifier = -> request {
     account_id  = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use resolved account ID
     session_id  = request.cookie_jar.encrypted[:session_id]
