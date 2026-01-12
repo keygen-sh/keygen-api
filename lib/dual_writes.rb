@@ -3,11 +3,35 @@
 require 'sidekiq'
 
 module DualWrites
-  DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS = 5
-
   class Error < StandardError; end
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
+
+  # Configuration class for DualWrites settings.
+  #
+  # @example Configuring retry attempts
+  #   DualWrites.configure do |config|
+  #     config.retry_attempts = 10
+  #   end
+  #
+  class Configuration
+    attr_accessor :retry_attempts
+
+    def initialize
+      @retry_attempts = 5
+    end
+  end
+
+  class << self
+    def configuration = @configuration ||= Configuration.new
+    def configuration=(config)
+      @configuration = config
+    end
+
+    def configure
+      yield(configuration)
+    end
+  end
 
   # Registry of abstract base classes for each database.
   # e.g., DualWrites.base_class_for(:clickhouse) returns an abstract class
@@ -376,9 +400,13 @@ module DualWrites
     queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
-    retry_on StandardError,
-      attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
-      wait: :polynomially_longer
+    rescue_from StandardError do |error|
+      if executions < DualWrites.configuration.retry_attempts
+        retry_job(wait: :polynomially_longer)
+      else
+        raise error
+      end
+    end
 
     def perform(operation:, class_name:, attributes:, performed_at:, database:, strategy_config: {})
       klass = class_name.constantize
@@ -403,9 +431,13 @@ module DualWrites
     queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
-    retry_on StandardError,
-      attempts: DUAL_WRITES_REPLICATION_RETRY_ATTEMPTS,
-      wait: :polynomially_longer
+    rescue_from StandardError do |error|
+      if executions < DualWrites.configuration.retry_attempts
+        retry_job(wait: :polynomially_longer)
+      else
+        raise error
+      end
+    end
 
     def perform(operation:, class_name:, database:, performed_at:, records:, strategy_config: {})
       klass = class_name.constantize
