@@ -34,6 +34,7 @@ module AsyncTouchable
     queue_as { ActiveRecord.queues[:default] }
 
     discard_on ActiveJob::DeserializationError
+    retry_on ActiveRecord::ActiveRecordError
 
     def perform(class_name:, id:, names:, time:, last_updated_at:)
       klass  = class_name.constantize
