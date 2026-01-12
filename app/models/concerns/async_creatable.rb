@@ -4,7 +4,7 @@ module AsyncCreatable
   extend ActiveSupport::Concern
 
   class_methods do
-    def create_async(attributes)
+    def create_async(**attributes)
       CreateAsyncJob.perform_later(
         class_name: name,
         attributes:,
