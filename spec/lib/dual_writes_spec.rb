@@ -57,7 +57,7 @@ describe DualWrites do
 
       describe DualWrites::ReplicationJob do
         it 'should retry up to configured attempts' do
-          DualWrites.configure { |c| c.retry_attempts = 3 }
+          DualWrites.configure { it.retry_attempts = 3 }
 
           job = DualWrites::ReplicationJob.new(
             class_name: 'RetryTestRecord',
@@ -76,7 +76,7 @@ describe DualWrites do
         end
 
         it 'should raise error when retries exhausted' do
-          DualWrites.configure { |c| c.retry_attempts = 3 }
+          DualWrites.configure { it.retry_attempts = 3 }
 
           job = DualWrites::ReplicationJob.new(
             class_name: 'RetryTestRecord',
@@ -96,7 +96,7 @@ describe DualWrites do
 
       describe DualWrites::BulkReplicationJob do
         it 'should retry up to configured attempts' do
-          DualWrites.configure { |c| c.retry_attempts = 3 }
+          DualWrites.configure { it.retry_attempts = 3 }
 
           job = DualWrites::BulkReplicationJob.new(
             class_name: 'RetryTestRecord',
@@ -115,7 +115,7 @@ describe DualWrites do
         end
 
         it 'should raise error when retries exhausted' do
-          DualWrites.configure { |c| c.retry_attempts = 3 }
+          DualWrites.configure { it.retry_attempts = 3 }
 
           job = DualWrites::BulkReplicationJob.new(
             class_name: 'RetryTestRecord',
@@ -572,7 +572,7 @@ describe DualWrites do
 
         results = model.all
         expect(results.count).to eq 2
-        expect(results.all? { |r| r.is_deleted == 0 }).to be true
+        expect(results.all? { it.is_deleted == 0 }).to be true
       end
 
       it 'should handle upsert_all as insert_all' do
