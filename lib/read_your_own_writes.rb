@@ -7,6 +7,12 @@ module ReadYourOwnWrites
   SKIP_RYOW_KEY    = 'database.skip_ryow'
   REDIS_KEY_PREFIX = 'ryow'
 
+  # Immutable struct representing the identity of a client for RYOW tracking.
+  # Used to generate a unique fingerprint for storing write timestamps.
+  ClientIdentity = Data.define :id do
+    def to_s = "client:#{Digest::SHA2.hexdigest(id.to_s)}"
+  end
+
   class Configuration
     # How long after a write to route reads to primary. Synced automatically from
     # config.active_record.database_selector[:delay] after Rails initializes.
@@ -23,8 +29,8 @@ module ReadYourOwnWrites
     # writes. Useful for read-only POST endpoints like search or validation.
     attr_accessor :ignored_request_paths
 
-    # Proc to extract client identifier parts from request for fingerprinting.
-    # Default uses authorization header and remote IP.
+    # Proc to extract client identity from request for fingerprinting.
+    # Must return a ClientIdentity struct. Default uses authorization header and remote IP.
     #
     # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
     #           middleware, so things like route params are NOT available.
@@ -36,7 +42,9 @@ module ReadYourOwnWrites
       @redis_ttl               = nil
       @ignored_request_paths   = []
       @client_identifier       = ->(request) {
-        [request.authorization, request.remote_ip]
+        id = [request.authorization, request.remote_ip].join(':')
+
+        ClientIdentity.new(id:)
       }
     end
 
@@ -209,9 +217,11 @@ module ReadYourOwnWrites
 
       def client_id
         @client_id ||= begin
-          identifiers = @config.client_identifier.call(request)
+          identity = @config.client_identifier.call(request)
 
-          Digest::SHA2.hexdigest(Array(identifiers).join(':'))
+          raise TypeError, "client_identifier must return a ClientIdentity, got #{identity.class}" unless identity.is_a?(ClientIdentity)
+
+          identity.to_s
         end
       end
 
