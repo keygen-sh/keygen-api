@@ -259,7 +259,6 @@ describe EventLog, type: :model do
           expect(replica2.is_deleted).to eq 0
         end
       end
-
     end
   end
 end
