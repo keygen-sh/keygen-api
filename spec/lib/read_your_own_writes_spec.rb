@@ -48,6 +48,88 @@ describe ReadYourOwnWrites do
     end
   end
 
+  describe ReadYourOwnWrites::RequestPath do
+    describe '#matches?' do
+      it 'should match when one scope is prefix of another' do
+        path1 = described_class.new(segments: ['/accounts/test/licenses'])
+        path2 = described_class.new(segments: ['/accounts/test/licenses/abc'])
+
+        expect(path1.matches?(path2)).to be(true)
+        expect(path2.matches?(path1)).to be(true)
+      end
+
+      it 'should match when segments share common scope' do
+        path1 = described_class.new(segments: ['/accounts/test', '/accounts/test/licenses'])
+        path2 = described_class.new(segments: ['/accounts/test', '/accounts/test/users'])
+
+        expect(path1.matches?(path2)).to be(true)
+      end
+
+      it 'should not match sibling paths' do
+        path1 = described_class.new(segments: ['/accounts/test/licenses'])
+        path2 = described_class.new(segments: ['/accounts/test/users'])
+
+        expect(path1.matches?(path2)).to be(false)
+      end
+
+      it 'should not match when segments have no common scope' do
+        path1 = described_class.new(segments: ['/accounts/test'])
+        path2 = described_class.new(segments: ['/accounts/other'])
+
+        expect(path1.matches?(path2)).to be(false)
+      end
+
+      it 'should not match partial segment prefixes' do
+        path1 = described_class.new(segments: ['/accounts/test'])
+        path2 = described_class.new(segments: ['/accounts/testing'])
+
+        expect(path1.matches?(path2)).to be(false)
+      end
+
+      it 'should match everything when either segments is nil' do
+        path1 = described_class.new(segments: nil)
+        path2 = described_class.new(segments: ['/accounts/test'])
+
+        expect(path1.matches?(path2)).to be(true)
+        expect(path2.matches?(path1)).to be(true)
+      end
+
+      it 'should match when both segments are nil' do
+        path1 = described_class.new(segments: nil)
+        path2 = described_class.new(segments: nil)
+
+        expect(path1.matches?(path2)).to be(true)
+      end
+
+      it 'should match exact scope' do
+        path1 = described_class.new(segments: ['/accounts/test/licenses/abc'])
+        path2 = described_class.new(segments: ['/accounts/test/licenses/abc'])
+
+        expect(path1.matches?(path2)).to be(true)
+      end
+    end
+
+    describe '#to_s' do
+      it 'should return the last scope in segments' do
+        path = described_class.new(segments: ['/accounts/test', '/accounts/test/licenses'])
+
+        expect(path.to_s).to eq('/accounts/test/licenses')
+      end
+
+      it 'should return / for nil segments' do
+        path = described_class.new(segments: nil)
+
+        expect(path.to_s).to eq('/')
+      end
+
+      it 'should return / for empty segments' do
+        path = described_class.new(segments: [])
+
+        expect(path.to_s).to eq('/')
+      end
+    end
+  end
+
   describe '.reading_own_writes?' do
     def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
       instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
@@ -59,12 +141,22 @@ describe ReadYourOwnWrites do
       expect(described_class.reading_own_writes?(request)).to be(false)
     end
 
-    it 'should return true when recent write exists for matching path' do
+    it 'should return true when recent write exists' do
       write_request = build_request(path: '/v1/accounts/test/licenses/abc')
       write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
       write_context.update_last_write_timestamp
 
       read_request = build_request(path: '/v1/accounts/test/licenses')
+
+      expect(described_class.reading_own_writes?(read_request)).to be(true)
+    end
+
+    it 'should return true for any path after a write (default behavior)' do
+      write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+      write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
+      write_context.update_last_write_timestamp
+
+      read_request = build_request(path: '/v1/accounts/test/users')
 
       expect(described_class.reading_own_writes?(read_request)).to be(true)
     end
@@ -79,16 +171,6 @@ describe ReadYourOwnWrites do
       travel 5.seconds do
         expect(described_class.reading_own_writes?(read_request)).to be(false)
       end
-    end
-
-    it 'should return false for non-matching path' do
-      write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-      write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
-      write_context.update_last_write_timestamp
-
-      read_request = build_request(path: '/v1/accounts/test/users')
-
-      expect(described_class.reading_own_writes?(read_request)).to be(false)
     end
   end
 
@@ -144,7 +226,7 @@ describe ReadYourOwnWrites do
         expect(context.last_write_timestamp).to eq(Time.at(0))
       end
 
-      it 'should return timestamp for matching write path' do
+      it 'should return timestamp after a write' do
         write_request = build_request(path: '/v1/accounts/test/licenses/abc')
         write_context = described_class.new(write_request)
         write_context.update_last_write_timestamp
@@ -155,7 +237,7 @@ describe ReadYourOwnWrites do
         expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
       end
 
-      it 'should return epoch for non-matching write path' do
+      it 'should return timestamp for any path after a write (default behavior)' do
         write_request = build_request(path: '/v1/accounts/test/licenses/abc')
         write_context = described_class.new(write_request)
         write_context.update_last_write_timestamp
@@ -163,12 +245,18 @@ describe ReadYourOwnWrites do
         read_request = build_request(path: '/v1/accounts/test/users')
         read_context = described_class.new(read_request)
 
-        expect(read_context.last_write_timestamp).to eq(Time.at(0))
+        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
       end
     end
 
     describe '#update_last_write_timestamp' do
-      it 'should store write path with timestamp in redis sorted set' do
+      it 'should store each scope in the path segments in redis sorted set' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            ReadYourOwnWrites::RequestPath.new(segments: ['/accounts/test', '/accounts/test/licenses'])
+          }
+        end
+
         request = build_request(path: '/v1/accounts/test/licenses')
         context = described_class.new(request)
 
@@ -177,8 +265,8 @@ describe ReadYourOwnWrites do
 
           members = redis.then { it.zrange("ryow:#{context.send(:client_id)}", 0, -1, with_scores: true) }
 
-          expect(members.length).to eq(1)
-          expect(members.first[0]).to eq('/v1/accounts/test/licenses')
+          expect(members.length).to eq(2)
+          expect(members.map(&:first)).to contain_exactly('/accounts/test', '/accounts/test/licenses')
         end
       end
 
@@ -194,7 +282,7 @@ describe ReadYourOwnWrites do
         expect(ttl).to be_between(1, expected_ttl)
       end
 
-      it 'should store multiple write paths' do
+      it 'should store scopes from multiple writes' do
         request1 = build_request(path: '/v1/accounts/test/licenses/abc')
         context1 = described_class.new(request1)
         context1.update_last_write_timestamp
@@ -222,8 +310,16 @@ describe ReadYourOwnWrites do
       end
     end
 
-    describe 'path matching' do
+    describe 'path matching (opt-in)' do
       before do
+        # Opt into path-based matching
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            path = request.path.chomp('/').split('?').first
+            ReadYourOwnWrites::RequestPath.new(segments: [path])
+          }
+        end
+
         # Simulate a write to /v1/accounts/test/licenses/bar
         write_request = build_request(path: '/v1/accounts/test/licenses/bar')
         write_context = described_class.new(write_request)
@@ -407,6 +503,99 @@ describe ReadYourOwnWrites do
         context = described_class.new(build_request(path: '/test'))
 
         expect { context.send(:client_id) }.to raise_error(TypeError, /must return a ClientIdentity/)
+      end
+    end
+
+    describe 'request path resolution' do
+      it 'should use custom request_path_resolver when configured' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            ReadYourOwnWrites::RequestPath.new(segments: ['/custom/scope'])
+          }
+        end
+
+        # Write with custom resolver
+        write_request = build_request(path: '/anything')
+        write_context = described_class.new(write_request)
+        write_context.update_last_write_timestamp
+
+        # Read with same custom scope should match
+        read_request = build_request(path: '/different/path')
+        read_context = described_class.new(read_request)
+
+        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
+      end
+
+      it 'should match when segments share common scope' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            if request.path.include?('licenses')
+              ReadYourOwnWrites::RequestPath.new(segments: ['/accounts/test', '/accounts/test/licenses'])
+            else
+              ReadYourOwnWrites::RequestPath.new(segments: ['/accounts/test', '/accounts/test/users'])
+            end
+          }
+        end
+
+        # Write to licenses
+        write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+        write_context = described_class.new(write_request)
+        write_context.update_last_write_timestamp
+
+        # Read from users should match (shares /accounts/test scope)
+        read_request = build_request(path: '/v1/accounts/test/users')
+        read_context = described_class.new(read_request)
+
+        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
+      end
+
+      it 'should not match when segments have no common scope' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            account = request.path[/accounts\/([^\/]+)/, 1]
+            ReadYourOwnWrites::RequestPath.new(segments: ["/accounts/#{account}"])
+          }
+        end
+
+        # Write to account "test"
+        write_request = build_request(path: '/v1/accounts/test/licenses')
+        write_context = described_class.new(write_request)
+        write_context.update_last_write_timestamp
+
+        # Read from account "other" should not match
+        read_request = build_request(path: '/v1/accounts/other/licenses')
+        read_context = described_class.new(read_request)
+
+        expect(read_context.last_write_timestamp).to eq(Time.at(0))
+      end
+
+      it 'should match everything when stack is nil (opt-out)' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) {
+            ReadYourOwnWrites::RequestPath.new(segments: nil)
+          }
+        end
+
+        # Write to any path
+        write_request = build_request(path: '/v1/accounts/test/licenses')
+        write_context = described_class.new(write_request)
+        write_context.update_last_write_timestamp
+
+        # Read from completely different path should still match
+        read_request = build_request(path: '/v1/completely/different/path')
+        read_context = described_class.new(read_request)
+
+        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
+      end
+
+      it 'should raise TypeError when request_path_resolver returns wrong type' do
+        ReadYourOwnWrites.configure do |config|
+          config.request_path_resolver = ->(request) { request.path }
+        end
+
+        context = described_class.new(build_request(path: '/test'))
+
+        expect { context.send(:request_path) }.to raise_error(TypeError, /must return a RequestPath/)
       end
     end
 
