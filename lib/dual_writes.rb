@@ -1,16 +1,13 @@
 # frozen_string_literal: true
 
-require 'sidekiq'
-
-require_relative 'dual_writes/context'
-require_relative 'dual_writes/operation'
-require_relative 'dual_writes/bulk_operation'
-require_relative 'dual_writes/strategy/clickhouse'
-
 module DualWrites
   class Error < StandardError; end
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
+
+  Context = Data.define(:performed_at) do
+    def initialize(performed_at: Time.current) = super
+  end
 
   # registry of dynamic abstract base classes for each database
   @base_classes = {}
@@ -52,6 +49,71 @@ module DualWrites
     end
   end
 
+  class Operation
+    class << self
+      def lookup(name)
+        const_get("#{self.name}::#{name.to_s.camelize}")
+      rescue NameError
+        raise ArgumentError, "unknown operation: #{name.inspect}"
+      end
+    end
+
+    attr_reader :attributes,
+                :context
+
+    def initialize(attributes, context:)
+      @attributes = attributes
+      @context    = context
+    end
+
+    def execute_with(strategy)
+      raise NotImplementedError, "#{self.class}#execute_with must be implemented"
+    end
+
+    class Create < Operation
+      def execute_with(strategy) = strategy.handle_create(self)
+    end
+
+    class Update < Operation
+      def execute_with(strategy) = strategy.handle_update(self)
+    end
+
+    class Destroy < Operation
+      def execute_with(strategy) = strategy.handle_destroy(self)
+    end
+  end
+
+  class BulkOperation
+    class << self
+      def lookup(name)
+        const_get("#{self.name}::#{name.to_s.camelize}")
+      rescue NameError
+        raise ArgumentError, "unknown bulk operation: #{name.inspect}"
+      end
+    end
+
+    attr_reader :records,
+                :context
+
+    def initialize(records, context:)
+      @records = records
+      @context = context
+    end
+
+    def execute_with(strategy)
+      raise NotImplementedError, "#{self.class}#execute_with must be implemented"
+    end
+
+    class InsertAll < BulkOperation
+      def execute_with(strategy) = strategy.handle_insert_all(self)
+    end
+
+    class UpsertAll < BulkOperation
+      def execute_with(strategy) = strategy.handle_upsert_all(self)
+    end
+  end
+
+  # abstract strategy interface
   class Strategy
     class << self
       def lookup(name)
@@ -102,6 +164,51 @@ module DualWrites
 
     def handle_upsert_all(operation)
       raise NotImplementedError, "#{self.class}#handle_upsert_all must be implemented"
+    end
+  end
+
+  class Strategy::Clickhouse < Strategy
+    def handle_create(operation)
+      insert_record(operation.attributes, is_deleted: 0, ver: operation.context.performed_at)
+    end
+
+    def handle_update(operation)
+      insert_record(operation.attributes, is_deleted: 0, ver: operation.context.performed_at)
+    end
+
+    def handle_destroy(operation)
+      insert_record(operation.attributes, is_deleted: 1, ver: operation.context.performed_at)
+    end
+
+    def handle_insert_all(operation)
+      insert_records(operation.records, is_deleted: 0, ver: operation.context.performed_at)
+    end
+
+    def handle_upsert_all(operation)
+      # upsert becomes insert (ReplacingMergeTree handles dedup)
+      insert_records(operation.records, is_deleted: 0, ver: operation.context.performed_at)
+    end
+
+    private
+
+    def insert_record(attributes, is_deleted:, ver:)
+      replica_class.insert!(with_metadata(attributes, is_deleted:, ver:))
+    end
+
+    def insert_records(records, is_deleted:, ver:)
+      records = records.map { with_metadata(it, is_deleted:, ver:) }
+
+      replica_class.insert_all!(records)
+    end
+
+    def with_metadata(attributes, is_deleted:, ver:)
+      attrs = attributes.dup
+
+      attrs['is_deleted'] = is_deleted if replica_class.column_names.include?('is_deleted')
+      attrs['ver']        = ver if replica_class.column_names.include?('ver')
+      attrs['ttl']        = config[:clickhouse_ttl] if replica_class.column_names.include?('ttl')
+
+      attrs
     end
   end
 
