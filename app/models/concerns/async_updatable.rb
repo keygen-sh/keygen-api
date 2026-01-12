@@ -28,6 +28,7 @@ module AsyncUpdatable
     queue_as { ActiveRecord.queues[:default] }
 
     discard_on ActiveJob::DeserializationError
+    retry_on ActiveRecord::ActiveRecordError
 
     def perform(class_name:, id:, attributes:, last_updated_at:)
       klass  = class_name.constantize

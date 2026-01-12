@@ -14,6 +14,7 @@ module AsyncDestroyable
     queue_as { ActiveRecord.queues[:default] }
 
     discard_on ActiveJob::DeserializationError
+    retry_on ActiveRecord::ActiveRecordError
 
     def perform(class_name:, id:)
       klass  = class_name.constantize
