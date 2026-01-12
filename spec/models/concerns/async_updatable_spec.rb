@@ -69,6 +69,21 @@ describe AsyncUpdatable, type: :concern do
 
       expect(person.reload.name).to eq 'newer'
     end
+
+    it 'only updates changed attributes' do
+      person = Person.create!(name: 'test', email: 'test@keygen.example')
+
+      person.email = 'updated@keygen.example'
+
+      expect { person.update_async(name: 'updated') }.to have_enqueued_job(
+        AsyncUpdatable::UpdateAsyncJob,
+      ).with(
+        class_name: 'Person',
+        id: person.id,
+        attributes: { 'email' => 'updated@keygen.example', 'name' => 'updated' },
+        last_updated_at: person.updated_at,
+      )
+    end
   end
 
   describe '#update_async!' do
