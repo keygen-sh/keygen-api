@@ -17,11 +17,15 @@ module AsyncTouchable
   def touch_async!(*names, time: nil)
     time ||= Time.current # if not provided we have to default to now
 
-    touch_async(*names, time:)
-
-    [:updated_at, *names].each { self[it] = time }
+    names.each { self[it] = time }
     validate!
     readonly!
+
+    # enqueue after we assign/validate
+    touch_async(*names, time:)
+
+    # touch updated after enqueue
+    self.updated_at = time
 
     self
   end
