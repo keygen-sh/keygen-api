@@ -7,7 +7,7 @@ module AsyncUpdatable
     UpdateAsyncJob.perform_later(
       class_name: self.class.name,
       id:,
-      attributes: self.attributes.merge(attributes),
+      attributes: changes.transform_values(&:last).merge(attributes),
       last_updated_at: updated_at,
     )
   end
