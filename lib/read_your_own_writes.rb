@@ -117,6 +117,8 @@ module ReadYourOwnWrites
   # Custom resolver that inherits from Rails' DatabaseSelector::Resolver.
   # This allows us to customize behavior in the future if needed.
   class Resolver < ActiveRecord::Middleware::DatabaseSelector::Resolver
+    def reading_request?(request) = super || context.ignore?(request)
+
     # Redis-based resolver context for read-your-own-writes in API-only apps.
     #
     # Unlike the default Session resolver which uses cookies, this resolver
@@ -127,6 +129,8 @@ module ReadYourOwnWrites
     #   request.env[ReadYourOwnWrites::SKIP_RYOW_KEY] = true
     #
     class Context
+      EPOCH = Time.at(0)
+
       class << self
         def call(request) = new(request)
 
@@ -135,7 +139,7 @@ module ReadYourOwnWrites
         end
 
         def convert_timestamp_to_time(t)
-          t ? Time.at(t / 1000, (t % 1000) * 1000) : Time.at(0)
+          t ? Time.at(t / 1000, (t % 1000) * 1000) : EPOCH
         end
       end
 
@@ -147,16 +151,17 @@ module ReadYourOwnWrites
       end
 
       def last_write_timestamp
-        return Time.at(0) if replica_only_request?
+        return EPOCH if ignore?(request)
 
         timestamp = redis { it.get(redis_key) }
-
-        return Time.at(0) if timestamp.nil?
+        return EPOCH if timestamp.nil?
 
         self.class.convert_timestamp_to_time(timestamp.to_i)
       end
 
       def update_last_write_timestamp
+        return if ignore?(request)
+
         t = self.class.convert_time_to_timestamp(Time.now)
 
         redis { it.setex(redis_key, @config.redis_ttl, t) }
@@ -166,10 +171,17 @@ module ReadYourOwnWrites
         # No-op: state is stored in Redis, not the response
       end
 
+      def ignore?(request)
+        return true if request.env[SKIP_RYOW_KEY]
+
+        path = request.path.split('?').first.chomp('/')
+
+        @config.ignored_request_paths.any? { it.match?(path) }
+      end
+
       private
 
       def redis_key = "#{@config.redis_key_prefix}:#{client_id}"
-
       def redis(&)
         Rails.cache.redis.then(&)
       rescue Redis::BaseError, Errno::ECONNREFUSED
@@ -185,14 +197,6 @@ module ReadYourOwnWrites
 
           identity.to_s
         end
-      end
-
-      def replica_only_request?
-        return true if request.env[SKIP_RYOW_KEY]
-
-        path = request.path.split('?').first.chomp('/')
-
-        @config.ignored_request_paths.any? { it.match?(path) }
       end
     end
   end
