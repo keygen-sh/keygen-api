@@ -5,6 +5,7 @@ require_dependency Rails.root / 'lib' / 'read_your_own_writes'
 ReadYourOwnWrites.configure do |config|
   config.ignored_request_paths = [
     %r{/actions/validate-key\z},
+    %r{/actions/validate\z},
     %r{/search\z},
   ]
 
