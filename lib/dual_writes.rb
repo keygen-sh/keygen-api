@@ -219,14 +219,14 @@ module DualWrites
       class_attribute :dual_writes_config, instance_accessor: false, default: nil
 
       # async replication: enqueue jobs after commit (no rollback on failure)
-      after_create_commit  :replicate_create_async,  if: :should_replicate_async?
-      after_update_commit  :replicate_update_async,  if: :should_replicate_async?
-      after_destroy_commit :replicate_destroy_async, if: :should_replicate_async?
+      after_create_commit  :replicate_create,  if: :should_replicate_async?
+      after_update_commit  :replicate_update,  if: :should_replicate_async?
+      after_destroy_commit :replicate_destroy, if: :should_replicate_async?
 
       # sync replication: run inside transaction (rollback primary on failure)
-      after_create  :replicate_create_sync,  if: :should_replicate_sync?
-      after_update  :replicate_update_sync,  if: :should_replicate_sync?
-      after_destroy :replicate_destroy_sync, if: :should_replicate_sync?
+      after_create  :replicate_create,  if: :should_replicate_sync?
+      after_update  :replicate_update,  if: :should_replicate_sync?
+      after_destroy :replicate_destroy, if: :should_replicate_sync?
     end
 
     class_methods do
@@ -271,7 +271,8 @@ module DualWrites
       def insert_all(attributes, **options)
         result = super
 
-        replicate_bulk(:insert_all, attributes)
+        replicate_bulk(:insert_all, attributes) if
+          should_replicate_bulk?
 
         result
       end
@@ -279,7 +280,8 @@ module DualWrites
       def insert_all!(attributes, **options)
         result = super
 
-        replicate_bulk(:insert_all, attributes)
+        replicate_bulk(:insert_all, attributes) if
+          should_replicate_bulk?
 
         result
       end
@@ -287,40 +289,38 @@ module DualWrites
       def upsert_all(attributes, **options)
         result = super
 
-        replicate_bulk(:upsert_all, attributes)
+        replicate_bulk(:upsert_all, attributes) if
+          should_replicate_bulk?
 
         result
       end
 
       private
 
-      def replicate_bulk(operation, records)
-        return if
-          dual_writes_config.nil?
+      def should_replicate_bulk? = dual_writes_config.present?
 
-        performed_at    = Time.current
+      def replicate_bulk(operation, records)
+        return unless
+          should_replicate_bulk?
+
         config          = dual_writes_config
+        performed_at    = Time.current
         strategy_config = resolved_strategy_config
 
         config[:to].each do |database|
+          params = {
+            class_name: name,
+            performed_at:,
+            operation:,
+            database:,
+            records:,
+            strategy_config:,
+          }
+
           if config[:sync]
-            BulkReplicationJob.perform_now(
-              class_name: name,
-              performed_at:,
-              operation:,
-              database:,
-              records:,
-              strategy_config:,
-            )
+            BulkReplicationJob.perform_now(**params)
           else
-            BulkReplicationJob.perform_later(
-              class_name: name,
-              performed_at:,
-              operation:,
-              database:,
-              records:,
-              strategy_config:,
-            )
+            BulkReplicationJob.perform_later(**params)
           end
         end
       end
@@ -335,58 +335,41 @@ module DualWrites
     private
 
     def should_replicate_async?
-      return false if
-        self.class.dual_writes_config.nil?
+      return false if self.class.dual_writes_config.nil?
 
       !self.class.dual_writes_config[:sync]
     end
 
     def should_replicate_sync?
-      return false if
-        self.class.dual_writes_config.nil?
+      return false if self.class.dual_writes_config.nil?
 
       self.class.dual_writes_config[:sync]
     end
 
-    def replicate_create_async  = replicate_async(:create)
-    def replicate_update_async  = replicate_async(:update)
-    def replicate_destroy_async = replicate_async(:destroy)
+    def replicate_create  = replicate(:create)
+    def replicate_update  = replicate(:update)
+    def replicate_destroy = replicate(:destroy)
 
-    def replicate_create_sync  = replicate_sync(:create)
-    def replicate_update_sync  = replicate_sync(:update)
-    def replicate_destroy_sync = replicate_sync(:destroy)
-
-    def replicate_async(operation)
-      performed_at    = Time.current
+    def replicate(operation)
       config          = self.class.dual_writes_config
+      performed_at    = Time.current
       strategy_config = resolved_strategy_config
 
       config[:to].each do |database|
-        ReplicationJob.perform_later(
+        params = {
           class_name: self.class.name,
           attributes:,
           performed_at:,
           operation:,
           database:,
           strategy_config:,
-        )
-      end
-    end
+        }
 
-    def replicate_sync(operation)
-      performed_at    = Time.current
-      config          = self.class.dual_writes_config
-      strategy_config = resolved_strategy_config
-
-      config[:to].each do |database|
-        ReplicationJob.perform_now(
-          class_name: self.class.name,
-          attributes:,
-          performed_at:,
-          operation:,
-          database:,
-          strategy_config:,
-        )
+        if config[:sync]
+          ReplicationJob.perform_now(**params)
+        else
+          ReplicationJob.perform_later(**params)
+        end
       end
     end
 
