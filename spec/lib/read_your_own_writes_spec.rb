@@ -267,7 +267,7 @@ describe ReadYourOwnWrites do
           config.client_identifier = ->(request) {
             account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\//, 1]
 
-            [account_id, request.authorization, request.remote_ip]
+            ReadYourOwnWrites::ClientIdentity.new(id: [account_id, request.authorization, request.remote_ip].join(':'))
           }
         end
 
@@ -372,11 +372,12 @@ describe ReadYourOwnWrites do
         expect(context1.send(:client_id)).to eq(context2.send(:client_id))
       end
 
-      it 'should generate SHA256 hash as client ID' do
+      it 'should generate SHA256 digest as client ID' do
         context = described_class.new(build_request(path: '/test'))
 
         expect(context.send(:client_id)).to be_a(String)
-        expect(context.send(:client_id).length).to eq(64)
+        expect(context.send(:client_id)).to start_with('client:')
+        expect(context.send(:client_id).length).to eq('client:'.size + Digest::SHA2.new.block_length)
       end
 
       it 'should use custom client_identifier when configured' do
@@ -384,7 +385,7 @@ describe ReadYourOwnWrites do
           config.client_identifier = ->(request) {
             account_id = request.path[/^\/accounts\/([^\/]+)/, 1]
 
-            [account_id, request.remote_ip]
+            ReadYourOwnWrites::ClientIdentity.new(id: [account_id, request.remote_ip].join(':'))
           }
         end
 
@@ -396,6 +397,16 @@ describe ReadYourOwnWrites do
         expect(context1.send(:client_id)).to eq(context2.send(:client_id))
         # Different account should produce different client ID
         expect(context1.send(:client_id)).not_to eq(context3.send(:client_id))
+      end
+
+      it 'should raise TypeError when client_identifier returns wrong type' do
+        ReadYourOwnWrites.configure do |config|
+          config.client_identifier = ->(request) { [request.authorization, request.remote_ip] }
+        end
+
+        context = described_class.new(build_request(path: '/test'))
+
+        expect { context.send(:client_id) }.to raise_error(TypeError, /must return a ClientIdentity/)
       end
     end
 

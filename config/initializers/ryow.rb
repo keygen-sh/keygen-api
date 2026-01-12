@@ -10,13 +10,13 @@ ReadYourOwnWrites.configure do |config|
 
   # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
   #           middleware, so things like route params are NOT available.
-  #
-  # extract tenant (account) from request path for client identifier
   config.client_identifier = -> request {
-    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use account ID
+    account_id = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use resolved account ID
     session_id = request.cookie_jar.encrypted[:session_id]
     auth_value = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
 
-    [account_id, session_id, auth_value, request.remote_ip]
+    id = [request.host, account_id, session_id, auth_value, request.remote_ip].join(':')
+
+    ReadYourOwnWrites::ClientIdentity.new(id:)
   }
 end
