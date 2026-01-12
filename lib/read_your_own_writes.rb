@@ -185,11 +185,11 @@ module ReadYourOwnWrites
 
       def client_id
         @client_id ||= begin
-          identity = @config.client_identifier.call(request)
+          client = @config.client_identifier.call(request)
 
-          raise TypeError, "client_identifier must return a Client, got #{identity.class}" unless identity.is_a?(Client)
+          raise TypeError, "client_identifier must return a Client, got #{client.class}" unless client.is_a?(Client)
 
-          identity.to_s
+          client.to_s
         end
       end
     end
