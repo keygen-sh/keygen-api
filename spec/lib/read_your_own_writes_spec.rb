@@ -264,7 +264,7 @@ describe ReadYourOwnWrites do
           config.client_identifier = ->(request) {
             account_id = request.path[/^\/accounts\/([^\/]+)/, 1]
 
-            ReadYourOwnWrites::Client.new(id: [account_id, request.remote_ip].join(':'))
+            ReadYourOwnWrites::Client.new(fingerprint: [account_id, request.remote_ip].join(':'))
           }
         end
 

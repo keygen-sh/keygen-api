@@ -16,8 +16,8 @@ ReadYourOwnWrites.configure do |config|
     session_id = request.cookie_jar.encrypted[:session_id]
     auth_value = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
 
-    id = [request.host, account_id, session_id, auth_value, request.remote_ip].join(':')
+    fingerprint = [request.host, account_id, session_id, auth_value, request.remote_ip].join(':')
 
-    ReadYourOwnWrites::Client.new(id:)
+    ReadYourOwnWrites::Client.new(fingerprint:)
   }
 end
