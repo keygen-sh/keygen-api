@@ -300,12 +300,11 @@ module DualWrites
       def should_replicate_bulk? = dual_writes_config.present?
 
       def replicate_bulk(operation, records)
-        return unless
-          should_replicate_bulk?
+        return unless should_replicate_bulk?
 
         config          = dual_writes_config
+        strategy_config = config[:strategy_config].transform_values { it.is_a?(Proc) ? it.call : it }
         performed_at    = Time.current
-        strategy_config = resolved_strategy_config
 
         config[:to].each do |database|
           params = {
@@ -322,12 +321,6 @@ module DualWrites
           else
             BulkReplicationJob.perform_later(**params)
           end
-        end
-      end
-
-      def resolved_strategy_config
-        dual_writes_config[:strategy_config].transform_values do |value|
-          value.is_a?(Proc) ? value.call : value
         end
       end
     end
@@ -352,8 +345,8 @@ module DualWrites
 
     def replicate(operation)
       config          = self.class.dual_writes_config
+      strategy_config = config[:strategy_config].transform_values { it.is_a?(Proc) ? instance_exec(&it) : it }
       performed_at    = Time.current
-      strategy_config = resolved_strategy_config
 
       config[:to].each do |database|
         params = {
@@ -370,12 +363,6 @@ module DualWrites
         else
           ReplicationJob.perform_later(**params)
         end
-      end
-    end
-
-    def resolved_strategy_config
-      self.class.dual_writes_config[:strategy_config].transform_values do |value|
-        value.is_a?(Proc) ? instance_exec(&value) : value
       end
     end
   end
