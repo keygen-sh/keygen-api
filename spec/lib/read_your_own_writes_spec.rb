@@ -61,7 +61,7 @@ describe ReadYourOwnWrites do
 
     it 'should return true when recent write exists for matching path' do
       write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
       write_context.update_last_write_timestamp
 
       read_request = build_request(path: '/v1/accounts/test/licenses')
@@ -71,7 +71,7 @@ describe ReadYourOwnWrites do
 
     it 'should return false when write is older than delay' do
       write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
       write_context.update_last_write_timestamp
 
       read_request = build_request(path: '/v1/accounts/test/licenses')
@@ -83,7 +83,7 @@ describe ReadYourOwnWrites do
 
     it 'should return false for non-matching path' do
       write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-      write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+      write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
       write_context.update_last_write_timestamp
 
       read_request = build_request(path: '/v1/accounts/test/users')
@@ -92,7 +92,7 @@ describe ReadYourOwnWrites do
     end
   end
 
-  describe ReadYourOwnWrites::RedisContext do
+  describe ReadYourOwnWrites::Resolver::Context do
     let(:redis) { Rails.cache.redis }
 
     def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
@@ -537,7 +537,7 @@ describe ReadYourOwnWrites do
       context 'when recent write exists' do
         before do
           write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-          write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+          write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
           write_context.update_last_write_timestamp
 
           controller.request = build_request(path: '/v1/accounts/test/licenses')
@@ -558,7 +558,7 @@ describe ReadYourOwnWrites do
       context 'when write is older than delay' do
         before do
           write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-          write_context = ReadYourOwnWrites::RedisContext.new(write_request)
+          write_context = ReadYourOwnWrites::Resolver::Context.new(write_request)
           write_context.update_last_write_timestamp
 
           controller.request = build_request(path: '/v1/accounts/test/licenses')
