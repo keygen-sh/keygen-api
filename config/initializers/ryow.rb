@@ -19,4 +19,29 @@ ReadYourOwnWrites.configure do |config|
 
     ReadYourOwnWrites::ClientIdentity.new(id:)
   }
+
+  # Build RESTful resource segments from the request path. Each segment
+  # represents a resource boundary in the URL hierarchy.
+  #
+  # For example, /v1/accounts/abc/licenses/xyz/actions/validate becomes:
+  #   ['v1/accounts/abc', 'v1/accounts/abc/licenses/xyz']
+  #
+  # This ensures writes to a resource affect reads to:
+  #   - The same resource (exact match)
+  #   - Parent resources (e.g., listing endpoints)
+  #   - Child resources (e.g., nested actions)
+  #
+  config.request_path_resolver = -> request {
+    parts = request.path.split('/').reject(&:blank?)[1..] # drop version prefix
+
+    # Build segments by pairing resource type with ID (e.g., ['accounts', 'abc'] -> 'accounts/abc')
+    segments = parts.each_slice(2).each_with_object([]) { |pair, acc|
+      scope = [acc.last, pair.join('/')].compact.join('/')
+      acc << scope
+    }
+
+    pp(segments:)
+
+    ReadYourOwnWrites::RequestPath.new(segments:)
+  }
 end
