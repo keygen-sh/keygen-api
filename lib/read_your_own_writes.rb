@@ -9,8 +9,8 @@ module ReadYourOwnWrites
 
   # Immutable struct representing the identity of a client for RYOW tracking.
   # Used to generate a unique fingerprint for storing write timestamps.
-  Client = Data.define :id do
-    def to_s = "client:#{Digest::SHA2.hexdigest(id.to_s)}"
+  Client = Data.define :fingerprint do
+    def to_s = "client:#{Digest::SHA2.hexdigest(fingerprint.to_s)}"
   end
 
   class Configuration
@@ -42,9 +42,9 @@ module ReadYourOwnWrites
       @redis_ttl               = nil
       @ignored_request_paths   = []
       @client_identifier       = ->(request) {
-        id = [request.authorization, request.remote_ip].join(':')
+        fingerprint = [request.authorization, request.remote_ip].join(':')
 
-        Client.new(id:)
+        Client.new(fingerprint:)
       }
     end
 
