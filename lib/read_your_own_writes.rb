@@ -170,9 +170,7 @@ module ReadYourOwnWrites
       def ignore?(request)
         return true if request.env[RYOW_SKIP_KEY]
 
-        path = request.path.split('?').first.chomp('/')
-
-        @config.ignored_request_paths.any? { it.match?(path) }
+        @config.ignored_request_paths.any? { it.match?(request.path) }
       end
 
       private
