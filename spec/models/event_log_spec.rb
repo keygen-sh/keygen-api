@@ -119,16 +119,16 @@ describe EventLog, type: :model do
       it 'should replicate record to clickhouse' do
         event_log.save!
 
-        # Perform the enqueued replication job
+        # perform the enqueued replication job
         job = ActiveJob::Base.queue_adapter.enqueued_jobs.find { _1['job_class'] == 'DualWrites::ReplicationJob' }
         args = ActiveJob::Arguments.deserialize(job['arguments']).first
         DualWrites::ReplicationJob.perform_now(**args)
 
-        # Verify record exists in primary (PostgreSQL)
+        # verify record exists in primary
         primary_record = EventLog.find_by(id: event_log.id)
         expect(primary_record).to be_present
 
-        # Verify record exists in replica (ClickHouse)
+        # verify record exists in clickhouse
         replica_record = EventLog::Clickhouse.find_by(id: event_log.id)
         expect(replica_record).to be_present
         expect(replica_record.account_id).to eq event_log.account_id
@@ -240,12 +240,12 @@ describe EventLog, type: :model do
 
           EventLog.insert_all(attributes)
 
-          # Perform the enqueued bulk replication job
+          # perform the enqueued bulk replication job
           job = ActiveJob::Base.queue_adapter.enqueued_jobs.find { _1['job_class'] == 'DualWrites::BulkReplicationJob' }
           args = ActiveJob::Arguments.deserialize(job['arguments']).first
           DualWrites::BulkReplicationJob.perform_now(**args)
 
-          # Verify records exist in replica (ClickHouse)
+          # verify records exist in clickhouse
           replica1 = EventLog::Clickhouse.find_by(id: id1)
           expect(replica1).to be_present
           expect(replica1.account_id).to eq account.id
