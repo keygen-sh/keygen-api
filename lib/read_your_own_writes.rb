@@ -4,7 +4,7 @@ require 'active_support'
 require 'active_record'
 
 module ReadYourOwnWrites
-  SKIP_RYOW_KEY    = 'database.skip_ryow'
+  RYOW_SKIP_KEY    = 'database.skip_ryow'
   REDIS_KEY_PREFIX = 'ryow'
 
   # Immutable struct representing the identity of a client for RYOW tracking.
@@ -122,7 +122,7 @@ module ReadYourOwnWrites
     # to use primary for the configured delay period.
     #
     # @example Force replica in controller
-    #   request.env[ReadYourOwnWrites::SKIP_RYOW_KEY] = true
+    #   request.env[ReadYourOwnWrites::RYOW_SKIP_KEY] = true
     #
     class Context
       EPOCH = Time.at(0)
@@ -168,7 +168,7 @@ module ReadYourOwnWrites
       end
 
       def ignore?(request)
-        return true if request.env[SKIP_RYOW_KEY]
+        return true if request.env[RYOW_SKIP_KEY]
 
         path = request.path.split('?').first.chomp('/')
 
