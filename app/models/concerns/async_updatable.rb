@@ -14,11 +14,14 @@ module AsyncUpdatable
 
   # optimistic variant: assigns attributes, validates, and marks record as readonly
   def update_async!(attributes)
-    update_async(attributes)
+    time = Time.current
 
     assign_attributes(attributes)
     validate!
     readonly!
+
+    # enqueue after we assign/validate
+    update_async(updated_at: time)
 
     self
   end
