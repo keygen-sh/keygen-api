@@ -215,13 +215,13 @@ describe ReadYourOwnWrites do
         write_context.update_last_write_timestamp
       end
 
-      it 'should use replica when SKIP_RYOW_KEY is set' do
+      it 'should use replica when RYOW_SKIP_KEY is set' do
         request = instance_double(
           ActionDispatch::Request,
           path: '/v1/accounts/test/licenses/bar',
           authorization: 'Bearer test-token',
           remote_ip: '192.168.1.1',
-          env: { ReadYourOwnWrites::SKIP_RYOW_KEY => true },
+          env: { ReadYourOwnWrites::RYOW_SKIP_KEY => true },
         )
         context = described_class.new(request)
 
