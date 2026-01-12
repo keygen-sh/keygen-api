@@ -186,7 +186,7 @@ describe ReadYourOwnWrites do
           ]
         end
 
-        # Simulate a write
+        # simulate a write
         write_request = build_request(path: '/v1/accounts/test/licenses/bar')
         write_context = described_class.new(write_request)
         write_context.update_last_write_timestamp
@@ -209,7 +209,7 @@ describe ReadYourOwnWrites do
 
     describe 'force replica via request env' do
       before do
-        # Simulate a write
+        # simulate a write
         write_request = build_request(path: '/v1/accounts/test/licenses/bar')
         write_context = described_class.new(write_request)
         write_context.update_last_write_timestamp
@@ -272,9 +272,9 @@ describe ReadYourOwnWrites do
         context2 = described_class.new(build_request(path: '/accounts/test/bar', remote_ip: '1.1.1.1'))
         context3 = described_class.new(build_request(path: '/accounts/other/foo', remote_ip: '1.1.1.1'))
 
-        # Same account + IP should produce same client ID
+        # same account + IP should produce same client ID
         expect(context1.send(:client_id)).to eq(context2.send(:client_id))
-        # Different account should produce different client ID
+        # diff account should produce different client ID
         expect(context1.send(:client_id)).not_to eq(context3.send(:client_id))
       end
 

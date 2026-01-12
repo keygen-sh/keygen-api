@@ -66,7 +66,8 @@ describe DualWrites do
             operation: :create,
             database: :clickhouse,
           )
-          # executions is incremented before perform, so set to 1 to test retry at execution 2
+
+          # executions is incremented before perform so set to 1 to test retry at execution 2
           job.executions = 1
 
           allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
@@ -85,7 +86,8 @@ describe DualWrites do
             operation: :create,
             database: :clickhouse,
           )
-          # executions is incremented before perform, so set to 2 to test failure at execution 3
+
+          # executions is incremented before perform so set to 2 to test failure at execution 3
           job.executions = 2
 
           allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
@@ -105,7 +107,8 @@ describe DualWrites do
             operation: :insert_all,
             database: :clickhouse,
           )
-          # executions is incremented before perform, so set to 1 to test retry at execution 2
+
+          # executions is incremented before perform so set to 1 to test retry at execution 2
           job.executions = 1
 
           allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
@@ -124,7 +127,8 @@ describe DualWrites do
             operation: :insert_all,
             database: :clickhouse,
           )
-          # executions is incremented before perform, so set to 2 to test failure at execution 3
+
+          # executions is incremented before perform so set to 2 to test failure at execution 3
           job.executions = 2
 
           allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
@@ -363,7 +367,7 @@ describe DualWrites do
       let(:clickhouse_model) { ClickhouseStrategyRecord }
 
       before do
-        # Stub the replica class to use the primary model (same table/connection)
+        # stub the replica class to use the primary model (same table/connection)
         stub_const('ClickhouseStrategyRecord::Clickhouse', clickhouse_model)
       end
 
@@ -392,8 +396,7 @@ describe DualWrites do
 
       context 'with update operation' do
         it 'should insert new version with is_deleted = 0' do
-          # In insert-only mode, updates insert new rows rather than updating existing ones
-          # ClickHouse ReplacingMergeTree will deduplicate based on the version column
+          # clickHouse ReplacingMergeTree will deduplicate based on the ver column
           attrs = { id: 2, name: 'updated', data: 'new', created_at: Time.current, updated_at: Time.current }
 
           job.perform(
@@ -552,7 +555,7 @@ describe DualWrites do
       let(:model) { BulkClickhouseRecord }
 
       before do
-        # Stub the replica class to use the primary model (same table/connection)
+        # stub the replica class to use the primary model (same table/connection)
         stub_const('BulkClickhouseRecord::Clickhouse', model)
       end
 
