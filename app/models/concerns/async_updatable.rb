@@ -3,7 +3,7 @@
 module AsyncUpdatable
   extend ActiveSupport::Concern
 
-  def update_async(attributes)
+  def update_async(**attributes)
     UpdateAsyncJob.perform_later(
       class_name: self.class.name,
       id:,
@@ -13,15 +13,13 @@ module AsyncUpdatable
   end
 
   # optimistic variant: assigns attributes, validates, and marks record as readonly
-  def update_async!(attributes)
-    time = Time.current
-
-    assign_attributes(attributes)
+  def update_async!(**attributes)
+    assign_attributes(updated_at: Time.current, **attributes)
     validate!
     readonly!
 
     # enqueue after we assign/validate
-    update_async(updated_at: time)
+    update_async
 
     self
   end
