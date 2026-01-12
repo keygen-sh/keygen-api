@@ -436,14 +436,14 @@ describe ReadYourOwnWrites do
         end
 
         it 'should not change role (respects RYOW)' do
-          original_role = ActiveRecord::Base.current_role
+          role_was          = ActiveRecord::Base.current_role
           role_during_block = nil
 
           controller.with_read_replica_connection_unless_reading_own_writes do
             role_during_block = ActiveRecord::Base.current_role
           end
 
-          expect(role_during_block).to eq(original_role)
+          expect(role_during_block).to eq(role_was)
         end
       end
 
