@@ -7,33 +7,34 @@ module ReadYourOwnWrites
   RYOW_SKIP_KEY    = 'database.skip_ryow'
   REDIS_KEY_PREFIX = 'ryow'
 
-  # Immutable struct representing the identity of a client for RYOW tracking.
-  # Used to generate a unique fingerprint for storing write timestamps.
+  # immutable struct representing the unique identity of a client
   Client = Data.define :fingerprint do
     def to_s = "client:#{Digest::SHA2.hexdigest(fingerprint.to_s)}"
   end
 
   class Configuration
-    # How long after a write to route reads to primary. Synced automatically from
-    # config.active_record.database_selector[:delay] after Rails initializes.
+    # how long after a write to route reads to primary
     attr_reader :database_selector_delay
 
-    # Redis key prefix for storing write timestamps.
+    # redis key prefix for storing write timestamps
     attr_accessor :redis_key_prefix
 
-    # Time-to-live for write timestamp entries in Redis.
-    # Defaults to database_selector_delay * 2.
+    # time-to-live for write timestamp entries in Redis
+    #
+    # defaults to database_selector_delay * 2
     attr_writer :redis_ttl
 
-    # Path patterns that should always read from replica, regardless of recent
-    # writes. Useful for read-only POST endpoints like search or validation.
+    # path patterns that should always read from replica regardless of recent writes
+    #
+    # this is useful for read-only POST endpoints like search
     attr_accessor :ignored_request_paths
 
-    # Proc to extract client identity from request for fingerprinting.
-    # Must return a Client struct. Default uses authorization header and remote IP.
+    # client_identifier should be a proc that returns a Client
     #
-    # NB(ezekg) This is run BEFORE the Rails app via Rails' DatabaseSelector
-    #           middleware, so things like route params are NOT available.
+    # defaults to Authorization header and remote IP
+    #
+    # NB(ezekg) this is run BEFORE the Rails app via Rails' DatabaseSelector
+    #           middleware i.e. things like route params are NOT available
     attr_accessor :client_identifier
 
     def initialize
@@ -67,7 +68,7 @@ module ReadYourOwnWrites
       yield(configuration)
     end
 
-    # Check if the request is reading its own recent writes.
+    # check if the request is reading its own recent writes
     def reading_own_writes?(request)
       context       = Resolver::Context.new(request)
       last_write_at = context.last_write_timestamp
@@ -110,20 +111,9 @@ module ReadYourOwnWrites
     end
   end
 
-  # Custom resolver that inherits from Rails' DatabaseSelector::Resolver.
-  # This allows us to customize behavior in the future if needed.
   class Resolver < ActiveRecord::Middleware::DatabaseSelector::Resolver
     def reading_request?(request) = super || context.ignore?(request)
 
-    # Redis-based resolver context for read-your-own-writes in API-only apps.
-    #
-    # Unlike the default Session resolver which uses cookies, this resolver
-    # stores write timestamps in Redis. Any write causes all subsequent reads
-    # to use primary for the configured delay period.
-    #
-    # @example Force replica in controller
-    #   request.env[ReadYourOwnWrites::RYOW_SKIP_KEY] = true
-    #
     class Context
       EPOCH = Time.at(0)
 
@@ -143,32 +133,36 @@ module ReadYourOwnWrites
 
       def initialize(request)
         @request = request
-        @config = ReadYourOwnWrites.configuration
+        @config  = ReadYourOwnWrites.configuration
       end
 
       def last_write_timestamp
-        return EPOCH if ignore?(request)
+        return EPOCH if
+          ignore?(request)
 
-        timestamp = redis { it.get(redis_key) }
-        return EPOCH if timestamp.nil?
+        value = redis { it.get(redis_key) }
+        return EPOCH if
+          value.nil?
 
-        self.class.convert_timestamp_to_time(timestamp.to_i)
+        self.class.convert_timestamp_to_time(value.to_i)
       end
 
       def update_last_write_timestamp
-        return if ignore?(request)
+        return if
+          ignore?(request)
 
-        t = self.class.convert_time_to_timestamp(Time.now)
+        value = self.class.convert_time_to_timestamp(Time.now)
 
-        redis { it.setex(redis_key, @config.redis_ttl, t) }
+        redis { it.setex(redis_key, @config.redis_ttl, value) }
       end
 
       def save(response)
-        # No-op: state is stored in Redis, not the response
+        # noop (state is stored in redis not response)
       end
 
       def ignore?(request)
-        return true if request.env[RYOW_SKIP_KEY]
+        return true if
+          request.env[RYOW_SKIP_KEY]
 
         @config.ignored_request_paths.any? { it.match?(request.path) }
       end
@@ -179,15 +173,15 @@ module ReadYourOwnWrites
       def redis(&)
         Rails.cache.redis.then(&)
       rescue Redis::BaseError, Errno::ECONNREFUSED
-        # If Redis is unavailable, fail open (allow reads from replica)
-        nil
+        nil # fail open if redis is unreachable
       end
 
       def client_id
         @client_id ||= begin
           client = @config.client_identifier.call(request)
 
-          raise TypeError, "client_identifier must return a Client, got #{client.class}" unless client.is_a?(Client)
+          raise TypeError, "client_identifier must return a Client, got #{client.class}" unless
+            client.is_a?(Client)
 
           client.to_s
         end
