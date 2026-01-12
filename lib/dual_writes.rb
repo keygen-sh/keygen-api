@@ -12,25 +12,6 @@ module DualWrites
   class ReplicationError < Error; end
   class ConfigurationError < Error; end
 
-  class Configuration
-    attr_accessor :retry_attempts
-
-    def initialize
-      @retry_attempts = 5
-    end
-  end
-
-  class << self
-    def configuration = @configuration ||= Configuration.new
-    def configuration=(config)
-      @configuration = config
-    end
-
-    def configure
-      yield(configuration)
-    end
-  end
-
   # registry of dynamic abstract base classes for each database
   @base_classes = {}
 
@@ -51,6 +32,23 @@ module DualWrites
 
         base
       end
+    end
+
+    def configuration = @configuration ||= Configuration.new
+    def configuration=(config)
+      @configuration = config
+    end
+
+    def configure
+      yield(configuration)
+    end
+  end
+
+  class Configuration
+    attr_accessor :retry_attempts
+
+    def initialize
+      @retry_attempts = 5
     end
   end
 
