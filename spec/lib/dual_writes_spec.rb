@@ -8,11 +8,131 @@ require_dependency Rails.root / 'lib' / 'dual_writes'
 
 describe DualWrites do
   around do |example|
-    original_adapter = ActiveJob::Base.queue_adapter
-    ActiveJob::Base.queue_adapter = :test
+    adapter_was, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :test
+
     example.run
   ensure
-    ActiveJob::Base.queue_adapter = original_adapter
+    ActiveJob::Base.queue_adapter = adapter_was
+  end
+
+  describe DualWrites::Configuration do
+    around do |example|
+      config_was, DualWrites.configuration = DualWrites.configuration, nil
+
+      example.run
+    ensure
+      DualWrites.configuration = config_was
+    end
+
+    describe '#retry_attempts' do
+      it 'should default to 5' do
+        expect(DualWrites.configuration.retry_attempts).to eq 5
+      end
+
+      it 'should be configurable' do
+        DualWrites.configure do |config|
+          config.retry_attempts = 10
+        end
+
+        expect(DualWrites.configuration.retry_attempts).to eq 10
+      end
+    end
+
+    describe 'retry behavior' do
+      temporary_table :retry_test_records do |t|
+        t.string :name
+        t.integer :is_deleted, default: 0, null: false
+        t.timestamps
+      end
+
+      temporary_model :retry_test_record do
+        include DualWrites::Model
+
+        dual_writes to: %i[clickhouse], strategy: :clickhouse
+      end
+
+      before do
+        stub_const('RetryTestRecord::Clickhouse', RetryTestRecord)
+      end
+
+      describe DualWrites::ReplicationJob do
+        it 'should retry up to configured attempts' do
+          DualWrites.configure { |c| c.retry_attempts = 3 }
+
+          job = DualWrites::ReplicationJob.new(
+            class_name: 'RetryTestRecord',
+            attributes: { id: 1, name: 'test', created_at: Time.current, updated_at: Time.current },
+            performed_at: Time.current,
+            operation: :create,
+            database: :clickhouse,
+          )
+          # executions is incremented before perform, so set to 1 to test retry at execution 2
+          job.executions = 1
+
+          allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
+
+          expect(job).to receive(:retry_job)
+          job.perform_now
+        end
+
+        it 'should raise error when retries exhausted' do
+          DualWrites.configure { |c| c.retry_attempts = 3 }
+
+          job = DualWrites::ReplicationJob.new(
+            class_name: 'RetryTestRecord',
+            attributes: { id: 1, name: 'test', created_at: Time.current, updated_at: Time.current },
+            performed_at: Time.current,
+            operation: :create,
+            database: :clickhouse,
+          )
+          # executions is incremented before perform, so set to 2 to test failure at execution 3
+          job.executions = 2
+
+          allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
+
+          expect { job.perform_now }.to raise_error(StandardError, 'test error')
+        end
+      end
+
+      describe DualWrites::BulkReplicationJob do
+        it 'should retry up to configured attempts' do
+          DualWrites.configure { |c| c.retry_attempts = 3 }
+
+          job = DualWrites::BulkReplicationJob.new(
+            class_name: 'RetryTestRecord',
+            records: [{ name: 'test' }],
+            performed_at: Time.current,
+            operation: :insert_all,
+            database: :clickhouse,
+          )
+          # executions is incremented before perform, so set to 1 to test retry at execution 2
+          job.executions = 1
+
+          allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
+
+          expect(job).to receive(:retry_job)
+          job.perform_now
+        end
+
+        it 'should raise error when retries exhausted' do
+          DualWrites.configure { |c| c.retry_attempts = 3 }
+
+          job = DualWrites::BulkReplicationJob.new(
+            class_name: 'RetryTestRecord',
+            records: [{ name: 'test' }],
+            performed_at: Time.current,
+            operation: :insert_all,
+            database: :clickhouse,
+          )
+          # executions is incremented before perform, so set to 2 to test failure at execution 3
+          job.executions = 2
+
+          allow(DualWrites::Strategy::Clickhouse).to receive(:new).and_raise(StandardError, 'test error')
+
+          expect { job.perform_now }.to raise_error(StandardError, 'test error')
+        end
+      end
+    end
   end
 
   describe DualWrites::Model do
