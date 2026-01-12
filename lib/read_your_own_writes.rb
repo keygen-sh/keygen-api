@@ -58,25 +58,21 @@ module ReadYourOwnWrites
   end
 
   class << self
-    def configuration
-      @configuration ||= Configuration.new
+    def configuration = @configuration ||= Configuration.new
+    def configuration=(config)
+      @configuration = config
     end
 
     def configure
       yield(configuration)
     end
 
-    # Reset configuration to defaults (useful for testing)
-    def reset_configuration!
-      @configuration = Configuration.new
-    end
-
     # Check if the request is reading its own recent writes.
     def reading_own_writes?(request)
-      context = Resolver::Context.new(request)
-      last_write = context.last_write_timestamp
+      context       = Resolver::Context.new(request)
+      last_write_at = context.last_write_timestamp
 
-      Time.current - last_write < configuration.database_selector_delay
+      Time.current - last_write_at < configuration.database_selector_delay
     end
   end
 
