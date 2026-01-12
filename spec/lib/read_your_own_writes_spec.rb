@@ -6,7 +6,13 @@ require 'spec_helper'
 require_dependency Rails.root / 'lib' / 'read_your_own_writes'
 
 describe ReadYourOwnWrites do
-  after { ReadYourOwnWrites.reset_configuration! }
+   around do |example|
+    config_was, ReadYourOwnWrites.configuration = ReadYourOwnWrites.configuration, nil
+
+    example.run
+  ensure
+    ReadYourOwnWrites.configuration = config_was
+  end
 
   describe '.configure' do
     it 'should yield configuration' do
@@ -33,18 +39,6 @@ describe ReadYourOwnWrites do
       end
 
       expect(described_class.configuration.redis_ttl).to eq(30.seconds)
-    end
-  end
-
-  describe '.reset_configuration!' do
-    it 'should reset to defaults' do
-      described_class.configure do |config|
-        config.ignored_request_paths = [/test/]
-      end
-
-      described_class.reset_configuration!
-
-      expect(described_class.configuration.ignored_request_paths).to eq([])
     end
   end
 
