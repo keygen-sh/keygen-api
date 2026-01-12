@@ -240,8 +240,7 @@ class Account < ApplicationRecord
   end
 
   def clear_cache!
-    Account.clear_cache! id
-    Account.clear_cache! slug
+    [id, slug, "cname:#{cname}", "cname:#{domain}"].each { Account.clear_cache! it }
   end
 
   def self.daily_request_count_cache_key_ts
