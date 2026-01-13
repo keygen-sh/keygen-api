@@ -216,7 +216,7 @@ module DualWrites
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :dual_writes_config, instance_accessor: false, default: nil
+      class_attribute :dual_writes_config, default: nil
 
       # async replication: enqueue jobs after commit (no rollback on failure)
       after_create_commit  :replicate_create,  if: :should_replicate_async?
@@ -345,19 +345,19 @@ module DualWrites
     def should_replicate_async?
       return false unless dual_writes_enabled?
 
-      !self.class.dual_writes_config[:sync]
+      !dual_writes_config[:sync]
     end
 
     def should_replicate_sync?
       return false unless dual_writes_enabled?
 
-      self.class.dual_writes_config[:sync]
+      dual_writes_config[:sync]
     end
 
     def dual_writes_enabled?
-      return false if self.class.dual_writes_config.nil?
+      return false if dual_writes_config.nil?
 
-      cond = self.class.dual_writes_config[:if]
+      cond = dual_writes_config[:if]
 
       case cond
       when nil  then true
@@ -371,7 +371,7 @@ module DualWrites
     def replicate_destroy = replicate(:destroy)
 
     def replicate(operation)
-      config          = self.class.dual_writes_config
+      config          = dual_writes_config
       strategy_config = config[:strategy_config].transform_values { it.is_a?(Proc) ? instance_exec(&it) : it }
       performed_at    = Time.current
 
