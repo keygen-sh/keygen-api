@@ -35,13 +35,13 @@ describe RequestLog, type: :model do
       end
     end
 
-    with_env DATABASE_CLICKHOUSE_ENABLED: 'false' do
+    with_env CLICKHOUSE_DATABASE_ENABLED: 'false' do
       it 'should not replicate' do
         expect { request_log.save! }.not_to have_enqueued_job(DualWrites::ReplicationJob)
       end
     end
 
-    with_env DATABASE_CLICKHOUSE_ENABLED: 'true' do
+    with_env CLICKHOUSE_DATABASE_ENABLED: 'true' do
       describe 'on create' do
         it 'should enqueue replication job' do
           expect { request_log.save! }.to have_enqueued_job(DualWrites::ReplicationJob).with(
