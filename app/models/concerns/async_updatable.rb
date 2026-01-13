@@ -4,11 +4,13 @@ module AsyncUpdatable
   extend ActiveSupport::Concern
 
   def update_async(**attributes)
+    changed_attributes = changes.transform_values(&:last)
+                                .merge(attributes)
+
     UpdateAsyncJob.perform_later(
       class_name: self.class.name,
       id:,
-      attributes: changes.transform_values(&:last).merge(attributes),
-      last_updated_at: updated_at,
+      attributes: changed_attributes,
     )
   end
 
@@ -30,16 +32,11 @@ module AsyncUpdatable
     discard_on ActiveJob::DeserializationError
     retry_on ActiveRecord::ActiveRecordError
 
-    def perform(class_name:, id:, attributes:, last_updated_at:)
+    def perform(class_name:, id:, attributes:)
       klass  = class_name.constantize
       record = klass.find_by(klass.primary_key => id)
       return if
         record.nil?
-
-      # discard stale updates: if the record has been modified since this job
-      # was enqueued, a more recent update has already occurred.
-      return if
-        record.updated_at > last_updated_at
 
       record.update!(attributes)
     end
