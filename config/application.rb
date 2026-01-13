@@ -156,7 +156,7 @@ module Keygen
     config.encoding = 'utf-8'
 
     # Add lib, services, validators, etc. to autoload path
-    config.autoload_lib(ignore: %w[tasks])
+    config.autoload_lib(ignore: %w[rails_ext tasks])
     config.autoload_paths += %W[
       #{config.root}/app/serializers
       #{config.root}/app/validators
