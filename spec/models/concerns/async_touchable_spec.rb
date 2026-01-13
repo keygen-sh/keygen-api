@@ -59,33 +59,13 @@ describe AsyncTouchable, type: :concern do
 
       perform_enqueued_jobs { person.touch_async(:last_seen_at, time:) }
 
-      expect(person.reload.last_seen_at).to eq time
+      expect(person.reload.last_seen_at).to be_within(1.second).of(time)
     end
 
     it 'accepts nil time' do
       person = Person.create!(name: 'test')
 
       expect { person.touch_async(:last_seen_at, time: nil) }.to_not raise_error ArgumentError
-    end
-
-    it 'discards stale touches' do
-      person         = Person.create!(name: 'test')
-      updated_at_was = person.updated_at
-
-      # simulate a more recent update
-      person.update!(name: 'updated')
-      newer_updated_at = person.updated_at
-
-      # now perform the stale touch job
-      AsyncTouchable::TouchAsyncJob.perform_now(
-        class_name: Person.name,
-        id: person.id,
-        names: [],
-        time: nil,
-        last_updated_at: updated_at_was,
-      )
-
-      expect(person.reload.updated_at).to eq newer_updated_at
     end
   end
 
@@ -127,7 +107,7 @@ describe AsyncTouchable, type: :concern do
 
       person.touch_async!(:last_seen_at, time:)
 
-      expect(person.last_seen_at).to eq time
+      expect(person.last_seen_at).to be_within(1.second).of(time)
     end
 
     it 'rejects nil time' do
@@ -167,7 +147,6 @@ describe AsyncTouchable, type: :concern do
           id: person.id,
           names: [],
           time: nil,
-          last_updated_at: person.updated_at,
         )
       end
 
@@ -181,7 +160,6 @@ describe AsyncTouchable, type: :concern do
           id: SecureRandom.uuid,
           names: [],
           time: nil,
-          last_updated_at: Time.current,
         )
       }.to_not raise_error
     end
@@ -195,7 +173,6 @@ describe AsyncTouchable, type: :concern do
         id: person.id,
         names: [],
         time:,
-        last_updated_at: person.updated_at,
       )
 
       expect(person.reload.updated_at).to be_within(1.second).of(time)

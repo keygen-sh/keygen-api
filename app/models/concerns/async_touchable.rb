@@ -9,7 +9,6 @@ module AsyncTouchable
       id:,
       names:,
       time:,
-      last_updated_at: updated_at,
     )
   end
 
@@ -17,15 +16,12 @@ module AsyncTouchable
   def touch_async!(*names, time: Time.current)
     raise ArgumentError, 'time cannot be nil' if time.nil?
 
-    names.each { self[it] = time }
+    [:updated_at, *names].each { self[it] = time }
     validate!
     readonly!
 
     # enqueue after we assign/validate
     touch_async(*names, time:)
-
-    # touch updated after enqueue
-    self.updated_at = time
 
     self
   end
@@ -36,15 +32,11 @@ module AsyncTouchable
     discard_on ActiveJob::DeserializationError
     retry_on ActiveRecord::ActiveRecordError
 
-    def perform(class_name:, id:, names:, time:, last_updated_at:)
+    def perform(class_name:, id:, names:, time:)
       klass  = class_name.constantize
       record = klass.find_by(klass.primary_key => id)
       return if
         record.nil?
-
-      # discard stale touches
-      return if
-        record.updated_at > last_updated_at
 
       record.touch(*names, time:)
     end
