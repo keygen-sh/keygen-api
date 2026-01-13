@@ -14,8 +14,8 @@ module AsyncTouchable
   end
 
   # optimistic variant: assigns timestamps, validates, and marks record as readonly
-  def touch_async!(*names, time: nil)
-    time ||= Time.current # if not provided we have to default to now
+  def touch_async!(*names, time: Time.current)
+    raise ArgumentError, 'time cannot be nil' if time.nil?
 
     names.each { self[it] = time }
     validate!
