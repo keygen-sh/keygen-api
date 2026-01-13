@@ -120,9 +120,7 @@ module Api::V1::Licenses::Actions
         to: :show?
 
       license_file.validate!
-      license.touch_async!(:last_check_out_at,
-        time: Time.current,
-      )
+      license.touch_async!(:last_check_out_at)
 
       BroadcastEventService.call(
         event: 'license.checked-out',

@@ -51,6 +51,23 @@ describe AsyncTouchable, type: :concern do
       expect(person.reload.last_seen_at).to_not be_nil
     end
 
+    it 'touches specific with specific time' do
+      person = Person.create!(name: 'test')
+      time   = Time.current
+
+      expect(person.last_seen_at).to be_nil
+
+      perform_enqueued_jobs { person.touch_async(:last_seen_at, time:) }
+
+      expect(person.reload.last_seen_at).to eq time
+    end
+
+    it 'accepts nil time' do
+      person = Person.create!(name: 'test')
+
+      expect { person.touch_async(:last_seen_at, time: nil) }.to_not raise_error ArgumentError
+    end
+
     it 'discards stale touches' do
       person         = Person.create!(name: 'test')
       updated_at_was = person.updated_at
@@ -100,6 +117,23 @@ describe AsyncTouchable, type: :concern do
       person.touch_async!(:last_seen_at)
 
       expect(person.last_seen_at).to_not be_nil
+    end
+
+    it 'applies specific time optimistically' do
+      person = Person.create!(name: 'test')
+      time   = Time.current
+
+      expect(person.last_seen_at).to be_nil
+
+      person.touch_async!(:last_seen_at, time:)
+
+      expect(person.last_seen_at).to eq time
+    end
+
+    it 'rejects nil time' do
+      person = Person.create!(name: 'test')
+
+      expect { person.touch_async!(:last_seen_at, time: nil) }.to raise_error ArgumentError
     end
 
     it 'marks the record as readonly' do
