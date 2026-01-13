@@ -11,7 +11,8 @@ class RequestLog < ApplicationRecord
   include Pageable
 
   dual_writes to: :clickhouse, strategy: :clickhouse,
-    clickhouse_ttl: -> { Current.account&.request_log_retention_duration }
+    clickhouse_ttl: -> { Current.account&.request_log_retention_duration },
+    if: -> { Keygen.database.clickhouse_enabled? }
 
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true
