@@ -7,6 +7,9 @@ module Keygen
 
       def read_replica_available? = config(:replica)&.host.present?
       def read_replica_enabled?   = ENV.key?('DATABASE_READ_REPLICA_ENABLED')
+
+      def clickhouse_available? = config(:clickhouse)&.host.present?
+      def clickhouse_enabled?   = ENV.key?('DATABASE_CLICKHOUSE_ENABLED')
     end
   end
 end

@@ -162,6 +162,7 @@ describe DualWrites do
           sync: false,
           strategy: :clickhouse,
           strategy_config: {},
+          if: nil,
         )
       end
 
@@ -299,6 +300,161 @@ describe DualWrites do
           database: :clickhouse,
           strategy_config: { clickhouse_ttl: 7_776_000 },
         )
+      end
+    end
+
+    describe 'if condition' do
+      context 'with proc returning true' do
+        temporary_table :if_true_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :if_true_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: -> { true }
+        end
+
+        let(:if_true_model) { IfTrueRecord }
+
+        it 'should replicate on create' do
+          expect {
+            if_true_model.create!(name: 'test')
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+
+        it 'should replicate on update' do
+          record = if_true_model.create!(name: 'test')
+
+          expect {
+            record.update!(name: 'updated')
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+
+        it 'should replicate on destroy' do
+          record = if_true_model.create!(name: 'test')
+
+          expect {
+            record.destroy!
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+      end
+
+      context 'with proc returning false' do
+        temporary_table :if_false_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :if_false_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: -> { false }
+        end
+
+        let(:if_false_model) { IfFalseRecord }
+
+        it 'should not replicate on create' do
+          expect {
+            if_false_model.create!(name: 'test')
+          }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+
+        it 'should not replicate on update' do
+          record = if_false_model.create!(name: 'test')
+
+          expect {
+            record.update!(name: 'updated')
+          }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+
+        it 'should not replicate on destroy' do
+          record = if_false_model.create!(name: 'test')
+
+          expect {
+            record.destroy!
+          }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+      end
+
+      context 'with proc accessing instance methods' do
+        temporary_table :if_instance_records do |t|
+          t.string :name
+          t.boolean :replicable, default: true
+          t.timestamps
+        end
+
+        temporary_model :if_instance_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: -> { replicable? }
+        end
+
+        let(:if_instance_model) { IfInstanceRecord }
+
+        it 'should replicate when instance method returns true' do
+          expect {
+            if_instance_model.create!(name: 'test', replicable: true)
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+
+        it 'should not replicate when instance method returns false' do
+          expect {
+            if_instance_model.create!(name: 'test', replicable: false)
+          }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+      end
+
+      context 'with boolean true' do
+        temporary_table :if_bool_true_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :if_bool_true_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: true
+        end
+
+        it 'should replicate' do
+          expect {
+            IfBoolTrueRecord.create!(name: 'test')
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+      end
+
+      context 'with boolean false' do
+        temporary_table :if_bool_false_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :if_bool_false_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: false
+        end
+
+        it 'should not replicate' do
+          expect {
+            IfBoolFalseRecord.create!(name: 'test')
+          }.not_to have_enqueued_job(DualWrites::ReplicationJob)
+        end
+      end
+
+      context 'with nil (default)' do
+        it 'should replicate' do
+          expect {
+            model.create!(name: 'test')
+          }.to have_enqueued_job(DualWrites::ReplicationJob)
+        end
       end
     end
   end
@@ -531,6 +687,54 @@ describe DualWrites do
           database: :clickhouse,
           strategy_config: {},
         )
+      end
+    end
+
+    describe 'if condition' do
+      context 'with proc returning true' do
+        temporary_table :bulk_if_true_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :bulk_if_true_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: -> { true }
+        end
+
+        it 'should replicate on insert_all' do
+          expect {
+            BulkIfTrueRecord.insert_all([{ name: 'test' }])
+          }.to have_enqueued_job(DualWrites::BulkReplicationJob)
+        end
+      end
+
+      context 'with proc returning false' do
+        temporary_table :bulk_if_false_records do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        temporary_model :bulk_if_false_record do
+          include DualWrites::Model
+
+          dual_writes to: %i[clickhouse], strategy: :clickhouse,
+            if: -> { false }
+        end
+
+        it 'should not replicate on insert_all' do
+          expect {
+            BulkIfFalseRecord.insert_all([{ name: 'test' }])
+          }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+        end
+
+        it 'should not replicate on upsert_all' do
+          expect {
+            BulkIfFalseRecord.upsert_all([{ name: 'test' }])
+          }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+        end
       end
     end
   end

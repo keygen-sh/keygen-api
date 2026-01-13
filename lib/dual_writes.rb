@@ -230,7 +230,7 @@ module DualWrites
     end
 
     class_methods do
-      def dual_writes(to:, strategy:, sync: false, **strategy_config)
+      def dual_writes(to:, strategy:, sync: false, if: nil, **strategy_config)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -264,6 +264,7 @@ module DualWrites
           sync:,
           strategy:,
           strategy_config:,
+          if: binding.local_variable_get(:if),
         }.freeze
       end
 
@@ -297,7 +298,21 @@ module DualWrites
 
       private
 
-      def should_replicate_bulk? = dual_writes_config.present?
+      def should_replicate_bulk?
+        return false if dual_writes_config.nil?
+
+        dual_writes_enabled?
+      end
+
+      def dual_writes_enabled?
+        cond = dual_writes_config[:if]
+
+        case cond
+        when nil  then true
+        when Proc then cond.call
+        else !!cond
+        end
+      end
 
       def replicate_bulk(operation, records)
         return unless should_replicate_bulk?
@@ -328,15 +343,27 @@ module DualWrites
     private
 
     def should_replicate_async?
-      return false if self.class.dual_writes_config.nil?
+      return false unless dual_writes_enabled?
 
       !self.class.dual_writes_config[:sync]
     end
 
     def should_replicate_sync?
-      return false if self.class.dual_writes_config.nil?
+      return false unless dual_writes_enabled?
 
       self.class.dual_writes_config[:sync]
+    end
+
+    def dual_writes_enabled?
+      return false if self.class.dual_writes_config.nil?
+
+      cond = self.class.dual_writes_config[:if]
+
+      case cond
+      when nil  then true
+      when Proc then instance_exec(&cond)
+      else !!cond
+      end
     end
 
     def replicate_create  = replicate(:create)
