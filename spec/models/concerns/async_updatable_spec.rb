@@ -52,24 +52,6 @@ describe AsyncUpdatable, type: :concern do
       expect(person.name).to eq 'updated'
     end
 
-    it 'discards stale updates' do
-      person         = Person.create!(name: 'test')
-      updated_at_was = person.updated_at
-
-      # simulate a more recent update
-      person.update!(name: 'newer')
-
-      # now perform the stale job
-      AsyncUpdatable::UpdateAsyncJob.perform_now(
-        class_name: Person.name,
-        id: person.id,
-        attributes: { 'name' => 'stale' },
-        last_updated_at: updated_at_was,
-      )
-
-      expect(person.reload.name).to eq 'newer'
-    end
-
     it 'only updates changed attributes' do
       person = Person.create!(name: 'test', email: 'test@keygen.example')
 
@@ -81,7 +63,6 @@ describe AsyncUpdatable, type: :concern do
         class_name: 'Person',
         id: person.id,
         attributes: { 'email' => 'updated@keygen.example', 'name' => 'updated' },
-        last_updated_at: person.updated_at,
       )
     end
   end
@@ -128,37 +109,19 @@ describe AsyncUpdatable, type: :concern do
         class_name: Person.name,
         id: person.id,
         attributes: { 'name' => 'updated' },
-        last_updated_at: person.updated_at,
       )
 
       expect(person.reload.name).to eq 'updated'
     end
 
     it 'does nothing if record is missing' do
-      person = Person.create!(name: 'test')
-
       expect {
         described_class.perform_now(
           class_name: Person.name,
           id: SecureRandom.uuid,
           attributes: { 'name' => 'updated' },
-          last_updated_at: Time.current,
         )
       }.to_not raise_error
-    end
-
-    it 'discards stale updates based on updated_at' do
-      person   = Person.create!(name: 'test')
-      old_time = 1.hour.ago
-
-      described_class.perform_now(
-        class_name: Person.name,
-        id: person.id,
-        attributes: { 'name' => 'stale' },
-        last_updated_at: old_time,
-      )
-
-      expect(person.reload.name).to eq 'test'
     end
   end
 end
