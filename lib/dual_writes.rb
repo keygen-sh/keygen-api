@@ -306,13 +306,10 @@ module DualWrites
 
       private
 
-      def should_replicate_bulk?
+      def should_replicate_bulk? = dual_writes_enabled?
+      def dual_writes_enabled?
         return false if dual_writes_config.nil?
 
-        dual_writes_enabled?
-      end
-
-      def dual_writes_enabled?
         cond = dual_writes_config[:if]
 
         case cond
@@ -323,7 +320,8 @@ module DualWrites
       end
 
       def replicate_bulk(operation, records)
-        return unless should_replicate_bulk?
+        return unless
+          dual_writes_enabled?
 
         config          = dual_writes_config
         strategy_config = config[:strategy_config].transform_values { (it in Proc) ? it.call : it }
@@ -379,6 +377,9 @@ module DualWrites
     def replicate_destroy = replicate(:destroy)
 
     def replicate(operation)
+      return unless
+        dual_writes_enabled?
+
       config          = dual_writes_config
       strategy_config = config[:strategy_config].transform_values { (it in Proc) ? instance_exec(&it) : it }
       performed_at    = Time.current
