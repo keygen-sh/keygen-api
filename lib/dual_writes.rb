@@ -298,6 +298,12 @@ module DualWrites
         result
       end
 
+      def replica_class_for(database)
+        const_get(database.to_s.camelize)
+      rescue NameError
+        nil
+      end
+
       private
 
       def should_replicate_bulk?
@@ -416,9 +422,12 @@ module DualWrites
       end
 
       config          = klass.dual_writes_config
-      database_class  = klass.const_get(database.to_s.camelize)
+      replica_class   = klass.replica_class_for(database)
       strategy_class  = Strategy.lookup(config[:strategy])
       operation_class = Operation.lookup(operation)
+
+      raise ConfigurationError, "invalid database: #{database.inspect}" if
+        replica_class.nil?
 
       raise ConfigurationError, "invalid strategy: #{config[:strategy].inspect}" if
         strategy_class.nil?
@@ -426,7 +435,7 @@ module DualWrites
       raise ConfigurationError, "invalid operation: #{operation.inspect}" if
         operation_class.nil?
 
-      strategy  = strategy_class.new(database_class, strategy_config)
+      strategy  = strategy_class.new(replica_class, strategy_config)
       context   = Context.new(performed_at:)
       operation = operation_class.new(attributes, context:)
 
@@ -456,9 +465,12 @@ module DualWrites
       end
 
       config          = klass.dual_writes_config
-      database_class  = klass.const_get(database.to_s.camelize)
+      replica_class   = klass.replica_class_for(database)
       strategy_class  = Strategy.lookup(config[:strategy])
       operation_class = BulkOperation.lookup(operation)
+
+      raise ConfigurationError, "invalid database: #{database.inspect}" if
+        replica_class.nil?
 
       raise ConfigurationError, "invalid strategy: #{config[:strategy].inspect}" if
         strategy_class.nil?
@@ -466,7 +478,7 @@ module DualWrites
       raise ConfigurationError, "invalid bulk operation: #{operation.inspect}" if
         operation_class.nil?
 
-      strategy  = strategy_class.new(database_class, strategy_config)
+      strategy  = strategy_class.new(replica_class, strategy_config)
       context   = Context.new(performed_at:)
       operation = operation_class.new(records, context:)
 
