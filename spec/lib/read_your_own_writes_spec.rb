@@ -89,34 +89,6 @@ describe ReadYourOwnWrites do
         context = described_class.call(request)
 
         expect(context).to be_a(described_class)
-        expect(context.request).to eq(request)
-      end
-    end
-
-    describe '.convert_time_to_timestamp' do
-      it 'should convert time to milliseconds since epoch' do
-        time = Time.at(1704067200, 500_000) # 2024-01-01 00:00:00.500 UTC
-
-        timestamp = described_class.convert_time_to_timestamp(time)
-
-        expect(timestamp).to eq(1704067200500)
-      end
-    end
-
-    describe '.convert_timestamp_to_time' do
-      it 'should convert milliseconds since epoch to time' do
-        timestamp = 1704067200500
-
-        time = described_class.convert_timestamp_to_time(timestamp)
-
-        expect(time.to_i).to eq(1704067200)
-        expect(time.usec).to eq(500_000)
-      end
-
-      it 'should return epoch for nil timestamp' do
-        time = described_class.convert_timestamp_to_time(nil)
-
-        expect(time).to eq(Time.at(0))
       end
     end
 
@@ -164,16 +136,6 @@ describe ReadYourOwnWrites do
         expected_ttl = ReadYourOwnWrites.configuration.redis_ttl.to_i
 
         expect(ttl).to be_between(1, expected_ttl)
-      end
-    end
-
-    describe '#save' do
-      it 'should be a no-op' do
-        request = build_request(path: '/v1/accounts/test/licenses')
-        context = described_class.new(request)
-        response = instance_double(ActionDispatch::Response)
-
-        expect { context.save(response) }.not_to raise_error
       end
     end
 

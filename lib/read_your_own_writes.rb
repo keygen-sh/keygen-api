@@ -112,24 +112,18 @@ module ReadYourOwnWrites
   end
 
   class Resolver < ActiveRecord::Middleware::DatabaseSelector::Resolver
-    def reading_request?(request) = super || context.ignore?(request)
+    def reading_request?(request) = super || context.ignored?
+    def update_context(response)  = nil # noop
 
     class Context
       EPOCH = Time.at(0)
 
-      class << self
-        def call(request) = new(request)
+      attr_reader :request,
+                  :config
 
-        def convert_time_to_timestamp(t)
-          t.to_i * 1000 + t.usec / 1000
-        end
-
-        def convert_timestamp_to_time(t)
-          t ? Time.at(t / 1000, (t % 1000) * 1000) : EPOCH
-        end
-      end
-
-      attr_reader :request
+      # NB(ezekg) this odd service-object-but-not-really call pattern is required
+      #           by the database selector middleware
+      def self.call(request) = new(request)
 
       def initialize(request)
         @request = request
@@ -137,34 +131,26 @@ module ReadYourOwnWrites
       end
 
       def last_write_timestamp
-        return EPOCH if
-          ignore?(request)
+        return EPOCH if ignored?
 
         value = redis { it.get(redis_key) }
-        return EPOCH if
-          value.nil?
+        return EPOCH if value.nil?
 
-        self.class.convert_timestamp_to_time(value.to_i)
+        Time.at(value.to_i)
       end
 
       def update_last_write_timestamp
-        return if
-          ignore?(request)
+        return if ignored?
 
-        value = self.class.convert_time_to_timestamp(Time.now)
+        value = Time.current.to_i
 
-        redis { it.setex(redis_key, @config.redis_ttl, value) }
+        redis { it.setex(redis_key, config.redis_ttl, value) }
       end
 
-      def save(response)
-        # noop (state is stored in redis not response)
-      end
+      def ignored?
+        return true if request.env[RYOW_SKIP_KEY]
 
-      def ignore?(request)
-        return true if
-          request.env[RYOW_SKIP_KEY]
-
-        @config.ignored_request_paths.any? { it.match?(request.path) }
+        config.ignored_request_paths.any? { it.match?(request.path) }
       end
 
       private
