@@ -501,7 +501,7 @@ describe DualWrites do
               operation: :invalid,
               database: :clickhouse,
             )
-          }.to raise_error(ArgumentError, /unknown operation/)
+          }.to raise_error(DualWrites::ConfigurationError, /invalid operation/)
         end
       end
     end
@@ -598,7 +598,7 @@ describe DualWrites do
 
             dual_writes to: %i[clickhouse], strategy: :invalid
           end
-        }.to raise_error(DualWrites::ConfigurationError, /unknown strategy/)
+        }.to raise_error(DualWrites::ConfigurationError, /invalid strategy/)
       end
     end
   end
@@ -838,7 +838,7 @@ describe DualWrites do
               operation: :delete_all,
               database: :clickhouse,
             )
-          }.to raise_error(ArgumentError, /unknown bulk operation/)
+          }.to raise_error(DualWrites::ConfigurationError, /invalid bulk operation/)
         end
       end
     end
