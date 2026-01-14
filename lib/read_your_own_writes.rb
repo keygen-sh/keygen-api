@@ -65,7 +65,7 @@ module ReadYourOwnWrites
     end
 
     def configure
-      yield(configuration)
+      yield configuration
     end
 
     # check if the request is reading its own recent writes
