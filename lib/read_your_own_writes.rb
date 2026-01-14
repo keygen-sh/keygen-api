@@ -4,12 +4,19 @@ require 'active_support'
 require 'active_record'
 
 module ReadYourOwnWrites
+  RYOW_WRITE_AT_RESPONSE_HEADER   = 'X-Ryow-Last-Write-At'
+  RYOW_EXPIRES_AT_RESPONSE_HEADER = 'X-Ryow-Last-Write-Expires-At'
+  RYOW_EXPIRES_IN_RESPONSE_HEADER = 'X-Ryow-Last-Write-Expires-In'
+  RYOW_SELECTION_RESPONSE_HEADER  = 'X-Ryow-Selection'
+  RYOW_CLIENT_RESPONSE_HEADER     = 'X-Ryow-Client'
+  RYOW_DELAY_RESPONSE_HEADER      = 'X-Ryow-Delay'
+
   RYOW_SKIP_KEY    = 'database.skip_ryow'
   REDIS_KEY_PREFIX = 'ryow'
 
   # immutable struct representing the unique identity of a client
   Client = Data.define :fingerprint do
-    def to_s = "client:#{Digest::SHA2.hexdigest(fingerprint.to_s)}"
+    def to_s = Digest::SHA2.hexdigest(fingerprint.to_s)
   end
 
   class Configuration
@@ -29,7 +36,7 @@ module ReadYourOwnWrites
     # this is useful for read-only POST endpoints like search
     attr_accessor :ignored_request_paths
 
-    # client_identifier should be a proc that returns a Client
+    # client identifier should be a proc that returns a Client
     #
     # defaults to Authorization header and remote IP
     #
@@ -37,11 +44,17 @@ module ReadYourOwnWrites
     #           middleware i.e. things like route params are NOT available
     attr_accessor :client_identifier
 
+    # whether to include useful response headers for debugging
+    #
+    # defaults to Rails.env.local?
+    attr_writer :debug
+
     def initialize
       @database_selector_delay = 2.seconds
       @redis_key_prefix        = REDIS_KEY_PREFIX
       @redis_ttl               = nil
       @ignored_request_paths   = []
+      @debug                   = Rails.env.local?
       @client_identifier       = ->(request) {
         fingerprint = [request.authorization, request.remote_ip].join(':')
 
@@ -50,6 +63,7 @@ module ReadYourOwnWrites
     end
 
     def redis_ttl = @redis_ttl || @database_selector_delay * 2
+    def debug?    = !!@debug
 
     private
 
@@ -70,10 +84,9 @@ module ReadYourOwnWrites
 
     # check if the request is reading its own recent writes
     def reading_own_writes?(request)
-      context       = Resolver::Context.new(request)
-      last_write_at = context.last_write_timestamp
+      context = Resolver::Context.new(request)
 
-      Time.current - last_write_at < configuration.database_selector_delay
+      context.recent_writes?
     end
   end
 
@@ -113,7 +126,6 @@ module ReadYourOwnWrites
 
   class Resolver < ActiveRecord::Middleware::DatabaseSelector::Resolver
     def reading_request?(request) = super || context.ignored?
-    def update_context(response)  = nil # noop
 
     class Context
       EPOCH = Time.at(0)
@@ -123,11 +135,11 @@ module ReadYourOwnWrites
 
       # NB(ezekg) this odd service-object-but-not-really call pattern is required
       #           by the database selector middleware
-      def self.call(request) = new(request)
+      def self.call(...) = new(...)
 
-      def initialize(request)
+      def initialize(request, config: ReadYourOwnWrites.configuration)
         @request = request
-        @config  = ReadYourOwnWrites.configuration
+        @config  = config
       end
 
       def last_write_timestamp = @last_write_timestamp ||= begin
@@ -142,9 +154,16 @@ module ReadYourOwnWrites
       def update_last_write_timestamp
         return if ignored?
 
-        value = Time.current.to_i
+        # clear memo
+        @last_write_timestamp = value = Time.current
 
-        redis { it.setex(redis_key, config.redis_ttl, value) }
+        redis { it.setex(redis_key, config.redis_ttl, value.to_i) }
+
+        value
+      end
+
+      def recent_writes?
+        Time.current - last_write_timestamp < config.database_selector_delay
       end
 
       def ignored?
@@ -153,9 +172,31 @@ module ReadYourOwnWrites
         config.ignored_request_paths.any? { it.match?(request.path) }
       end
 
+      def save(response)
+        return unless config.debug? # only for debugging (everything else is saved in redis)
+
+        # FIXME(ezekg) why is this a Rack response...?
+        status, headers, body = response
+
+        if recent_writes?
+          expires_at = last_write_timestamp + config.database_selector_delay
+          expires_in = [(expires_at - Time.current).to_f.ceil, 0].max
+
+          headers[RYOW_WRITE_AT_RESPONSE_HEADER]   = last_write_timestamp.httpdate
+          headers[RYOW_EXPIRES_AT_RESPONSE_HEADER] = expires_at.httpdate
+          headers[RYOW_EXPIRES_IN_RESPONSE_HEADER] = expires_in
+          headers[RYOW_SELECTION_RESPONSE_HEADER]  = :primary
+        else
+          headers[RYOW_SELECTION_RESPONSE_HEADER] = :replica
+        end
+
+        headers[RYOW_CLIENT_RESPONSE_HEADER] = client_id
+        headers[RYOW_DELAY_RESPONSE_HEADER]  = config.database_selector_delay
+      end
+
       private
 
-      def redis_key = "#{@config.redis_key_prefix}:#{client_id}"
+      def redis_key = "#{config.redis_key_prefix}:client:#{client_id}"
       def redis(&)
         Rails.cache.redis.then(&)
       rescue Redis::BaseError, Errno::ECONNREFUSED
