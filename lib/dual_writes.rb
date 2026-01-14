@@ -54,7 +54,7 @@ module DualWrites
       def lookup(name)
         const_get("#{self.name}::#{name.to_s.camelize}")
       rescue NameError
-        raise ArgumentError, "unknown operation: #{name.inspect}"
+        nil
       end
     end
 
@@ -88,7 +88,7 @@ module DualWrites
       def lookup(name)
         const_get("#{self.name}::#{name.to_s.camelize}")
       rescue NameError
-        raise ArgumentError, "unknown bulk operation: #{name.inspect}"
+        nil
       end
     end
 
@@ -123,11 +123,13 @@ module DualWrites
         when Symbol, String
           const_get(name.to_s.camelize)
         else
-          raise ConfigurationError, "strategy must be a symbol or class, got #{name.class}"
+          nil
         end
       rescue NameError
-        raise ConfigurationError, "unknown strategy: #{name.inspect}"
+        nil
       end
+
+      def exists?(name) = lookup(name).present?
     end
 
     attr_reader :replica_class,
@@ -239,8 +241,8 @@ module DualWrites
         raise ConfigurationError, 'to cannot be empty' if
           databases.empty?
 
-        # validate strategy can be looked up
-        Strategy.lookup(strategy)
+        raise ConfigurationError, "invalid strategy: #{strategy.inspect}" unless
+          Strategy.exists?(strategy)
 
         # auto-generate model classes for each database e.g. RequestLog with to: :clickhouse
         # creates RequestLog::Clickhouse that inherits from DualWrites::ClickhouseRecord
@@ -413,11 +415,20 @@ module DualWrites
         raise ConfigurationError, "#{class_name} is not configured for dual writes"
       end
 
-      config         = klass.dual_writes_config
-      database_class = klass.const_get(database.to_s.camelize)
-      strategy       = Strategy.lookup(config[:strategy]).new(database_class, strategy_config)
-      context        = Context.new(performed_at:)
-      operation      = Operation.lookup(operation).new(attributes, context:)
+      config          = klass.dual_writes_config
+      database_class  = klass.const_get(database.to_s.camelize)
+      strategy_class  = Strategy.lookup(config[:strategy])
+      operation_class = Operation.lookup(operation)
+
+      raise ConfigurationError, "invalid strategy: #{config[:strategy].inspect}" if
+        strategy_class.nil?
+
+      raise ConfigurationError, "invalid operation: #{operation.inspect}" if
+        operation_class.nil?
+
+      strategy  = strategy_class.new(database_class, strategy_config)
+      context   = Context.new(performed_at:)
+      operation = operation_class.new(attributes, context:)
 
       strategy.execute(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
@@ -444,11 +455,20 @@ module DualWrites
         raise ConfigurationError, "#{class_name} is not configured for dual writes"
       end
 
-      config         = klass.dual_writes_config
-      database_class = klass.const_get(database.to_s.camelize)
-      strategy       = Strategy.lookup(config[:strategy]).new(database_class, strategy_config)
-      context        = Context.new(performed_at:)
-      operation      = BulkOperation.lookup(operation).new(records, context:)
+      config          = klass.dual_writes_config
+      database_class  = klass.const_get(database.to_s.camelize)
+      strategy_class  = Strategy.lookup(config[:strategy])
+      operation_class = BulkOperation.lookup(operation)
+
+      raise ConfigurationError, "invalid strategy: #{config[:strategy].inspect}" if
+        strategy_class.nil?
+
+      raise ConfigurationError, "invalid bulk operation: #{operation.inspect}" if
+        operation_class.nil?
+
+      strategy  = strategy_class.new(database_class, strategy_config)
+      context   = Context.new(performed_at:)
+      operation = operation_class.new(records, context:)
 
       strategy.execute_bulk(operation)
     rescue ActiveRecord::ConnectionNotEstablished => e
