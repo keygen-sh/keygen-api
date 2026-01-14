@@ -130,7 +130,7 @@ module ReadYourOwnWrites
         @config  = ReadYourOwnWrites.configuration
       end
 
-      def last_write_timestamp
+      def last_write_timestamp = @last_write_timestamp ||= begin
         return EPOCH if ignored?
 
         value = redis { it.get(redis_key) }
@@ -162,15 +162,13 @@ module ReadYourOwnWrites
         nil # fail open if redis is unreachable
       end
 
-      def client_id
-        @client_id ||= begin
-          client = @config.client_identifier.call(request)
+      def client_id = @client_id ||= begin
+        client = config.client_identifier.call(request)
 
-          raise TypeError, "client_identifier must return a Client, got #{client.class}" unless
-            client in Client
+        raise TypeError, "client_identifier must return a Client, got #{client.class}" unless
+          client in Client
 
-          client.to_s
-        end
+        client.to_s
       end
     end
   end
