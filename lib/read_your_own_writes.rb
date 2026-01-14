@@ -181,7 +181,7 @@ module ReadYourOwnWrites
           client = @config.client_identifier.call(request)
 
           raise TypeError, "client_identifier must return a Client, got #{client.class}" unless
-            client.is_a?(Client)
+            client in Client
 
           client.to_s
         end

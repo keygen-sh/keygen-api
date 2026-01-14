@@ -234,7 +234,7 @@ module DualWrites
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
-          databases.all? { it.is_a?(Symbol) }
+          databases.all? { it in Symbol }
 
         raise ConfigurationError, 'to cannot be empty' if
           databases.empty?
@@ -318,7 +318,7 @@ module DualWrites
         return unless should_replicate_bulk?
 
         config          = dual_writes_config
-        strategy_config = config[:strategy_config].transform_values { it.is_a?(Proc) ? it.call : it }
+        strategy_config = config[:strategy_config].transform_values { (it in Proc) ? it.call : it }
         performed_at    = Time.current
 
         config[:to].each do |database|
@@ -372,7 +372,7 @@ module DualWrites
 
     def replicate(operation)
       config          = dual_writes_config
-      strategy_config = config[:strategy_config].transform_values { it.is_a?(Proc) ? instance_exec(&it) : it }
+      strategy_config = config[:strategy_config].transform_values { (it in Proc) ? instance_exec(&it) : it }
       performed_at    = Time.current
 
       config[:to].each do |database|
