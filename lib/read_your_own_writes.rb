@@ -100,7 +100,7 @@ module ReadYourOwnWrites
 
     def with_read_replica_connection_unless_reading_own_writes
       if ReadYourOwnWrites.reading_own_writes?(request)
-        yield # noop since already handled elsewhere
+        yield # noop since already handled by database selector middleware
       else
         ActiveRecord::Base.connected_to(role: :reading) { yield }
       end
