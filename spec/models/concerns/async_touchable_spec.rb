@@ -65,7 +65,7 @@ describe AsyncTouchable, type: :concern do
     it 'accepts nil time' do
       person = Person.create!(name: 'test')
 
-      expect { person.touch_async(:last_seen_at, time: nil) }.to_not raise_error ArgumentError
+      expect { person.touch_async(:last_seen_at, time: nil) }.to_not raise_error
     end
   end
 
