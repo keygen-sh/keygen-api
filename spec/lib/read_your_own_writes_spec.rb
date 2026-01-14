@@ -89,6 +89,8 @@ describe ReadYourOwnWrites do
         context = described_class.call(request)
 
         expect(context).to be_a(described_class)
+        expect(context.request).to eq request
+        expect(context.config).to eq ReadYourOwnWrites.configuration
       end
     end
 
@@ -120,9 +122,9 @@ describe ReadYourOwnWrites do
         freeze_time do
           context.update_last_write_timestamp
 
-          timestamp = redis.then { it.get("ryow:#{context.send(:client_id)}") }
+          value = redis.then { it.get(context.send(:redis_key)) }
 
-          expect(timestamp).not_to be_nil
+          expect(value).not_to be_nil
         end
       end
 
@@ -132,10 +134,10 @@ describe ReadYourOwnWrites do
 
         context.update_last_write_timestamp
 
-        ttl = redis.then { it.ttl("ryow:#{context.send(:client_id)}") }
-        expected_ttl = ReadYourOwnWrites.configuration.redis_ttl.to_i
+        actual_ttl   = redis.then { it.ttl(context.send(:redis_key)) }
+        expected_ttl = context.config.redis_ttl
 
-        expect(ttl).to be_between(1, expected_ttl)
+        expect(actual_ttl).to be_between(1, expected_ttl)
       end
     end
 
@@ -217,8 +219,7 @@ describe ReadYourOwnWrites do
         context = described_class.new(build_request(path: '/test'))
 
         expect(context.send(:client_id)).to be_a(String)
-        expect(context.send(:client_id)).to start_with('client:')
-        expect(context.send(:client_id).length).to eq('client:'.size + Digest::SHA2.new.block_length)
+        expect(context.send(:client_id).length).to eq Digest::SHA2.new.block_length
       end
 
       it 'should use custom client_identifier when configured' do
