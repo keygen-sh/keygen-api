@@ -4,15 +4,14 @@ require 'active_support'
 require 'active_record'
 
 module ReadYourOwnWrites
-  RYOW_WRITE_AT_RESPONSE_HEADER   = 'X-Ryow-Last-Write-At'
-  RYOW_EXPIRES_AT_RESPONSE_HEADER = 'X-Ryow-Last-Write-Expires-At'
-  RYOW_EXPIRES_IN_RESPONSE_HEADER = 'X-Ryow-Last-Write-Expires-In'
-  RYOW_SELECTION_RESPONSE_HEADER  = 'X-Ryow-Selection'
-  RYOW_CLIENT_RESPONSE_HEADER     = 'X-Ryow-Client'
-  RYOW_DELAY_RESPONSE_HEADER      = 'X-Ryow-Delay'
-
-  RYOW_SKIP_KEY    = 'database.skip_ryow'
-  REDIS_KEY_PREFIX = 'ryow'
+  RESPONSE_WRITE_AT_HEADER   = 'X-Ryow-Last-Write-At'
+  RESPONSE_EXPIRES_AT_HEADER = 'X-Ryow-Last-Write-Expires-At'
+  RESPONSE_EXPIRES_IN_HEADER = 'X-Ryow-Last-Write-Expires-In'
+  RESPONSE_SELECTION_HEADER  = 'X-Ryow-Selection'
+  RESPONSE_CLIENT_HEADER     = 'X-Ryow-Client'
+  RESPONSE_DELAY_HEADER      = 'X-Ryow-Delay'
+  REQUEST_SKIP_KEY           = 'ryow.skip'
+  REDIS_KEY_PREFIX           = 'ryow'
 
   # immutable struct representing the unique identity of a client
   Client = Data.define :fingerprint do
@@ -167,7 +166,7 @@ module ReadYourOwnWrites
       end
 
       def ignored?
-        return true if request.env[RYOW_SKIP_KEY]
+        return true if request.env[REQUEST_SKIP_KEY]
 
         config.ignored_request_paths.any? { it.match?(request.path) }
       end
@@ -182,16 +181,16 @@ module ReadYourOwnWrites
           expires_at = last_write_timestamp + config.database_selector_delay
           expires_in = [(expires_at - Time.current).to_f.ceil, 0].max
 
-          headers[RYOW_WRITE_AT_RESPONSE_HEADER]   = last_write_timestamp.httpdate
-          headers[RYOW_EXPIRES_AT_RESPONSE_HEADER] = expires_at.httpdate
-          headers[RYOW_EXPIRES_IN_RESPONSE_HEADER] = expires_in
-          headers[RYOW_SELECTION_RESPONSE_HEADER]  = :primary
+          headers[RESPONSE_WRITE_AT_HEADER]   = last_write_timestamp.httpdate
+          headers[RESPONSE_EXPIRES_AT_HEADER] = expires_at.httpdate
+          headers[RESPONSE_EXPIRES_IN_HEADER] = expires_in
+          headers[RESPONSE_SELECTION_HEADER]  = :primary
         else
-          headers[RYOW_SELECTION_RESPONSE_HEADER] = :replica
+          headers[RESPONSE_SELECTION_HEADER] = :replica
         end
 
-        headers[RYOW_CLIENT_RESPONSE_HEADER] = client_id
-        headers[RYOW_DELAY_RESPONSE_HEADER]  = config.database_selector_delay
+        headers[RESPONSE_CLIENT_HEADER] = client_id
+        headers[RESPONSE_DELAY_HEADER]  = config.database_selector_delay
       end
 
       private
