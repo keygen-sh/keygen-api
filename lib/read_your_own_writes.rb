@@ -15,7 +15,7 @@ module ReadYourOwnWrites
 
   # immutable struct representing the unique identity of a client
   Client = Data.define :fingerprint do
-    def to_s = Digest::SHA2.hexdigest(fingerprint.to_s)
+    def to_s = fingerprint.to_s
   end
 
   class Configuration
@@ -55,7 +55,7 @@ module ReadYourOwnWrites
       @ignored_request_paths   = []
       @debug                   = Rails.env.local?
       @client_identifier       = ->(request) {
-        fingerprint = [request.authorization, request.remote_ip].join(':')
+        fingerprint = Digest::SHA2.hexdigest [request.authorization, request.remote_ip].join(':')
 
         Client.new(fingerprint:)
       }
