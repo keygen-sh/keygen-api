@@ -72,6 +72,9 @@ module ReadYourOwnWrites
   end
 
   class << self
+    def writing_role = ActiveRecord.writing_role
+    def reading_role = ActiveRecord.reading_role
+
     def configuration = @configuration ||= Configuration.new
     def configuration=(config)
       @configuration = config
@@ -107,19 +110,25 @@ module ReadYourOwnWrites
     end
 
     def with_primary_connection
-      ActiveRecord::Base.connected_to(role: :writing) { yield }
+      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.writing_role) do
+        yield
+      end
     end
 
     def with_read_replica_connection_unless_reading_own_writes
       if ReadYourOwnWrites.reading_own_writes?(request)
         yield # noop since already handled by database selector middleware
       else
-        ActiveRecord::Base.connected_to(role: :reading) { yield }
+        ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.reading_role) do
+          yield
+        end
       end
     end
 
     def with_read_replica_connection
-      ActiveRecord::Base.connected_to(role: :reading) { yield }
+      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.reading_role) do
+        yield
+      end
     end
   end
 
