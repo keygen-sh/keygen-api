@@ -61,8 +61,10 @@ module ReadYourOwnWrites
       }
     end
 
-    def redis_ttl = @redis_ttl || @database_selector_delay * 2
-    def debug?    = !!@debug
+    def writing_role = ActiveRecord.writing_role
+    def reading_role = ActiveRecord.reading_role
+    def redis_ttl    = @redis_ttl || @database_selector_delay * 2
+    def debug?       = !!@debug
 
     private
 
@@ -72,9 +74,6 @@ module ReadYourOwnWrites
   end
 
   class << self
-    def writing_role = ActiveRecord.writing_role
-    def reading_role = ActiveRecord.reading_role
-
     def configuration = @configuration ||= Configuration.new
     def configuration=(config)
       @configuration = config
@@ -110,7 +109,7 @@ module ReadYourOwnWrites
     end
 
     def with_primary_connection
-      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.writing_role) do
+      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.configuration.writing_role) do
         yield
       end
     end
@@ -119,14 +118,14 @@ module ReadYourOwnWrites
       if ReadYourOwnWrites.reading_own_writes?(request)
         yield # noop since already handled by database selector middleware
       else
-        ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.reading_role) do
+        ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.configuration.reading_role) do
           yield
         end
       end
     end
 
     def with_read_replica_connection
-      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.reading_role) do
+      ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.configuration.reading_role) do
         yield
       end
     end
