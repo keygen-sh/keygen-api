@@ -15,7 +15,9 @@ ReadYourOwnWrites.configure do |config|
     account_id  = request.path[/^\/v\d+\/accounts\/([^\/]+)\/?/, 1] # FIXME(ezekg) use resolved account ID
     session_id  = request.cookie_jar.encrypted[:session_id]
     auth        = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
-    fingerprint = [request.host, account_id, session_id, auth, request.remote_ip].join(':')
+    fingerprint = Digest::SHA2.hexdigest(
+      [request.host, account_id, session_id, auth, request.remote_ip].join(':'),
+    )
 
     ReadYourOwnWrites::Client.new(fingerprint:)
   }
