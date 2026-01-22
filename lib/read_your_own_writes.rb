@@ -54,8 +54,8 @@ module ReadYourOwnWrites
       @redis_ttl               = nil
       @ignored_request_paths   = []
       @debug                   = Rails.env.local?
-      @client_identifier       = ->(request) {
-        fingerprint = Digest::SHA2.hexdigest [request.authorization, request.remote_ip].join(':')
+      @client_identifier       = -> request {
+        fingerprint = Digest::SHA2.hexdigest [request.host, request.remote_ip, request.authorization].join(':')
 
         Client.new(fingerprint:)
       }
