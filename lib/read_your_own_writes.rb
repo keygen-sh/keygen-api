@@ -114,12 +114,12 @@ module ReadYourOwnWrites
     end
 
     def with_read_replica_connection_unless_reading_own_writes
-      if ReadYourOwnWrites.reading_own_writes?(request)
-        yield # noop since already handled by database selector middleware
-      else
+      unless reading_own_writes?
         ActiveRecord::Base.connected_to(role: ReadYourOwnWrites.configuration.reading_role) do
           yield
         end
+      else
+        yield # connection handled by database selector middleware
       end
     end
 
@@ -128,6 +128,10 @@ module ReadYourOwnWrites
         yield
       end
     end
+
+    private
+
+    def reading_own_writes? = ReadYourOwnWrites.reading_own_writes?(request)
   end
 
   class Resolver < ActiveRecord::Middleware::DatabaseSelector::Resolver
