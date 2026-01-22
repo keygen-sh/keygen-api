@@ -98,8 +98,7 @@ module ReadYourOwnWrites
       # use_primary always connects to the primary database (useful for GET requests that perform writes)
       def use_primary(**) = prepend_around_action(:with_primary_connection, **)
 
-      # use_read_replica connects to the replica database unless there has been a recent write (mainly
-      # useful for readonly POST requests, e.g. license validation and search)
+      # use_read_replica always connects to the replica database by default (useful for readonly POSTs)
       def use_read_replica(always: true, **)
         prepend_around_action(always ? :with_read_replica_connection : :with_read_replica_connection_unless_reading_own_writes, **)
       end
