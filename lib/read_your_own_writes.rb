@@ -19,6 +19,18 @@ module ReadYourOwnWrites
   end
 
   class Configuration
+    # the primary database key (defaults to :primary)
+    attr_accessor :primary_database_key
+
+    # the replica database key (defaults to :replica)
+    attr_accessor :read_replica_database_key
+
+    # whether the read replica is available (defaults to true)
+    attr_writer :read_replica_available
+
+    # whether the read replica is enabled (defaults to true)
+    attr_writer :read_replica_enabled
+
     # how long after a write to route reads to primary
     attr_reader :database_selector_delay
 
@@ -49,12 +61,16 @@ module ReadYourOwnWrites
     attr_writer :debug
 
     def initialize
-      @database_selector_delay = 2.seconds
-      @redis_key_prefix        = REDIS_KEY_PREFIX
-      @redis_ttl               = nil
-      @ignored_request_paths   = []
-      @debug                   = Rails.env.local?
-      @client_identifier       = -> request {
+      @primary_database_key      = :primary
+      @read_replica_database_key = :replica
+      @read_replica_available    = true
+      @read_replica_enabled      = true
+      @database_selector_delay   = 2.seconds
+      @redis_key_prefix          = REDIS_KEY_PREFIX
+      @redis_ttl                 = nil
+      @ignored_request_paths     = []
+      @debug                     = Rails.env.local?
+      @client_identifier         = -> request {
         fingerprint = Digest::SHA2.hexdigest [request.host, request.remote_ip, request.authorization].join(':')
 
         Client.new(fingerprint:)
@@ -64,7 +80,10 @@ module ReadYourOwnWrites
     def writing_role = ActiveRecord.writing_role
     def reading_role = ActiveRecord.reading_role
     def redis_ttl    = @redis_ttl || @database_selector_delay * 2
-    def debug?       = !!@debug
+
+    def read_replica_available? = (@read_replica_available in Proc) ? @read_replica_available.call : !!@read_replica_available
+    def read_replica_enabled?   = (@read_replica_enabled in Proc) ? @read_replica_enabled.call : !!@read_replica_enabled
+    def debug?                  = (@debug in Proc) ? @debug.call : !!@debug
 
     private
 
@@ -83,11 +102,32 @@ module ReadYourOwnWrites
       yield configuration
     end
 
+    def current_database = ActiveRecord::Base.connection_db_config.name.to_sym
+    def current_role     = ActiveRecord::Base.current_role.to_sym
+
     # check if the request is reading its own recent writes
     def reading_own_writes?(request)
       context = Resolver::Context.new(request)
 
       context.recent_writes?
+    end
+  end
+
+  module Model
+    extend ActiveSupport::Concern
+
+    class_methods do
+      def connects_to_read_replica_if_configured(config: ReadYourOwnWrites.configuration)
+        if config.read_replica_available? && config.read_replica_enabled?
+          connects_to database: { config.writing_role => config.primary_database_key, config.reading_role => config.read_replica_database_key }
+        else
+          connects_to database: { config.writing_role => config.primary_database_key, config.reading_role => config.primary_database_key }
+        end
+      end
+    end
+
+    included do
+      connects_to_read_replica_if_configured
     end
   end
 
@@ -230,5 +270,7 @@ module ReadYourOwnWrites
     if (selector = Rails.application.config.active_record.database_selector)
       ReadYourOwnWrites.configuration.send(:database_selector_delay=, selector[:delay])
     end
+
+    ActiveRecord::Base.include ReadYourOwnWrites::Model
   end
 end
