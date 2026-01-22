@@ -117,6 +117,9 @@ module ReadYourOwnWrites
     extend ActiveSupport::Concern
 
     class_methods do
+      # FIXME(ezekg) this doubles the connection pool for the primary in the case of no read
+      #              replica, but it's the only way to use the same code paths, because
+      #              without this, the :reading role is unavailable for the primary.
       def connects_to_read_replica_if_configured(config: ReadYourOwnWrites.configuration)
         if config.read_replica_available? && config.read_replica_enabled?
           connects_to database: { config.writing_role => config.primary_database_key, config.reading_role => config.read_replica_database_key }
