@@ -16,7 +16,7 @@ ReadYourOwnWrites.configure do |config|
     session_id  = request.cookie_jar.encrypted[:session_id]
     auth        = request.authorization || request.query_parameters[:token] || request.query_parameters[:auth]
     fingerprint = Digest::SHA2.hexdigest(
-      [request.host, account_id, session_id, auth, request.remote_ip].join(':'),
+      [request.host, request.remote_ip, account_id, session_id, auth].join(':'),
     )
 
     ReadYourOwnWrites::Client.new(fingerprint:)
