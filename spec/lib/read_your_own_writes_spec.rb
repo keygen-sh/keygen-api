@@ -43,8 +43,8 @@ describe ReadYourOwnWrites do
   end
 
   describe '.reading_own_writes?' do
-    def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
-      instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
+    def build_request(path:, host: 'api.keygen.example', authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
+      instance_double(ActionDispatch::Request, host:, path:, authorization:, remote_ip:, env:)
     end
 
     it 'should return false when no recent writes exist' do
@@ -79,8 +79,8 @@ describe ReadYourOwnWrites do
   describe ReadYourOwnWrites::Resolver::Context do
     let(:redis) { Rails.cache.redis }
 
-    def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
-      instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
+    def build_request(path:, host: 'api.keygen.example', authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
+      instance_double(ActionDispatch::Request, host:, path:, authorization:, remote_ip:, env:)
     end
 
     describe '.call' do
@@ -182,6 +182,7 @@ describe ReadYourOwnWrites do
       it 'should use replica when request skip key is set' do
         request = instance_double(
           ActionDispatch::Request,
+          host: 'api.keygen.example',
           path: '/v1/accounts/test/licenses/bar',
           authorization: 'Bearer test-token',
           remote_ip: '192.168.1.1',
@@ -224,7 +225,7 @@ describe ReadYourOwnWrites do
 
       it 'should use custom client_identifier when configured' do
         ReadYourOwnWrites.configure do |config|
-          config.client_identifier = ->(request) {
+          config.client_identifier = -> request {
             account_id = request.path[/^\/accounts\/([^\/]+)/, 1]
 
             ReadYourOwnWrites::Client.new(fingerprint: [account_id, request.remote_ip].join(':'))
@@ -243,7 +244,7 @@ describe ReadYourOwnWrites do
 
       it 'should raise TypeError when client_identifier returns wrong type' do
         ReadYourOwnWrites.configure do |config|
-          config.client_identifier = ->(request) { [request.authorization, request.remote_ip] }
+          config.client_identifier = -> request { [request.remote_ip] }
         end
 
         context = described_class.new(build_request(path: '/test'))
@@ -274,8 +275,8 @@ describe ReadYourOwnWrites do
   end
 
   describe ReadYourOwnWrites::Controller do
-    def build_request(path:, authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
-      instance_double(ActionDispatch::Request, path:, authorization:, remote_ip:, env:)
+    def build_request(path:, host: 'api.keygen.example', authorization: 'Bearer test-token', remote_ip: '192.168.1.1', env: {})
+      instance_double(ActionDispatch::Request, host:, path:, authorization:, remote_ip:, env:)
     end
 
     let(:test_controller_class) do
