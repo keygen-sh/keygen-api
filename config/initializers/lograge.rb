@@ -87,8 +87,8 @@ Rails.application.configure do
       end
 
     {
-      db_name: ActiveRecord::Base.current_role == :reading ? :replica : :primary,
-      db_role: ActiveRecord::Base.current_role,
+      db_name: ReadYourOwnWrites.current_database,
+      db_role: ReadYourOwnWrites.current_role,
       host: req.host,
       request_id: req.request_id,
       api_revision: api_revision || 'N/A',
