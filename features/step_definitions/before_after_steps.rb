@@ -69,7 +69,7 @@ After do |scenario|
 
     puts scenario.exception
 
-    if ENV.key?('DEBUG')
+    if ENV.true?('DEBUG')
       req_headers = last_request.env.select { |k, v| k.start_with?('HTTP_') }
                                     .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 

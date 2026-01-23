@@ -21,6 +21,8 @@ Bundler.require *Rails.groups
 
 module Keygen
   class Application < Rails::Application
+    Dir[Rails.root / 'lib' / 'ext' / '*'].each { require it } # load core extensions early
+
     config.load_defaults 8.0
 
     config.generators do |generator|
@@ -155,23 +157,23 @@ module Keygen
     # Force UTF-8 encoding
     config.encoding = 'utf-8'
 
-    # Add lib, services, validators, etc. to autoload path
-    config.autoload_lib(ignore: %w[rails_ext tasks])
+    # Add lib, extensions, services, validators, etc. to autoload path
+    config.autoload_lib(ignore: %w[ext tasks])
     config.autoload_paths += %W[
       #{config.root}/app/serializers
       #{config.root}/app/validators
       #{config.root}/app/services
     ]
 
-    # Set default URL options before server boots
     config.before_initialize do |app|
+      # Set default URL options before server boots
       app.default_url_options = { protocol: 'https' }.tap do |options|
         options[:host] = ENV['KEYGEN_HOST'] if ENV.key?('KEYGEN_HOST')
       end
     end
 
-    # Print env info when server boots
     config.after_initialize do |app|
+      # Print env info when server boots
       Keygen::Console.welcome!
     end
   end
