@@ -35,17 +35,23 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
-        edition:
+        KEYGEN_EDITION:
           - CE
           - EE
-        mode:
+        KEYGEN_MODE:
           - singleplayer
           - multiplayer
+        REPLICA_DATABASE_ENABLED:
+          - 0
+          - 1
+        CLICKHOUSE_DATABASE_ENABLED:
+          - 0
+          - 1
     env:
       KEYGEN_LICENSE_FILE: ${{secrets.KEYGEN_LICENSE_FILE}}
       KEYGEN_LICENSE_KEY: ${{secrets.KEYGEN_LICENSE_KEY}}
-      KEYGEN_EDITION: ${{matrix.edition}}
-      KEYGEN_MODE: ${{matrix.mode}}
+      KEYGEN_EDITION: ${{matrix.KEYGEN_EDITION}}
+      KEYGEN_MODE: ${{matrix.KEYGEN_MODE}}
       KEYGEN_HOST: api.keygen.sh
       KEYGEN_HOSTS: rubygems.pkg.keygen.sh,raw.pkg.keygen.sh,tauri.pkg.keygen.sh,pypi.pkg.keygen.sh,npm.pkg.keygen.sh,oci.pkg.keygen.sh,auth.keygen.sh
       SECRET_KEY_BASE: 1b39b6912d39c7dd412d9f5795dd9cdaed7f97d7d02cf0bdac7c9878830b16462af858027e2a51e9c63ff95edd505d461536829bbbce6bfb2db69963c014597a
@@ -63,9 +69,9 @@ jobs:
       AWS_REGION: us-east-2
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REPLICA_DATABASE_URL: postgres://postgres:postgres@localhost:5432
-      REPLICA_DATABASE_ENABLED: ${{vars.REPLICA_DATABASE_ENABLED}}
+      REPLICA_DATABASE_ENABLED: ${{matrix.REPLICA_DATABASE_ENABLED}}
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
-      CLICKHOUSE_DATABASE_ENABLED: ${{vars.CLICKHOUSE_DATABASE_ENABLED}}
+      CLICKHOUSE_DATABASE_ENABLED: ${{matrix.CLICKHOUSE_DATABASE_ENABLED}}
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
       DEBUG: ${{vars.DEBUG}}
