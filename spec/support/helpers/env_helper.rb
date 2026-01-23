@@ -2,8 +2,21 @@
 
 module EnvHelper
   module WorldMethods
-    def stub_prestine_env(key, value) = stub_const('ENV', { key.to_s => value.to_s })
-    def with_prestine_env(&)
+    def stub_env(stubbed_key, stubbed_value)
+      allow(ENV).to receive(:fetch).and_wrap_original do |method, key, *args, &block|
+        key == stubbed_key ? stubbed_value : method.call(key, *args, &block)
+      end
+
+      allow(ENV).to receive(:[]).and_wrap_original do |method, key|
+        key == stubbed_key ? stubbed_value : method.call(key)
+      end
+
+      allow(ENV).to receive(:key?).and_wrap_original do |method, key|
+        key == stubbed_key ? true : method.call(key)
+      end
+    end
+
+    def with_pristine_env(&)
       prev_env = ENV.to_hash
 
       ENV.clear
@@ -13,7 +26,6 @@ module EnvHelper
       ENV.replace(prev_env)
     end
 
-    def stub_env(key, value) = stub_const('ENV', ENV.to_hash.merge(key.to_s => value.to_s))
     def with_env(**next_env, &)
       prev_env = ENV.to_hash
 
@@ -28,10 +40,10 @@ module EnvHelper
   end
 
   module ScenarioMethods
-    def with_prestine_env(&)
+    def with_pristine_env(&)
       prev_env = ENV.to_hash
 
-      context 'with prestine environment' do
+      context 'with pristine environment' do
         before { ENV.clear }
         after  { ENV.replace(prev_env) }
 
