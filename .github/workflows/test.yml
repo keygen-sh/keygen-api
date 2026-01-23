@@ -62,7 +62,10 @@ jobs:
       AWS_BUCKET: test
       AWS_REGION: us-east-2
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      REPLICA_DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      REPLICA_DATABASE_ENABLED: ${{vars.REPLICA_DATABASE_ENABLED}}
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
+      CLICKHOUSE_DATABASE_ENABLED: ${{vars.CLICKHOUSE_DATABASE_ENABLED}}
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
       DEBUG: ${{vars.DEBUG}}
