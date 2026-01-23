@@ -111,9 +111,9 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
-  # Make sure we're working with a prestine ENV in EE tests.
+  # Make sure we're working with a pristine ENV in EE tests.
   config.around type: :ee do |example|
-    with_prestine_env(&example)
+    with_pristine_env(&example)
   end
 
   # hooks to run/skip tests for a certain edition
