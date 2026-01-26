@@ -47,6 +47,10 @@ jobs:
         CLICKHOUSE_DATABASE_ENABLED:
           - 0
           - 1
+        exclude:
+          # NB(ezekg) we do not offer a multiplayer variant of CE
+          - KEYGEN_EDITION: CE
+            KEYGEN_MODE: multiplayer
     env:
       KEYGEN_LICENSE_FILE: ${{secrets.KEYGEN_LICENSE_FILE}}
       KEYGEN_LICENSE_KEY: ${{secrets.KEYGEN_LICENSE_KEY}}
