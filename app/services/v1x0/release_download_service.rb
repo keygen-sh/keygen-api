@@ -52,9 +52,9 @@ class V1x0::ReleaseDownloadService < BaseService
     end
 
     redirect_url = if upgrade?
-                     artifact.upgrade(ttl:)
+                     artifact.generate_presigned_upgrade_url(ttl:)
                    else
-                     artifact.download(ttl:)
+                     artifact.generate_presigned_download_url(ttl:)
                    end
 
     DownloadResult.new(

@@ -36,7 +36,9 @@ module Api::V1::Releases::Relationships
       return render jsonapi: artifact if
         !artifact.downloadable? || prefers?('no-download')
 
-      download_url = artifact.download(ttl: release_artifact_query[:ttl])
+      download_url = artifact.generate_presigned_download_url(
+        ttl: release_artifact_query[:ttl],
+      )
 
       BroadcastEventService.call(
         event: %w[artifact.downloaded release.downloaded],
