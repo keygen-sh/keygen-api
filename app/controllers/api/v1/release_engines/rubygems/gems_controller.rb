@@ -11,7 +11,7 @@ module Api::V1::ReleaseEngines
       authorize! artifact
 
       # FIXME(ezekg) typically, we'd redirect to the vanity url but rubygems isn't forwarding auth to redirects
-      download_url = artifact.download(
+      download_url = artifact.generate_presigned_download_url(
         ttl: 10.minutes,
       )
 
