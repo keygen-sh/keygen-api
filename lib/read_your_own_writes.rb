@@ -225,26 +225,12 @@ module ReadYourOwnWrites
         config.ignored_request_paths.any? { it.match?(request.path) }
       end
 
-      def save(response)
-        return unless config.debug? # only for debugging (everything else is saved in redis)
+      def save(rack_response)
+        _status, headers, _body = *rack_response # FIXME(ezekg) not sure why it's a rack response...
 
-        # FIXME(ezekg) why is this a Rack response...?
-        status, headers, body = response
+        add_debug_headers(headers)
 
-        if recent_writes?
-          expires_at = last_write_timestamp + config.database_selector_delay
-          expires_in = [(expires_at - Time.current).to_f.ceil, 0].max
-
-          headers[RESPONSE_WRITE_AT_HEADER]   = last_write_timestamp.httpdate
-          headers[RESPONSE_EXPIRES_AT_HEADER] = expires_at.httpdate
-          headers[RESPONSE_EXPIRES_IN_HEADER] = expires_in
-          headers[RESPONSE_SELECTION_HEADER]  = :primary
-        else
-          headers[RESPONSE_SELECTION_HEADER] = :replica
-        end
-
-        headers[RESPONSE_CLIENT_HEADER] = client_id
-        headers[RESPONSE_DELAY_HEADER]  = config.database_selector_delay
+        rack_response
       end
 
       private
@@ -263,6 +249,27 @@ module ReadYourOwnWrites
           client in Client
 
         client.to_s
+      end
+
+      def add_debug_headers(headers)
+        return unless config.debug? # only for debugging (everything else is saved in redis)
+
+        if recent_writes?
+          expires_at = last_write_timestamp + config.database_selector_delay
+          expires_in = [(expires_at - Time.current).to_f.ceil, 0].max
+
+          headers[RESPONSE_WRITE_AT_HEADER]   = last_write_timestamp.httpdate
+          headers[RESPONSE_EXPIRES_AT_HEADER] = expires_at.httpdate
+          headers[RESPONSE_EXPIRES_IN_HEADER] = expires_in
+          headers[RESPONSE_SELECTION_HEADER]  = config.primary_database_key
+        else
+          headers[RESPONSE_SELECTION_HEADER] = config.read_replica_database_key
+        end
+
+        headers[RESPONSE_CLIENT_HEADER] = client_id
+        headers[RESPONSE_DELAY_HEADER]  = config.database_selector_delay
+
+        headers
       end
     end
   end
