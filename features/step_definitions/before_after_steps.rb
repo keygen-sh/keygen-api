@@ -70,55 +70,41 @@ After do |scenario|
     puts scenario.exception
 
     if ENV.true?('DEBUG')
-      req_headers = last_request.env.select { |k, v| k.start_with?('HTTP_') }
-                                    .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
+      begin
+        req_headers = last_request.env.select { |k, v| k.start_with?('HTTP_') }
+                                      .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
-      puts
-      puts "dump:"
-      puts
-      pp(
-        request: {
-          method: last_request.request_method,
-          url: last_request.url,
-          headers: req_headers,
-          json: (JSON.parse(last_request.body.string) rescue nil),
-          body: last_request.body.string,
-        },
-        response: {
-          status: last_response.status,
-          headers: (last_response.headers.to_h rescue {}),
-          json: (JSON.parse(last_response.body) rescue nil),
-          body: last_response.body,
-        },
-        debug: {
-          env_number: ENV['TEST_ENV_NUMBER'].to_i,
-          error_log: $!&.backtrace || [],
-          query_log: if File.exist?(log_path = Rails.root / 'log' / 'test.log')
-            Elif.open(log_path) do |log|
-              count = ENV.fetch('TEST_DEBUG_QUERY_LOG_LINE_COUNT') { 25 }.to_i
-              lines = []
-
-              # Read the last n SQL lines from the log file (useful when debugging CI)
-              log.each do |line|
-                break if lines.count >= count
-
-                if line =~ /application='Keygen',pid='#{Process.pid}'/
-                  lines << line.squish
-                end
-              end
-
-              lines
-            rescue
-              lines
-            end
-          end,
-        },
-      )
+        puts
+        puts "dump:"
+        puts
+        pp(
+          request: {
+            method: last_request.request_method,
+            url: last_request.url,
+            headers: req_headers,
+            json: (JSON.parse(last_request.body.string) rescue nil),
+            body: last_request.body.string,
+          },
+          response: {
+            status: last_response.status,
+            headers: (last_response.headers.to_h rescue {}),
+            json: (JSON.parse(last_response.body) rescue nil),
+            body: last_response.body,
+          },
+          debug: {
+            env_number: ENV['TEST_ENV_NUMBER'].to_i,
+            backtrace: $!&.backtrace || [],
+          },
+        )
+      rescue Exception => e
+        puts "[debug] unexpected error: #{e.class} - #{e.message}"
+      end
     end
   end
 
   @account = nil
-  @token = nil
+  @bearer  = nil
+  @token   = nil
 end
 
 AfterAll { Rails.cache.clear }
