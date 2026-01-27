@@ -272,6 +272,64 @@ describe ReadYourOwnWrites do
         expect { context.update_last_write_timestamp }.not_to raise_error
       end
     end
+
+    describe 'debug headers' do
+      let(:request_id)    { SecureRandom.uuid_v7 }
+      let(:rack_response) { [200, { 'X-Request-Id' => request_id }, ''] }
+      let(:config)        { ReadYourOwnWrites.configuration }
+
+      it 'should add debug headers when enabled and recent write exists' do
+        ReadYourOwnWrites.configure { it.debug = true }
+
+        request = build_request(path: '/v1/accounts/test/licenses')
+        context = described_class.new(request)
+
+        freeze_time do
+          context.update_last_write_timestamp
+          context.save(rack_response)
+
+          response = ActionDispatch::Response.new(*rack_response)
+
+          expect(response.headers[ReadYourOwnWrites::RESPONSE_SELECTION_HEADER]).to eq(config.primary_database_key)
+          expect(response.headers[ReadYourOwnWrites::RESPONSE_WRITE_AT_HEADER]).to eq(Time.current.httpdate)
+          expect(response.headers[ReadYourOwnWrites::RESPONSE_EXPIRES_IN_HEADER]).to eq(context.config.database_selector_delay.to_i)
+          expect(response.headers[ReadYourOwnWrites::RESPONSE_CLIENT_HEADER]).to be_present
+          expect(response.headers[ReadYourOwnWrites::RESPONSE_DELAY_HEADER]).to eq(context.config.database_selector_delay)
+          expect(response.headers['X-Request-Id']).to eq(request_id)
+        end
+      end
+
+      it 'should add replica selection when no recent writes' do
+        ReadYourOwnWrites.configure { it.debug = true }
+
+        request = build_request(path: '/v1/accounts/test/licenses')
+        context = described_class.new(request)
+
+        context.save(rack_response)
+
+        response = ActionDispatch::Response.new(*rack_response)
+
+        expect(response.headers[ReadYourOwnWrites::RESPONSE_SELECTION_HEADER]).to eq(config.read_replica_database_key)
+        expect(response.headers[ReadYourOwnWrites::RESPONSE_WRITE_AT_HEADER]).to be_nil
+        expect(response.headers['X-Request-Id']).to eq(request_id)
+      end
+
+      it 'should not add debug headers when disabled' do
+        ReadYourOwnWrites.configure { it.debug = false }
+
+        request = build_request(path: '/v1/accounts/test/licenses')
+        context = described_class.new(request)
+        context.update_last_write_timestamp
+
+        context.save(rack_response)
+
+        response = ActionDispatch::Response.new(*rack_response)
+
+        expect(response.headers[ReadYourOwnWrites::RESPONSE_SELECTION_HEADER]).to be_nil
+        expect(response.headers[ReadYourOwnWrites::RESPONSE_CLIENT_HEADER]).to be_nil
+        expect(response.headers['X-Request-Id']).to eq(request_id)
+      end
+    end
   end
 
   describe ReadYourOwnWrites::Controller do
