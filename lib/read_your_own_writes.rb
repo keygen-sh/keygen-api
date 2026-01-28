@@ -267,7 +267,7 @@ module ReadYourOwnWrites
         end
 
         headers[RESPONSE_CLIENT_HEADER] = client_id
-        headers[RESPONSE_DELAY_HEADER]  = config.database_selector_delay
+        headers[RESPONSE_DELAY_HEADER]  = config.database_selector_delay.to_i
 
         headers
       end
