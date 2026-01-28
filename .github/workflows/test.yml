@@ -42,11 +42,11 @@ jobs:
           - singleplayer
           - multiplayer
         REPLICA_DATABASE_ENABLED:
-          - 0
-          - 1
+          - '0'
+          - '1'
         CLICKHOUSE_DATABASE_ENABLED:
-          - 0
-          - 1
+          - '0'
+          - '1'
         exclude:
           # NB(ezekg) we do not offer a multiplayer variant of CE
           - KEYGEN_EDITION: CE
