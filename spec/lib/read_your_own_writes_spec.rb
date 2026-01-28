@@ -103,14 +103,16 @@ describe ReadYourOwnWrites do
       end
 
       it 'should return timestamp after a write' do
-        write_request = build_request(path: '/v1/accounts/test/licenses/abc')
-        write_context = described_class.new(write_request)
-        write_context.update_last_write_timestamp
+        freeze_time do
+          write_request = build_request(path: '/v1/accounts/test/licenses/abc')
+          write_context = described_class.new(write_request)
+          write_context.update_last_write_timestamp
 
-        read_request = build_request(path: '/v1/accounts/test/licenses')
-        read_context = described_class.new(read_request)
+          read_request = build_request(path: '/v1/accounts/test/licenses')
+          read_context = described_class.new(read_request)
 
-        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
+          expect(read_context.last_write_timestamp).to eq(Time.current)
+        end
       end
     end
 
@@ -141,7 +143,7 @@ describe ReadYourOwnWrites do
       end
     end
 
-    describe 'replica-only patterns' do
+    describe 'ignored request paths' do
       before do
         ReadYourOwnWrites.configure do |config|
           config.ignored_request_paths = [
@@ -149,25 +151,33 @@ describe ReadYourOwnWrites do
             /\/actions\/search\z/,
           ]
         end
-
-        # simulate a write
-        write_request = build_request(path: '/v1/accounts/test/licenses/bar')
-        write_context = described_class.new(write_request)
-        write_context.update_last_write_timestamp
       end
 
-      it 'should always use replica for configured patterns' do
-        read_request = build_request(path: '/v1/accounts/test/licenses/actions/validate-key')
-        read_context = described_class.new(read_request)
+      it 'should ignore for matching paths' do
+        freeze_time do
+          # simulate a write
+          write_request = build_request(path: '/v1/accounts/test/licenses/bar')
+          write_context = described_class.new(write_request)
+          write_context.update_last_write_timestamp
 
-        expect(read_context.last_write_timestamp).to eq(Time.at(0))
+          read_request = build_request(path: '/v1/accounts/test/licenses/actions/validate-key')
+          read_context = described_class.new(read_request)
+
+          expect(read_context.last_write_timestamp).to eq(Time.at(0))
+        end
       end
 
-      it 'should not affect non-matching patterns' do
-        read_request = build_request(path: '/v1/accounts/test/licenses/bar/actions/check-in')
-        read_context = described_class.new(read_request)
+      it 'should not ignore other paths' do
+        freeze_time do
+          write_request = build_request(path: '/v1/accounts/test/licenses/bar')
+          write_context = described_class.new(write_request)
+          write_context.update_last_write_timestamp
 
-        expect(read_context.last_write_timestamp).to be_within(1.second).of(Time.now)
+          read_request = build_request(path: '/v1/accounts/test/licenses/bar/actions/check-in')
+          read_context = described_class.new(read_request)
+
+          expect(read_context.last_write_timestamp).to eq(Time.current)
+        end
       end
     end
 
