@@ -63,42 +63,12 @@ After do |scenario|
 
   unfreeze_time
 
-  # Tell Cucumber to quit if a scenario fails
+  # tell Cucumber to quit when a scenario fails
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    puts scenario.exception
-
     if ENV.true?('DEBUG')
-      begin
-        req_headers = last_request.env.select { |k, v| k.start_with?('HTTP_') }
-                                      .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
-
-        puts
-        puts "dump:"
-        puts
-        pp(
-          request: {
-            method: last_request.request_method,
-            url: last_request.url,
-            headers: req_headers,
-            json: (JSON.parse(last_request.body.string) rescue nil),
-            body: last_request.body.string,
-          },
-          response: {
-            status: last_response.status,
-            headers: (last_response.headers.to_h rescue {}),
-            json: (JSON.parse(last_response.body) rescue nil),
-            body: last_response.body,
-          },
-          debug: {
-            env_number: ENV['TEST_ENV_NUMBER'].to_i,
-            backtrace: $!&.backtrace || [],
-          },
-        )
-      rescue Exception => e
-        puts "[debug] unexpected error: #{e.class} - #{e.message}"
-      end
+      warn ScenarioDebugger.call(scenario:, request: last_request, response: last_response)
     end
   end
 
