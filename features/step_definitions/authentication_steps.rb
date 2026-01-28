@@ -121,7 +121,7 @@ Given /^I send the following raw headers:$/ do |body|
   headers = body.split /\n/
 
   headers.each do |raw|
-    key, value = raw.split(':')
+    key, value = raw.split(':', 2)
 
     header key, value&.strip
   end
