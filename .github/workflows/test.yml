@@ -77,7 +77,7 @@ jobs:
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
       CLICKHOUSE_DATABASE_ENABLED: ${{matrix.CLICKHOUSE_DATABASE_ENABLED}}
       REDIS_URL: redis://localhost:6379
-      RAILS_LOG_LEVEL: debug
+      RAILS_LOG_LEVEL: ${{vars.RAILS_LOG_LEVEL}}
       RAILS_ENV: test
       DEBUG: ${{vars.DEBUG}}
     steps:
