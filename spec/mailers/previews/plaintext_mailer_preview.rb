@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class PlaintextMailerPreview < ActionMailer::Preview
-  def low_activity_lifeline
-    PlaintextMailer.low_activity_lifeline account: account
-  end
-
   def trial_ending_soon_without_payment_method
     PlaintextMailer.trial_ending_soon_without_payment_method account: account
   end
