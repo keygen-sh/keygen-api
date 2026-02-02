@@ -20,8 +20,8 @@ begin
       # without using database /0 (our potential development database).
       #
       # Thus, we need to keep this in the range of 1..14 for /1../15.
-      ENV['PARALLEL_TEST_PROCESSORS'] = Parallel.processor_count.clamp(1, 14)
-                                                                .to_s
+      ENV['PARALLEL_TEST_PROCESSORS'] ||= Parallel.processor_count.clamp(1, 14)
+                                                                  .to_s
 
       # We don't want to interfere with our development/test databases.
       ENV['PARALLEL_TEST_FIRST_IS_1'] = '1'
