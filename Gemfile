@@ -139,7 +139,7 @@ end
 
 group :test do
   gem 'stripe-ruby-mock', github: 'stripe-ruby-mock/stripe-ruby-mock', ref: '6ceea9679bb573cb8bc6830f1bdf670b220a9859', require: 'stripe_mock'
-  gem 'cucumber', '~> 10'
+  gem 'cucumber', '~> 10.2'
   gem 'cucumber-rails', '~> 4', require: false
   gem 'rspec-rails', '~> 8'
   gem 'rspec-expectations', '~> 3.13'
