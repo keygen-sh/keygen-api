@@ -12,34 +12,12 @@ class RequestLimitsReportWorker < BaseWorker
     end_date = date.end_of_day
 
     Account.includes(:billing, :plan).where(billings: { state: active_states }).unordered.find_each do |account|
-      request_count = account.request_logs.where(created_at: (start_date..end_date)).count
-      if request_count == 0
-        next unless account.trialing_or_free? &&
-                    account.created_at > 3.months.ago &&
-                    account.created_at < 1.week.ago
-
-        request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
-        next if request_count_for_week > 0
-
-        if account.last_low_activity_lifeline_sent_at.nil?
-          Keygen.logger.info "[workers.request-limits-report] Sending low-activity lifeline email: account_id=#{account.id}"
-
-          account.touch(:last_low_activity_lifeline_sent_at)
-
-          # Random delay between 1 and n minutes
-          delay = rand(1..42).minutes
-
-          PlaintextMailer.low_activity_lifeline(account: account).deliver_later(wait: delay)
-        end
-
-        next
-      end
-
       Keygen.logger.info "[workers.request-limits-report] Generating report: account_id=#{account.id}"
 
       admin = account.admins.last
-      plan = account.plan
+      plan  = account.plan
 
+      request_count = account.request_logs.where(created_at: (start_date..end_date)).count
       request_limit = plan.max_reqs
 
       admin_count = account.users.with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent).count

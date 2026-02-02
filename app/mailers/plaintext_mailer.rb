@@ -3,30 +3,6 @@
 class PlaintextMailer < ApplicationMailer
   default from: "Zeke Gabrielse <zeke@keygen.sh>"
 
-  def low_activity_lifeline(account:)
-    admin = account.admins.last
-
-    call_to_action = if admin.free_or_disposable_email?
-                       %(Just want to make sure you aren't stuck on anything. As the founder, it's easy for me to overlook roadblocks for new users.)
-                     else
-                       %(If your team uses Slack, let's connect! We've already set up a 1-1 channel: https://app.keygen.sh/chat)
-                     end
-
-    mail(
-      content_type: "text/plain",
-      to: admin.email,
-      subject: "Are you stuck?",
-      body: <<~TXT
-        I noticed that you created a Keygen account but there hasn't been much API activity on it lately. Is there anything I can do to help get things kickstarted?
-
-        #{call_to_action}
-
-        --
-        Zeke, Founder <https://keygen.sh>
-      TXT
-    )
-  end
-
   def trial_ending_soon_without_payment_method(account:)
     return if
       account.free?
