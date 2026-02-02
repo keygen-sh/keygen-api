@@ -2,7 +2,7 @@
 
 class RequestLimitsReportWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     date = Date.yesterday

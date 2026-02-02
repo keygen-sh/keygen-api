@@ -2,7 +2,7 @@
 
 class CullDeadMachinesWorker < BaseWorker
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     machines = Machine.joins(:policy)

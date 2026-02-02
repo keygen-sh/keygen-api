@@ -2,7 +2,7 @@ class VacuumAnalyzeEventLogsWorker < BaseWorker
   STATEMENT_TIMEOUT = ENV.fetch('KEYGEN_VACUUM_STATEMENT_TIMEOUT') { '5min' }
 
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     EventLog.statement_timeout(STATEMENT_TIMEOUT, mode: :session) do |conn|

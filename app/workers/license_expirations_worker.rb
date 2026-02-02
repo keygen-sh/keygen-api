@@ -2,7 +2,7 @@
 
 class LicenseExpirationsWorker < BaseWorker
   sidekiq_options queue: :critical,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     licenses = License.preload(:account, :policy)

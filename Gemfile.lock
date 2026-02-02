@@ -157,7 +157,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    cronitor (5.0.0)
+    cronitor (5.3.0)
       httparty
     css_parser (1.17.1)
       addressable
@@ -491,8 +491,8 @@ GEM
       fugit (~> 1.8)
       globalid (>= 1.0.1)
       sidekiq (>= 6)
-    sidekiq-cronitor (3.6.0)
-      cronitor (~> 5.0)
+    sidekiq-cronitor (3.8.0)
+      cronitor (~> 5.1)
       sidekiq (< 8)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
@@ -622,7 +622,7 @@ DEPENDENCIES
   sentry-sidekiq
   sidekiq (~> 7.3)
   sidekiq-cron (~> 1.12.0)
-  sidekiq-cronitor (~> 3.6.0)
+  sidekiq-cronitor (~> 3.8.0)
   sprockets (~> 3.0)
   stackprof
   statement_timeout (~> 1.1)
