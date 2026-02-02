@@ -22,6 +22,7 @@ After("@skip/bullet")  { Bullet.instance_variable_set :@enable, true }
 # make sure we always have a clean slate
 BeforeAll do
   DatabaseCleaner.clean_with :truncation, except: %w[event_types permissions]
+  Rails.cache.clear
 end
 
 Before do |scenario|
@@ -47,6 +48,7 @@ Before do |scenario|
   Sidekiq::Worker.clear_all
   StripeHelper.start
   Rails.cache.clear
+  DatabaseCleaner.start
 
   stub_everything!
 
@@ -56,10 +58,6 @@ end
 After do |scenario|
   Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
   Bullet.end_request if Bullet.enable?
-
-  Faker::UniqueGenerator.clear
-  StripeHelper.stop
-  Current.reset
 
   unfreeze_time
 
@@ -72,9 +70,12 @@ After do |scenario|
     end
   end
 
+  Faker::UniqueGenerator.clear
+  StripeHelper.stop
+  Current.reset
+  DatabaseCleaner.clean
+
   @account = nil
   @bearer  = nil
   @token   = nil
 end
-
-AfterAll { Rails.cache.clear }

@@ -6,6 +6,9 @@
 
 require 'cucumber/rails'
 
+# NB(ezekg) we do this manually in our own before/after hooks
+Cucumber::Rails::Database.autorun_database_cleaner = false
+
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
 # your application behaves in the production environment, where an error page will
