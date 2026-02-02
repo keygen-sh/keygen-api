@@ -13,6 +13,8 @@ module AsyncCreatable
   end
 
   class CreateAsyncJob < ActiveJob::Base
+    self.log_arguments = Rails.env.local?
+
     queue_as { ActiveRecord.queues[:default] }
 
     discard_on ActiveJob::DeserializationError
