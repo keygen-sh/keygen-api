@@ -16,6 +16,8 @@ begin
 
   namespace :test do
     task :environment do
+      ENV['PARALLEL_TEST_OPTIONS'] ||= ENV.true?('DEBUG') ? '--fail-fast --verbose' : '--fail-fast'
+
       # We want to make sure that we stay within Redis' default 16 database limit,
       # without using database /0 (our potential development database).
       #
@@ -54,6 +56,7 @@ begin
     desc 'run rspec test suite'
     task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
+      options = ENV['PARALLEL_TEST_OPTIONS']
 
       if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
         RSpec::Core::RakeTask.new(:spec) unless Rake::Task.task_defined?('spec') # make sure task always exists
@@ -71,13 +74,19 @@ begin
 
         rspec.invoke
       else
-        Rake::Task['parallel:spec'].invoke(nil, pattern)
+        Rake::Task['parallel:spec'].invoke(
+          nil,
+          pattern,
+          nil,
+          options,
+        )
       end
     end
 
     desc 'run cucumber test suite'
     task :cucumber, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
+      options = ENV['PARALLEL_TEST_OPTIONS']
 
       if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers
         cucumber = Rake::Task['cucumber']
@@ -86,7 +95,12 @@ begin
 
         cucumber.invoke
       else
-        Rake::Task['parallel:features'].invoke(nil, pattern)
+        Rake::Task['parallel:features'].invoke(
+          nil,
+          pattern,
+          nil,
+          options,
+        )
       end
     end
   end
