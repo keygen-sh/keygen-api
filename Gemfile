@@ -70,7 +70,7 @@ gem 'rails-pattern_matching'
 # Background jobs
 gem 'sidekiq', '~> 7.3'
 gem 'sidekiq-cron', '~> 1.12.0'
-gem 'sidekiq-cronitor', '~> 3.6.0'
+gem 'sidekiq-cronitor', '~> 3.8.0'
 
 # HTTP requests
 gem 'httparty', '~> 0.22.0'

@@ -4,7 +4,7 @@ class PruneExpiredTokensWorker < BaseWorker
   BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')        { 1 }.to_f
 
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     tokens = Token.where('expiry is not null and expiry < ?', 90.days.ago)

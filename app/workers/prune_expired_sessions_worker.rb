@@ -4,7 +4,7 @@ class PruneExpiredSessionsWorker < BaseWorker
   BATCH_WAIT        = ENV.fetch('KEYGEN_PRUNE_BATCH_WAIT')        { 1 }.to_f
 
   sidekiq_options queue: :cron,
-                  cronitor_disabled: false
+                  cronitor_enabled: true
 
   def perform
     sessions = Session.where(<<~SQL.squish, max_age: 90.days.ago)
