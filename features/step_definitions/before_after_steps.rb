@@ -61,10 +61,8 @@ After do |scenario|
 
   unfreeze_time
 
-  # tell Cucumber to quit when a scenario fails
   if scenario.failed?
-    Cucumber.wants_to_quit = true
-
+    # print additional information about the failed scenario to stderr when debug mode is enabled
     if ENV.true?('DEBUG')
       warn ScenarioDebugger.call(scenario:, request: last_request, response: last_response)
     end
