@@ -115,3 +115,18 @@ end
 ActiveSupport.on_load :active_record_postgresqladapter do
   self.create_unlogged_tables = true
 end
+
+# make sure our outputs are fully flushed after tests
+at_exit do
+  exit_code = $?&.exitstatus || 0
+
+  $stderr.flush # flush output buffers
+  $stdout.flush
+
+  unless exit_code.zero?
+    warn "exit: error=#{$!.class} message=#{$!.message.inspect}" if $!
+    warn "exit: code=#{exit_code}"
+  end
+
+  $stderr.flush # flush last buffer
+end
