@@ -12,6 +12,7 @@ clickhouse: &clickhouse
   read_timeout: <%= ENV['CLICKHOUSE_READ_TIMEOUT'] || 30 %>
   write_timeout: <%= ENV['CLICKHOUSE_WRITE_TIMEOUT'] || 30 %>
   migrations_paths: db/clickhouse
+  ssl: <%= ENV.false?('CLICKHOUSE_TLS_DISABLED') %>
 
 development:
   primary: &primary_dev
