@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   test:
-    runs-on: depot-ubuntu-latest-16
+    runs-on: depot-ubuntu-latest-32
     services:
       postgres:
         image: postgres:17-alpine
