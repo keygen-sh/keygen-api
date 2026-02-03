@@ -56,7 +56,7 @@ begin
     desc 'run rspec test suite'
     task :rspec, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
-      options = ENV['PARALLEL_TEST_OPTIONS']
+      options = ['--group-by=filesize', ENV['PARALLEL_TEST_OPTIONS']].compact.join(" ")
 
       if pattern&.match?(/((\[\d+(:\d+)*\])|(:\d+))$/) # parallel_tests doesn't support line numbers/example IDs
         RSpec::Core::RakeTask.new(:spec) unless Rake::Task.task_defined?('spec') # make sure task always exists
@@ -86,7 +86,7 @@ begin
     desc 'run cucumber test suite'
     task :cucumber, %i[pattern] => %i[test:environment log:clear] do |_, args|
       pattern = args[:pattern]&.delete_prefix('./') # parallel_tests doesn't support this prefix
-      options = ENV['PARALLEL_TEST_OPTIONS']
+      options = ['--group-by=scenarios', ENV['PARALLEL_TEST_OPTIONS']].compact.join(" ")
 
       if pattern&.match?(/:\d+$/) # parallel_tests doesn't support line numbers
         cucumber = Rake::Task['cucumber']
