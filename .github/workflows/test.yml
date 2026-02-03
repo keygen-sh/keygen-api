@@ -76,6 +76,7 @@ jobs:
       REPLICA_DATABASE_ENABLED: ${{matrix.REPLICA_DATABASE_ENABLED}}
       CLICKHOUSE_DATABASE_URL: clickhouse://clickhouse:clickhouse@localhost:8123
       CLICKHOUSE_DATABASE_ENABLED: ${{matrix.CLICKHOUSE_DATABASE_ENABLED}}
+      CLICKHOUSE_TLS_DISABLED: '1'
       REDIS_URL: redis://localhost:6379
       RAILS_LOG_LEVEL: ${{vars.RAILS_LOG_LEVEL}}
       RAILS_ENV: test
