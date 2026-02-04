@@ -200,7 +200,7 @@ module DualWrites
     def insert_records(records, is_deleted:, ver:)
       records = records.map { with_metadata(it, is_deleted:, ver:) }
 
-      replica_class.insert_all!(records)
+      replica_class.insert_all!(records, record_timestamps: false)
     end
 
     def with_metadata(attributes, is_deleted:, ver:)
