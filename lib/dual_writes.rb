@@ -404,6 +404,8 @@ module DualWrites
   end
 
   class ReplicationJob < ActiveJob::Base
+    self.log_arguments = Rails.env.local?
+
     queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
@@ -447,6 +449,8 @@ module DualWrites
   end
 
   class BulkReplicationJob < ActiveJob::Base
+    self.log_arguments = Rails.env.local?
+
     queue_as { ActiveRecord.queues[:dual_writes] }
 
     discard_on ActiveJob::DeserializationError
