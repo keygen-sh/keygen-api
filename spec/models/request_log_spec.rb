@@ -229,8 +229,9 @@ describe RequestLog, type: :model do
                 'url' => '/v1/licenses',
                 'status' => '201',
                 'ip' => '127.0.0.1',
-                'created_at' => now,
-                'updated_at' => now,
+                # NB(ezekg) testing missing timestamps
+                # 'created_at' => now,
+                # 'updated_at' => now,
                 'created_date' => now.to_date,
               },
             ]
