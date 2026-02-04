@@ -411,7 +411,7 @@ module DualWrites
     discard_on ActiveJob::DeserializationError
     rescue_from StandardError do |error| # FIXME(ezekg) rails doesn't support dynamic attempts proc
       if executions < DualWrites.configuration.retry_attempts
-        retry_job(wait: :polynomially_longer)
+        retry_job(wait: determine_delay(seconds_or_duration_or_algorithm: :polynomially_longer, executions:))
       else
         raise error
       end
@@ -456,7 +456,7 @@ module DualWrites
     discard_on ActiveJob::DeserializationError
     rescue_from StandardError do |error|
       if executions < DualWrites.configuration.retry_attempts
-        retry_job(wait: :polynomially_longer)
+        retry_job(wait: determine_delay(seconds_or_duration_or_algorithm: :polynomially_longer, executions:))
       else
         raise error
       end
