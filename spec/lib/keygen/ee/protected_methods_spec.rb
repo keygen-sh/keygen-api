@@ -17,13 +17,31 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
     end
   end
 
+  it 'should not raise when included' do
+    expect { Class.new { include Keygen::EE::ProtectedMethods[:foo] } }.to_not raise_error
+  end
+
+  it 'should not raise when prepended' do
+    expect { Class.new { prepend Keygen::EE::ProtectedMethods[:foo] } }.to_not raise_error
+  end
+
+  it 'should raise when included without []' do
+    expect { Class.new { include Keygen::EE::ProtectedMethods } }
+      .to raise_error NotImplementedError
+  end
+
+  it 'should raise when prepended without []' do
+    expect { Class.new { include Keygen::EE::ProtectedMethods } }
+      .to raise_error NotImplementedError
+  end
+
   it 'should raise when positional and keyword args are mixed' do
     expect { Class.new { include Keygen::EE::ProtectedMethods[:foo, singleton_methods: %i[bar], instance_methods: %i[baz]] } }
       .to raise_error ArgumentError
   end
 
-  it 'should not include the module outside of a console environment' do
-    expect(subject.ancestors).to_not include Keygen::EE::ProtectedMethods::MethodBouncer
+  it 'should not apply protections outside of a console environment' do
+    expect { subject.foo }.to_not raise_error
   end
 
   it 'should not block a predefined set of singleton methods' do
@@ -43,10 +61,6 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
   end
 
   within_console do
-    it 'should include the module within a console environment' do
-      expect(subject.ancestors).to include Keygen::EE::ProtectedMethods::MethodBouncer
-    end
-
     within_ce do
       it 'should block a predefined set of singleton methods' do
         expect { subject.foo }.to raise_error Keygen::EE::ProtectedMethodError
@@ -344,6 +358,83 @@ describe Keygen::EE::ProtectedMethods, type: :ee do
         it 'should bind instance methods to the correct object' do
           expect(t1.v).to eq 1
           expect(t2.v).to eq 2
+        end
+      end
+    end
+  end
+
+  context 'ancestors' do
+    subject do
+      Class.new do
+        include Keygen::EE::ProtectedMethods[:v]
+
+        def initialize(v) = @v = v
+        def v = @v
+      end
+    end
+
+    it 'should not define singleton protection module outside of a console environment' do
+      expect(subject.const_defined?(:ProtectedSingletonMethods)).to be false
+    end
+
+    it 'should not define instance protection module outside of a console environment' do
+      expect(subject.const_defined?(:ProtectedInstanceMethods)).to be false
+    end
+
+    within_console do
+      it 'should define singleton protection module inside of a console environment' do
+        expect(subject.const_defined?(:ProtectedSingletonMethods)).to be true
+        expect(subject.singleton_class.ancestors).to include(
+          subject.const_get(:ProtectedSingletonMethods),
+        )
+      end
+
+      it 'should define instance protection module inside of a console environment' do
+        expect(subject.const_defined?(:ProtectedInstanceMethods)).to be true
+        expect(subject.ancestors).to include(
+          subject.const_get(:ProtectedInstanceMethods),
+        )
+      end
+
+      within_ee do
+        it 'should respect singleton method ancestor chain' do
+          calls = []
+
+          base = Class.new
+          base.define_singleton_method(:call) { calls << :foo; :foo }
+
+          mod = Module.new do
+            define_method(:call) { calls << :bar; super() }
+          end
+
+          klass = Class.new(base) do
+            include Keygen::EE::ProtectedMethods[singleton_methods: %i[call]]
+
+            extend mod
+          end
+
+          expect(klass.call).to eq :foo
+          expect(calls).to eq %i[bar foo]
+        end
+
+        it 'should respect instance method ancestor chain' do
+          calls = []
+
+          base = Class.new
+          base.define_method(:call) { calls << :foo; :foo }
+
+          mod = Module.new do
+            define_method(:call) { calls << :bar; super() }
+          end
+
+          klass = Class.new(base) do
+            include Keygen::EE::ProtectedMethods[instance_methods: %i[call]]
+
+            include mod
+          end
+
+          expect(klass.new.call).to eq :foo
+          expect(calls).to eq %i[bar foo]
         end
       end
     end
