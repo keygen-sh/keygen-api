@@ -38,6 +38,20 @@ describe DualWrites do
       end
     end
 
+    describe '#primary_database_key' do
+      it 'should default to :primary' do
+        expect(DualWrites.configuration.primary_database_key).to eq :primary
+      end
+
+      it 'should be configurable' do
+        DualWrites.configure do |config|
+          config.primary_database_key = :master
+        end
+
+        expect(DualWrites.configuration.primary_database_key).to eq :master
+      end
+    end
+
     describe 'retry behavior' do
       temporary_table :retry_test_records do |t|
         t.string :name
@@ -160,6 +174,7 @@ describe DualWrites do
         expect(model.dual_writes_config).to eq(
           to: [:clickhouse],
           sync: false,
+          ignored_columns: nil,
           strategy: :clickhouse,
           strategy_config: {},
           if: nil,
@@ -284,7 +299,7 @@ describe DualWrites do
         include DualWrites::Model
 
         dual_writes to: %i[clickhouse], strategy: :clickhouse,
-          clickhouse_ttl: -> { retention_seconds }
+          ttl: -> { retention_seconds }
       end
 
       let(:expiring_model) { ExpiringRecord }
@@ -298,7 +313,7 @@ describe DualWrites do
           performed_at: a_kind_of(ActiveSupport::TimeWithZone),
           operation: :create,
           database: :clickhouse,
-          strategy_config: { clickhouse_ttl: 7_776_000 },
+          strategy_config: { ttl: 7_776_000 },
         )
       end
     end
@@ -734,6 +749,107 @@ describe DualWrites do
           expect {
             BulkIfFalseRecord.upsert_all([{ name: 'test' }])
           }.not_to have_enqueued_job(DualWrites::BulkReplicationJob)
+        end
+      end
+    end
+
+    describe 'ignored_columns' do
+      context 'ignored columns for primary' do
+        temporary_table :points do |t|
+          t.float :x
+          t.float :y
+          t.timestamps
+        end
+
+        temporary_model :point do
+          include DualWrites::Model
+
+          dual_writes to: :clickhouse, strategy: :clickhouse,
+            ignored_columns: { primary: %w[z] }
+        end
+
+        context 'individual replication' do
+          it 'should ignore columns' do
+            expect {
+              Point.create!(x: 1.0, y: 2.0, z: 3.0)
+            }.to have_enqueued_job(DualWrites::ReplicationJob).with(
+              hash_including(
+                attributes: include('x' => 1.0, 'y' => 2.0, 'z' => 3.0),
+              ),
+            )
+
+            expect(Point.last).to have_attributes(x: 1.0, y: 2.0, z: nil)
+          end
+        end
+
+        context 'bulk replication' do
+          it 'should ignore columns' do
+            attributes = [{ 'x' => 1.0, 'y' => 2.0, 'z' => 3.0 }]
+
+            expect {
+              Point.insert_all(attributes)
+            }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+              hash_including(
+                records: [
+                  include('x' => 1.0, 'y' => 2.0, 'z' => 3.0),
+                ],
+              ),
+            )
+
+            expect(Point.last).to have_attributes(x: 1.0, y: 2.0, z: nil)
+          end
+        end
+      end
+
+      context 'ignored columns for replica' do
+        temporary_table :points do |t|
+          t.float :x
+          t.float :y
+          t.float :z
+          t.timestamps
+        end
+
+        temporary_model :point do
+          include DualWrites::Model
+
+          dual_writes to: :clickhouse, strategy: :clickhouse,
+            ignored_columns: { clickhouse: %w[z] }
+        end
+
+        context 'individual replication' do
+          it 'should ignore columns' do
+            expect {
+              Point.create!(x: 1.0, y: 2.0, z: 3.0)
+            }.to have_enqueued_job(DualWrites::ReplicationJob).with(
+              hash_including(
+                attributes: include('x' => 1.0, 'y' => 2.0).and(
+                  exclude('z'),
+                ),
+              ),
+            )
+
+            expect(Point.last).to have_attributes(x: 1.0, y: 2.0, z: 3.0)
+          end
+        end
+
+        context 'bulk replication' do
+          it 'should ignore columns' do
+            attributes = [{ 'x' => 1.0, 'y' => 2.0, 'z' => 3.0 }]
+
+            expect {
+              Point.insert_all(attributes)
+            }.to have_enqueued_job(DualWrites::BulkReplicationJob).with(
+              hash_including(
+                records: [
+                  include('x' => 1.0, 'y' => 2.0).and(
+                    exclude('z'),
+                  ),
+                ],
+              ),
+            )
+
+            expect(Point.last).to have_attributes(x: 1.0, y: 2.0, z: 3.0)
+          end
         end
       end
     end

@@ -33,7 +33,7 @@ describe EventLog, type: :model do
           strategy: :clickhouse,
           sync: false,
           strategy_config: hash_including(
-            clickhouse_ttl: an_instance_of(Proc),
+            ttl: an_instance_of(Proc),
           ),
         )
       end
@@ -61,7 +61,7 @@ describe EventLog, type: :model do
             operation: :create,
             database: :clickhouse,
             strategy_config: hash_including(
-              clickhouse_ttl: account.event_log_retention_duration,
+              ttl: account.event_log_retention_duration,
             ),
           )
         end
@@ -99,7 +99,7 @@ describe EventLog, type: :model do
             operation: :update,
             database: :clickhouse,
             strategy_config: hash_including(
-              clickhouse_ttl: account.event_log_retention_duration,
+              ttl: account.event_log_retention_duration,
             ),
           )
         end
@@ -116,7 +116,7 @@ describe EventLog, type: :model do
             operation: :destroy,
             database: :clickhouse,
             strategy_config: hash_including(
-              clickhouse_ttl: account.event_log_retention_duration,
+              ttl: account.event_log_retention_duration,
             ),
           )
         end
@@ -186,7 +186,7 @@ describe EventLog, type: :model do
               operation: :insert_all,
               database: :clickhouse,
               strategy_config: hash_including(
-                clickhouse_ttl: account.event_log_retention_duration,
+                ttl: account.event_log_retention_duration,
               ),
             )
           end

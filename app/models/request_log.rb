@@ -11,7 +11,8 @@ class RequestLog < ApplicationRecord
   include Pageable
 
   dual_writes to: :clickhouse, strategy: :clickhouse,
-    clickhouse_ttl: -> { Current.account&.request_log_retention_duration },
+    ignored_columns: { primary: %w[ttl] }, # NB(ezekg) ttl is only applicable to clickhouse
+    ttl: -> { Current.account&.request_log_retention_duration&.to_i },
     if: -> { Keygen.database.clickhouse_enabled? }
 
   belongs_to :requestor, polymorphic: true, optional: true

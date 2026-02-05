@@ -107,6 +107,8 @@ module RequestLogger
         'status' => request_log_status,
         'queue_time' => request_log_request_queue_time,
         'run_time' => request_log_request_run_time,
+        # NB(ezekg) this is only applicable to clickhouse (gets ignored by primary)
+        'ttl' => Current.account.request_log_retention_duration&.to_i,
       )
     rescue => e
       Keygen.logger.exception(e)

@@ -42,10 +42,15 @@ module DualWrites
   end
 
   class Configuration
+    # the primary database key (defaults to :primary)
+    attr_accessor :primary_database_key
+
+    # the number of times a replication job will retry
     attr_accessor :retry_attempts
 
     def initialize
-      @retry_attempts = 5
+      @primary_database_key = :primary
+      @retry_attempts       = 5
     end
   end
 
@@ -203,12 +208,12 @@ module DualWrites
       replica_class.insert_all!(records)
     end
 
-    def with_metadata(attributes, is_deleted:, ver:)
+    def with_metadata(attributes, is_deleted:, ver:, ttl: config[:ttl])
       attrs = attributes.dup
 
-      attrs['is_deleted'] = is_deleted if replica_class.column_names.include?('is_deleted')
-      attrs['ver']        = ver if replica_class.column_names.include?('ver')
-      attrs['ttl']        = config[:clickhouse_ttl] if replica_class.column_names.include?('ttl')
+      attrs['is_deleted'] ||= is_deleted if replica_class.column_names.include?('is_deleted')
+      attrs['ver']        ||= ver        if replica_class.column_names.include?('ver')
+      attrs['ttl']        ||= ttl        if replica_class.column_names.include?('ttl')
 
       attrs
     end
@@ -232,7 +237,7 @@ module DualWrites
     end
 
     class_methods do
-      def dual_writes(to:, strategy:, sync: false, if: nil, **strategy_config)
+      def dual_writes(to:, strategy:, ignored_columns: nil, sync: false, if: nil, **strategy_config)
         databases = Array(to)
 
         raise ConfigurationError, 'to must be a symbol or array of symbols' unless
@@ -243,6 +248,15 @@ module DualWrites
 
         raise ConfigurationError, "invalid strategy: #{strategy.inspect}" unless
           Strategy.exists?(strategy)
+
+        self.dual_writes_config = {
+          to: databases,
+          sync:,
+          ignored_columns:,
+          strategy:,
+          strategy_config:,
+          if: binding.local_variable_get(:if),
+        }.freeze
 
         # auto-generate model classes for each database e.g. RequestLog with to: :clickhouse
         # creates RequestLog::Clickhouse that inherits from DualWrites::ClickhouseRecord
@@ -261,41 +275,49 @@ module DualWrites
           const_set(database_class_name, database_class)
         end
 
-        self.dual_writes_config = {
-          to: databases,
-          sync:,
-          strategy:,
-          strategy_config:,
-          if: binding.local_variable_get(:if),
-        }.freeze
+        # define virtual attributes for columns ignored on primary so they can be
+        # passed to individual creates/updates and included in replication
+        ignored_columns_for_primary.each do |column|
+          attr_accessor column.to_sym
+        end
       end
 
       # override bulk insert methods to automatically replicate
-      def insert_all(attributes, **options)
-        result = super
+      def insert_all(attributes, **)
+        return super unless should_replicate_bulk?
 
-        replicate_bulk(:insert_all, attributes) if
-          should_replicate_bulk?
+        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
 
-        result
-      end
-
-      def insert_all!(attributes, **options)
-        result = super
-
-        replicate_bulk(:insert_all, attributes) if
-          should_replicate_bulk?
+        replicate_bulk(:insert_all, attributes)
 
         result
       end
 
-      def upsert_all(attributes, **options)
-        result = super
+      def insert_all!(attributes, **)
+        return super unless should_replicate_bulk?
 
-        replicate_bulk(:upsert_all, attributes) if
-          should_replicate_bulk?
+        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
+
+        replicate_bulk(:insert_all, attributes)
 
         result
+      end
+
+      def upsert_all(attributes, **)
+        return super unless should_replicate_bulk?
+
+        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
+
+        replicate_bulk(:upsert_all, attributes)
+
+        result
+      end
+
+      def ignored_columns_for(database) = dual_writes_config.dig(:ignored_columns, database).presence || []
+      def ignored_columns_for_primary
+        config = DualWrites.configuration
+
+        ignored_columns_for(config.primary_database_key)
       end
 
       def replica_class_for(database)
@@ -328,12 +350,14 @@ module DualWrites
         performed_at    = Time.current
 
         config[:to].each do |database|
+          ignored_columns = ignored_columns_for(database)
+
           params = {
             class_name: name,
             performed_at:,
             operation:,
             database:,
-            records:,
+            records: records.map { it.except(*ignored_columns) },
             strategy_config:,
           }
 
@@ -384,10 +408,20 @@ module DualWrites
       strategy_config = config[:strategy_config].transform_values { (it in Proc) ? instance_exec(&it) : it }
       performed_at    = Time.current
 
+      # merge virtual attributes (primary-ignored columns) into the attributes hash
+      # so they're available for replication to databases that need them
+      all_attributes = attributes.merge(
+        self.class.ignored_columns_for_primary.each_with_object({}) do |column, hash|
+          hash[column] = public_send(column)
+        end
+      )
+
       config[:to].each do |database|
+        ignored_columns = self.class.ignored_columns_for(database)
+
         params = {
           class_name: self.class.name,
-          attributes:,
+          attributes: all_attributes.except(*ignored_columns),
           performed_at:,
           operation:,
           database:,
