@@ -765,7 +765,7 @@ describe DualWrites do
           include DualWrites::Model
 
           dual_writes to: :clickhouse, strategy: :clickhouse,
-            ignored_columns: { primary: %w[z] }
+            ignored_columns: { primary: %i[z] }
         end
 
         context 'individual replication' do
@@ -784,7 +784,7 @@ describe DualWrites do
 
         context 'bulk replication' do
           it 'should ignore columns' do
-            attributes = [{ 'x' => 1.0, 'y' => 2.0, 'z' => 3.0 }]
+            attributes = [{ x: 1.0, y: 2.0, z: 3.0 }]
 
             expect {
               Point.insert_all(attributes)
