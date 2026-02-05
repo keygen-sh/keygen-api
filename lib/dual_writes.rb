@@ -286,7 +286,11 @@ module DualWrites
       def insert_all(attributes, **)
         return super unless should_replicate_bulk?
 
-        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
+        attributes = attributes.map(&:with_indifferent_access)
+        result     = super(
+          attributes.map { it.except(*ignored_columns_for_primary) },
+          **,
+        )
 
         replicate_bulk(:insert_all, attributes)
 
@@ -296,7 +300,11 @@ module DualWrites
       def insert_all!(attributes, **)
         return super unless should_replicate_bulk?
 
-        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
+        attributes = attributes.map(&:with_indifferent_access)
+        result     = super(
+          attributes.map { it.except(*ignored_columns_for_primary) },
+          **,
+        )
 
         replicate_bulk(:insert_all, attributes)
 
@@ -306,7 +314,11 @@ module DualWrites
       def upsert_all(attributes, **)
         return super unless should_replicate_bulk?
 
-        result = super(attributes.map { it.except(*ignored_columns_for_primary) }, **)
+        attributes = attributes.map(&:with_indifferent_access)
+        result     = super(
+          attributes.map { it.except(*ignored_columns_for_primary) },
+          **,
+        )
 
         replicate_bulk(:upsert_all, attributes)
 
@@ -410,7 +422,7 @@ module DualWrites
 
       # merge virtual attributes (primary-ignored columns) into the attributes hash
       # so they're available for replication to databases that need them
-      all_attributes = attributes.merge(
+      all_attributes = attributes.with_indifferent_access.merge(
         self.class.ignored_columns_for_primary.each_with_object({}) do |column, hash|
           hash[column] = public_send(column)
         end
