@@ -1,0 +1,22 @@
+<p>
+  I'm reaching out because your Keygen account <%= @account.name %> has exceeded your tier's active
+  licensed user limit of <%= number_with_delimiter @report.license_limit %>. Your account currently
+  has <%= number_with_delimiter @report.license_count %> active licensed users. An "active licensed user"
+  is any license that has had activity within the last 90 days.
+</p>
+<p>
+  <% if @plan.paid? %>
+    <strong>We have not limited your account in any way — license creation is still active.</strong>
+    If you foresee this growth continuing, I recommend that you upgrade from <%= @plan.name %>
+    to the next appropriate tier. You can upgrade here: <%= link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription' %>.
+  <% else %>
+    <strong>Because you're on a free tier, license creation has been paused.</strong>
+    I recommend that you upgrade from <%= @plan.name %> to a paid tier. You can upgrade here: <%= link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription' %>.
+  <% end %>
+</p>
+<p>
+  You can view your account's access logs here: <%= link_to 'https://app.keygen.sh/request-logs', 'https://app.keygen.sh/request-logs' %>.
+</p>
+<p>
+  Let me know if you have any questions about this! (You can respond to this email directly.)
+</p>

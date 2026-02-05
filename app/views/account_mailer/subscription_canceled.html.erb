@@ -1,11 +1,13 @@
--# frozen_string_literal: true
-%p
+<p>
   Thanks for giving Keygen a try, even if it didn't work out. The subscription for
-  your account #{@account.name} has been canceled. Access to your account's API
+  your account <%= @account.name %> has been canceled. Access to your account's API
   endpoints has been disabled until your subscription is renewed.
-%p
+</p>
+<p>
   If you would like to reactivate your account's subscription, please head over to
-  #{link_to "https://app.keygen.sh/billing", "https://app.keygen.sh/billing"}. (We
+  <%= link_to "https://app.keygen.sh/billing", "https://app.keygen.sh/billing" %>. (We
   also have a free dev tier, which you can select at any time!)
-%p
+</p>
+<p>
   If I could ask a quick question -- what made you not move forward?
+</p>

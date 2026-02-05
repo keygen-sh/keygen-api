@@ -82,13 +82,6 @@ gem 'aasm', '~> 5.0.3'
 gem 'sendgrid-ruby'
 gem 'sendgrid-actionmailer'
 
-# Email templating
-gem 'sprockets', '~> 3.0'
-gem 'premailer', '~> 1.23.0'
-gem 'premailer-rails'
-gem 'haml-rails'
-gem 'sass-rails'
-
 # Monitoring/APM
 unless ENV.key?('NO_SENTRY')
   gem 'stackprof'

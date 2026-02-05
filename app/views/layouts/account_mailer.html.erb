@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="width=device-width" name="viewport">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <title><%= message.subject %></title>
+    <style>
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      a {
+        color: #00ce75;
+      }
+      a.ellipsis {
+        display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      ul.no-margin {
+        margin: 0;
+      }
+      hr {
+        margin: 20px 0;
+        outline: none;
+        border: none;
+        border-top: 1px solid #f3f3f3;
+      }
+    </style>
+  </head>
+  <body>
+    <p><%= @account.name %>,</p>
+    <%= yield %>
+    <p>
+      Kind regards
+      <br>
+      &#45;&#45;
+      <br>
+      Zeke Gabrielse
+      <br>
+      Founder &lt;https://keygen.sh&gt;
+    </p>
+    <hr>
+    <small>Technical information for your account, in case you need it:</small>
+    <ul class="no-margin">
+      <li>
+        <small>Account login: <%= link_to "https://app.keygen.sh/login?account=" + @account.slug, "https://app.keygen.sh/login?account=" + @account.id %> (p.s. bookmark for quicker access)</small>
+      </li>
+      <li>
+        <small>Account machine ID: <%= @account.id %></small>
+      </li>
+      <li>
+        <small>Account human ID: <%= @account.slug %></small>
+      </li>
+      <li>
+        <small>Account name: <%= @account.name %></small>
+      </li>
+      <li>
+        <small>Admin email: <%= @user.email %></small>
+      </li>
+    </ul>
+  </body>
+</html>

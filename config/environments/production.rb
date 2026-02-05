@@ -8,9 +8,6 @@ Rails.application.configure do
     },
   )
 
-  # Disables security vulnerability
-  config.assets.compile = false
-
   # Code is not reloaded between requests.
   config.cache_classes = true
 
