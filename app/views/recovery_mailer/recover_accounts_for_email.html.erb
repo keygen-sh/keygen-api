@@ -1,0 +1,27 @@
+<p>
+  As requested, here is a list of Keygen accounts that this email address is associated with:
+</p>
+<ul>
+  <% @users.each do |user| %>
+    <li>
+      <strong>Account name:</strong>
+      <span><%= user.account.name %></span>
+      <br>
+      <strong>Unique ID:</strong>
+      <span><%= user.account.slug %></span>
+      <br>
+      <span>
+        <strong>Recover:</strong>
+        <a href="https://app.keygen.sh/recover/password?account=<%= user.account.slug %>&email=<%= user.email %>">click here</a>
+      </span>
+      <br>
+      <span>
+        <strong>Login:</strong>
+        <a href="https://app.keygen.sh/login?account=<%= user.account.slug %>">click here</a>
+      </span>
+    </li>
+  <% end %>
+</ul>
+<p>
+  Let us know if you have any questions, or if you are still having trouble logging in.
+</p>

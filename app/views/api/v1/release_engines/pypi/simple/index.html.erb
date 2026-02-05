@@ -1,0 +1,17 @@
+<% title = "Packages for #{account.name}" %>
+
+<% content_for(:title) { title } %>
+<% content_for(:head) do %>
+  <meta name="pypi:repository-version" content="1.1">
+<% end %>
+
+<h1><%= title %></h1>
+
+<% packages.each do |package| %>
+  <%# NOTE(ezekg) The nil format is required for trailing slash because
+      the route has a default format. %>
+  <% url = v1_account_release_engine_pypi_simple_package_url(account, package, format: nil, trailing_slash: true, host: request.host) %>
+
+  <%= link_to(package.key, url, data: package.metadata) %>
+  <br>
+<% end %>

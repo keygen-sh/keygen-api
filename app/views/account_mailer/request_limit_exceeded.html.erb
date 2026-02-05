@@ -1,0 +1,47 @@
+<p>
+  I'm reaching out because your Keygen account <%= @account.name %> has exceeded your tier's daily
+  request limit of <%= number_with_delimiter @report.request_limit %> API requests per-day. Over the
+  past 24 hours, <%= number_with_delimiter @report.request_count %> API requests were made to your
+  Keygen account. If you foresee this trend continuing, I recommend that you upgrade from "<%= @plan.name %>"
+  to the next appropriate tier. You can upgrade your account here: <%= link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription' %>.
+  If this request count seems off or unexpected, please ensure that your software is working
+  as intended and is not making superfluous API requests.
+</p>
+<p>
+  To reduce your API request volume, there are a few things you could do:
+</p>
+<ul>
+  <li>
+    Reduce the number of API requests by <%= link_to 'caching validation requests', 'https://github.com/keygen-sh/example-validation-caching' %>
+    locally, when possible.
+  </li>
+  <li>
+    If you're currently running <%= link_to 'automated CI/CD tests', 'https://keygen.sh/docs/api/#testing' %>
+    against our API, mock our API instead.
+  </li>
+  <li>
+    Instead of sending a GET request for webhook events, you can verify the signature of the webhook event
+    request body. Here's <%= link_to 'an example', 'https://github.com/keygen-sh/example-webhook-handler/blob/master/index.js#L24-L41' %>
+    of that, and <%= link_to 'here are the docs', 'https://keygen.sh/docs/api/#request-signatures' %>.
+  </li>
+  <li>
+    Update your webhook endpoint to only subscribe to events that you care about.
+  </li>
+  <li>
+    Lower the frequency at which you revalidate licenses, when possible.
+  </li>
+  <li>
+    Talk to us about a separate sandbox account, for development purposes.
+  </li>
+</ul>
+<p>
+  If we see this usage trend continue over the next 2 weeks, we will automatically upgrade your
+  account to the next appropriate tier to support your current request volume. If this was just
+  an occasional spike in volume, no worries, and no need to upgrade yet!
+</p>
+<p>
+  You can view your account's request logs here: <%= link_to 'https://app.keygen.sh/request-logs', 'https://app.keygen.sh/request-logs' %>.
+</p>
+<p>
+  If you have any questions about this, just hit reply! Happy to help.
+</p>

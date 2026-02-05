@@ -1,0 +1,72 @@
+<h3>Usage report for <%= @date.strftime "%m/%d/%Y" %></h3>
+
+<p>
+  There were <%= number_with_delimiter @request_count %> total requests across <%= number_with_delimiter @reports.size %> active
+  accounts (<%= number_with_delimiter @free_user_count %> free,
+  <%= number_with_delimiter @paid_user_count %> paid accounts).
+</p>
+
+<h4>New accounts</h4>
+
+<% if @new_accounts.any? %>
+  <ul>
+    <% @new_accounts.each do |account| %>
+      <li><%= account.name %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No new accounts for today</p>
+<% end %>
+
+<h4>New products</h4>
+
+<% if @new_products.any? %>
+  <ul>
+    <% @new_products.each do |product| %>
+      <li><%= product.name %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No new products for today</p>
+<% end %>
+
+<h4>Account activity</h4>
+
+<% if @reports.any? %>
+  <ul>
+    <% @reports.each do |report| %>
+      <li>
+        <strong>Account ID:</strong>
+        <span><%= report.account.id %> / <%= report.account.slug %></span>
+        <br>
+        <strong>Contact:</strong>
+        <span><%= report.admin.full_name %> / <%= mail_to report.admin.email %></span>
+        <br>
+        <strong>Requests:</strong>
+        <span style="color: <%= report.request_limit_exceeded ? '#ff0041' : '#00ce75' %>">
+          <%= number_with_delimiter report.request_count %> / <%= number_with_delimiter report.request_limit || 'unlimited' %>
+        </span>
+        <br>
+        <strong>Licenses:</strong>
+        <span style="color: <%= report.license_limit_exceeded ? '#ff0041' : '#00ce75' %>">
+          <%= number_with_delimiter report.active_licensed_user_count %> / <%= number_with_delimiter report.license_limit || 'unlimited' %> (total <%= number_with_delimiter report.license_count %> licenses)
+        </span>
+        <br>
+        <strong>Products:</strong>
+        <span style="color: <%= report.product_limit_exceeded ? '#ff0041' : '#00ce75' %>">
+          <%= number_with_delimiter report.product_count %> / <%= number_with_delimiter report.product_limit || 'unlimited' %>
+        </span>
+        <br>
+        <strong>Admins:</strong>
+        <span style="color: <%= report.admin_limit_exceeded ? '#ff0041' : '#00ce75' %>">
+          <%= number_with_delimiter report.admin_count %> / <%= number_with_delimiter report.admin_limit || 'unlimited' %>
+        </span>
+        <br>
+        <strong>Plan:</strong>
+        <span><%= report.account.plan.name %> @ $<%= number_with_delimiter report.account.plan.price&.div(100) || 0 %> / <%= report.account.billing.state %></span>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>Nothing to report today</p>
+<% end %>

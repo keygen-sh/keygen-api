@@ -1,0 +1,17 @@
+<% title = "Files for #{package.name} by #{account.name}" %>
+
+<% content_for(:title) { title } %>
+<% content_for(:head) do %>
+  <meta name="pypi:repository-version" content="1.1">
+<% end %>
+
+<h1><%= title %></h1>
+
+<% artifacts.each do |artifact| %>
+  <%# NOTE(ezekg) Even though it's not covered in PEP 503, pip expects the URL path to be a
+      filename, not a UUID. Paths without an extension are ignored. %>
+  <% url = vanity_v1_account_release_artifact_url(account, artifact, filename: artifact.filename, anchor: checksum_for(artifact, format: :pep), host: request.host) %>
+
+  <%= link_to(artifact.filename, url, data: artifact.metadata) %>
+  <br>
+<% end %>
