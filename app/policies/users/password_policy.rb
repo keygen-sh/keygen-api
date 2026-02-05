@@ -17,9 +17,9 @@ module Users
       verify_permissions!('user.password.reset')
       verify_environment!
 
-      # User's without a password set cannot reset their password if account is protected
+      # users without a password set cannot reset their password
       deny! if
-        user.has_role?(:user) && account.protected? && !user.password?
+        user.managed?
 
       bearer.nil? || user == bearer
     end
