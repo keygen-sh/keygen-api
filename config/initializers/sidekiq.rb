@@ -2,10 +2,14 @@
 
 require 'sidekiq'
 require 'sidekiq-cron'
+require 'sidekiq/middleware/current_attributes'
 require 'sidekiq/web'
 
 SIDEKIQ_MAX_QUEUE_LATENCY =
   (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
+
+# persist our Rails current attributes to Sidekiq jobs
+Sidekiq::CurrentAttributes.persist('Current')
 
 # Configure Sidekiq's web interface to use basic authentication
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
