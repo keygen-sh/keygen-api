@@ -205,7 +205,7 @@ Feature: Show package
     When I send a GET request to "/accounts/test1/packages/$1"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to retrieve a licensed package
@@ -214,7 +214,7 @@ Feature: Show package
     When I send a GET request to "/accounts/test1/packages/$1"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to retrieve a closed package
@@ -223,7 +223,7 @@ Feature: Show package
     When I send a GET request to "/accounts/test1/packages/$1"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to retrieve an open package
@@ -233,5 +233,5 @@ Feature: Show package
     Then the response status should be "200"
     And the response body should be a "package"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

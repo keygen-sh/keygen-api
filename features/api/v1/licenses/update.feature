@@ -41,7 +41,7 @@ Feature: Update license
     And the response body should be a "license" with the name "Some Name"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license expiry (UNIX string)
@@ -66,7 +66,7 @@ Feature: Update license
     And the response body should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license expiry (UNIX number)
@@ -91,7 +91,7 @@ Feature: Update license
     And the response body should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license by key
@@ -127,7 +127,7 @@ Feature: Update license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin overrides a floating license's max machines
@@ -161,7 +161,7 @@ Feature: Update license
     And the response body should be a "license" with the maxMachines "10"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a floating license's max machine override
@@ -198,7 +198,7 @@ Feature: Update license
     And the response body should be a "license" with the maxMachines "5"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin overrides a floating license's max machines
@@ -232,7 +232,7 @@ Feature: Update license
     And the response body should be a "license" with the maxMachines "5"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin overrides a floating license's max cores
@@ -266,7 +266,7 @@ Feature: Update license
     And the response body should be a "license" with the maxCores "32"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a floating license's max cores override
@@ -303,7 +303,7 @@ Feature: Update license
     And the response body should be a "license" with the maxCores "4"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin overrides a floating license's max uses
@@ -337,7 +337,7 @@ Feature: Update license
     And the response body should be a "license" with the maxUses "500"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a floating license's max uses override
@@ -374,7 +374,7 @@ Feature: Update license
     And the response body should be a "license" with the maxUses "100"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin overrides a floating license's max processes
@@ -410,7 +410,7 @@ Feature: Update license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a floating license's max machine override
@@ -449,7 +449,7 @@ Feature: Update license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer updates a license expiry
@@ -562,7 +562,7 @@ Feature: Update license
     And the response body should be a "license" with a nil name
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license to protected
@@ -587,7 +587,7 @@ Feature: Update license
     And the response body should be a "license" that is protected
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license to protected
@@ -612,7 +612,7 @@ Feature: Update license
     And the response body should be a "license" that is not protected
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a license's name
@@ -641,7 +641,7 @@ Feature: Update license
     And the response body should be a "license" with a nil name
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   # Making sure schemed licenses do not re-encrypt/sign their key on update
@@ -672,7 +672,7 @@ Feature: Update license
     And the response body should be a "license" with the key "test"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license policy
@@ -701,7 +701,7 @@ Feature: Update license
     Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license key
@@ -723,7 +723,7 @@ Feature: Update license
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -756,7 +756,7 @@ Feature: Update license
       { "name": "Isolated License" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -789,7 +789,7 @@ Feature: Update license
       { "name": "Shared License" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -850,7 +850,7 @@ Feature: Update license
       }
       """
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update a license for another product
@@ -874,7 +874,7 @@ Feature: Update license
     Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to update themself
@@ -896,7 +896,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to update another license
@@ -918,7 +918,7 @@ Feature: Update license
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update their license (license owner)
@@ -941,7 +941,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update their license (license user)
@@ -965,7 +965,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a license
@@ -988,7 +988,7 @@ Feature: Update license
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to update a license for their account
@@ -1008,7 +1008,7 @@ Feature: Update license
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a license for another account
@@ -1030,7 +1030,7 @@ Feature: Update license
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license key
@@ -1052,7 +1052,7 @@ Feature: Update license
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license expiry
@@ -1083,7 +1083,7 @@ Feature: Update license
     And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And the response body should be a "license" that is suspended
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license expiry to a nil value
@@ -1106,7 +1106,7 @@ Feature: Update license
     Then the response status should be "200"
     And the response body should be a "license" with a nil expiry
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a license that has exceeded it's usage limit
@@ -1141,7 +1141,7 @@ Feature: Update license
     Then the response status should be "200"
     And the response body should be a "license" with the name "Jackie's License"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a license expiry for their product
@@ -1166,7 +1166,7 @@ Feature: Update license
     Then the response status should be "200"
     And the response body should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update the expiry of a license for another product
@@ -1189,7 +1189,7 @@ Feature: Update license
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a license expiry for their account
@@ -1212,7 +1212,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update a license name for their account
@@ -1235,5 +1235,5 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

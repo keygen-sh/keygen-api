@@ -27,7 +27,7 @@ Feature: Delete environments
     Then the response status should be "204"
     And the current account should have 2 "environments"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete an environment for another account
@@ -41,7 +41,7 @@ Feature: Delete environments
     And the response body should be an array of 1 error
     And the current account should have 3 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes an environment
@@ -55,7 +55,7 @@ Feature: Delete environments
     Then the response status should be "204"
     And the current account should have 2 "environments"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales attempts to delete an environment
@@ -69,7 +69,7 @@ Feature: Delete environments
     Then the response status should be "403"
     And the current account should have 3 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support attempts to delete an environment
@@ -83,7 +83,7 @@ Feature: Delete environments
     Then the response status should be "403"
     And the current account should have 3 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only attempts to delete an environment
@@ -97,7 +97,7 @@ Feature: Delete environments
     Then the response status should be "403"
     And the current account should have 3 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Environment attempts to delete an environment
@@ -113,7 +113,7 @@ Feature: Delete environments
     Then the response status should be "403"
     And the current account should have 1 "environment"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete an environment
@@ -127,7 +127,7 @@ Feature: Delete environments
     Then the response status should be "404"
     And the current account should have 2 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete an environment (no environment)
@@ -141,7 +141,7 @@ Feature: Delete environments
     Then the response status should be "404"
     And the current account should have 2 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete an environment (in environment)
@@ -159,7 +159,7 @@ Feature: Delete environments
     Then the response status should be "404"
     And the current account should have 1 "environment"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete an environment (no environment)
@@ -173,7 +173,7 @@ Feature: Delete environments
     Then the response status should be "404"
     And the current account should have 2 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete an environment (in environment)
@@ -191,7 +191,7 @@ Feature: Delete environments
     Then the response status should be "404"
     And the current account should have 1 "environment"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to delete an environment
@@ -202,5 +202,5 @@ Feature: Delete environments
     Then the response status should be "401"
     And the current account should have 2 "environments"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

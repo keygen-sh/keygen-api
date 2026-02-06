@@ -402,7 +402,7 @@ Feature: Release constraints relationship
     Then the response status should be "200"
     And the response body should be an array of 3 "constraints"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches constraints to a release when the constraint already exists
@@ -498,7 +498,7 @@ Feature: Release constraints relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach constraints to a release with an invalid parameter
@@ -544,7 +544,7 @@ Feature: Release constraints relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach an constraint to a release for another account
@@ -571,7 +571,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -622,7 +622,7 @@ Feature: Release constraints relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -670,7 +670,7 @@ Feature: Release constraints relationship
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -722,7 +722,7 @@ Feature: Release constraints relationship
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attaches constraints to a release
@@ -759,7 +759,7 @@ Feature: Release constraints relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "constraints"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to attach constraints to a release it doesn't own
@@ -799,7 +799,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to attach constraints to a release
@@ -828,7 +828,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach constraints to a release
@@ -862,7 +862,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Detachment
@@ -886,7 +886,7 @@ Feature: Release constraints relationship
     And the current account should have 0 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach constraints from a release with an invalid constraint ID
@@ -920,7 +920,7 @@ Feature: Release constraints relationship
     And the current account should have 3 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach an constraint from a release for another account
@@ -940,7 +940,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -973,7 +973,7 @@ Feature: Release constraints relationship
     And the current account should have 0 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1006,7 +1006,7 @@ Feature: Release constraints relationship
     And the current account should have 0 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1039,7 +1039,7 @@ Feature: Release constraints relationship
     And the current account should have 1 "release-entitlement-constraint"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1070,7 +1070,7 @@ Feature: Release constraints relationship
     And the current account should have 3 "release-entitlement-constraints"
     And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product detaches constraints from a release
@@ -1094,7 +1094,7 @@ Feature: Release constraints relationship
     And the current account should have 2 "release-entitlement-constraints"
     And the current account should have 4 "entitlements"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to detach constraints from a release it doesn't own
@@ -1119,7 +1119,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to detach constraints from a release
@@ -1173,7 +1173,7 @@ Feature: Release constraints relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to detach constraints from a release
@@ -1232,5 +1232,5 @@ Feature: Release constraints relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

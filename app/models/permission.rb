@@ -108,8 +108,6 @@ class Permission < ApplicationRecord
     machine.read
     machine.update
 
-    metric.read
-
     package.create
     package.delete
     package.read
@@ -382,8 +380,6 @@ class Permission < ApplicationRecord
     license.validate
 
     machine.read
-
-    metric.read
 
     package.read
 

@@ -10,7 +10,6 @@ module Pageable
     WebhookEvent
     RequestLog
     EventLog
-    Metric
   ]
 
   extend ActiveSupport::Concern

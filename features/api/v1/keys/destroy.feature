@@ -27,7 +27,7 @@ Feature: Delete key
     Then the response status should be "204"
     And the current account should have 2 "keys"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -46,7 +46,7 @@ Feature: Delete key
     Then the response status should be "204"
     And the current account should have 2 "keys"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -66,7 +66,7 @@ Feature: Delete key
     Then the response status should be "403"
     And the current account should have 6 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete a key for their product
@@ -81,7 +81,7 @@ Feature: Delete key
     Then the response status should be "204"
     And the current account should have 2 "keys"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to delete a key for another product
@@ -96,7 +96,7 @@ Feature: Delete key
     And the response body should be an array of 1 error
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete a key for their account
@@ -111,7 +111,7 @@ Feature: Delete key
     And the response body should be an array of 1 error
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a key for their account
@@ -126,7 +126,7 @@ Feature: Delete key
     And the response body should be an array of 1 error
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a key for their account
@@ -138,7 +138,7 @@ Feature: Delete key
     And the response body should be an array of 1 error
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a key for another account
@@ -152,5 +152,5 @@ Feature: Delete key
     And the response body should be an array of 1 error
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

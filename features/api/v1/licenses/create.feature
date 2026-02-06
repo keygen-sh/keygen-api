@@ -64,7 +64,7 @@ Feature: Create license
     And the current account should have 1 "license"
     And the first "license" should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for a user of their account (v1.5)
@@ -112,7 +112,7 @@ Feature: Create license
     And the current account should have 1 "license"
     And the first "license" should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license with a null key
@@ -146,7 +146,7 @@ Feature: Create license
     And the response body should be a "license" with a key that is not nil
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license with empty metadata
@@ -179,7 +179,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license with null metadata
@@ -212,7 +212,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a license for a user of their account
@@ -382,7 +382,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -431,7 +431,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -475,7 +475,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -528,7 +528,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -581,7 +581,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -628,7 +628,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -678,7 +678,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -731,7 +731,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -769,7 +769,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -807,7 +807,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -860,7 +860,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -917,7 +917,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -963,7 +963,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1009,7 +1009,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "ent1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1062,7 +1062,7 @@ Feature: Create license
       { "Keygen-Environment": null }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1116,7 +1116,7 @@ Feature: Create license
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1167,7 +1167,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1214,7 +1214,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1268,7 +1268,7 @@ Feature: Create license
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1319,7 +1319,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1366,7 +1366,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1401,7 +1401,7 @@ Feature: Create license
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account
@@ -1443,7 +1443,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account (null group)
@@ -1485,7 +1485,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account (invalid group)
@@ -1528,7 +1528,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account (limit exceeded, explicit group)
@@ -1580,7 +1580,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account (limit exceeded, inherited group)
@@ -1637,7 +1637,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped license for their account (inherited from user)
@@ -1688,7 +1688,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1736,7 +1736,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a grouped license for their account
@@ -1783,7 +1783,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a grouped license for their account
@@ -1829,7 +1829,7 @@ Feature: Create license
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for a user of their account with a key that contains a null byte
@@ -1876,7 +1876,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an invalid policy for a user of their account
@@ -1922,7 +1922,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an empty owner
@@ -1960,7 +1960,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a false owner
@@ -1998,7 +1998,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a null owner (relationship)
@@ -2027,7 +2027,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a null owner (linkage)
@@ -2058,7 +2058,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for an invalid owner of their account (default)
@@ -2102,7 +2102,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for an invalid owner of their account (v1.6)
@@ -2147,7 +2147,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for an invalid user of their account (v1.5)
@@ -2192,7 +2192,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with metadata for their account
@@ -2235,7 +2235,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with nested metadata
@@ -2292,7 +2292,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with complex nested metadata
@@ -2349,7 +2349,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with too complex nested metadata
@@ -2401,7 +2401,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with metadata for their account and the keys should be transformed to camelcase
@@ -2450,7 +2450,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a pre-determined expiry
@@ -2482,7 +2482,7 @@ Feature: Create license
     And the response body should be a "license" with an expiry "2016-09-05T22:53:37.000Z"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a pre-determined key
@@ -2514,7 +2514,7 @@ Feature: Create license
     And the response body should be a "license" with the key "a-license-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate license with a pre-determined key
@@ -2553,7 +2553,7 @@ Feature: Create license
     Then the response status should be "422"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a pre-determined key that conflicts with a license ID
@@ -2585,7 +2585,7 @@ Feature: Create license
     Then the response status should be "422"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a pre-determined UUID key
@@ -2618,7 +2618,7 @@ Feature: Create license
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate license of another account with a pre-determined UUID key
@@ -2669,7 +2669,7 @@ Feature: Create license
     And the response body should be a "license" with maxUses "100"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate license of another account with a pre-determined key
@@ -2714,7 +2714,7 @@ Feature: Create license
     And the response body should be a "license" with the key "a-duplicate-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a legacy encrypted license for a user of their account
@@ -2758,7 +2758,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "LEGACY_ENCRYPT"
     And the response body should be a "license" that is encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a legacy encrypted license with a pre-determined key
@@ -2816,7 +2816,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT without seed data
@@ -2867,7 +2867,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT with a pre-determined key
@@ -2914,7 +2914,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_ENCRYPT"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT with a key that is too large
@@ -2970,7 +2970,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN for a user of their account
@@ -3034,7 +3034,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN with a pre-determined key
@@ -3081,7 +3081,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN for a user of their account
@@ -3135,7 +3135,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN with a pre-determined key
@@ -3182,7 +3182,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN with an empty key
@@ -3237,7 +3237,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_JWT_RS256 for a user of their account
@@ -3291,7 +3291,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_JWT_RS256 with an invalid payload
@@ -3347,7 +3347,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_JWT_RS256 with an invalid JWT exp
@@ -3403,7 +3403,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_JWT_RS256 with a pre-determined key
@@ -3456,7 +3456,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_JWT_RS256"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN_V2 for a user of their account
@@ -3519,7 +3519,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN_V2 with a pre-determined key
@@ -3566,7 +3566,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_SIGN_V2"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 for a user of their account
@@ -3620,7 +3620,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined key
@@ -3667,7 +3667,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID and key
@@ -3708,7 +3708,7 @@ Feature: Create license
     And the response body should be a "license" with the signed key of "id=00000000-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
     And the response body should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID and autogen key
@@ -3762,7 +3762,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID that conflicts with another license
@@ -3819,7 +3819,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID that is not a UUID
@@ -3868,7 +3868,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ED25519_SIGN for a user of their account
@@ -3922,7 +3922,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ED25519_SIGN with a pre-determined key
@@ -3969,7 +3969,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "ED25519_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ED25519_SIGN with a short key
@@ -4016,7 +4016,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "ED25519_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ECDSA_P256_SIGN for a user of their account
@@ -4067,7 +4067,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ECDSA_P256_SIGN with a pre-determined key
@@ -4112,7 +4112,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "ECDSA_P256_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ECDSA_P256_SIGN with a short key
@@ -4157,7 +4157,7 @@ Feature: Create license
     And the response body should be a "license" with the scheme "ECDSA_P256_SIGN"
     And the response body should be a "license" that is not encrypted
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license without a user
@@ -4186,7 +4186,7 @@ Feature: Create license
     And the response body should be a "license" that is not protected
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a null user
@@ -4217,7 +4217,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license without a policy
@@ -4255,7 +4255,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license with an invalid policy
@@ -4300,7 +4300,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a reserved key
@@ -4343,7 +4343,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license for themself
@@ -4378,7 +4378,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -4417,7 +4417,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -4461,7 +4461,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates an unprotected license for themself
@@ -4510,7 +4510,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a protected license for themself
@@ -4559,7 +4559,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license for themself with a pre-determined ID
@@ -4606,7 +4606,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a suspended license for themself
@@ -4655,7 +4655,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license for themself with a pre-determined expiry
@@ -4704,7 +4704,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a license without a user
@@ -4733,7 +4733,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a license for another user
@@ -4768,7 +4768,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using a pooled policy
@@ -4819,7 +4819,7 @@ Feature: Create license
     And the current account should have 3 "keys"
     And the response body should be a "license" that is strict
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an empty policy pool
@@ -4873,7 +4873,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license for a user of another account
@@ -4917,7 +4917,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using a protected policy
@@ -4962,7 +4962,7 @@ Feature: Create license
     And the response body should be a "license" that is not strict
     And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a protected license using a protected policy
@@ -5010,7 +5010,7 @@ Feature: Create license
     And the response body should be a "license" that is not strict
     And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a protected license using an unprotected policy
@@ -5058,7 +5058,7 @@ Feature: Create license
     And the response body should be a "license" that is not strict
     And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an unprotected license using a protected policy
@@ -5106,7 +5106,7 @@ Feature: Create license
     And the response body should be a "license" that is not strict
     And the response body should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a license using a protected policy
@@ -5154,7 +5154,7 @@ Feature: Create license
     And the response body should be a "license" that is protected
     And the response body should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a license with a pre-determined ID
@@ -5204,7 +5204,7 @@ Feature: Create license
     And the response body should be a "license" that is protected
     And the response body should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -5335,7 +5335,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5380,7 +5380,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5438,7 +5438,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
 
   @ee
   Scenario: Product creates a user license with custom permissions (ent tier)
@@ -5495,7 +5495,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5569,7 +5569,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
 
   @ee
   Scenario: Product creates a user license with default permissions (with override)
@@ -5621,7 +5621,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
 
   @ee
   Scenario: Product creates a license with unsupported permissions (standard tier)
@@ -5669,7 +5669,7 @@ Feature: Create license
         }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5718,7 +5718,7 @@ Feature: Create license
         }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5767,7 +5767,7 @@ Feature: Create license
         }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5816,7 +5816,7 @@ Feature: Create license
         }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5867,7 +5867,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -5918,7 +5918,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -6023,7 +6023,7 @@ Feature: Create license
     And the current account should have 1 "license"
     And the response body should be a "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license using a protected policy
@@ -6066,7 +6066,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a license with mismatched policy/user IDs
@@ -6101,7 +6101,7 @@ Feature: Create license
     Then the response status should be "422"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin uses an invalid token that looks like a UUID while attempting to create a license
@@ -6142,7 +6142,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin uses an invalid token while attempting to create a license
@@ -6180,7 +6180,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a license using an invalid policy ID
@@ -6209,7 +6209,7 @@ Feature: Create license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a license using a policy they don't own
@@ -6239,7 +6239,7 @@ Feature: Create license
     Then the response status should be "403"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a license for a user of another account
@@ -6291,7 +6291,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin sends invalid JSON while attempting to create a license
@@ -6327,7 +6327,7 @@ Feature: Create license
       """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to create a license while on a paid tier with card but has exceeded their max licensed user limit
@@ -6358,7 +6358,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 51 "licenses"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license while trialing a paid tier with card but has exceeded their max licensed user limit
@@ -6390,7 +6390,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 51 "licenses"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license while trialing a paid tier without card but has exceeded their max licensed user limit
@@ -6434,7 +6434,7 @@ Feature: Create license
       """
     And the current account should have 50 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license while on the free tier but has exceeded their max licensed user limit
@@ -6478,7 +6478,7 @@ Feature: Create license
       """
     And the current account should have 50 "licenses"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a license
@@ -6521,7 +6521,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a floating license that overrides its policy's max machines
@@ -6561,7 +6561,7 @@ Feature: Create license
     And the response body should be a "license" that is floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a node-locked license that overrides its policy's max machines
@@ -6611,7 +6611,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a floating license that overrides its policy's max machines (noop)
@@ -6651,7 +6651,7 @@ Feature: Create license
     And the response body should be a "license" that is floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a node-locked license that overrides its policy's max machines (noop)
@@ -6691,7 +6691,7 @@ Feature: Create license
     And the response body should be a "license" that is not floating
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max cores
@@ -6729,7 +6729,7 @@ Feature: Create license
     And the response body should be a "license" with maxCores "32"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max cores (noop)
@@ -6767,7 +6767,7 @@ Feature: Create license
     And the response body should be a "license" with maxCores "16"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a max memory override
@@ -6798,7 +6798,7 @@ Feature: Create license
     Then the response status should be "201"
     And the response body should be a "license" with maxMemory "131072"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an invalid max memory override
@@ -6838,7 +6838,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with a max disk override
@@ -6869,7 +6869,7 @@ Feature: Create license
     Then the response status should be "201"
     And the response body should be a "license" with maxDisk "4096000"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an invalid max disk override
@@ -6909,7 +6909,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max uses
@@ -6947,7 +6947,7 @@ Feature: Create license
     And the response body should be a "license" with maxUses "500"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max uses (noop)
@@ -6985,7 +6985,7 @@ Feature: Create license
     And the response body should be a "license" with maxUses "100"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max processes
@@ -7024,7 +7024,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license that overrides its policy's max processes (noop)
@@ -7063,7 +7063,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license that overrides the policy's max machines
@@ -7119,7 +7119,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a license that overrides the policy's max processes
@@ -7173,7 +7173,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Scenario: Admin sends a badly encoded URL query parameter when attempting to create a license
@@ -7195,7 +7195,7 @@ Feature: Create license
   #     """
   #   And the current account should have 0 "licenses"
   #   And sidekiq should have 0 "webhook" jobs
-  #   And sidekiq should have 0 "metric" jobs
+  #   And sidekiq should have 0 "event-log" jobs
   #   And sidekiq should have 1 "request-log" job
 
   # Expiration basis
@@ -7369,7 +7369,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ECDSA_P256_SIGN using template variables
@@ -7409,7 +7409,7 @@ Feature: Create license
       {"id":"$licenses[0].id","alg":"nist-p256","iss":"$licenses[0].created_at","exp":"$licenses[0].expiry"}
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 using template variables
@@ -7468,7 +7468,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN_V2 using template variables
@@ -7543,7 +7543,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN using template variables
@@ -7607,7 +7607,7 @@ Feature: Create license
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license without a scheme using template variables
@@ -7639,7 +7639,7 @@ Feature: Create license
     And the current account should have 1 "license"
     And the response body should be a "license" with the key "{{account}}-{{product}}-{{id}}"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables
@@ -7680,7 +7680,7 @@ Feature: Create license
       """
       { "foo": "", "baz": "", "qux": "{{}}" }
       """
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with nested metadata (default)
@@ -7723,7 +7723,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with nested metadata (v1.4)
@@ -7767,7 +7767,7 @@ Feature: Create license
       """
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   # product-specific webhook smoke tests
@@ -7793,5 +7793,5 @@ Feature: Create license
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job

@@ -29,7 +29,7 @@ Feature: Delete artifact
     Then the response status should be "204"
     And the current account should have 2 "artifacts"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their artifacts by filename (for latest release)
@@ -62,7 +62,7 @@ Feature: Delete artifact
       { "releaseId": "a391f935-bd9b-4277-affd-16759d84d65e" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their artifacts by filename (for release by version)
@@ -95,7 +95,7 @@ Feature: Delete artifact
       { "releaseId": "a391f935-bd9b-4277-affd-16759d84d65e" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their artifacts by filename (for release by ID)
@@ -128,7 +128,7 @@ Feature: Delete artifact
       { "releaseId": "306aae31-e07d-4769-a409-518d3d2a4b10" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their artifacts (S3 timing out)
@@ -147,7 +147,7 @@ Feature: Delete artifact
       { "status": "YANKED" }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete an artifact for another account
@@ -162,7 +162,7 @@ Feature: Delete artifact
     And the response body should be an array of 1 error
     And the current account should have 3 "artifacts"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their artifacts
@@ -177,7 +177,7 @@ Feature: Delete artifact
     Then the response status should be "204"
     And the current account should have 2 "artifacts"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales deletes one of their artifacts
@@ -229,7 +229,7 @@ Feature: Delete artifact
     Then the response status should be "204"
     And the current account should have 2 "artifacts"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -248,7 +248,7 @@ Feature: Delete artifact
     Then the response status should be "204"
     And the current account should have 2 "artifacts"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes one of their artifacts
@@ -263,7 +263,7 @@ Feature: Delete artifact
     Then the response status should be "204"
     And the current account should have 2 "artifacts"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes an artifact for a different product
@@ -278,7 +278,7 @@ Feature: Delete artifact
     Then the response status should be "404"
     And the current account should have 3 "artifacts"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete an artifact for their product

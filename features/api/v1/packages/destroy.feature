@@ -26,7 +26,7 @@ Feature: Delete package
     Then the response status should be "204"
     And the current account should have 2 "packages"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a package for another account
@@ -40,7 +40,7 @@ Feature: Delete package
     And the response body should be an array of 1 error
     And the current account should have 3 "packages"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their packages
@@ -54,7 +54,7 @@ Feature: Delete package
     Then the response status should be "204"
     And the current account should have 2 "packages"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales attempts to delete one of their packages
@@ -68,7 +68,7 @@ Feature: Delete package
     Then the response status should be "403"
     And the current account should have 3 "packages"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Support attempts to delete one of their packages
@@ -82,7 +82,7 @@ Feature: Delete package
     Then the response status should be "403"
     And the current account should have 3 "packages"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Read-only attempts to delete one of their packages
@@ -96,7 +96,7 @@ Feature: Delete package
     Then the response status should be "403"
     And the current account should have 3 "packages"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -110,7 +110,7 @@ Feature: Delete package
     When I send a DELETE request to "/accounts/test1/packages/$0?environment=isolated"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes their package
@@ -123,7 +123,7 @@ Feature: Delete package
     Then the response status should be "204"
     And the current account should have 1 "package"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes a package
@@ -136,7 +136,7 @@ Feature: Delete package
     Then the response status should be "404"
     And the current account should have 3 "packages"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete their package

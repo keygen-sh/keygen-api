@@ -37,7 +37,7 @@ Feature: Delete machine
     And the first "license" should have a correct machine core count
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their machines
@@ -100,7 +100,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 1 "machine"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -119,7 +119,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 1 "machine"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -138,7 +138,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 2 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes a machine
@@ -182,7 +182,7 @@ Feature: Delete machine
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin deletes one of their machines by UUID fingerprint
@@ -200,7 +200,7 @@ Feature: Delete machine
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a machine that belongs to another user
@@ -215,7 +215,7 @@ Feature: Delete machine
     And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner deletes a machine for their unprotected license (is machine owner)
@@ -234,7 +234,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner deletes a machine for their unprotected license (not machine owner)
@@ -253,7 +253,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their unprotected license (is machine owner)
@@ -272,7 +272,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their unprotected license (not machine owner)
@@ -291,7 +291,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner deletes a machine for their protected license (is machine owner)
@@ -310,7 +310,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner deletes a machine for their protected license (not machine owner)
@@ -329,7 +329,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their protected license (is machine owner)
@@ -348,7 +348,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their protected license (not machine owner)
@@ -367,7 +367,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their group
@@ -398,7 +398,7 @@ Feature: Delete machine
     Then the response status should be "404"
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine for their license
@@ -416,7 +416,7 @@ Feature: Delete machine
       { "deactivations": 1 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
     # Sanity check on license's machine counter
@@ -459,7 +459,7 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deactivates a machine with permission
@@ -481,7 +481,7 @@ Feature: Delete machine
     Then the response status should be "204"
     And the current account should have 2 "machines"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine for their license but they've hit their deactivation limit
@@ -519,7 +519,7 @@ Feature: Delete machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine that belongs to another license
@@ -545,7 +545,7 @@ Feature: Delete machine
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a machine for their account
@@ -557,7 +557,7 @@ Feature: Delete machine
     And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a machine for another account
@@ -571,5 +571,5 @@ Feature: Delete machine
     And the response body should be an array of 1 error
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

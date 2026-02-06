@@ -249,7 +249,7 @@ Feature: Show policy
     When I send a GET request to "/accounts/test1/policies/$1"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves a policy with a process leasing strategy

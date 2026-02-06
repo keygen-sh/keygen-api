@@ -36,7 +36,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license by key
@@ -65,7 +65,7 @@ Feature: License usage actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license by 100
@@ -99,7 +99,7 @@ Feature: License usage actions
       { "uses": 100 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license by 100 for a policy that only allows 99
@@ -129,7 +129,7 @@ Feature: License usage actions
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license by a int larger than max int
@@ -169,7 +169,7 @@ Feature: License usage actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license that has no usage limit
@@ -197,7 +197,7 @@ Feature: License usage actions
       { "uses": 1 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -227,7 +227,7 @@ Feature: License usage actions
       { "uses": 4 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product increments the usage count for a license
@@ -253,7 +253,7 @@ Feature: License usage actions
       { "uses": 4 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User increments the usage count for their license (license owner)
@@ -282,7 +282,7 @@ Feature: License usage actions
       { "uses": 5 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User increments the usage count for their license (license user)
@@ -308,7 +308,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license that is at its usage limit
@@ -343,7 +343,7 @@ Feature: License usage actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin increments the usage count for a license that would be at its usage limit but has an override
@@ -372,7 +372,7 @@ Feature: License usage actions
       { "uses": 6 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product increments the usage count for a license that is at its usage limit
@@ -405,7 +405,7 @@ Feature: License usage actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License increments the usage count for itself
@@ -433,7 +433,7 @@ Feature: License usage actions
       { "uses": 5 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License increments the usage count for another license
@@ -457,7 +457,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$1/actions/increment-usage"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User increments the usage count for an unprotected license that is at its usage limit
@@ -493,7 +493,7 @@ Feature: License usage actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User increments the usage count for a protected license that is at its usage limit
@@ -518,7 +518,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous decrements the usage count for a license
@@ -540,7 +540,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin decrements the usage count for a license
@@ -568,7 +568,7 @@ Feature: License usage actions
       { "uses": 1 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin decrements the usage count for a license by 50
@@ -603,7 +603,7 @@ Feature: License usage actions
       { "uses": 25 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -633,7 +633,7 @@ Feature: License usage actions
       { "uses": 2 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product decrements the usage count for a license
@@ -659,7 +659,7 @@ Feature: License usage actions
       { "uses": 4 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User decrements the usage count for their license (license owner)
@@ -684,7 +684,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User decrements the usage count for their license (license user)
@@ -710,7 +710,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin decrements the usage count for a license that is at 0
@@ -745,7 +745,7 @@ Feature: License usage actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License decrements the usage count for itself
@@ -769,7 +769,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License decrements the usage count for another license
@@ -793,7 +793,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$1/actions/decrement-usage"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous resets the usage count for a license
@@ -815,7 +815,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin resets the usage count for a license
@@ -843,7 +843,7 @@ Feature: License usage actions
       { "uses": 0 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -873,7 +873,7 @@ Feature: License usage actions
       { "uses": 0 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product resets the usage count for a license
@@ -899,7 +899,7 @@ Feature: License usage actions
       { "uses": 0 }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User resets the usage count for their license (license owner)
@@ -924,7 +924,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User resets the usage count for their license (license user)
@@ -950,7 +950,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License decrements the usage count for itself
@@ -974,7 +974,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License decrements the usage count for another license
@@ -998,7 +998,7 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Expiration basis

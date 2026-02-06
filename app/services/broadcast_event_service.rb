@@ -10,12 +10,6 @@ class BroadcastEventService < BaseService
 
   def call
     events.each do |event|
-      begin
-        RecordMetricService.call(metric: event, account: account, resource: resource)
-      rescue => e
-        Keygen.logger.exception(e)
-      end
-
       event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
         EventType.find_or_create_by!(event:)
       end

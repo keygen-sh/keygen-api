@@ -308,7 +308,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, within limit)
@@ -338,7 +338,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 3 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, exceeds limit)
@@ -368,7 +368,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 3 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_25X_OVERAGE, within limit)
@@ -397,7 +397,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_25X_OVERAGE, exceeds limit)
@@ -438,7 +438,7 @@ Feature: License users relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_5X_OVERAGE, within limit)
@@ -467,7 +467,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_1_5X_OVERAGE, exceeds limit)
@@ -508,7 +508,7 @@ Feature: License users relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_2X_OVERAGE, within limit)
@@ -538,7 +538,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 3 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (ALLOW_2X_OVERAGE, exceeds limit)
@@ -580,7 +580,7 @@ Feature: License users relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (NO_OVERAGE, within limit)
@@ -610,7 +610,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 3 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches users to a license with a max users limit (NO_OVERAGE, exceeds limit)
@@ -652,7 +652,7 @@ Feature: License users relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -681,7 +681,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -716,7 +716,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -751,7 +751,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin bulk attaches 100 users to a license
@@ -871,7 +871,7 @@ Feature: License users relationship
     And the current account should have 100 "license-users"
     And the current account should have 100 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin bulk attaches 101 users to a license
@@ -1000,7 +1000,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches empty users to a license
@@ -1024,7 +1024,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches a user to a license that already exists as an owner
@@ -1055,7 +1055,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches a user to a license that already exists as a user
@@ -1086,7 +1086,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach users to a license with an invalid user ID
@@ -1119,7 +1119,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach a user to a license for another account
@@ -1153,7 +1153,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to attach a user while trialing a paid tier without card but has exceeded their max licensed user limit
@@ -1195,7 +1195,7 @@ Feature: License users relationship
     And the current account should have 10 "licenses"
     And the current account should have 49 "license-users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin of another account attempts to attach themself to a license
@@ -1214,7 +1214,7 @@ Feature: License users relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1249,7 +1249,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1283,7 +1283,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1318,7 +1318,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1353,7 +1353,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1389,7 +1389,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1425,7 +1425,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attaches users to a license
@@ -1449,7 +1449,7 @@ Feature: License users relationship
     Then the response status should be "200"
     And the response body should be an array with 2 "license-users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to attach users to a license it doesn't own
@@ -1480,7 +1480,7 @@ Feature: License users relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to attach users to themselves
@@ -1501,7 +1501,7 @@ Feature: License users relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner attempts to attach users to a license (default permissions)
@@ -1521,7 +1521,7 @@ Feature: License users relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner attempts to attach users to a license (explicit permission, unprotected license)
@@ -1564,7 +1564,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner attempts to attach users to a license (explicit permission, protected license)
@@ -1588,7 +1588,7 @@ Feature: License users relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach users to their license (default permission)
@@ -1608,7 +1608,7 @@ Feature: License users relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach users to their license (explicit permission)
@@ -1632,7 +1632,7 @@ Feature: License users relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to attach users to a license
@@ -1651,7 +1651,7 @@ Feature: License users relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Detachment
@@ -1676,7 +1676,7 @@ Feature: License users relationship
     And the current account should have 0 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin detaches empty users from a license
@@ -1702,7 +1702,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach users from a license with an invalid user ID
@@ -1735,7 +1735,7 @@ Feature: License users relationship
     And the current account should have 3 "license-users"
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach a user from a license that is the owner
@@ -1808,7 +1808,7 @@ Feature: License users relationship
     And the current account should have 0 "license-users"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1838,7 +1838,7 @@ Feature: License users relationship
     And the current account should have 2 "license-users"
     And the current account should have 4 "users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1868,7 +1868,7 @@ Feature: License users relationship
     And the current account should have 4 "license-users"
     And the current account should have 4 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2114,7 +2114,7 @@ Feature: License users relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to detach users from their license (default permission)

@@ -141,7 +141,7 @@ Feature: Raw artifact download
       { "Location": "https://raw.pkg.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/c811f16c-18e5-40d6-9130-ba9ce2df0df9/install.sh" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @sp
@@ -156,7 +156,7 @@ Feature: Raw artifact download
       { "Location": "https://raw.pkg.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/c811f16c-18e5-40d6-9130-ba9ce2df0df9/install.sh" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should redirect when an artifact exists
@@ -170,7 +170,7 @@ Feature: Raw artifact download
       { "Location": "https://api.keygen.sh/v1/accounts/29b60e24-f18a-4c6a-9e86-da3116c52f30/artifacts/c811f16c-18e5-40d6-9130-ba9ce2df0df9/install.sh" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return error when an artifact does not exist (no artifact)
@@ -180,7 +180,7 @@ Feature: Raw artifact download
     When I send a GET request to "/accounts/keygen/engines/raw/relay/@relay/1.0.0/foobar.txt"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return error when an artifact does not exist (no release)
@@ -190,7 +190,7 @@ Feature: Raw artifact download
     When I send a GET request to "/accounts/keygen/engines/raw/relay/@relay/3.0.0/install.sh"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return error when an artifact does not exist (no package)
@@ -200,7 +200,7 @@ Feature: Raw artifact download
     When I send a GET request to "/accounts/keygen/engines/raw/relay/1.0.0-beta.1/install.sh"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should return error when an artifact does not exist (no product)
@@ -210,7 +210,7 @@ Feature: Raw artifact download
     When I send a GET request to "/accounts/keygen/engines/raw/rleay/@relay/1.0.0/install.sh"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Endpoint should redirect for an artifact that is a duplicate of another

@@ -53,7 +53,7 @@ Feature: Machine proof actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a proof for a machine with a custom dataset
@@ -128,7 +128,7 @@ Feature: Machine proof actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -170,7 +170,7 @@ Feature: Machine proof actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to generate a default proof for a machine
@@ -212,7 +212,7 @@ Feature: Machine proof actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to generate a custom proof for a machine
@@ -248,7 +248,7 @@ Feature: Machine proof actions
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to generate a proof for a machine with a custom dataset

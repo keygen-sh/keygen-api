@@ -27,7 +27,7 @@ Feature: Delete policy
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their policies
@@ -41,7 +41,7 @@ Feature: Delete policy
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Sales deletes one of their policies
@@ -85,7 +85,7 @@ Feature: Delete policy
     And the response body should be an array of 1 error
     And the current account should have 3 "policies"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -100,7 +100,7 @@ Feature: Delete policy
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -115,7 +115,7 @@ Feature: Delete policy
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -130,7 +130,7 @@ Feature: Delete policy
     Then the response status should be "403"
     And the current account should have 3 "policies"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes one of their policies
@@ -144,7 +144,7 @@ Feature: Delete policy
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes a policy for a different product
@@ -158,7 +158,7 @@ Feature: Delete policy
     Then the response status should be "404"
     And the current account should have 3 "policies"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to delete a policy for their product

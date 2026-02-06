@@ -50,7 +50,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with role
@@ -90,7 +90,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with blank names
@@ -116,7 +116,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with null names
@@ -142,7 +142,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -182,7 +182,7 @@ Feature: Create user
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -222,7 +222,7 @@ Feature: Create user
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -266,7 +266,7 @@ Feature: Create user
       """
     And the current account should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -309,7 +309,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -351,7 +351,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -400,7 +400,7 @@ Feature: Create user
       """
     And the current account should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -443,7 +443,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -485,7 +485,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -523,7 +523,7 @@ Feature: Create user
       """
     And the current account should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -561,7 +561,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -599,7 +599,7 @@ Feature: Create user
       """
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -640,7 +640,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -681,7 +681,7 @@ Feature: Create user
     And the response should contain a valid signature header for "ent1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -722,7 +722,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -763,7 +763,7 @@ Feature: Create user
     And the response should contain a valid signature header for "ent1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a grouped user for an account
@@ -805,7 +805,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a grouped user for an account
@@ -845,7 +845,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped user for an account
@@ -888,7 +888,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped user for an account (null group)
@@ -931,7 +931,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped user for an account (invalid group)
@@ -970,7 +970,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a grouped user for an account (limit exceeded)
@@ -1019,7 +1019,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 1 "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with a short password
@@ -1069,7 +1069,7 @@ Feature: Create user
       { "email": "invite@keygen.example" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with no name
@@ -1101,7 +1101,7 @@ Feature: Create user
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user for a protected account
@@ -1129,7 +1129,7 @@ Feature: Create user
     Then the response status should be "403"
     And the response body should be an array of 1 error
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create an incomplete user for an account
@@ -1233,7 +1233,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "user"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a user for their protected account
@@ -1362,7 +1362,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "admin"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an admin for their account (has permissions)
@@ -1395,7 +1395,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "admin"
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an admin for their account (no permissions)
@@ -1464,7 +1464,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "developer"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a sales agent for their account
@@ -1496,7 +1496,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "sales-agent"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a support agent for their account
@@ -1528,7 +1528,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "support-agent"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a read-only for their account
@@ -1558,7 +1558,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "read-only"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer attempts to create an admin for their account
@@ -1631,7 +1631,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -1744,7 +1744,7 @@ Feature: Create user
       """
     And the current account should have 2 "admins"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1781,7 +1781,7 @@ Feature: Create user
       """
     And the current account should have 2 "admins"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1812,7 +1812,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1840,7 +1840,7 @@ Feature: Create user
     Then the response status should be "201"
     And the response body should be a "user" with the role "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates an admin for their account
@@ -1866,7 +1866,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a user for a protected account
@@ -1901,7 +1901,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ce
@@ -2017,7 +2017,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2057,7 +2057,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2142,7 +2142,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2187,7 +2187,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2231,7 +2231,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2275,7 +2275,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2319,7 +2319,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2363,7 +2363,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2395,7 +2395,7 @@ Feature: Create user
       { "permissions": [] }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2427,7 +2427,7 @@ Feature: Create user
       { "permissions": [] }
       """
     And sidekiq should have 3 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create an admin for their account
@@ -2453,7 +2453,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a user for a protected account
@@ -2482,7 +2482,7 @@ Feature: Create user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create an admin for an account
@@ -2516,7 +2516,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a developer role for an account
@@ -2550,7 +2550,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a sales agent role for an account
@@ -2584,7 +2584,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a support agent role for an account
@@ -2618,7 +2618,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a read-only role for an account
@@ -2652,7 +2652,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a license role for an account
@@ -2686,7 +2686,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with a product role for an account
@@ -2720,7 +2720,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with an admin role for an account (meme casing)
@@ -2754,7 +2754,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a user with an admin role for an account (caps casing)
@@ -2788,7 +2788,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -2926,7 +2926,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   # Ref: https://github.com/BishopFox/json-interop-vuln-labs/#attack-techniques
@@ -2957,7 +2957,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous attempts to send a request containing a unicode injection (2)
@@ -2989,7 +2989,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing a stray backslash injection
@@ -3021,7 +3021,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing a stray quotes injection
@@ -3051,7 +3051,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous attempts to send a request containing a missing quotes injection
@@ -3081,7 +3081,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous attempts to send a request containing a comment injection (1)
@@ -3112,7 +3112,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous attempts to send a request containing a comment injection (2)
@@ -3137,7 +3137,7 @@ Feature: Create user
     And the response body should be a "user" with a nil lastName
     And the response body should be a "user" with the role "user"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "event-log" jobs
     And sidekiq should have 1 "request-log" jobs
 
   Scenario: Anonymous attempts to send a request containing a comment injection (3)
@@ -3168,7 +3168,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing trailing garbage
@@ -3196,7 +3196,7 @@ Feature: Create user
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 0 "request-log" jobs
 
   # product-specific webhook smoke tests
@@ -3218,5 +3218,5 @@ Feature: Create user
       """
     Then the response status should be "201"
     And sidekiq should have 4 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job

@@ -28,7 +28,7 @@ Feature: Kill machine process
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "processes"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer kills one of their processes
@@ -82,7 +82,7 @@ Feature: Kill machine process
     When I send a DELETE request to "/accounts/test1/processes/$0?environment=isolated"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product kills one of their processes
@@ -98,7 +98,7 @@ Feature: Kill machine process
     When I send a DELETE request to "/accounts/test1/processes/$0"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product kills a process for a different product
@@ -114,7 +114,7 @@ Feature: Kill machine process
     When I send a DELETE request to "/accounts/test1/processes/$0"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to kill a process that belongs to another user
@@ -129,7 +129,7 @@ Feature: Kill machine process
     And the response body should be an array of 1 error
     And the current account should have 3 "processes"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User kills a process for their unprotected license (license owner)
@@ -154,7 +154,7 @@ Feature: Kill machine process
     Then the response status should be "204"
     And the current account should have 0 "processes"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User kills a process for their unprotected license (license user, machine owner)
@@ -176,7 +176,7 @@ Feature: Kill machine process
     Then the response status should be "204"
     And the current account should have 0 "processes"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User kills a process for their unprotected license (license user, not owner)
@@ -197,7 +197,7 @@ Feature: Kill machine process
     When I send a DELETE request to "/accounts/test1/processes/$0"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User kills a process for their protected license
@@ -222,7 +222,7 @@ Feature: Kill machine process
     Then the response status should be "403"
     And the current account should have 1 "process"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License kills a process for one of their machines
@@ -237,7 +237,7 @@ Feature: Kill machine process
     Then the response status should be "204"
     And the current account should have 1 "process"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License kills a process for a different license
@@ -251,7 +251,7 @@ Feature: Kill machine process
     Then the response status should be "404"
     And the current account should have 1 "process"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to kill a process for their account
@@ -263,7 +263,7 @@ Feature: Kill machine process
     And the response body should be an array of 1 error
     And the current account should have 3 "processes"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to kill a process for another account
@@ -277,5 +277,5 @@ Feature: Kill machine process
     And the response body should be an array of 1 error
     And the current account should have 3 "processes"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

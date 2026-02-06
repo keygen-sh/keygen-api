@@ -51,7 +51,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" that is not floating
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a floating policy for their account
@@ -110,7 +110,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a floating policy for their account with a max machines attribute
@@ -154,7 +154,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that inherits from a protected account
@@ -214,7 +214,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a max uses is less than the max value of a 4 byte integer
@@ -251,7 +251,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Large Usage Policy"
     And the response body should be a "policy" with the maxUses "2147483646"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a max uses that is the max value of a 4 byte integer
@@ -288,7 +288,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Larger Usage Policy"
     And the response body should be a "policy" with the maxUses "2147483647"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a max uses that exceeds the max value of a 4 byte integer
@@ -335,7 +335,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a machine leasing strategy
@@ -373,7 +373,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a process leasing strategy
@@ -411,7 +411,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a leasing strategy
@@ -453,7 +453,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a leasing strategy (v1.6)
@@ -492,7 +492,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a fingerprint uniqueness strategy (v1.3)
@@ -531,7 +531,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a fingerprint matching strategy (v1.3)
@@ -570,7 +570,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid machine uniqueness strategy
@@ -613,7 +613,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid machine matching strategy
@@ -656,7 +656,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a component uniqueness strategy
@@ -694,7 +694,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a component matching strategy
@@ -732,7 +732,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a maintain access expiration strategy
@@ -765,7 +765,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Maintain Expiration Strategy"
     And the response body should be a "policy" with the expirationStrategy "MAINTAIN_ACCESS"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow access expiration strategy
@@ -798,7 +798,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Expiration Strategy"
     And the response body should be a "policy" with the expirationStrategy "ALLOW_ACCESS"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid expiration strategy
@@ -841,7 +841,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a creation expiration basis
@@ -874,7 +874,7 @@ Feature: Create policy
     And the response body should be a "policy" with the expirationBasis "FROM_CREATION"
     And the response body should be a "policy" with the name "Creation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an first validation expiration basis
@@ -907,7 +907,7 @@ Feature: Create policy
     And the response body should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
     And the response body should be a "policy" with the name "Validation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an first activation expiration basis
@@ -940,7 +940,7 @@ Feature: Create policy
     And the response body should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
     And the response body should be a "policy" with the name "Activation Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an first use expiration basis
@@ -973,7 +973,7 @@ Feature: Create policy
     And the response body should be a "policy" with the expirationBasis "FROM_FIRST_USE"
     And the response body should be a "policy" with the name "Use Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an first download expiration basis
@@ -1006,7 +1006,7 @@ Feature: Create policy
     And the response body should be a "policy" with the expirationBasis "FROM_FIRST_DOWNLOAD"
     And the response body should be a "policy" with the name "Download Expiration Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid expiration basis
@@ -1049,7 +1049,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an expiry renewal basis
@@ -1082,7 +1082,7 @@ Feature: Create policy
     And the response body should be a "policy" with the renewalBasis "FROM_EXPIRY"
     And the response body should be a "policy" with the name "Expiry Renewal Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a now renewal basis
@@ -1115,7 +1115,7 @@ Feature: Create policy
     And the response body should be a "policy" with the renewalBasis "FROM_NOW"
     And the response body should be a "policy" with the name "Now Renewal Basis"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid renewal basis
@@ -1158,7 +1158,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid license auth strategy
@@ -1201,7 +1201,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid heartbeat cull strategy
@@ -1244,7 +1244,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid heartbeat resurrection strategy
@@ -1287,7 +1287,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an incompatible heartbeat resurrection strategy
@@ -1331,7 +1331,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid transfer strategy
@@ -1374,7 +1374,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default overage strategy
@@ -1406,7 +1406,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Default Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default overage strategy (v1.2)
@@ -1439,7 +1439,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Default Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default overage strategy (v1.1)
@@ -1472,7 +1472,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Default Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default overage strategy (v1.0)
@@ -1505,7 +1505,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Default Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an always allow overage strategy
@@ -1538,7 +1538,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible machine limit)
@@ -1573,7 +1573,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (non-divisible machine limit)
@@ -1618,7 +1618,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible core limit)
@@ -1654,7 +1654,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (non-divisible core limit)
@@ -1700,7 +1700,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible process limits)
@@ -1736,7 +1736,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (non-divisible process limit)
@@ -1782,7 +1782,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (divisible user limits)
@@ -1818,7 +1818,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_25X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.25x overage strategy (non-divisible user limit)
@@ -1864,7 +1864,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a node-locked policy that has an allow 1.25x overage strategy
@@ -1909,7 +1909,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even machine limit)
@@ -1944,7 +1944,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd machine limit)
@@ -1989,7 +1989,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even core limit)
@@ -2025,7 +2025,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd core limit)
@@ -2071,7 +2071,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even process limit)
@@ -2107,7 +2107,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd process limit)
@@ -2153,7 +2153,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even user limit)
@@ -2189,7 +2189,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd user limit)
@@ -2235,7 +2235,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a node-locked policy that has an allow 1.5x overage strategy
@@ -2280,7 +2280,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an allow 2x overage strategy
@@ -2313,7 +2313,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Allow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "ALLOW_2X_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a no overage strategy
@@ -2346,7 +2346,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Disallow Overage Strategy"
     And the response body should be a "policy" with the overageStrategy "NO_OVERAGE"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid overage strategy
@@ -2389,7 +2389,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an always allow overage strategy (v1.1)
@@ -2429,7 +2429,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a no overage strategy (v1.1)
@@ -2469,7 +2469,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a custom heartbeat duration
@@ -2506,7 +2506,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Long Heartbeat Policy"
     And the response body should be a "policy" with the heartbeatDuration "604800"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that does not have a custom heartbeat duration
@@ -2542,7 +2542,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Normal Heartbeat Policy"
     And the response body should be a "policy" with a nil heartbeatDuration
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a custom heartbeat duration that is too short
@@ -2589,7 +2589,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a heartbeat duration that exceeds the max value of a 4 byte integer
@@ -2636,7 +2636,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that inherits from an unprotected account
@@ -2671,7 +2671,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the response body should be a "policy" that is not protected
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a protected policy that inherits from an unprotected account
@@ -2707,7 +2707,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the response body should be a "policy" that is protected
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an unprotected policy that inherits from a protected account
@@ -2743,7 +2743,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the response body should be a "policy" that is not protected
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create an incomplete policy for their account
@@ -2771,7 +2771,7 @@ Feature: Create policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create an policy for their account with too short of a duration
@@ -2802,7 +2802,7 @@ Feature: Create policy
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a policy that is legacy encrypted that uses a pool
@@ -2858,7 +2858,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_ENCRYPT that uses a pool
@@ -2902,7 +2902,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_SIGN that uses a pool
@@ -2946,7 +2946,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_JWT_RS256 that uses a pool
@@ -2990,7 +2990,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a policy for another account
@@ -3024,7 +3024,7 @@ Feature: Create policy
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3070,7 +3070,7 @@ Feature: Create policy
       { "Keygen-Environment": "isolated" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3116,7 +3116,7 @@ Feature: Create policy
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -3162,7 +3162,7 @@ Feature: Create policy
       { "Keygen-Environment": "shared" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a policy for their product
@@ -3198,7 +3198,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create a policy for their account
@@ -3232,7 +3232,7 @@ Feature: Create policy
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to create a policy for their account
@@ -3257,7 +3257,7 @@ Feature: Create policy
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that requires certain scopes
@@ -3311,7 +3311,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that requires license check-in
@@ -3344,7 +3344,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that requires license check-in that is not valid
@@ -3399,7 +3399,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that requires machine heartbeats
@@ -3432,7 +3432,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the response body should be a "policy" that does requireHeartbeat
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that does not require machine heartbeats
@@ -3464,7 +3464,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the response body should be a "policy" that does not requireHeartbeat
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a floating policy for their account that is not valid
@@ -3507,7 +3507,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a node-locked policy for their account that is not valid
@@ -3550,7 +3550,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an incomplete policy for their account that requires license check-in
@@ -3581,7 +3581,7 @@ Feature: Create policy
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_SIGN for their account
@@ -3615,7 +3615,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_PSS_SIGN for their account
@@ -3649,7 +3649,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_ENCRYPT for their account
@@ -3683,7 +3683,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_JWT_RS256 for their account
@@ -3717,7 +3717,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "JWT RS256"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_SIGN_V2 for their account
@@ -3751,7 +3751,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_PSS_SIGN_V2 for their account
@@ -3785,7 +3785,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a legacy encrypted policy using scheme LEGACY_ENCRYPT for their account
@@ -3820,7 +3820,7 @@ Feature: Create policy
     And the response body should be a "policy" that is encrypted
     And the response body should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme ED25519_SIGN for their account
@@ -3854,7 +3854,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "Ed25519"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme ED25519_SIGN for their account
@@ -3885,7 +3885,7 @@ Feature: Create policy
     And the response body should be a "policy" that is not encrypted
     And the response body should be a "policy" with the name "ECDSA"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a legacy encrypted policy without a scheme for their account
@@ -3919,7 +3919,7 @@ Feature: Create policy
     And the response body should be a "policy" that is encrypted
     And the response body should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme LEGACY_ENCRYPT for their account without encryption
@@ -3961,7 +3961,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using an unsupported encryption scheme RSA_2048_PKCS1_SIGN for their account
@@ -4004,7 +4004,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy using scheme AES_SHA256 for their account
@@ -4046,7 +4046,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an encrypted policy without a scheme for their account
@@ -4080,7 +4080,7 @@ Feature: Create policy
     And the response body should be a "policy" that is encrypted
     And the response body should be a "policy" with the name "Default Scheme"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a concurrent policy (v1.2)
@@ -4112,7 +4112,7 @@ Feature: Create policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a concurrent policy (v1.1)
@@ -4146,7 +4146,7 @@ Feature: Create policy
     And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And the response body should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a concurrent policy (v1.0)
@@ -4180,7 +4180,7 @@ Feature: Create policy
     And the response body should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
     And the response body should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy for their account that has a duration that is too large
@@ -4222,7 +4222,7 @@ Feature: Create policy
         }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a maximum cores count
@@ -4259,7 +4259,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Core-metered Policy"
     And the response body should be a "policy" with the maxCores "32"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid maximum cores count
@@ -4305,7 +4305,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a memory limit
@@ -4342,7 +4342,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Memory-metered Policy"
     And the response body should be a "policy" with the maxMemory "34359738368"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid max memory
@@ -4388,7 +4388,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a disk limit
@@ -4425,7 +4425,7 @@ Feature: Create policy
     And the response body should be a "policy" with the name "Disk-metered Policy"
     And the response body should be a "policy" with the maxDisk "1099511627776"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid max disk
@@ -4471,7 +4471,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a maximum process count
@@ -4509,7 +4509,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has an invalid maximum process count
@@ -4551,7 +4551,7 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a policy for their account
@@ -4693,7 +4693,7 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat)
@@ -4728,7 +4728,7 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_CREATION" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat, v1.3)
@@ -4764,7 +4764,7 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_CREATION" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a default heartbeat basis (requires heartbeat, v1.2)
@@ -4800,7 +4800,7 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a FROM_CREATION heartbeat basis
@@ -4835,7 +4835,7 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_CREATION" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy with a FROM_FIRST_PING heartbeat basis
@@ -4870,5 +4870,5 @@ Feature: Create policy
       { "heartbeatBasis": "FROM_FIRST_PING" }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
