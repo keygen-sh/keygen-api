@@ -45,7 +45,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin requests a machine whose heartbeat is alive
@@ -66,7 +66,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin requests a machine whose heartbeat is dead
@@ -87,7 +87,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Pings
@@ -98,7 +98,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a machine's heartbeat for the first time
@@ -119,7 +119,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a machine's heartbeat for the first time by fingerprint
@@ -144,7 +144,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings an alive machine's heartbeat
@@ -165,7 +165,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead machine's heartbeat
@@ -189,7 +189,7 @@ Feature: Machine heartbeat actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead machine's heartbeat that supports resurrection (period not passed)
@@ -228,7 +228,7 @@ Feature: Machine heartbeat actions
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead machine's heartbeat that supports resurrection (period passed)
@@ -268,7 +268,7 @@ Feature: Machine heartbeat actions
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead machine's heartbeat that supports resurrection (always revive, from first ping basis)
@@ -300,7 +300,7 @@ Feature: Machine heartbeat actions
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin pings a dead machine's heartbeat that supports resurrection (always revive, from creation basis)
@@ -330,7 +330,7 @@ Feature: Machine heartbeat actions
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
@@ -357,7 +357,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -379,7 +379,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product pings a machine's heartbeat
@@ -403,7 +403,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product pings a machine's heartbeat that doesn't belong to them
@@ -420,7 +420,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License pings a machine's heartbeat
@@ -442,7 +442,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat within seconds of "$time.10.minutes.from_now.iso"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License pings a machine's heartbeat with a custom heartbeat duration
@@ -473,7 +473,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat within seconds of "$time.1.week.from_now.iso"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License pings a machine's heartbeat that doesn't belong to them
@@ -490,7 +490,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings an unprotected machine's heartbeat (license owner)
@@ -517,7 +517,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings an unprotected machine's heartbeat (license user, machine owner)
@@ -544,7 +544,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings an unprotected machine's heartbeat (license user, not owner)
@@ -567,7 +567,7 @@ Feature: Machine heartbeat actions
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings a protected machine's heartbeat
@@ -589,7 +589,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User pings a machine's heartbeat that doesn't belong to them
@@ -606,7 +606,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   # Reset
@@ -621,7 +621,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin resets a machine's heartbeat
@@ -642,7 +642,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -668,7 +668,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -690,7 +690,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product resets a machine's heartbeat
@@ -714,7 +714,7 @@ Feature: Machine heartbeat actions
     And the response body should be a "machine" with a nil nextHeartbeat
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product resets a machine's heartbeat that doesn't belong to them
@@ -731,7 +731,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License resets a machine's heartbeat
@@ -748,7 +748,7 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User resets a machine's heartbeat
@@ -770,5 +770,5 @@ Feature: Machine heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

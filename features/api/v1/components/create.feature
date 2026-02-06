@@ -16,7 +16,7 @@ Feature: Create machine component
     Then the response status should be "403"
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component for their account
@@ -69,7 +69,7 @@ Feature: Create machine component
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer creates a component for their account
@@ -222,7 +222,7 @@ Feature: Create machine component
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for the same machine (UNIQUE_PER_MACHINE)
@@ -274,7 +274,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for a different license (UNIQUE_PER_LICENSE)
@@ -315,7 +315,7 @@ Feature: Create machine component
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for the same license (UNIQUE_PER_LICENSE)
@@ -367,7 +367,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for a different policy (UNIQUE_PER_POLICY)
@@ -408,7 +408,7 @@ Feature: Create machine component
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for the same policy (UNIQUE_PER_POLICY)
@@ -460,7 +460,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for a different product (UNIQUE_PER_PRODUCT)
@@ -501,7 +501,7 @@ Feature: Create machine component
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for the same product (UNIQUE_PER_PRODUCT)
@@ -553,7 +553,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component (UNIQUE_PER_ACCOUNT)
@@ -590,7 +590,7 @@ Feature: Create machine component
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for a different product (UNIQUE_PER_ACCOUNT)
@@ -642,7 +642,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with a fingerprint matching another component for the same product (UNIQUE_PER_ACCOUNT)
@@ -694,7 +694,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component for their account with a fingerprint matching a reserved word
@@ -737,7 +737,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with missing attributes
@@ -774,7 +774,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with missing fingerprint
@@ -814,7 +814,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with missing name
@@ -854,7 +854,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with missing relationships
@@ -887,7 +887,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with missing machine
@@ -922,7 +922,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a component with an invalid machine UUID
@@ -964,7 +964,7 @@ Feature: Create machine component
       }
     """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   @ee
@@ -1023,7 +1023,7 @@ Feature: Create machine component
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for their machine (license owner)
@@ -1063,7 +1063,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for their machine (license user, as owner)
@@ -1104,7 +1104,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for their machine (license user, no owner)
@@ -1138,7 +1138,7 @@ Feature: Create machine component
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for their machine with a protected policy
@@ -1180,7 +1180,7 @@ Feature: Create machine component
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for an unprotected machine
@@ -1229,7 +1229,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for their machine
@@ -1269,7 +1269,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for a protected machine
@@ -1313,7 +1313,7 @@ Feature: Create machine component
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for their machine with a duplicate fingerprint
@@ -1362,7 +1362,7 @@ Feature: Create machine component
       """
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for their machine with a blank fingerprint
@@ -1405,7 +1405,7 @@ Feature: Create machine component
       """
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for their machine with a blank name
@@ -1448,7 +1448,7 @@ Feature: Create machine component
       """
     And the current account should have 0 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a component for another license's machine
@@ -1479,7 +1479,7 @@ Feature: Create machine component
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a component for another product's machine
@@ -1513,7 +1513,7 @@ Feature: Create machine component
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a component for another user's machine
@@ -1545,7 +1545,7 @@ Feature: Create machine component
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to create a component
@@ -1574,7 +1574,7 @@ Feature: Create machine component
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin of another account attempts to create a component
@@ -1605,7 +1605,7 @@ Feature: Create machine component
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License activates a component with a pre-determined ID

@@ -27,7 +27,7 @@ Feature: Delete machine component
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "components"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer deletes one of their components
@@ -81,7 +81,7 @@ Feature: Delete machine component
     When I send a DELETE request to "/accounts/test1/components/$0?environment=isolated"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes one of their components
@@ -97,7 +97,7 @@ Feature: Delete machine component
     When I send a DELETE request to "/accounts/test1/components/$0"
     Then the response status should be "204"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product deletes a component for a different product
@@ -113,7 +113,7 @@ Feature: Delete machine component
     When I send a DELETE request to "/accounts/test1/components/$0"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a component that belongs to another user
@@ -128,7 +128,7 @@ Feature: Delete machine component
     And the response body should be an array of 1 error
     And the current account should have 3 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a component for their unprotected license (license owner)
@@ -153,7 +153,7 @@ Feature: Delete machine component
     Then the response status should be "204"
     And the current account should have 0 "components"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a component for their unprotected license (license user, as owner)
@@ -175,7 +175,7 @@ Feature: Delete machine component
     Then the response status should be "204"
     And the current account should have 0 "components"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a component for their unprotected license (license user, no owner)
@@ -197,7 +197,7 @@ Feature: Delete machine component
     Then the response status should be "403"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a component for their protected license
@@ -222,7 +222,7 @@ Feature: Delete machine component
     Then the response status should be "403"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a component for one of their machines
@@ -237,7 +237,7 @@ Feature: Delete machine component
     Then the response status should be "204"
     And the current account should have 1 "component"
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a component for a different license
@@ -251,7 +251,7 @@ Feature: Delete machine component
     Then the response status should be "404"
     And the current account should have 1 "component"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a component for their account
@@ -263,7 +263,7 @@ Feature: Delete machine component
     And the response body should be an array of 1 error
     And the current account should have 3 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a component for another account
@@ -277,5 +277,5 @@ Feature: Delete machine component
     And the response body should be an array of 1 error
     And the current account should have 3 "components"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

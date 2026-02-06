@@ -203,7 +203,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, within limit)
@@ -241,7 +241,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALWAYS_ALLOW_OVERAGE, exceeds limit)
@@ -279,7 +279,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_1_25X_OVERAGE, within limit)
@@ -317,7 +317,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_1_25X_OVERAGE, exceeds limit)
@@ -358,7 +358,7 @@ Feature: License owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_1_5X_OVERAGE, within limit)
@@ -396,7 +396,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_1_5X_OVERAGE, exceeds limit)
@@ -437,7 +437,7 @@ Feature: License owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_2X_OVERAGE, within limit)
@@ -475,7 +475,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (ALLOW_2X_OVERAGE, exceeds limit)
@@ -516,7 +516,7 @@ Feature: License owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (NO_OVERAGE, within limit)
@@ -554,7 +554,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (NO_OVERAGE, exceeds limit)
@@ -595,7 +595,7 @@ Feature: License owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attaches an owner to a license with a max users limit (NO_OVERAGE, existing owner)
@@ -632,7 +632,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin removes a license's owner relationship
@@ -661,7 +661,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's owner relationship to a non-existent user (default)
@@ -693,7 +693,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's owner relationship to a non-existent user (v1.5)
@@ -726,7 +726,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's owner relationship to a user for another account
@@ -753,7 +753,7 @@ Feature: License owner relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's owner relationship to another user
@@ -803,7 +803,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's owner relationship to a new user they don't own
@@ -845,7 +845,7 @@ Feature: License owner relationship
       }
       """
     And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "event-log" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's owner relationship to a new user for a license they don't own
@@ -877,7 +877,7 @@ Feature: License owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's owner relationship that would exceed group limits
@@ -933,7 +933,7 @@ Feature: License owner relationship
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Owner attempts to change their license's owner relationship
@@ -958,7 +958,7 @@ Feature: License owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change their license's owner relationship
@@ -984,7 +984,7 @@ Feature: License owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change a license's owner relationship
@@ -1009,7 +1009,7 @@ Feature: License owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to change their owner relationship
@@ -1034,7 +1034,7 @@ Feature: License owner relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License attempts to change a license's owner relationship
@@ -1059,7 +1059,7 @@ Feature: License owner relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to change a license's owner relationship
@@ -1090,5 +1090,5 @@ Feature: License owner relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job

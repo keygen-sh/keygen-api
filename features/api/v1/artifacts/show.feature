@@ -40,7 +40,7 @@ Feature: Show release artifact
     Then the response status should be "303"
     And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact by filename (for release by version)
@@ -87,7 +87,7 @@ Feature: Show release artifact
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact by filename (for release by tag)
@@ -130,7 +130,7 @@ Feature: Show release artifact
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact by filename (for release by ID)
@@ -173,7 +173,7 @@ Feature: Show release artifact
       }
       """
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact for their account (prefers no-download via header)
@@ -191,7 +191,7 @@ Feature: Show release artifact
     Then the response status should be "200"
     And the response body should be an "artifact" without a "redirect" link
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact for their account (prefers no-download via query parameter)
@@ -205,7 +205,7 @@ Feature: Show release artifact
     Then the response status should be "200"
     And the response body should be an "artifact" without a "redirect" link
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact for their account (prefers no-redirect via header)
@@ -223,7 +223,7 @@ Feature: Show release artifact
     Then the response status should be "200"
     And the response body should be an "artifact" with a "redirect" link
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact for their account (prefers no-redirect via query parameter)
@@ -237,7 +237,7 @@ Feature: Show release artifact
     Then the response status should be "200"
     And the response body should be an "artifact" with a "redirect" link
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact for their account (prefers via unsupported query parameter)
@@ -251,7 +251,7 @@ Feature: Show release artifact
     Then the response status should be "303"
     And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact using valid vanity filename
@@ -273,7 +273,7 @@ Feature: Show release artifact
       """
     And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an artifact using invalid vanity filename
@@ -291,7 +291,7 @@ Feature: Show release artifact
     Then the response status should be "303"
     And the response body should be an "artifact"
     And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 2 "event-log" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer retrieves an artifact for their account
